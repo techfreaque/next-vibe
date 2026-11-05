@@ -51,6 +51,8 @@ export async function runAutoQueueBranch(params: {
   user: JwtPayloadType;
   userId: string | undefined;
   logger: EndpointLogger;
+  /** TEST-ONLY browser E2E fixture scope (see CreateAiStreamParams). */
+  fixtureScopeId: string | undefined;
 }): Promise<ResponseType<AiStreamPostResponseOutput> | null> {
   const { data, user, userId, logger } = params;
 
@@ -91,11 +93,10 @@ export async function runAutoQueueBranch(params: {
   // fixture chain so replay is deterministic.
   const { makeHeadlessContext } =
     await import("../../../../core/execution-context");
-  const queueEmbedContext = makeHeadlessContext(
-    undefined,
-    data.threadId,
-    data.timezone ?? "UTC",
-  );
+  const queueEmbedContext = {
+    ...makeHeadlessContext(undefined, data.threadId, data.timezone ?? "UTC"),
+    fixtureScopeId: params.fixtureScopeId,
+  };
 
   await MessagesRepository.createUserMessage({
     messageId: data.userMessageId,

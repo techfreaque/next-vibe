@@ -38,6 +38,7 @@ import { Route as ApiLocalePaymentRouteImport } from './routes/api.$locale.payme
 import { Route as ApiLocaleReferralRouteImport } from './routes/api.$locale.referral'
 import { Route as ApiLocaleSubscriptionRouteImport } from './routes/api.$locale.subscription'
 import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.creator.$userId.index'
+import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$locale.invoice.$invoiceId.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
 import { Route as LocaleSkillSkillIdIndexRouteImport } from './routes/$locale.skill.$skillId.index'
 import { Route as LocaleStoryAboutUsIndexRouteImport } from './routes/$locale.story.about-us.index'
@@ -736,6 +737,12 @@ const LocaleCreatorUserIdIndexRoute =
   LocaleCreatorUserIdIndexRouteImport.update({
     id: '/$locale/creator/$userId/',
     path: '/$locale/creator/$userId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LocaleInvoiceInvoiceIdIndexRoute =
+  LocaleInvoiceInvoiceIdIndexRouteImport.update({
+    id: '/$locale/invoice/$invoiceId/',
+    path: '/$locale/invoice/$invoiceId/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LocaleSharedTokenIndexRoute = LocaleSharedTokenIndexRouteImport.update({
@@ -4136,6 +4143,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
@@ -4714,6 +4722,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/invoice/$invoiceId': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us': typeof LocaleStoryAboutUsIndexRoute
@@ -5299,6 +5308,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
@@ -5884,6 +5894,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
+    | '/$locale/invoice/$invoiceId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/about-us/'
@@ -6462,6 +6473,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId'
+    | '/$locale/invoice/$invoiceId'
     | '/$locale/shared/$token'
     | '/$locale/skill/$skillId'
     | '/$locale/story/about-us'
@@ -7046,6 +7058,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
+    | '/$locale/invoice/$invoiceId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/about-us/'
@@ -7609,6 +7622,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeExecuteToolRoute: typeof ApiLocaleVibeExecuteToolRouteWithChildren
   ApiLocaleVibeHelpToolRoute: typeof ApiLocaleVibeHelpToolRoute
   LocaleCreatorUserIdIndexRoute: typeof LocaleCreatorUserIdIndexRoute
+  LocaleInvoiceInvoiceIdIndexRoute: typeof LocaleInvoiceInvoiceIdIndexRoute
   LocaleSharedTokenIndexRoute: typeof LocaleSharedTokenIndexRoute
   LocaleSkillSkillIdIndexRoute: typeof LocaleSkillSkillIdIndexRoute
   ApiLocaleAnalyticsEvaluatorsAndRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRoute
@@ -8097,6 +8111,13 @@ declare module '@tanstack/react-router' {
       path: '/$locale/creator/$userId'
       fullPath: '/$locale/creator/$userId/'
       preLoaderRoute: typeof LocaleCreatorUserIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$locale/invoice/$invoiceId/': {
+      id: '/$locale/invoice/$invoiceId/'
+      path: '/$locale/invoice/$invoiceId'
+      fullPath: '/$locale/invoice/$invoiceId/'
+      preLoaderRoute: typeof LocaleInvoiceInvoiceIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/shared/$token/': {
@@ -13050,6 +13071,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeExecuteToolRoute: ApiLocaleVibeExecuteToolRouteWithChildren,
   ApiLocaleVibeHelpToolRoute: ApiLocaleVibeHelpToolRoute,
   LocaleCreatorUserIdIndexRoute: LocaleCreatorUserIdIndexRoute,
+  LocaleInvoiceInvoiceIdIndexRoute: LocaleInvoiceInvoiceIdIndexRoute,
   LocaleSharedTokenIndexRoute: LocaleSharedTokenIndexRoute,
   LocaleSkillSkillIdIndexRoute: LocaleSkillSkillIdIndexRoute,
   ApiLocaleAnalyticsEvaluatorsAndRoute: ApiLocaleAnalyticsEvaluatorsAndRoute,

@@ -12,11 +12,14 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 import type { EnabledTool } from "../../../chat/hooks/store";
 import { useToolsModalStore } from "../../../tools/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
+
+const noopUnsubscribe = (): void => undefined;
+const subscribeNever = (): (() => void) => noopUnsubscribe;
 
 interface ToolsButtonProps {
   disabled?: boolean;
@@ -63,12 +66,23 @@ export function ToolsButton({
 
   const totalToolCount = helpEndpoint.read?.data?.totalCount ?? 0;
 
+  // The help count can already sit in the client cache while the server
+  // rendered without it — render the count only after hydration so SSR and
+  // the hydration pass agree (else React logs a mismatch on every load).
+  const hydrated = useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
   const activeToolCount = useMemo(() => {
+    if (!hydrated) {
+      return 0;
+    }
     if (enabledToolsProp) {
       return enabledToolsProp.length;
     }
     return totalToolCount;
-  }, [enabledToolsProp, totalToolCount]);
+  }, [hydrated, enabledToolsProp, totalToolCount]);
 
   const { t } = aiStreamScopedTranslation.scopedT(locale);
 

@@ -14,8 +14,8 @@ export const translations = {
         toolName: {
           label: "Tool Name",
           description:
-            "The registered tool name or alias to execute (e.g. 'agent_chat_characters_GET'). Use tool-help to discover available tools.",
-          placeholder: "agent_chat_characters_GET",
+            "The registered tool name or alias to execute (e.g. 'vibe_agent_skills_GET'). Use tool-help to discover available tools.",
+          placeholder: "vibe_agent_skills_GET",
         },
         input: {
           label: "Input",

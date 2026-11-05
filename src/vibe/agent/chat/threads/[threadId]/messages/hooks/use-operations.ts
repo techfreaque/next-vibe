@@ -25,6 +25,8 @@ import { retryMessage as retryMessageOp } from "../../../../../ai-stream/stream/
 import { sendMessage as sendMessageOp } from "../../../../../ai-stream/stream/hooks/send-message";
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
+import type { AiStreamT } from "../../../../../ai-stream/stream/i18n";
+import { scopedTranslation as aiStreamScopedTranslation } from "../../../../../ai-stream/stream/i18n";
 import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
@@ -113,6 +115,56 @@ export interface MessageOperationsDeps {
   favoriteConfig: FavoriteConfig | null;
 }
 
+/** Toast shown when a turn is attempted with no model selected. */
+function toastNoModel(t: AiStreamT): void {
+  toast({
+    title: t("input.noModel.title"),
+    description: t("input.noModel.description"),
+    variant: "destructive",
+  });
+}
+
+/**
+ * Block a turn the balance cannot cover (cost estimated at default turn size)
+ * and tell the customer why. Returns true when the turn may proceed.
+ */
+function passesCreditGuard(
+  t: AiStreamT,
+  creditsTotal: number,
+  modelId: ChatModelId,
+): boolean {
+  if (creditsTotal <= 0) {
+    toast({
+      title: t("input.noCredits.title"),
+      description: t("input.noCredits.description"),
+      variant: "destructive",
+      duration: Infinity,
+    });
+    return false;
+  }
+  const modelInfo = getChatModelById(modelId);
+  if (modelInfo) {
+    const modelCost = calculateCreditCost(
+      modelInfo,
+      DEFAULT_INPUT_TOKENS,
+      DEFAULT_OUTPUT_TOKENS,
+    );
+    if (creditsTotal < modelCost) {
+      toast({
+        title: t("input.insufficientCredits.title", {
+          cost: modelCost.toFixed(1),
+          balance: creditsTotal.toFixed(1),
+        }),
+        description: t("input.insufficientCredits.description"),
+        variant: "destructive",
+        duration: Infinity,
+      });
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Hook for message operations
  */
@@ -174,41 +226,13 @@ export function useMessageOperations(
     ): Promise<{ success: boolean; createdThreadId: string | null }> => {
       // Read latest deps from ref to avoid stale closure values
       const d = depsRef.current;
+      const { t } = aiStreamScopedTranslation.scopedT(locale);
       if (!d.settings.selectedModel) {
-        toast({
-          title: "No model selected",
-          description:
-            "Please select a model before sending a message. Check your API keys and model settings.",
-          variant: "destructive",
-        });
+        toastNoModel(t);
         return { success: false, createdThreadId: null };
       }
-      if (creditsTotal <= 0) {
-        toast({
-          title: "No credits",
-          description:
-            "You have run out of credits. Add credits to continue chatting.",
-          variant: "destructive",
-          duration: Infinity,
-        });
+      if (!passesCreditGuard(t, creditsTotal, d.settings.selectedModel)) {
         return { success: false, createdThreadId: null };
-      }
-      const selectedModelInfo = getChatModelById(d.settings.selectedModel);
-      if (selectedModelInfo) {
-        const modelCost = calculateCreditCost(
-          selectedModelInfo,
-          DEFAULT_INPUT_TOKENS,
-          DEFAULT_OUTPUT_TOKENS,
-        );
-        if (creditsTotal < modelCost) {
-          toast({
-            title: "Insufficient credits",
-            description: `This model costs ${modelCost.toFixed(1)} credits per turn but you only have ${creditsTotal.toFixed(1)}. Add credits or choose a cheaper model.`,
-            variant: "destructive",
-            duration: Infinity,
-          });
-          return { success: false, createdThreadId: null };
-        }
       }
       return sendMessageOp(
         params,
@@ -239,41 +263,13 @@ export function useMessageOperations(
       attachments: File[] | undefined,
     ): Promise<void> => {
       const d = depsRef.current;
+      const { t } = aiStreamScopedTranslation.scopedT(locale);
       if (!d.settings.selectedModel) {
-        toast({
-          title: "No model selected",
-          description:
-            "Please select a model before retrying. Check your API keys and model settings.",
-          variant: "destructive",
-        });
+        toastNoModel(t);
         return;
       }
-      if (creditsTotal <= 0) {
-        toast({
-          title: "No credits",
-          description:
-            "You have run out of credits. Add credits to continue chatting.",
-          variant: "destructive",
-          duration: Infinity,
-        });
+      if (!passesCreditGuard(t, creditsTotal, d.settings.selectedModel)) {
         return;
-      }
-      const retryModelInfo = getChatModelById(d.settings.selectedModel);
-      if (retryModelInfo) {
-        const retryCost = calculateCreditCost(
-          retryModelInfo,
-          DEFAULT_INPUT_TOKENS,
-          DEFAULT_OUTPUT_TOKENS,
-        );
-        if (creditsTotal < retryCost) {
-          toast({
-            title: "Insufficient credits",
-            description: `This model costs ${retryCost.toFixed(1)} credits per turn but you only have ${creditsTotal.toFixed(1)}. Add credits or choose a cheaper model.`,
-            variant: "destructive",
-            duration: Infinity,
-          });
-          return;
-        }
       }
       await retryMessageOp(messageId, attachments, {
         logger,
@@ -303,12 +299,7 @@ export function useMessageOperations(
     ): Promise<void> => {
       const d = depsRef.current;
       if (!d.settings.selectedModel) {
-        toast({
-          title: "No model selected",
-          description:
-            "Please select a model before editing. Check your API keys and model settings.",
-          variant: "destructive",
-        });
+        toastNoModel(aiStreamScopedTranslation.scopedT(locale).t);
         return;
       }
       await branchMessageOp(messageId, newContent, audioInput, attachments, {
@@ -338,12 +329,7 @@ export function useMessageOperations(
     ): Promise<void> => {
       const d = depsRef.current;
       if (!d.settings.selectedModel) {
-        toast({
-          title: "No model selected",
-          description:
-            "Please select a model before answering. Check your API keys and model settings.",
-          variant: "destructive",
-        });
+        toastNoModel(aiStreamScopedTranslation.scopedT(locale).t);
         return;
       }
       await answerAsAIOp(messageId, content, attachments, {
@@ -360,7 +346,7 @@ export function useMessageOperations(
         executionContext: { mode: "local" as const },
       });
     },
-    [logger],
+    [logger, locale],
   );
 
   const deleteMessage = useCallback(

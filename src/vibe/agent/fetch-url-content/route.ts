@@ -14,7 +14,13 @@ import { FetchUrlContentRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: fetchUrlContentDefinition,
   [Methods.GET]: {
-    handler: ({ data, logger, t }) =>
-      FetchUrlContentRepository.fetchUrl(data.url, data.query, logger, t),
+    handler: ({ data, logger, t, toolExecutionContext }) =>
+      FetchUrlContentRepository.fetchUrl(
+        data.url,
+        data.query,
+        logger,
+        t,
+        toolExecutionContext,
+      ),
   },
 });

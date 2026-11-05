@@ -1,5 +1,5 @@
 export const CLIENT_LOG_PATH = [
-  "system",
+  "vibe",
   "logger",
   "error-monitor",
   "client-log",

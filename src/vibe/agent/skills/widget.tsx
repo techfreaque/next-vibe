@@ -1208,12 +1208,9 @@ export function VariantRow({
           fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.modelInfo`}
         />
 
-        <TextWidget
-          field={
-            fieldDefs.sections.child.children.skills.child.children.separator1
-          }
-          fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.separator1`}
-        />
+        <Span className="hidden @sm:inline text-xs text-muted-foreground">
+          {t("get.response.skills.skill.separator.content")}
+        </Span>
 
         {/* Provider */}
         <TextWidget
@@ -1474,13 +1471,9 @@ export function SkillCard({
               )}
               fieldName={`sections.${idx}.skills.${charBaseId}.modelInfo`}
             />
-            <TextWidget
-              field={
-                children.sections.child.children.skills.child.children
-                  .separator1
-              }
-              fieldName={`sections.${idx}.skills.${charBaseId}.separator1`}
-            />
+            <Span className="hidden @sm:inline text-xs text-muted-foreground">
+              {t("get.response.skills.skill.separator.content")}
+            </Span>
             <TextWidget
               field={withValue(
                 children.sections.child.children.skills.child.children
@@ -1490,13 +1483,9 @@ export function SkillCard({
               )}
               fieldName={`sections.${idx}.skills.${charBaseId}.modelProvider`}
             />
-            <TextWidget
-              field={
-                children.sections.child.children.skills.child.children
-                  .separator2
-              }
-              fieldName={`sections.${idx}.skills.${charBaseId}.separator2`}
-            />
+            <Span className="text-xs text-muted-foreground">
+              {t("get.response.skills.skill.separator.content")}
+            </Span>
             {char.modelId && (
               <ModelCreditDisplay
                 modelId={char.modelId}
@@ -1509,13 +1498,9 @@ export function SkillCard({
               char.voteCount !== null &&
               char.voteCount > 0 && (
                 <>
-                  <TextWidget
-                    field={
-                      children.sections.child.children.skills.child.children
-                        .separator2
-                    }
-                    fieldName={`sections.${idx}.skills.${charBaseId}.separator2`}
-                  />
+                  <Span className="text-xs text-muted-foreground">
+                    {t("get.response.skills.skill.separator.content")}
+                  </Span>
                   <Span className="flex items-center gap-0.5 text-xs text-muted-foreground">
                     <ThumbsUp className="h-3 w-3" />
                     {char.voteCount}
@@ -1875,6 +1860,7 @@ export function EditFavBeforeAddButton({
 
   return (
     <Button
+      type="button"
       variant={variant}
       size="sm"
       onClick={handleClick}
@@ -1939,6 +1925,7 @@ export function AddToFavoritesButton({
 
   return (
     <Button
+      type="button"
       variant={variant}
       size="sm"
       onClick={addToFavorites}

@@ -1,7 +1,7 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * AGENT.md - Agent Gateway Document
- * GET /api/[locale]/system/platforms/ai/skills/AGENT.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/AGENT.md
  *
  * A lean, stable entry point for all AI agents.
  * Describes what the platform is and directs agents to the correct skill manifest
@@ -26,7 +26,7 @@ async function generateGatewayMarkdown(
   locale: CountryLanguage,
 ): Promise<string> {
   const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
-  const skillsBase = `${baseUrl}/api/${locale}/system/platforms/ai/skills`;
+  const skillsBase = `${baseUrl}/api/${locale}/vibe/platforms/ai/skills`;
   const now = new Date().toISOString();
 
   const characters = await getListableSkills(locale);

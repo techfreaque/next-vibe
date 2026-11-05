@@ -139,10 +139,11 @@ interface UseUrlNavStackOptions {
  *
  * push  → pushState(buildUrl(entry))   — browser back will pop
  * pop   → history.back()               — real browser back
+ * Modal entries (renderInModal) stay in memory on top: no URL, no history.
  * replace → replaceState(buildUrl(entry))
  *
  * On popstate the URL is read and the single entry reconstructed.
- * The in-memory "stack" is always 0 or 1 entries.
+ * The in-memory "stack" is 0 or 1 URL entries, plus any open modals.
  */
 type UrlNavStackReturn = UseNavigationStackReturn & {
   /** Reset in-memory stack without touching browser history. For sidebar-driven base changes. */
@@ -235,6 +236,15 @@ export function useUrlNavStack(
           opts?.replaceOnSuccess as NavigationStackEntry["replaceOnSuccess"],
         modalPosition: opts?.modalPosition,
       };
+      // Modals (pickers, confirmations) are transient overlays on the current
+      // entry: they carry callbacks a URL can't encode, and closing one must
+      // not navigate. Keep them in memory only, on top of the current entry.
+      if (entry.renderInModal) {
+        const next = [...stackRef.current, entry];
+        stackRef.current = next;
+        setStack(next);
+        return;
+      }
       stackRef.current = [entry];
       setStack([entry]);
       const serialized = serializeEntry(entry);
@@ -243,9 +253,16 @@ export function useUrlNavStack(
     [],
   );
 
-  // ── Pop: real browser back ────────────────────────────────────────────────
+  // ── Pop: close the top modal, else real browser back ──────────────────────
   const pop = useCallback((): void => {
-    // Stack is always 0-1 entries — one pop = go back
+    const top = stackRef.current[stackRef.current.length - 1];
+    if (top?.renderInModal) {
+      const next = stackRef.current.slice(0, -1);
+      stackRef.current = next;
+      setStack(next);
+      return;
+    }
+    // Non-modal stack is always 0-1 entries — one pop = go back
     historyRef.current.back();
   }, []);
 

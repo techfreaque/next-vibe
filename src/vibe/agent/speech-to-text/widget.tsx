@@ -3,6 +3,12 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "next-vibe/ui/components/form/form";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Check } from "next-vibe/ui/components/icons/Check";
@@ -21,6 +27,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
+  useWidgetContext,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -59,7 +66,8 @@ export function SpeechToTextContainer(): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { t } = scopedTranslation.scopedT(locale);
-
+  // Field-error messages are endpoint translation keys (schema refine messages)
+  const { t: tField } = useWidgetContext();
   const [showModelSelector, setShowModelSelector] = useState(false);
 
   const currentModelId = form?.watch("modelId") ?? DEFAULT_STT_MODEL_ID;
@@ -268,33 +276,44 @@ export function SpeechToTextContainer(): JSX.Element {
         )}
 
         {/* File upload — secondary option */}
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-xs font-medium text-muted-foreground">
-            {t("post.fileUpload.title")}
-          </Span>
-          <Div
-            className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-4 cursor-pointer hover:bg-muted/30 transition-colors"
-            onClick={() => fileInputRef.current?.click?.()}
-          >
-            <Upload className="h-5 w-5 text-muted-foreground" />
-            <Span className="text-xs text-muted-foreground text-center">
-              {t("post.audio.description")}
-            </Span>
-            {hasFile && selectedFiles && (
-              <Badge variant="secondary" className="text-[10px]">
-                {selectedFiles[0]?.name}
-              </Badge>
+        {form && (
+          <FormField
+            control={form.control}
+            name="fileUpload.files"
+            render={() => (
+              <FormItem className="flex flex-col gap-1.5">
+                <Span className="text-xs font-medium text-muted-foreground">
+                  {t("post.fileUpload.title")}
+                </Span>
+                <Div
+                  className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                  onClick={() => fileInputRef.current?.click?.()}
+                >
+                  <Upload className="h-5 w-5 text-muted-foreground" />
+                  <Span className="text-xs text-muted-foreground text-center">
+                    {t("post.audio.description")}
+                  </Span>
+                  {hasFile && selectedFiles && (
+                    <Badge variant="secondary" className="text-[10px]">
+                      {selectedFiles[0]?.name}
+                    </Badge>
+                  )}
+                </Div>
+                <FormControl>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="audio/*,video/webm,video/ogg"
+                    multiple={false}
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </FormControl>
+                <FormMessage t={tField} />
+              </FormItem>
             )}
-          </Div>
-          <Input
-            ref={fileInputRef}
-            type="file"
-            accept="audio/*,video/webm,video/ogg"
-            multiple={false}
-            className="hidden"
-            onChange={handleFileChange}
           />
-        </Div>
+        )}
 
         {/* Submit for file uploads */}
         {hasFile && (
@@ -347,9 +366,7 @@ export function SpeechToTextContainer(): JSX.Element {
               )}
               {result?.creditCost !== undefined && (
                 <Badge variant="outline" className="text-[10px]">
-                  {result.creditCost === 1
-                    ? `${result.creditCost} credit`
-                    : `${result.creditCost} credits`}
+                  {`${t("post.response.creditCost")}: ${String(result.creditCost)}`}
                 </Badge>
               )}
             </Div>

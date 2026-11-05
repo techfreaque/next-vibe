@@ -75,4 +75,15 @@ export const translations = {
       },
     },
   },
+  form: {
+    headline: "Stay in the loop",
+    namePlaceholder: "Your first name",
+    emailPlaceholder: "Your email",
+    send: "Subscribe",
+    sending: "...",
+    doneHeading: "Done.",
+    doneSub: "You're on the list.",
+    finePrint: "No spam. Unsubscribe any time.",
+    error: "Something went wrong. Try again.",
+  },
 };

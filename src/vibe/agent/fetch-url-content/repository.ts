@@ -11,14 +11,20 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import { tool } from "ai";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import TurndownService from "turndown";
-import { z } from "zod";
 
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import type { FetchUrlContentGetResponseOutput } from "./definition";
 import type { FetchUrlContentT } from "./i18n";
 
@@ -59,23 +65,31 @@ function cacheKey(url: string): string {
   return createHash("sha256").update(url).digest("hex").slice(0, 16);
 }
 
+function cacheFilename(url: string): string {
+  return `${cacheKey(url)}.md`;
+}
+
 async function readFromCache(url: string): Promise<string | null> {
   try {
     const adapter = getStorageAdapter();
-    const key = cacheKey(url);
+    const filename = cacheFilename(url);
+    const freshSince = Date.now() - CACHE_TTL_MS;
 
-    const metadata = await adapter.getFileMetadata(key);
+    // The adapter stores files under a generated id - match on the original
+    // filename and take the newest entry still inside the TTL.
+    const files = await adapter.listFilesByThread(CACHE_THREAD_ID);
+    const metadata = files
+      .filter(
+        (file) =>
+          file.originalFilename === filename &&
+          file.uploadedAt.getTime() > freshSince,
+      )
+      .toSorted((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())[0];
     if (!metadata) {
       return null;
     }
 
-    // Check TTL using uploadedAt
-    const age = Date.now() - metadata.uploadedAt.getTime();
-    if (age > CACHE_TTL_MS) {
-      return null;
-    }
-
-    const base64 = await adapter.readFileAsBase64(key, CACHE_THREAD_ID);
+    const base64 = await adapter.readFileAsBase64(metadata.id, CACHE_THREAD_ID);
     if (!base64) {
       return null;
     }
@@ -89,10 +103,9 @@ async function readFromCache(url: string): Promise<string | null> {
 async function writeToCache(url: string, content: string): Promise<void> {
   try {
     const adapter = getStorageAdapter();
-    const key = cacheKey(url);
     const buffer = Buffer.from(content, "utf-8");
     await adapter.uploadFile(buffer, {
-      filename: `${key}.md`,
+      filename: cacheFilename(url),
       mimeType: "text/markdown",
       threadId: CACHE_THREAD_ID,
     });
@@ -197,7 +210,10 @@ class FetchUrlService {
     this.turndownService.remove(["script", "style", "noscript"]);
   }
 
-  async fetchUrl(url: string): Promise<FetchResult<FetchUrlResult>> {
+  async fetchUrl(
+    url: string,
+    fetchImpl: typeof globalThis.fetch,
+  ): Promise<FetchResult<FetchUrlResult>> {
     const validateResult = this.validateUrl(url);
     if (!validateResult.ok) {
       return validateResult;
@@ -223,7 +239,11 @@ class FetchUrlService {
       controller.abort();
     }, this.TIMEOUT);
 
-    const scrappeyResult = await this.fetchFromScrappey(url, controller.signal);
+    const scrappeyResult = await this.fetchFromScrappey(
+      url,
+      controller.signal,
+      fetchImpl,
+    );
     clearTimeout(timeoutId);
 
     if (!scrappeyResult.ok) {
@@ -259,12 +279,12 @@ class FetchUrlService {
   private async fetchFromScrappey(
     url: string,
     signal: AbortSignal,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
 
     try {
-      // oxlint-disable-next-line restricted/no-raw-fetch
-      const response = await fetch(apiUrl, {
+      const response = await fetchImpl(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -380,84 +400,28 @@ export class FetchUrlContentRepository {
     return FetchUrlContentRepository.fetchUrlInstance;
   }
 
-  /**
-   * AI SDK Tool for Fetch URL Content
-   */
-  static readonly fetchUrlTool = tool({
-    // eslint-disable-next-line i18next/no-literal-string
-    description: `Fetch web page content as markdown (max ${MAX_CHARS.toLocaleString()} chars, middle section shown when truncated).
-- Omit query for full page content. Only add query= when you know what section you need.
-- query= is a JS regex applied to paragraphs: matching paragraphs are returned ranked by match count.
-  Examples: "authentication"  |  "(login|signup)"  |  "class\\s+\\w+"  |  invalid regex → literal match
-- If truncated: note in truncatedNote tells you how many chars were cut and suggests a query.
-- Cache: same URL within 5 min returns cached content at no extra cost.`,
-    inputSchema: z.object({
-      url: z.string().url().describe(
-        // eslint-disable-next-line i18next/no-literal-string
-        "The complete URL to fetch (must include http:// or https://)",
-      ),
-      query: z.string().optional().describe(
-        // eslint-disable-next-line i18next/no-literal-string
-        "JS regex to filter content. Paragraphs matching the pattern are returned ranked by match count. Omit unless you need a specific section. Examples: 'authentication', '(login|signup)', 'class\\s+\\w+'. Invalid regex falls back to literal match.",
-      ),
-    }),
-    execute: async ({ url, query }: { url: string; query?: string }) => {
-      if (!url || typeof url !== "string" || url.trim() === "") {
-        return {
-          success: false,
-          message: "Error: URL is required but was not provided by the model.",
-          url: url || "",
-          content: "",
-        };
-      }
-
-      const fetchService = FetchUrlContentRepository.getFetchUrlService();
-      const result = await fetchService.fetchUrl(url);
-
-      if (!result.ok) {
-        return {
-          success: false,
-          message: `Failed to fetch URL: ${result.error}`,
-          url,
-          content: "",
-          error: result.error,
-        };
-      }
-
-      const {
-        content: rawContent,
-        url: fetchedUrl,
-        statusCode,
-        timeElapsed,
-        timestamp,
-      } = result.data;
-
-      const processed = query
-        ? filterByQuery(rawContent, query)
-        : truncateMiddle(rawContent);
-
-      return {
-        success: true,
-        message: `Successfully fetched content from: ${fetchedUrl}`,
-        fetchedUrl,
-        content: processed.content,
-        truncated: processed.truncated,
-        truncatedNote: processed.truncatedNote,
-        statusCode,
-        timeElapsed,
-        timestamp: new Date(timestamp).toISOString(),
-      };
-    },
-  });
-
   static async fetchUrl(
     url: string,
     query: string | undefined,
     logger: EndpointLogger,
     t: FetchUrlContentT,
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<FetchUrlContentGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } =
-      await import("next-vibe/core/route/response.schema");
+    if (!agentEnv.SCRAPPEY_API_KEY) {
+      const {
+        envKey,
+        url: setupUrl,
+        label,
+      } = PROVIDER_SETUP_INSTRUCTIONS.scrappey;
+      return fail({
+        message: t("get.errors.notConfigured.title", {
+          label,
+          envKey,
+          url: setupUrl,
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
 
     if (!url || typeof url !== "string" || url.trim() === "") {
       return fail({
@@ -467,7 +431,10 @@ export class FetchUrlContentRepository {
     }
 
     const fetchService = FetchUrlContentRepository.getFetchUrlService();
-    const result = await fetchService.fetchUrl(url);
+    const result = await fetchService.fetchUrl(
+      url,
+      createFixtureFetch(toolExecutionContext, logger),
+    );
 
     if (!result.ok) {
       const logFn = result.isTimeout ? logger.warn : logger.error;

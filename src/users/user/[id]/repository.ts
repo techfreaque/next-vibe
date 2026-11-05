@@ -22,6 +22,7 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
+import { passwordResets } from "@/user/public/reset-password/db";
 
 import type {
   UserDeleteResponseOutput,
@@ -316,6 +317,11 @@ export class UserByIdRepository {
         .update(leads)
         .set({ convertedUserId: null })
         .where(eq(leads.convertedUserId, urlPathParams.id));
+
+      // Pending password-reset tokens block the delete (FK, no cascade)
+      await db
+        .delete(passwordResets)
+        .where(eq(passwordResets.userId, urlPathParams.id));
 
       // Delete user roles first to satisfy FK constraint
       await UserRolesRepository.deleteByUserId(

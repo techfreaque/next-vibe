@@ -300,7 +300,8 @@ export const translations: typeof enTranslations = {
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
     auth_error: "Anmeldung für {{email}} fehlgeschlagen: {{error}}",
     user_not_found: "Kein Benutzer zu {{userId}} gefunden",
-    session_creation_failed: "Sitzung für {{userId}} konnte nicht erstellt werden: {{error}}",
+    session_creation_failed:
+      "Sitzung für {{userId}} konnte nicht erstellt werden: {{error}}",
     token_save_failed:
       "Authentifizierungs-Token konnte nicht gespeichert werden",
     validation: {

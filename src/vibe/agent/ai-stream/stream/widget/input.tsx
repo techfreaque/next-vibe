@@ -332,7 +332,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     bootContext.initialRootFolderId === currentRootFolderId;
   const rootPermissionsQuery = useApiQuery({
     endpoint: rootPermissionsDefinition.GET,
-    requestData: { rootFolderId: currentRootFolderId },
+    urlPathParams: { rootFolderId: currentRootFolderId },
     logger,
     user,
     options: {
@@ -340,6 +340,12 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       staleTime: Infinity,
     },
   });
+  // Switching roots client-side: permissions are unknown until the query
+  // lands - keep posting blocked, but don't flash "no permission" meanwhile.
+  const rootPermissionsPending =
+    !bootRootMatches &&
+    !isIncognitoFolder(currentRootFolderId) &&
+    rootPermissionsQuery.data === undefined;
   const rootFolderPermissions = useMemo(() => {
     if (bootRootMatches) {
       return bootContext.rootFolderPermissions;
@@ -733,7 +739,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           )}
 
           {/* No permission message */}
-          {!canPost && (
+          {!canPost && !rootPermissionsPending && (
             <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
               {noPermissionReason || t("input.noPermission")}
             </Div>
@@ -741,7 +747,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
           {/* No credits / insufficient credits error */}
           {canPost && (noCredits || insufficientCredits) && (
-            <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none">
+            // Opaque backdrop: a kept draft must not bleed through the notice
+            <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-t-md bg-background/95">
               <Div className="text-sm font-medium text-destructive">
                 {noCredits
                   ? t("input.noCredits.title")

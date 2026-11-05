@@ -26,6 +26,14 @@ import type { BuildConfig } from "next-vibe/tooling/builder/repository";
 // build fails trying to resolve the .node file as a JS module.
 const NATIVE_BINDING_EXTERNALS = ["ssh2", "cpu-features"];
 
+// The vibe-frame bundles run on third-party pages, where there is no `process`.
+// Shared env code reads process.env.* — inline it away or the script throws
+// "process is not defined" before mounting anything.
+const BROWSER_EMBED_DEFINE = {
+  "process.env.NODE_ENV": JSON.stringify("production"),
+  "process.env": "{}",
+};
+
 const config: BuildConfig = {
   // Sequential, not parallel. Evidence: two separate Docker (Linux) builds, same
   // config, same ssh2/cpu-features externals fix applied - one run failed on
@@ -122,6 +130,7 @@ const config: BuildConfig = {
       modulesToExternalize: [],
       bunOptions: {
         target: BunTargetEnum.BROWSER,
+        define: BROWSER_EMBED_DEFINE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
         format: OutputFormatEnum.IIFE,
         minify: true,
@@ -136,6 +145,7 @@ const config: BuildConfig = {
       modulesToExternalize: [],
       bunOptions: {
         target: BunTargetEnum.BROWSER,
+        define: BROWSER_EMBED_DEFINE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
         format: OutputFormatEnum.ESM,
         minify: false,
@@ -150,6 +160,7 @@ const config: BuildConfig = {
       modulesToExternalize: [],
       bunOptions: {
         target: BunTargetEnum.BROWSER,
+        define: BROWSER_EMBED_DEFINE,
         sourcemap: SourcemapModeEnum.EXTERNAL,
         format: OutputFormatEnum.IIFE,
         minify: true,

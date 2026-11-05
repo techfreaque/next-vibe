@@ -1,7 +1,7 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * USER_WITH_ACCOUNT_SKILL.md - Account-Required Skill Manifest
- * GET /api/[locale]/system/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL.md
  *
  * Returns a markdown document listing tools that strictly require an authenticated account
  * (CUSTOMER role only, no PUBLIC access - REMOTE_SKILL marker required).

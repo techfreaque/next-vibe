@@ -9,7 +9,6 @@ import { Video as VideoIcon } from "next-vibe/ui/components/icons/Video";
 import { Input } from "next-vibe/ui/components/input";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
-import { Textarea } from "next-vibe/ui/components/textarea";
 import { H3 } from "next-vibe/ui/components/typography";
 import { Video } from "next-vibe/ui/components/video";
 import {
@@ -20,6 +19,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
@@ -131,7 +131,6 @@ export function VideoGenerationContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>();
   const children = field.children;
-  const prompt = form?.watch("prompt") ?? "";
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const availability = useProviderAvailability();
@@ -143,7 +142,6 @@ export function VideoGenerationContainer({
   const currentAspectRatio = form?.watch("aspectRatio");
   const currentResolution = form?.watch("resolution");
   const currentFrameImages = form?.watch("frameReferences") ?? [];
-  const currentNegativePrompt = form?.watch("negativePrompt") ?? "";
 
   const firstFrameEntry = currentFrameImages.find((f) => f.role === "first");
   const lastFrameEntry = currentFrameImages.find((f) => f.role === "last");
@@ -340,37 +338,15 @@ export function VideoGenerationContainer({
 
         {/* Negative prompt - only when model supports it */}
         {supportsNegativePrompt && (
-          <Div className="flex flex-col gap-1.5">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t("post.negativePrompt.label")}
-            </Span>
-            <Textarea
-              className="w-full min-h-[60px] resize-none"
-              placeholder={t("post.negativePrompt.placeholder")}
-              value={currentNegativePrompt}
-              disabled={isDisabled}
-              onChange={(e) =>
-                form?.setValue("negativePrompt", e.target.value || undefined)
-              }
-            />
-            <Span className="text-[10px] text-muted-foreground/70">
-              {t("post.negativePrompt.description")}
-            </Span>
-          </Div>
+          <TextareaFieldWidget
+            fieldName="negativePrompt"
+            field={children.negativePrompt}
+          />
         )}
 
         {/* Prompt */}
         <Div className="flex flex-col gap-1.5">
-          <Span className="text-xs font-medium text-muted-foreground">
-            {t("post.prompt.label")}
-          </Span>
-          <Textarea
-            className="w-full min-h-[80px] resize-none"
-            placeholder={t("post.prompt.placeholder")}
-            value={prompt}
-            disabled={isDisabled}
-            onChange={(e) => form?.setValue("prompt", e.target.value)}
-          />
+          <TextareaFieldWidget fieldName="prompt" field={children.prompt} />
           {/* Style chips */}
           <Div className="flex flex-wrap gap-1.5">
             {STYLE_CHIPS.map((style) => (

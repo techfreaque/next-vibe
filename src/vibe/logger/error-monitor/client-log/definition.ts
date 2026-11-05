@@ -82,6 +82,8 @@ export const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "post.fields.metadata.label" as const,
         description: "post.fields.metadata.description" as const,
+        // Machine-supplied context (tab id, error details) — no text box can produce it
+        hidden: true,
         schema: z.array(WidgetDataSchema).optional(),
       }),
       ok: responseField(scopedTranslation, {

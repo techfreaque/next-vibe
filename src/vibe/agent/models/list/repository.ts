@@ -231,7 +231,7 @@ export const ModelsListRepository = {
   async getModels(
     data: {
       query?: string;
-      modelType: string;
+      modelType?: string;
       contentLevel?: string;
       intelligence?: string;
     },

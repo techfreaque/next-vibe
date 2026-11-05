@@ -7,12 +7,11 @@ import {
 } from "next-vibe/ui/components/avatar";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { Nav } from "next-vibe/ui/components/nav";
 import { Span } from "next-vibe/ui/components/span";
 import { H2, P } from "next-vibe/ui/components/typography";
-import { useCallback, useMemo, useState, type JSX } from "react";
+import { useMemo, type JSX } from "react";
 
 import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
 import {
@@ -35,148 +34,10 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
+import { LeadCaptureForm } from "@/lead-magnet/capture/widget";
 
 import type { GET } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-type CaptureState = "idle" | "submitting" | "done" | "error";
-
-function CreatorLeadCaptureForm({
-  skillId,
-  headline,
-  buttonText,
-  locale,
-  t,
-}: {
-  skillId: string;
-  headline: string | null;
-  buttonText: string | null;
-  locale: ReturnType<typeof useWidgetLocale>;
-  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
-}): JSX.Element {
-  const [state, setState] = useState<CaptureState>("idle");
-  const [firstName, setFirstName] = useState("");
-  const [email, setEmail] = useState("");
-  const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
-
-  const handleSubmit = useCallback((): void => {
-    if (!firstName.trim() || !email.trim()) {
-      return;
-    }
-    setState("submitting");
-    void (async (): Promise<void> => {
-      try {
-        const [{ apiClient }, captureDef] = await Promise.all([
-          import("next-vibe/unified-ui/hooks/store"),
-          import("@/lead-magnet/capture/definition"),
-        ]);
-        const result = await apiClient.mutate(
-          captureDef.POST,
-          logger,
-          { id: "", isPublic: true, roles: [], leadId: "" } as never,
-          { skillId, firstName: firstName.trim(), email: email.trim() },
-          undefined,
-          locale,
-        );
-        setState(result.success ? "done" : "error");
-      } catch {
-        setState("error");
-      }
-    })();
-  }, [skillId, firstName, email, locale, logger, availability]);
-
-  const displayHeadline = headline ?? t("widget.lead.headline");
-  const displayButton = buttonText ?? t("widget.lead.send");
-
-  if (state === "done") {
-    return (
-      <Div
-        style={{
-          padding: "32px 24px",
-          borderRadius: 12,
-          border: "1px solid rgba(139,92,246,0.25)",
-          background: "rgba(139,92,246,0.08)",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          alignItems: "center",
-        }}
-      >
-        <H2 style={{ fontSize: 18, fontWeight: 700, color: "#fff", margin: 0 }}>
-          {t("widget.lead.doneHeading")}
-        </H2>
-        <P style={{ color: "rgba(255,255,255,0.55)", margin: 0, fontSize: 14 }}>
-          {t("widget.lead.doneSub")}
-        </P>
-      </Div>
-    );
-  }
-
-  return (
-    <Div
-      style={{
-        padding: "28px 24px",
-        borderRadius: 12,
-        border: "1px solid rgba(255,255,255,0.08)",
-        background: "rgba(255,255,255,0.02)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 14,
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <H2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>
-        {displayHeadline}
-      </H2>
-      <Div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          width: "100%",
-          maxWidth: 340,
-        }}
-      >
-        <Input
-          value={firstName}
-          onChange={(e): void => setFirstName(e.target.value)}
-          placeholder={t("widget.lead.namePlaceholder")}
-          disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
-        />
-        <Input
-          type="email"
-          value={email}
-          onChange={(e): void => setEmail(e.target.value)}
-          placeholder={t("widget.lead.emailPlaceholder")}
-          disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
-        />
-        <Button
-          onClick={handleSubmit}
-          disabled={
-            state === "submitting" || !firstName.trim() || !email.trim()
-          }
-          className="bg-violet-600 hover:bg-violet-700 text-white"
-        >
-          {state === "submitting" ? t("widget.lead.sending") : displayButton}
-        </Button>
-        {state === "error" && (
-          <Span style={{ fontSize: 12, color: "rgba(255,100,100,0.8)" }}>
-            {t("widget.lead.error")}
-          </Span>
-        )}
-      </Div>
-      <Span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
-        {t("widget.lead.finePrint")}
-      </Span>
-    </Div>
-  );
-}
 
 export function CreatorProfileWidget(): JSX.Element {
   const data = useWidgetValue<typeof GET>();
@@ -225,6 +86,12 @@ export function CreatorProfileWidget(): JSX.Element {
     return map;
   }, [favorites]);
 
+  const accent = data?.creatorAccentColor ?? DEFAULT_ACCENT;
+  const scopedPaletteStyle = useMemo(
+    () => buildScopedPaletteStyle(accent, true),
+    [accent],
+  );
+
   if (!data) {
     return (
       <Div
@@ -254,14 +121,7 @@ export function CreatorProfileWidget(): JSX.Element {
     );
   }
 
-  const accent = data.creatorAccentColor ?? DEFAULT_ACCENT;
-  const scopedPaletteStyle = useMemo(
-    () => buildScopedPaletteStyle(accent, true),
-    [accent],
-  );
   const skills = data.skills;
-  const hasLeadMagnet =
-    data.leadMagnetHeadline !== null || data.leadMagnetButtonText !== null;
 
   const avatarNode = (
     <Avatar className="h-full w-full">
@@ -365,14 +225,12 @@ export function CreatorProfileWidget(): JSX.Element {
         )}
 
         {/* Lead capture */}
-        {hasLeadMagnet && skills.length > 0 && (
+        {data.leadMagnetActive && skills.length > 0 && (
           <Div style={{ marginTop: 36 }}>
-            <CreatorLeadCaptureForm
+            <LeadCaptureForm
               skillId={skills[0].id}
               headline={data.leadMagnetHeadline}
               buttonText={data.leadMagnetButtonText}
-              locale={locale}
-              t={t}
             />
           </Div>
         )}

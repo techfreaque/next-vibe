@@ -4,57 +4,106 @@
  * Full unsubscribe surface — hero, form, info, and alternatives. Renders on every
  * platform via the endpoint's customWidgetObject; the story page mounts it through
  * EndpointsPage. No UI lives outside this widget.
+ *
+ * The form IS the endpoint's form (EndpointRenderer owns the <form>): the email
+ * field, alert and submit button are the shared widgets, so validation, prefill
+ * (/unsubscribe/[email] deep link, logged-in profile email) and errors flow
+ * through the standard pipeline.
  */
 
 "use client";
 
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Form } from "next-vibe/ui/components/form/form";
-import { Check } from "next-vibe/ui/components/icons/Check";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Send } from "next-vibe/ui/components/icons/Send";
-import { X } from "next-vibe/ui/components/icons/X";
-import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React from "react";
+import { z } from "zod";
 
-import { useNewsletterManager } from "@/newsletter/hooks";
+import { useNewsletterStatus } from "@/newsletter/hooks";
 
 import type definition from "./definition";
-import type { UnsubscribePostRequestInput } from "./definition";
 
-export function UnsubscribeWidget(): React.JSX.Element {
+interface UnsubscribeWidgetProps {
+  field: (typeof definition.POST)["fields"];
+}
+
+const emailSchema = z.email();
+
+export function UnsubscribeWidget({
+  field,
+}: UnsubscribeWidgetProps): React.JSX.Element {
+  const children = field.children;
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const platform = useWidgetPlatform();
+  const isCli = platform === Platform.CLI || platform === Platform.MCP;
   const form = useWidgetForm<typeof definition.POST>();
+  const data = useWidgetValue<typeof definition.POST>();
 
-  // The email prefill is seeded into the form's `email` request field by the page
-  // (via autoPrefillData) — from the /unsubscribe/[email] deep link or, for a
-  // logged-in user, their profile email fetched server-side. The JWT payload has
-  // no email, so all prefill flows through the form, never off `user`.
-  const values: UnsubscribePostRequestInput = form.getValues();
-  const prefilledEmail = values.email || undefined;
+  const email = form?.watch("email") ?? "";
+  const isValidEmail = emailSchema.safeParse(email).success;
+  // Seeded via autoPrefillData: the deep link or a logged-in user's profile email
+  const hasPrefilledEmail = Boolean(form?.formState.defaultValues?.email);
 
-  const {
+  // Tell the visitor whether the typed address is actually on the list
+  const status = useNewsletterStatus(user, {
     email,
-    isLoggedIn,
-    isUnsubscribing,
-    isAnyOperationInProgress,
-    notification,
-    showConfirmUnsubscribe,
-    unsubscribe,
-    handleEmailChange,
-  } = useNewsletterManager(user, prefilledEmail);
+    enabled: !isCli && isValidEmail && !data?.success,
+  });
+  const statusResponse = status.read?.response;
+  const isSubscribed =
+    statusResponse?.success === true ? statusResponse.data.subscribed : null;
+
+  const submitButton = (
+    <SubmitButtonWidget<typeof definition.POST>
+      field={{
+        text: "unsubscribe.page.unsubscribeButton",
+        loadingText: "unsubscribe.page.unsubscribing",
+        icon: "bell-off",
+        variant: "destructive",
+        size: isCli ? "default" : "lg",
+      }}
+    />
+  );
+
+  if (isCli) {
+    if (data?.success) {
+      return (
+        <Div className="flex items-center gap-2">
+          <CheckCircle className="h-5 w-5 text-success" />
+          <Span className="font-semibold">
+            {t("subscription.unsubscribe.success")}
+          </Span>
+        </Div>
+      );
+    }
+    return (
+      <Div className="flex flex-col gap-2">
+        <FormAlertWidget field={{}} />
+        <EmailFieldWidget fieldName="email" field={children.email} />
+        {submitButton}
+      </Div>
+    );
+  }
 
   return (
     <Div className="min-h-screen bg-red-50 bg-linear-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -68,87 +117,39 @@ export function UnsubscribeWidget(): React.JSX.Element {
             {t("unsubscribe.page.subtitle")}
           </H2>
           <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
-            {prefilledEmail
+            {hasPrefilledEmail
               ? t("unsubscribe.page.emailProvided.description")
               : t("unsubscribe.page.description")}
           </P>
 
           {/* Unsubscribe Form */}
-          <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto">
-            <Form
-              onSubmit={() => {
-                // Validate email before submission
-                if (!email?.includes("@")) {
-                  return;
-                }
-                // Server gets leadId from JWT - no need to pass it
-                unsubscribe(email);
-              }}
-              className="flex flex-col gap-4"
-            >
-              <Div className="flex flex-col gap-3">
-                <Input<"email">
-                  type="email"
-                  placeholder={t("emailPlaceholder")}
-                  className="text-center text-lg py-3"
-                  autoComplete="email"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  value={email}
-                  onChange={handleEmailChange}
-                  aria-label={t("emailPlaceholder")}
-                  disabled={isAnyOperationInProgress || isLoggedIn}
-                  name="email"
-                  id="newsletter-unsubscribe-email"
-                />
-
-                <Button
-                  type="submit"
-                  className={`py-3 text-lg font-semibold ${
-                    showConfirmUnsubscribe
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                  }`}
-                  variant={showConfirmUnsubscribe ? "default" : "outline"}
-                  aria-label={
-                    showConfirmUnsubscribe
-                      ? t("subscription.unsubscribe.confirmButton")
-                      : t("unsubscribe.page.unsubscribeButton")
-                  }
-                  disabled={isAnyOperationInProgress}
-                >
-                  {isUnsubscribing ? (
-                    <Div className="animate-spin mr-2">
-                      <Div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                    </Div>
-                  ) : showConfirmUnsubscribe ? (
-                    <Check className="h-5 w-5 mr-2" />
-                  ) : (
-                    <X className="h-5 w-5 mr-2" />
-                  )}
-                  {showConfirmUnsubscribe
-                    ? t("subscription.unsubscribe.confirmButton")
-                    : t("unsubscribe.page.unsubscribeButton")}
-                </Button>
+          <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto text-left">
+            {data?.success ? (
+              <Div className="flex flex-col items-center gap-3 text-center">
+                <CheckCircle className="h-10 w-10 text-success" />
+                <Span className="font-semibold text-lg">
+                  {t("subscription.unsubscribe.success")}
+                </Span>
+                <Span className="text-sm text-muted-foreground">
+                  {t("unsubscribe.page.info.immediate.description")}
+                </Span>
               </Div>
-
-              {/* Notification display */}
-              {notification && (
-                <Div
-                  className={`text-sm p-3 rounded-lg ${
-                    notification.type === "error"
-                      ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                      : notification.type === "success"
-                        ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                        : notification.type === "info"
-                          ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
-                          : "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
-                  }`}
-                >
-                  {notification.message}
-                </Div>
-              )}
-            </Form>
+            ) : (
+              <Div className="flex flex-col gap-4">
+                <FormAlertWidget field={{}} />
+                <EmailFieldWidget fieldName="email" field={children.email} />
+                {isValidEmail && isSubscribed !== null && (
+                  <Span
+                    className={`text-sm ${isSubscribed ? "text-foreground" : "text-muted-foreground"}`}
+                  >
+                    {isSubscribed
+                      ? t("unsubscribe.page.status.subscribed")
+                      : t("unsubscribe.page.status.notSubscribed")}
+                  </Span>
+                )}
+                {submitButton}
+              </Div>
+            )}
 
             {/* Subscribe link */}
             <Div className="text-center mt-4">
@@ -217,6 +218,7 @@ export function UnsubscribeWidget(): React.JSX.Element {
           </P>
           <Div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
+              type="button"
               onClick={() => {
                 assignUrl(`/${locale}/story/newsletter`);
               }}
@@ -227,6 +229,7 @@ export function UnsubscribeWidget(): React.JSX.Element {
               {t("unsubscribe.page.alternatives.subscribe")}
             </Button>
             <Button
+              type="button"
               onClick={() => {
                 assignUrl(`/${locale}/help`);
               }}

@@ -16,8 +16,15 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   type DefaultFolderId,
   rootlessToolExecutionContext,
+  type ToolExecutionContext,
 } from "../../../../core/execution-context";
-import { CHAT_MESSAGE_COLUMNS, chatMessages } from "../../../chat/db";
+import {
+  CHAT_MESSAGE_COLUMNS,
+  chatFolders,
+  chatMessages,
+  chatThreads,
+} from "../../../chat/db";
+import { canViewThread } from "../../../chat/permissions/permissions";
 import { chatSettings } from "../../../chat/settings/db";
 import { isSkillVariantId, isUuid, parseSkillId } from "../../../chat/slugify";
 import { loadRawEmbeddingScores } from "../../../cortex/system-prompt";
@@ -92,6 +99,7 @@ export async function buildDebugSystemPrompt({
   user,
   locale,
   logger,
+  toolExecutionContext,
 }: {
   rootFolderId: DefaultFolderId;
   userMessage?: string;
@@ -104,9 +112,37 @@ export async function buildDebugSystemPrompt({
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  /** Request context — carries the E2E fixture scope to provider calls. */
+  toolExecutionContext: ToolExecutionContext;
 }): Promise<ResponseType<SystemPromptDebugResponseOutput>> {
   const { t } = scopedTranslation.scopedT(locale);
   try {
+    // A thread's messages feed the response (messageContextLines) — only for
+    // threads the caller may read, never someone else's by guessing an id.
+    if (threadId) {
+      const [thread] = await db
+        .select()
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .limit(1);
+      const [folder] = thread?.folderId
+        ? await db
+            .select()
+            .from(chatFolders)
+            .where(eq(chatFolders.id, thread.folderId))
+            .limit(1)
+        : [];
+      if (
+        !thread ||
+        !(await canViewThread(user, thread, folder ?? null, logger, locale))
+      ) {
+        return fail({
+          message: t("get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+    }
+
     // Load user's active favorite for cascade resolution (same as stream setup)
     const userId = user.isPublic ? undefined : user.id;
     const [favorite, availability] = await Promise.all([
@@ -140,7 +176,11 @@ export async function buildDebugSystemPrompt({
     const [{ systemPrompt, trailingSystemMessage }, rawScores, threadMsgs] =
       await Promise.all([
         buildSystemPrompt({
-          toolExecutionContext: rootlessToolExecutionContext(),
+          // Thread-less, but keeps an E2E fixture scope for any provider call.
+          toolExecutionContext: {
+            ...rootlessToolExecutionContext(),
+            fixtureScopeId: toolExecutionContext.fixtureScopeId,
+          },
           skillId: skillId ?? null,
           user,
           logger,
@@ -175,7 +215,12 @@ export async function buildDebugSystemPrompt({
           },
         }),
         userMessage && user.id
-          ? loadRawEmbeddingScores(user.id, userMessage, logger)
+          ? loadRawEmbeddingScores(
+              user.id,
+              userMessage,
+              logger,
+              toolExecutionContext,
+            )
           : Promise.resolve(undefined),
         threadId
           ? db

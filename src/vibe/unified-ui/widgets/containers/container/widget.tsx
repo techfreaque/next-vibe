@@ -466,6 +466,7 @@ export function ContainerWidget<
             {/* Submit button (right side) */}
             <Button
               type="button"
+              data-testid="endpoint-submit"
               onClick={(): void => {
                 if (onSubmit) {
                   onSubmit();
@@ -525,6 +526,7 @@ export function ContainerWidget<
             )}
             <Button
               type="button"
+              data-testid="endpoint-submit"
               onClick={(): void => {
                 if (onSubmit) {
                   onSubmit();
@@ -573,6 +575,7 @@ export function ContainerWidget<
             {showHeaderButton && (
               <Button
                 type="button"
+                data-testid="endpoint-submit"
                 onClick={(): void => {
                   if (form && onSubmit) {
                     void form.handleSubmit(() => {
@@ -656,6 +659,7 @@ export function ContainerWidget<
             {/* Submit button (right side) */}
             <Button
               type="button"
+              data-testid="endpoint-submit"
               onClick={(): void => {
                 if (onSubmit) {
                   onSubmit();
@@ -718,6 +722,7 @@ export function ContainerWidget<
             )}
             <Button
               type="button"
+              data-testid="endpoint-submit"
               onClick={(): void => {
                 if (onSubmit) {
                   onSubmit();

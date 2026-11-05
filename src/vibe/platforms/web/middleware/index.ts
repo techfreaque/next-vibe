@@ -25,6 +25,7 @@ import {
   updateLeadLocale,
   UUID_REGEX,
 } from "../../../identity/middleware/lead-id/index";
+import { VIBE_FRAME_MOUNT_API_PATH } from "../../vibe-frame/mount/constants";
 import type { LanguageMiddlewareOptions } from "./language/index";
 import { detectLocale } from "./language/index";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
@@ -259,6 +260,14 @@ export async function middleware(
         stampCsrfCookie(request, bearerResp);
         addCorsHeaders(request, bearerResp, path);
         return bearerResp;
+      }
+
+      // The vibe-frame mount endpoint is called by the embed script from
+      // third-party pages: no cookies, identity travels in the POST body.
+      if (path.endsWith(VIBE_FRAME_MOUNT_API_PATH)) {
+        const mountResp = NextResponseClass.next();
+        addCorsHeaders(request, mountResp, path);
+        return mountResp;
       }
 
       // The public login endpoint must work without a pre-existing lead_id

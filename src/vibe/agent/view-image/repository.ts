@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { HandlerResponse } from "next-vibe/core/route/response.schema";
 import {
   createContentResponse,
@@ -9,6 +10,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { fetchStorageFileAsBase64 } from "../chat/storage/url-utils";
 import type { ViewImagePostRequestInput } from "./definition";
 import type { ViewImageT } from "./i18n";
@@ -19,12 +21,18 @@ export class ViewImageRepository {
     user: JwtPayloadType,
     t: ViewImageT,
     logger: EndpointLogger,
+    /** External URLs are fetched through the fixture chain (record/replay in dev/test). */
+    toolExecutionContext: ToolExecutionContext,
   ): Promise<HandlerResponse<never>> {
     const { url } = data;
 
     logger.debug("[ViewImage] Fetching image", { url });
 
-    const base64 = await fetchStorageFileAsBase64(url, user);
+    const base64 = await fetchStorageFileAsBase64(
+      url,
+      user,
+      createFixtureFetch(toolExecutionContext, logger),
+    );
 
     if (!base64) {
       logger.warn("[ViewImage] Image not found or fetch failed", { url });

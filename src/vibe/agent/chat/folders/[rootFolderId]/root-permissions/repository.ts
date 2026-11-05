@@ -21,7 +21,7 @@ import {
   hasRolePermission,
 } from "../../../permissions/permissions";
 import type {
-  RootPermissionsGetRequestOutput,
+  RootPermissionsGetUrlVariablesOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
 
@@ -37,12 +37,12 @@ export class RootFolderPermissionsRepository {
    * For public root folder, permissions are based on user role and folder config
    */
   static async getRootFolderPermissions(
-    data: RootPermissionsGetRequestOutput,
+    urlPathParams: RootPermissionsGetUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
-    const { rootFolderId } = data;
+    const { rootFolderId } = urlPathParams;
 
     // Validate root folder ID
     if (!isDefaultFolderId(rootFolderId)) {

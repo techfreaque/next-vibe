@@ -65,6 +65,11 @@ export const translations = {
         // detail placeholder lives here instead of leaking into those labels.
         detail: "Fetch Error: {{message}}",
       },
+      notConfigured: {
+        title:
+          "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
+        description: "Set up {{label}} to fetch web pages",
+      },
       timeout: {
         title: "Fetch Timeout",
         description: "The URL fetch timed out",

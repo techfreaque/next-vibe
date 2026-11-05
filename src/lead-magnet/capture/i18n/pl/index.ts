@@ -67,4 +67,15 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  form: {
+    headline: "Bądź na bieżąco",
+    namePlaceholder: "Twoje imię",
+    emailPlaceholder: "Twój e-mail",
+    send: "Subskrybuj",
+    sending: "...",
+    doneHeading: "Gotowe.",
+    doneSub: "Jesteś na liście.",
+    finePrint: "Żadnego spamu. Wypisz się w dowolnej chwili.",
+    error: "Coś poszło nie tak. Spróbuj ponownie.",
+  },
 };

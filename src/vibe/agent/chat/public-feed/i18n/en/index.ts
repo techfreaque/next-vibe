@@ -22,6 +22,16 @@ export const translations = {
       label: "Search",
       description: "Search threads by title",
     },
+    feed: {
+      empty: "No public threads yet. Start one.",
+      emptySearch: "Nothing matches that search.",
+      justNow: "just now",
+      hoursAgo: "{{count}}h ago",
+      daysAgo: "{{count}}d ago",
+      messages: "{{count}} messages",
+      participants: "{{count}} participants",
+      score: "Score",
+    },
     response: {
       title: "Feed Response",
       description: "Enriched public thread list",

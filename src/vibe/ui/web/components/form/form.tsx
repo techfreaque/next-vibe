@@ -93,9 +93,21 @@ export interface FormDatePickerProps {
   onChange?: (value: string) => void;
 }
 
+const noopUnsubscribe = (): void => undefined;
+const subscribeNever = (): (() => void) => noopUnsubscribe;
+
 export function Form<TRequest extends FieldValues>(
   props: FormProps<TRequest>,
 ): React.JSX.Element {
+  // false during SSR + hydration, true once this form is interactive.
+  // `data-hydrated` is the E2E driver's per-form "safe to type" signal.
+  const hydrated = React.useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
+  const hydratedAttr = hydrated ? "" : undefined;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -109,14 +121,20 @@ export function Form<TRequest extends FieldValues>(
     if (props.noFormElement) {
       return (
         <FormProvider {...props.form}>
-          <div className={cn(props.className)}>{props.children}</div>
+          <div className={cn(props.className)} data-hydrated={hydratedAttr}>
+            {props.children}
+          </div>
         </FormProvider>
       );
     }
 
     return (
       <FormProvider {...props.form}>
-        <form className={cn(props.className)} onSubmit={handleSubmit}>
+        <form
+          className={cn(props.className)}
+          onSubmit={handleSubmit}
+          data-hydrated={hydratedAttr}
+        >
           {props.children}
         </form>
       </FormProvider>
@@ -125,7 +143,11 @@ export function Form<TRequest extends FieldValues>(
 
   // Otherwise, render a simple form element
   return (
-    <form className={cn(props.className)} onSubmit={handleSubmit}>
+    <form
+      className={cn(props.className)}
+      onSubmit={handleSubmit}
+      data-hydrated={hydratedAttr}
+    >
       {props.children}
     </form>
   );
@@ -197,10 +219,17 @@ export function FormItem({
   ...props
 }: FormItemProps): React.JSX.Element {
   const id = React.useId();
+  // Stable per-field hook for E2E drivers (e2e/field-drivers.ts) — the field
+  // path ("basicInfo.email") is the one selector every widget shares.
+  const fieldContext = React.useContext(FormFieldContext);
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div className={cn("space-y-1", className)} {...props} />
+      <div
+        className={cn("space-y-1", className)}
+        data-field={fieldContext?.name}
+        {...props}
+      />
     </FormItemContext.Provider>
   );
 }
@@ -258,12 +287,36 @@ export function FormDescription({
 }
 FormDescription.displayName = "FormDescription";
 
+/**
+ * The message to show for a field. Array fields (File[], string[]) carry no
+ * message of their own when one ITEM fails (e.g. a non-audio upload) — the
+ * error sits under the item's index, so surface the first item's message
+ * instead of rendering nothing.
+ */
+function fieldErrorMessage(error: FieldError): string | undefined {
+  if (error.message) {
+    return String(error.message);
+  }
+  for (const item of Object.values(error)) {
+    if (
+      typeof item === "object" &&
+      item !== null &&
+      "message" in item &&
+      typeof item.message === "string" &&
+      item.message
+    ) {
+      return item.message;
+    }
+  }
+  return undefined;
+}
+
 export function FormMessage({
   children,
   t,
 }: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error.message) : children;
+  const body = error ? fieldErrorMessage(error) : children;
 
   if (!body || body === "undefined") {
     return null;
@@ -272,6 +325,7 @@ export function FormMessage({
   return (
     <p
       id={formMessageId}
+      data-field-error=""
       className="text-[0.8rem] font-medium text-destructive dark:text-destructive"
     >
       {t(String(body))}

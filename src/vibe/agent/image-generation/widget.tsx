@@ -10,7 +10,6 @@ import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Image } from "next-vibe/ui/components/image";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
-import { Textarea } from "next-vibe/ui/components/textarea";
 import { H3 } from "next-vibe/ui/components/typography";
 import {
   useWidgetDisabled,
@@ -20,6 +19,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
@@ -220,18 +220,7 @@ export function ImageGenerationContainer({
         <FormAlertWidget field={{}} />
 
         {/* Prompt */}
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-xs font-medium text-muted-foreground">
-            {t("post.prompt.label")}
-          </Span>
-          <Textarea
-            className="w-full min-h-[80px] resize-none"
-            placeholder={t("post.prompt.placeholder")}
-            value={prompt}
-            disabled={isDisabled}
-            onChange={(e) => form?.setValue("prompt", e.target.value)}
-          />
-        </Div>
+        <TextareaFieldWidget fieldName="prompt" field={children.prompt} />
 
         {/* Size presets - hidden when model doesn't support size selection */}
         {availableSizePresets.length > 0 && (

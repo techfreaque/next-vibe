@@ -274,6 +274,19 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // oxlint-disable-next-line restricted/no-raw-fetch
     const response = await fetch(url, options);
+    // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
+    // body — report the HTTP status, not a JSON parse error.
+    const isJsonBody = (response.headers.get("content-type") ?? "").includes(
+      "application/json",
+    );
+    if (!response.ok && !isJsonBody) {
+      return fail({
+        message: hooksTranslation
+          .scopedT(locale)
+          .t("apiUtils.errors.httpStatus", { status: response.status, url }),
+        errorType: ErrorResponseTypes.HTTP_ERROR,
+      });
+    }
     const json = (await response.json()) as ResponseType<
       TEndpoint["types"]["ResponseOutput"]
     >;
@@ -291,6 +304,16 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     }
 
     if (json.success) {
+      // Content responses (text + image blocks, see createContentResponse)
+      // have no schema'd fields — validation would strip them to {} and the
+      // page would render nothing. Pass them through for ContentBlocksRenderer.
+      if (
+        typeof json.data === "object" &&
+        json.data !== null &&
+        "isContentResponse" in json.data
+      ) {
+        return json;
+      }
       const validationResponse = validateData(
         json.data,
         endpoint.responseSchema,

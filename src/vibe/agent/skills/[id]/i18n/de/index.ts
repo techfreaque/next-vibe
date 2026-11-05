@@ -211,17 +211,6 @@ export const translations: typeof enTranslations = {
       signup: "Kostenlos registrieren",
       login: "Schon ein Konto? Einloggen",
     },
-    leadCapture: {
-      fallbackHeadline: "Bleib auf dem Laufenden",
-      namePlaceholder: "Dein Vorname",
-      emailPlaceholder: "Deine E-Mail",
-      fallbackButton: "Abonnieren",
-      sending: "...",
-      doneHeading: "Fertig.",
-      doneSub: "Du bist auf der Liste.",
-      error: "Etwas ist schiefgelaufen. Versuch es nochmal.",
-      finePrint: "Kein Spam. Jederzeit abmeldbar.",
-    },
     landing: {
       backToHome: "Startseite",
       signIn: "Anmelden",

@@ -356,46 +356,46 @@ export class VideoGenerationRepository {
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by
     // the caller's leadId and served only to that lead (browser).
-    const scThreadId = toolExecutionContext.threadId;
-    const isIncognito =
+    // Standalone calls (tool page, no thread) MUST be re-hosted too: provider
+    // URLs like OpenRouter's are authed, so a raw one is unplayable in the
+    // browser. They get a fresh lead-owned namespace, served like incognito.
+    const scThreadId = toolExecutionContext.threadId ?? crypto.randomUUID();
+    const isLeadOwned =
+      !toolExecutionContext.threadId ||
       toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
-    if (scThreadId) {
-      try {
-        const storage = getStorageAdapter();
-        // Some providers (OpenRouter) serve the finished video from an authed
-        // endpoint — download WITH the provider's headers, else it 401s and we
-        // store a tiny error JSON as a broken .mp4.
-        const downloadRes = await fetchImpl(videoUrl, {
-          headers: generationResult.data.downloadHeaders,
-        });
-        if (!downloadRes.ok) {
-          // oxlint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
-          throw new Error(
-            `Video download failed: HTTP ${String(downloadRes.status)}`,
-          );
-        }
-        const arrayBuf = await downloadRes.arrayBuffer();
-        const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
-        const ext = videoUrl.includes("webm") ? "webm" : "mp4";
-        const uploadResult = await storage.uploadFile(videoBuffer, {
-          filename: `generated-video-${Date.now()}.${ext}`,
-          mimeType: `video/${ext}`,
-          threadId: scThreadId,
-          userId: isIncognito ? undefined : user.id,
-          leadId: isIncognito ? user.leadId : undefined,
-        });
-        videoUrl = uploadResult.url;
-      } catch (uploadErr) {
-        logger.error(
-          "[VideoGen] Failed to upload to storage, using provider URL",
-          {
-            error:
-              uploadErr instanceof Error
-                ? uploadErr.message
-                : String(uploadErr),
-          },
+    try {
+      const storage = getStorageAdapter();
+      // Some providers (OpenRouter) serve the finished video from an authed
+      // endpoint — download WITH the provider's headers, else it 401s and we
+      // store a tiny error JSON as a broken .mp4.
+      const downloadRes = await fetchImpl(videoUrl, {
+        headers: generationResult.data.downloadHeaders,
+      });
+      if (!downloadRes.ok) {
+        // oxlint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
+        throw new Error(
+          `Video download failed: HTTP ${String(downloadRes.status)}`,
         );
       }
+      const arrayBuf = await downloadRes.arrayBuffer();
+      const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
+      const ext = videoUrl.includes("webm") ? "webm" : "mp4";
+      const uploadResult = await storage.uploadFile(videoBuffer, {
+        filename: `generated-video-${Date.now()}.${ext}`,
+        mimeType: `video/${ext}`,
+        threadId: scThreadId,
+        userId: isLeadOwned ? undefined : user.id,
+        leadId: isLeadOwned ? user.leadId : undefined,
+      });
+      videoUrl = uploadResult.url;
+    } catch (uploadErr) {
+      logger.error(
+        "[VideoGen] Failed to upload to storage, using provider URL",
+        {
+          error:
+            uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
+        },
+      );
     }
 
     if (videoModel.apiProvider !== ApiProvider.UNBOTTLED) {

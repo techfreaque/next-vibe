@@ -117,7 +117,7 @@ export class TextToSpeechRepository {
     fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.OPENAI_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiTts;
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -178,7 +178,7 @@ export class TextToSpeechRepository {
     fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.EDEN_AI_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.voice;
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.edenAiTts;
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -266,12 +266,9 @@ export class TextToSpeechRepository {
     fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.ELEVENLABS_API_KEY) {
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.elevenlabs;
       return fail({
-        message: t("post.errors.notConfigured", {
-          label: "ElevenLabs",
-          envKey: "ELEVENLABS_API_KEY",
-          url: "https://elevenlabs.io/app/settings/api-keys",
-        }),
+        message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -341,9 +338,14 @@ export class TextToSpeechRepository {
       _ttsAvailability,
     );
     if (!modelOption) {
+      // No voice of any configured provider can serve this request — say so
+      // (and how to fix it) instead of a bare "Not Found".
+      logger.warn("[TTS] No TTS provider available", {
+        voiceId: data.voiceId,
+      });
       return fail({
-        message: t("post.errors.not_found.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
+        message: t("post.errors.noTtsProviderConfigured"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
     const language = TextToSpeechRepository.mapLocaleToLanguage(locale);

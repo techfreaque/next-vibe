@@ -16,8 +16,8 @@ export const translations: typeof enTranslations = {
         toolName: {
           label: "Tool-Name",
           description:
-            "Der registrierte Tool-Name oder Alias (z.B. 'agent_chat_characters_GET'). Verwende system_help_GET zum Entdecken.",
-          placeholder: "agent_chat_characters_GET",
+            "Der registrierte Tool-Name oder Alias (z.B. 'vibe_agent_skills_GET'). Verwende tool-help zum Entdecken.",
+          placeholder: "vibe_agent_skills_GET",
         },
         input: {
           label: "Eingabe",

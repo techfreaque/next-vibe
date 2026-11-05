@@ -177,6 +177,10 @@ export function MarkdownEditor({
         },
         // Keep codeBlock disabled (inline code only)
         codeBlock: false,
+        // StarterKit v3 bundles Link — registered below with our options.
+        // Two instances crash ProseMirror ("different instances of a keyed
+        // plugin") and React has to re-render the whole page to recover.
+        link: false,
       }),
       SmartEnter,
       LinkExtension.configure({

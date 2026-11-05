@@ -5,6 +5,7 @@
 
 "use client";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -31,24 +32,29 @@ import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import type { PublicFeedItem } from "../definition";
 import { FeedSortMode } from "../definition";
+import type { PublicFeedT } from "../i18n";
 import { scopedTranslation } from "../i18n";
 
 type SortMode = (typeof FeedSortMode)[keyof typeof FeedSortMode];
 
-function formatTimestamp(date: Date, locale: string): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
+function formatTimestamp(
+  date: Date,
+  now: number,
+  locale: CountryLanguage,
+  t: PublicFeedT,
+): string {
+  const diff = now - date.getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
   if (hours < 1) {
-    return "just now";
+    return t("get.feed.justNow");
   }
   if (hours < 24) {
-    return `${hours.toString()}h ago`;
+    return t("get.feed.hoursAgo", { count: hours });
   }
   if (days < 30) {
-    return `${days.toString()}d ago`;
+    return t("get.feed.daysAgo", { count: days });
   }
   return new Date(date).toLocaleDateString(locale, {
     month: "short",
@@ -88,16 +94,12 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
         "flex gap-3 p-3 hover:shadow-md",
       )}
     >
-      {/* Vote Section */}
-      <Div className="flex flex-col items-center gap-1 min-w-12">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 hover:text-orange-500"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ArrowBigUp className="h-5 w-5" />
-        </Button>
+      {/* Score - aggregated from message votes; voting happens on messages */}
+      <Div
+        className="flex flex-col items-center gap-1 min-w-12 text-muted-foreground"
+        title={t("get.feed.score")}
+      >
+        <ArrowBigUp className="h-5 w-5" />
         <Span
           className={cn(
             "font-bold text-sm",
@@ -107,14 +109,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
         >
           {item.score}
         </Span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 hover:text-primary"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ArrowBigDown className="h-5 w-5" />
-        </Button>
+        <ArrowBigDown className="h-5 w-5" />
       </Div>
 
       {/* Content Section */}
@@ -131,7 +126,9 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
               {item.folderName}
             </Badge>
           )}
-          <Span>{formatTimestamp(new Date(item.createdAt), locale)}</Span>
+          <Span>
+            {formatTimestamp(new Date(item.createdAt), now, locale, t)}
+          </Span>
           {item.authorName && (
             <Span className="hover:underline">u/{item.authorName}</Span>
           )}
@@ -140,14 +137,18 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
               {item.modelNames.join(", ")}
             </Span>
           )}
-          {item.authorCount > 1 && <Span>{item.authorCount} participants</Span>}
+          {item.authorCount > 1 && (
+            <Span>
+              {t("get.feed.participants", { count: item.authorCount })}
+            </Span>
+          )}
         </Div>
 
         {/* Stats Row */}
         <Div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
           <Div className="flex items-center gap-1">
             <MessageSquare className="h-3.5 w-3.5" />
-            <Span>{item.messageCount} messages</Span>
+            <Span>{t("get.feed.messages", { count: item.messageCount })}</Span>
           </Div>
           {isRising && (
             <Badge
@@ -213,6 +214,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
+                aria-pressed={sortMode === FeedSortMode.HOT}
                 onClick={() => onSortChange(FeedSortMode.HOT)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
@@ -226,6 +228,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
+                aria-pressed={sortMode === FeedSortMode.RISING}
                 onClick={() => onSortChange(FeedSortMode.RISING)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
@@ -239,6 +242,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
+                aria-pressed={sortMode === FeedSortMode.NEW}
                 onClick={() => onSortChange(FeedSortMode.NEW)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
@@ -268,7 +272,9 @@ function PublicFeedView({
             {items.length === 0 ? (
               <Div className="text-center py-12 text-muted-foreground">
                 <Span className="text-lg">
-                  {t("get.errors.notFound.title")}
+                  {searchQuery.trim()
+                    ? t("get.feed.emptySearch")
+                    : t("get.feed.empty")}
                 </Span>
               </Div>
             ) : (

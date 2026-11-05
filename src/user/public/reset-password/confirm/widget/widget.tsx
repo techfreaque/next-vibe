@@ -13,10 +13,12 @@ import {
   CardTitle,
 } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
+import { useState } from "react";
 
 import { PasswordStrengthIndicator } from "@/user/public/signup/widget/password-strength-indicator";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -48,6 +50,10 @@ export function ResetPasswordConfirmContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const data = useWidgetValue<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  // Arrived via the emailed link: the token is already in the form — don't
+  // show the customer a raw JWT. Only the bare tool page asks for it.
+  const [tokenFromLink] = useState(() => Boolean(form.getValues("token")));
 
   return (
     <Card>
@@ -58,7 +64,9 @@ export function ResetPasswordConfirmContainer({
       <CardContent className="flex flex-col gap-6">
         {/* Verification Section */}
         <Div className="flex flex-col gap-4">
-          <TextFieldWidget fieldName="token" field={children.token} />
+          <Div className={tokenFromLink ? "hidden" : undefined}>
+            <TextFieldWidget fieldName="token" field={children.token} />
+          </Div>
           <EmailFieldWidget fieldName="email" field={children.email} />
         </Div>
 

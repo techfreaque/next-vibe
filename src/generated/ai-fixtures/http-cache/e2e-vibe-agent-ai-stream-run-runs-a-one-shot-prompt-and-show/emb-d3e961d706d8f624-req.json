@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/cron/table-tennis-word-quiz--ping---pong-d924909e-e8c7-4c97-815a-033df84dbce1.md\n\n# Table Tennis Word Quiz: Ping → Pong\nFolder: cron\nDescription: User asked which table-tennis word corresponds to 'ping'. The correct answer is 'pong', the classic pairing from the game of table tennis that also inspired the name of one of the first video games.",
+    "encoding_format": "float"
+  }
+}

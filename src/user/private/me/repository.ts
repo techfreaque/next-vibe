@@ -145,6 +145,20 @@ async function fetchUserSkills(userId: string, viewer: JwtPayloadType) {
   });
 }
 
+/** Image type from the leading base64 bytes (the file field sends bare base64). */
+function sniffImageMime(base64: string): string {
+  if (base64.startsWith("iVBORw0KGgo")) {
+    return "image/png";
+  }
+  if (base64.startsWith("R0lGOD")) {
+    return "image/gif";
+  }
+  if (base64.startsWith("UklGR")) {
+    return "image/webp";
+  }
+  return "image/jpeg";
+}
+
 /**
  * User Profile Repository - Static class pattern
  */
@@ -368,43 +382,43 @@ export class UserProfileRepository {
           updateData.bio = p.bio;
         }
         if (p.websiteUrl !== undefined) {
-          updateData.websiteUrl = p.websiteUrl;
+          updateData.websiteUrl = p.websiteUrl || null;
         }
         if (p.twitterUrl !== undefined) {
-          updateData.twitterUrl = p.twitterUrl;
+          updateData.twitterUrl = p.twitterUrl || null;
         }
         if (p.youtubeUrl !== undefined) {
-          updateData.youtubeUrl = p.youtubeUrl;
+          updateData.youtubeUrl = p.youtubeUrl || null;
         }
         if (p.instagramUrl !== undefined) {
-          updateData.instagramUrl = p.instagramUrl;
+          updateData.instagramUrl = p.instagramUrl || null;
         }
         if (p.tiktokUrl !== undefined) {
-          updateData.tiktokUrl = p.tiktokUrl;
+          updateData.tiktokUrl = p.tiktokUrl || null;
         }
         if (p.githubUrl !== undefined) {
-          updateData.githubUrl = p.githubUrl;
+          updateData.githubUrl = p.githubUrl || null;
         }
         if (p.facebookUrl !== undefined) {
-          updateData.facebookUrl = p.facebookUrl;
+          updateData.facebookUrl = p.facebookUrl || null;
         }
         if (p.discordUrl !== undefined) {
-          updateData.discordUrl = p.discordUrl;
+          updateData.discordUrl = p.discordUrl || null;
         }
         if (p.tribeUrl !== undefined) {
-          updateData.tribeUrl = p.tribeUrl;
+          updateData.tribeUrl = p.tribeUrl || null;
         }
         if (p.rumbleUrl !== undefined) {
-          updateData.rumbleUrl = p.rumbleUrl;
+          updateData.rumbleUrl = p.rumbleUrl || null;
         }
         if (p.odyseeUrl !== undefined) {
-          updateData.odyseeUrl = p.odyseeUrl;
+          updateData.odyseeUrl = p.odyseeUrl || null;
         }
         if (p.nostrUrl !== undefined) {
-          updateData.nostrUrl = p.nostrUrl;
+          updateData.nostrUrl = p.nostrUrl || null;
         }
         if (p.gabUrl !== undefined) {
-          updateData.gabUrl = p.gabUrl;
+          updateData.gabUrl = p.gabUrl || null;
         }
         if (p.creatorAccentColor !== undefined) {
           updateData.creatorAccentColor = p.creatorAccentColor;
@@ -416,9 +430,9 @@ export class UserProfileRepository {
             !p.creatorHeaderImageUrl.startsWith("data:") &&
             !p.creatorHeaderImageUrl.startsWith("http")
           ) {
-            updateData.creatorHeaderImageUrl = `data:image/jpeg;base64,${p.creatorHeaderImageUrl}`;
+            updateData.creatorHeaderImageUrl = `data:${sniffImageMime(p.creatorHeaderImageUrl)};base64,${p.creatorHeaderImageUrl}`;
           } else {
-            updateData.creatorHeaderImageUrl = p.creatorHeaderImageUrl;
+            updateData.creatorHeaderImageUrl = p.creatorHeaderImageUrl || null;
           }
         }
       }

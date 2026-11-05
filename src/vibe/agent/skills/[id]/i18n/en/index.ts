@@ -206,17 +206,6 @@ export const translations = {
       signup: "Sign up free",
       login: "Already have an account? Log in",
     },
-    leadCapture: {
-      fallbackHeadline: "Stay in the loop",
-      namePlaceholder: "Your first name",
-      emailPlaceholder: "Your email",
-      fallbackButton: "Subscribe",
-      sending: "...",
-      doneHeading: "Done.",
-      doneSub: "You're on the list.",
-      error: "Something went wrong. Try again.",
-      finePrint: "No spam. Unsubscribe any time.",
-    },
     landing: {
       backToHome: "Home",
       signIn: "Sign in",

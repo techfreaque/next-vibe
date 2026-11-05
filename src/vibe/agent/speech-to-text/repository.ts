@@ -430,7 +430,7 @@ export class SpeechToTextRepository {
     }>
   > {
     if (!agentEnv.OPENAI_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiImages;
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiStt;
       logger.error("[STT] OpenAI API key not configured");
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),

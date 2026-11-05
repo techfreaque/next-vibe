@@ -257,6 +257,30 @@ export async function resolveAgentPins(params: {
 }
 
 /**
+ * Public visitors have no settings or favorites, so their pins are the role
+ * defaults. Narrows the visitor's web listing to the active pinned view
+ * server-side: filtering after pagination would show short or empty pages.
+ * "all"/"allowed" leave the listing untouched (null).
+ */
+export async function narrowPublicPins(
+  meta: EndpointMeta[],
+  effectiveUser: JwtPayloadType,
+  statsFilter: NonNullable<HelpGetRequestOutput["statsFilter"]>,
+): Promise<EndpointMeta[] | null> {
+  if (statsFilter !== "pinned" && statsFilter !== "webPinned") {
+    return null;
+  }
+  const { getDefaultToolIdsForUser, getDefaultWebPinnedIdsForUser } =
+    await import("../../agent/chat/constants");
+  const ids = new Set(
+    statsFilter === "pinned"
+      ? getDefaultToolIdsForUser(effectiveUser)
+      : getDefaultWebPinnedIdsForUser(effectiveUser),
+  );
+  return meta.filter((m) => inSet(m, ids));
+}
+
+/**
  * The user whose eyes we list through: the caller, or the impersonated role.
  * Admin-only view-as-role, so an admin can see exactly what a lower role sees.
  * Also drives the pin defaults, so listing and pins agree on whose view this is.

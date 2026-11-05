@@ -113,6 +113,17 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST FIELDS ===
+      engagementType: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.engagementType.label",
+        description: "post.engagementType.description",
+        placeholder: "post.engagementType.placeholder",
+        helpText: "post.engagementType.helpText",
+        options: EngagementTypesOptions,
+        columns: 6,
+        schema: z.enum(EngagementTypesDB),
+      }),
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -125,17 +136,6 @@ const { POST } = createEndpoint({
         helpText: "post.leadId.helpText",
         columns: 12,
         schema: z.uuid().nullable().optional(),
-      }),
-      engagementType: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "post.engagementType.label",
-        description: "post.engagementType.description",
-        placeholder: "post.engagementType.placeholder",
-        helpText: "post.engagementType.helpText",
-        options: EngagementTypesOptions,
-        columns: 6,
-        schema: z.enum(EngagementTypesDB),
       }),
       campaignId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -369,18 +369,15 @@ const { GET } = createEndpoint({
       }),
 
       // === REQUEST FIELDS (Query Parameters) ===
-      leadId: requestField(scopedTranslation, {
+      url: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.ENTITY_PICKER,
-        listEndpoint: async () =>
-          (await import("@/leads/list/definition")).default.GET,
-        labelField: "email",
-        label: "get.id.label",
-        description: "get.id.description",
-        placeholder: "get.id.placeholder",
-        helpText: "get.id.helpText",
+        fieldType: FieldDataType.TEXT,
+        label: "get.url.label",
+        description: "get.url.description",
+        placeholder: "get.url.placeholder",
+        helpText: "get.url.helpText",
         columns: 12,
-        schema: z.uuid().optional(),
+        schema: z.string().optional(),
       }),
       campaignId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -414,15 +411,18 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
       }),
-      url: requestField(scopedTranslation, {
+      leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.url.label",
-        description: "get.url.description",
-        placeholder: "get.url.placeholder",
-        helpText: "get.url.helpText",
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/leads/list/definition")).default.GET,
+        labelField: "email",
+        label: "get.id.label",
+        description: "get.id.description",
+        placeholder: "get.id.placeholder",
+        helpText: "get.id.helpText",
         columns: 12,
-        schema: z.string().optional(),
+        schema: z.uuid().optional(),
       }),
       ref: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -433,6 +433,16 @@ const { GET } = createEndpoint({
         helpText: "get.ref.helpText",
         columns: 12,
         schema: z.coerce.string().optional(),
+      }),
+      // Signature for an external `url` (see redirect-signature.ts) — set by
+      // the links we generate, never typed by a human.
+      sig: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.sig.label",
+        description: "get.sig.description",
+        hidden: true,
+        schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===

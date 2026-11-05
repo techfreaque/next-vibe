@@ -1,15 +1,15 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * Skill Skill Manifest - Dynamic Route
- * GET /api/[locale]/system/platforms/ai/skills/[skill-id]-skill.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/[skill-id]-skill.md
  *
  * Returns a per-skill manifest listing only the tools that skill
  * has configured in its availableTools list. For generic skills (no availableTools),
  * falls back to the full public-user tier.
  *
  * Examples:
- *   /api/en/system/platforms/ai/skills/research-agent-skill.md
- *   /api/en/system/platforms/ai/skills/writer-skill.md
+ *   /api/en/vibe/platforms/ai/skills/research-agent-skill.md
+ *   /api/en/vibe/platforms/ai/skills/writer-skill.md
  *
  * Returns 404 for unknown, admin-only, or instance-filtered skills.
  */

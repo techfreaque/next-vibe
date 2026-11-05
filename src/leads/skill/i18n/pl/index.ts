@@ -56,5 +56,11 @@ export const translations: typeof enTranslations = {
       title: "Skill przypisany",
       description: "Skill został zapisany dla tego leada.",
     },
+    skipped: {
+      title: "Nie zapisano",
+      description:
+        "Brak sesji odwiedzającego do przypisania. Otwórz najpierw stronę, potem spróbuj ponownie.",
+    },
+    submit: "Przypisz skill",
   },
 };

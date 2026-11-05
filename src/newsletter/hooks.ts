@@ -138,7 +138,7 @@ export function useNewsletterManager(
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
     (e: InputChangeEvent<"email">): void => {
-      if (!user) {
+      if (user.isPublic) {
         setManualEmail(e.target.value);
       }
     },
@@ -300,7 +300,7 @@ export function useNewsletterManager(
 
   const setEmail = useCallback(
     (newEmail: string): void => {
-      if (!user) {
+      if (user.isPublic) {
         setManualEmail(newEmail);
         setShowConfirmUnsubscribe(false);
 
@@ -331,7 +331,7 @@ export function useNewsletterManager(
   return {
     email: email || "",
     setEmail,
-    isLoggedIn: !!user,
+    isLoggedIn: !user.isPublic,
     isSubscribed: effectiveIsSubscribed,
     isSubmitting: subscriptionEndpoint.create?.isSubmitting ?? false,
     isUnsubscribing: unsubscribeEndpoint.create?.isSubmitting ?? false,

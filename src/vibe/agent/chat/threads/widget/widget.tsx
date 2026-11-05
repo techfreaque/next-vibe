@@ -401,6 +401,7 @@ function ThreadRow({
                   variant="ghost"
                   size="icon"
                   className="h-5 w-6"
+                  aria-label={t("widget.actions.menu")}
                   onClick={(e) => {
                     e.stopPropagation();
                     setDropdownOpen(true);

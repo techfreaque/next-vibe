@@ -99,7 +99,8 @@ export const translations: typeof enTranslations = {
         noItems: "Brak wyników",
         required: "Wymagane",
         select: "Wybierz...",
-        useToFind: "Użyj do wyszukania",
+        selectLabel: "Wybierz: {{label}}",
+        useToFind: "Znajdź przez {{alias}}",
       },
       markdownTextarea: {
         edit: "Edytuj",

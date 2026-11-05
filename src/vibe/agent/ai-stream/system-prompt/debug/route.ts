@@ -8,7 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
+    handler: ({ data, user, locale, logger, toolExecutionContext }) =>
       buildDebugSystemPrompt({
         rootFolderId: data.rootFolderId,
         userMessage: data.userMessage,
@@ -21,6 +21,7 @@ export const { GET, tools } = endpointsHandler({
         user,
         locale,
         logger,
+        toolExecutionContext,
       }),
   },
 });

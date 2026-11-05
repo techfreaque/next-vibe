@@ -51,10 +51,15 @@ type FileLogFn = (
 ) => void;
 
 function getTimePrefix(): string {
-  if (process.env["VIBE_LOG_TIMESTAMP"] === "iso") {
+  const startTime = Number(process.env["VIBE_START_TIME"]);
+  // Browsers have no VIBE_START_TIME — uptime would print as "NaNmNaNs"
+  if (
+    process.env["VIBE_LOG_TIMESTAMP"] === "iso" ||
+    !Number.isFinite(startTime)
+  ) {
     return new Date().toISOString().slice(11, 23);
   }
-  const totalSec = (Date.now() - Number(process.env["VIBE_START_TIME"])) / 1000;
+  const totalSec = (Date.now() - startTime) / 1000;
   if (totalSec < 60) {
     return `${totalSec.toFixed(3)}s`;
   }

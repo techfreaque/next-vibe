@@ -930,6 +930,8 @@ export function HelpToolsWidget(): JSX.Element {
     endpoint: string;
   } | null>(null);
 
+  // SSR renders from a per-request query cache (QueryProvider
+  // isolateServerRender), so the server and hydrating client agree.
   const response = useWidgetValue<typeof definition.GET>();
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const availableTools: HelpToolMetadataSerialized[] = useMemo(
@@ -1066,38 +1068,9 @@ export function HelpToolsWidget(): JSX.Element {
     skillAllowedDefault,
   ]);
 
-  // For public users, server returns all tools and we filter client-side from localStorage.
-  // For authenticated users, server already applied the statsFilter.
-  const visibleTools = useMemo((): HelpToolMetadataSerialized[] => {
-    if (!user?.isPublic) {
-      return availableTools;
-    }
-    if (statsFilter === "pinned") {
-      return availableTools.filter((tool) =>
-        effectiveEnabledTools.some(
-          (et) => et.id === (tool.id ?? tool.name) && et.pinned,
-        ),
-      );
-    }
-    if (statsFilter === "allowed") {
-      return availableTools.filter((tool) =>
-        effectiveEnabledTools.some((et) => et.id === (tool.id ?? tool.name)),
-      );
-    }
-    if (statsFilter === "webPinned") {
-      const webPins = new Set(
-        webPinnedTools ?? (user ? getDefaultWebPinnedIdsForUser(user) : []),
-      );
-      return availableTools.filter((tool) => webPins.has(tool.id ?? tool.name));
-    }
-    return availableTools;
-  }, [
-    user,
-    availableTools,
-    statsFilter,
-    effectiveEnabledTools,
-    webPinnedTools,
-  ]);
+  // The server applies statsFilter for every user (public visitors resolve to
+  // role defaults) before paginating, so the page is already the visible set.
+  const visibleTools = availableTools;
 
   const toolsByCategory = useMemo(() => {
     const grouped: Record<
@@ -2241,7 +2214,7 @@ export function HelpToolsWidget(): JSX.Element {
                   triggerRefetch();
                 }
               }}
-              placeholder="Search tools…"
+              placeholder={t("aiTools.modal.searchPlaceholder")}
               className="flex-1 h-full border-none bg-transparent text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-1 placeholder:text-muted-foreground/60"
             />
             {isSearching && (
@@ -2279,25 +2252,25 @@ export function HelpToolsWidget(): JSX.Element {
                 {
                   key: "webPinned" as const,
                   icon: Pin,
-                  label: "Web",
+                  label: t("aiTools.modal.chipWeb"),
                   count: stats.webPinned,
                 },
                 {
                   key: "pinned" as const,
                   icon: Bot,
-                  label: "AI pins",
+                  label: t("aiTools.modal.chipAiPins"),
                   count: stats.pinned,
                 },
                 {
                   key: "allowed" as const,
                   icon: Shield,
-                  label: "AI allowed",
+                  label: t("aiTools.modal.chipAiAllowed"),
                   count: stats.enabled,
                 },
                 {
                   key: "all" as const,
                   icon: null,
-                  label: "All",
+                  label: t("aiTools.modal.chipAll"),
                   count: stats.total,
                 },
               ] as const
@@ -2340,19 +2313,19 @@ export function HelpToolsWidget(): JSX.Element {
                     {
                       key: "cliAllowed" as const,
                       icon: Terminal,
-                      label: "CLI",
+                      label: t("aiTools.modal.chipCli"),
                       count: stats.cliAllowed ?? 0,
                     },
                     {
                       key: "mcpPinned" as const,
                       icon: Zap,
-                      label: "MCP vis",
+                      label: t("aiTools.modal.chipMcpPinned"),
                       count: stats.mcpPinned ?? 0,
                     },
                     {
                       key: "mcpAllowed" as const,
                       icon: Zap,
-                      label: "MCP all",
+                      label: t("aiTools.modal.chipMcpAllowed"),
                       count: stats.mcpAllowed ?? 0,
                     },
                   ] as const
@@ -2448,8 +2421,7 @@ export function HelpToolsWidget(): JSX.Element {
                 <Search className="h-7 w-7 text-muted-foreground/25" />
                 <Div>
                   <Span className="block text-sm font-medium text-foreground/60">
-                    {/* oxlint-disable-next-line i18n/no-literal-string */}
-                    No results
+                    {t("aiTools.modal.searchNoResults")}
                   </Span>
                   <Span className="block text-[11px] text-muted-foreground/50 mt-0.5">
                     &ldquo;{searchQuery}&rdquo;
@@ -2459,8 +2431,11 @@ export function HelpToolsWidget(): JSX.Element {
             ) : (
               <Div className="pt-1">
                 <Span className="block text-[10px] font-medium text-muted-foreground/40 uppercase tracking-wider pb-2">
-                  {visibleTools.length} result
-                  {visibleTools.length !== 1 ? "s" : ""}
+                  {visibleTools.length === 1
+                    ? t("aiTools.modal.searchResultOne")
+                    : t("aiTools.modal.searchResultMany", {
+                        count: visibleTools.length,
+                      })}
                 </Span>
                 {toolGrid(visibleTools)}
               </Div>

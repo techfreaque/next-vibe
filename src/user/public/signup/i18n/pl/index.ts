@@ -216,7 +216,8 @@ export const translations: typeof enTranslations = {
     conflict: {
       title: "Konflikt konta",
       description: "Konto z tym adresem e-mail już istnieje",
-      detail: "Konto z tym adresem e-mail już istnieje. Zaloguj się zamiast tego.",
+      detail:
+        "Konto z tym adresem e-mail już istnieje. Zaloguj się zamiast tego.",
     },
     userNotFound: "Nie znaleziono konta dla {{email}}",
     forbidden: {

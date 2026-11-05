@@ -34,6 +34,11 @@ export const translations = {
       description: "The generated speech audio",
       success: "Success",
       audioUrl: "Audio URL",
+      creditCost: "Credits used",
+    },
+    submitButton: {
+      label: "Speak it",
+      loadingText: "Synthesizing...",
     },
     errors: {
       validation_failed: {
@@ -72,6 +77,8 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred",
       },
+      noTtsProviderConfigured:
+        "No text-to-speech provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, or ELEVENLABS_API_KEY, or connect a system inference provider.",
       notConfigured:
         "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
       conversionFailed: "Speech synthesis failed: {{error}}",

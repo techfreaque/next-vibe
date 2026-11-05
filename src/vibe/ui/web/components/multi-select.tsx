@@ -160,6 +160,8 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
                     )}
                   >
                     <div
+                      // cmdk's aria-selected means "highlighted"; this is the real selection (E2E hook)
+                      data-checked={isSelected}
                       className={cn(
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         isSelected

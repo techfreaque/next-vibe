@@ -1,7 +1,7 @@
 /**
  * Vibe Frame Config - Endpoint Definition
  *
- * POST /api/[locale]/system/platforms/vibe-frame/mount
+ * POST /api/[locale]/vibe/platforms/vibe-frame/mount
  *
  * Called by the embed script (always cross-origin) with identity provided in
  * the POST body. For each requested integration, mints a short-lived (30s)

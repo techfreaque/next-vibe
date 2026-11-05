@@ -130,16 +130,14 @@ const { POST } = createEndpoint({
         description: "run.post.fields.model.description",
         options: ChatModelIdOptions,
         columns: 6,
+        // Agent callers resolve the model from skill/favorite. Human surfaces
+        // (web composer, desktop, CLI) keep it: the composer's model picker
+        // writes this field, and stripping it silently dropped the pick.
         hiddenForPlatforms: [
           Platform.AI,
           Platform.MCP,
           Platform.REMOTE_SKILL,
-          Platform.TRPC,
-          Platform.NEXT_PAGE,
-          Platform.NEXT_API,
           Platform.CRON,
-          Platform.ELECTRON,
-          Platform.FRAME,
         ],
         schema: z.enum(ChatModelId).optional(),
       }),

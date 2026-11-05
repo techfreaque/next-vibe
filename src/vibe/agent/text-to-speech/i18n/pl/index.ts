@@ -35,6 +35,11 @@ export const translations: typeof enTranslations = {
       description: "Wygenerowane audio mowy",
       success: "Sukces",
       audioUrl: "URL audio",
+      creditCost: "Zużyte kredyty",
+    },
+    submitButton: {
+      label: "Przeczytaj",
+      loadingText: "Generuję głos...",
     },
     errors: {
       validation_failed: {
@@ -73,6 +78,8 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt",
       },
+      noTtsProviderConfigured:
+        "Nie skonfigurowano żadnego dostawcy syntezy mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo ELEVENLABS_API_KEY – lub podłącz systemowego dostawcę inferencji.",
       notConfigured:
         "Klucz API {{label}} nie jest skonfigurowany. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Pobierz klucz na {{url}}",
       conversionFailed: "Synteza mowy nie powiodła się: {{error}}",

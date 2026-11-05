@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
     title: "Debug System Prompt",
     titleShort: "Debug prompt",
     description:
-      "Renderuje pełny system prompt dla danego kontekstu użytkownika. Tylko admin/dev.",
+      "Pokazuje dokładny system prompt, który AI dostaje w danym kontekście — folder, skill, wątek, wiadomość.",
     status: {
       loading: "Generowanie...",
       done: "Gotowe",
@@ -18,6 +18,14 @@ export const translations: typeof enTranslations = {
         description:
           "Symulowany kontekst folderu (private, public, incognito, cron, shared, remote)",
         placeholder: "private",
+        options: {
+          private: "Prywatny",
+          shared: "Udostępniony",
+          public: "Publiczny",
+          incognito: "Incognito",
+          background: "W tle",
+          remote: "Zdalny",
+        },
       },
       userRole: {
         label: "Rola użytkownika",
@@ -102,6 +110,18 @@ export const translations: typeof enTranslations = {
         description: "Zapisz lub odrzuć zmiany",
       },
       conflict: { title: "Konflikt", description: "Niespójny stan" },
+    },
+    widget: {
+      emptyTitle: "Wybierz kontekst",
+      emptyMessage: "Wybierz folder, opcjonalnie wiadomość, i zbuduj prompt.",
+      chars: "Znaki",
+      tokens: "~Tokeny",
+      cortexFailed:
+        "Embedding Cortex nie powiódł się — brak klucza API lub błąd dostawcy.",
+      cortexNoNodes:
+        "Embedding wygenerowany, ale żaden węzeł Cortex nie ma jeszcze embeddingów.",
+      cortexPassing: "{{passing}} z {{total}} trafień powyżej progu",
+      noTrailing: "Brak kontekstu końcowego dla tego zapytania.",
     },
     success: {
       title: "Prompt gotowy",

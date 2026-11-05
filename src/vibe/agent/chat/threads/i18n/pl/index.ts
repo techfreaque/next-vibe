@@ -327,6 +327,7 @@ export const translations: typeof enTranslations = {
       cancel: "Anuluj",
     },
     actions: {
+      menu: "Akcje wątku",
       rename: "Zmień nazwę",
       unpin: "Odepnij",
       pin: "Przypnij na górze",

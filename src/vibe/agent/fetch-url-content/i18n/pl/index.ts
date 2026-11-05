@@ -65,6 +65,11 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił błąd podczas pobierania adresu URL",
         detail: "Błąd pobierania: {{message}}",
       },
+      notConfigured: {
+        title:
+          "Brak klucza API {{label}}. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Klucz pobierzesz na {{url}}",
+        description: "Skonfiguruj {{label}}, aby pobierać strony",
+      },
       timeout: {
         title: "Przekroczono czas",
         description: "Pobieranie URL przekroczyło limit czasu",

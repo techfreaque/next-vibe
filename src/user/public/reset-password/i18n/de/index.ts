@@ -374,10 +374,8 @@ export const translations: typeof enTranslations = {
       expiresAt: "Token läuft ab am",
       nextSteps: {
         item: "Nächste Schritte nach Validierung",
-        steps: [
-          "Fahren Sie fort, um Ihr neues Passwort festzulegen",
-          "Wählen Sie ein starkes, einzigartiges Passwort",
-        ],
+        setPassword: "Fahren Sie fort, um Ihr neues Passwort festzulegen",
+        choosePassword: "Wählen Sie ein starkes, einzigartiges Passwort",
       },
     },
     errors: {

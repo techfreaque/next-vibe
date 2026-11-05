@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/videos/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a55e615499acdbc5-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 05 Nov 2026 19:49:10 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "set-cookie": "__cf_bm=8sJ_uUeTchnoatPIL4S58xWZvequMedZLSGwRaU7kgc-1793908150.4944212-1.0.1.1-KMmeLOMwet1ddIuPrgVLMk3q.UrbTtPVLopPbYwmg36VJPVVis6SJuGLtdd_egSesfCLGCUZxTFmJXn04PYiGuSKUTtXPZ0hEM3cMicwgTJtaPnm4pjVsgXhZ_PkYHMc; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu, 05 Nov 2026 20:19:10 GMT"
+  },
+  "body": {
+    "id": "gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "generation_id": "gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "polling_url": "https://openrouter.ai/api/v1/videos/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "status": "completed",
+    "unsigned_urls": [
+      "https://openrouter.ai/api/v1/videos/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9/content?index=0"
+    ],
+    "urls": [
+      "https://storage.googleapis.com/openrouter-generated-media-us/v1/user_2xa4RltcnuVIYLYSeWPhnk4qIjt/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9/0?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=generated-media-writer%40openrouter-core.iam.gserviceaccount.com%2F20261105%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20261105T194910Z&X-Goog-Expires=86398&X-Goog-SignedHeaders=host&X-Goog-Signature=172bbbf6af5552eb24d869bbfca52bf773320bae022234ff6fb4fd16c5cf876eda96e53fa6a3b579b41132d7e18010fd7c61565a213c0725d29ce5c6ef878e3eac4b2a46dcfdeeffb190e6ea5c7e1e359f144a7d33b421eea89d1c91dbe814f94046fbbbaf68ef6d16acae8f754ab661c30249a4c12c8e2b64ad6d717a7b816443c41041b0585eaa5a1f383204e3923013dd540f239a95d9b9bde231c0e6eec82d13e4d8a53d47f98dcee1987ebc2317b68b1a11f95b8b71896711cb25f505dad82dfa59f5839d0c6e089a24923969da8f85bb009b32f26414e708b0c6a9cf3b6196097f587201794d3eb4096a1a225e83879f69d7e77160ac0518915ffb0875"
+    ],
+    "usage": {
+      "cost": 0.5,
+      "is_byok": false
+    },
+    "expires_at": 1793994548
+  }
+}

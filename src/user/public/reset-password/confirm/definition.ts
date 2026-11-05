@@ -13,7 +13,10 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
-import { requestField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";

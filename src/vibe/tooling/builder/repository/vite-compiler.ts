@@ -2727,7 +2727,15 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
             "style-to-js",
             "debug",
             "extend",
+            // All of Tiptap or none: noDiscovery serves unlisted packages raw, so a
+            // prebundled @tiptap/react next to raw @tiptap/core loads two copies of
+            // prosemirror-state — every editor then crashes on mount ("Adding
+            // different instances of a keyed plugin").
+            "@tiptap/core",
             "@tiptap/react",
+            "@tiptap/starter-kit",
+            "@tiptap/extension-link",
+            "@tiptap/extension-placeholder",
             "tiptap-markdown",
             "markdown-it-task-lists",
             "fast-equals",

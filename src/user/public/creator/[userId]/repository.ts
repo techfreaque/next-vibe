@@ -211,6 +211,7 @@ export class CreatorProfileRepository {
 
       const referralCode = referralResult[0]?.code ?? null;
       const cfg = configRows[0];
+      const leadMagnetActive = cfg?.isActive ?? false;
       const leadMagnetHeadline = cfg?.isActive ? (cfg.headline ?? null) : null;
       const leadMagnetButtonText = cfg?.isActive
         ? (cfg.buttonText ?? null)
@@ -242,6 +243,7 @@ export class CreatorProfileRepository {
         creatorHeaderImageUrl: user.creatorHeaderImageUrl ?? null,
         referralCode,
         appName,
+        leadMagnetActive,
         leadMagnetHeadline,
         leadMagnetButtonText,
         skills,

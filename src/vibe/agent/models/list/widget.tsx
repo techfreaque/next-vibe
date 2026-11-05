@@ -18,6 +18,10 @@ import {
   useWidgetLocale,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -207,7 +211,39 @@ function ModelGrid({
 
 // ── Main Widget ───────────────────────────────────────────────────────────────
 
-export function ModelsListWidget(): JSX.Element {
+interface ModelsListWidgetProps {
+  field: (typeof definition.GET)["fields"];
+}
+
+/** Server-side filters — the request form. Without it the page had no way to pick a modelType. */
+function ModelsListFilters({
+  fields: children,
+}: {
+  fields: ModelsListWidgetProps["field"]["children"];
+}): JSX.Element {
+  return (
+    <Div className="flex flex-col gap-2">
+      <Div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <SelectFieldWidget fieldName="modelType" field={children.modelType} />
+        <SelectFieldWidget
+          fieldName="contentLevel"
+          field={children.contentLevel}
+        />
+        <SelectFieldWidget
+          fieldName="intelligence"
+          field={children.intelligence}
+        />
+      </Div>
+      <TextFieldWidget fieldName="query" field={children.query} />
+      <FormAlertWidget field={{}} />
+      <SubmitButtonWidget<typeof definition.GET> field={{}} />
+    </Div>
+  );
+}
+
+export function ModelsListWidget({
+  field,
+}: ModelsListWidgetProps): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const value = useWidgetValue<typeof definition.GET>();
@@ -241,7 +277,11 @@ export function ModelsListWidget(): JSX.Element {
   }, [value, localQuery, activeContent]);
 
   if (!value) {
-    return <Div />;
+    return isPickerMode ? (
+      <Div />
+    ) : (
+      <ModelsListFilters fields={field.children} />
+    );
   }
 
   const types = TYPE_ORDER.filter((type) =>
@@ -252,47 +292,50 @@ export function ModelsListWidget(): JSX.Element {
 
   return (
     <Div className="space-y-3">
-      {/* Search + content filter */}
-      <Div className="flex flex-col gap-2">
-        <Div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8"
-            placeholder={t("get.fields.query.placeholder")}
-            value={localQuery}
-            onChange={(e) => {
-              setLocalQuery(e.target.value);
-            }}
-          />
-        </Div>
-        {!isPickerMode && contentLevels.length > 1 && (
-          <Div className="flex gap-1 flex-wrap">
-            <Button
-              variant={activeContent === null ? "default" : "outline"}
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => {
-                setActiveContent(null);
+      {!isPickerMode && <ModelsListFilters fields={field.children} />}
+      {/* Picker mode: instant local search + content filter over the loaded list */}
+      {isPickerMode && (
+        <Div className="flex flex-col gap-2">
+          <Div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-8"
+              placeholder={t("get.fields.query.placeholder")}
+              value={localQuery}
+              onChange={(e) => {
+                setLocalQuery(e.target.value);
               }}
-            >
-              {t("get.browser.allLabel")}
-            </Button>
-            {contentLevels.map((level) => (
+            />
+          </Div>
+          {contentLevels.length > 1 && (
+            <Div className="flex gap-1 flex-wrap">
               <Button
-                key={level}
-                variant={activeContent === level ? "default" : "outline"}
+                variant={activeContent === null ? "default" : "outline"}
                 size="sm"
                 className="h-7 text-xs"
                 onClick={() => {
-                  setActiveContent(activeContent === level ? null : level);
+                  setActiveContent(null);
                 }}
               >
-                {level}
+                {t("get.browser.allLabel")}
               </Button>
-            ))}
-          </Div>
-        )}
-      </Div>
+              {contentLevels.map((level) => (
+                <Button
+                  key={level}
+                  variant={activeContent === level ? "default" : "outline"}
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setActiveContent(activeContent === level ? null : level);
+                  }}
+                >
+                  {level}
+                </Button>
+              ))}
+            </Div>
+          )}
+        </Div>
+      )}
 
       {/* Stats */}
       {!isPickerMode && (
@@ -307,10 +350,13 @@ export function ModelsListWidget(): JSX.Element {
       )}
 
       {/* Tabs by model type — full mode; flat grid in picker mode */}
-      {isPickerMode ? (
+      {/* No tabs to show for an empty result — ModelGrid renders the empty state */}
+      {isPickerMode || types.length === 0 ? (
         <ModelGrid models={filtered} t={t} locale={locale} onPick={onPick} />
       ) : (
-        <Tabs defaultValue={defaultTab}>
+        // Remount when the type set changes (a refetch narrowed to other types),
+        // else the uncontrolled tab stays on a type that no longer exists.
+        <Tabs key={types.join(",")} defaultValue={defaultTab}>
           <TabsList>
             {types.map((type) => {
               const count = filtered.filter((m) => m.type === type).length;

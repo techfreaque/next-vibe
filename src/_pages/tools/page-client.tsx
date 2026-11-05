@@ -1,13 +1,9 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type {
-  HelpGetRequestInput,
-  HelpGetResponseOutput,
-} from "next-vibe/help-tool/definition";
+import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
@@ -16,69 +12,7 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
-function parseInitialState(
-  searchParams: ReturnType<typeof useSearchParams>,
-): Partial<HelpGetRequestInput> {
-  const state: Partial<HelpGetRequestInput> = { statsFilter: "webPinned" };
-
-  const q = searchParams.get("q");
-  if (q) {
-    state.query = q;
-  }
-
-  const sf = searchParams.get("sf");
-  if (
-    sf === "pinned" ||
-    sf === "allowed" ||
-    sf === "all" ||
-    sf === "webPinned" ||
-    sf === "cliAllowed" ||
-    sf === "mcpPinned" ||
-    sf === "mcpAllowed"
-  ) {
-    state.statsFilter = sf;
-  }
-
-  if (searchParams.get("prod") === "1") {
-    state.includeProdOnly = true;
-  }
-
-  const view = searchParams.get("view");
-  if (
-    view === UserPermissionRole.PUBLIC ||
-    view === UserPermissionRole.CUSTOMER
-  ) {
-    state.viewAsRole = view;
-  }
-
-  const inst = searchParams.get("inst");
-  if (inst) {
-    state.instanceId = inst;
-  }
-
-  const cat = searchParams.get("cat");
-  if (cat) {
-    state.category = cat;
-  }
-
-  const p = searchParams.get("p");
-  if (p) {
-    const n = parseInt(p, 10);
-    if (!isNaN(n) && n >= 1) {
-      state.page = n;
-    }
-  }
-
-  const ps = searchParams.get("ps");
-  if (ps) {
-    const n = parseInt(ps, 10);
-    if (!isNaN(n) && n >= 1) {
-      state.pageSize = n;
-    }
-  }
-
-  return state;
-}
+import { parseToolsInitialState } from "./initial-state";
 
 export function ToolsPageClient({
   locale,
@@ -94,14 +28,17 @@ export function ToolsPageClient({
   const searchParams = useSearchParams();
   const logger = useLogger();
 
-  const initialState = parseInitialState(searchParams);
-  const useInitialData =
-    !initialState.category &&
-    (!initialState.statsFilter || initialState.statsFilter === "webPinned");
+  const initialState = parseToolsInitialState(searchParams);
+  // The SSR snapshot is the default view only (webPinned, page 1, no filters).
+  // Any URL filter (?q, ?cat, ?p, ?ps, ?inst, ?prod, ?view) must fetch - seeding
+  // the default snapshot would render the unfiltered list under a filtered URL.
+  const isDefaultView = Object.entries(initialState).every(
+    ([key, value]) => key === "statsFilter" && value === "webPinned",
+  );
   const endpointOptions = {
     read: {
       initialState,
-      initialData: useInitialData ? (initialHelpData ?? undefined) : undefined,
+      initialData: isDefaultView ? (initialHelpData ?? undefined) : undefined,
       queryOptions: {
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,

@@ -32,9 +32,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     allowMixedLocales: true,
   });
 
-  // For passthrough responses (not redirects/errors), inject x-pathname so
-  // server components can read the current pathname without URL hacks.
-  if (response.status < 300) {
+  // For passthrough responses (NextResponse.next(), not redirects/errors or a
+  // final answer like the 204 CORS preflight), inject x-pathname so server
+  // components can read the current pathname without URL hacks.
+  if (response.headers.get("x-middleware-next") === "1") {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-pathname", request.nextUrl.pathname);
     const withPathname = NextResponseClass.next({

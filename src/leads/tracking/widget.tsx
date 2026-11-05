@@ -16,14 +16,22 @@ import { User } from "next-vibe/ui/components/icons/User";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
 import { openInNewTab } from "next-vibe/ui/lib/location";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { UuidFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/uuid-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback } from "react";
 
 import type definition from "./definition";
@@ -64,6 +72,10 @@ export function LeadEngagementTrackingContainer({
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const user = useWidgetUser();
+  // Lead/user pickers list admin-only endpoints — visitors are tracked via their own lead cookie
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
   const isLoading = endpointMutations?.create?.isSubmitting;
   const hasResult = data?.id !== null && data?.id !== undefined;
@@ -248,30 +260,46 @@ export function LeadEngagementTrackingContainer({
         </Div>
       )}
 
-      {/* Empty / pre-submit state */}
+      {/* Pre-submit state: the engagement form */}
       {!hasResult && !isLoading && (
-        <Div className="rounded-lg border bg-muted/20 p-8 flex flex-col items-center gap-5 text-center">
-          <Activity className="h-10 w-10 text-muted-foreground" />
-          <Div>
-            <Span className="font-medium block text-base">
-              {t("widget.post.emptyTitle")}
-            </Span>
-            <Span className="text-sm text-muted-foreground">
-              {t("widget.post.emptyDescription")}
-            </Span>
+        <Div className="flex flex-col gap-4">
+          <Div className="flex items-start gap-3">
+            <Activity className="h-6 w-6 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <Div>
+              <Span className="font-medium block text-base">
+                {t("widget.post.emptyTitle")}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {t("widget.post.emptyDescription")}
+              </Span>
+            </Div>
           </Div>
-          <Div className="flex items-center gap-2 pt-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleViewStats}
-              className="gap-1 text-xs"
-            >
-              <BarChart2 className="h-4 w-4" />
-              {t("widget.post.viewLeadStatsButton")}
-            </Button>
+          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <SelectFieldWidget
+              fieldName="engagementType"
+              field={children.engagementType}
+            />
+            <UuidFieldWidget
+              fieldName="campaignId"
+              field={children.campaignId}
+            />
           </Div>
+          {isAdmin && (
+            <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <EntityPickerFieldWidget
+                fieldName="leadId"
+                field={children.leadId}
+              />
+              <EntityPickerFieldWidget
+                fieldName="userId"
+                field={children.userId}
+              />
+            </Div>
+          )}
+          <FormAlertWidget field={{}} />
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{ icon: "activity", variant: "primary" }}
+          />
         </Div>
       )}
     </Div>
@@ -291,7 +319,10 @@ export function LeadClickTrackingContainer({
   const data = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.POST>();
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const user = useWidgetUser();
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
   const isLoading = endpointMutations?.read?.isLoading;
   const hasResult = data?.success !== null && data?.success !== undefined;
@@ -345,6 +376,24 @@ export function LeadClickTrackingContainer({
           <BarChart2 className="h-4 w-4" />
           {t("widget.get.statsButton")}
         </Button>
+      </Div>
+
+      {/* Click parameters — the same query a tracked email link carries */}
+      <Div className="flex flex-col gap-3">
+        {isAdmin && (
+          <EntityPickerFieldWidget fieldName="leadId" field={children.leadId} />
+        )}
+        <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <UuidFieldWidget fieldName="campaignId" field={children.campaignId} />
+          <SelectFieldWidget fieldName="stage" field={children.stage} />
+          <SelectFieldWidget fieldName="source" field={children.source} />
+          <TextFieldWidget fieldName="ref" field={children.ref} />
+        </Div>
+        <TextFieldWidget fieldName="url" field={children.url} />
+        <FormAlertWidget field={{}} />
+        <SubmitButtonWidget<typeof definition.GET>
+          field={{ icon: "mouse-pointer-click", variant: "primary" }}
+        />
       </Div>
 
       {/* Loading state */}

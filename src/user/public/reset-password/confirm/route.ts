@@ -27,6 +27,7 @@ export const { POST, tools } = endpointsHandler({
         data.token,
         data.email,
         data.password,
+        data.confirmPassword,
         locale,
         logger,
         t,

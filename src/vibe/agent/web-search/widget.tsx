@@ -13,6 +13,7 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
+import { FormField, FormItem } from "next-vibe/ui/components/form/form";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Search } from "next-vibe/ui/components/icons/Search";
@@ -67,7 +68,8 @@ function ProviderTabs({
 }): JSX.Element {
   const locale = useWidgetLocale();
   const { t: widgetT } = scopedTranslation.scopedT(locale);
-  return (
+  const form = useWidgetForm<typeof definition.GET>();
+  const tabs = (
     <Div className="flex items-center gap-1">
       {PROVIDER_TABS.map((tab) => (
         <Button
@@ -82,6 +84,16 @@ function ProviderTabs({
         </Button>
       ))}
     </Div>
+  );
+  // A real form field like its siblings - carries data-field="provider"
+  return form ? (
+    <FormField
+      control={form.control}
+      name="provider"
+      render={() => <FormItem className="space-y-0">{tabs}</FormItem>}
+    />
+  ) : (
+    tabs
   );
 }
 
@@ -295,8 +307,9 @@ export function WebSearchResultsContainer({
           <Div className="flex items-center gap-2">
             {value?.usedProvider ? (
               <Badge variant="secondary" className="text-xs font-normal">
-                {/* eslint-disable-next-line i18n/no-literal-string */}
-                via {widgetT(value.usedProvider)}
+                {widgetT("get.widget.via", {
+                  provider: widgetT(value.usedProvider),
+                })}
               </Badge>
             ) : null}
             <DefaultProviderControl />

@@ -320,7 +320,7 @@ export function SignupFormContainer({
                         />
                       </FormControl>
                       <Span className="text-sm">
-                        {name ?? `${skillId.slice(0, 8)  }…`}
+                        {name ?? `${skillId.slice(0, 8)}…`}
                       </Span>
                     </Div>
                   ))}

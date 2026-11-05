@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        url: "https://example.com/api/en-GLOBAL/agent/chat/threads/files/thread-123/screenshot-abc.png",
+        url: "https://example.com/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
       },
     },
   },

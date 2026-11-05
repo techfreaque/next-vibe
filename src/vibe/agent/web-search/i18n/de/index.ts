@@ -90,6 +90,7 @@ export const translations: typeof enTranslations = {
       aiDefaultLabel: "KI-Standard:",
       switchTo: "Wechseln zu",
       separatorDot: "·",
+      via: "über {{provider}}",
       braveBanner: "Deine KI sucht gerade mit Kagi",
       kagiBanner: "Deine KI sucht gerade mit Brave",
       useBrave: "Brave nutzen",

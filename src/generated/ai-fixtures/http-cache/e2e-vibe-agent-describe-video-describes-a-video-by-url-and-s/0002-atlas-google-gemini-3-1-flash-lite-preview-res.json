@@ -1,0 +1,77 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a55e45a548b65d1a-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 05 Nov 2026 19:30:17 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1793907016-Lg1jUYbPjC4qBFZ3l61Z",
+    "x-openrouter-release": "api;6b0051ab-7060-454f-99c5-bd96a124cdc1",
+    "set-cookie": "__cf_bm=yd_ga5dT_rY.lm7h.SZL7WpTFETXLr2VDonYGUYVVrE-1793907016.5365386-1.0.1.1-l9GvyYXScIp7C5PNG94_pU3qYJDchIu1aTuqPZFVERpxSUGdGdUWYGqkWGz4c0jRU5phVN4_ncSP4F7ICqecrbW.5QPoTEy5vF7iFfmSGDEGBntDgAF8JPnOFQ7k2iKT; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu, 05 Nov 2026 20:00:17 GMT"
+  },
+  "body": {
+    "id": "gen-1793907016-Lg1jUYbPjC4qBFZ3l61Z",
+    "object": "chat.completion",
+    "created": 1793907016,
+    "model": "google/gemini-3.1-flash-lite-preview",
+    "provider": "Google AI Studio",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A sloth bear paces back and forth inside its enclosure behind a wire fence.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "EnMKcQFpFH0TsAH8TOpoj4HEfMk1LxyrDH5OnaNR9M4vSx5IEByxs9Qm36URE4PGMVcAv7d4+lmmoLYX7n2K8zFUwseulUUJ9m1CvBBs8FG6BdyRAPPuPeAr3GaSYhkPlo97aXRLCMZq661gXw2AZ+4n5NhS",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 80,
+      "completion_tokens": 15,
+      "total_tokens": 95,
+      "cost": 0.0000425,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0000425,
+        "upstream_inference_prompt_cost": 0.00002,
+        "upstream_inference_completions_cost": 0.0000225
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

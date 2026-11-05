@@ -15,10 +15,17 @@ export const translations: typeof enTranslations = {
       description: "Berechtigungen für Root-Ordner anzeigen",
     },
     rootFolderId: {
-      label: "Root-Ordner-ID",
+      label: "Root-Ordner",
       description:
         "Die ID des Root-Ordners, für den Berechtigungen geprüft werden sollen",
-      placeholder: "private, shared, public oder incognito",
+      options: {
+        private: "Privat",
+        shared: "Geteilt",
+        public: "Öffentlich",
+        background: "Hintergrund",
+        incognito: "Inkognito",
+        remote: "Remote",
+      },
     },
     response: {
       canCreateThread: {

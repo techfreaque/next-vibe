@@ -41,6 +41,7 @@ export const translations = {
       creatorHeaderImageUrl: "Header-Bild",
       referralCode: "Empfehlungscode",
       appName: "App-Name",
+      leadMagnetActive: "Lead-Magnet aktiv",
       leadMagnetHeadline: "Lead-Magnet-Titel",
       leadMagnetButtonText: "Lead-Magnet-Button",
       skills: "Skills",
@@ -97,16 +98,11 @@ export const translations = {
       backArrow: "\u2190",
       copyright: "\u00a9",
     },
-    lead: {
-      headline: "Bleib auf dem Laufenden",
-      namePlaceholder: "Dein Vorname",
-      emailPlaceholder: "Deine E-Mail",
-      send: "Anmelden",
-      sending: "...",
-      doneHeading: "Fertig.",
-      doneSub: "Du stehst auf der Liste.",
-      finePrint: "Kein Spam. Jederzeit abmeldbar.",
-      error: "Etwas ist schiefgelaufen. Versuch es noch einmal.",
-    },
+  },
+  meta: {
+    title: "{{publicName}} - Creator-Profil",
+    description:
+      "{{publicName}} baut KI-Skills auf {{appName}}. Arbeiten ansehen, Gespräch starten.",
+    notFound: "Creator nicht gefunden - {{appName}}",
   },
 };

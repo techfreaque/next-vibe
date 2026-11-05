@@ -23,6 +23,16 @@ export const translations: typeof enTranslations = {
       label: "Szukaj",
       description: "Szukaj wątków po tytule",
     },
+    feed: {
+      empty: "Brak publicznych wątków. Zacznij pierwszy.",
+      emptySearch: "Nic nie pasuje do wyszukiwania.",
+      justNow: "przed chwilą",
+      hoursAgo: "{{count}} godz. temu",
+      daysAgo: "{{count}} dni temu",
+      messages: "Wiadomości: {{count}}",
+      participants: "Uczestnicy: {{count}}",
+      score: "Wynik",
+    },
     response: {
       title: "Odpowiedź feedu",
       description: "Wzbogacona lista publicznych wątków",

@@ -40,7 +40,8 @@ export const translations = {
       creatorHeaderImageUrl: "Obraz naglówka",
       referralCode: "Kod polecajacy",
       appName: "Nazwa aplikacji",
-      leadMagnetHeadline: "Naglówek lead magnet",
+      leadMagnetActive: "Lead magnet aktywny",
+      leadMagnetHeadline: "Nagłówek lead magnet",
       leadMagnetButtonText: "Przycisk lead magnet",
       skills: "Skille",
     },
@@ -93,16 +94,11 @@ export const translations = {
       backArrow: "\u2190",
       copyright: "\u00a9",
     },
-    lead: {
-      headline: "Bądź na bieżąco",
-      namePlaceholder: "Twoje imię",
-      emailPlaceholder: "Twój e-mail",
-      send: "Subskrybuj",
-      sending: "...",
-      doneHeading: "Gotowe.",
-      doneSub: "Jesteś na liście.",
-      finePrint: "Żadnego spamu. Wypisz się w dowolnej chwili.",
-      error: "Coś poszło nie tak. Spróbuj ponownie.",
-    },
+  },
+  meta: {
+    title: "{{publicName}} - Profil twórcy",
+    description:
+      "{{publicName}} tworzy skille AI na {{appName}}. Zobacz, co zbudował, i zacznij rozmowę.",
+    notFound: "Nie znaleziono twórcy - {{appName}}",
   },
 };

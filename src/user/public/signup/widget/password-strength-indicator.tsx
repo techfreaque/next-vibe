@@ -65,15 +65,14 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
         <Span className={cn("font-semibold", textColorClass)}>{labelText}</Span>
       </Div>
       <Div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-        <Div
-          style={{
-            width: `${widthPercentage}%`,
-            height: "100%",
-            transitionProperty: "all",
-            transitionDuration: "300ms",
-            backgroundColor: colorClass,
-          }}
-        />
+        <Div style={{ width: `${widthPercentage}%`, height: "100%" }}>
+          <Div
+            className={cn(
+              "h-full w-full transition-all duration-300",
+              colorClass,
+            )}
+          />
+        </Div>
       </Div>
       {level !== "strong" && (
         <Div className="flex flex-col gap-1 text-sm mt-1 text-muted-foreground">

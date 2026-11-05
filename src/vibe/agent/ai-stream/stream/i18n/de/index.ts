@@ -680,9 +680,16 @@ export const translations: typeof enTranslations = {
     noCredits: {
       title: "Keine Credits mehr",
       addCredits: "Credits aufladen",
+      description: "Dein Guthaben ist leer. Lade auf und chatte weiter.",
     },
     insufficientCredits: {
       title: "Nicht genug Credits (benötigt {{cost}}, vorhanden {{balance}})",
+      description: "Lade auf oder wähle ein günstigeres Modell.",
+    },
+    noModel: {
+      title: "Kein Modell gewählt",
+      description:
+        "Wähle zuerst ein Modell. Keins verfügbar? Prüfe deine Provider-API-Schlüssel.",
     },
     keyboardShortcuts: {
       enter: "Enter",

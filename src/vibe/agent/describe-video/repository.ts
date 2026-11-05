@@ -31,6 +31,8 @@ import {
 } from "../ai-stream/repository/core/modality-resolver";
 import { chatSettings } from "../chat/settings/db";
 import { getEnvAvailability } from "../env-availability";
+import { VISION_MINIMUM_BALANCE } from "../shared/constants";
+import { createFixtureDownload } from "../shared/fixture-download";
 import { calculateCreditCost } from "../models/models";
 import { chatFavorites, FAVORITE_CONFIG_COLUMNS } from "../skills/favorites/db";
 import { resolveFavoriteConfig } from "../skills/favorites/repository";
@@ -90,6 +92,17 @@ export class DescribeVideoRepository {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+    // Cost is only known after the call — refuse up front when the account
+    // can't cover even the smallest description instead of going negative.
+    if (balanceResult.data.total < VISION_MINIMUM_BALANCE) {
+      return fail({
+        message: t("post.errors.insufficientCredits", {
+          balance: balanceResult.data.total.toString(),
+          minimum: VISION_MINIMUM_BALANCE.toString(),
+        }),
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      });
+    }
 
     try {
       const visionProvider = ProviderFactory.getProviderForModel(
@@ -100,6 +113,12 @@ export class DescribeVideoRepository {
 
       const result = await aiGenerateText({
         model: visionProvider.chat(visionModel.providerModel) as LanguageModel,
+        // Media the model can't take by URL is downloaded through the
+        // fixture chain, never the AI SDK's global fetch.
+        experimental_download: createFixtureDownload(
+          toolExecutionContext,
+          logger,
+        ),
         messages: [
           {
             role: "user" as const,

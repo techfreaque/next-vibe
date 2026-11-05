@@ -33,6 +33,12 @@ import type { ErrorResponseType } from "./route/response.schema";
 import type { WidgetData } from "./utils/json";
 
 /**
+ * Request header a browser E2E run sends to bind its API calls to a fixture
+ * scope (see ToolExecutionContext.fixtureScopeId). Honoured in dev/test only.
+ */
+export const FIXTURE_SCOPE_HEADER = "x-vibe-fixture-scope";
+
+/**
  * Default folder IDs
  * These are special system folder IDs that exist outside the database
  * They use simple string IDs (not UUIDs) for easy reference
@@ -97,6 +103,14 @@ export interface ToolExecutionContext {
    * (the fixture engine is dev/test-only); ignored outside the fixture fetch.
    */
   fixtureOrdinal?: number;
+  /**
+   * TEST-ONLY fixture scope for a context with no thread — a browser E2E
+   * request carries it via FIXTURE_SCOPE_HEADER so standalone AI/media tools
+   * record once and replay after. Takes precedence over threadId as the
+   * fixture key only; it never changes thread semantics. next-handler sets it
+   * only in development/test, so prod never sees one.
+   */
+  fixtureScopeId?: string;
   /**
    * IANA timezone of the turn (e.g. "Europe/Vienna"). Threaded from the client
    * request for interactive turns and from the owning user / server for

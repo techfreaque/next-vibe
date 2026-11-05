@@ -1013,11 +1013,15 @@ export class MessagesRepository {
       }
 
       const messageId = data.id ?? crypto.randomUUID();
+      // Stamped here, not read back via RETURNING: the id and time are known.
+      const createdAt = new Date();
 
       const [message] = await db
         .insert(chatMessages)
         .values({
           id: messageId,
+          createdAt,
+          updatedAt: createdAt,
           threadId: data.threadId,
           role: safeRole,
           content: data.content || "",
@@ -1028,10 +1032,7 @@ export class MessagesRepository {
           skill: user.isPublic ? null : data.skill || null,
           metadata: data.metadata || {},
         })
-        .returning({
-          id: chatMessages.id,
-          createdAt: chatMessages.createdAt,
-        });
+        .returning({ id: chatMessages.id });
 
       if (!message) {
         return fail({
@@ -1053,13 +1054,13 @@ export class MessagesRepository {
       }
 
       logger.debug("Message created", {
-        messageId: message.id,
+        messageId,
         threadId: data.threadId,
       });
 
       return success({
-        messageId: message.id,
-        createdAt: message.createdAt,
+        messageId,
+        createdAt,
       });
     } catch (error) {
       logger.error("Error creating message", parseError(error));

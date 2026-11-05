@@ -21,6 +21,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { Pre } from "next-vibe/ui/components/pre";
 import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
@@ -139,12 +140,14 @@ export function ExecuteToolWidget(): JSX.Element {
     );
   }, [isRemoteTool, remoteInfo.instanceId, connectionsState?.read?.response]);
 
-  // Fetch available tools from help endpoint (role-based filtering)
+  // Fetch available tools from help endpoint (role-based filtering).
+  // statsFilter "all": every tool the caller may run — the default "pinned"
+  // view would offer only the handful of pinned tools.
   const helpState = useEndpoint(
     helpEndpoints,
     {
       read: {
-        initialState: { pageSize: 500 },
+        initialState: { pageSize: 500, statsFilter: "all" },
         queryOptions: {
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000, // 5 minutes
@@ -333,6 +336,7 @@ export function ExecuteToolWidget(): JSX.Element {
                   )}
                   allowCustom={true}
                 />
+                <FormMessage t={t} />
               </FormItem>
             )}
           />
@@ -496,6 +500,7 @@ export function ExecuteToolWidget(): JSX.Element {
             <Button
               type="button"
               variant="ghost"
+              data-testid="endpoint-submit"
               onClick={(): void => {
                 form.handleSubmit(onSubmit)();
               }}

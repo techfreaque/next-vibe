@@ -672,9 +672,16 @@ export const translations: typeof enTranslations = {
     noCredits: {
       title: "Skończyły się kredyty",
       addCredits: "Doładuj kredyty",
+      description: "Saldo jest puste. Doładuj i rozmawiaj dalej.",
     },
     insufficientCredits: {
       title: "Za mało kredytów (potrzeba {{cost}}, masz {{balance}})",
+      description: "Doładuj kredyty albo wybierz tańszy model.",
+    },
+    noModel: {
+      title: "Nie wybrano modelu",
+      description:
+        "Najpierw wybierz model. Brak na liście? Sprawdź klucze API dostawców.",
     },
     keyboardShortcuts: {
       enter: "Enter",

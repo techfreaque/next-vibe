@@ -74,4 +74,15 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  form: {
+    headline: "Bleib auf dem Laufenden",
+    namePlaceholder: "Dein Vorname",
+    emailPlaceholder: "Deine E-Mail",
+    send: "Anmelden",
+    sending: "...",
+    doneHeading: "Fertig.",
+    doneSub: "Du stehst auf der Liste.",
+    finePrint: "Kein Spam. Jederzeit abmeldbar.",
+    error: "Etwas ist schiefgelaufen. Versuch es noch einmal.",
+  },
 };

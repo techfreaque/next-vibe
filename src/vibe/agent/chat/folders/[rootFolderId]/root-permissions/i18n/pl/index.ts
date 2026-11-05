@@ -15,9 +15,16 @@ export const translations: typeof enTranslations = {
       description: "Zobacz uprawnienia dla folderów głównych",
     },
     rootFolderId: {
-      label: "ID folderu głównego",
+      label: "Folder główny",
       description: "ID folderu głównego, dla którego sprawdzane są uprawnienia",
-      placeholder: "private, shared, public lub incognito",
+      options: {
+        private: "Prywatny",
+        shared: "Udostępniony",
+        public: "Publiczny",
+        background: "W tle",
+        incognito: "Incognito",
+        remote: "Zdalne",
+      },
     },
     response: {
       canCreateThread: {

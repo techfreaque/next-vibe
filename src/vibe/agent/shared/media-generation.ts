@@ -14,6 +14,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import type { CreditsT } from "@/credits/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -90,4 +91,23 @@ export async function deductMediaCredits(
   }
 
   return success(undefined);
+}
+
+/**
+ * True when the caller's own model pick must survive requestDefaults.
+ * requestDefaults patches always win over the request (so an AI caller's
+ * stale example model is replaced by the favorite/skill model), but a human
+ * picking a model in the web/CLI form chose it deliberately — overriding it
+ * silently charged them for a different (often far pricier) model.
+ */
+export function keepsExplicitMediaModel(
+  platform: Platform,
+  requestedModel: string | undefined,
+): boolean {
+  return (
+    requestedModel !== undefined &&
+    requestedModel !== "" &&
+    platform !== Platform.AI &&
+    platform !== Platform.MCP
+  );
 }

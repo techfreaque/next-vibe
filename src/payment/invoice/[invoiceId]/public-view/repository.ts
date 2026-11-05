@@ -90,7 +90,7 @@ export class InvoicePublicViewRepository {
 
       return success({
         id: invoice.id,
-        invoiceNumber: invoice.providerInvoiceId ?? null,
+        invoiceNumber: invoice.invoiceNumber ?? invoice.providerInvoiceId,
         currency: invoice.currency,
         status: invoice.status,
         amount: invoice.amount,

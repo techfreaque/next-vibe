@@ -8,7 +8,12 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { objectField, requestField, responseArrayField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -152,6 +157,7 @@ const { GET } = createEndpoint({
                           type: WidgetType.TEXT,
                           content:
                             "response.loginMethods.social.providers.id.content",
+                          hidden: true,
                           schema: z.string().describe("Provider identifier"),
                         }),
                         enabled: responseField(scopedTranslation, {

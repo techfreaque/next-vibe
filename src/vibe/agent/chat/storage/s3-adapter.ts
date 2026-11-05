@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
 import type { FileMetadata, StorageAdapter } from "./index";
-import { makeAbsoluteStorageUrl } from "./url-utils";
+import { buildStorageFileUrl } from "./url-utils";
 
 export class S3StorageAdapter implements StorageAdapter {
   private client!: S3Client;
@@ -129,9 +129,7 @@ export class S3StorageAdapter implements StorageAdapter {
     // Generate URL
     const url = this.publicUrlBase
       ? `${this.publicUrlBase}/${fileKey}`
-      : makeAbsoluteStorageUrl(
-          `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${storedFilename}`,
-        );
+      : buildStorageFileUrl(metadata.threadId, storedFilename);
 
     return {
       url,
@@ -188,9 +186,7 @@ export class S3StorageAdapter implements StorageAdapter {
       return `${this.publicUrlBase}/${fileKey}`;
     }
 
-    return makeAbsoluteStorageUrl(
-      `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${metadata.filename}`,
-    );
+    return buildStorageFileUrl(metadata.threadId, metadata.filename);
   }
 
   async getFileMetadata(fileId: string): Promise<FileMetadata | null> {

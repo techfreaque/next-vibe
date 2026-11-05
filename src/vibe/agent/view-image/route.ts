@@ -9,7 +9,13 @@ import { ViewImageRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, user, t, logger }) =>
-      ViewImageRepository.viewImage(data, user, t, logger),
+    handler: ({ data, user, t, logger, toolExecutionContext }) =>
+      ViewImageRepository.viewImage(
+        data,
+        user,
+        t,
+        logger,
+        toolExecutionContext,
+      ),
   },
 });

@@ -6,7 +6,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
-import { objectField, requestUrlPathParamsField, responseArrayField, responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  objectField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -160,6 +165,11 @@ export const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.appName" as const,
         schema: z.string(),
+      }),
+      leadMagnetActive: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.leadMagnetActive" as const,
+        schema: z.boolean(),
       }),
       leadMagnetHeadline: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -360,6 +370,7 @@ export const { GET } = createEndpoint({
         creatorHeaderImageUrl: null,
         referralCode: "thea2024",
         appName: "unbottled.ai",
+        leadMagnetActive: false,
         leadMagnetHeadline: null,
         leadMagnetButtonText: null,
         skills: [],

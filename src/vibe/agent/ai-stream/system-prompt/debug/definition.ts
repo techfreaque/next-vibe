@@ -1,6 +1,6 @@
 /**
  * System Prompt Debug Endpoint
- * Admin/dev-only - renders the full system prompt for a given user context.
+ * Renders the full system prompt the caller would get in a given context.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -26,7 +26,7 @@ import { videoGenModelSelectionSchema } from "../../../video-generation/models";
 import { scopedTranslation } from "./i18n";
 
 const SystemPromptDebugWidget = lazyWidget(() =>
-  import("./widget.cli").then((m) => ({ default: m.SystemPromptDebugWidget })),
+  import("./widget").then((m) => ({ default: m.SystemPromptDebugWidget })),
 );
 
 const { GET } = createEndpoint({
@@ -77,10 +77,36 @@ const { GET } = createEndpoint({
       // === REQUEST ===
       rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "get.fields.rootFolderId.label" as const,
         description: "get.fields.rootFolderId.description" as const,
         placeholder: "get.fields.rootFolderId.placeholder" as const,
+        options: [
+          {
+            value: DefaultFolderId.PRIVATE,
+            label: "get.fields.rootFolderId.options.private" as const,
+          },
+          {
+            value: DefaultFolderId.SHARED,
+            label: "get.fields.rootFolderId.options.shared" as const,
+          },
+          {
+            value: DefaultFolderId.PUBLIC,
+            label: "get.fields.rootFolderId.options.public" as const,
+          },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "get.fields.rootFolderId.options.incognito" as const,
+          },
+          {
+            value: DefaultFolderId.BACKGROUND,
+            label: "get.fields.rootFolderId.options.background" as const,
+          },
+          {
+            value: DefaultFolderId.REMOTE,
+            label: "get.fields.rootFolderId.options.remote" as const,
+          },
+        ],
         schema: z
           .nativeEnum(DefaultFolderId)
           .default(DefaultFolderId.PRIVATE)

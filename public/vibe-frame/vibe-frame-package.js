@@ -19776,7 +19776,7 @@ function defineEnvClient(fields) {
     if (v === "") {
       return [k, undefined];
     }
-    if (process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true" && typeof v === "string" && isRuntimeEnvPlaceholder(v)) {
+    if ({}["VIBE_BUILD_PLACEHOLDER_ENV"] === "true" && typeof v === "string" && isRuntimeEnvPlaceholder(v)) {
       return [k, undefined];
     }
     return [k, v];
@@ -20182,30 +20182,30 @@ var {
 } = defineEnvClient({
   NODE_ENV: {
     schema: exports_external.enum(Environment).default("development" /* DEVELOPMENT */),
-    value: "development",
+    value: "production",
     example: "development"
   },
   NEXT_PUBLIC_APP_URL: {
     schema: exports_external.string().url().default("http://localhost:3000").transform((s) => isBrowser ? getCurrentOrigin() : s.replace(/\/$/, "")),
-    value: process.env.NEXT_PUBLIC_APP_URL,
+    value: {}.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000"
   },
   NEXT_PUBLIC_PROJECT_URL: {
     schema: exports_external.string().url().default("https://unbottled.ai"),
-    value: process.env.NEXT_PUBLIC_PROJECT_URL,
+    value: {}.NEXT_PUBLIC_PROJECT_URL,
     example: "https://unbottled.ai",
     comment: "Project URL - defaults to https://unbottled.ai. Override to use your own domain.",
     commented: true
   },
   NEXT_PUBLIC_VIBE_MODE: {
     schema: exports_external.enum(VibeModeValues).default("dev" /* DEV */),
-    value: process.env.NEXT_PUBLIC_VIBE_MODE,
+    value: {}.NEXT_PUBLIC_VIBE_MODE,
     example: "dev" /* DEV */,
     comment: "Instance mode. 'agent' = personal local instance (no auth wall, no payments). 'cloud' = SaaS deployment (auth, payments, receive-only sync). 'dev' = Atlas coding instance (default)."
   },
   NEXT_PUBLIC_DEBUG_PRODUCTION: {
     schema: exports_external.string().optional().default("false").transform((v) => v === "true"),
-    value: process.env.NEXT_PUBLIC_DEBUG_PRODUCTION,
+    value: {}.NEXT_PUBLIC_DEBUG_PRODUCTION,
     example: "false"
   }
 });
@@ -20225,7 +20225,7 @@ var START_ALIASES = [START_ALIAS, START_ALIAS_SHORT];
 // src/vibe/env/detect.ts
 var _args = typeof process !== "undefined" && Array.isArray(process.argv) ? process.argv.slice(2) : [];
 var _hasLocalFlag = _args.includes("--preview") || _args.includes("--hermes");
-var _isProduction = process.env["NODE_ENV"] === "production";
+var _isProduction = {}["NODE_ENV"] === "production";
 var _isDevCommand = ["dev", "d"].some((a) => _args.includes(a));
 var _isStartCommand = [...START_ALIASES, BUILD_ALIAS, BUILD_SERVER_ALIAS].some((a) => _args.includes(a)) || _args.includes(REBUILD_ALIAS);
 var _isMcpCommand = _args.includes("mcp");
@@ -20760,6 +20760,9 @@ function getLanguage() {
   return navigator.language;
 }
 
+// src/vibe/platforms/vibe-frame/mount/constants.ts
+var VIBE_FRAME_MOUNT_API_PATH = "/vibe/platforms/vibe-frame/mount";
+
 // src/vibe/platforms/vibe-frame/triggers.ts
 var sharedState = {
   scroll: 0,
@@ -21241,7 +21244,7 @@ function destroyAll() {
 }
 async function fetchFrameConfig(serverUrl, locale, integrations, leadId, authToken) {
   const base = serverUrl.replace(/\/$/, "");
-  const url2 = `${base}/api/${locale}/system/platforms/vibe-frame/mount`;
+  const url2 = `${base}/api/${locale}${VIBE_FRAME_MOUNT_API_PATH}`;
   const body = { integrations };
   if (leadId) {
     body.leadId = leadId;
@@ -21382,4 +21385,4 @@ export {
   subscribeConfig
 };
 
-//# debugId=2911879C81F8020864756E2164756E21
+//# debugId=37F4BC68CC22AD6A64756E2164756E21

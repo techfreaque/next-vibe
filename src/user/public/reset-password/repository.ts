@@ -368,10 +368,13 @@ export class PasswordRepository {
     return success({
       response: {
         valid: true,
-        message: "Token is valid",
+        message: t("validate.success.description"),
         userId: verifyResult.data,
         expiresAt: undefined,
-        nextSteps: ["Submit new password", "Login with new password"],
+        nextSteps: [
+          t("validate.response.nextSteps.setPassword"),
+          t("validate.response.nextSteps.choosePassword"),
+        ],
       },
     });
   }
@@ -451,12 +454,20 @@ export class PasswordRepository {
     token: string,
     email: string,
     password: string,
+    confirmPassword: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ResetPasswordT,
   ): Promise<ResponseType<ResetPasswordConfirmPostResponseOutput>> {
     try {
       logger.debug("Processing password reset confirmation", { email });
+
+      if (password !== confirmPassword) {
+        return fail({
+          message: t("confirm.validation.passwords.mismatch"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
 
       const resetPayloadResponse = await this.verifyJwtToken(
         token,

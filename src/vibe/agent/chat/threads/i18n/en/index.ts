@@ -324,6 +324,7 @@ export const translations = {
       cancel: "Cancel",
     },
     actions: {
+      menu: "Thread actions",
       rename: "Rename",
       unpin: "Unpin",
       pin: "Pin to Top",

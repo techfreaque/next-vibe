@@ -139,6 +139,11 @@ export const translations: typeof enTranslations = {
       placeholder: "Wprowadź ID referencyjne",
       helpText: "Opcjonalne ID referencyjne do dodatkowego kontekstu śledzenia",
     },
+    sig: {
+      label: "Podpis linku",
+      description:
+        "Potwierdza, że zewnętrzny cel pochodzi z wygenerowanego przez nas linku",
+    },
     response: {
       success: "Sukces",
       redirectUrl: "URL przekierowania",

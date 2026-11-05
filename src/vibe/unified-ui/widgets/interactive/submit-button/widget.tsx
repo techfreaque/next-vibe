@@ -83,6 +83,7 @@ export function SubmitButtonWidget<
   return (
     <Button
       type="submit"
+      data-testid="endpoint-submit"
       disabled={isSubmitting}
       variant={variant === "primary" ? "default" : variant}
       size={size}

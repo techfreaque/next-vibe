@@ -96,7 +96,8 @@ export const translations = {
         noItems: "No items found",
         required: "Required",
         select: "Select...",
-        useToFind: "Use to find",
+        selectLabel: "Select {{label}}",
+        useToFind: "Find it with {{alias}}",
       },
       markdownTextarea: {
         edit: "Edit",

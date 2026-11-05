@@ -9791,7 +9791,7 @@ export const endpointsMeta: EndpointMeta[] = [
           id: "456e7890-e89b-12d3-a456-426614174000",
           invoiceNumber: "AR-00000001-000001",
           currency: "EUR",
-          status: "OPEN",
+          status: "enums.invoiceStatus.open",
           amount: "1200.00",
           dueDate: "2024-02-01T00:00:00.000Z",
           notes: null,
@@ -14092,6 +14092,7 @@ export const endpointsMeta: EndpointMeta[] = [
           creatorHeaderImageUrl: null,
           referralCode: "thea2024",
           appName: "unbottled.ai",
+          leadMagnetActive: false,
           leadMagnetHeadline: null,
           leadMagnetButtonText: null,
           skills: [],
@@ -15229,7 +15230,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Debug System Prompt",
     titleShort: "Debug prompt",
     description:
-      "Renderuje pełny system prompt dla danego kontekstu użytkownika. Tylko admin/dev.",
+      "Pokazuje dokładny system prompt, który AI dostaje w danym kontekście — folder, skill, wątek, wiadomość.",
     icon: "terminal",
     category: "ai",
     subCategory: "Tools",
@@ -18955,7 +18956,7 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       inputs: {
         default: {
-          url: "https://example.com/api/en-GLOBAL/agent/chat/threads/files/thread-123/screenshot-abc.png",
+          url: "https://example.com/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
         },
       },
     },
@@ -20403,7 +20404,7 @@ export const endpointsMeta: EndpointMeta[] = [
     ],
     examples: {
       inputs: {
-        default: { toolName: "agent_chat_characters_GET", input: {} },
+        default: { toolName: "vibe_agent_skills_GET", input: {} },
         remoteBackground: {
           toolName: "bash",
           input: { command: "echo hello" },
@@ -20565,7 +20566,7 @@ export const endpointsMeta: EndpointMeta[] = [
   {
     toolName: "report-client-error",
     method: "POST",
-    path: ["system", "logger", "error-monitor", "client-log"],
+    path: ["vibe", "logger", "error-monitor", "client-log"],
     allowedRoles: [
       "enums.userRole.public",
       "enums.userRole.customer",

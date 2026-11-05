@@ -8,7 +8,7 @@
  *
  * Usage (CLI):
  *   vibe execute-tool \
- *     --toolName=agent_chat_characters_GET \
+ *     --toolName=vibe_agent_skills_GET \
  *     --input='{}'
  */
 
@@ -240,7 +240,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        toolName: "agent_chat_characters_GET",
+        toolName: "vibe_agent_skills_GET",
         input: {},
       },
       ...dispatchRequestExamples,

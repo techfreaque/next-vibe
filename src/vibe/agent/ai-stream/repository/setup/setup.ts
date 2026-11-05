@@ -551,6 +551,8 @@ export async function setupAiStream(params: {
   parentAbortSignal?: AbortSignal;
   /** Spawning thread when this is a sub-stream/sub-agent child (persisted on the row). */
   parentThreadId?: string;
+  /** TEST-ONLY E2E fixture scope of the originating request (see CreateAiStreamParams). */
+  fixtureScopeId?: string;
   resolvedRelayContext?: ResolvedRelayContext;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
@@ -573,11 +575,11 @@ export async function setupAiStream(params: {
   // transcription) run before the rich stream context is built, so they bind
   // their external calls to this thread-anchored context; the rich context
   // built below carries the same threadId.
-  const threadFixtureContext = makeHeadlessContext(
-    undefined,
-    data.threadId,
-    data.timezone,
-  );
+  // A browser E2E run's explicit scope (fixtureScopeId) wins over the thread.
+  const threadFixtureContext: ToolExecutionContext = {
+    ...makeHeadlessContext(undefined, data.threadId, data.timezone),
+    fixtureScopeId: params.fixtureScopeId,
+  };
 
   // File upload promise for server threads (captured for SSE event emission)
   let fileUploadPromise:
@@ -993,6 +995,9 @@ export async function setupAiStream(params: {
     // Sub-stream lineage in-context: an incognito sub-stream (image-gen) has no
     // DB row, so the fixture engine walks the lineage starting from here.
     parentThreadId: params.parentThreadId,
+    // Browser E2E fixture scope (dev/test only) — every tool/provider call of
+    // this stream records/replays under it.
+    fixtureScopeId: params.fixtureScopeId,
     // Voice mode on/off rides the context so a revival keeps speaking; the
     // voice itself resolves from the favorite/skill, not from here.
     voiceEnabled: data.voiceMode?.enabled ?? false,

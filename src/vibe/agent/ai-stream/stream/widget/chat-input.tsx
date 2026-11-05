@@ -278,6 +278,7 @@ export function WidgetChatInput({
                       size="icon"
                       variant="outline"
                       className="h-8 w-8 @sm:h-9 @sm:w-9"
+                      title={t("actions.openThread")}
                       onClick={() => {
                         openInNewTab(threadHref);
                       }}
@@ -298,6 +299,7 @@ export function WidgetChatInput({
                     size="icon"
                     variant="destructive"
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
+                    title={t("actions.stopGeneration")}
                     onClick={onCancel}
                   >
                     <Square className="h-3.5 w-3.5 fill-current" />
@@ -317,6 +319,7 @@ export function WidgetChatInput({
                     disabled={!canSubmit}
                     onClick={onSubmit}
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
+                    title={t("actions.sendMessage")}
                   >
                     <Send className="h-4 w-4" />
                   </Button>

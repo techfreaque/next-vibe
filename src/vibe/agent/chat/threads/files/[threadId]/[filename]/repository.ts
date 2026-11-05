@@ -238,7 +238,8 @@ export class ChatFileRepository {
     }
 
     return createFileResponse(result.buffer, result.contentType, {
-      "Cache-Control": "public, max-age=31536000, immutable",
+      // private: files are access-checked per viewer — a shared cache must never serve them to someone else
+      "Cache-Control": "private, max-age=31536000, immutable",
       "Content-Length": String(result.buffer.length),
       "Accept-Ranges": "bytes",
     });

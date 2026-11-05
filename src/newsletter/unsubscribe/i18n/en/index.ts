@@ -23,6 +23,11 @@ export const translations = {
           "Are you sure you want to unsubscribe from our newsletter?",
       },
       unsubscribeButton: "Unsubscribe",
+      unsubscribing: "Unsubscribing...",
+      status: {
+        subscribed: "This address gets our newsletter.",
+        notSubscribed: "This address is not on our list.",
+      },
       subscribeText: "Changed your mind?",
       subscribeLink: "Subscribe again",
       info: {

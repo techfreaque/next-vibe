@@ -231,6 +231,14 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     setResponseHeader("Set-Cookie", setCookies);
   }
 
+  // CORS headers the proxy stamped on API passthroughs (Next.js merges these
+  // onto the final response; TanStack needs them forwarded explicitly).
+  proxyResponse.headers.forEach((value, key) => {
+    if (key.toLowerCase().startsWith("access-control-")) {
+      setResponseHeader(key, value);
+    }
+  });
+
   const appStart = Date.now();
   const result = await next();
   const total = Date.now() - requestStart;

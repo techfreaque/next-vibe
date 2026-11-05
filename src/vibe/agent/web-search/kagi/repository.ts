@@ -15,6 +15,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../../env-availability";
 import type {
@@ -80,7 +81,12 @@ export class KagiSearchRepository {
       });
     }
 
-    const fetchResult = await this.fetchFastGPT(data.query, logger, t);
+    const fetchResult = await this.fetchFastGPT(
+      data.query,
+      logger,
+      t,
+      createFixtureFetch(toolExecutionContext, logger),
+    );
 
     if (!fetchResult.success) {
       return fetchResult;
@@ -132,6 +138,7 @@ export class KagiSearchRepository {
     query: string,
     logger: EndpointLogger,
     t: KagiT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<
     ResponseType<{ output: string; references: KagiFastGPTReference[] }>
   > {
@@ -143,8 +150,7 @@ export class KagiSearchRepository {
     }, this.TIMEOUT);
 
     try {
-      // oxlint-disable-next-line restricted/no-raw-fetch
-      const response = await fetch(url, {
+      const response = await fetchImpl(url, {
         method: "POST",
         headers: {
           Authorization: `Bot ${agentEnv.KAGI_API_KEY}`,

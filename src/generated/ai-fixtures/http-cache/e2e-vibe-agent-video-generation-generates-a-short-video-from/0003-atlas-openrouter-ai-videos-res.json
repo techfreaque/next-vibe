@@ -1,0 +1,27 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/videos/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a55e5f4538eddbc5-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Thu, 05 Nov 2026 19:47:47 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "set-cookie": "__cf_bm=ss8asHSJt1ct5EGYNhQE6QpR9ME9JUX__rb.SRC2bls-1793908066.114865-1.0.1.1-.O7sRFcIEGoJOIJcJJpUIBArkK_9FIcxu1frlDCqTLAvVKbMUGciWjlThK5Y_5.bUhXIcEf.Uhdf5spoZFTG2AXhCsKDYUJ3z6DBMMhSmuM20ywR4mrPD__9EX6xWzuj; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu, 05 Nov 2026 20:17:47 GMT"
+  },
+  "body": {
+    "id": "gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "generation_id": "gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "polling_url": "https://openrouter.ai/api/v1/videos/gen-vid-1793908053-kyTxCQ7dB1xdvwVHSJc9",
+    "status": "pending"
+  }
+}

@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
       }),
       creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "post.response.audioUrl",
+        label: "post.response.creditCost",
         schema: z.number().optional(),
       }),
     },

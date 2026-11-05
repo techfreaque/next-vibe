@@ -1,6 +1,6 @@
 /**
  * Root Folder Permissions API Route
- * GET /api/[locale]/agent/chat/folders/root-permissions
+ * GET /api/[locale]/vibe/agent/chat/folders/[rootFolderId]/root-permissions
  */
 
 import { Methods } from "next-vibe/core/definition/enums";
@@ -13,9 +13,9 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger, locale }) =>
+    handler: ({ urlPathParams, user, logger, locale }) =>
       RootFolderPermissionsRepository.getRootFolderPermissions(
-        data,
+        urlPathParams,
         user,
         locale,
         logger,

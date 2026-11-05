@@ -1,0 +1,36 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai/7.0.162 ai-sdk/provider-utils/5.0.42 runtime/bun/1.4.0",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": [
+          {
+            "image_url": {
+              "url": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+            },
+            "type": "image_url"
+          },
+          {
+            "text": "Answer in one short sentence.\n\nDescribe this image in detail.",
+            "type": "text"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model": "google/gemini-3-pro-image-preview"
+  }
+}

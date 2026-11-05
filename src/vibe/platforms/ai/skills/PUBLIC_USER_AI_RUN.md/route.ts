@@ -1,7 +1,7 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * PUBLIC_USER_AI_RUN.md - AI Run Guide (Public + Authenticated Tier)
- * GET /api/[locale]/system/platforms/ai/skills/PUBLIC_USER_AI_RUN.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN.md
  *
  * Focused guide for using POST /agent/ai-stream/run without a specific character.
  * Covers the full public+authenticated tool set. No tool listing - see PUBLIC_USER_SKILL.md

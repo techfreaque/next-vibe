@@ -34,6 +34,9 @@ export const { POST, tools } = endpointsHandler({
         user,
         request,
         subAgentDepth: toolExecutionContext.subAgentDepth,
+        // Dev/test browser E2E scope (next-handler) — the stream builds its own
+        // thread context, so the scope must be handed over explicitly.
+        fixtureScopeId: toolExecutionContext.fixtureScopeId,
       }),
   },
 });

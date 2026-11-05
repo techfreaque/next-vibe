@@ -9,6 +9,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
@@ -61,6 +62,8 @@ export function ThreadRenameContainer({
           {t("patch.container.description")}
         </Span>
       </Div>
+
+      <EntityPickerFieldWidget field={children.threadId} fieldName="threadId" />
 
       <TextFieldWidget field={children.title} fieldName="title" />
 

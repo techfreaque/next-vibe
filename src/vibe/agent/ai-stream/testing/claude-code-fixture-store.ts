@@ -57,7 +57,8 @@ export async function withClaudeCodeFixture(
   modelId: string,
   producer: () => Promise<ReadableStream<LanguageModelV2StreamPart>>,
 ): Promise<ReadableStream<LanguageModelV2StreamPart>> {
-  const threadId = toolExecutionContext?.threadId;
+  const threadId =
+    toolExecutionContext?.fixtureScopeId ?? toolExecutionContext?.threadId;
   // No thread → not a fixture run. Read prefix + bump the run's single ordinal
   // in one round-trip (same counter the HTTP engine bumps). No prefix → live.
   const fx = threadId ? await readAndBumpFixture(threadId) : null;

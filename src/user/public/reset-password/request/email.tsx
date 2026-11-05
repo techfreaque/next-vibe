@@ -269,7 +269,10 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
-        totalModelCount: getAvailableModelCount(false, await getEnvAvailability()),
+        totalModelCount: getAvailableModelCount(
+          false,
+          await getEnvAvailability(),
+        ),
       };
 
       return success({

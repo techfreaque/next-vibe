@@ -90,6 +90,7 @@ export const translations: typeof enTranslations = {
       aiDefaultLabel: "Domyślne AI:",
       switchTo: "Przełącz na",
       separatorDot: "·",
+      via: "przez {{provider}}",
       braveBanner: "Twoje AI szuka teraz przez Kagi",
       kagiBanner: "Twoje AI szuka teraz przez Brave",
       useBrave: "Użyj Brave",

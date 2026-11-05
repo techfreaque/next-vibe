@@ -136,6 +136,11 @@ export const translations = {
       placeholder: "Enter reference ID",
       helpText: "Optional reference ID for additional tracking context",
     },
+    sig: {
+      label: "Link signature",
+      description:
+        "Proves an external destination came from a link we generated",
+    },
     response: {
       success: "Success",
       redirectUrl: "Redirect URL",

@@ -96,6 +96,8 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { LeadCaptureForm } from "@/lead-magnet/capture/widget";
+
 import {
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_CHAT_MODEL_SELECTION,
@@ -1671,8 +1673,6 @@ export function SkillViewContainer({
                 skillId={skillId}
                 headline={creator.leadMagnetHeadline}
                 buttonText={creator.leadMagnetButtonText}
-                locale={locale}
-                t={t}
               />
             </Div>
           )}
@@ -1998,8 +1998,6 @@ export function SkillViewContainer({
               skillId={skillId}
               headline={creator.leadMagnetHeadline}
               buttonText={creator.leadMagnetButtonText}
-              locale={locale}
-              t={t}
             />
           )}
         </Div>
@@ -2222,6 +2220,7 @@ function VariantCard({
         >
           {!isFavorited ? (
             <Button
+              type="button"
               variant="default"
               size="sm"
               className="h-7 gap-1 text-xs px-2.5"
@@ -2489,159 +2488,6 @@ function CreatorRow({
           </Div>
         )}
       </Div>
-    </Div>
-  );
-}
-
-// ── LEAD CAPTURE FORM ────────────────────────────────────────────────────────
-
-type CaptureState = "idle" | "submitting" | "done" | "error";
-
-/**
- * Email capture form - shown when creator has active lead magnet config.
- * Works in both landing page and panel mode.
- */
-function LeadCaptureForm({
-  skillId,
-  headline,
-  buttonText,
-  locale,
-  t,
-}: {
-  skillId: string;
-  headline: string | null;
-  buttonText: string | null;
-  locale: CountryLanguage;
-  t: ReturnType<typeof useWidgetTranslation>;
-}): React.JSX.Element {
-  const [state, setState] = useState<CaptureState>("idle");
-  const [firstName, setFirstName] = useState("");
-  const [email, setEmail] = useState("");
-  const logger = useLogger();
-  const handleSubmit = useCallback((): void => {
-    if (!firstName.trim() || !email.trim()) {
-      return;
-    }
-    setState("submitting");
-    void (async (): Promise<void> => {
-      try {
-        const [{ apiClient }, captureDef] = await Promise.all([
-          import("next-vibe/unified-ui/hooks/store"),
-          import("@/lead-magnet/capture/definition"),
-        ]);
-
-        const result = await apiClient.mutate(
-          captureDef.POST,
-          logger,
-          { id: "", isPublic: true, roles: [], leadId: "" } as never,
-          { skillId, firstName: firstName.trim(), email: email.trim() },
-          undefined,
-          locale,
-        );
-        setState(result.success ? "done" : "error");
-      } catch {
-        setState("error");
-      }
-    })();
-  }, [skillId, firstName, email, locale, logger]);
-
-  const displayHeadline = headline ?? t("get.leadCapture.fallbackHeadline");
-  const displayButton = buttonText ?? t("get.leadCapture.fallbackButton");
-
-  if (state === "done") {
-    return (
-      <Div
-        style={{
-          padding: "24px 20px",
-          borderRadius: 12,
-          border: "1px solid rgba(139,92,246,0.25)",
-          background: "rgba(139,92,246,0.08)",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-          alignItems: "center",
-        }}
-      >
-        <Span
-          style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}
-        >
-          {t("get.leadCapture.doneHeading")}
-        </Span>
-        <Span
-          style={{
-            color: "rgba(255,255,255,0.55)",
-            margin: 0,
-            fontSize: 13,
-          }}
-        >
-          {t("get.leadCapture.doneSub")}
-        </Span>
-      </Div>
-    );
-  }
-
-  return (
-    <Div
-      style={{
-        padding: "20px 20px",
-        borderRadius: 12,
-        border: "1px solid rgba(255,255,255,0.08)",
-        background: "rgba(255,255,255,0.02)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <Span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>
-        {displayHeadline}
-      </Span>
-      <Div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          width: "100%",
-          maxWidth: 320,
-        }}
-      >
-        <Input
-          value={firstName}
-          onChange={(e): void => setFirstName(e.target.value)}
-          placeholder={t("get.leadCapture.namePlaceholder")}
-          disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
-        />
-        <Input
-          type="email"
-          value={email}
-          onChange={(e): void => setEmail(e.target.value)}
-          placeholder={t("get.leadCapture.emailPlaceholder")}
-          disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
-        />
-        <Button
-          onClick={handleSubmit}
-          disabled={
-            state === "submitting" || !firstName.trim() || !email.trim()
-          }
-          className="bg-violet-600 hover:bg-violet-700 text-white"
-        >
-          {state === "submitting"
-            ? t("get.leadCapture.sending")
-            : displayButton}
-        </Button>
-        {state === "error" && (
-          <Span style={{ fontSize: 12, color: "rgba(255,100,100,0.8)" }}>
-            {t("get.leadCapture.error")}
-          </Span>
-        )}
-      </Div>
-      <Span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
-        {t("get.leadCapture.finePrint")}
-      </Span>
     </Div>
   );
 }
@@ -3073,6 +2919,7 @@ export function SkillCard({
         <Div className="mt-2 pt-2 border-t bg-muted/10 flex items-center gap-1 flex-wrap">
           {!isAddedToFav && (
             <Button
+              type="button"
               variant="default"
               size="sm"
               className="gap-1"
@@ -3254,9 +3101,9 @@ function ShareEarnButton({
     }
   };
 
-  const portalContainer = getDocumentBody();
+  // Only touched once open (client-side) — document does not exist during SSR
   const popoverContent =
-    open && popoverRect && portalContainer
+    open && popoverRect
       ? createPortal(
           <Div
             style={{
@@ -3416,7 +3263,7 @@ function ShareEarnButton({
               </Div>
             )}
           </Div>,
-          portalContainer,
+          getDocumentBody(),
         )
       : null;
 

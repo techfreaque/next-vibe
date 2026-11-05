@@ -436,13 +436,15 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
           routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
           userId: user.isPublic ? "public" : user.id,
           cost: endpoint.credits,
+          reason: deductResult.message,
         });
         return {
           success: false,
           message: tCredits("errors.deductionFailed", {
             cost: endpoint.credits,
           }),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          // Keep the cause (402 payment required vs 500)
+          errorType: deductResult.errorType,
         };
       }
     }

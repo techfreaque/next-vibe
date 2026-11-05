@@ -65,6 +65,11 @@ export const translations: typeof enTranslations = {
         description: "Beim Abrufen der URL ist ein Fehler aufgetreten",
         detail: "Abruffehler: {{message}}",
       },
+      notConfigured: {
+        title:
+          "{{label}} API-Schlüssel fehlt. Trage {{envKey}}=<dein-schlüssel> in deine .env-Datei ein. Schlüssel gibt es auf {{url}}",
+        description: "{{label}} einrichten, um Webseiten abzurufen",
+      },
       timeout: {
         title: "Zeitüberschreitung",
         description: "Der URL-Abruf hat die Zeitgrenze überschritten",

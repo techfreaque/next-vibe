@@ -2372,9 +2372,6 @@ async function importEndpoint(
       ).default.GET;
     case "system-settings":
       return (await import("@/vibe/env/settings/definition")).default.GET;
-    case "system_logger_error-monitor_client-log_POST":
-      return (await import("@/vibe/logger/error-monitor/client-log/definition"))
-        .default.POST;
     case "t":
       return (await import("@/vibe/tooling/testing/test/definition")).default
         .POST;
@@ -3122,6 +3119,9 @@ async function importEndpoint(
       return (await import("@/vibe/help-tool/definition")).default.GET;
     case "vibe_logger_error-monitor_cleanup_POST":
       return (await import("@/vibe/logger/error-monitor/cleanup/definition"))
+        .default.POST;
+    case "vibe_logger_error-monitor_client-log_POST":
+      return (await import("@/vibe/logger/error-monitor/client-log/definition"))
         .default.POST;
     case "vibe_logger_error-monitor_data-sources_error-logs-errors_POST":
       return (

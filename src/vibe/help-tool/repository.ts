@@ -49,6 +49,7 @@ import type {
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 import {
+  narrowPublicPins,
   resolveAgentPins,
   resolveEffectiveUser,
 } from "./repository/agent-pins";
@@ -340,6 +341,14 @@ export class HelpRepository {
         : null;
     if (pins?.filteredMeta) {
       platformFilteredMeta = pins.filteredMeta;
+    }
+    if (!isCompact && user.isPublic) {
+      platformFilteredMeta =
+        (await narrowPublicPins(
+          platformFilteredMeta,
+          effectiveUser,
+          statsFilter,
+        )) ?? platformFilteredMeta;
     }
 
     // Admin web/CLI debug fields. Excluded from compact (AI/MCP) output — a tool

@@ -559,7 +559,11 @@ const { POST } = createEndpoint({
             description: "update.fields.websiteUrl.description" as const,
             placeholder: "update.fields.websiteUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           twitterUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -568,7 +572,11 @@ const { POST } = createEndpoint({
             description: "update.fields.twitterUrl.description" as const,
             placeholder: "update.fields.twitterUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           youtubeUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -577,7 +585,11 @@ const { POST } = createEndpoint({
             description: "update.fields.youtubeUrl.description" as const,
             placeholder: "update.fields.youtubeUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           instagramUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -586,7 +598,11 @@ const { POST } = createEndpoint({
             description: "update.fields.instagramUrl.description" as const,
             placeholder: "update.fields.instagramUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           tiktokUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -595,7 +611,11 @@ const { POST } = createEndpoint({
             description: "update.fields.tiktokUrl.description" as const,
             placeholder: "update.fields.tiktokUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           githubUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -604,7 +624,11 @@ const { POST } = createEndpoint({
             description: "update.fields.githubUrl.description" as const,
             placeholder: "update.fields.githubUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           facebookUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -613,7 +637,11 @@ const { POST } = createEndpoint({
             description: "update.fields.facebookUrl.description" as const,
             placeholder: "update.fields.facebookUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           discordUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -622,7 +650,11 @@ const { POST } = createEndpoint({
             description: "update.fields.discordUrl.description" as const,
             placeholder: "update.fields.discordUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           tribeUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -631,7 +663,11 @@ const { POST } = createEndpoint({
             description: "update.fields.tribeUrl.description" as const,
             placeholder: "update.fields.tribeUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           rumbleUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -640,7 +676,11 @@ const { POST } = createEndpoint({
             description: "update.fields.rumbleUrl.description" as const,
             placeholder: "update.fields.rumbleUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           odyseeUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -649,7 +689,11 @@ const { POST } = createEndpoint({
             description: "update.fields.odyseeUrl.description" as const,
             placeholder: "update.fields.odyseeUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           nostrUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -658,7 +702,11 @@ const { POST } = createEndpoint({
             description: "update.fields.nostrUrl.description" as const,
             placeholder: "update.fields.nostrUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           gabUrl: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -667,7 +715,11 @@ const { POST } = createEndpoint({
             description: "update.fields.gabUrl.description" as const,
             placeholder: "update.fields.gabUrl.placeholder" as const,
             columns: 6,
-            schema: z.url().optional().nullable(),
+            // "" = the user cleared the link
+            schema: z
+              .union([z.url(), z.literal("")])
+              .optional()
+              .nullable(),
           }),
           creatorSlug: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

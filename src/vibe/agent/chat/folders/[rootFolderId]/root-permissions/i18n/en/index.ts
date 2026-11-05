@@ -13,9 +13,16 @@ export const translations = {
       description: "View permissions for root folders",
     },
     rootFolderId: {
-      label: "Root Folder ID",
+      label: "Root Folder",
       description: "The ID of the root folder to check permissions for",
-      placeholder: "private, shared, public, or incognito",
+      options: {
+        private: "Private",
+        shared: "Shared",
+        public: "Public",
+        background: "Background",
+        incognito: "Incognito",
+        remote: "Remote",
+      },
     },
     response: {
       canCreateThread: {

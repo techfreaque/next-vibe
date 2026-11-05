@@ -22,6 +22,11 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  FormField,
+  FormItem,
+  FormMessage,
+} from "next-vibe/ui/components/form/form";
 import { Span } from "next-vibe/ui/components/span";
 import { type JSX, useEffect, useState } from "react";
 
@@ -54,6 +59,9 @@ async function resolveListEndpoint(
     : listEndpoint;
 }
 
+/** Labels of entities picked this session, by id (survives remounts). */
+const pickedLabelsById = new Map<string, string>();
+
 export function EntityPickerFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
   TKey extends (TEndpoint extends CreateApiEndpointAny
@@ -85,7 +93,14 @@ export function EntityPickerFieldWidget<
   const [initiallyFilled] = useState<boolean>(isFilled);
 
   // Human-readable label for the selected item (set when user picks from list).
-  const [pickedLabel, setPickedLabel] = useState<string | undefined>(undefined);
+  const [pickedLabelState, setPickedLabel] = useState<string | undefined>(
+    undefined,
+  );
+  // Closing the picker modal can remount this field: fall back to the label
+  // remembered for the picked id so the badge never degrades to a raw uuid.
+  const pickedLabel =
+    pickedLabelState ??
+    (isFilled ? pickedLabelsById.get(String(currentValue)) : undefined);
 
   // Resolved list endpoint — listEndpoint may be an async resolver used to
   // break static import cycles, so it's resolved lazily. A direct endpoint is
@@ -127,13 +142,25 @@ export function EntityPickerFieldWidget<
         renderInModal: true,
         pickerCallback: (value: WidgetData) => {
           const picked = value as Record<string, string>;
-          form?.setValue(name, picked[valueField] ?? String(value));
+          // List widgets return the row ({ id, name }) — the entity id lives
+          // under the field's own key or, far more often, the row's `id`.
+          const pickedId =
+            typeof value === "string"
+              ? value
+              : (picked[valueField] ?? picked["id"] ?? String(value));
+          form?.setValue(name, pickedId, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
           const label =
             picked[labelField] ??
             picked["name"] ??
             picked["title"] ??
             picked["label"];
           setPickedLabel(label ?? undefined);
+          if (label) {
+            pickedLabelsById.set(pickedId, label);
+          }
         },
         pickerLabelField: field.labelField,
       });
@@ -164,37 +191,33 @@ export function EntityPickerFieldWidget<
   }
 
   // Web / interactive CLI — always visible (field was empty on first render)
-  if (isFilled) {
-    return (
-      <Div className="flex items-center gap-2 min-w-0">
-        <Div className="flex items-center gap-1.5 min-w-0 flex-1">
-          <Badge
-            variant="secondary"
-            className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[260px] truncate"
-          >
-            {pickedLabel ?? String(currentValue)}
-          </Badge>
-          {pickedLabel && (
-            <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
-              {/* eslint-disable-next-line i18n/no-literal-string */}
-              {String(currentValue).slice(0, 8)}…
-            </Span>
-          )}
-        </Div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
-          onClick={handleOpen}
+  const control = isFilled ? (
+    <Div className="flex items-center gap-2 min-w-0">
+      <Div className="flex items-center gap-1.5 min-w-0 flex-1">
+        <Badge
+          variant="secondary"
+          className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[260px] truncate"
         >
-          {widgetT("widgets.formFields.entityPicker.change")}
-        </Button>
+          {pickedLabel ?? String(currentValue)}
+        </Badge>
+        {pickedLabel && (
+          <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
+            {/* eslint-disable-next-line i18n/no-literal-string */}
+            {String(currentValue).slice(0, 8)}…
+          </Span>
+        )}
       </Div>
-    );
-  }
-
-  return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
+        onClick={handleOpen}
+      >
+        {widgetT("widgets.formFields.entityPicker.change")}
+      </Button>
+    </Div>
+  ) : (
     <Button
       type="button"
       variant="outline"
@@ -204,8 +227,29 @@ export function EntityPickerFieldWidget<
     >
       {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
-      {widgetT("widgets.formFields.entityPicker.select")} {resolvedLabel}
+      {widgetT("widgets.formFields.entityPicker.selectLabel", {
+        label: resolvedLabel,
+      })}
     </Button>
+  );
+
+  if (!form) {
+    return control;
+  }
+
+  // FormItem registers the field like every other input: a validation error
+  // (required id never picked) renders under the picker instead of vanishing.
+  return (
+    <FormField
+      control={form.control}
+      name={name}
+      render={() => (
+        <FormItem>
+          {control}
+          <FormMessage t={tField} />
+        </FormItem>
+      )}
+    />
   );
 }
 
@@ -337,7 +381,7 @@ export function EntityPickerField<TValue extends WidgetData>({
     >
       {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
-      {widgetT("widgets.formFields.entityPicker.select")} {label}
+      {widgetT("widgets.formFields.entityPicker.selectLabel", { label })}
     </Button>
   );
 }

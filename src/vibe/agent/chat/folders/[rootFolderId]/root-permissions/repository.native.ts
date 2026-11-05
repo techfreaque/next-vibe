@@ -10,7 +10,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
 import type {
-  RootPermissionsGetRequestOutput,
+  RootPermissionsGetUrlVariablesOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
 import definitions from "./definition";
@@ -21,7 +21,7 @@ import type { RootFolderPermissionsRepositoryType } from "./repository";
  */
 export class RootFolderPermissionsRepository {
   static async getRootFolderPermissions(
-    data: RootPermissionsGetRequestOutput,
+    urlPathParams: RootPermissionsGetUrlVariablesOutput,
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
     locale: CountryLanguage,
@@ -29,7 +29,7 @@ export class RootFolderPermissionsRepository {
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
     const response = await nativeEndpoint(
       definitions.GET,
-      { data },
+      { urlPathParams },
       logger,
       locale,
     );

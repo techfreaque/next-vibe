@@ -23,6 +23,16 @@ export const translations: typeof enTranslations = {
       label: "Suche",
       description: "Threads nach Titel durchsuchen",
     },
+    feed: {
+      empty: "Noch keine öffentlichen Threads. Starte den ersten.",
+      emptySearch: "Keine Treffer für diese Suche.",
+      justNow: "gerade eben",
+      hoursAgo: "vor {{count}} Std.",
+      daysAgo: "vor {{count}} T.",
+      messages: "{{count}} Nachrichten",
+      participants: "{{count}} Teilnehmer",
+      score: "Wertung",
+    },
     response: {
       title: "Feed-Antwort",
       description: "Angereicherte öffentliche Thread-Liste",

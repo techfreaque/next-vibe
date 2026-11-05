@@ -25,6 +25,11 @@ export const translations: typeof enTranslations = {
           "Sind Sie sicher, dass Sie sich von unserem Newsletter abmelden möchten?",
       },
       unsubscribeButton: "Abmelden",
+      unsubscribing: "Wird abgemeldet...",
+      status: {
+        subscribed: "Diese Adresse erhält unseren Newsletter.",
+        notSubscribed: "Diese Adresse steht nicht auf unserer Liste.",
+      },
       subscribeText: "Haben Sie Ihre Meinung geändert?",
       subscribeLink: "Erneut abonnieren",
       info: {

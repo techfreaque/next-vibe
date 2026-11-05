@@ -10,9 +10,9 @@
  *      and the entire batch executes under runExclusive — concurrent connections
  *      never interleave messages inside PGlite's single-threaded WASM backend.
  *
- * INSERT…RETURNING fix (PGlite v0.5.x bug):
- *   Simple Query ('Q') with INSERT…RETURNING: strip RETURNING, INSERT, SELECT
- *   back via ctid DESC, synthesise DataRow/CommandComplete/ReadyForQuery.
+ * INSERT…RETURNING fix (PGlite v0.5.x bug in the raw protocol path):
+ *   INSERT…RETURNING (Simple or Extended Query) runs through pg.query() and
+ *   the rows are re-encoded as DataRow/CommandComplete/ReadyForQuery.
  */
 
 import "server-only";
@@ -125,7 +125,11 @@ function buildDataRow(values: (string | null)[]): Buffer {
   return buf;
 }
 
-function buildRowDescription(columns: string[]): Buffer {
+/** Column type OIDs default to text (25) — the client then gets raw strings. */
+function buildRowDescription(
+  columns: string[],
+  typeIds: readonly number[] = [],
+): Buffer {
   const colBufs = columns.map((c) => Buffer.from(`${c}\0`, "utf8"));
   let size = 2;
   for (const b of colBufs) {
@@ -138,14 +142,14 @@ function buildRowDescription(columns: string[]): Buffer {
   off += 4;
   buf.writeInt16BE(columns.length, off);
   off += 2;
-  for (const b of colBufs) {
+  for (const [i, b] of colBufs.entries()) {
     b.copy(buf, off);
     off += b.length;
     buf.writeInt32BE(0, off);
     off += 4;
     buf.writeInt16BE(0, off);
     off += 2;
-    buf.writeInt32BE(25, off);
+    buf.writeInt32BE(typeIds[i] ?? 25, off);
     off += 4;
     buf.writeInt16BE(-1, off);
     off += 2;
@@ -218,76 +222,88 @@ function parseParamsFromBindMessage(msg: Buffer): (string | null)[] | null {
 
 // ─── INSERT…RETURNING intercept ───────────────────────────────────────────────
 
-function countInsertRows(sql: string): number {
-  const idx = sql.search(/\bvalues\s*\(/i);
-  if (idx === -1) {
-    return 1;
-  }
-  const s = sql.slice(idx);
-  let depth = 0;
-  let count = 0;
-  for (const ch of s) {
-    if (ch === "(") {
-      depth++;
-      if (depth === 1) {
-        count++;
-      }
-    } else if (ch === ")") {
-      depth--;
-    }
-  }
-  return Math.max(count, 1);
-}
+/** A value as PGlite parses it (rowMode "array"). */
+type PgliteValue =
+  | string
+  | number
+  | boolean
+  | bigint
+  | null
+  | undefined
+  | Date
+  | Uint8Array
+  | PgliteValue[]
+  | { [key: string]: PgliteValue };
 
-type PgliteRow = Record<string, string | number | boolean | null | undefined>;
+const OID_DATE = 1082;
+const OID_TIMESTAMPTZ = 1184;
+const OID_JSON = 114;
+const OID_JSONB = 3802;
+
+/**
+ * Re-encode a parsed PGlite value in Postgres TEXT format, exactly what a real
+ * server sends for that column type — the client parses it by the declared
+ * OID (drizzle: `new Date(value + "+0000")` for timestamp), so never JS
+ * `String(date)` / "[object Object]".
+ */
+function toPgText(value: PgliteValue, typeId: number): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (value instanceof Date) {
+    const iso = value.toISOString();
+    if (typeId === OID_DATE) {
+      return iso.slice(0, 10);
+    }
+    const stamp = `${iso.slice(0, 10)} ${iso.slice(11, 23)}`;
+    return typeId === OID_TIMESTAMPTZ ? `${stamp}+00` : stamp;
+  }
+  if (typeof value === "boolean") {
+    return value ? "t" : "f";
+  }
+  if (value instanceof Uint8Array) {
+    return `\\x${Buffer.from(value).toString("hex")}`;
+  }
+  if (typeId === OID_JSON || typeId === OID_JSONB) {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    // Postgres array literal: {a,"b c",NULL}
+    const items = value.map((item) => {
+      const text = toPgText(item, 0);
+      return text === null
+        ? "NULL"
+        : `"${text.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+    });
+    return `{${items.join(",")}}`;
+  }
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
 
 async function execInsertReturning(
   pg: PGlite,
   sql: string,
   params: (string | null)[] = [],
 ): Promise<Buffer> {
-  const tableMatch = /^\s*insert\s+into\s+"?([^"\s(]+)"?/i.exec(sql);
-  const tableName = tableMatch?.[1];
-  const sqlNoReturn = sql.replace(/\s+returning\s+[\s\S]+$/i, "");
-  const inserted = await pg.query(sqlNoReturn, params, { rowMode: "object" });
-  if (!tableName) {
-    return Buffer.concat([
-      buildCommandComplete("INSERT 0 0"),
-      buildReadyForQuery(),
-    ]);
-  }
-  // ON CONFLICT DO NOTHING inserts fewer rows than the VALUES list: only the
-  // rows actually written may come back, never an unrelated existing row.
-  const rowCount = Math.min(
-    countInsertRows(sql),
-    inserted.affectedRows ?? Number.MAX_SAFE_INTEGER,
-  );
-  if (rowCount === 0) {
-    return Buffer.concat([
-      buildRowDescription([]),
-      buildCommandComplete("INSERT 0 0"),
-      buildReadyForQuery(),
-    ]);
-  }
-  const result = await pg.query<PgliteRow>(
-    `SELECT * FROM "${tableName}" ORDER BY ctid DESC LIMIT ${rowCount}`,
-    [],
-    { rowMode: "object" },
-  );
-  const rows = result.rows.toReversed();
+  // pg.query() runs INSERT…RETURNING correctly — only the raw wire-protocol
+  // path corrupts it. The rows come back exactly as RETURNING lists them
+  // (never re-selected: "last row by ctid" is a different row whenever the
+  // insert lands in reused page space).
+  const result = await pg.query<PgliteValue[]>(sql, params, {
+    rowMode: "array",
+  });
   const cols = result.fields.map((f) => f.name);
-  const parts: Buffer[] = [buildRowDescription(cols)];
-  for (const row of rows) {
+  const typeIds = result.fields.map((f) => f.dataTypeID);
+  const parts: Buffer[] = [buildRowDescription(cols, typeIds)];
+  for (const row of result.rows) {
     parts.push(
-      buildDataRow(
-        cols.map((c) => {
-          const v = row[c];
-          return v === null || v === undefined ? null : String(v);
-        }),
-      ),
+      buildDataRow(typeIds.map((typeId, i) => toPgText(row[i], typeId))),
     );
   }
-  parts.push(buildCommandComplete(`INSERT 0 ${String(rows.length)}`));
+  parts.push(buildCommandComplete(`INSERT 0 ${String(result.rows.length)}`));
   parts.push(buildReadyForQuery());
   return Buffer.concat(parts);
 }

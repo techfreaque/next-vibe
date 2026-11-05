@@ -28,7 +28,7 @@ export function RootProviders({
   children: ReactNode;
 }): JSX.Element {
   return (
-    <QueryProvider>
+    <QueryProvider isolateServerRender>
       <ThemeProvider
         attribute="class"
         defaultTheme={theme ?? "dark"}

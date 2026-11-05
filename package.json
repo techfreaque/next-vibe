@@ -85,6 +85,7 @@
     "build": "vibe build",
     "start": "vibe start",
     "test": "bun test --bail --isolate",
+    "test:e2e": "bun src/vibe/tooling/testing/e2e/run.ts",
     "check": "vibe check",
     "lint": "echo redirecting to check && vibe check",
     "studio": "vibe studio",

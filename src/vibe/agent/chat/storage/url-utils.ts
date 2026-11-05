@@ -18,8 +18,23 @@ export function makeAbsoluteStorageUrl(relativeUrl: string): string {
 }
 
 /**
+ * Absolute URL served by the thread-files endpoint
+ * (vibe/agent/chat/threads/files/[threadId]/[filename]). Single source for
+ * every storage adapter — a hand-built path that drifts from the endpoint's
+ * route 404s every attachment.
+ */
+export function buildStorageFileUrl(
+  threadId: string,
+  filename: string,
+): string {
+  return makeAbsoluteStorageUrl(
+    `/api/en-GLOBAL/vibe/agent/chat/threads/files/${threadId}/${filename}`,
+  );
+}
+
+/**
  * The pattern for storage file URLs is:
- *   /api/{locale}/agent/chat/threads/files/{threadId}/{filename}
+ *   /api/{locale}/vibe/agent/chat/threads/files/{threadId}/{filename}
  * where filename is typically `{fileId}.{ext}`.
  *
  * Returns `{ threadId, fileId }` or null if the URL doesn't match.
@@ -55,10 +70,12 @@ export async function fetchStorageFileAsBase64(
 ): Promise<string | null> {
   const parsed = parseStorageUrl(url);
   if (!parsed) {
-    // External URL - plain fetch, no auth concern
+    // External URL — user/AI supplied, so never let it reach internal hosts
+    // (cloud metadata, local services). Lazy: ssrf-guard is server-only.
     try {
-      const response = await fetchImpl(url);
-      if (!response.ok) {
+      const { fetchPublicUrl } = await import("../../../core/utils/ssrf-guard");
+      const response = await fetchPublicUrl(url, fetchImpl);
+      if (!response?.ok) {
         return null;
       }
       const buffer = await response.arrayBuffer();

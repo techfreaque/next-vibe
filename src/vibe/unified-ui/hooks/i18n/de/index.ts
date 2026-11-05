@@ -98,7 +98,8 @@ export const translations: typeof enTranslations = {
         noItems: "Keine Einträge gefunden",
         required: "Pflichtfeld",
         select: "Auswählen...",
-        useToFind: "Zum Suchen verwenden",
+        selectLabel: "{{label}} auswählen",
+        useToFind: "Mit {{alias}} finden",
       },
       markdownTextarea: {
         edit: "Bearbeiten",

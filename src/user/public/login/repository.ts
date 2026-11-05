@@ -202,7 +202,6 @@ export class LoginRepository {
         userResponse.data.id,
         rememberMe,
         locale,
-        request,
         platform,
         logger,
         user, // Pass entire user object from route handler
@@ -218,7 +217,6 @@ export class LoginRepository {
         email,
         userResponse.data.id,
         logger,
-        locale,
         leadsT,
       );
 
@@ -239,7 +237,6 @@ export class LoginRepository {
    * @param userId - User ID
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
-   * @param request - Next.js request object for platform detection
    * @param logger - Logger instance
    * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with user session
@@ -248,7 +245,6 @@ export class LoginRepository {
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
-    request: NextRequest | undefined,
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
@@ -259,40 +255,6 @@ export class LoginRepository {
       false,
       rememberMe,
       locale,
-      request,
-      platform,
-      logger,
-      handlerUser,
-      t,
-    );
-  }
-
-  /**
-   * Renew user session with fresh JWT token and update database session (private helper method)
-   * @param userId - User ID
-   * @param rememberMe - Whether to extend session duration
-   * @param locale - Locale for lead tracking
-   * @param request - Next.js request object for platform detection
-   * @param logger - Logger instance
-   * @param handlerUser - User object from route handler containing leadId
-   * @returns Login response with renewed session
-   */
-  private static async renewSession(
-    userId: string,
-    rememberMe = false,
-    locale: CountryLanguage,
-    request: NextRequest | undefined,
-    platform: Platform,
-    logger: EndpointLogger,
-    handlerUser: JWTPublicPayloadType,
-    t: LoginT,
-  ): Promise<ResponseType<LoginPostResponseOutput>> {
-    return await this.createOrRenewSession(
-      userId,
-      true, // isRenewal
-      rememberMe,
-      locale,
-      request,
       platform,
       logger,
       handlerUser,
@@ -307,7 +269,6 @@ export class LoginRepository {
    * @param isRenewal - Whether this is a session renewal
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
-   * @param request - Next.js request object for platform detection
    * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with session data
    */
@@ -316,7 +277,6 @@ export class LoginRepository {
     isRenewal = false,
     rememberMe = false,
     locale: CountryLanguage,
-    request: NextRequest | undefined,
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
@@ -523,9 +483,10 @@ export class LoginRepository {
             socialDescription: t("options.messages.socialAuthDescription"),
             providers:
               options.socialProviders?.map((provider) => ({
-                name: provider.name,
+                name: t(provider.name),
                 id: provider.providers[0] || "unknown",
-                enabled: provider.enabled,
+                // A provider is only usable when social login itself is on
+                enabled: options.allowSocialAuth && provider.enabled,
                 description: t("options.messages.continueWithProvider", {
                   provider: t(provider.name),
                 }),
@@ -539,12 +500,6 @@ export class LoginRepository {
             ? t("options.messages.twoFactorRequired")
             : t("options.messages.standardSecurity"),
         },
-        recommendations: [
-          options.allowPasswordAuth
-            ? t("options.messages.tryPasswordFirst")
-            : t("options.messages.useSocialLogin"),
-          t("options.messages.socialLoginFaster"),
-        ],
       },
     });
   }
@@ -597,15 +552,11 @@ export class LoginRepository {
           locale,
           logger,
         );
-        if (!user.success) {
-          return fail({
-            message: t("errors.user_not_found", { userId: email }),
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            cause: user,
-          });
+        // Unknown emails get the general options — answering "not found" here
+        // would let anyone probe which addresses have an account.
+        if (user.success) {
+          options.requireTwoFactor = user.data.requireTwoFactor === true;
         }
-        // Apply user-specific settings if they exist
-        options.requireTwoFactor = user.data.requireTwoFactor === true;
 
         // Check if account is locked (DB-backed, cross-instance)
         const isLocked = await this.isAccountLockedDb(email, "unknown");
@@ -630,16 +581,16 @@ export class LoginRepository {
   private static async recordAttemptDb(
     email: string,
     ipAddress: string,
-    success: boolean,
+    succeeded: boolean,
     isBlocked: boolean,
   ): Promise<void> {
     try {
       await db.insert(loginAttempts).values({
         email: email.toLowerCase(),
         ipAddress,
-        success,
+        success: succeeded,
         isBlocked,
-        failureCount: success ? 0 : 1,
+        failureCount: succeeded ? 0 : 1,
       });
     } catch {
       // Non-critical - don't fail login if attempt recording fails
@@ -684,7 +635,6 @@ export class LoginRepository {
    * @param leadId - Lead ID from tracking if available
    * @param email - User email
    * @param userId - User ID
-   * @param locale - User locale
    * @param logger - Logger instance
    * @param user - JWT payload for authorization
    */
@@ -693,7 +643,6 @@ export class LoginRepository {
     email: string,
     userId: string,
     logger: EndpointLogger,
-    locale: CountryLanguage,
     leadsT: LeadsT,
   ): Promise<void> {
     try {

@@ -47,6 +47,7 @@ import {
   createParentBridge,
   recordDisplay,
 } from "./bridge";
+import { VIBE_FRAME_MOUNT_API_PATH } from "./mount/constants";
 import { setupTrigger } from "./triggers";
 import {
   DEFAULT_SANDBOX,
@@ -551,7 +552,7 @@ async function fetchFrameConfig(
   authToken?: string,
 ): Promise<ConfigWidgetResponse[]> {
   const base = serverUrl.replace(/\/$/, "");
-  const url = `${base}/api/${locale}/system/platforms/vibe-frame/mount`;
+  const url = `${base}/api/${locale}${VIBE_FRAME_MOUNT_API_PATH}`;
 
   const body: ConfigBody = { integrations };
   if (leadId) {

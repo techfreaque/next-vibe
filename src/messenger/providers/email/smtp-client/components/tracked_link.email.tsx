@@ -7,6 +7,7 @@ import { Link } from "@react-email/components";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CSSProperties, JSX, ReactNode } from "react";
 
+import { signRedirectUrl } from "@/leads/tracking/redirect-signature";
 import {
   ensureFullUrl,
   generateTrackingLinkUrl,
@@ -65,6 +66,8 @@ export function TrackedLink({
     tracking.campaignId,
     baseUrl,
     tracking.locale,
+    "email",
+    signRedirectUrl(fullUrl),
   );
 
   return (

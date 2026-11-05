@@ -24,7 +24,6 @@ import { LogOut } from "next-vibe/ui/components/icons/LogOut";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Music } from "next-vibe/ui/components/icons/Music";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
-import { Save } from "next-vibe/ui/components/icons/Save";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
 import { Twitter } from "next-vibe/ui/components/icons/Twitter";
@@ -46,6 +45,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
@@ -56,6 +56,7 @@ import { MarkdownTextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-f
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import {
   type JSX,
   useCallback,
@@ -528,6 +529,29 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const [editing, setEditing] = useState(false);
   const [liveAvatarUrl, setLiveAvatarUrl] = useState<string | null>(null);
 
+  // A successful save closes the editor (adjust state during render) and
+  // reloads the profile so the card shows what was just saved.
+  const saved = useWidgetValue<typeof meDefinition.POST>();
+  // Before any submit the widget value is not a response yet — no `response` key
+  const savedOk =
+    saved !== undefined &&
+    "response" in saved &&
+    saved.response?.success === true;
+  const [handledSave, setHandledSave] = useState(saved);
+  const [saveCount, setSaveCount] = useState(0);
+  if (saved !== handledSave) {
+    setHandledSave(saved);
+    if (savedOk) {
+      setEditing(false);
+      setSaveCount((n) => n + 1);
+    }
+  }
+  useEffect(() => {
+    if (saveCount > 0) {
+      void refetch();
+    }
+  }, [saveCount, refetch]);
+
   // Skills come from the me GET endpoint response (server-side enriched)
   const mySkills = useMemo(
     () =>
@@ -836,17 +860,16 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
                 >
                   {t("widget.cancelEdit")}
                 </Button>
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="text-xs h-7 gap-1"
-                  disabled={form.formState.isSubmitting}
-                >
-                  <Save className="h-3 w-3" />
-                  {form.formState.isSubmitting
-                    ? t("widget.saving")
-                    : t("widget.save")}
-                </Button>
+                <SubmitButtonWidget<typeof meDefinition.POST>
+                  field={{
+                    text: "widget.save",
+                    loadingText: "widget.saving",
+                    icon: "save",
+                    iconSize: "xs",
+                    size: "sm",
+                    className: "text-xs h-7",
+                  }}
+                />
               </Div>
             ) : (
               <Button
@@ -855,6 +878,12 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
                 size="sm"
                 className="bg-white/10 text-white/70 hover:bg-white/20 text-xs h-7 gap-1"
                 onClick={(): void => {
+                  // Open the editor on the saved profile — the form may have been
+                  // re-initialised since the profile loaded (empty fields, and a
+                  // cleared field would never register as a change).
+                  if (profile) {
+                    form.reset(profileFormValues(profile));
+                  }
                   setEditing(true);
                 }}
               >
@@ -980,10 +1009,12 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
                   >
                     {icon}
                   </Div>
-                  <UrlFieldWidget
-                    fieldName={`profileInfo.${key}`}
-                    field={profileInfo[key]}
-                  />
+                  <Div className="flex-1 min-w-0">
+                    <UrlFieldWidget
+                      fieldName={`profileInfo.${key}`}
+                      field={profileInfo[key]}
+                    />
+                  </Div>
                 </Div>
               ))}
             </Div>

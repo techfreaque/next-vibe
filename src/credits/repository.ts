@@ -3065,6 +3065,7 @@ export class CreditRepository {
         logger.error(`Failed to deduct credits for ${feature}`, {
           ...identifier,
           cost,
+          reason: result.message,
         });
         return fail({
           message: t("errors.deductionFailed", { cost }),

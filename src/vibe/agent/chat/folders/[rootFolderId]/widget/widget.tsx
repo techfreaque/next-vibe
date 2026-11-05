@@ -180,6 +180,13 @@ function RootFolderBar({
               <Div
                 key={folderConfig.id}
                 onClick={() => handleClick(folderConfig.id)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleClick(folderConfig.id);
+                  }
+                }}
                 className={cn(
                   "inline-flex items-center justify-center rounded-md h-13 w-13 flex-col gap-1 text-sm font-medium transition-colors no-underline cursor-pointer",
                   colorClasses,

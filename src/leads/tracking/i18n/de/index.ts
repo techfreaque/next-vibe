@@ -139,6 +139,11 @@ export const translations: typeof enTranslations = {
       placeholder: "Referenz-ID eingeben",
       helpText: "Optionale Referenz-ID für zusätzliche Tracking-Kontexte",
     },
+    sig: {
+      label: "Link-Signatur",
+      description:
+        "Belegt, dass ein externes Ziel aus einem von uns erzeugten Link stammt",
+    },
     response: {
       success: "Erfolg",
       redirectUrl: "Weiterleitungs-URL",

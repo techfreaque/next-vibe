@@ -41,6 +41,7 @@ import {
 } from "./models";
 import { generateMusicWithFalAi } from "./providers/fal-ai";
 import { generateMusicWithModelsLab } from "./providers/modelslab";
+import { generateMusicWithOpenRouter } from "./providers/openrouter";
 import { generateMusicWithReplicate } from "./providers/replicate";
 import { generateMusicWithUnbottled } from "./providers/unbottled";
 
@@ -164,6 +165,17 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+          fetchImpl,
+        });
+        break;
+
+      case ApiProvider.OPENROUTER:
+        generationResult = await generateMusicWithOpenRouter({
+          providerModel: audioModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
           logger,
           locale,
           fetchImpl,

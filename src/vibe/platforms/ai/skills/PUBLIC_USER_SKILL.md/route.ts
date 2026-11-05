@@ -1,7 +1,7 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * PUBLIC_USER_SKILL.md - Signed-In User Skill Manifest
- * GET /api/[locale]/system/platforms/ai/skills/PUBLIC_USER_SKILL.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/PUBLIC_USER_SKILL.md
  *
  * Returns a markdown document listing all tools available to authenticated users
  * (PUBLIC + CUSTOMER role endpoints with REMOTE_SKILL marker).

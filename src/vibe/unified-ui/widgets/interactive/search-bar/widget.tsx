@@ -155,6 +155,7 @@ export function SearchBarWidget<
             </FormControl>
             <Button
               type="submit"
+              data-testid="endpoint-submit"
               disabled={isSubmitting}
               size="unset"
               className={cn(

@@ -423,10 +423,33 @@ export async function readFixturePrefix(
   return row?.prefix ?? null;
 }
 
+/**
+ * Credential-bearing header names (Authorization, X-Api-Key, Brave's
+ * X-Subscription-Token). Fixtures are committed - secrets never reach disk.
+ */
+const SECRET_HEADER = /^(authorization|x-api-key|x-subscription-token)$/i;
+/** Query params that carry API keys (Scrappey's "key", "api_key", "token"). */
+const SECRET_QUERY_PARAM = /^(key|api_?key|token|access_token)$/i;
+
+/** Recorded URL with credential query params masked. */
+function redactUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    for (const name of new Set(u.searchParams.keys())) {
+      if (SECRET_QUERY_PARAM.test(name)) {
+        u.searchParams.set(name, "[redacted]");
+      }
+    }
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 function headersToRecord(headers: Headers): Record<string, string> {
   const out: Record<string, string> = {};
   headers.forEach((v, k) => {
-    out[k] = k === "authorization" || k === "x-api-key" ? "[redacted]" : v;
+    out[k] = SECRET_HEADER.test(k) ? "[redacted]" : v;
   });
   return out;
 }
@@ -443,11 +466,7 @@ function sanitiseRequestHeaders(
       : Object.entries(headers as Record<string, string>);
   const out: Record<string, string> = {};
   for (const [k, v] of entries) {
-    const lk = k.toLowerCase();
-    out[k] =
-      lk === "authorization" || lk === "x-api-key"
-        ? "[redacted]"
-        : (v as string);
+    out[k] = SECRET_HEADER.test(k) ? "[redacted]" : (v as string);
   }
   return out;
 }
@@ -574,11 +593,12 @@ function isBinaryContentType(contentType: string): boolean {
 }
 
 function buildResFile(
-  url: string,
+  rawUrl: string,
   status: number,
   headers: Record<string, string>,
   bytes: Uint8Array,
 ): ResFile {
+  const url = redactUrl(rawUrl);
   const contentType = headers["content-type"] ?? "";
   if (contentType.includes("event-stream")) {
     const text = new TextDecoder().decode(bytes);
@@ -856,7 +876,7 @@ async function engineFetch(
 
     // Write req file (full body, human-readable)
     const reqEntry: ReqFile = {
-      url,
+      url: redactUrl(url),
       method: init?.method ?? "GET",
       headers: sanitiseRequestHeaders(init?.headers),
       body: parseBodyForStorage(bodyStr),
@@ -1005,7 +1025,10 @@ export function createFixtureFetch(
   toolExecutionContext: ToolExecutionContext | undefined,
   logger: EndpointLogger = createEndpointLogger(false, defaultLocale),
 ): typeof globalThis.fetch {
-  const threadId = toolExecutionContext?.threadId;
+  // An explicit E2E fixture scope wins over the thread (browser requests to
+  // standalone tools have no thread; streams inside an E2E run share its scope).
+  const threadId =
+    toolExecutionContext?.fixtureScopeId ?? toolExecutionContext?.threadId;
   if (!threadId || !fixturesEnabled()) {
     // oxlint-disable-next-line restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
     return fetch;

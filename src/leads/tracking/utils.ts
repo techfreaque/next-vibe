@@ -45,6 +45,8 @@ export function generateTrackingLinkUrl(
   baseUrl: string,
   locale: CountryLanguage,
   source = "email",
+  /** `signRedirectUrl(originalUrl)` — lets /track forward to an external URL. */
+  signature?: string,
 ): string {
   // Prevent nested tracking URLs
   if (
@@ -57,6 +59,9 @@ export function generateTrackingLinkUrl(
 
   const url = new URL(`/${locale}/track`, baseUrl);
   url.searchParams.set("url", originalUrl);
+  if (signature) {
+    url.searchParams.set("sig", signature);
+  }
 
   if (leadId) {
     url.searchParams.set("leadId", leadId);

@@ -24,6 +24,11 @@ export const translations: typeof enTranslations = {
         description: "Czy na pewno chcesz wypisać się z naszego newslettera?",
       },
       unsubscribeButton: "Wypisz się",
+      unsubscribing: "Wypisywanie...",
+      status: {
+        subscribed: "Ten adres dostaje nasz newsletter.",
+        notSubscribed: "Tego adresu nie ma na naszej liście.",
+      },
       subscribeText: "Zmieniłeś zdanie?",
       subscribeLink: "Subskrybuj ponownie",
       info: {

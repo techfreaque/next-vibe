@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           { value: "audio", label: "enums.modelType.audio" as const },
         ],
         columns: 4,
-        schema: z.enum(["text", "image", "video", "audio"] as const),
+        schema: z.enum(["text", "image", "video", "audio"] as const).optional(),
       }),
 
       contentLevel: requestField(scopedTranslation, {

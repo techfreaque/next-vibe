@@ -127,8 +127,9 @@ const { GET } = createEndpoint({
             DefaultFolderId.REMOTE,
           ])
           .describe(
-            "Root folder to filter threads (incognito routed to route-client.ts via useClientRoute)",
-          ),
+            "Root folder to filter threads (incognito routed to route-client.ts via useClientRoute). Defaults to private.",
+          )
+          .default(DefaultFolderId.PRIVATE),
         includeInCacheKey: true,
       }),
       subFolderId: requestField(scopedTranslation, {

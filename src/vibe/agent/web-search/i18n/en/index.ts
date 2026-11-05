@@ -87,6 +87,7 @@ export const translations = {
       aiDefaultLabel: "AI default:",
       switchTo: "Switch to",
       separatorDot: "·",
+      via: "via {{provider}}",
       braveBanner: "Your AI searches with Kagi",
       kagiBanner: "Your AI searches with Brave",
       useBrave: "Use Brave",

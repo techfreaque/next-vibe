@@ -723,7 +723,6 @@ export const pathToAliasMap = {
   "subscriptions-payment-failed": "subscriptions-payment-failed",
   "subscriptions-trialing": "subscriptions-trialing",
   sync: "sync",
-  "system_logger_error-monitor_client-log_POST": "report-client-error",
   "system-prompt-debug": "system-prompt-debug",
   "system-settings": "system-settings",
   "task-execute": "execute-task",
@@ -974,6 +973,7 @@ export const pathToAliasMap = {
   "vibe_execute-tool_revival_POST": "resume-stream",
   "vibe_help-tool_GET": "tool-help",
   "vibe_logger_error-monitor_cleanup_POST": "error-logs-cleanup",
+  "vibe_logger_error-monitor_client-log_POST": "report-client-error",
   "vibe_logger_error-monitor_data-sources_error-logs-errors_POST":
     "error-logs-errors",
   "vibe_logger_error-monitor_data-sources_error-logs-total_POST":

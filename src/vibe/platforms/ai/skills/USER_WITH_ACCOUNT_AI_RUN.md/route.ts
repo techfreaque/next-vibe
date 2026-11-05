@@ -1,7 +1,7 @@
 // oxlint-disable boilerplate/route-pattern -- Markdown endpoint serves raw Response, cannot use endpointsHandler
 /**
  * USER_WITH_ACCOUNT_AI_RUN.md - AI Run Guide (Authenticated Tier)
- * GET /api/[locale]/system/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md
+ * GET /api/[locale]/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md
  *
  * Focused guide for using POST /agent/ai-stream/run with account-required tools.
  * All requests require a Bearer JWT token. No tool listing - see USER_WITH_ACCOUNT_SKILL.md

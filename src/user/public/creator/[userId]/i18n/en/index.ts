@@ -41,6 +41,7 @@ export const translations = {
       creatorHeaderImageUrl: "Header Image",
       referralCode: "Referral Code",
       appName: "App Name",
+      leadMagnetActive: "Lead Magnet Active",
       leadMagnetHeadline: "Lead Magnet Headline",
       leadMagnetButtonText: "Lead Magnet Button",
       skills: "Skills",
@@ -88,16 +89,11 @@ export const translations = {
       backArrow: "\u2190",
       copyright: "\u00a9",
     },
-    lead: {
-      headline: "Stay in the loop",
-      namePlaceholder: "Your first name",
-      emailPlaceholder: "Your email",
-      send: "Subscribe",
-      sending: "...",
-      doneHeading: "Done.",
-      doneSub: "You're on the list.",
-      finePrint: "No spam. Unsubscribe any time.",
-      error: "Something went wrong. Try again.",
-    },
+  },
+  meta: {
+    title: "{{publicName}} - Creator Profile",
+    description:
+      "{{publicName}} builds AI skills on {{appName}}. Explore their work and start a conversation.",
+    notFound: "Creator Not Found - {{appName}}",
   },
 };

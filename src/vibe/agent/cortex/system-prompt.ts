@@ -3,6 +3,7 @@ import "server-only";
 
 import type { sql as sqlTag } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { languageConfig } from "next-vibe/core/i18n";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -1805,48 +1806,76 @@ export async function loadRawEmbeddingScores(
   userId: string,
   userMessage: string,
   logger: EndpointLogger,
+  /** Caller's request context — only its E2E fixture scope is carried. */
+  callerContext: ToolExecutionContext,
 ): Promise<
   { scores: RawEmbeddingScore[]; embeddingGenerated: boolean } | undefined
 > {
   try {
     const { generateEmbedding } = await import("./embeddings/service");
-    // Debug endpoint (no stream) — explicit thread-less context routes live.
+    // Debug endpoint (no stream) — thread-less; live unless an E2E run
+    // scoped the request (fixtureScopeId), in which case it records/replays.
     const { makeHeadlessContext } =
       await import("next-vibe/core/execution-context");
-    const queryEmbedding = await generateEmbedding(
-      userMessage,
+    const queryEmbedding = await generateEmbedding(userMessage, {
       // no user context — UTC (dates not user-facing here)
-      makeHeadlessContext(undefined, undefined, "UTC"),
-    );
+      ...makeHeadlessContext(undefined, undefined, "UTC"),
+      fixtureScopeId: callerContext.fixtureScopeId,
+    });
     if (!queryEmbedding) {
       return { scores: [], embeddingGenerated: false };
     }
 
-    const { db } = await import("next-vibe/database");
+    const { db, isPglite } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
     const { CortexNodeType } = await import("./enum");
     const { eq, and, isNotNull, sql } = await import("drizzle-orm");
 
-    const embeddingStr = `[${queryEmbedding.join(",")}]`;
+    const ownFiles = and(
+      eq(cortexNodes.userId, userId),
+      eq(cortexNodes.nodeType, CortexNodeType.FILE),
+      isNotNull(cortexNodes.embedding),
+    );
 
-    const rows = await db
-      .select({
-        path: cortexNodes.path,
-        updatedAt: cortexNodes.updatedAt,
-        similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
-      })
-      .from(cortexNodes)
-      .where(
-        and(
-          eq(cortexNodes.userId, userId),
-          eq(cortexNodes.nodeType, CortexNodeType.FILE),
-          isNotNull(cortexNodes.embedding),
-        ),
-      )
-      .orderBy(
-        sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
-      )
-      .limit(20);
+    // PGlite has no pgvector `<=>` operator (the column is plain text there) —
+    // score in JS, same as vectorSearchPglite. Without this the debug view
+    // always reported "embedding failed" on local/PGlite instances.
+    const rows: Array<{ path: string; updatedAt: Date; similarity: number }> =
+      isPglite
+        ? (
+            await db
+              .select({
+                path: cortexNodes.path,
+                updatedAt: cortexNodes.updatedAt,
+                embedding: cortexNodes.embedding,
+              })
+              .from(cortexNodes)
+              .where(ownFiles)
+          )
+            .map((r) => ({
+              path: r.path,
+              updatedAt: r.updatedAt,
+              similarity: r.embedding
+                ? cosineSimilarity(queryEmbedding, r.embedding)
+                : 0,
+            }))
+            .toSorted((a, b) => b.similarity - a.similarity)
+            .slice(0, 20)
+        : await (async () => {
+            const embeddingStr = `[${queryEmbedding.join(",")}]`;
+            return await db
+              .select({
+                path: cortexNodes.path,
+                updatedAt: cortexNodes.updatedAt,
+                similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
+              })
+              .from(cortexNodes)
+              .where(ownFiles)
+              .orderBy(
+                sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
+              )
+              .limit(20);
+          })();
 
     const scores: RawEmbeddingScore[] = rows.map((r) => {
       const baseSimilarity = r.similarity;

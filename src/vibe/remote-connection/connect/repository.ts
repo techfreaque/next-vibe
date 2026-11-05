@@ -20,7 +20,6 @@ import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "@/user/public/login/definition";
 
-import { coreEnv } from "../../core/env";
 import { coreClientEnv as envClient } from "../../core/env-client";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
@@ -29,9 +28,13 @@ import {
   type ResponseType,
   success,
 } from "../../core/route/response.schema";
-import { db } from "../../database";
 import { AuthRepository } from "../../identity/auth/repository";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import {
+  allowsPrivateTargets,
+  isPrivateAddress,
+} from "../../core/utils/ssrf-guard";
+import { db } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
 import registerEndpoints from "../connect-reverse/definition";
 import {
@@ -51,27 +54,10 @@ import type { RemoteConnectT } from "./i18n";
 
 export class RemoteConnectionConnectRepository {
   /**
-   * Private IP / loopback ranges that must never be used as remote URLs.
-   * Prevents SSRF attacks where an authenticated user points the server at
-   * internal services (AWS metadata, Kubernetes, local DB, etc.).
-   */
-  private static readonly PRIVATE_IP_PATTERNS = [
-    /^localhost$/i,
-    /^127\./,
-    /^0\./,
-    /^10\./,
-    /^172\.(1[6-9]|2\d|3[01])\./,
-    /^192\.168\./,
-    /^169\.254\./, // link-local / AWS metadata
-    /^::1$/,
-    /^\[::1\]/,
-    /^fc00:/i, // IPv6 unique local
-    /^fd[0-9a-f]{2}:/i,
-  ];
-
-  /**
-   * Returns an error string if the URL hostname resolves to a private/loopback
-   * range, null if the URL is acceptable.
+   * Returns an error string if the URL is not http(s) or its hostname is a
+   * private/loopback range (SSRF: internal services, cloud metadata), null if
+   * the URL is acceptable. Private targets stay allowed in dev/test/preview
+   * for local-to-local testing (`allowsPrivateTargets`).
    */
   private static validateRemoteUrl(rawUrl: string): string | null {
     let parsed: URL;
@@ -83,22 +69,12 @@ export class RemoteConnectionConnectRepository {
     if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
       return "Remote URL must use http or https";
     }
-    const host = parsed.hostname;
-    // Allow loopback/private addresses in development, test, or preview mode (for local-to-local testing)
     const isDev =
+      allowsPrivateTargets() ||
       envClient.NODE_ENV === "development" ||
-      envClient.NODE_ENV === "test" ||
-      coreEnv.NODE_ENV === "development" ||
-      coreEnv.NODE_ENV === "test" ||
-      coreEnv.IS_PREVIEW_MODE === true;
-    if (!isDev) {
-      if (
-        RemoteConnectionConnectRepository.PRIVATE_IP_PATTERNS.some((re) =>
-          re.test(host),
-        )
-      ) {
-        return "Remote URL must not point to a private or loopback address";
-      }
+      envClient.NODE_ENV === "test";
+    if (!isDev && isPrivateAddress(parsed.hostname)) {
+      return "Remote URL must not point to a private or loopback address";
     }
     return null;
   }

@@ -1482,9 +1482,30 @@
           "label": "Status",
           "schema": {
             "def": {
-              "type": "string"
+              "type": "enum",
+              "entries": {
+                "enums.invoiceStatus.draft": "enums.invoiceStatus.draft",
+                "enums.invoiceStatus.open": "enums.invoiceStatus.open",
+                "enums.invoiceStatus.paid": "enums.invoiceStatus.paid",
+                "enums.invoiceStatus.void": "enums.invoiceStatus.void",
+                "enums.invoiceStatus.uncollectible": "enums.invoiceStatus.uncollectible"
+              }
             },
-            "type": "string"
+            "type": "enum",
+            "enum": {
+              "enums.invoiceStatus.draft": "enums.invoiceStatus.draft",
+              "enums.invoiceStatus.open": "enums.invoiceStatus.open",
+              "enums.invoiceStatus.paid": "enums.invoiceStatus.paid",
+              "enums.invoiceStatus.void": "enums.invoiceStatus.void",
+              "enums.invoiceStatus.uncollectible": "enums.invoiceStatus.uncollectible"
+            },
+            "options": [
+              "enums.invoiceStatus.draft",
+              "enums.invoiceStatus.open",
+              "enums.invoiceStatus.paid",
+              "enums.invoiceStatus.void",
+              "enums.invoiceStatus.uncollectible"
+            ]
           },
           "usage": {
             "response": true
@@ -4903,12 +4924,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -4936,12 +4992,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -4969,12 +5060,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5002,12 +5128,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5035,12 +5196,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5068,12 +5264,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5101,12 +5332,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5134,12 +5400,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5167,12 +5468,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5200,12 +5536,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5233,12 +5604,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5266,12 +5672,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -5299,12 +5740,47 @@
                       "type": "optional",
                       "innerType": {
                         "def": {
-                          "type": "string",
-                          "format": "url",
-                          "check": "string_format",
-                          "abort": false
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string",
+                                "format": "url",
+                                "check": "string_format",
+                                "abort": false
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "literal",
+                                "values": [""]
+                              },
+                              "type": "literal",
+                              "values": {}
+                            }
+                          ]
                         },
-                        "type": "string"
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string",
+                              "format": "url",
+                              "check": "string_format",
+                              "abort": false
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "literal",
+                              "values": [""]
+                            },
+                            "type": "literal",
+                            "values": {}
+                          }
+                        ]
                       }
                     },
                     "type": "optional"
@@ -7852,17 +8328,7 @@
             }
           ],
           "columns": 6,
-          "hiddenForPlatforms": [
-            "ai",
-            "mcp",
-            "remote-skill",
-            "trpc",
-            "next-page",
-            "next-api",
-            "cron",
-            "electron",
-            "frame"
-          ],
+          "hiddenForPlatforms": ["ai", "mcp", "remote-skill", "cron"],
           "schema": {
             "def": {
               "type": "optional",
@@ -9254,7 +9720,7 @@
     "toolName": "system-prompt-debug",
     "title": "System-Prompt Debug",
     "titleShort": "Prompt debuggen",
-    "description": "Zeigt den vollständigen System-Prompt für einen gegebenen Nutzerkontext. Nur für Admins/Dev.",
+    "description": "Zeigt den exakten System-Prompt, den die KI in einem Kontext bekommt — Ordner, Skill, Thread, Nachricht.",
     "fields": {
       "usage": {
         "request": "data",
@@ -9263,10 +9729,36 @@
       "children": {
         "rootFolderId": {
           "type": "form_field",
-          "fieldType": "text",
+          "fieldType": "select",
           "label": "Root-Ordner",
           "description": "Ordnerkontext simulieren (private, public, incognito, cron, shared, remote)",
           "placeholder": "private",
+          "options": [
+            {
+              "value": "private",
+              "label": "get.fields.rootFolderId.options.private"
+            },
+            {
+              "value": "shared",
+              "label": "get.fields.rootFolderId.options.shared"
+            },
+            {
+              "value": "public",
+              "label": "get.fields.rootFolderId.options.public"
+            },
+            {
+              "value": "incognito",
+              "label": "get.fields.rootFolderId.options.incognito"
+            },
+            {
+              "value": "cron",
+              "label": "get.fields.rootFolderId.options.background"
+            },
+            {
+              "value": "remote",
+              "label": "get.fields.rootFolderId.options.remote"
+            }
+          ],
           "schema": {
             "def": {
               "type": "default",
@@ -16878,16 +17370,42 @@
       "description": "Berechtigungen für Root-Ordner anzeigen",
       "layoutType": "stacked",
       "usage": {
-        "request": "data",
+        "request": "urlPathParams",
         "response": true
       },
       "children": {
         "rootFolderId": {
           "type": "form_field",
-          "fieldType": "text",
-          "label": "Root-Ordner-ID",
+          "fieldType": "select",
+          "label": "Root-Ordner",
           "description": "Die ID des Root-Ordners, für den Berechtigungen geprüft werden sollen",
           "columns": 12,
+          "options": [
+            {
+              "value": "private",
+              "label": "get.rootFolderId.options.private"
+            },
+            {
+              "value": "shared",
+              "label": "get.rootFolderId.options.shared"
+            },
+            {
+              "value": "public",
+              "label": "get.rootFolderId.options.public"
+            },
+            {
+              "value": "cron",
+              "label": "get.rootFolderId.options.background"
+            },
+            {
+              "value": "incognito",
+              "label": "get.rootFolderId.options.incognito"
+            },
+            {
+              "value": "remote",
+              "label": "get.rootFolderId.options.remote"
+            }
+          ],
           "schema": {
             "def": {
               "type": "enum",
@@ -16919,7 +17437,7 @@
             ]
           },
           "usage": {
-            "request": "data"
+            "request": "urlPathParams"
           },
           "schemaType": "primitive"
         },
@@ -24875,33 +25393,40 @@
           ],
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "private": "private",
-                "shared": "shared",
-                "public": "public",
-                "cron": "cron",
-                "incognito": "incognito",
-                "remote": "remote"
-              }
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "private": "private",
+                    "shared": "shared",
+                    "public": "public",
+                    "cron": "cron",
+                    "incognito": "incognito",
+                    "remote": "remote"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "private": "private",
+                  "shared": "shared",
+                  "public": "public",
+                  "cron": "cron",
+                  "incognito": "incognito",
+                  "remote": "remote"
+                },
+                "options": [
+                  "private",
+                  "shared",
+                  "public",
+                  "cron",
+                  "incognito",
+                  "remote"
+                ]
+              },
+              "defaultValue": "private"
             },
-            "type": "enum",
-            "enum": {
-              "private": "private",
-              "shared": "shared",
-              "public": "public",
-              "cron": "cron",
-              "incognito": "incognito",
-              "remote": "remote"
-            },
-            "options": [
-              "private",
-              "shared",
-              "public",
-              "cron",
-              "incognito",
-              "remote"
-            ]
+            "type": "default"
           },
           "includeInCacheKey": true,
           "usage": {
@@ -27499,22 +28024,28 @@
           "columns": 4,
           "schema": {
             "def": {
-              "type": "enum",
-              "entries": {
-                "text": "text",
-                "image": "image",
-                "video": "video",
-                "audio": "audio"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "text": "text",
+                    "image": "image",
+                    "video": "video",
+                    "audio": "audio"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "text": "text",
+                  "image": "image",
+                  "video": "video",
+                  "audio": "audio"
+                },
+                "options": ["text", "image", "video", "audio"]
               }
             },
-            "type": "enum",
-            "enum": {
-              "text": "text",
-              "image": "image",
-              "video": "video",
-              "audio": "audio"
-            },
-            "options": ["text", "image", "video", "audio"]
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -59487,8 +60018,8 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Tool-Name",
-          "description": "Der registrierte Tool-Name oder Alias (z.B. 'agent_chat_characters_GET'). Verwende system_help_GET zum Entdecken.",
-          "placeholder": "agent_chat_characters_GET",
+          "description": "Der registrierte Tool-Name oder Alias (z.B. 'vibe_agent_skills_GET'). Verwende tool-help zum Entdecken.",
+          "placeholder": "vibe_agent_skills_GET",
           "columns": 12,
           "schema": {
             "def": {

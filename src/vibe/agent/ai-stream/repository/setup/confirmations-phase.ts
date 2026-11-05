@@ -77,6 +77,8 @@ export async function runConfirmationsPhase(params: {
   const confirmationtoolExecutionContext: ToolExecutionContext = {
     rootFolderId: data.rootFolderId,
     threadId: data.threadId ?? undefined,
+    // Confirmed tools run on behalf of the same E2E fixture scope (dev/test).
+    fixtureScopeId: toolExecutionContext.fixtureScopeId,
     timezone: toolExecutionContext.timezone,
     voiceEnabled: toolExecutionContext.voiceEnabled,
     aiMessageId: undefined,

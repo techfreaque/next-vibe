@@ -59,5 +59,11 @@ export const translations: typeof enTranslations = {
       title: "Skill zugeordnet",
       description: "Der Skill wurde für diesen Lead gespeichert.",
     },
+    skipped: {
+      title: "Nicht erfasst",
+      description:
+        "Keine Besucher-Sitzung zum Zuordnen. Erst eine Seite öffnen, dann erneut versuchen.",
+    },
+    submit: "Skill zuordnen",
   },
 };

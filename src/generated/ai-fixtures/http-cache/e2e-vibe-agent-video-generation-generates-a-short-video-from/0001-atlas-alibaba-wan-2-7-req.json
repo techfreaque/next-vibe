@@ -1,0 +1,16 @@
+{
+  "url": "https://openrouter.ai/api/v1/videos",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "alibaba/wan-2.7",
+    "prompt": "A red ball rolling across a white floor",
+    "duration": 2,
+    "generate_audio": true
+  }
+}

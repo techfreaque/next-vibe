@@ -295,7 +295,8 @@ export const translations = {
     two_factor_required: "Two-factor authentication required",
     auth_error: "Authentication failed for {{email}}: {{error}}",
     user_not_found: "No user found for {{userId}}",
-    session_creation_failed: "Could not create a session for {{userId}}: {{error}}",
+    session_creation_failed:
+      "Could not create a session for {{userId}}: {{error}}",
     token_save_failed: "Failed to save authentication token",
     validation: {
       title: "Validation Failed",

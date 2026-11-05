@@ -11,14 +11,19 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
+
+const LeadSkillWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LeadSkillWidget })),
+);
 
 const { PATCH } = createEndpoint({
   scopedTranslation,
@@ -34,19 +39,16 @@ const { PATCH } = createEndpoint({
   subCategory: "Management",
   tags: ["tags.leads" as const, "tags.skill" as const],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "patch.title" as const,
-    description: "patch.description" as const,
+  fields: customWidgetObject({
+    render: LeadSkillWidget,
     usage: { request: "data", response: true } as const,
     children: {
       skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.UUID,
         label: "patch.skillId.label" as const,
         description: "patch.skillId.description" as const,
-        hidden: true,
-        schema: z.string().uuid(),
+        schema: z.uuid(),
       }),
 
       // === RESPONSE ===

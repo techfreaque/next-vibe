@@ -679,9 +679,16 @@ export const translations = {
     noCredits: {
       title: "No credits left",
       addCredits: "Add credits",
+      description: "Your balance is empty. Top up to keep chatting.",
     },
     insufficientCredits: {
       title: "Not enough credits (need {{cost}}, have {{balance}})",
+      description: "Top up or pick a cheaper model.",
+    },
+    noModel: {
+      title: "No model selected",
+      description:
+        "Pick a model first. None listed? Check your provider API keys.",
     },
     keyboardShortcuts: {
       enter: "Enter",

@@ -15,6 +15,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../../env-availability";
 import type { BraveSearchGetResponseOutput } from "./definition";
@@ -121,6 +122,7 @@ export class BraveSearchRepository {
       agentEnv.BRAVE_SEARCH_API_KEY,
       logger,
       t,
+      createFixtureFetch(toolExecutionContext, logger),
     );
 
     if (!fetchResult.success) {
@@ -172,6 +174,7 @@ export class BraveSearchRepository {
     apiKey: string,
     logger: EndpointLogger,
     t: BraveT,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<ResponseType<{ results: BraveSearchResult[] }>> {
     const params = new URLSearchParams({
       q: query,
@@ -193,8 +196,7 @@ export class BraveSearchRepository {
     }, this.TIMEOUT);
 
     try {
-      // oxlint-disable-next-line restricted/no-raw-fetch
-      const response = await fetch(url, {
+      const response = await fetchImpl(url, {
         method: "GET",
         headers: {
           Accept: "application/json",

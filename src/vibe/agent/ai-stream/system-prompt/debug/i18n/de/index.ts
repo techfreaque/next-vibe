@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
     title: "System-Prompt Debug",
     titleShort: "Prompt debuggen",
     description:
-      "Zeigt den vollständigen System-Prompt für einen gegebenen Nutzerkontext. Nur für Admins/Dev.",
+      "Zeigt den exakten System-Prompt, den die KI in einem Kontext bekommt — Ordner, Skill, Thread, Nachricht.",
     status: {
       loading: "Erstellt...",
       done: "Fertig",
@@ -18,6 +18,14 @@ export const translations: typeof enTranslations = {
         description:
           "Ordnerkontext simulieren (private, public, incognito, cron, shared, remote)",
         placeholder: "private",
+        options: {
+          private: "Privat",
+          shared: "Geteilt",
+          public: "Öffentlich",
+          incognito: "Inkognito",
+          background: "Hintergrund",
+          remote: "Remote",
+        },
       },
       userRole: {
         label: "Nutzerrolle",
@@ -105,6 +113,20 @@ export const translations: typeof enTranslations = {
         description: "Speichern oder verwerfen",
       },
       conflict: { title: "Konflikt", description: "Inkonsistenter Zustand" },
+    },
+    widget: {
+      emptyTitle: "Kontext wählen",
+      emptyMessage:
+        "Ordner wählen, optional eine Nachricht, dann Prompt erzeugen.",
+      chars: "Zeichen",
+      tokens: "~Tokens",
+      cortexFailed:
+        "Cortex-Embedding fehlgeschlagen — kein API-Key oder Anbieterfehler.",
+      cortexNoNodes:
+        "Embedding erzeugt, aber noch keine Cortex-Knoten mit Embeddings.",
+      cortexPassing:
+        "{{passing}} von {{total}} Treffern über dem Schwellenwert",
+      noTrailing: "Kein nachgestellter Kontext für diese Anfrage.",
     },
     success: {
       title: "Prompt erstellt",

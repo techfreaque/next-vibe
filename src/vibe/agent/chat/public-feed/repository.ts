@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, ilike, ne, sql } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -20,13 +20,24 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ChatFolder } from "../db";
 import { chatFolders, chatMessages, chatThreads } from "../db";
+import { ThreadStatus } from "../enum";
+import { canViewThread } from "../permissions/permissions";
 import type {
   PublicFeedGetRequestOutput,
   PublicFeedGetResponseOutput,
 } from "./definition";
 import { FeedSortMode } from "./definition";
 import type { PublicFeedT } from "./i18n";
+
+/** Rising = created within this window with a non-negative score. */
+const RISING_HOURS = 24;
+
+/** Escape LIKE wildcards so a search for "50%" matches literally. */
+function escapeLike(value: string): string {
+  return value.replaceAll(/[\\%_]/g, (c) => `\\${c}`);
+}
 
 export class PublicFeedRepository {
   static async getFeed(
@@ -55,12 +66,23 @@ export class PublicFeedRepository {
 
       // Build search condition
       const searchCondition = search
-        ? ilike(chatThreads.title, `%${search}%`)
+        ? ilike(chatThreads.title, `%${escapeLike(search)}%`)
         : undefined;
+
+      // Rising's age window lives in SQL so pages and totals agree with it
+      const risingCondition =
+        sortMode === FeedSortMode.RISING
+          ? gt(
+              chatThreads.createdAt,
+              new Date(Date.now() - RISING_HOURS * 60 * 60 * 1000),
+            )
+          : undefined;
 
       const baseCondition = and(
         eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC),
+        ne(chatThreads.status, ThreadStatus.DELETED),
         searchCondition,
+        risingCondition,
       );
 
       // Get total count
@@ -101,14 +123,7 @@ export class PublicFeedRepository {
       // Fetch threads with joins
       const dbThreads = await db
         .select({
-          id: chatThreads.id,
-          title: chatThreads.title,
-          description: chatThreads.description,
-          folderId: chatThreads.folderId,
-          streamingState: chatThreads.streamingState,
-          createdAt: chatThreads.createdAt,
-          updatedAt: chatThreads.updatedAt,
-          userId: chatThreads.userId,
+          thread: chatThreads,
           folderName: chatFolders.name,
           authorName: users.publicName,
           messageCount: statsSubquery.messageCount,
@@ -130,28 +145,52 @@ export class PublicFeedRepository {
         .limit(limit)
         .offset(offset);
 
-      // For rising: filter to threads < 24h old with non-negative score
-      const RISING_HOURS = 24;
+      // Same visibility rules as the sidebar: a public thread (or its folder
+      // chain) may restrict who can view it - never leak those into the feed
+      const publicFolders = await db
+        .select()
+        .from(chatFolders)
+        .where(eq(chatFolders.rootFolderId, DefaultFolderId.PUBLIC));
+      const folderMap: Record<string, ChatFolder> = {};
+      for (const folder of publicFolders) {
+        folderMap[folder.id] = folder;
+      }
+      const visibleThreads = [];
+      for (const row of dbThreads) {
+        const folder = row.thread.folderId
+          ? (folderMap[row.thread.folderId] ?? null)
+          : null;
+        if (
+          await canViewThread(
+            user,
+            row.thread,
+            folder,
+            logger,
+            locale,
+            folderMap,
+          )
+        ) {
+          visibleThreads.push(row);
+        }
+      }
+
       const filteredThreads =
         sortMode === FeedSortMode.RISING
-          ? dbThreads.filter((row) => {
-              const ageHours =
-                (Date.now() - row.createdAt.getTime()) / (1000 * 60 * 60);
-              const score = (row.totalUpvotes ?? 0) - (row.totalDownvotes ?? 0);
-              return ageHours < RISING_HOURS && score >= 0;
-            })
-          : dbThreads;
+          ? visibleThreads.filter(
+              (row) => (row.totalUpvotes ?? 0) - (row.totalDownvotes ?? 0) >= 0,
+            )
+          : visibleThreads;
 
       const items = filteredThreads.map((row) => {
         const upvotes = row.totalUpvotes ?? 0;
         const downvotes = row.totalDownvotes ?? 0;
         return {
-          id: row.id,
-          title: row.title,
-          description: row.description ?? null,
-          folderId: row.folderId ?? null,
+          id: row.thread.id,
+          title: row.thread.title,
+          description: row.thread.description ?? null,
+          folderId: row.thread.folderId ?? null,
           folderName: row.folderName ?? null,
-          authorId: row.userId ?? null,
+          authorId: row.thread.userId ?? null,
           authorName: row.authorName ?? null,
           messageCount: row.messageCount ?? 0,
           authorCount: row.authorCount ?? 0,
@@ -159,9 +198,9 @@ export class PublicFeedRepository {
           downvotes,
           score: upvotes - downvotes,
           modelNames: row.modelNames ?? [],
-          streamingState: row.streamingState,
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt,
+          streamingState: row.thread.streamingState,
+          createdAt: row.thread.createdAt,
+          updatedAt: row.thread.updatedAt,
         };
       });
 

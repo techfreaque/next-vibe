@@ -39,6 +39,8 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 import { emails } from "@/messenger/messages/db";
 import { ReferralRepository } from "@/referral/repository";
 
+import { resolveSafeRedirect, signRedirectUrl } from "./redirect-signature";
+
 import type {
   ClickTrackingRequestOutput,
   ClickTrackingResponseOutput,
@@ -1015,7 +1017,8 @@ export class LeadTrackingRepository {
   ): Promise<ResponseType<ClickTrackingResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { leadId: trackingLeadId, campaignId, url, ref } = data;
+      const { leadId: trackingLeadId, campaignId, url, ref, sig } = data;
+      const redirectUrl = resolveSafeRedirect(url, sig, locale);
       const isLoggedIn = !user.isPublic;
       const currentLeadId = user.leadId;
       let engagementRecorded = false;
@@ -1066,7 +1069,7 @@ export class LeadTrackingRepository {
       if (!trackingLeadId) {
         return success({
           success: true,
-          redirectUrl: url ?? `/${locale}`,
+          redirectUrl,
           responseLeadId: currentLeadId ?? "",
           responseCampaignId: campaignId,
           engagementRecorded: false,
@@ -1175,7 +1178,7 @@ export class LeadTrackingRepository {
 
       return success({
         success: true,
-        redirectUrl: url,
+        redirectUrl,
         responseLeadId: trackingLeadId,
         responseCampaignId: campaignId,
         engagementRecorded,
@@ -1222,6 +1225,7 @@ export class LeadTrackingRepository {
     url.searchParams.set("stage", stage);
     url.searchParams.set("source", "email");
     url.searchParams.set("url", finalDestinationUrl);
+    url.searchParams.set("sig", signRedirectUrl(finalDestinationUrl));
 
     return url.toString();
   }

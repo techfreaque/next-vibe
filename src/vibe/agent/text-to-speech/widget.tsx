@@ -9,7 +9,6 @@ import { Play } from "next-vibe/ui/components/icons/Play";
 import { Square } from "next-vibe/ui/components/icons/Square";
 import { Volume2 } from "next-vibe/ui/components/icons/Volume2";
 import { Span } from "next-vibe/ui/components/span";
-import { Textarea } from "next-vibe/ui/components/textarea";
 import { H3 } from "next-vibe/ui/components/typography";
 import {
   useWidgetDisabled,
@@ -18,6 +17,7 @@ import {
   useWidgetLocale,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -53,7 +53,13 @@ function formatTime(s: number): string {
   return `${String(m)}:${String(sec).padStart(2, "0")}`;
 }
 
-export function TextToSpeechContainer(): JSX.Element {
+interface TextToSpeechContainerProps {
+  field: (typeof definition.POST)["fields"];
+}
+
+export function TextToSpeechContainer({
+  field,
+}: TextToSpeechContainerProps): JSX.Element {
   const isSubmitting = useWidgetIsSubmitting();
   const isDisabled = useWidgetDisabled();
   const form = useWidgetForm<typeof definition.POST>();
@@ -173,18 +179,7 @@ export function TextToSpeechContainer(): JSX.Element {
       <Div className="flex flex-col gap-4 px-4 pb-4">
         {/* Text input */}
         <Div className="flex flex-col gap-1.5">
-          <Span className="text-xs font-medium text-muted-foreground">
-            {t("post.text.label")}
-          </Span>
-          <Textarea
-            className="w-full min-h-[100px] resize-none"
-            placeholder={t("post.text.placeholder")}
-            value={currentText}
-            disabled={isDisabled}
-            onChange={(e) =>
-              form?.setValue("text", e.target.value, { shouldDirty: true })
-            }
-          />
+          <TextareaFieldWidget fieldName="text" field={field.children.text} />
           <Span className="text-[10px] text-muted-foreground text-right">
             {`${currentText.length} / 5000`}
           </Span>
@@ -229,8 +224,8 @@ export function TextToSpeechContainer(): JSX.Element {
         <FormAlertWidget field={{}} />
         <SubmitButtonWidget<typeof definition.POST>
           field={{
-            text: "post.title",
-            loadingText: "post.success.description",
+            text: "post.submitButton.label",
+            loadingText: "post.submitButton.loadingText",
             icon: "volume-2",
             variant: "primary",
           }}
@@ -309,8 +304,7 @@ export function TextToSpeechContainer(): JSX.Element {
               )}
               {result?.creditCost !== undefined && (
                 <Badge variant="outline" className="text-[10px]">
-                  {result.creditCost}
-                  {result.creditCost === 1 ? " credit" : " credits"}
+                  {`${t("post.response.creditCost")}: ${String(result.creditCost)}`}
                 </Badge>
               )}
             </Div>

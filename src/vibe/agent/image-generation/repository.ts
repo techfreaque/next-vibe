@@ -305,11 +305,16 @@ export class ImageGenerationRepository {
           platform,
           // The media-gen context is a narrowed shape — rebuild a headless
           // context carrying its abort wiring + fixture chain for dispatch.
-          toolExecutionContext: makeHeadlessContext(
-            toolExecutionContext.abortSignal,
-            toolExecutionContext.threadId,
-            toolExecutionContext.timezone,
-          ),
+          toolExecutionContext: {
+            ...makeHeadlessContext(
+              toolExecutionContext.abortSignal,
+              toolExecutionContext.threadId,
+              toolExecutionContext.timezone,
+            ),
+            // E2E fixture scope (dev/test only) must survive the rebuild, or
+            // a browser-driven run escapes record/replay on this path.
+            fixtureScopeId: toolExecutionContext.fixtureScopeId,
+          },
         });
         break;
 
@@ -513,6 +518,9 @@ export class ImageGenerationRepository {
       // engine walks child → parent → root to record/replay in the run's folder
       // instead of going live under this fresh incognito id.
       parentThreadId: toolExecutionContext.threadId,
+      // Browser E2E scope (no caller thread to walk to) — keeps the
+      // sub-stream's model call under record/replay.
+      fixtureScopeId: toolExecutionContext.fixtureScopeId,
     });
 
     if (!result.success) {

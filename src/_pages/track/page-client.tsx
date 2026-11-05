@@ -31,6 +31,7 @@ export default function TrackPage({
   const url = searchParams.get("url") ?? undefined;
   const ref = searchParams.get("ref") ?? undefined;
   const campaignId = searchParams.get("campaignId") ?? undefined;
+  const sig = searchParams.get("sig") ?? undefined;
 
   const logger = useLogger();
 
@@ -43,6 +44,7 @@ export default function TrackPage({
       source: LeadSource.EMAIL_CAMPAIGN,
       campaignId,
       ref,
+      sig,
     },
     logger,
     user,

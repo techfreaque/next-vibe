@@ -120,13 +120,31 @@ export function BadgeWidget<
     value = field.value;
   }
 
+  // Boolean flag with a static label ("Enabled", "2FA Required"): the label
+  // states the flag, so it shows only when the flag is true.
+  if (typeof value === "boolean") {
+    return value && staticText ? (
+      <Badge
+        variant={badgeVariant}
+        className={cn("w-fit", sizeClass, className)}
+      >
+        {tField(staticText)}
+      </Badge>
+    ) : (
+      <></>
+    );
+  }
+
   // value is properly typed from schema - no assertions needed
   // Handle enum options - find matching label for value
   if (enumOptions) {
     const enumLabel = findEnumLabel(value, enumOptions, tField);
     if (enumLabel) {
       return (
-        <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+        <Badge
+          variant={badgeVariant}
+          className={cn("w-fit", sizeClass, className)}
+        >
           {enumLabel}
         </Badge>
       );
@@ -140,7 +158,10 @@ export function BadgeWidget<
       const translatedText = tField(staticText);
 
       return (
-        <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+        <Badge
+          variant={badgeVariant}
+          className={cn("w-fit", sizeClass, className)}
+        >
           {translatedText}
         </Badge>
       );
@@ -153,14 +174,17 @@ export function BadgeWidget<
     const translatedText = tField(value);
 
     return (
-      <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+      <Badge
+        variant={badgeVariant}
+        className={cn("w-fit", sizeClass, className)}
+      >
         {translatedText}
       </Badge>
     );
   }
 
   return (
-    <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
+    <Badge variant={badgeVariant} className={cn("w-fit", sizeClass, className)}>
       {value}
     </Badge>
   );

@@ -69,8 +69,11 @@ export class RouteExecutionExecutor {
     const { t } = systemScopedTranslation.scopedT(params.locale);
     // Some AI providers mangle tool names: underscores instead of hyphens, or
     // leading/trailing whitespace (e.g. " execute-tool", "execute_tool").
-    // Normalize before lookup so the model variant doesn't matter.
-    const effectiveToolName = params.toolName.trim().replaceAll("_", "-");
+    // Normalize before lookup so the model variant doesn't matter — but only
+    // as a fallback: canonical ids (`user_public_signup_POST`) ARE underscored.
+    const trimmedToolName = params.toolName.trim();
+    const hyphenatedToolName = trimmedToolName.replaceAll("_", "-");
+    let effectiveToolName = trimmedToolName;
     try {
       let handlerResult = params.preloadedHandler ?? null;
       if (params.preloadedHandler === undefined) {
@@ -91,7 +94,11 @@ export class RouteExecutionExecutor {
             });
           }
           try {
-            handlerResult = await getRouteHandler(effectiveToolName);
+            handlerResult = await getRouteHandler(trimmedToolName);
+            if (!handlerResult && hyphenatedToolName !== trimmedToolName) {
+              handlerResult = await getRouteHandler(hyphenatedToolName);
+              effectiveToolName = hyphenatedToolName;
+            }
             break;
           } catch (importError) {
             if (attempt === 7) {

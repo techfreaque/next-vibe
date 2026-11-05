@@ -15,7 +15,7 @@ import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   objectField,
-  requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -54,15 +54,41 @@ const { GET } = createEndpoint({
     title: "get.container.title" as const,
     description: "get.container.description" as const,
     layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+    usage: { request: "urlPathParams", response: true },
     children: {
-      // === REQUEST ===
-      rootFolderId: requestField(scopedTranslation, {
+      // === REQUEST URL PATH PARAMS ===
+      rootFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "get.rootFolderId.label" as const,
         description: "get.rootFolderId.description" as const,
         columns: 12,
+        options: [
+          {
+            value: DefaultFolderId.PRIVATE,
+            label: "get.rootFolderId.options.private" as const,
+          },
+          {
+            value: DefaultFolderId.SHARED,
+            label: "get.rootFolderId.options.shared" as const,
+          },
+          {
+            value: DefaultFolderId.PUBLIC,
+            label: "get.rootFolderId.options.public" as const,
+          },
+          {
+            value: DefaultFolderId.BACKGROUND,
+            label: "get.rootFolderId.options.background" as const,
+          },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "get.rootFolderId.options.incognito" as const,
+          },
+          {
+            value: DefaultFolderId.REMOTE,
+            label: "get.rootFolderId.options.remote" as const,
+          },
+        ],
         schema: z.enum(DefaultFolderId),
       }),
 
@@ -128,7 +154,7 @@ const { GET } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: {
+    urlPathParams: {
       default: {
         rootFolderId: DefaultFolderId.PRIVATE,
       },
@@ -145,5 +171,6 @@ const { GET } = createEndpoint({
 const definitions = { GET } as const;
 export default definitions;
 
-export type RootPermissionsGetRequestOutput = typeof GET.types.RequestOutput;
+export type RootPermissionsGetUrlVariablesOutput =
+  typeof GET.types.UrlVariablesOutput;
 export type RootPermissionsGetResponseOutput = typeof GET.types.ResponseOutput;

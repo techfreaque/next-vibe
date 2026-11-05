@@ -208,17 +208,6 @@ export const translations: typeof enTranslations = {
       signup: "Zaloz konto za darmo",
       login: "Masz juz konto? Zaloguj sie",
     },
-    leadCapture: {
-      fallbackHeadline: "Badz na biezaco",
-      namePlaceholder: "Twoje imie",
-      emailPlaceholder: "Twoj email",
-      fallbackButton: "Subskrybuj",
-      sending: "...",
-      doneHeading: "Gotowe.",
-      doneSub: "Jestes na liscie.",
-      error: "Cos poszlo nie tak. Sprobuj ponownie.",
-      finePrint: "Bez spamu. Wypisz sie w dowolnym momencie.",
-    },
     landing: {
       backToHome: "Strona glowna",
       signIn: "Zaloguj sie",

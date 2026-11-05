@@ -182,33 +182,15 @@ export async function sendBrowserTestRequest<
 
       // ── 5b. Create a real DB session + inject auth cookie before navigating ──
       if (!testUser.isPublic) {
-        const { AuthRepository } =
-          await import("../../../identity/auth/repository");
-        const { SessionRepository } =
-          await import("../../../identity/session/repository");
-        const { AUTH_TOKEN_COOKIE_NAME } = await import("@/env/constants");
-        const { createEndpointLogger } = await import("../../../logger/server");
-        const logger = createEndpointLogger(false, defaultLocale);
-        const tokenResult = await AuthRepository.signJwt(
-          testUser,
-          logger,
-          defaultLocale,
-        );
+        const { createTestSessionToken, E2E_AUTH_COOKIE_NAME } =
+          await import("../e2e/auth");
+        const tokenResult = await createTestSessionToken(testUser);
         if (tokenResult.success) {
-          // Session must exist in DB — the server validates the token against the sessions table
-          await SessionRepository.create(
-            {
-              userId: testUser.id,
-              token: tokenResult.data,
-              expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
-            },
-            defaultLocale,
-          );
           const cdpTargetId = await getSessionCDPTargetId(sessionId);
           if (cdpTargetId) {
             await setCookiesViaCDP(cdpTargetId, [
               {
-                name: AUTH_TOKEN_COOKIE_NAME,
+                name: E2E_AUTH_COOKIE_NAME,
                 value: tokenResult.data,
                 domain: "localhost",
                 path: "/",

@@ -59,16 +59,17 @@ async function resolveUserName(param: string): Promise<string | null> {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, userId: rawParam } = await params;
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const publicName = await resolveUserName(rawParam);
 
   if (!publicName) {
-    return { title: `Creator Not Found - ${appName}` };
+    return { title: t("meta.notFound", { appName }) };
   }
 
   return {
-    title: `${publicName} - Creator Profile`,
-    description: `${publicName} builds AI skills on ${appName}. Explore their work and start a conversation.`,
+    title: t("meta.title", { publicName }),
+    description: t("meta.description", { publicName, appName }),
   };
 }
 

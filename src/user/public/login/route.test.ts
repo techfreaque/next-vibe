@@ -1,9 +1,10 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { clearLoginAttempts } from "next-vibe/tooling/testing/testing-suite/login-attempts";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import loginEndpoints from "./definition";
@@ -15,6 +16,13 @@ describe("POST /user/public/login", () => {
 
   beforeAll(async () => {
     adminUser = await resolveTestAdminUser();
+  });
+
+  // Wrong-password cases feed the lockout ledger (by email AND IP) — without
+  // this, repeated runs lock the admin account and every localhost login.
+  afterAll(async () => {
+    await clearLoginAttempts(identityEnv.VIBE_ADMIN_USER_EMAIL);
+    await clearLoginAttempts("nobody-at-all-does-not-exist@example.com");
   });
 
   const publicUser = () => ({

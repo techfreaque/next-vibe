@@ -1,10 +1,12 @@
 "use client";
 
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetLocale,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -13,18 +15,18 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import type { InvoiceStatusDB } from "../../../enum";
+import { InvoiceStatus } from "../../../enum";
+import { scopedTranslation as paymentScopedTranslation } from "../../../i18n";
 import type definition from "./definition";
 
 function statusVariant(
-  status: string,
+  status: (typeof InvoiceStatusDB)[number],
 ): "default" | "secondary" | "outline" | "destructive" {
-  if (status === "PAID") {
+  if (status === InvoiceStatus.PAID) {
     return "default";
   }
-  if (status === "OPEN") {
-    return "secondary";
-  }
-  if (status === "VOID") {
+  if (status === InvoiceStatus.VOID || status === InvoiceStatus.UNCOLLECTIBLE) {
     return "destructive";
   }
   return "secondary";
@@ -37,6 +39,8 @@ export function InvoicePublicViewWidget({
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const paymentT = paymentScopedTranslation.scopedT(locale).t;
 
   if (data?.id) {
     return (
@@ -54,7 +58,7 @@ export function InvoicePublicViewWidget({
               </Span>
             </Div>
             <Badge variant={statusVariant(data.status)} className="text-xs">
-              {data.status}
+              {paymentT(data.status)}
             </Badge>
           </Div>
 
@@ -68,7 +72,7 @@ export function InvoicePublicViewWidget({
           {data.dueDate && (
             <Span className="text-sm text-muted-foreground">
               {t("get.response.dueDate")}:{" "}
-              {new Date(data.dueDate).toLocaleDateString()}
+              {formatSimpleDate(data.dueDate, locale)}
             </Span>
           )}
         </Div>

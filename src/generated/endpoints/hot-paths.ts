@@ -2636,10 +2636,6 @@ export const endpointHotPaths: Record<
     relPath: "vibe/env/settings/definition.ts",
     method: "GET",
   },
-  "system_logger_error-monitor_client-log_POST": {
-    relPath: "vibe/logger/error-monitor/client-log/definition.ts",
-    method: "POST",
-  },
   "task-execute": {
     relPath: "vibe/tasks/execute/definition.ts",
     method: "POST",
@@ -3593,6 +3589,10 @@ export const endpointHotPaths: Record<
   },
   "vibe_logger_error-monitor_cleanup_POST": {
     relPath: "vibe/logger/error-monitor/cleanup/definition.ts",
+    method: "POST",
+  },
+  "vibe_logger_error-monitor_client-log_POST": {
+    relPath: "vibe/logger/error-monitor/client-log/definition.ts",
     method: "POST",
   },
   "vibe_logger_error-monitor_data-sources_error-logs-errors_POST": {

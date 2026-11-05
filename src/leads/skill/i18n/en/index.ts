@@ -56,5 +56,11 @@ export const translations = {
       title: "Skill attributed",
       description: "The skill has been recorded for this lead.",
     },
+    skipped: {
+      title: "Not recorded",
+      description:
+        "No visitor session to attribute. Open a page first, then retry.",
+    },
+    submit: "Attribute skill",
   },
 };

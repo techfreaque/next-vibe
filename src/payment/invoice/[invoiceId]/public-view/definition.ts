@@ -25,6 +25,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { InvoiceStatus, InvoiceStatusDB } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
 const InvoicePublicViewWidgetLazy = lazyWidget(() =>
@@ -93,7 +94,7 @@ const { GET } = createEndpoint({
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.status" as const,
-        schema: z.string(),
+        schema: z.enum(InvoiceStatusDB),
       }),
 
       amount: responseField(scopedTranslation, {
@@ -247,7 +248,7 @@ const { GET } = createEndpoint({
         id: "456e7890-e89b-12d3-a456-426614174000",
         invoiceNumber: "AR-00000001-000001",
         currency: "EUR",
-        status: "OPEN",
+        status: InvoiceStatus.OPEN,
         amount: "1200.00",
         dueDate: "2024-02-01T00:00:00.000Z",
         notes: null,

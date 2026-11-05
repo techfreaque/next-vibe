@@ -493,8 +493,8 @@ export async function generateTierAiRunMarkdown(
   const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const runUrl = `${apiBase}/agent/ai-stream/run`;
-  const skillUrl = `${baseUrl}/api/${locale}/system/platforms/ai/skills/${config.filename}`;
-  const agentUrl = `${baseUrl}/api/${locale}/system/platforms/ai/skills/AGENT.md`;
+  const skillUrl = `${baseUrl}/api/${locale}/vibe/platforms/ai/skills/${config.filename}`;
+  const agentUrl = `${baseUrl}/api/${locale}/vibe/platforms/ai/skills/AGENT.md`;
 
   const authLine = config.requiresAuthentication
     ? "\nAuthorization: Bearer <YOUR_JWT_TOKEN>"
@@ -601,7 +601,7 @@ export async function generateSkillAiRunMarkdown(
   const baseUrl = coreEnv.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const runUrl = `${apiBase}/agent/ai-stream/run`;
-  const skillUrl = `${baseUrl}/api/${locale}/system/platforms/ai/skills/${skillId}-skill.md`;
+  const skillUrl = `${baseUrl}/api/${locale}/vibe/platforms/ai/skills/${skillId}-skill.md`;
 
   const hasTools =
     charInfo.availableTools !== null && charInfo.availableTools.length > 0;

@@ -3,7 +3,7 @@ export const translations = {
     title: "System Prompt Debug",
     titleShort: "Debug Prompt",
     description:
-      "Render the full system prompt for a given user context. Admin/dev only.",
+      "Shows the exact system prompt the AI gets in a given context — folder, skill, thread, message.",
     status: {
       loading: "Building...",
       done: "Done",
@@ -17,6 +17,14 @@ export const translations = {
         description:
           "Folder context to simulate (private, public, incognito, cron, shared, remote)",
         placeholder: "private",
+        options: {
+          private: "Private",
+          shared: "Shared",
+          public: "Public",
+          incognito: "Incognito",
+          background: "Background",
+          remote: "Remote",
+        },
       },
       userRole: {
         label: "User Role",
@@ -92,6 +100,18 @@ export const translations = {
         description: "Save or discard first",
       },
       conflict: { title: "Conflict", description: "Conflicting state" },
+    },
+    widget: {
+      emptyTitle: "Pick a context",
+      emptyMessage:
+        "Choose a folder, optionally a message, then build the prompt.",
+      chars: "Characters",
+      tokens: "~Tokens",
+      cortexFailed: "Cortex embedding failed — no API key or provider error.",
+      cortexNoNodes:
+        "Embedding generated, but no cortex nodes have embeddings yet.",
+      cortexPassing: "{{passing}} of {{total}} matches pass the threshold",
+      noTrailing: "No trailing context for this request.",
     },
     success: {
       title: "Prompt Built",

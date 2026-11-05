@@ -71,7 +71,7 @@ describe("GET /user/public/login/options", () => {
     expect(response.security.requireTwoFactor).toBe(false);
   });
 
-  it("returns NOT_FOUND for unknown email", async () => {
+  it("answers an unknown email like any other (no account enumeration)", async () => {
     const res = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint,
@@ -79,14 +79,9 @@ describe("GET /user/public/login/options", () => {
       user: publicUser(),
     });
 
-    expect(res.success).toBe(false);
-    if (res.success) return;
-    // Repository returns NOT_FOUND when email not found
-    const { ErrorResponseTypes } =
-      await import("next-vibe/core/route/response.schema");
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.NOT_FOUND.errorCode,
-    );
+    expect(res.success).toBe(true);
+    if (!res.success) return;
+    expect(res.data.response.loginMethods.password.enabled).toBe(true);
   });
 
   it("returns VALIDATION_ERROR for invalid email format", async () => {

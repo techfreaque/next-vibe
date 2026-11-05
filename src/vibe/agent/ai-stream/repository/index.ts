@@ -212,6 +212,13 @@ export interface CreateAiStreamParams {
    * NULL/absent for top-level streams and relay mirrors.
    */
   parentThreadId?: string;
+  /**
+   * TEST-ONLY fixture scope (ToolExecutionContext.fixtureScopeId) of the
+   * request that started this stream — a browser E2E run. Carried onto every
+   * context the stream builds so all its external calls record/replay under
+   * that scope. Absent in prod.
+   */
+  fixtureScopeId?: string;
 }
 
 export class AiStreamRepository {
@@ -449,6 +456,7 @@ export class AiStreamRepository {
           headless: undefined,
           subAgentDepth,
           isRevival: false,
+          fixtureScopeId: toolExecutionContext.fixtureScopeId,
         };
         for (const call of runPreCalls) {
           const startTime = Date.now();
@@ -622,6 +630,7 @@ export class AiStreamRepository {
         // root walk. The `data.appendThreadId ?? random` id above stays the
         // child's own identity.
         parentThreadId: toolExecutionContext.threadId,
+        fixtureScopeId: toolExecutionContext.fixtureScopeId,
       });
 
       if (!streamResult.success) {
@@ -774,6 +783,7 @@ export class AiStreamRepository {
     deferredWakeUpPayload,
     explicitParentMessageId,
     parentThreadId,
+    fixtureScopeId,
   }: CreateAiStreamParams & {
     awaitResult?: boolean;
   }): Promise<
@@ -927,6 +937,7 @@ export class AiStreamRepository {
       user,
       userId,
       logger,
+      fixtureScopeId,
     });
     if (queueResult !== null) {
       return queueResult;
@@ -964,6 +975,7 @@ export class AiStreamRepository {
       toolsOverride,
       parentAbortSignal,
       parentThreadId,
+      fixtureScopeId,
       resolvedRelayContext,
     });
 
