@@ -80,6 +80,14 @@ export const translations = {
     confirmations: {
       deleteMessage: "Are you sure you want to delete this message?",
     },
+    signInGate: {
+      title: "Sign in to open this thread",
+      description:
+        "This conversation lives in a private or shared folder. Sign in with an account that has access.",
+      signIn: "Sign in",
+      signUp: "Create free account",
+      incognito: "Start a private chat instead",
+    },
     welcomeTour: {
       authDialog: {
         title: "Unlock Private & Shared Folders",

@@ -9,12 +9,12 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   responseField,
   widgetField,
@@ -22,6 +22,12 @@ import {
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
+
+const ResetPasswordRequestContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.ResetPasswordRequestContainer,
+  })),
+);
 
 /**
  * POST /reset-password/request - Request password reset
@@ -37,37 +43,10 @@ const { POST } = createEndpoint({
   category: "account",
   tags: ["request.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ResetPasswordRequestContainer,
+    usage: { request: "data", response: true } as const,
     children: {
-      icon: widgetField(scopedTranslation, {
-        type: WidgetType.ICON,
-        icon: "mail",
-        containerSize: "base",
-        iconSize: "base",
-        borderRadius: "full",
-        inline: true,
-        order: 0,
-        usage: { request: "data", response: true },
-      }),
-      title: widgetField(scopedTranslation, {
-        type: WidgetType.TITLE,
-        label: "request.ui.title",
-        level: 3,
-        order: 1,
-        inline: true,
-        usage: { request: "data", response: true },
-      }),
-      subtitle: widgetField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "request.ui.subtitle",
-        order: 2,
-        usage: { request: "data", response: true },
-      }),
-
       email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
@@ -75,9 +54,9 @@ const { POST } = createEndpoint({
         description: "request.fields.email.description",
         placeholder: "request.fields.email.placeholder",
         helpText: "request.fields.email.help",
-        // theme: {
-        //   style: "none",
-        // },
+        theme: {
+          style: "none",
+        },
         order: 4,
         schema: z
           .string()

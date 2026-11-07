@@ -12,8 +12,6 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
-  type DraggableAttributes,
-  type DraggableSyntheticListeners,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -28,31 +26,40 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div, type DivRefObject } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Compass } from "next-vibe/ui/components/icons/Compass";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe/ui/components/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
+import { Check } from "next-vibe/ui/components/icons/Check";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
+import { GripVertical } from "next-vibe/ui/components/icons/GripVertical";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { Share2 } from "next-vibe/ui/components/icons/Share2";
 import { Star } from "next-vibe/ui/components/icons/Star";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
-import { Zap } from "next-vibe/ui/components/icons/Zap";
-import {
-  Popover,
-  PopoverClose,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe/ui/components/popover";
 import { Span } from "next-vibe/ui/components/span";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import {
-  arrayFieldPath,
-  withValue,
-} from "next-vibe/unified-ui/_shared/field-helpers";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetContext,
@@ -60,9 +67,6 @@ import {
   useWidgetSelector,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
-import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
-import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
-import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
@@ -71,8 +75,8 @@ import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-t
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import { parseSkillId } from "../../chat/slugify";
 import { useTourState } from "../../chat/tour-state";
+import { ShareSkillDialog } from "../[id]/share-skill";
 import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
-import { getTtsModelById } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";
 import { SkillCategory } from "../enum";
@@ -81,15 +85,6 @@ import definition, { type FavoriteCard } from "./definition";
 import { useFavoriteSelectOverride } from "./favorite-select-context";
 import { scopedTranslation } from "./i18n";
 import reorderDefinition from "./reorder/definition";
-
-/**
- * Props for custom widget
- */
-interface CustomWidgetProps {
-  field: (typeof definition.GET)["fields"];
-}
-
-const FAVORITES_FIELD = "favorites";
 
 /**
  * Skill group - favorites grouped by skillId
@@ -212,209 +207,160 @@ const SECTION_ORDER: FavoriteSectionType[] = [
 ];
 
 // ============================================================================
-// Full card - used for single-item groups (no own useSortable - parent handles it)
+// Shared types + actions
 // ============================================================================
 
-/**
- * Full card for a single favorite.
- * Drag handle attributes/listeners are passed from the parent SortableGroup.
- */
-const FullCard = React.memo(function FullCard({
-  item,
-  index,
-  fieldChildren,
-  handleSelectFavorite,
-  navigate,
-  locale,
-  isTouch,
-  isPickerMode,
-  dragAttributes,
-  dragListeners,
-  logger,
-  user,
-}: {
-  item: FavoriteCard;
-  index: number;
-  fieldChildren: (typeof definition.GET)["fields"]["children"];
-  handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  locale: CountryLanguage;
-  isTouch: boolean;
-  isPickerMode: boolean;
-  dragAttributes: DraggableAttributes;
-  dragListeners: DraggableSyntheticListeners;
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
-}): React.JSX.Element {
-  const isActive = Boolean(item.activeBadge);
+type WidgetLogger = ReturnType<typeof useWidgetContext>["logger"];
+type WidgetUser = ReturnType<typeof useWidgetContext>["user"];
+type NavigateFn = ReturnType<typeof useWidgetNavigation>["push"];
 
-  return (
-    <Div
-      className={cn(
-        "group relative flex items-start gap-4 p-4 rounded-lg border transition-colors",
-        isActive
-          ? "bg-primary/5 border-primary/20"
-          : "hover:bg-accent cursor-pointer",
-      )}
-      onClick={() => !isActive && void handleSelectFavorite(item)}
-    >
-      <Div
-        className={cn(
-          "flex items-center justify-center rounded-lg transition-colors",
-          "w-12 h-12",
-          isActive
-            ? "bg-primary/15 text-primary"
-            : "bg-primary/10 group-hover:bg-primary/20",
-        )}
-      >
-        <IconWidget
-          field={withValue(
-            fieldChildren.favorites.child.children.icon,
-            item.icon,
-            item,
-          )}
-          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "icon")}
-        />
-      </Div>
-      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span
-            className={cn("text-base font-bold", isActive && "text-primary")}
-          >
-            <TextWidget
-              field={withValue(
-                fieldChildren.favorites.child.children.name,
-                item.name,
-                item,
-              )}
-              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "name")}
-            />
-          </Span>
-          <TextWidget
-            field={withValue(
-              fieldChildren.favorites.child.children.tagline,
-              item.tagline,
-              item,
-            )}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "tagline")}
-          />
-          <BadgeWidget
-            field={withValue(
-              fieldChildren.favorites.child.children.activeBadge,
-              item.activeBadge,
-              item,
-            )}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
-          />
-        </Div>
-        <TextWidget
-          field={withValue(
-            fieldChildren.favorites.child.children.description,
-            item.description,
-            item,
-          )}
-          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "description")}
-        />
-        {/* Model-only: skip model name (already in title), keep provider + price */}
-        <Div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
-          <TextWidget
-            field={withValue(
-              fieldChildren.favorites.child.children.modelProvider,
-              item.modelProvider,
-              item,
-            )}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelProvider")}
-          />
-          <TextWidget
-            field={fieldChildren.favorites.child.children.separator2}
-            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "separator2")}
-          />
-          {item.modelId && (
-            <ModelCreditDisplay
-              modelId={item.modelId}
-              variant="text"
-              className="text-xs text-muted-foreground"
-              locale={locale}
-            />
-          )}
-        </Div>
-      </Div>
-      {!isPickerMode && (
-        <Div
-          className={cn(
-            "absolute top-1 right-1 flex gap-0.5",
-            isTouch
-              ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100 transition-opacity",
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Div
-            {...dragAttributes}
-            {...dragListeners}
-            className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <Icon icon={"grip"} className="h-4 w-4" />
-          </Div>
-          {!isActive && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="text-primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                void handleSelectFavorite(item);
-              }}
-            >
-              <Zap className="h-4 w-4" />
-            </Button>
-          )}
-          <EditFavoriteButton item={item} navigate={navigate} />
-          <DeleteVariantButton
-            item={item}
-            logger={logger}
-            user={user}
-            locale={locale}
-          />
-        </Div>
-      )}
-    </Div>
+interface ActionDeps {
+  navigate: NavigateFn;
+  logger: WidgetLogger;
+  user: WidgetUser;
+  locale: CountryLanguage;
+}
+
+/** Delete favorites by id and drop them from the cached list. */
+async function removeFavorites(
+  ids: string[],
+  { logger, user, locale }: ActionDeps,
+): Promise<void> {
+  const favoriteDetailDefinitions = await import("./[id]/definition");
+  await Promise.all(
+    ids.map((id) =>
+      apiClient.mutate(
+        favoriteDetailDefinitions.default.DELETE,
+        logger,
+        user,
+        undefined,
+        { id },
+        locale,
+      ),
+    ),
   );
-});
+  const idsToRemove = new Set(ids);
+  apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
+    if (!oldData?.success) {
+      return oldData;
+    }
+    return {
+      success: true,
+      data: {
+        ...oldData.data,
+        favorites: oldData.data.favorites.filter((f) => !idsToRemove.has(f.id)),
+      },
+    };
+  });
+}
+
+/** Open the create-favorite form prefilled for another variant of a skill. */
+async function openAddVariant(
+  skillId: string,
+  { navigate, logger, user, locale }: ActionDeps,
+): Promise<void> {
+  const characterSingleDefinitions = await import("../[id]/definition");
+  const createFavoriteDefinitions = await import("./create/definition");
+  const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
+
+  const cachedData = apiClient.getEndpointData(
+    characterSingleDefinitions.default.GET,
+    logger,
+    { urlPathParams: { id: baseSkillId } },
+  );
+  const skillData = cachedData?.success
+    ? cachedData.data
+    : await apiClient
+        .fetch(
+          characterSingleDefinitions.default.GET,
+          logger,
+          user,
+          undefined,
+          { id: baseSkillId },
+          locale,
+        )
+        .then((response) => (response.success ? response.data : null));
+  if (!skillData) {
+    return;
+  }
+  const variants = skillData.variants;
+  const variant =
+    (variantId ? variants.find((v) => v.id === variantId) : null) ??
+    variants.find((v) => v.isDefault) ??
+    variants[0];
+  navigate(createFavoriteDefinitions.default.POST, {
+    data: {
+      skillId,
+      icon: skillData.icon ?? undefined,
+      voiceModelSelection: variant?.voiceModelSelection ?? null,
+      modelSelection: null,
+    },
+    popNavigationOnSuccess: 1,
+  });
+}
+
+async function openSkillDetails(
+  skillId: string,
+  navigate: NavigateFn,
+): Promise<void> {
+  const { skillId: baseSkillId } = parseSkillId(skillId);
+  const skillDetailDef = await import("../[id]/definition");
+  navigate(skillDetailDef.default.GET, {
+    urlPathParams: { id: baseSkillId },
+  });
+}
+
+async function openEditFavorite(
+  item: FavoriteCard,
+  navigate: NavigateFn,
+): Promise<void> {
+  const favoriteDetailDefinitions = await import("./[id]/definition");
+  navigate(favoriteDetailDefinitions.default.PATCH, {
+    urlPathParams: { id: item.id },
+    data: {
+      skillId: item.skillId ?? undefined,
+      icon: item.icon,
+    },
+    prefillFromGet: true,
+    getEndpoint: favoriteDetailDefinitions.default.GET,
+    popNavigationOnSuccess: 1,
+  });
+}
+
+/** Max variant rows shown for a group that doesn't hold the active favorite. */
+const COLLAPSED_ROW_COUNT = 1;
 
 // ============================================================================
-// Compact variant row - used inside multi-item groups
+// Variant row - one selectable model config
 // ============================================================================
 
 /**
- * Compact sortable row for a variant within a multi-item group.
- * Shows: grip | model icon | model name • provider • credits | zap | edit
+ * One selectable model under a character.
+ * Layout: [select: model icon + label/model] [price] [active check] [menu].
+ * Price lives outside the select button (it's its own popover trigger).
  */
-const SortableVariantRow = React.memo(function SortableVariantRow({
+const VariantRow = React.memo(function VariantRow({
   item,
-  index,
-  fieldChildren,
+  showVariantLabel,
   handleSelectFavorite,
-  navigate,
-  locale,
+  deps,
   isTouch,
   isPickerMode,
-  logger,
-  user,
+  sortable,
 }: {
   item: FavoriteCard;
-  index: number;
-  fieldChildren: (typeof definition.GET)["fields"]["children"];
+  /** Model-only favorites show the model as the title instead */
+  showVariantLabel: boolean;
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  locale: CountryLanguage;
+  deps: ActionDeps;
   isTouch: boolean;
   isPickerMode: boolean;
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
+  sortable: boolean;
 }): React.JSX.Element {
-  const variantLabel = getVariantLabel(item, locale);
+  const { t } = scopedTranslation.scopedT(deps.locale);
+  const variantLabel = showVariantLabel
+    ? getVariantLabel(item, deps.locale)
+    : null;
   const {
     attributes,
     listeners,
@@ -422,11 +368,12 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({
-    id: item.id,
-  });
+  } = useSortable({ id: item.id, disabled: !sortable });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const isActive = Boolean(item.activeBadge);
+  const title = variantLabel ?? item.modelInfo;
+  const subtitle = variantLabel ? item.modelInfo : item.modelProvider;
 
   return (
     <Div
@@ -439,144 +386,128 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
       }}
     >
       <Div
+        data-favorite-row={item.id}
         className={cn(
-          "group/row relative flex items-center py-1.5 px-2 rounded transition-colors",
-          isActive ? "bg-primary/5" : "hover:bg-accent/50 cursor-pointer",
-          isDragging && "opacity-50 z-[999]",
+          "group/row relative flex min-h-11 items-center gap-1 rounded-lg pr-1 transition-colors",
+          isActive ? "bg-primary/[0.08]" : "hover:bg-accent",
+          isDragging && "z-[999] opacity-60 shadow-lg",
         )}
-        onClick={() => !isActive && void handleSelectFavorite(item)}
       >
-        {/* Two-line content */}
-        <Div className="flex-1 min-w-0">
-          {/* Line 1: variant name · model icon · model name · active badge */}
-          <Div className="flex items-center gap-1.5">
-            {variantLabel && (
-              <Span
-                className={cn(
-                  "text-sm font-bold truncate",
-                  isActive && "text-primary",
-                )}
-              >
-                {variantLabel}
-              </Span>
-            )}
-            <IconWidget
-              field={withValue(
-                fieldChildren.favorites.child.children.modelIcon,
-                item.modelIcon,
-                item,
-              )}
-              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
-            />
-            <Span
-              className={cn("text-sm truncate", isActive && "text-primary")}
-            >
-              <TextWidget
-                field={withValue(
-                  fieldChildren.favorites.child.children.modelInfo,
-                  item.modelInfo,
-                  item,
-                )}
-                fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelInfo")}
-              />
-            </Span>
-            <BadgeWidget
-              field={withValue(
-                fieldChildren.favorites.child.children.activeBadge,
-                item.activeBadge,
-                item,
-              )}
-              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
-            />
-          </Div>
-          {/* Line 2: provider · price · voice */}
-          <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <TextWidget
-              field={withValue(
-                fieldChildren.favorites.child.children.modelProvider,
-                item.modelProvider,
-                item,
-              )}
-              fieldName={arrayFieldPath(
-                FAVORITES_FIELD,
-                index,
-                "modelProvider",
-              )}
-            />
-            {item.modelId ? (
-              <>
-                <TextWidget
-                  field={fieldChildren.favorites.child.children.separator2}
-                  fieldName={arrayFieldPath(
-                    FAVORITES_FIELD,
-                    index,
-                    "separator2",
-                  )}
-                />
-                <ModelCreditDisplay
-                  modelId={item.modelId}
-                  variant="text"
-                  className="text-xs text-muted-foreground"
-                  locale={locale}
-                />
-              </>
-            ) : null}
-            {item.voiceId ? (
-              <>
-                <TextWidget
-                  field={fieldChildren.favorites.child.children.separator2}
-                  fieldName={arrayFieldPath(
-                    FAVORITES_FIELD,
-                    index,
-                    "separator2",
-                  )}
-                />
-                <Span className="opacity-60">
-                  {getTtsModelById(item.voiceId)?.name}
-                </Span>
-              </>
-            ) : null}
-          </Div>
-        </Div>
-        {/* Action buttons - floating absolute overlay, visible on hover (hidden in picker mode) */}
-        {!isPickerMode && (
+        {/* Drag handle - desktop only, in the left gutter on hover */}
+        {sortable && !isPickerMode && !isTouch && (
           <Div
-            className={cn(
-              "absolute top-0 right-0 flex gap-0.5 h-full items-center pr-0.5",
-              isTouch
-                ? "opacity-100"
-                : "opacity-0 group-hover/row:opacity-100 transition-opacity",
-            )}
-            onClick={(e) => e.stopPropagation()}
+            {...attributes}
+            {...listeners}
+            title={t("get.actions.reorder")}
+            className="absolute -left-4 top-1/2 flex h-7 w-4 -translate-y-1/2 cursor-grab items-center justify-center text-muted-foreground/50 opacity-0 transition-opacity group-hover/row:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
           >
-            <Div
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-7 w-7 rounded hover:bg-accent hover:text-accent-foreground transition-colors"
-            >
-              <Icon icon="grip" className="h-3 w-3" />
-            </Div>
-            {!isActive && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void handleSelectFavorite(item);
-                }}
-              >
-                <Zap className="h-3 w-3" />
-              </Button>
+            <GripVertical className="h-3.5 w-3.5" />
+          </Div>
+        )}
+
+        <Button
+          type="button"
+          variant="ghost"
+          aria-current={isActive ? "true" : undefined}
+          onClick={() => !isActive && void handleSelectFavorite(item)}
+          className={cn(
+            "h-auto min-h-11 min-w-0 flex-1 justify-start gap-2.5 rounded-lg px-2 py-1.5 text-left font-normal whitespace-normal hover:bg-transparent",
+            isActive && "cursor-default",
+          )}
+        >
+          <Icon
+            icon={item.modelIcon}
+            className={cn(
+              "h-4 w-4 shrink-0",
+              isActive ? "text-primary" : "text-muted-foreground",
             )}
-            <EditFavoriteButton item={item} navigate={navigate} size="sm" />
-            <DeleteVariantButton
-              item={item}
-              logger={logger}
-              user={user}
-              locale={locale}
-              size="sm"
+          />
+          <Div className="flex min-w-0 flex-1 flex-col">
+            <Span
+              className={cn(
+                "truncate text-sm font-medium leading-tight",
+                isActive && "text-primary",
+              )}
+            >
+              {title}
+            </Span>
+            <Span className="flex min-w-0 items-center gap-1.5 text-xs leading-tight text-muted-foreground">
+              <Span className="truncate">{subtitle}</Span>
+              {item.modelId ? (
+                <>
+                  <Span
+                    aria-hidden
+                    className="h-1 w-1 shrink-0 rounded-full bg-current opacity-40"
+                  />
+                  <ModelCreditDisplay
+                    modelId={item.modelId}
+                    variant="text"
+                    interactive={false}
+                    className="shrink-0 tabular-nums"
+                    locale={deps.locale}
+                  />
+                </>
+              ) : null}
+            </Span>
+          </Div>
+        </Button>
+
+        <Div className="flex w-5 shrink-0 justify-center">
+          {isActive && (
+            <Check
+              className="h-4 w-4 text-primary"
+              aria-label={t("get.actions.active")}
+            />
+          )}
+        </Div>
+
+        {!isPickerMode && (
+          <Div className="shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("get.actions.menu")}
+                  title={t("get.actions.menu")}
+                  className={cn(
+                    "h-8 w-8 text-muted-foreground hover:text-foreground",
+                    !isTouch &&
+                      "opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                  )}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                onCloseAutoFocus={(e) => e?.preventDefault()}
+              >
+                <DropdownMenuItem
+                  onSelect={() => void openEditFavorite(item, deps.navigate)}
+                  className="cursor-pointer"
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t("get.actions.edit")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => setConfirmOpen(true)}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t("get.deleteVariantAction")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ConfirmRemoveDialog
+              open={confirmOpen}
+              onOpenChange={setConfirmOpen}
+              title={t("get.deleteVariant")}
+              actionLabel={t("get.deleteVariantAction")}
+              cancelLabel={t("get.deleteGroup.cancel")}
+              onConfirm={() => void removeFavorites([item.id], deps)}
             />
           </Div>
         )}
@@ -586,39 +517,28 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
 });
 
 // ============================================================================
-// Sortable Group - wraps a character group
+// Sortable Group - one character with its model rows
 // ============================================================================
 
-/**
- * Sortable Group Component
- * - Multi-item: character header + compact variant rows
- * - Single-item: delegates to full card
- */
+/** Rows start where the character name starts: px-3 (12) + avatar (36) + gap (12) - row padding (8) */
+const ROW_INDENT = "pl-[52px]";
+
 const SortableGroup = React.memo(function SortableGroup({
   group,
-  allFavorites,
-  fieldChildren,
   handleSelectFavorite,
-  navigate,
-  locale,
+  deps,
   onItemDragEnd,
   isTouch,
   isPickerMode,
-  logger,
-  user,
 }: {
   group: SkillGroup;
-  allFavorites: FavoriteCard[];
-  fieldChildren: (typeof definition.GET)["fields"]["children"];
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  locale: CountryLanguage;
+  deps: ActionDeps;
   onItemDragEnd: (groupId: string, event: DragEndEvent) => void;
   isTouch: boolean;
   isPickerMode: boolean;
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
+  const { t } = scopedTranslation.scopedT(deps.locale);
   const {
     attributes,
     listeners,
@@ -626,9 +546,7 @@ const SortableGroup = React.memo(function SortableGroup({
     transform,
     transition,
     isDragging,
-  } = useSortable({
-    id: group.id,
-  });
+  } = useSortable({ id: group.id });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -646,210 +564,280 @@ const SortableGroup = React.memo(function SortableGroup({
     [group.id, onItemDragEnd],
   );
 
-  // Multi-variant groups collapse their rows - a click anywhere on the group toggles
-  const [variantsExpanded, setVariantsExpanded] = useState(false);
-
   const isModelOnly = group.skillId === NO_SKILL_ID;
-  const isSingle = group.items.length === 1;
-  const singleIsActive = isSingle && Boolean(group.items[0].activeBadge);
+  const hasActive = group.items.some((i) => Boolean(i.activeBadge));
+  // Groups holding the active favorite open by default; others show one row.
+  const [expanded, setExpanded] = useState(hasActive);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
-  // Model-only: render as full card (no group chrome)
+  const canCollapse = group.items.length > COLLAPSED_ROW_COUNT;
+  const visibleItems =
+    expanded || !canCollapse
+      ? group.items
+      : [
+          group.items.find((i) => Boolean(i.activeBadge)) ?? group.items[0],
+        ].filter((i): i is FavoriteCard => i !== undefined);
+  const hiddenCount = group.items.length - visibleItems.length;
+
+  const sortStyle = {
+    transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+    transition,
+    opacity: isDragging ? 0.6 : undefined,
+    zIndex: isDragging ? 999 : undefined,
+  };
+
+  // Model-only favorite: a single row in its own card, no character chrome
   if (isModelOnly) {
     const item = group.items[0];
-    const globalIndex = allFavorites.findIndex((f) => f.id === item.id);
     return (
-      <Div
-        ref={setNodeRef as React.Ref<DivRefObject>}
-        style={{
-          transform: transform
-            ? `translate3d(0, ${transform.y}px, 0)`
-            : undefined,
-          transition,
-          opacity: isDragging ? 0.5 : undefined,
-          zIndex: isDragging ? 999 : undefined,
-        }}
-      >
-        <FullCard
-          item={item}
-          index={globalIndex}
-          fieldChildren={fieldChildren}
-          handleSelectFavorite={handleSelectFavorite}
-          navigate={navigate}
-          locale={locale}
-          isTouch={isTouch}
-          isPickerMode={isPickerMode}
-          dragAttributes={attributes}
-          dragListeners={listeners}
-          logger={logger}
-          user={user}
-        />
+      <Div ref={setNodeRef as React.Ref<DivRefObject>} style={sortStyle}>
+        <Div className="group/head relative rounded-xl border border-border bg-card p-1.5">
+          {!isPickerMode && !isTouch && (
+            <Div
+              {...attributes}
+              {...listeners}
+              title={t("get.actions.reorder")}
+              className="absolute -left-0.5 top-1/2 flex h-7 w-4 -translate-y-1/2 cursor-grab items-center justify-center text-muted-foreground/50 opacity-0 transition-opacity group-hover/head:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+            >
+              <GripVertical className="h-3.5 w-3.5" />
+            </Div>
+          )}
+          {item ? (
+            <VariantRow
+              item={item}
+              showVariantLabel={false}
+              handleSelectFavorite={handleSelectFavorite}
+              deps={deps}
+              isTouch={isTouch}
+              isPickerMode={isPickerMode}
+              sortable={false}
+            />
+          ) : null}
+        </Div>
       </Div>
     );
   }
 
-  // Skill group (single or multi): character header + compact variant rows
+  const isMulti = group.items.length > 1;
+
   return (
-    <Div
-      ref={setNodeRef as React.Ref<DivRefObject>}
-      style={{
-        transform: transform
-          ? `translate3d(0, ${transform.y}px, 0)`
-          : undefined,
-        transition,
-        opacity: isDragging ? 0.5 : undefined,
-        zIndex: isDragging ? 999 : undefined,
-      }}
-    >
+    <Div ref={setNodeRef as React.Ref<DivRefObject>} style={sortStyle}>
       <Div
         className={cn(
-          "rounded-lg border overflow-hidden transition-colors",
-          isSingle && !singleIsActive && "hover:bg-accent cursor-pointer",
-          isSingle && singleIsActive && "bg-primary/5 border-primary/20",
-          !isSingle && "cursor-pointer",
+          "rounded-xl border bg-card transition-colors",
+          hasActive ? "border-primary/40" : "border-border",
         )}
-        onClick={
-          isSingle
-            ? () => !singleIsActive && void handleSelectFavorite(group.items[0])
-            : () => setVariantsExpanded((v) => !v)
-        }
       >
-        {/* Group header - matches full card layout */}
-        <Div
-          className={cn(
-            "group relative flex items-start gap-4 px-4 pt-4",
-            isSingle || variantsExpanded ? "pb-2" : "pb-4",
+        {/* Character header */}
+        <Div className="group/head relative flex items-center gap-3 px-3 pb-1 pt-3">
+          {!isPickerMode && !isTouch && (
+            <Div
+              {...attributes}
+              {...listeners}
+              title={t("get.actions.reorder")}
+              className="absolute left-0 top-1/2 flex h-8 w-3 -translate-y-1/2 cursor-grab items-center justify-center text-muted-foreground/50 opacity-0 transition-opacity group-hover/head:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+            >
+              <GripVertical className="h-3.5 w-3.5" />
+            </Div>
           )}
-        >
           <Div
             className={cn(
-              "flex items-center justify-center rounded-lg w-12 h-12 shrink-0",
-              isSingle && singleIsActive
-                ? "bg-primary/15 text-primary"
-                : "bg-primary/10",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+              hasActive
+                ? "bg-primary text-primary-foreground"
+                : "bg-primary/10 text-primary",
             )}
           >
-            <Icon icon={group.icon} className="h-6 w-6" />
+            <Icon icon={group.icon} className="h-[18px] w-[18px]" />
           </Div>
-          <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <Div className="flex items-center gap-2 flex-wrap">
-              <Span
-                className={cn(
-                  "text-base font-bold",
-                  singleIsActive && "text-primary",
-                )}
-              >
-                {group.name}
-              </Span>
-              {group.tagline ? (
-                <Span className="text-xs text-muted-foreground">
-                  {group.tagline}
-                </Span>
-              ) : null}
-              {group.items.length > 1 && (
-                <Span className="text-xs text-muted-foreground/60 bg-muted px-1.5 py-0.5 rounded-full">
-                  {group.items.length}
-                </Span>
-              )}
-            </Div>
-            {group.description ? (
-              <Span className="text-xs text-muted-foreground">
-                {group.description}
+          <Div
+            className="flex min-w-0 flex-1 flex-col"
+            title={group.description ?? undefined}
+          >
+            <Span className="truncate text-sm font-semibold leading-tight">
+              {group.name}
+            </Span>
+            {group.tagline ? (
+              <Span className="truncate text-xs leading-tight text-muted-foreground">
+                {group.tagline}
               </Span>
             ) : null}
           </Div>
-          {!isSingle && (
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 shrink-0 self-center text-muted-foreground transition-transform",
-                variantsExpanded && "rotate-180",
-              )}
-            />
-          )}
           {!isPickerMode && (
-            <Div
-              className={cn(
-                "absolute top-1 right-1 flex gap-0.5",
-                isTouch
-                  ? "opacity-100"
-                  : "opacity-0 group-hover:opacity-100 transition-opacity",
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Div
-                {...attributes}
-                {...listeners}
-                className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                <Icon icon="grip" className="h-4 w-4" />
-              </Div>
-              <DeleteGroupButton
-                group={group}
-                logger={logger}
-                user={user}
-                locale={locale}
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("get.actions.menu")}
+                    title={t("get.actions.menu")}
+                    className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  onCloseAutoFocus={(e) => e?.preventDefault()}
+                >
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      void openSkillDetails(group.skillId, deps.navigate)
+                    }
+                    className="cursor-pointer"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    {t("get.viewSkill")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => void openAddVariant(group.skillId, deps)}
+                    className="cursor-pointer"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t("get.addVariant")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setShareOpen(true)}
+                    className="cursor-pointer"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    {t("get.actions.share")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => setConfirmOpen(true)}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {isMulti
+                      ? t("get.deleteGroup.trigger")
+                      : t("get.deleteVariantAction")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ConfirmRemoveDialog
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title={
+                  isMulti
+                    ? t("get.deleteGroup.confirm", {
+                        count: String(group.items.length),
+                      })
+                    : t("get.deleteVariant")
+                }
+                actionLabel={
+                  isMulti
+                    ? t("get.deleteGroup.action")
+                    : t("get.deleteVariantAction")
+                }
+                cancelLabel={t("get.deleteGroup.cancel")}
+                onConfirm={() =>
+                  void removeFavorites(
+                    group.items.map((i) => i.id),
+                    deps,
+                  )
+                }
               />
-              <ViewSkillButton
-                skillId={group.skillId}
-                navigate={navigate}
-                locale={locale}
+              <ShareSkillDialog
+                skillId={parseSkillId(group.skillId).skillId}
+                skillName={group.name}
+                locale={deps.locale}
+                open={shareOpen}
+                onOpenChange={setShareOpen}
               />
-            </Div>
+            </>
           )}
         </Div>
 
-        {/* Variant rows - indented to align with text content past icon.
-            Multi-variant groups only render rows when expanded. */}
-        {(isSingle || variantsExpanded) && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+        {/* Model rows - aligned under the character name */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={visibleItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={group.items.map((item) => item.id)}
-              strategy={verticalListSortingStrategy}
+            <Div
+              className={cn("flex flex-col gap-0.5 pb-2 pr-1.5", ROW_INDENT)}
             >
-              <Div
-                className="border-t border-border/40 py-0.5 ml-[4.5rem] mr-3"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {group.items.map((item) => {
-                  const globalIndex = allFavorites.findIndex(
-                    (f) => f.id === item.id,
-                  );
-                  return (
-                    <SortableVariantRow
-                      key={item.id}
-                      item={item}
-                      index={globalIndex}
-                      fieldChildren={fieldChildren}
-                      handleSelectFavorite={handleSelectFavorite}
-                      navigate={navigate}
-                      locale={locale}
-                      isTouch={isTouch}
-                      isPickerMode={isPickerMode}
-                      logger={logger}
-                      user={user}
-                    />
-                  );
-                })}
-                {!isPickerMode && !isModelOnly && (
-                  <AddVariantRow
-                    skillId={group.skillId}
-                    navigate={navigate}
-                    logger={logger}
-                    user={user}
-                    locale={locale}
+              {visibleItems.map((item) => (
+                <VariantRow
+                  key={item.id}
+                  item={item}
+                  showVariantLabel
+                  handleSelectFavorite={handleSelectFavorite}
+                  deps={deps}
+                  isTouch={isTouch}
+                  isPickerMode={isPickerMode}
+                  sortable={expanded && isMulti}
+                />
+              ))}
+              {canCollapse && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 justify-start gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  onClick={() => setExpanded((v) => !v)}
+                  aria-expanded={expanded}
+                >
+                  <ChevronDown
+                    className={cn(
+                      "h-3.5 w-3.5 transition-transform",
+                      expanded && "rotate-180",
+                    )}
                   />
-                )}
-              </Div>
-            </SortableContext>
-          </DndContext>
-        )}
+                  {expanded
+                    ? t("get.actions.showLess")
+                    : t("get.actions.showMore", {
+                        count: String(hiddenCount),
+                      })}
+                </Button>
+              )}
+            </Div>
+          </SortableContext>
+        </DndContext>
       </Div>
     </Div>
   );
 });
+
+function ConfirmRemoveDialog({
+  open,
+  onOpenChange,
+  title,
+  actionLabel,
+  cancelLabel,
+  onConfirm,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  actionLabel: string;
+  cancelLabel: string;
+  onConfirm: () => void;
+}): React.JSX.Element {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>
+            {actionLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 // ============================================================================
 // Main container
@@ -858,13 +846,15 @@ const SortableGroup = React.memo(function SortableGroup({
 /**
  * Custom container widget for favorites list - grouped by character
  */
-export function FavoritesListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
+// Field metadata is unused: rows render their own typed layout
+export function FavoritesListContainer(): React.JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
+  const deps = useMemo(
+    (): ActionDeps => ({ navigate, logger, user, locale }),
+    [navigate, logger, user, locale],
+  );
   const favoritesData = useWidgetSelector<typeof definition.GET>()(
     (d) => d?.favorites,
   );
@@ -1121,29 +1111,43 @@ export function FavoritesListContainer({
 
   return (
     <Div className="flex flex-col gap-0">
-      {/* Tab bar: My Favorites | Settings gear - hidden when embedded or in picker mode.
-          Sticky so it stays visible while the surrounding container (popover) scrolls. */}
+      {/* Header: segmented Favorites | Browse + settings. Hidden when embedded or picking.
+          Sticky so it stays visible while the surrounding container scrolls. */}
       {!hideChrome && !isPickerMode && (
-        <Div className="flex border-b border-border sticky top-0 z-10 bg-popover">
-          <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
-            <Star className="h-4 w-4" />
-            {tFav("get.tabs.myFavorites")}
+        <Div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-popover/95 px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-popover/80">
+          <Div
+            role="tablist"
+            className="grid flex-1 grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+          >
+            <Div
+              role="tab"
+              aria-selected
+              className="flex h-8 items-center justify-center gap-1.5 rounded-md bg-card text-sm font-medium text-foreground shadow-sm"
+            >
+              <Star className="h-3.5 w-3.5 text-primary" />
+              {tFav("get.tabs.myFavorites")}
+            </Div>
+            <Button
+              type="button"
+              role="tab"
+              aria-selected={false}
+              variant="ghost"
+              className="h-8 gap-1.5 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-card/60 hover:text-foreground"
+              onClick={() => void handleBrowseSkills()}
+              data-tour={TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS}
+            >
+              <Compass className="h-3.5 w-3.5" />
+              {tFav("get.tabs.browseSkills")}
+            </Button>
           </Div>
           <Button
             type="button"
             variant="ghost"
-            className="flex-1 rounded-none border-b-2 border-transparent h-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
-            onClick={() => void handleBrowseSkills()}
-            data-tour={TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS}
-          >
-            <Compass className="h-4 w-4" />
-            {tFav("get.tabs.browseSkills")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="shrink-0 h-10 w-10 px-0 rounded-none border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+            size="icon"
+            className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
             onClick={() => void handleOpenSettings()}
+            aria-label={tFav("get.actions.settings")}
+            title={tFav("get.actions.settings")}
           >
             <Settings className="h-4 w-4" />
           </Button>
@@ -1152,13 +1156,13 @@ export function FavoritesListContainer({
 
       {/* Favorites List - grouped by character.
           Scroll is owned by the surrounding container (popover or page). */}
-      <Div className="px-4 pt-4 pb-4">
+      <Div className="px-3 pt-3 pb-3">
         {favoritesData === undefined ? (
           <Div className="h-[300px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </Div>
         ) : favoritesList.length > 0 ? (
-          <Div className="flex flex-col gap-3">
+          <Div className="flex flex-col gap-1">
             {sections.map((section, sectionIdx) => (
               <Div
                 key={section.type}
@@ -1172,16 +1176,16 @@ export function FavoritesListContainer({
                 {sections.length > 1 && (
                   <Div
                     className={cn(
-                      "flex items-center gap-2 mb-2",
-                      sectionIdx > 0 && "mt-2 pt-2 border-t border-border/40",
+                      "mb-2 flex items-center gap-2 px-1",
+                      sectionIdx > 0 && "mt-3",
                     )}
                   >
-                    <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                       {section.label}
                     </Span>
-                    <Span className="text-xs text-muted-foreground/60">
-                      {/* Count skills (groups), not variants */}(
-                      {section.groups.length})
+                    <Span className="text-[11px] tabular-nums text-muted-foreground/60">
+                      {/* Count skills (groups), not variants */}
+                      {section.groups.length}
                     </Span>
                   </Div>
                 )}
@@ -1197,21 +1201,16 @@ export function FavoritesListContainer({
                     items={section.groups.map((g) => g.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <Div className="flex flex-col gap-3">
+                    <Div className="flex flex-col gap-2">
                       {section.groups.map((group) => (
                         <SortableGroup
                           key={group.id}
                           group={group}
-                          allFavorites={favoritesList}
-                          fieldChildren={children}
                           handleSelectFavorite={handleSelectFavorite}
-                          navigate={navigate}
-                          locale={locale}
+                          deps={deps}
                           onItemDragEnd={handleItemDragEnd}
                           isTouch={isTouch}
                           isPickerMode={isPickerMode}
-                          logger={logger}
-                          user={user}
                         />
                       ))}
                     </Div>
@@ -1219,432 +1218,38 @@ export function FavoritesListContainer({
                 </DndContext>
               </Div>
             ))}
+            {!isPickerMode && !hideChrome && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="mt-2 h-11 w-full gap-2 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                onClick={() => void handleBrowseSkills()}
+              >
+                <Plus className="h-4 w-4" />
+                {tFav("get.actions.addAi")}
+              </Button>
+            )}
           </Div>
         ) : (
-          <Div className="text-center text-muted-foreground py-8">
-            {scopedTranslation.scopedT(locale).t("get.emptyState")}
+          <Div className="flex flex-col items-center gap-3 py-10 text-center">
+            <Div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Star className="h-5 w-5 text-primary" />
+            </Div>
+            <Span className="text-sm text-muted-foreground">
+              {tFav("get.emptyState")}
+            </Span>
+            <Button
+              type="button"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => void handleBrowseSkills()}
+            >
+              <Compass className="h-4 w-4" />
+              {tFav("get.tabs.browseSkills")}
+            </Button>
           </Div>
         )}
       </Div>
     </Div>
-  );
-}
-
-// ============================================================================
-// Shared helper components
-// ============================================================================
-
-/**
- * Edit Favorite Button - navigates to edit favorite
- */
-function DeleteVariantButton({
-  item,
-  logger,
-  user,
-  locale,
-  size,
-}: {
-  item: FavoriteCard;
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
-  locale: CountryLanguage;
-  size?: "sm";
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = scopedTranslation.scopedT(locale);
-  const isSmall = size === "sm";
-  const iconSize = isSmall ? "h-3 w-3" : "h-4 w-4";
-  const btnClass = isSmall
-    ? "h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
-    : "text-muted-foreground hover:text-destructive";
-
-  const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const favoriteDetailDefinitions = await import("./[id]/definition");
-      await apiClient.mutate(
-        favoriteDetailDefinitions.default.DELETE,
-        logger,
-        user,
-        undefined,
-        { id: item.id },
-        locale,
-      );
-
-      apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
-        if (!oldData?.success) {
-          return oldData;
-        }
-        return {
-          success: true,
-          data: {
-            ...oldData.data,
-            favorites: oldData.data.favorites.filter((f) => f.id !== item.id),
-          },
-        };
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className={btnClass}
-          onClick={(e) => e.stopPropagation()}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Loader2 className={cn(iconSize, "animate-spin")} />
-          ) : (
-            <Trash2 className={iconSize} />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-48 p-3"
-        side="top"
-        align="end"
-        onInteractOutside={(e) => e.stopPropagation()}
-      >
-        <Div className="flex flex-col gap-3">
-          <Span className="text-sm font-medium">{t("get.deleteVariant")}</Span>
-          <Div className="flex gap-2">
-            <PopoverClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {t("get.deleteGroup.cancel")}
-              </Button>
-            </PopoverClose>
-            <PopoverClose asChild>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={handleConfirm}
-              >
-                {t("get.deleteVariantAction")}
-              </Button>
-            </PopoverClose>
-          </Div>
-        </Div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function DeleteGroupButton({
-  group,
-  logger,
-  user,
-  locale,
-}: {
-  group: SkillGroup;
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
-  locale: CountryLanguage;
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = scopedTranslation.scopedT(locale);
-
-  const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const favoriteDetailDefinitions = await import("./[id]/definition");
-      await Promise.all(
-        group.items.map((item) =>
-          apiClient.mutate(
-            favoriteDetailDefinitions.default.DELETE,
-            logger,
-            user,
-            undefined,
-            { id: item.id },
-            locale,
-          ),
-        ),
-      );
-
-      const idsToRemove = new Set(group.items.map((item) => item.id));
-      apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
-        if (!oldData?.success) {
-          return oldData;
-        }
-        return {
-          success: true,
-          data: {
-            ...oldData.data,
-            favorites: oldData.data.favorites.filter(
-              (f) => !idsToRemove.has(f.id),
-            ),
-          },
-        };
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-destructive"
-          onClick={(e) => e.stopPropagation()}
-          disabled={isLoading}
-          title={t("get.deleteGroup.trigger")}
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-52 p-3"
-        side="top"
-        align="end"
-        onInteractOutside={(e) => e.stopPropagation()}
-      >
-        <Div className="flex flex-col gap-3">
-          <Span className="text-sm font-medium">
-            {t("get.deleteGroup.confirm", {
-              count: String(group.items.length),
-            })}
-          </Span>
-          <Div className="flex gap-2">
-            <PopoverClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {t("get.deleteGroup.cancel")}
-              </Button>
-            </PopoverClose>
-            <PopoverClose asChild>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={handleConfirm}
-              >
-                {t("get.deleteGroup.action")}
-              </Button>
-            </PopoverClose>
-          </Div>
-        </Div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function AddVariantRow({
-  skillId,
-  navigate,
-  logger,
-  user,
-  locale,
-}: {
-  skillId: string;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  user: ReturnType<typeof useWidgetContext>["user"];
-  locale: CountryLanguage;
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = scopedTranslation.scopedT(locale);
-
-  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const characterSingleDefinitions = await import("../[id]/definition");
-      const createFavoriteDefinitions = await import("./create/definition");
-      const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
-
-      const cachedData = apiClient.getEndpointData(
-        characterSingleDefinitions.default.GET,
-        logger,
-        { urlPathParams: { id: baseSkillId } },
-      );
-
-      if (cachedData?.success) {
-        const cachedVariants = cachedData.data.variants;
-        const cachedVariant =
-          (variantId ? cachedVariants.find((v) => v.id === variantId) : null) ??
-          cachedVariants.find((v) => v.isDefault) ??
-          cachedVariants[0];
-        navigate(createFavoriteDefinitions.default.POST, {
-          data: {
-            skillId,
-            icon: cachedData.data.icon ?? undefined,
-            voiceModelSelection: cachedVariant?.voiceModelSelection ?? null,
-            modelSelection: null,
-          },
-          popNavigationOnSuccess: 1,
-        });
-        return;
-      }
-
-      const characterResponse = await apiClient.fetch(
-        characterSingleDefinitions.default.GET,
-        logger,
-        user,
-        undefined,
-        { id: baseSkillId },
-        locale,
-      );
-      if (!characterResponse.success) {
-        return;
-      }
-
-      const responseVariants = characterResponse.data.variants;
-      const responseVariant =
-        (variantId ? responseVariants.find((v) => v.id === variantId) : null) ??
-        responseVariants.find((v) => v.isDefault) ??
-        responseVariants[0];
-      navigate(createFavoriteDefinitions.default.POST, {
-        data: {
-          skillId,
-          icon: characterResponse.data.icon ?? undefined,
-          voiceModelSelection: responseVariant?.voiceModelSelection ?? null,
-          modelSelection: null,
-        },
-        popNavigationOnSuccess: 1,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground h-8 px-2 mt-0.5"
-      onClick={handleClick}
-      disabled={isLoading}
-    >
-      {isLoading ? (
-        <Loader2 className="h-3 w-3 animate-spin" />
-      ) : (
-        <Plus className="h-3 w-3" />
-      )}
-      <Span className="text-xs">{t("get.addVariant")}</Span>
-    </Button>
-  );
-}
-
-function ViewSkillButton({
-  skillId,
-  navigate,
-  locale,
-}: {
-  skillId: string;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  locale: CountryLanguage;
-}): React.JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
-
-  if (skillId === NO_SKILL_ID) {
-    return <></>;
-  }
-
-  const handleClick = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const { skillId: baseSkillId } = parseSkillId(skillId);
-      const skillDetailDef = await import("../[id]/definition");
-      navigate(skillDetailDef.default.GET, {
-        urlPathParams: { id: baseSkillId },
-      });
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="text-muted-foreground hover:text-foreground"
-      onClick={handleClick}
-      title={t("get.viewSkill")}
-    >
-      <Eye className="h-4 w-4" />
-    </Button>
-  );
-}
-
-function EditFavoriteButton({
-  navigate,
-  item,
-  size,
-}: {
-  item: FavoriteCard;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
-  size?: "sm";
-}): React.JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
-    e.stopPropagation();
-    setIsLoading(true);
-
-    try {
-      const favoriteDetailDefinitions = await import("./[id]/definition");
-      navigate(favoriteDetailDefinitions.default.PATCH, {
-        urlPathParams: { id: item.id },
-        data: {
-          skillId: item.skillId ?? undefined,
-          icon: item.icon,
-        },
-        prefillFromGet: true,
-        getEndpoint: favoriteDetailDefinitions.default.GET,
-        popNavigationOnSuccess: 1,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const isSmall = size === "sm";
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className={isSmall ? "h-7 w-7 p-0" : undefined}
-      onClick={handleClick}
-      disabled={isLoading}
-    >
-      {isLoading ? (
-        <Loader2
-          className={cn("animate-spin", isSmall ? "h-3 w-3" : "h-4 w-4")}
-        />
-      ) : (
-        <Pencil className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
-      )}
-    </Button>
   );
 }

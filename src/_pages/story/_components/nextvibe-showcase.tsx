@@ -1,13 +1,10 @@
 "use client";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import type codingAgentDefinitions from "next-vibe/agent/coding-agent/definition";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
@@ -16,13 +13,29 @@ import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import type cronTasksDefinitions from "next-vibe/tasks/cron/tasks/definition";
+import {
+  CronTaskPriority,
+  TaskCategory,
+  TaskOutputMode,
+} from "next-vibe/tasks/enum";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
 
+import { SubscriptionStatusAdminFilter } from "@/subscription/admin/enum";
+
+import {
+  mkAssistantMsg,
+  mkDemoExecuteToolMsg,
+  mkDemoToolMsg,
+  mkUserMsg,
+} from "./demo-messages";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
+
+type CodingAgentEndpoint = typeof codingAgentDefinitions.POST;
+type CronCreateEndpoint = typeof cronTasksDefinitions.POST;
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
@@ -47,14 +60,12 @@ function NextVibeBlock({
   reversed,
   delay,
 }: NextVibeBlockProps): JSX.Element {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
   return (
-    <Div ref={ref as never} className="py-16 md:py-24">
+    <Div className="py-16 md:py-24">
       <MotionDiv
         className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
-        initial={{ opacity: 0, y: 30 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay }}
       >
         <Div className={reversed ? "md:[direction:ltr]" : ""}>
@@ -75,85 +86,6 @@ function NextVibeBlock({
 }
 
 // ---------------------------------------------------------------------------
-// Mock helpers
-// ---------------------------------------------------------------------------
-
-function baseMockMsg(overrides: {
-  id: string;
-  threadId: string;
-  role: ChatMessage["role"];
-  content: string | null;
-  parentId: string | null;
-  depth: number;
-  sequenceId: string | null;
-  isAI: boolean;
-  model: ChatMessage["model"];
-  metadata: ChatMessage["metadata"];
-}): ChatMessage {
-  const now = new Date();
-  return {
-    authorId: null,
-    authorName: null,
-    skill: null,
-    errorType: null,
-    errorMessage: null,
-    errorCode: null,
-    upvotes: 0,
-    downvotes: 0,
-    createdAt: now,
-    updatedAt: now,
-    ...overrides,
-  };
-}
-
-function mkToolMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  toolCallId: string,
-  toolName: string,
-  args: WidgetData,
-  result: WidgetData,
-  executionTime: number,
-): ChatMessage {
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.TOOL,
-    content: null,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: {
-      toolCall: { toolCallId, toolName, args, result, executionTime },
-    },
-  });
-}
-
-function mkAssistantMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  content: string,
-  meta?: Partial<ChatMessage["metadata"]>,
-): ChatMessage {
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.ASSISTANT,
-    content,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: { ...meta },
-  });
-}
-
-// ---------------------------------------------------------------------------
 // Demo builders
 // ---------------------------------------------------------------------------
 
@@ -169,26 +101,26 @@ function buildEndpointGroup(t: ScopedT): MessageGroup {
     t("home.nextvibe.demos.endpoint.reasoning"),
   );
 
-  const codingTool = mkToolMsg(
-    "nv-scaffold",
-    tid,
-    seq,
-    "toolu_scaffold1",
-    "coding-agent",
-    {
+  const codingTool = mkDemoToolMsg<CodingAgentEndpoint>({
+    id: "nv-scaffold",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_scaffold1",
+    toolName: "coding-agent",
+    args: {
       prompt:
         "Build the subscriptions endpoint: list active subscriptions with billing status. Three files: definition.ts (Zod schema, allowedRoles ADMIN), repository.ts (Drizzle query, returns ResponseType), route.ts (endpointsHandler). Run vibe check when done.",
       provider: "claude-code",
       interactiveMode: false,
       taskTitle: "Build subscriptions endpoint",
     },
-    {
+    result: {
       output:
-        "Created 3 files:\n  next-vibe/agent/subscriptions/definition.ts\n  next-vibe/agent/subscriptions/repository.ts\n  next-vibe/agent/subscriptions/route.ts\nvibe check: 0 errors.",
+        "Created 3 files:\n  src/app/subscriptions/definition.ts\n  src/app/subscriptions/repository.ts\n  src/app/subscriptions/route.ts\nvibe check: 0 errors.",
       durationMs: 22400,
     },
-    22400,
-  );
+    executionTime: 22400,
+  });
 
   const response = mkAssistantMsg(
     "endpoint-response",
@@ -232,7 +164,8 @@ function buildSurfacesGroup(t: ScopedT): MessageGroup {
   };
 }
 
-// Cron: AI uses execute-tool (the universal executor) to create a cron job
+// Cron: AI uses execute-tool (the universal executor) to schedule an
+// ai-run that pre-fetches trialing subscriptions and drafts the digest.
 function buildCronGroup(t: ScopedT): MessageGroup {
   const tid = "demo-nextvibe-cron";
   const seq = "cron-seq";
@@ -244,56 +177,85 @@ function buildCronGroup(t: ScopedT): MessageGroup {
     t("home.nextvibe.demos.cron.reasoning"),
   );
 
-  const cronTool = mkToolMsg(
-    "nv-cron-create",
-    tid,
-    seq,
-    "toolu_cron1",
-    "execute-tool",
-    {
-      toolName: "cron-create",
-      input: {
-        routeId: "cron-steps",
-        displayName: "Daily trial expiry digest",
-        schedule: "0 8 * * *",
+  const displayName = "Daily trial expiry digest";
+  const schedule = "0 8 * * *";
+  const taskInput = {
+    skill: "thea",
+    prompt:
+      "Trials expiring in the next 3 days are in the pre-call result. Draft and send a digest email to the admin: who is expiring and when.",
+    preCalls: [
+      {
+        routeId: "subscription-admin-list",
+        args: {
+          searchFilters: { status: [SubscriptionStatusAdminFilter.TRIALING] },
+        },
+      },
+    ],
+    maxTurns: 5,
+  };
+  const createdAt = new Date("2026-03-29T09:12:00Z");
+
+  const cronTool = mkDemoExecuteToolMsg<CronCreateEndpoint>({
+    id: "nv-cron-create",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_cron1",
+    innerToolName: "cron-create",
+    input: {
+      routeId: "ai-run",
+      displayName,
+      schedule,
+      priority: CronTaskPriority.MEDIUM,
+      category: TaskCategory.SYSTEM,
+      enabled: true,
+      hidden: false,
+      outputMode: TaskOutputMode.NOTIFY_ON_FAILURE,
+      timeout: 300000,
+      retries: 3,
+      retryDelay: 5000,
+      taskInput,
+      runOnce: false,
+    },
+    result: {
+      task: {
+        id: "cron_trial_digest",
+        shortId: "td1",
+        routeId: "ai-run",
+        displayName,
+        description: null,
+        version: "1",
+        category: TaskCategory.SYSTEM,
+        schedule,
+        timezone: "UTC",
         enabled: true,
-        taskInput: {
-          steps: [
-            {
-              type: "call",
-              routeId: "subscriptions-list_GET",
-              args: { status: "trialing", expiresWithinDays: 3 },
-            },
-            {
-              type: "ai_agent",
-              model: "claude-sonnet-4-6",
-              character: "thea",
-              prompt:
-                "Trials expiring in 3 days: $step_0_result. Draft and send a digest email to the admin summarising who is expiring and when.",
-              threadMode: "none",
-            },
-          ],
-        },
+        hidden: false,
+        priority: CronTaskPriority.MEDIUM,
+        timeout: 300000,
+        retries: 3,
+        retryDelay: 5000,
+        taskInput,
+        runOnce: false,
+        outputMode: TaskOutputMode.NOTIFY_ON_FAILURE,
+        owner: { type: "user", userId: "00000000-0000-0000-0000-000000000000" },
+        notificationTargets: [],
+        lastExecutedAt: null,
+        lastExecutionStatus: null,
+        lastExecutionError: null,
+        lastExecutionDuration: null,
+        nextExecutionAt: "2026-03-30T08:00:00Z",
+        executionCount: 0,
+        consecutiveFailures: 0,
+        successCount: 0,
+        errorCount: 0,
+        averageExecutionTime: null,
+        targetInstance: null,
+        tags: [],
+        createdAt,
+        updatedAt: createdAt,
       },
     },
-    {
-      result: {
-        task: {
-          id: "cron_trial_digest",
-          shortId: "td1",
-          routeId: "cron-steps",
-          displayName: "Daily trial expiry digest",
-          schedule: "0 8 * * *",
-          enabled: true,
-          hidden: false,
-          priority: 5,
-          version: 1,
-          timezone: "UTC",
-        },
-      },
-    },
-    580,
-  );
+    executionTime: 580,
+  });
 
   const response = mkAssistantMsg(
     "cron-response",
@@ -350,17 +312,10 @@ function NextVibeDemoVisual({
 
   const userMsg = useMemo(
     () =>
-      baseMockMsg({
+      mkUserMsg({
         id: `nextvibe-user-${activeId}`,
         threadId: `demo-nextvibe-${activeId}`,
-        role: ChatMessageRole.USER,
         content: userMessages[activeId],
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
       }),
     [activeId, userMessages],
   );
@@ -399,7 +354,7 @@ function NextVibeDemoVisual({
               roles: [UserPermissionRole.ADMIN],
             }}
           />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <MotionDiv
               key={activeId}
               initial={{ opacity: 0, y: 8 }}

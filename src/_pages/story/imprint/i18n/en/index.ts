@@ -11,6 +11,7 @@ export const translations = {
     twitterDescription: "Legal information and company details for {{appName}}",
   },
   printAriaLabel: "Print imprint",
+  onThisPage: "On this page",
   printButton: "Print",
   title: "Legal Notice",
   lastUpdated: "Last updated: January 2025",

@@ -73,7 +73,11 @@ export const translations: typeof enTranslations = {
       "Weil jeder Knoten ein Standard-Endpoint ist, sind sie einzeln über die CLI testbar, für KI-Agenten per MCP zugänglich und mit derselben Infra wie alles andere cachbar. Die Graph-Engine erfindet keine eigene Sprache. Sie schedulet Endpoints.",
   },
   cta: {
+    title: "Code lesen. Selbst ausführen.",
+    subtitle:
+      "next-vibe ist Open Source. Klonen, vibe dev starten und den ersten Endpoint an einem Nachmittag auf jede Oberfläche bringen.",
     github: "Auf GitHub ansehen",
     clone: "git clone https://github.com/techfreaque/next-vibe",
+    framework: "next-vibe entdecken",
   },
 };

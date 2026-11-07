@@ -934,7 +934,7 @@ export function ToolCallRenderer({
         credits === 1
           ? "widgets.toolCall.creditsUsed_one"
           : "widgets.toolCall.creditsUsed_other",
-        { cost: credits },
+        { count: credits },
       )
     : null;
 

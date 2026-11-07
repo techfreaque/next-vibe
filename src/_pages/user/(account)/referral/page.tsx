@@ -41,10 +41,13 @@ export async function generateMetadata({
 
   const referralParams = getReferralParams(locale);
   return {
-    title: t("title", { appName: configTranslations.appName }),
+    title: t("title", {
+      appName: configTranslations.appName,
+      ...referralParams,
+    }),
     description: t("description", {
       appName: configTranslations.appName,
-      directPct: referralParams.directPct,
+      ...referralParams,
     }),
   };
 }

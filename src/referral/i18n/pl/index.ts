@@ -53,8 +53,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Utwórz kod",
     description: "Utwórz nowy kod polecający",
     form: {
-      title: "Utwórz kod polecający",
-      description: "Wygeneruj nowy kod polecający do udostępnienia",
+      title: "Nowy kod polecający",
+      description:
+        "Jeden kod na jedną grupę odbiorców. Discord, blog, znajomi. Każdy liczony osobno.",
     },
     submit: {
       label: "Utwórz kod",
@@ -130,7 +131,7 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         empty: "Nie masz jeszcze żadnych kodów polecających",
-        emptyHint: "Utwórz swój pierwszy kod powyżej ↑",
+        emptyHint: "Utwórz pierwszy kod poniżej. Link gotowy od razu.",
         copied: "Skopiowano!",
         copy: "Kopiuj link",
         visitors: "Odwiedzający",
@@ -225,14 +226,14 @@ export const translations: typeof enTranslations = {
   form: {
     fields: {
       code: {
-        label: "Kod polecający",
-        description: "Unikalny kod polecający",
-        placeholder: "Wprowadź kod",
+        label: "Kod",
+        description: "Widoczny w Twoim linku. 3-50 znaków.",
+        placeholder: "np. OLA10",
       },
       label: {
-        label: "Etykieta",
-        description: "Opcjonalna etykieta dla tego kodu",
-        placeholder: "Mój kod polecający",
+        label: "Notatka (widzisz tylko Ty)",
+        description: "Gdzie go udostępnisz.",
+        placeholder: "np. bio na YouTube",
       },
       description: {
         label: "Opis",
@@ -365,7 +366,7 @@ export const translations: typeof enTranslations = {
         "Generuj unikalne kody dla różnych grup - znajomych, mediów społecznościowych lub kampanii.",
       step2Title: "Udostępnij link - lub link do skilla",
       step2Body:
-        "Link polecający: {{directPct}} każdej płatności od tego użytkownika, wiecznie. Link do skilla: {{skillPct}} łącznie ({{directPct}} bezpośrednio + {{skillBonusPct}} bonus za skill) - dwa źródła dochodu, jeden link.",
+        "Link polecający: {{directPct}} każdej płatności od tego użytkownika, wiecznie. Twój skill udostępniany przez innych: {{skillBonusPct}} każdej płatności tych użytkowników - dochód z linków, których nigdy nie wrzuciłeś/aś.",
       step3Title: "Otrzymaj płatność",
       step3Body:
         "Zarobki są natychmiastowe. Użyj ich jako kredytów do czatów lub wypłać w krypto.",

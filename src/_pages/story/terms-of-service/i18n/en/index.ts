@@ -12,6 +12,7 @@ export const translations = {
     twitterDescription: "Read the terms and conditions for using {{appName}}",
   },
   printAriaLabel: "Print terms of service",
+  onThisPage: "On this page",
   printButton: "Print",
   title: "Terms of Service",
   lastUpdated: "Last updated: January 2025",

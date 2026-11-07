@@ -242,11 +242,40 @@ class CallRecorder<TEndpoint extends CreateApiEndpointAny> {
       await route.fallback();
       return;
     }
-    // No cap: first-run fixture recordings (video, music) outlast the 30s default
-    const response = await route.fetch({ timeout: 0 });
-    const contentType = response.headers()["content-type"] ?? "";
-    const raw = await response.body();
-    const status = response.status();
+    // Replay the call ourselves and hand the browser the answer. Not
+    // route.fetch(): under Bun, Playwright's Node HTTP client crashes on any
+    // Set-Cookie response (Bun reports a relative IncomingMessage.url that
+    // Playwright feeds to `new URL()`), so login/signup/lead calls never
+    // returned. Reading the body here, before fulfilling, also survives the
+    // page navigating away the moment it gets the response.
+    const postData = request.postDataBuffer();
+    // oxlint-disable-next-line restricted/no-raw-fetch -- e2e proxy: replays the browser's own request to the server under test
+    const upstream = await fetch(request.url(), {
+      method: request.method(),
+      headers: await request.allHeaders(),
+      body: postData ? new Uint8Array(postData) : undefined,
+      redirect: "manual",
+    });
+    const raw = Buffer.from(await upstream.arrayBuffer());
+    const headers: Record<string, string> = {};
+    upstream.headers.forEach((value, key) => {
+      // fetch() already decoded the body — drop encoding/length so the
+      // browser doesn't decode it twice
+      if (
+        key !== "set-cookie" &&
+        key !== "content-encoding" &&
+        key !== "content-length"
+      ) {
+        headers[key] = value;
+      }
+    });
+    const setCookies = upstream.headers.getSetCookie();
+    if (setCookies.length > 0) {
+      // Playwright splits a newline-joined set-cookie into separate cookies
+      headers["set-cookie"] = setCookies.join("\n");
+    }
+    const contentType = headers["content-type"] ?? "";
+    const status = upstream.status;
     const isJson = contentType.includes("application/json");
     const body = isJson
       ? (JSON.parse(raw.toString("utf-8")) as ResponseType<
@@ -274,7 +303,7 @@ class CallRecorder<TEndpoint extends CreateApiEndpointAny> {
     for (const listener of this.listeners) {
       listener();
     }
-    await route.fulfill({ response, body: raw });
+    await route.fulfill({ status: upstream.status, headers, body: raw });
   }
 
   /** Resolve with call #index (0-based) once it exists, or null on timeout. */

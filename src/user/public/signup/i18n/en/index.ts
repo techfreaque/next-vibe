@@ -1,5 +1,3 @@
-import { translations as _componentsTranslations } from "../../widget/i18n/en";
-
 export const translations = {
   category: "Users",
 
@@ -89,9 +87,8 @@ export const translations = {
   description: "User registration endpoint",
   tag: "Authentication",
   form: {
-    title: "Welcome to Uncensored AI",
-    description:
-      "Help build uncensored, privacy-first, and truly independent AI. unbottled.ai is open source and community-driven, your signup supports the development of AI technology that respects your freedom.",
+    title: "Create your account",
+    description: "Every model. Your rules. Free to start.",
   },
   actions: {
     submit: "Create Account",
@@ -99,10 +96,9 @@ export const translations = {
   },
   fields: {
     privateName: {
-      label: "Your Private Name",
-      description:
-        "How the AI will address you in private conversations. This stays between you and the AI - completely private.",
-      placeholder: "Enter your name",
+      label: "Private name",
+      description: "What the AI calls you. Never shown to anyone else.",
+      placeholder: "e.g. Alex",
       validation: {
         required: "Private name is required",
         minLength: "Name must be at least 2 characters",
@@ -110,10 +106,9 @@ export const translations = {
       },
     },
     publicName: {
-      label: "Your Public Name",
-      description:
-        "Your identity in public chats and forums. Other users and AIs will see this name. Choose wisely - it represents you in the community.",
-      placeholder: "Enter display name",
+      label: "Public name",
+      description: "Shown in shared chats and forums.",
+      placeholder: "e.g. alex_builds",
       validation: {
         required: "Display name is required",
         minLength: "Display name must be at least 2 characters",
@@ -121,10 +116,9 @@ export const translations = {
       },
     },
     email: {
-      label: "Your Email",
-      description:
-        "Your login credentials and contact method. Kept private - never shared with other users or AIs.",
-      placeholder: "Enter email address",
+      label: "Email",
+      description: "For login only. Never shared.",
+      placeholder: "you@example.com",
       help: "This will be your login email and primary contact method",
       validation: {
         required: "Email is required",
@@ -132,10 +126,10 @@ export const translations = {
       },
     },
     password: {
-      label: "Your Password",
+      label: "Password",
       description:
-        "Strong passwords protect your account. We're implementing end-to-end encryption soon - at that point, password resets will clear your message history since only you hold the decryption key. Save it somewhere safe.",
-      placeholder: "Enter password",
+        "8+ characters with upper, lower and a number. Store it safe: end-to-end encryption is coming, and a reset will then wipe your history.",
+      placeholder: "Create a password",
       validation: {
         required: "Password is required",
         minLength: "Password must be at least 8 characters",
@@ -143,7 +137,7 @@ export const translations = {
       },
     },
     confirmPassword: {
-      label: "Confirm Your Password",
+      label: "Confirm password",
       validation: {
         required: "Please confirm your password",
         minLength: "Password must be at least 8 characters",
@@ -151,12 +145,11 @@ export const translations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Subscribe to Newsletter",
-      description:
-        "Occasional updates about new models and features. No spam, just what matters.",
+      label: "Send me product updates",
+      description: "New models and features. Rarely. No spam.",
     },
     acceptTerms: {
-      label: "Accept Terms & Conditions",
+      label: "I accept the terms",
       description: "Our terms and conditions respect your freedom and privacy.",
       termsLink: "terms",
       conditionsLink: "conditions",
@@ -168,10 +161,9 @@ export const translations = {
       },
     },
     referralCode: {
-      label: "Referral Code (optional)",
-      description:
-        "Have a friend on unbottled.ai? Enter their code to support them. They get rewarded for bringing you in.",
-      placeholder: "Enter referral code (optional)",
+      label: "Referral code (optional)",
+      description: "Got a code from a friend? They earn when you subscribe.",
+      placeholder: "Enter code",
       labelPrefilled: "Referral code",
       descriptionPrefilled:
         "Your friend gets rewarded when you create your account.",

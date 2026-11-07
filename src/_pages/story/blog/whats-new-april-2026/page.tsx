@@ -3,19 +3,34 @@ import { getAvailableSkillCount } from "next-vibe/agent/skills/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Gift } from "next-vibe/ui/components/icons/Gift";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Star } from "next-vibe/ui/components/icons/Star";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, Muted, P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import { H3, P } from "next-vibe/ui/components/typography";
+import type { IconComponent } from "next-vibe/ui/lib/helper";
+import type { JSX, ReactNode } from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleEnd,
+  ArticleH3,
+  ArticleHeader,
+  ArticleList,
+  ArticleP,
+  ArticleQuote,
+  ArticleSection,
+} from "../../_shared/article";
+import { Callout, Cta, CtaRow } from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -61,113 +76,63 @@ export async function tanstackLoader({
   };
 }
 
-// ── Typed variant tables ──────────────────────────────────────────────────────
+// ── Local building blocks ───────────────────────────────────────────────────
 
-type ModelTier = "brilliant" | "kimi" | "uncensored";
-
-const MODEL_TIER: Record<
-  ModelTier,
-  { ring: string; dot: string; label: string; bg: string }
-> = {
-  brilliant: {
-    ring: "border-amber-300 dark:border-amber-700",
-    dot: "bg-amber-400",
-    label: "text-amber-700 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-950/20",
-  },
-  kimi: {
-    ring: "border-blue-300 dark:border-blue-700",
-    dot: "bg-blue-400",
-    label: "text-blue-700 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-950/20",
-  },
-  uncensored: {
-    ring: "border-red-300 dark:border-red-700",
-    dot: "bg-red-400",
-    label: "text-red-700 dark:text-red-400",
-    bg: "bg-red-50 dark:bg-red-950/20",
-  },
-};
-
-function TierCard({
-  tier,
+function LabeledCard({
   label,
-  model,
-  body,
+  meta,
+  children,
 }: {
-  tier: ModelTier;
   label: string;
-  model: string;
-  body: string;
+  meta?: string;
+  children: ReactNode;
 }): JSX.Element {
-  const s = MODEL_TIER[tier];
   return (
-    <Div className={`rounded-xl border p-4 ${s.bg} ${s.ring}`}>
-      <Div className="flex items-center gap-2 mb-1">
-        <Div className={`h-2 w-2 rounded-full shrink-0 ${s.dot}`} />
-        <Span
-          className={`text-xs font-bold uppercase tracking-wider ${s.label}`}
-        >
-          {label}
+    <Div className="flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-xs">
+      <Span className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+        {label}
+      </Span>
+      {meta !== undefined && (
+        <Span className="mt-1 font-mono text-xs text-muted-foreground">
+          {meta}
         </Span>
-      </Div>
-      <Div className="text-xs text-muted-foreground mb-2 pl-4">{model}</Div>
-      <P className="text-sm text-muted-foreground leading-relaxed pl-4">
-        {body}
+      )}
+      <P className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        {children}
       </P>
     </Div>
   );
 }
 
-type ExampleVariant = "med" | "knowledge" | "creative" | "dev";
-
-const EXAMPLE_STYLE: Record<
-  ExampleVariant,
-  { border: string; dot: string; label: string }
-> = {
-  med: {
-    border: "border-cyan-200 dark:border-cyan-800",
-    dot: "bg-cyan-500",
-    label: "text-cyan-700 dark:text-cyan-400",
-  },
-  knowledge: {
-    border: "border-amber-200 dark:border-amber-800",
-    dot: "bg-amber-500",
-    label: "text-amber-700 dark:text-amber-400",
-  },
-  creative: {
-    border: "border-purple-200 dark:border-purple-800",
-    dot: "bg-purple-500",
-    label: "text-purple-700 dark:text-purple-400",
-  },
-  dev: {
-    border: "border-emerald-200 dark:border-emerald-800",
-    dot: "bg-emerald-500",
-    label: "text-emerald-700 dark:text-emerald-400",
-  },
-};
-
-function ExampleCard({
-  title,
+function CompanionCard({
+  icon: Icon,
+  name,
+  tagline,
   body,
-  variant,
 }: {
-  title: string;
+  icon: IconComponent;
+  name: string;
+  tagline: string;
   body: string;
-  variant: ExampleVariant;
 }): JSX.Element {
-  const s = EXAMPLE_STYLE[variant];
   return (
-    <Div className={`rounded-xl border p-4 bg-background ${s.border}`}>
-      <Div className="flex items-center gap-2 mb-2">
-        <Div className={`h-2 w-2 rounded-full shrink-0 ${s.dot}`} />
-        <Div
-          className={`text-xs font-bold uppercase tracking-wider ${s.label}`}
-        >
-          {title}
+    <Div className="flex h-full flex-col rounded-xl border border-border bg-card p-6 shadow-xs">
+      <Div className="flex items-center gap-3">
+        <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </Div>
+        <Div className="min-w-0">
+          <H3 className="text-lg font-semibold leading-tight tracking-tight">
+            {name}
+          </H3>
+          <P className="text-sm leading-snug text-muted-foreground">
+            {tagline}
+          </P>
         </Div>
       </Div>
-      <P className="text-sm text-muted-foreground leading-relaxed">{body}</P>
+      <P className="mt-4 text-[0.9375rem] leading-relaxed text-foreground/90">
+        {body}
+      </P>
     </Div>
   );
 }
@@ -181,415 +146,228 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <Div className="bg-purple-700 border-b border-purple-800">
-        <Div className="container mx-auto px-4 py-3 max-w-3xl flex items-center gap-3">
-          <Div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center text-white text-xs">
-            {t("hero.icon")}
-          </Div>
-          <P className="text-white font-semibold text-sm">
-            {t("hero.brand", { appName })}
-            {t("hero.category")}
-          </P>
-        </Div>
-      </Div>
+      <ArticleHeader
+        back={back}
+        category={t("hero.category")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("whats-new-april-2026", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
 
-      {/* Hero */}
-      <Div className="bg-gradient-to-b from-purple-50 to-background dark:from-purple-950/20 dark:to-background border-b border-purple-100 dark:border-purple-900/30">
-        <Div className="container mx-auto px-4 pt-8 pb-12 max-w-3xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
-            {t("hero.backToBlog")}
-          </Link>
-          <Div className="flex items-center gap-2 mb-5">
-            <Div className="px-2.5 py-0.5 bg-purple-700 rounded-full text-white text-xs font-semibold uppercase tracking-wider">
-              {t("hero.category")}
-            </Div>
-            <Muted className="text-xs">{t("hero.readTime")}</Muted>
-          </Div>
-          <H1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-lg text-muted-foreground mb-8 max-w-2xl">
-            {t("hero.subtitle")}
-          </P>
-          <Div className="px-5 py-4 rounded-xl bg-white dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-200 text-sm italic max-w-xl">
-            {t("hero.quote")}
-          </Div>
-        </Div>
-      </Div>
+      <ArticleBody>
+        <ArticleQuote>{t("hero.quote")}</ArticleQuote>
 
-      <Div className="container mx-auto px-4 py-12 max-w-3xl space-y-14">
-        {/* ── Honest ── plain prose */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("honest.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("honest.p1", { appName })}
-          </P>
-          <P className="text-muted-foreground leading-relaxed">
-            {t("honest.p2")}
-          </P>
-        </Div>
+        <ArticleSection title={t("honest.title")}>
+          <ArticleP>{t("honest.p1", { appName })}</ArticleP>
+          <ArticleP>{t("honest.p2")}</ArticleP>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── What changed ── compact checklist */}
-        <Div>
-          <Div className="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-4">
-            {t("whatsNew.label")}
-          </Div>
-          <Div className="space-y-2.5 mb-6">
-            {(
-              [
-                { key: "whatsNew.item1", dot: "bg-purple-500" },
-                { key: "whatsNew.item2", dot: "bg-blue-500" },
-                { key: "whatsNew.item3", dot: "bg-blue-400" },
-                { key: "whatsNew.item4", dot: "bg-emerald-500" },
-                { key: "whatsNew.item5", dot: "bg-slate-400" },
-              ] as const
-            ).map(({ key, dot }) => (
-              <Div key={key} className="flex items-baseline gap-3">
-                <Div
-                  className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`}
-                />
-                <Span className="text-sm text-foreground">{t(key)}</Span>
-              </Div>
-            ))}
-          </Div>
-          <Div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
+        <ArticleSection label={t("whatsNew.label")}>
+          <ArticleList
+            items={[
+              t("whatsNew.item1"),
+              t("whatsNew.item2"),
+              t("whatsNew.item3"),
+              t("whatsNew.item4"),
+              t("whatsNew.item5"),
+            ]}
+          />
+          <Callout icon={Info} tone="neutral">
             {t("whatsNew.betaNote")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Multimodal ── lead + two example cards + note */}
-        <Div>
-          <H2 className="text-xl font-bold mb-3">{t("multimodal.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("multimodal.lead")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-6">
-            {t("multimodal.how", { appName })}
-          </P>
-          <Div className="grid sm:grid-cols-2 gap-3 mb-5">
-            <Div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-4 py-4">
-              <Div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                {t("multimodal.visionLabel")}
-              </Div>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("multimodal.vision")}
-              </P>
-            </Div>
-            <Div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-4 py-4">
-              <Div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                {t("multimodal.localLabel")}
-              </Div>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("multimodal.local", { appName })}
-              </P>
-            </Div>
+        <ArticleSection title={t("multimodal.title")}>
+          <ArticleP>{t("multimodal.lead")}</ArticleP>
+          <ArticleP>{t("multimodal.how", { appName })}</ArticleP>
+          <Div className="grid gap-4 sm:grid-cols-2">
+            <LabeledCard label={t("multimodal.visionLabel")}>
+              {t("multimodal.vision")}
+            </LabeledCard>
+            <LabeledCard label={t("multimodal.localLabel")}>
+              {t("multimodal.local", { appName })}
+            </LabeledCard>
           </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
+          <Callout icon={Info} tone="neutral">
             {t("multimodal.note")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Monitoring ── the real bug story */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("monitoring.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("monitoring.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-5">
-            {t("monitoring.p2")}
-          </P>
-          <Div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-200">
+        <ArticleSection title={t("monitoring.title")}>
+          <ArticleP>{t("monitoring.p1")}</ArticleP>
+          <ArticleP>{t("monitoring.p2")}</ArticleP>
+          <Callout icon={Activity} tone="success">
             {t("monitoring.note", { appName })}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Companions ── two cards with dark headers */}
-        <Div>
-          <H2 className="text-xl font-bold mb-1">{t("companions.title")}</H2>
-          <P className="text-muted-foreground text-sm mb-6">
-            {t("companions.subtitle")}
-          </P>
-          <Div className="grid sm:grid-cols-2 gap-4 mb-5">
-            <Div className="rounded-xl border border-purple-200 dark:border-purple-800 overflow-hidden">
-              <Div className="bg-purple-700 px-5 py-4">
-                <Div className="font-bold text-white">
-                  {t("companions.theaName")}
-                </Div>
-                <Div className="text-purple-200 text-xs mt-0.5">
-                  {t("companions.theaTagline")}
-                </Div>
-              </Div>
-              <Div className="px-5 py-4">
-                <P className="text-sm text-muted-foreground leading-relaxed">
-                  {t("companions.theaBody")}
-                </P>
-              </Div>
-            </Div>
-            <Div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <Div className="bg-slate-800 px-5 py-4">
-                <Div className="font-bold text-white">
-                  {t("companions.hermesName")}
-                </Div>
-                <Div className="text-slate-300 text-xs mt-0.5">
-                  {t("companions.hermesTagline")}
-                </Div>
-              </Div>
-              <Div className="px-5 py-4">
-                <P className="text-sm text-muted-foreground leading-relaxed">
-                  {t("companions.hermesBody")}
-                </P>
-              </Div>
-            </Div>
+        <ArticleSection
+          title={t("companions.title")}
+          intro={t("companions.subtitle")}
+        >
+          <Div className="grid gap-4 sm:grid-cols-2">
+            <CompanionCard
+              icon={Sparkles}
+              name={t("companions.theaName")}
+              tagline={t("companions.theaTagline")}
+              body={t("companions.theaBody")}
+            />
+            <CompanionCard
+              icon={Bot}
+              name={t("companions.hermesName")}
+              tagline={t("companions.hermesTagline")}
+              body={t("companions.hermesBody")}
+            />
           </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground mb-3">
-            <Span className="font-semibold text-foreground">
+          <Callout tone="neutral">
+            <Span className="font-semibold">
               {t("companions.variantsLabel")} —{" "}
             </Span>
             {t("companions.variantsBody")}
-          </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
-            <Span className="font-semibold text-foreground">
-              {t("companions.tipLabel")}
-            </Span>
+          </Callout>
+          <Callout tone="neutral">
+            <Span className="font-semibold">{t("companions.tipLabel")}</Span>
             {t("companions.resetTip")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Model tiers ── 3-column color cards */}
-        <Div>
-          <H2 className="text-xl font-bold mb-2">{t("modelTiers.title")}</H2>
-          <P className="text-muted-foreground text-sm mb-5">
-            {t("modelTiers.intro")}
-          </P>
-          <Div className="grid sm:grid-cols-3 gap-3 mb-4">
-            <TierCard
-              tier="brilliant"
+        <ArticleSection
+          title={t("modelTiers.title")}
+          intro={t("modelTiers.intro")}
+        >
+          <Div className="grid gap-4 md:grid-cols-3">
+            <LabeledCard
               label={t("modelTiers.brilliantLabel")}
-              model={t("modelTiers.brilliantModel")}
-              body={t("modelTiers.brilliantBody")}
-            />
-            <TierCard
-              tier="kimi"
-              label={t("modelTiers.kimiLabel")}
-              model={t("modelTiers.kimiModel")}
-              body={t("modelTiers.kimiBody")}
-            />
-            <TierCard
-              tier="uncensored"
-              label={t("modelTiers.uncensoredLabel")}
-              model={t("modelTiers.uncensoredModel")}
-              body={t("modelTiers.uncensoredBody")}
-            />
-          </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
-            {t("modelTiers.note")}
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* ── Skills ── prose with real count */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">
-            {t("skills.title", { skillCount })}
-          </H2>
-          <P className="text-muted-foreground leading-relaxed mb-4">
-            {t("skills.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-4">
-            {t("skills.p2")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed">
-            {t("skills.p3")}
-          </P>
-        </Div>
-
-        <Separator />
-
-        {/* ── Skill economy ── pitch + examples + CTAs */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("skillEconomy.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("skillEconomy.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-8">
-            {t("skillEconomy.p2")}
-          </P>
-          <Div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
-            {t("skillEconomy.examplesLabel")}
-          </Div>
-          <Div className="grid sm:grid-cols-2 gap-3 mb-6">
-            <ExampleCard
-              title={t("skillEconomy.example1Title")}
-              body={t("skillEconomy.example1Body")}
-              variant="med"
-            />
-            <ExampleCard
-              title={t("skillEconomy.example2Title")}
-              body={t("skillEconomy.example2Body")}
-              variant="knowledge"
-            />
-            <ExampleCard
-              title={t("skillEconomy.example3Title")}
-              body={t("skillEconomy.example3Body")}
-              variant="creative"
-            />
-            <ExampleCard
-              title={t("skillEconomy.example4Title")}
-              body={t("skillEconomy.example4Body")}
-              variant="dev"
-            />
-          </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground mb-6">
-            {t("skillEconomy.note")}
-          </Div>
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-purple-700 hover:bg-purple-800 text-white"
+              meta={t("modelTiers.brilliantModel")}
             >
-              <Link href={`/${locale}/skills`}>
-                {t("skillEconomy.cta")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href={`/${locale}/user/(account)/referral`}>
-                {t("skillEconomy.ctaReferral")}
-              </Link>
-            </Button>
+              {t("modelTiers.brilliantBody")}
+            </LabeledCard>
+            <LabeledCard
+              label={t("modelTiers.kimiLabel")}
+              meta={t("modelTiers.kimiModel")}
+            >
+              {t("modelTiers.kimiBody")}
+            </LabeledCard>
+            <LabeledCard
+              label={t("modelTiers.uncensoredLabel")}
+              meta={t("modelTiers.uncensoredModel")}
+            >
+              {t("modelTiers.uncensoredBody")}
+            </LabeledCard>
           </Div>
-        </Div>
+          <Callout icon={Info} tone="neutral">
+            {t("modelTiers.note")}
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("skills.title", { skillCount })}>
+          <ArticleP>{t("skills.p1")}</ArticleP>
+          <ArticleP>{t("skills.p2")}</ArticleP>
+          <ArticleP>{t("skills.p3")}</ArticleP>
+        </ArticleSection>
 
-        {/* ── Self-host ── startup angle */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("selfHost.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("selfHost.p1", { appName })}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-5">
-            {t("selfHost.p2", { appName })}
-          </P>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
+        <ArticleSection title={t("skillEconomy.title")}>
+          <ArticleP>{t("skillEconomy.p1")}</ArticleP>
+          <ArticleP>{t("skillEconomy.p2")}</ArticleP>
+          <ArticleH3>{t("skillEconomy.examplesLabel")}</ArticleH3>
+          <Div className="grid gap-4 sm:grid-cols-2">
+            <LabeledCard label={t("skillEconomy.example1Title")}>
+              {t("skillEconomy.example1Body")}
+            </LabeledCard>
+            <LabeledCard label={t("skillEconomy.example2Title")}>
+              {t("skillEconomy.example2Body")}
+            </LabeledCard>
+            <LabeledCard label={t("skillEconomy.example3Title")}>
+              {t("skillEconomy.example3Body")}
+            </LabeledCard>
+            <LabeledCard label={t("skillEconomy.example4Title")}>
+              {t("skillEconomy.example4Body")}
+            </LabeledCard>
+          </Div>
+          <Callout icon={Info} tone="neutral">
+            {t("skillEconomy.note")}
+          </Callout>
+          <CtaRow>
+            <Cta href={`/${locale}/skills`} label={t("skillEconomy.cta")} />
+            <Cta
+              href={`/${locale}/user/referral`}
+              label={t("skillEconomy.ctaReferral")}
+              variant="secondary"
+            />
+          </CtaRow>
+        </ArticleSection>
+
+        <ArticleSection title={t("selfHost.title")}>
+          <ArticleP>{t("selfHost.p1", { appName })}</ArticleP>
+          <ArticleP>{t("selfHost.p2", { appName })}</ArticleP>
+          <Callout icon={Server} tone="neutral">
             {t("selfHost.note")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("roadmap.title")}>
+          <ArticleP>{t("roadmap.p1", { appName })}</ArticleP>
+          <ArticleP>{t("roadmap.p2")}</ArticleP>
+        </ArticleSection>
 
-        {/* ── Roadmap ── brief */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("roadmap.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("roadmap.p1", { appName })}
-          </P>
-          <P className="text-muted-foreground leading-relaxed">
-            {t("roadmap.p2")}
-          </P>
-        </Div>
+        <ArticleSection title={t("mission.title")}>
+          <ArticleP>{t("mission.p1")}</ArticleP>
+          <ArticleP>{t("mission.p2")}</ArticleP>
+          <ArticleQuote>{t("mission.hermesQuote")}</ArticleQuote>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Mission ── conviction + Hermes quote */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("mission.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("mission.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-6">
-            {t("mission.p2")}
-          </P>
-          <Div className="px-5 py-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm italic">
-            {t("mission.hermesQuote")}
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* ── Feedback ── CTA with reward */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("feedback.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("feedback.p1", { appName })}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-6">
-            {t("feedback.p2")}
-          </P>
-          <Div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 px-5 py-4 mb-4">
-            <Div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
+        <ArticleSection title={t("feedback.title")}>
+          <ArticleP>{t("feedback.p1", { appName })}</ArticleP>
+          <ArticleP>{t("feedback.p2")}</ArticleP>
+          <Callout icon={Gift}>
+            <P className="font-semibold">
               {t("feedback.rewardTitle", { credits: FEEDBACK_REWARD_CREDITS })}
-            </Div>
-            <P className="text-sm text-purple-800 dark:text-purple-300 leading-relaxed mb-4">
+            </P>
+            <P className="mt-1 text-muted-foreground">
               {t("feedback.rewardBody", { credits: FEEDBACK_REWARD_CREDITS })}
             </P>
-            <Button
-              asChild
-              size="sm"
-              className="bg-purple-700 hover:bg-purple-800 text-white"
-            >
-              <Link href={`/${locale}/help`}>{t("feedback.cta")}</Link>
-            </Button>
-          </Div>
-          <Div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
+            <Div className="mt-4">
+              <Cta
+                href={`/${locale}/help`}
+                label={t("feedback.cta")}
+                variant="secondary"
+              />
+            </Div>
+          </Callout>
+          <Callout icon={Star} tone="warning">
             {t("feedback.payingNote")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("close.title")}>
+          <ArticleP>{t("close.p1")}</ArticleP>
+          <ArticleP>{t("close.p2")}</ArticleP>
+        </ArticleSection>
 
-        {/* ── Close ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("close.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("close.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-8">
-            {t("close.p2")}
-          </P>
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-purple-700 hover:bg-purple-800 text-white"
-            >
-              <Link href={`/${locale}/threads`}>
-                {t("close.cta", { appName })}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </Div>
-        </Div>
-
-        <Div className="pt-2">
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/story/blog`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("hero.backToBlog")}
-            </Link>
-          </Button>
-        </Div>
-      </Div>
+        <ArticleEnd
+          back={back}
+          title={t("cta.title")}
+          subtitle={t("cta.subtitle")}
+          actions={
+            <>
+              <Cta
+                href={`/${locale}/threads`}
+                label={t("close.cta", { appName })}
+              />
+              <Cta
+                href={`/${locale}/help`}
+                label={t("feedback.cta")}
+                variant="secondary"
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

@@ -11,8 +11,6 @@ export const translations = {
   },
   hero: {
     backToBlog: "Back to Blog",
-    brand: "{{appName}} - ",
-    icon: "📊",
     category: "For Affiliate Pros",
     readTime: "6 min read",
     title:
@@ -50,7 +48,7 @@ export const translations = {
   structure: {
     title: "The full commission structure",
     p1: "Direct referral: 10% of every payment from people you refer directly. This is yours always, for life, regardless of anything else.",
-    p2: "Skill bonus: if someone signs up through a skill you published, you earn an additional 5% on their payments - 15% total from that user. Skills are shareable AI presets anyone can create and publish. Critical detail for affiliate pros: you earn the 5% as the skill author even when someone else shares your skill link. A user discovers your skill in the directory and shares it - you still get credited. Skill authorship is tracked by the platform, not by who distributed the link. This creates passive attribution you don't have to actively manage.",
+    p2: "Skill bonus: if someone signs up through another member's link to a skill you published, you earn 5% on their payments - on top of the 10% that member earns. Skills are shareable AI presets anyone can create and publish. Critical detail for affiliate pros: you earn the 5% as the skill author even when someone else shares your skill link. A user discovers your skill in the directory and shares it - you still get credited. Skill authorship is tracked by the platform, not by who distributed the link. This creates passive attribution you don't have to actively manage.",
     p3: "Multi-level chain: an additional 10% pool is distributed across up to 5 levels of your referral chain, with geometric decay - each level earns half of the one above it. Your direct referrals' referrals earn you ~5%, their referrals ~2.5%, and so on. Maximum total payout across all earners: ~20% of any single payment.",
     p4: "Honest disclosure: the chain bonuses get small fast. The 10% direct + 5% skill is where the real income is. Don't build a strategy around multi-level depth - build it around quality direct referrals and publishable skills.",
   },
@@ -98,6 +96,5 @@ export const translations = {
     p2: "If your audience overlaps with any of the above, it's worth a code and a post.",
     createCode: "Create your referral code",
     joinDiscord: "Join the Discord",
-    backToBlog: "Back to Blog",
   },
 };

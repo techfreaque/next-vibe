@@ -934,13 +934,11 @@ function StackEntryRenderer({
         }
       }}
     >
-      {/* z-[500] / overlay z-[450]: navigation modals can open from inside a
-          popover (z-[400], e.g. the model selector) - the modal must layer
-          above it and the backdrop must dim the popover */}
-      <DialogContent
-        className="sm:max-w-[600px] max-w-[90vw] max-h-[min(80dvh,calc(100dvh-80px))] overflow-y-auto z-[500]"
-        overlayClassName="z-[450]"
-      >
+      {/* Dialogs share the z-[500] overlay layer with popovers/selects/menus:
+          DOM (open) order stacks them, so a modal opened from the model
+          selector popover covers it, and a select opened inside the modal
+          covers the modal */}
+      <DialogContent className="sm:max-w-[600px] max-w-[90vw] max-h-[min(80dvh,calc(100dvh-80px))] overflow-y-auto">
         {children}
       </DialogContent>
     </Dialog>

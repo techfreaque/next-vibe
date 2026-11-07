@@ -2,22 +2,17 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
-import { Div } from "next-vibe/ui/components/div";
 import { Building } from "next-vibe/ui/components/icons/Building";
-import { FileText } from "next-vibe/ui/components/icons/FileText";
-import { Info } from "next-vibe/ui/components/icons/Info";
-import { Li } from "next-vibe/ui/components/li";
-import { Span } from "next-vibe/ui/components/span";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Strong } from "next-vibe/ui/components/strong";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
-import { Ul } from "next-vibe/ui/components/ul";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
-import { ImprintClientInteraction } from "./_components/imprint-client-content";
+import { LegalCard, LegalDocument, LegalH3, LegalP } from "../_shared/legal";
+import { PrintButton } from "../_shared/print-button";
 import { scopedTranslation } from "./i18n";
 
 interface Props {
@@ -78,158 +73,106 @@ export function TanstackPage({
 }: ImprintPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <Div className="container max-w-4xl mx-auto py-16 px-4">
-        {/* Header with icon */}
-        <Div className="mb-12 text-center">
-          <Div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
-            <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-          </Div>
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("title")}
-          </H1>
-          <P className="text-lg text-gray-600 dark:text-gray-400">
-            {t("lastUpdated")}
-          </P>
-        </Div>
-
-        {/* Main content */}
-        <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
-          <Div className="prose dark:prose-invert max-w-none">
-            <P className="lead text-lg">
-              {t("introduction", {
-                appName: configT("appName"),
-              })}
-            </P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Partnerships Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.partnerships.title")}
-            </H2>
-            <P className="mt-2">{t("sections.partnerships.description")}</P>
-            <Alert variant="default" className="mt-4">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                {t("sections.partnerships.content", {
-                  appName: configT("appName"),
-                })}
-              </AlertDescription>
-            </Alert>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Company Information Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
-              <Building className="h-5 w-5 mr-2" />
-              {t("sections.companyInfo.title")}
-            </H2>
-            <P className="mt-2">
-              {t("sections.companyInfo.description", {
-                appName: configT("appName"),
-              })}
-            </P>
-            <Ul className="flex flex-col gap-2 mt-4">
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{configT("group.name")}</Span>
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{configT("group.legalForm")}</Span>
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                <Span>{configT("group.registrationNumber")}</Span>
-              </Li>
-              {/* <Li className="flex items-start">
-<Span className="mr-2 text-blue-500">•</Span>
-<Span>{t("app.common.company.vatId")}</Span>
-</Li> */}
-              {/* <Li className="flex items-start">
-<Span className="mr-2 text-blue-500">•</Span>
-<Span>{t("app.common.company.registrationCourt")}</Span>
-</Li> */}
-            </Ul>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Contact Information Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.contactInfo.title")}
-            </H2>
-            <P className="mt-2">{t("sections.contactInfo.description")}</P>
-
-            <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
-              <H3 className="font-medium text-lg mb-2">
-                {configT("group.address.title")}
-              </H3>
-              <P>{configT("group.address.street")}</P>
-              <P>{configT("group.address.city")}</P>
-              <P>{configT("group.address.country")}</P>
-              <P>{supportEmail}</P>
-              {/* <P>{t("sections.contactInfo.communication.phone")}</P> */}
-            </Div>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Responsible Person Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.responsiblePerson.title")}
-            </H2>
-            <P className="mt-2">
-              {t("sections.responsiblePerson.description")}
-            </P>
-            <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
-              <P>
+    <LegalDocument
+      eyebrow={t("meta.category")}
+      eyebrowIcon={Building}
+      title={t("title")}
+      lastUpdated={t("lastUpdated")}
+      tocLabel={t("onThisPage")}
+      actions={
+        <PrintButton label={t("printButton")} ariaLabel={t("printAriaLabel")} />
+      }
+      intro={<LegalP>{t("introduction", { appName })}</LegalP>}
+      sections={[
+        {
+          id: "company",
+          title: t("sections.companyInfo.title"),
+          content: (
+            <>
+              <LegalP>
+                {t("sections.companyInfo.description", { appName })}
+              </LegalP>
+              <LegalCard>
+                <Strong>{configT("group.name")}</Strong>
+                <P>{configT("group.legalForm")}</P>
+                <P>{configT("group.registrationNumber")}</P>
+              </LegalCard>
+            </>
+          ),
+        },
+        {
+          id: "contact",
+          title: t("sections.contactInfo.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.contactInfo.description")}</LegalP>
+              <LegalCard>
+                <Strong>{configT("group.address.title")}</Strong>
+                <P>{configT("group.address.street")}</P>
+                <P>{configT("group.address.city")}</P>
+                <P>{configT("group.address.country")}</P>
+                <ExternalLink
+                  href={`mailto:${supportEmail}`}
+                  className="mt-2 inline-flex min-h-11 items-center font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {supportEmail}
+                </ExternalLink>
+              </LegalCard>
+            </>
+          ),
+        },
+        {
+          id: "responsible-person",
+          title: t("sections.responsiblePerson.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.responsiblePerson.description")}</LegalP>
+              <LegalCard>
                 <Strong>{configT("group.responsiblePerson.name")}</Strong>
-              </P>
-              <P>{configT("group.address.addressIn1Line")}</P>
-            </Div>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Dispute Resolution Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.disputeResolution.title")}
-            </H2>
-            <P className="mt-2">
-              {t("sections.disputeResolution.description")}
-            </P>
-            <P className="mt-4">{t("sections.disputeResolution.content")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            {/* Disclaimer Section */}
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
-              <FileText className="h-5 w-5 mr-2" />
-              {t("sections.disclaimer.title")}
-            </H2>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("sections.disclaimer.liability.title")}
-            </H3>
-            <P className="mt-2">{t("sections.disclaimer.liability.content")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("sections.disclaimer.links.title")}
-            </H3>
-            <P className="mt-2">{t("sections.disclaimer.links.content")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("sections.disclaimer.copyright.title")}
-            </H3>
-            <P className="mt-2">{t("sections.disclaimer.copyright.content")}</P>
-          </Div>
-        </Div>
-
-        {/* Client component for interactive elements only */}
-        <ImprintClientInteraction locale={locale} />
-      </Div>
-    </Div>
+                <P>{configT("group.address.addressIn1Line")}</P>
+              </LegalCard>
+            </>
+          ),
+        },
+        {
+          id: "partnerships",
+          title: t("sections.partnerships.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.partnerships.description")}</LegalP>
+              <LegalP>{t("sections.partnerships.content", { appName })}</LegalP>
+            </>
+          ),
+        },
+        {
+          id: "dispute-resolution",
+          title: t("sections.disputeResolution.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.disputeResolution.description")}</LegalP>
+              <LegalP>{t("sections.disputeResolution.content")}</LegalP>
+            </>
+          ),
+        },
+        {
+          id: "disclaimer",
+          title: t("sections.disclaimer.title"),
+          content: (
+            <>
+              <LegalH3>{t("sections.disclaimer.liability.title")}</LegalH3>
+              <LegalP>{t("sections.disclaimer.liability.content")}</LegalP>
+              <LegalH3>{t("sections.disclaimer.links.title")}</LegalH3>
+              <LegalP>{t("sections.disclaimer.links.content")}</LegalP>
+              <LegalH3>{t("sections.disclaimer.copyright.title")}</LegalH3>
+              <LegalP>{t("sections.disclaimer.copyright.content")}</LegalP>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 

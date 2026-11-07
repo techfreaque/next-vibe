@@ -7,6 +7,7 @@ import {
   filterRoleModels,
   getProviderPrice,
   type ModelDefinition,
+  type ModelOptionBase,
   type ModelOptionCreditBased,
   type ModelOptionTokenBased,
 } from "../models/models";
@@ -16,9 +17,14 @@ import {
   sharedFilterPropsSchema,
 } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
-import { chatModelDefinitions, ChatModelId } from "./models-definitions";
+import { ModelUtility } from "../models/enum";
+import {
+  chatModelDefinitions,
+  ChatModelId,
+  chatModelSuccessors,
+} from "./models-definitions";
 
-export { chatModelDefinitions, ChatModelId };
+export { chatModelDefinitions, ChatModelId, chatModelSuccessors };
 
 /**
  * Featured models by category for use in marketing content, emails, etc.
@@ -26,20 +32,22 @@ export { chatModelDefinitions, ChatModelId };
 export const FEATURED_MODELS = {
   // Representative picks per category - used in marketing content and emails
   mainstream: [
-    chatModelDefinitions[ChatModelId.CLAUDE_OPUS_4_7].name,
-    chatModelDefinitions[ChatModelId.GPT_5_5_PRO].name,
-    chatModelDefinitions[ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS].name,
-    chatModelDefinitions[ChatModelId.GROK_4_20].name,
+    chatModelDefinitions[ChatModelId.CLAUDE_OPUS_5_5].name,
+    chatModelDefinitions[ChatModelId.GPT_6_ASTRA].name,
+    chatModelDefinitions[ChatModelId.GEMINI_4_ARGON].name,
+    chatModelDefinitions[ChatModelId.GROK_4_7].name,
   ],
   open: [
-    chatModelDefinitions[ChatModelId.DEEPSEEK_R1].name,
-    chatModelDefinitions[ChatModelId.DEEPSEEK_V4_PRO].name,
-    chatModelDefinitions[ChatModelId.GLM_5].name,
+    chatModelDefinitions[ChatModelId.KIMI_K3_1_PRO].name,
+    chatModelDefinitions[ChatModelId.DEEPSEEK_V4_1_FLASH].name,
+    chatModelDefinitions[ChatModelId.GLM_5_3].name,
   ],
+  // Enabled + servable only (Venice / NanoGPT), strongest abliterated first.
   uncensored: [
+    chatModelDefinitions[ChatModelId.GLM_5_3_UNCENSORED].name,
+    chatModelDefinitions[ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED]
+      .name,
     chatModelDefinitions[ChatModelId.UNCENSORED_LM_V1_2].name,
-    chatModelDefinitions[ChatModelId.FREEDOMGPT_LIBERTY].name,
-    chatModelDefinitions[ChatModelId.GAB_AI_ARYA].name,
     chatModelDefinitions[ChatModelId.VENICE_UNCENSORED].name,
   ],
 } as const;
@@ -231,10 +239,113 @@ export const chatModelSelectionSchema: z.ZodType<
 ]);
 
 // ============================================================
+// LEGACY → SUCCESSOR RESOLUTION
+// ============================================================
+
+/** True when the model is flagged ModelUtility.LEGACY (hidden from pickers, still resolvable). */
+export function isLegacyChatModel(modelId: ChatModelId): boolean {
+  const def = chatModelDefinitions[modelId];
+  if (!def) {
+    return false;
+  }
+  return def.utilities.includes(ModelUtility.LEGACY);
+}
+
+/**
+ * Follow the legacy → successor chain to the current model. Returns the input
+ * id unchanged for current models and for legacy models without a successor.
+ * Pure + static: callers that must honour provider availability use
+ * filterChatModels / resolveChatModelForUser, which fall back to the legacy id
+ * when its successor cannot be served.
+ */
+export function resolveChatModelSuccessor(modelId: ChatModelId): ChatModelId {
+  let current = modelId;
+  const seen = new Set<ChatModelId>([current]);
+  let next = chatModelSuccessors[current];
+  while (next && !seen.has(next)) {
+    seen.add(next);
+    current = next;
+    next = chatModelSuccessors[current];
+  }
+  return current;
+}
+
+/**
+ * Resolve an explicitly chosen model id for a user: legacy ids map to their
+ * successor when the successor is servable for this user/env, otherwise the
+ * original id is kept (no silent swap to an unrelated model).
+ */
+export function resolveChatModelForUser(
+  modelId: ChatModelId,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): ChatModelId {
+  const successorId = resolveChatModelSuccessor(modelId);
+  if (successorId === modelId) {
+    return modelId;
+  }
+  const best = getBestChatModel(
+    { selectionType: ModelSelectionType.MANUAL, manualModelId: modelId },
+    user,
+    availability,
+  );
+  return best && (best.id === successorId || best.id === modelId)
+    ? best.id
+    : modelId;
+}
+
+// ============================================================
 // CHAT MODEL RESOLUTION
 // ============================================================
 
-/** Get all chat models matching a selection (MANUAL falls back to FILTERS if unavailable). */
+/** Selection shape accepted by filterRoleModels (any role). */
+type RoleModelSelection = NonNullable<Parameters<typeof filterRoleModels>[1]>;
+
+/**
+ * filterRoleModels with legacy → successor resolution for MANUAL picks.
+ * Works for every pool whose ids are chat model ids (chat + vision bridges):
+ * a MANUAL pick of a legacy model resolves to its successor when the successor
+ * is in this pool and servable; otherwise the original pick resolves as before
+ * (legacy model itself, then the filter fallback).
+ */
+export function filterRoleModelsWithSuccessor<
+  TOption extends ModelOptionBase,
+  TSelection extends RoleModelSelection,
+>(
+  pool: TOption[],
+  selection: TSelection | null | undefined,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): TOption[] {
+  const manualId =
+    selection?.selectionType === ModelSelectionType.MANUAL
+      ? selection.manualModelId
+      : undefined;
+  const chatId = manualId
+    ? Object.values(ChatModelId).find((id) => id === manualId)
+    : undefined;
+  if (selection && chatId) {
+    const successorId = resolveChatModelSuccessor(chatId);
+    if (successorId !== chatId && pool.some((m) => m.id === successorId)) {
+      const viaSuccessor = filterRoleModels(
+        pool,
+        { ...selection, manualModelId: successorId },
+        user,
+        availability,
+      );
+      if (viaSuccessor[0]?.id === successorId) {
+        return viaSuccessor;
+      }
+    }
+  }
+  return filterRoleModels(pool, selection, user, availability);
+}
+
+/**
+ * Get all chat models matching a selection (MANUAL falls back to FILTERS if unavailable).
+ * MANUAL picks of a legacy model resolve to its successor first; when the
+ * successor is not servable the legacy model itself is used if it still is.
+ */
 export function filterChatModels(
   selection: ChatModelSelection,
   user: JwtPayloadType,
@@ -245,7 +356,7 @@ export function filterChatModels(
         (m) => m.apiProvider === ApiProvider.UNBOTTLED,
       )
     : chatModelOptionsPool;
-  return filterRoleModels(pool, selection, user, availability);
+  return filterRoleModelsWithSuccessor(pool, selection, user, availability);
 }
 
 /** Get best chat model from a selection. */

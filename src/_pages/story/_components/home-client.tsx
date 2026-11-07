@@ -3,16 +3,21 @@
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Main } from "next-vibe/ui/components/main";
-import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { getElementById } from "next-vibe/ui/lib/dom";
-import { getCurrentUrl, silentReplaceState } from "next-vibe/ui/lib/location";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { SITE_FOOTER_ID } from "../constants";
-import type { ActiveSide } from "./split-hero";
-import { SplitHero } from "./split-hero";
-import { UniverseContent } from "./universe-content";
+import { CapabilityShowcase } from "./capability-showcase";
+import { HomeHero } from "./home-hero";
+import {
+  HomeFaq,
+  HowItWorks,
+  MoreWaysIn,
+  PricingTeaser,
+} from "./home-sections";
+import { ProblemStatement } from "./problem-statement";
+import { UnbottledCta } from "./tab-unbottled";
 
 interface HomeClientProps {
   locale: CountryLanguage;
@@ -23,13 +28,24 @@ interface HomeClientProps {
   hasUser: boolean;
 }
 
-const VALID_TABS = ["unbottled", "personal", "nextvibe", "referral"] as const;
-type TabId = (typeof VALID_TABS)[number];
+/** Old home tabs (?tab=...) now live on their own pages */
+const LEGACY_TAB_PATHS: Record<string, string> = {
+  personal: "/story/self-host",
+  nextvibe: "/story/framework",
+  referral: "/story/earn",
+};
 
-function isValidTab(value: string | null): value is TabId {
-  return VALID_TABS.includes(value as TabId);
+function scrollToHow(): void {
+  getElementById("how-it-works")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
 }
 
+/**
+ * Home v2 - sells the chat product end to end:
+ * hero → why → how it works → what it can do → pricing → beyond chat → FAQ → CTA.
+ */
 export function HomeClient({
   locale,
   totalToolCount,
@@ -38,77 +54,45 @@ export function HomeClient({
   modelCountsByTier,
   hasUser,
 }: HomeClientProps): JSX.Element {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
-  const [activeSide, setActiveSide] = useState<ActiveSide>(
-    isValidTab(tabParam) ? tabParam : null,
-  );
+  const router = useRouter();
+  const tabParam = useSearchParams().get("tab");
 
   useEffect(() => {
-    const el = getElementById(SITE_FOOTER_ID);
-    if (el) {
-      el.style.display = activeSide === null ? "none" : "";
+    const target = tabParam ? LEGACY_TAB_PATHS[tabParam] : undefined;
+    if (target) {
+      router.replace(`/${locale}${target}`);
     }
-    return (): void => {
-      if (el) {
-        el.style.display = "";
-      }
-    };
-  }, [activeSide]);
-
-  // Sync active side when the ?tab= param changes (adjust state during render)
-  const [prevTabParam, setPrevTabParam] = useState(tabParam);
-  if (tabParam !== prevTabParam) {
-    setPrevTabParam(tabParam);
-    if (isValidTab(tabParam)) {
-      setActiveSide(tabParam);
-    }
-  }
-
-  useEffect(() => {
-    if (isValidTab(tabParam)) {
-      setTimeout(() => {
-        const el = getElementById("universe-content");
-        el?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 150);
-    }
-  }, [tabParam]);
-
-  function handleSideChange(side: ActiveSide): void {
-    setActiveSide(side);
-    if (side !== null) {
-      const url = new URL(getCurrentUrl());
-      url.searchParams.set("tab", side);
-      url.hash = "universe-content";
-      silentReplaceState(url.toString());
-      setTimeout(() => {
-        const el = getElementById("universe-content");
-        el?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    } else {
-      const url = new URL(getCurrentUrl());
-      url.searchParams.delete("tab");
-      url.hash = "";
-      silentReplaceState(url.toString());
-    }
-  }
+  }, [tabParam, locale, router]);
 
   return (
-    <Main className="flex flex-col w-full">
-      <SplitHero
-        locale={locale}
-        totalToolCount={totalToolCount}
-        totalModelCount={totalModelCount}
-        onSideChange={handleSideChange}
-      />
-      <UniverseContent
+    <Main className="flex w-full flex-col">
+      <HomeHero
         locale={locale}
         totalToolCount={totalToolCount}
         totalModelCount={totalModelCount}
         totalProviderCount={totalProviderCount}
         modelCountsByTier={modelCountsByTier}
-        activeSide={activeSide}
-        onSideChange={handleSideChange}
+        onSeeHow={scrollToHow}
+      />
+      <ProblemStatement locale={locale} />
+      <HowItWorks locale={locale} totalModelCount={totalModelCount} />
+      <CapabilityShowcase
+        locale={locale}
+        totalToolCount={totalToolCount}
+        totalModelCount={totalModelCount}
+        totalProviderCount={totalProviderCount}
+        modelCountsByTier={modelCountsByTier}
+      />
+      <PricingTeaser locale={locale} />
+      <MoreWaysIn locale={locale} />
+      <HomeFaq
+        locale={locale}
+        totalModelCount={totalModelCount}
+        totalProviderCount={totalProviderCount}
+      />
+      <UnbottledCta
+        locale={locale}
+        totalModelCount={totalModelCount}
         hasUser={hasUser}
       />
     </Main>

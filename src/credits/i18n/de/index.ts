@@ -222,9 +222,13 @@ export const translations: typeof enTranslations = {
       description: "Ihr aktuelles Credit-Guthaben und Aufschlüsselung",
     },
     balance: {
-      title: "Ihr Credit-Guthaben",
+      subscribe: "Pläne ansehen",
+      freePlanHint:
+        "{{count}} Gratis-Credits pro Monat. Mit Abo {{subCredits}} plus Aufladepakete.",
+      freePlan: "Du nutzt den Gratis-Plan",
+      title: "Deine Credits",
       adminTitle: "Ausgabenlimit",
-      description: "Nutzen Sie Ihre Credits bei {{modelCount}} KI-Modellen",
+      description: "Ein Guthaben für alle {{modelCount}} Modelle.",
       adminDescription:
         "Credits wirken als Ausgabenlimit - kontrollieren Sie die erlaubte KI-Nutzung aller Benutzer.",
       credit: "{{count}} Credit",
@@ -333,6 +337,7 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      emptyHint: "Jeder Credit, der rein- oder rausgeht, landet hier.",
       title: "Credit-Verlauf abrufen",
       titleShort: "Verlauf",
       description: "Paginierten Credit-Transaktionsverlauf abrufen",
@@ -340,7 +345,7 @@ export const translations: typeof enTranslations = {
         title: "Credit-Verlauf",
         description: "Ihren Credit-Transaktionsverlauf anzeigen",
       },
-      emptyState: "Noch keine Credit-Transaktionen",
+      emptyState: "Noch keine Transaktionen",
       balance: "Guthaben danach: {{count}}",
       limit: {
         label: "Limit",

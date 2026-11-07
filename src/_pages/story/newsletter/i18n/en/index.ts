@@ -1,57 +1,54 @@
 export const translations = {
   emailPlaceholder: "Enter your email",
   page: {
-    title: "Stay Updated with {{appName}}",
-    description: "Get the latest AI news, updates, and tips",
-    subtitle: "Get the latest AI news and updates",
+    eyebrow: "The {{appName}} newsletter",
+    title: "One email a month. Only what changed.",
+    description: "New models, new features, prompts that work - monthly.",
+    subtitle: "New models, new features, prompts that work.",
     heroDescription:
-      "Join our newsletter to receive updates about new AI models, features, and tips for getting the most out of uncensored AI chat.",
+      "New models the day they land, features worth knowing, setups that actually get results. Once a month. Unsubscribe in one click.",
     invalidEmail: {
-      title: "Invalid Email",
-      description:
-        "The email address provided is not valid. Please check and try again.",
+      title: "Invalid email",
+      description: "That address doesn't look right. Check it and try again.",
     },
     emailProvided: {
-      title: "Manage Your Subscription",
-      description:
-        "Update your newsletter preferences or unsubscribe at any time.",
+      title: "Manage your subscription",
+      description: "Change your newsletter settings or unsubscribe any time.",
     },
-    unsubscribeText: "Want to unsubscribe?",
-    unsubscribeLink: "Click here",
+    unsubscribeText: "Want out?",
+    unsubscribeLink: "Unsubscribe here",
+    privacyNote: "No spam. No sharing your address. Ever.",
     cta: {
-      title: "Ready to Stay Informed?",
-      description:
-        "Join thousands of AI enthusiasts getting the latest updates",
+      title: "Get the next issue.",
+      description: "One email a month. Zero filler.",
       subscribeButton: "Subscribe",
     },
     benefits: {
-      title: "What You'll Get",
-      subtitle: "Stay ahead with exclusive AI insights",
+      title: "What lands in your inbox",
+      subtitle: "Four things. Nothing else.",
       benefit1: {
-        title: "New AI Model Announcements",
+        title: "New models, first",
         description:
-          "Be the first to know when we add new AI models to the platform.",
+          "Every model we add - what it's good at, what it costs, when to pick it.",
       },
       benefit2: {
-        title: "Feature Updates",
-        description:
-          "Get notified about new features, improvements, and platform updates.",
+        title: "Features that shipped",
+        description: "What changed, why it matters, how to use it today.",
       },
       benefit3: {
-        title: "AI Tips & Tricks",
+        title: "Prompts that work",
         description:
-          "Learn how to get better results from AI with our expert tips and use cases.",
+          "Real setups and skills that get results - copy them, tweak them, ship.",
       },
       benefit4: {
-        title: "Exclusive Offers",
-        description:
-          "Receive special discounts and early access to new features.",
+        title: "Subscriber-only offers",
+        description: "Discounts and early access before anyone else.",
       },
     },
     frequency: {
-      title: "Email Frequency",
+      title: "Monthly. That's it.",
       description:
-        "We send newsletters monthly. You can unsubscribe at any time.",
+        "One email per month. Unsubscribe any time - one click, no questions.",
     },
   },
   subscription: {

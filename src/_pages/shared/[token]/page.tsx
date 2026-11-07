@@ -89,7 +89,7 @@ export async function tanstackLoader({
   // Check if authentication is required but user is not authenticated
   if (shareLink.requireAuth && user.isPublic) {
     const returnUrl = encodeURIComponent(`/${locale}/shared/${token}`);
-    redirect(`/${locale}/user/auth?returnUrl=${returnUrl}`);
+    redirect(`/${locale}/user/login?callbackUrl=${returnUrl}`);
   }
 
   redirect(`/${locale}/threads/shared/${thread.id}`);

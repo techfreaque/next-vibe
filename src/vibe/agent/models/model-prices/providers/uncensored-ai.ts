@@ -1,9 +1,9 @@
 /**
  * Uncensored AI price fetcher.
  *
- * Scrapes pricing info from the JS bundle at https://uncensored.ai/api
- * The page is JS-rendered (React SPA), so we extract data from the
- * compiled JavaScript bundle instead of HTML.
+ * Scrapes pricing info from the JS bundles behind https://uncensored.ai/api
+ * The page is a code-split React SPA, so we read the main bundle plus its
+ * lazy API/pricing chunks instead of HTML.
  *
  * Current pricing (as of 2026-04):
  *   Model: uncensored-lm (UncensoredAI v1.2)
@@ -87,7 +87,27 @@ export class UncensoredAiPriceFetcher extends PriceFetcher {
         };
       }
 
-      const js = await bundleResponse.text();
+      const mainJs = await bundleResponse.text();
+
+      // The SPA code-splits its pages: the "$X per inference" copy lives in a
+      // lazy chunk (ApiManagement-*.js today). Pull the API/pricing chunks too.
+      const chunkNames = [
+        ...new Set(
+          [
+            ...mainJs.matchAll(/import\("\.\/((?:Api|Pricing)[\w-]*\.js)"\)/g),
+          ].map((m) => m[1]),
+        ),
+      ];
+      const chunks = await Promise.all(
+        chunkNames.map(async (name) => {
+          // oxlint-disable-next-line restricted/no-raw-fetch
+          const res = await fetch(`https://uncensored.ai/assets/${name}`, {
+            headers: { "User-Agent": "Mozilla/5.0 (compatible)" },
+          });
+          return res.ok ? res.text() : "";
+        }),
+      );
+      const js = [mainJs, ...chunks].join("\n");
 
       // Extract pricing: "$0.05 per inference" pattern
       const priceMatch = js.match(/\$(\d+\.?\d*)\s*per\s*inference/i);
@@ -97,7 +117,7 @@ export class UncensoredAiPriceFetcher extends PriceFetcher {
       }
 
       // Extract context length: "32,768 tokens" or "32768 tokens"
-      const contextMatch = js.match(/([\d,]+)\s*tokens/);
+      const contextMatch = js.match(/"([\d,]{4,})\s*tokens"/);
       if (contextMatch) {
         contextLength = parseInt(contextMatch[1].replaceAll(",", ""), 10);
         // Filter out obviously wrong matches (React internals have small numbers)

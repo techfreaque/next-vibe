@@ -9,7 +9,6 @@ import { H2, H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
 
 import {
   ENDPOINT_PLATFORMS,
@@ -921,7 +920,7 @@ function FileViewer({
           </Button>
         ))}
       </Div>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <MotionDiv
           key={activeFile}
           initial={{ opacity: 0 }}
@@ -965,7 +964,7 @@ function SourceExamples({ t }: { t: TFn }): JSX.Element {
           </Button>
         ))}
       </Div>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <MotionDiv
           key={activeExample}
           initial={{ opacity: 0, y: 6 }}
@@ -983,7 +982,6 @@ function SourceExamples({ t }: { t: TFn }): JSX.Element {
 
 export function Architecture({ locale }: ArchitectureProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 });
   const [activePlatform, setActivePlatform] =
     useState<EndpointPlatformKey>("webApi");
 
@@ -999,15 +997,15 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
   const ActivePanel = PLATFORM_PANELS[activePlatform];
 
   return (
-    <Div className="relative overflow-hidden bg-muted/20" ref={ref as never}>
+    <Div className="relative overflow-hidden bg-muted/20">
       <Div className="absolute inset-0 bg-linear-to-b from-background via-transparent to-background pointer-events-none" />
 
       <Div className="container relative px-4 md:px-6 py-24 md:py-32">
         {/* Header */}
         <MotionDiv
           className="text-center mb-14"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <Div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary mb-6">
@@ -1028,8 +1026,8 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
         {/* Source examples */}
         <MotionDiv
           className="mb-10"
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.5 }}
         >
           <SourceExamples t={t} />
@@ -1038,8 +1036,8 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
         {/* Arrow divider */}
         <MotionDiv
           className="flex justify-center mb-10"
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
+          initial={false}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.4 }}
         >
           <Div className="flex flex-col items-center gap-1">
@@ -1054,8 +1052,8 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
         {/* Interactive platform explorer */}
         <MotionDiv
           className="mx-auto max-w-6xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <Div className="rounded-2xl border-2 border-border bg-card shadow-xl overflow-hidden">
@@ -1100,7 +1098,7 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
                 </Div>
 
                 {/* Panel */}
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                   <MotionDiv
                     key={activePlatform}
                     initial={{ opacity: 0, x: 8 }}
@@ -1120,7 +1118,7 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
                   activeMeta.bgColor,
                 )}
               >
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                   <MotionDiv
                     key={activePlatform}
                     initial={{ opacity: 0, y: 8 }}
@@ -1164,8 +1162,8 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
         {/* Bottom callout */}
         <MotionDiv
           className="mx-auto max-w-3xl text-center mt-14"
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.4 }}
         >
           <Div className="rounded-xl border bg-card p-6 md:p-8 shadow-sm">

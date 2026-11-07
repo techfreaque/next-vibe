@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "addresses",
 
   list: {
-    title: "Moje adresy",
+    title: "Adresy rozliczeniowe",
     titleShort: "Moje adresy",
     description: "Lista zapisanych adresów",
     response: {
@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
       billing: "Rozliczeniowy",
       delivery: "Dostawczy",
       empty: "Brak zapisanych adresów",
-      emptyHint: "Zapisz adresy, by szybciej składać zamówienia",
+      emptyHint: "Zapisz raz i nie wpisuj go przy płatności.",
       emptyCta: "Dodaj pierwszy adres",
       loading: "Ładowanie adresów…",
     },

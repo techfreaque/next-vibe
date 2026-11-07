@@ -12,8 +12,6 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Wróć do bloga",
-    brand: "{{appName}} - ",
-    icon: "📊",
     category: "Dla profesjonalistów afiliacyjnych",
     readTime: "6 min czytania",
     title: "Jestem marketerem afiliacyjnym. Co różni subskrypcje AI?",
@@ -50,7 +48,7 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "Pełna struktura prowizji",
     p1: "Bezpośrednie polecenie: 10% każdej płatności od osób, które polecasz bezpośrednio. To zawsze Twoje, wiecznie, niezależnie od wszystkiego innego.",
-    p2: "Bonus za skill: jeśli ktoś zarejestrował się przez skill, który opublikowałeś/aś, zarabiasz dodatkowo 5% na ich płatnościach - łącznie 15% od tego użytkownika. Skille to konfigurowalne ustawienia AI, które każdy może tworzyć i publikować. Kluczowy szczegół dla affiliate profesjonalistów: zarabiasz 5% jako autor skilla, nawet gdy ktoś inny udostępnia Twój link. Użytkownik odkrywa Twój skill w katalogu i przekazuje go dalej - i tak zostaniesz zaliczony. Platforma śledzi autorstwo skilla, nie kto dystrybuował link. Pasywna atrybucja, którą nie musisz aktywnie zarządzać.",
+    p2: "Bonus za skill: jeśli ktoś zarejestruje się przez link innego członka do skilla, który opublikowałeś/aś, zarabiasz 5% od jego płatności - niezależnie od 10% dla tego członka. Skille to konfigurowalne ustawienia AI, które każdy może tworzyć i publikować. Kluczowy szczegół dla affiliate profesjonalistów: zarabiasz 5% jako autor skilla, nawet gdy ktoś inny udostępnia Twój link. Użytkownik odkrywa Twój skill w katalogu i przekazuje go dalej - i tak zostaniesz zaliczony. Platforma śledzi autorstwo skilla, nie kto dystrybuował link. Pasywna atrybucja, którą nie musisz aktywnie zarządzać.",
     p3: "Łańcuch wielopoziomowy: dodatkowa 10% pula jest rozdzielana na do 5 poziomów łańcucha poleceń, z geometrycznym spadkiem - każdy poziom zarabia połowę poziomu powyżej. Polecenia Twoich poleceń przynoszą Ci ~5%, ich polecenia ~2,5% itd. Maksymalna łączna wypłata dla wszystkich: ~20% jednej płatności.",
     p4: "Uczciwe wyjaśnienie: bonusy łańcucha szybko maleją. Prawdziwy dochód to 10% bezpośrednio + 5% skill. Nie buduj strategii wokół głębokości wielopoziomowej - buduj ją wokół jakościowych bezpośrednich poleceń i wartościowych skillów.",
   },
@@ -99,6 +97,5 @@ export const translations: typeof enTranslations = {
     p2: "Jeśli Twoi odbiorcy pokrywają się z którymkolwiek z powyższych segmentów, jeden kod i post są warte wysiłku.",
     createCode: "Utwórz kod polecający",
     joinDiscord: "Dołącz do Discorda",
-    backToBlog: "Wróć do bloga",
   },
 };

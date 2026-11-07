@@ -61,7 +61,8 @@ export const translations: typeof enTranslations = {
   widget: {
     title: "Fernverbindungen",
     addButton: "Verbindung hinzufügen",
-    emptyState: "Noch keine Fernverbindungen.",
+    emptyState:
+      "Verknüpfe eine weitere Instanz – Erinnerungen und Tools synchronisieren sich jede Minute in beide Richtungen.",
     emptyStateCloud:
       "Verknüpfe deine lokale Installation hier, sobald sie läuft. Deine Erinnerungen und Tools synchronisieren sich automatisch.",
     connectedBadge: "Verbunden",
@@ -132,7 +133,7 @@ export const translations: typeof enTranslations = {
       benefit1: "Erinnerungen synchronisieren sich bidirektional, automatisch",
       benefit2: "Cloud-KI entdeckt und führt deine lokalen Tools aus",
       benefit3: "Delegiere Aufgaben von der Cloud an diesen Rechner",
-      noConnectionsYet: "Noch keine Verbindungen.",
+      noConnectionsYet: "Noch nichts verknüpft",
       connectionsTitle: "Verknüpfte Verbindungen",
     },
     selfIdentity: {

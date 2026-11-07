@@ -34,8 +34,8 @@ export function Navbar({
   hideUserMenu = false,
 }: NavbarProps): JSX.Element {
   return (
-    <Div className="sticky top-0 z-50 w-full transition-all duration-300 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-sm">
-      <Div className="container flex h-16 md:h-20 items-center justify-between px-4 lg:px-6">
+    <Div className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70">
+      <Div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
         {/* Logo */}
         <Div className="flex items-center gap-2 shrink-0">
           <Logo locale={locale} pathName="" />

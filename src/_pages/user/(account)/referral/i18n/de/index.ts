@@ -1,17 +1,17 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   backToChat: "Zurück zum Chat",
-  title: "Deine Empfehlungskette. Wiederkehrend. Für immer.",
+  title: "Link teilen. {{directPct}} von jeder Zahlung. Für immer.",
   description:
-    "Jemanden empfehlen → {{directPct}} jeder Zahlung, die er je macht. Skill veröffentlichen, über den er sich anmeldet → {{skillPct}} gesamt. Deren Empfehlungen bringen dir auch was, Ebene für Ebene. Kein Ablaufdatum. Kein Limit.",
+    "Wer sich über deinen Link anmeldet, bringt dir {{directPct}} jeder Zahlung. Kein Ablaufdatum, keine Obergrenze. Veröffentlichst du einen Skill, bekommst du {{skillBonusPct}} auf Nutzer, die andere darüber bringen.",
   tagline: "Empfehlungen & Skills",
 
   hero: {
     directEarning: "Du verdienst",
     directLabel: "auf jede Zahlung",
     directNote: "von Personen, die du empfiehlst, für immer",
-    bonusEarning: "Via Skill-Link",
-    bonusNote: "direkt + Skill-Bonus, wiederkehrend für immer",
+    bonusEarning: "Als Skill-Ersteller",
+    bonusNote: "wenn andere deinen Skill teilen, für immer",
   },
 
   commissionTable: {
@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
     whoLabel5: "Ebene 6",
     colExample: "Beispiel ({{examplePrice}}/Monat)",
     tableNote:
-      "Empfehlungslink: {{directPct}} pro Nutzer. Skill-Link: {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer. Beides wiederkehrend, für immer.",
+      "Empfehlungslink: {{directPct}} pro Nutzer. Dein Skill, von anderen geteilt: {{skillBonusPct}} pro Nutzer. Beides wiederkehrend, für immer.",
   },
 
   commission: {
@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
       "Einzigartige Codes für verschiedene Zielgruppen - Freunde, Discord, ein Blog-Beitrag. Jeder separat getrackt.",
     step2Title: "Link teilen",
     step2Body:
-      "Empfehlungslink → {{directPct}} pro Nutzer, für immer. Skill-Link → {{skillPct}} pro Nutzer ({{directPct}} + {{skillBonusPct}} Skill-Bonus). Zwei Quellen, ein Link.",
+      "Empfehlungslink → {{directPct}} pro Nutzer, für immer. Dein Skill, von anderen geteilt → {{skillBonusPct}} pro Nutzer. Zwei Quellen, null Mehraufwand.",
     step3Title: "Bezahlt werden",
     step3Body:
       "Credits sind sofort da. Ab {{minPayout}} in BTC oder USDC auszahlen.",
@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
 
   manage: {
     createSubtitle: "Codes für bestimmte Kampagnen oder Zielgruppen erstellen.",
-    codesSubtitle: "Performance und Einnahmen für jeden Code verfolgen.",
+    codesSubtitle: "Link kopieren, teilen, mitverdienen.",
   },
   createCode: {
     title: "Empfehlungscode erstellen",
@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
     creating: "Wird erstellt...",
   },
   myCodes: {
-    title: "Deine Empfehlungscodes",
+    title: "Deine Links",
     loading: "Lädt...",
     error: "Codes konnten nicht geladen werden",
     empty: "Noch keine Codes. Ersten Code oben erstellen ↑",
@@ -145,12 +145,12 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Konto erstellen und anfangen zu verdienen",
     description:
-      "Empfehlungslink holen. {{directPct}} auf jede Zahlung - wiederkehrend, ohne Ablauf. Skill veröffentlichen und {{skillPct}} verdienen.",
+      "Empfehlungslink holen. {{directPct}} auf jede Zahlung - wiederkehrend, ohne Ablauf. Skill veröffentlichen und {{skillBonusPct}} verdienen, wenn andere ihn teilen.",
     signUp: "Konto erstellen",
     logIn: "Anmelden",
     pitch1: "{{directPct}} Empfehlungsprovision - wiederkehrend, kein Ablauf",
     pitch2:
-      "Skill veröffentlichen → {{skillPct}} von jedem, der sich darüber anmeldet",
+      "Skill veröffentlichen → {{skillBonusPct}} von jedem, den andere darüber bringen",
     pitch3: "Credits sofort. BTC/USDC ab {{minPayout}} Minimum.",
   },
   payout: {
@@ -170,9 +170,9 @@ export const translations: typeof enTranslations = {
     newBody:
       "Code teilen. Jeder, der sich anmeldet und zahlt, bringt dir {{directPct}} jeder Zahlung, jeden Monat, für immer. Einmal gepostet. Für immer verdient.",
     newCta: "Deinen Empfehlungslink holen",
-    proTitle: "Skill-Link - {{skillPct}} pro Nutzer",
+    proTitle: "Skill-Ersteller - {{skillBonusPct}} pro Nutzer",
     proBody:
-      "Skill bauen. Link teilen. Jeder, der sich darüber anmeldet, zahlt dir {{directPct}} direkt + {{skillBonusPct}} Skill-Bonus = {{skillPct}} pro Nutzer, wiederkehrend. Noch besser: Die {{skillBonusPct}} gehören dir als Skill-Autor, auch wenn jemand anderes deinen Skill teilt. Die Plattform trackt Skill-Autorenschaft - passive Attribution ohne extra Aufwand.",
+      "Skill bauen. Link teilen. Jeder, der sich über deinen eigenen Link anmeldet, zahlt dir {{directPct}}, wiederkehrend. Der Hebel: Teilt jemand anderes deinen Skill mit seinem Link, gehören dir als Skill-Autor trotzdem {{skillBonusPct}}. Die Plattform trackt Skill-Autorenschaft - passive Attribution ohne extra Aufwand.",
     proCta: "Skill bauen",
   },
   discord: {

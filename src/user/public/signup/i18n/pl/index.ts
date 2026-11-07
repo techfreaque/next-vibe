@@ -1,4 +1,3 @@
-import { translations as _componentsTranslations } from "../../widget/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -95,10 +94,9 @@ export const translations: typeof enTranslations = {
   },
   fields: {
     privateName: {
-      label: "Twoja prywatna nazwa",
-      description:
-        "Jak AI będzie się do Ciebie zwracać w prywatnych rozmowach. To zostaje między Tobą a AI - całkowicie prywatne.",
-      placeholder: "Wpisz swoje imię",
+      label: "Imię prywatne",
+      description: "Tak zwraca się do Ciebie AI. Nikt inny tego nie widzi.",
+      placeholder: "np. Ola",
       validation: {
         required: "Prywatna nazwa jest wymagana",
         minLength: "Nazwa musi mieć co najmniej 2 znaki",
@@ -106,10 +104,9 @@ export const translations: typeof enTranslations = {
       },
     },
     publicName: {
-      label: "Twoja publiczna nazwa",
-      description:
-        "Twoja tożsamość w publicznych czatach i na forach. Inni użytkownicy i AI zobaczą tę nazwę. Wybierz mądrze - ona reprezentuje Cię w społeczności.",
-      placeholder: "Wpisz nazwę wyświetlaną",
+      label: "Nazwa publiczna",
+      description: "Widoczna we wspólnych czatach i na forum.",
+      placeholder: "np. ola_tworzy",
       validation: {
         required: "Nazwa wyświetlana jest wymagana",
         minLength: "Nazwa wyświetlana musi mieć co najmniej 2 znaki",
@@ -117,10 +114,9 @@ export const translations: typeof enTranslations = {
       },
     },
     email: {
-      label: "Twój e-mail",
-      description:
-        "Twoje dane logowania i metoda kontaktu. Pozostaje prywatny - nigdy nie będzie udostępniony innym użytkownikom ani AI.",
-      placeholder: "Wpisz adres e-mail",
+      label: "E-mail",
+      description: "Tylko do logowania. Nigdy nie udostępniamy.",
+      placeholder: "ty@przyklad.pl",
       help: "To będzie Twój e-mail do logowania i główna metoda kontaktu",
       validation: {
         required: "E-mail jest wymagany",
@@ -128,10 +124,10 @@ export const translations: typeof enTranslations = {
       },
     },
     password: {
-      label: "Twoje hasło",
+      label: "Hasło",
       description:
-        "Silne hasła chronią Twoje konto. Wkrótce wdrożymy szyfrowanie end-to-end - od tego momentu reset hasła usunie Twoją historię wiadomości, ponieważ tylko Ty posiadasz klucz deszyfrujący. Zapisz je w bezpiecznym miejscu.",
-      placeholder: "Wpisz hasło",
+        "Min. 8 znaków: wielka i mała litera oraz cyfra. Zapisz je bezpiecznie: nadchodzi szyfrowanie end-to-end, a reset hasła usunie wtedy historię.",
+      placeholder: "Ustaw hasło",
       validation: {
         required: "Hasło jest wymagane",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
@@ -139,7 +135,7 @@ export const translations: typeof enTranslations = {
       },
     },
     confirmPassword: {
-      label: "Potwierdź hasło",
+      label: "Powtórz hasło",
       validation: {
         required: "Potwierdź swoje hasło",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
@@ -148,7 +144,7 @@ export const translations: typeof enTranslations = {
     },
 
     acceptTerms: {
-      label: "Akceptuj regulamin",
+      label: "Akceptuję regulamin",
       description: "Nasz regulamin szanuje Twoją wolność i prywatność.",
       termsLink: "regulamin",
       conditionsLink: "politykę prywatności",
@@ -160,16 +156,14 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Subskrybuj newsletter",
-      description:
-        "Sporadyczne aktualizacje o nowych modelach i funkcjach. Bez spamu, tylko to co ważne.",
+      label: "Chcę dostawać nowości",
+      description: "Nowe modele i funkcje. Rzadko. Bez spamu.",
     },
 
     referralCode: {
       label: "Kod polecający (opcjonalnie)",
-      description:
-        "Masz znajomego na unbottled.ai? Wpisz jego kod, żeby go wesprzeć. Dostanie nagrodę za to, że Cię tu przyprowadził.",
-      placeholder: "Wpisz kod polecający (opcjonalnie)",
+      description: "Masz kod od znajomego? Zarobi, gdy zasubskrybujesz.",
+      placeholder: "Wpisz kod",
       labelPrefilled: "Kod polecający",
       descriptionPrefilled:
         "Twoj znajomy dostanie nagrodę, gdy założysz konto.",
@@ -188,9 +182,8 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
-    title: "Witamy w Uncensored AI",
-    description:
-      "Pomóż budować niecenzurowaną, prywatną i naprawdę niezależną AI. unbottled.ai to open source i projekt społecznościowy - Twoja rejestracja wspiera rozwój technologii AI, która szanuje Twoją wolność.",
+    title: "Załóż konto",
+    description: "Każdy model. Twoje zasady. Start za darmo.",
   },
   footer: {
     alreadyHaveAccount: "Masz już konto? Zaloguj się",

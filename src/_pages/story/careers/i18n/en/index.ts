@@ -16,10 +16,10 @@ export const translations = {
   },
 
   hero: {
-    eyebrow: "next-vibe developer platform",
-    title: "If a human can do it on a computer, next-vibe can automate it.",
+    eyebrow: "Careers",
+    title: "No job board. The work is open.",
     subtitle:
-      "One endpoint definition becomes a web form, CLI command, MCP tool, native screen, and AI-callable skill - simultaneously. Small scripts to full production line automation.",
+      "No vacancies listed here. The work is open: ship next-vibe to clients, automate real businesses, earn from skills you publish. Everything you need is on GitHub.",
     ctaPrimary: "Start building",
     ctaSecondary: "Read the docs",
   },
@@ -81,7 +81,7 @@ export const translations = {
       skillEconomy: {
         title: "Sell what you build",
         description:
-          "Wrap your automation as a skill. Share the link. Earn 15% recurring from every signup that came through your URL.",
+          "Wrap your automation as a skill. Share the link. Earn 10% of every payment from each user who signs up through it - recurring, for as long as they pay.",
       },
     },
   },
@@ -105,7 +105,7 @@ export const translations = {
   referral: {
     title: "Build it. Share it. Earn from it.",
     description:
-      "Every skill you publish carries your referral link. 10% direct, 15% via skill, 20% stacked. Recurring forever from every user who signs up through you.",
+      "Every skill you share carries your referral link. 10% of every payment from users you bring in. Plus 5% when someone else's link brings a user to your skill. Recurring, for as long as they pay.",
     cta: "How the skill economy works",
   },
 

@@ -2,14 +2,15 @@
 import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
 import { ChatModelId, FEATURED_MODELS } from "next-vibe/agent/ai-stream/models";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
+import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
+import type fetchUrlDefinitions from "next-vibe/agent/fetch-url-content/definition";
+import type braveSearchDefinitions from "next-vibe/agent/web-search/brave/definition";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
@@ -27,12 +28,16 @@ import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import { mkAssistantMsg, mkDemoToolMsg, mkUserMsg } from "./demo-messages";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
+
+type CortexSearchEndpoint = typeof cortexSearchDefinitions.GET;
+type BraveSearchEndpoint = typeof braveSearchDefinitions.GET;
+type FetchUrlEndpoint = typeof fetchUrlDefinitions.GET;
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
@@ -65,15 +70,13 @@ function CapabilityBlock({
   id,
   stacked = false,
 }: CapabilityBlockProps): JSX.Element {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
   if (stacked) {
     return (
-      <Div ref={ref as never} id={id} className="py-16 md:py-24">
+      <Div id={id} className="py-16 md:py-24">
         <MotionDiv
           className="flex flex-col gap-10"
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay }}
         >
           <Div>
@@ -94,11 +97,11 @@ function CapabilityBlock({
   }
 
   return (
-    <Div ref={ref as never} id={id} className="py-16 md:py-24">
+    <Div id={id} className="py-16 md:py-24">
       <MotionDiv
         className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
-        initial={{ opacity: 0, y: 30 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay }}
       >
         <Div className={reversed ? "md:[direction:ltr]" : ""}>
@@ -119,88 +122,97 @@ function CapabilityBlock({
 }
 
 // ---------------------------------------------------------------------------
-// Mock message helpers
+// Memory demo - context-aware follow-up (cortex-search over /memories)
 // ---------------------------------------------------------------------------
 
-function baseMockMsg(overrides: {
+function mkMemorySearchMsg(params: {
   id: string;
   threadId: string;
-  role: ChatMessage["role"];
-  content: string | null;
-  parentId: string | null;
-  depth: number;
-  sequenceId: string | null;
-  isAI: boolean;
-  model: ChatMessage["model"];
-  metadata: ChatMessage["metadata"];
+  sequenceId: string;
+  toolCallId: string;
+  query: string;
+  memoryPath: string;
+  excerpt: string;
+  score: number;
+  updatedAt: string;
+  executionTime: number;
 }): ChatMessage {
-  const now = new Date();
-  return {
-    authorId: null,
-    authorName: null,
-    skill: null,
-    errorType: null,
-    errorMessage: null,
-    errorCode: null,
-    upvotes: 0,
-    downvotes: 0,
-    createdAt: now,
-    updatedAt: now,
-    ...overrides,
-  };
-}
-
-function mkToolMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  toolCallId: string,
-  toolName: string,
-  args: WidgetData,
-  result: WidgetData,
-  executionTime: number,
-): ChatMessage {
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.TOOL,
-    content: null,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: {
-      toolCall: { toolCallId, toolName, args, result, executionTime },
+  return mkDemoToolMsg<CortexSearchEndpoint>({
+    id: params.id,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    toolCallId: params.toolCallId,
+    toolName: "cortex-search",
+    args: { query: params.query, path: "/memories", maxResults: 5 },
+    result: {
+      responseQuery: params.query,
+      results: [
+        {
+          resultPath: params.memoryPath,
+          excerpt: params.excerpt,
+          score: params.score,
+          updatedAt: new Date(params.updatedAt),
+        },
+      ],
+      total: 1,
+      searchMode: "hybrid",
     },
+    executionTime: params.executionTime,
   });
 }
 
-function mkAssistantMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  content: string,
-  extra?: Partial<ChatMessage["metadata"]> & { model?: ChatMessage["model"] },
-): ChatMessage {
-  const { model: modelOverride, ...metaExtra } = extra ?? {};
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.ASSISTANT,
-    content,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: modelOverride ?? ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: { ...metaExtra },
+function mkBraveSearchMsg(params: {
+  id: string;
+  threadId: string;
+  sequenceId: string;
+  toolCallId: string;
+  query: string;
+  maxResults: number;
+  results: BraveSearchEndpoint["types"]["ResponseOutput"]["results"];
+  executionTime: number;
+}): ChatMessage {
+  return mkDemoToolMsg<BraveSearchEndpoint>({
+    id: params.id,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    toolCallId: params.toolCallId,
+    toolName: "brave-search",
+    args: {
+      query: params.query,
+      maxResults: params.maxResults,
+      includeNews: false,
+    },
+    result: { results: params.results },
+    executionTime: params.executionTime,
   });
 }
 
-// ---------------------------------------------------------------------------
-// Memory demo - context-aware follow-up (search-memory tool call)
-// ---------------------------------------------------------------------------
+function mkFetchUrlMsg(params: {
+  id: string;
+  threadId: string;
+  sequenceId: string;
+  toolCallId: string;
+  url: string;
+  content: string;
+  executionTime: number;
+}): ChatMessage {
+  return mkDemoToolMsg<FetchUrlEndpoint>({
+    id: params.id,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    toolCallId: params.toolCallId,
+    toolName: "fetch-url-content",
+    args: { url: params.url },
+    result: {
+      message: `Successfully fetched content from: ${params.url}`,
+      fetchedUrl: params.url,
+      content: params.content,
+      statusCode: 200,
+      timeElapsed: params.executionTime,
+    },
+    executionTime: params.executionTime,
+  });
+}
 
 function buildMemoryContextGroup(t: ScopedT): MessageGroup {
   const tid = "demo-memory-context";
@@ -213,28 +225,18 @@ function buildMemoryContextGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.memory.demos.context.reasoning"),
   );
 
-  const memoryTool = mkToolMsg(
-    "context-memory-search",
-    tid,
-    seq,
-    "toolu_mem1",
-    "memories-search",
-    { query: t("home.capabilities.memory.demos.context.searchQuery") },
-    {
-      results: [
-        {
-          memoryNumber: 1,
-          content: t("home.capabilities.memory.demos.context.memoryResult"),
-          tags: ["investor-call", "objections", "follow-up"],
-          priority: 85,
-          isArchived: false,
-          createdAt: "2026-03-18T14:30:00Z",
-        },
-      ],
-      total: 1,
-    },
-    320,
-  );
+  const memoryTool = mkMemorySearchMsg({
+    id: "context-memory-search",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_mem1",
+    query: t("home.capabilities.memory.demos.context.searchQuery"),
+    memoryPath: "/memories/travel/japan-trip.md",
+    excerpt: t("home.capabilities.memory.demos.context.memoryResult"),
+    score: 0.92,
+    updatedAt: "2026-03-18T14:30:00Z",
+    executionTime: 320,
+  });
 
   const response = mkAssistantMsg(
     "context-response",
@@ -252,7 +254,7 @@ function buildMemoryContextGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Memory demo - project continuation (search-memory tool call)
+// Memory demo - project continuation (cortex-search over /memories)
 // ---------------------------------------------------------------------------
 
 function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
@@ -266,28 +268,18 @@ function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.memory.demos.project.reasoning"),
   );
 
-  const memoryTool = mkToolMsg(
-    "project-memory-search",
-    tid,
-    seq,
-    "toolu_mem2",
-    "memories-search",
-    { query: t("home.capabilities.memory.demos.project.searchQuery") },
-    {
-      results: [
-        {
-          memoryNumber: 2,
-          content: t("home.capabilities.memory.demos.project.memoryResult"),
-          tags: ["launch-plan", "progress", "pricing"],
-          priority: 90,
-          isArchived: false,
-          createdAt: "2026-03-22T09:15:00Z",
-        },
-      ],
-      total: 1,
-    },
-    290,
-  );
+  const memoryTool = mkMemorySearchMsg({
+    id: "project-memory-search",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_mem2",
+    query: t("home.capabilities.memory.demos.project.searchQuery"),
+    memoryPath: "/memories/learning/spanish.md",
+    excerpt: t("home.capabilities.memory.demos.project.memoryResult"),
+    score: 0.89,
+    updatedAt: "2026-03-22T09:15:00Z",
+    executionTime: 290,
+  });
 
   const response = mkAssistantMsg(
     "project-response",
@@ -305,7 +297,7 @@ function buildMemoryProjectGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo - live news (web-search with real results)
+// Search demo - live news (brave-search → fetch-url-content)
 // ---------------------------------------------------------------------------
 
 function buildSearchNewsGroup(t: ScopedT): MessageGroup {
@@ -319,43 +311,38 @@ function buildSearchNewsGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.news.reasoning1"),
   );
 
-  const searchTool = mkToolMsg(
-    "news-search",
-    tid,
-    seq,
-    "toolu_search1",
-    "brave-search",
-    {
-      query: t("home.capabilities.search.demos.news.searchQuery"),
-      maxResults: 5,
-    },
-    {
-      results: [
-        {
-          title: t("home.capabilities.search.demos.news.result1Title"),
-          url: "https://www.skyscanner.com/transport/flights/",
-          snippet: t("home.capabilities.search.demos.news.result1Snippet"),
-          age: "live",
-          source: "Skyscanner",
-        },
-        {
-          title: t("home.capabilities.search.demos.news.result2Title"),
-          url: "https://www.kayak.com/flights/",
-          snippet: t("home.capabilities.search.demos.news.result2Snippet"),
-          age: "live",
-          source: "Kayak",
-        },
-        {
-          title: t("home.capabilities.search.demos.news.result3Title"),
-          url: "https://www.google.com/travel/flights",
-          snippet: t("home.capabilities.search.demos.news.result3Snippet"),
-          age: "live",
-          source: "Google Flights",
-        },
-      ],
-    },
-    920,
-  );
+  const searchTool = mkBraveSearchMsg({
+    id: "news-search",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_search1",
+    query: t("home.capabilities.search.demos.news.searchQuery"),
+    maxResults: 5,
+    results: [
+      {
+        title: t("home.capabilities.search.demos.news.result1Title"),
+        url: "https://www.skyscanner.com/transport/flights/",
+        snippet: t("home.capabilities.search.demos.news.result1Snippet"),
+        age: "live",
+        source: "Skyscanner",
+      },
+      {
+        title: t("home.capabilities.search.demos.news.result2Title"),
+        url: "https://www.kayak.com/flights/",
+        snippet: t("home.capabilities.search.demos.news.result2Snippet"),
+        age: "live",
+        source: "Kayak",
+      },
+      {
+        title: t("home.capabilities.search.demos.news.result3Title"),
+        url: "https://www.google.com/travel/flights",
+        snippet: t("home.capabilities.search.demos.news.result3Snippet"),
+        age: "live",
+        source: "Google Flights",
+      },
+    ],
+    executionTime: 920,
+  });
 
   const reasoning2 = mkAssistantMsg(
     "news-reasoning2",
@@ -364,23 +351,15 @@ function buildSearchNewsGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.news.reasoning2"),
   );
 
-  const fetchTool = mkToolMsg(
-    "news-fetch",
-    tid,
-    seq,
-    "toolu_fetch_news1",
-    "fetch-url-content",
-    { url: "https://www.kayak.com/flights/" },
-    {
-      message:
-        "Successfully fetched content from: https://www.kayak.com/flights/",
-      content: t("home.capabilities.search.demos.news.fetchContent"),
-      fetchedUrl: "https://www.kayak.com/flights/",
-      statusCode: 200,
-      timeElapsed: 1340,
-    },
-    1340,
-  );
+  const fetchTool = mkFetchUrlMsg({
+    id: "news-fetch",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_fetch_news1",
+    url: "https://www.kayak.com/flights/",
+    content: t("home.capabilities.search.demos.news.fetchContent"),
+    executionTime: 1340,
+  });
 
   const response = mkAssistantMsg(
     "news-response",
@@ -398,7 +377,7 @@ function buildSearchNewsGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo - deep read (web-search → fetch-url-content chain)
+// Search demo - deep read (brave-search → fetch-url-content chain)
 // ---------------------------------------------------------------------------
 
 function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
@@ -412,36 +391,31 @@ function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.deepRead.reasoning1"),
   );
 
-  const searchTool = mkToolMsg(
-    "deep-search",
-    tid,
-    seq,
-    "toolu_search2",
-    "brave-search",
-    {
-      query: t("home.capabilities.search.demos.deepRead.searchQuery"),
-      maxResults: 4,
-    },
-    {
-      results: [
-        {
-          title: t("home.capabilities.search.demos.deepRead.result1Title"),
-          url: "https://www.tripadvisor.com/Restaurant_Review-123456",
-          snippet: t("home.capabilities.search.demos.deepRead.result1Snippet"),
-          age: "3 days ago",
-          source: "TripAdvisor",
-        },
-        {
-          title: t("home.capabilities.search.demos.deepRead.result2Title"),
-          url: "https://www.yelp.com/biz/trattoria-roma-123",
-          snippet: t("home.capabilities.search.demos.deepRead.result2Snippet"),
-          age: "1 week ago",
-          source: "Yelp",
-        },
-      ],
-    },
-    870,
-  );
+  const searchTool = mkBraveSearchMsg({
+    id: "deep-search",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_search2",
+    query: t("home.capabilities.search.demos.deepRead.searchQuery"),
+    maxResults: 4,
+    results: [
+      {
+        title: t("home.capabilities.search.demos.deepRead.result1Title"),
+        url: "https://www.tripadvisor.com/Restaurant_Review-123456",
+        snippet: t("home.capabilities.search.demos.deepRead.result1Snippet"),
+        age: "3 days ago",
+        source: "TripAdvisor",
+      },
+      {
+        title: t("home.capabilities.search.demos.deepRead.result2Title"),
+        url: "https://www.yelp.com/biz/trattoria-roma-123",
+        snippet: t("home.capabilities.search.demos.deepRead.result2Snippet"),
+        age: "1 week ago",
+        source: "Yelp",
+      },
+    ],
+    executionTime: 870,
+  });
 
   const reasoning2 = mkAssistantMsg(
     "deep-reasoning2",
@@ -450,23 +424,15 @@ function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.deepRead.reasoning2"),
   );
 
-  const fetchTool = mkToolMsg(
-    "deep-fetch",
-    tid,
-    seq,
-    "toolu_fetch1",
-    "fetch-url-content",
-    { url: "https://www.tripadvisor.com/Restaurant_Review-123456" },
-    {
-      message:
-        "Successfully fetched content from: https://www.tripadvisor.com/Restaurant_Review-123456",
-      content: t("home.capabilities.search.demos.deepRead.fetchContent"),
-      fetchedUrl: "https://www.tripadvisor.com/Restaurant_Review-123456",
-      statusCode: 200,
-      timeElapsed: 1480,
-    },
-    1480,
-  );
+  const fetchTool = mkFetchUrlMsg({
+    id: "deep-fetch",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_fetch1",
+    url: "https://www.tripadvisor.com/Restaurant_Review-123456",
+    content: t("home.capabilities.search.demos.deepRead.fetchContent"),
+    executionTime: 1480,
+  });
 
   const response = mkAssistantMsg(
     "deep-response",
@@ -484,7 +450,7 @@ function buildSearchDeepReadGroup(t: ScopedT): MessageGroup {
 }
 
 // ---------------------------------------------------------------------------
-// Search demo - compare two angles (two web-searches)
+// Search demo - compare two angles (two brave-searches)
 // ---------------------------------------------------------------------------
 
 function buildSearchCompareGroup(t: ScopedT): MessageGroup {
@@ -498,36 +464,31 @@ function buildSearchCompareGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.compare.reasoning1"),
   );
 
-  const search1Tool = mkToolMsg(
-    "compare-search1",
-    tid,
-    seq,
-    "toolu_search3a",
-    "brave-search",
-    {
-      query: t("home.capabilities.search.demos.compare.searchQuery1"),
-      maxResults: 4,
-    },
-    {
-      results: [
-        {
-          title: t("home.capabilities.search.demos.compare.result1aTitle"),
-          url: "https://www.gsmarena.com/iphone_16_review-123",
-          snippet: t("home.capabilities.search.demos.compare.result1aSnippet"),
-          age: "2 months ago",
-          source: "GSMArena",
-        },
-        {
-          title: t("home.capabilities.search.demos.compare.result1bTitle"),
-          url: "https://www.theverge.com/iphone-16-review",
-          snippet: t("home.capabilities.search.demos.compare.result1bSnippet"),
-          age: "2 months ago",
-          source: "The Verge",
-        },
-      ],
-    },
-    910,
-  );
+  const search1Tool = mkBraveSearchMsg({
+    id: "compare-search1",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_search3a",
+    query: t("home.capabilities.search.demos.compare.searchQuery1"),
+    maxResults: 4,
+    results: [
+      {
+        title: t("home.capabilities.search.demos.compare.result1aTitle"),
+        url: "https://www.gsmarena.com/iphone_16_review-123",
+        snippet: t("home.capabilities.search.demos.compare.result1aSnippet"),
+        age: "2 months ago",
+        source: "GSMArena",
+      },
+      {
+        title: t("home.capabilities.search.demos.compare.result1bTitle"),
+        url: "https://www.theverge.com/iphone-16-review",
+        snippet: t("home.capabilities.search.demos.compare.result1bSnippet"),
+        age: "2 months ago",
+        source: "The Verge",
+      },
+    ],
+    executionTime: 910,
+  });
 
   const reasoning2 = mkAssistantMsg(
     "compare-reasoning2",
@@ -536,36 +497,31 @@ function buildSearchCompareGroup(t: ScopedT): MessageGroup {
     t("home.capabilities.search.demos.compare.reasoning2"),
   );
 
-  const search2Tool = mkToolMsg(
-    "compare-search2",
-    tid,
-    seq,
-    "toolu_search3b",
-    "brave-search",
-    {
-      query: t("home.capabilities.search.demos.compare.searchQuery2"),
-      maxResults: 4,
-    },
-    {
-      results: [
-        {
-          title: t("home.capabilities.search.demos.compare.result2aTitle"),
-          url: "https://www.macrumors.com/iphone-17-rumors",
-          snippet: t("home.capabilities.search.demos.compare.result2aSnippet"),
-          age: "1 week ago",
-          source: "MacRumors",
-        },
-        {
-          title: t("home.capabilities.search.demos.compare.result2bTitle"),
-          url: "https://9to5mac.com/iphone-17-release-date",
-          snippet: t("home.capabilities.search.demos.compare.result2bSnippet"),
-          age: "3 days ago",
-          source: "9to5Mac",
-        },
-      ],
-    },
-    940,
-  );
+  const search2Tool = mkBraveSearchMsg({
+    id: "compare-search2",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_search3b",
+    query: t("home.capabilities.search.demos.compare.searchQuery2"),
+    maxResults: 4,
+    results: [
+      {
+        title: t("home.capabilities.search.demos.compare.result2aTitle"),
+        url: "https://www.macrumors.com/iphone-17-rumors",
+        snippet: t("home.capabilities.search.demos.compare.result2aSnippet"),
+        age: "1 week ago",
+        source: "MacRumors",
+      },
+      {
+        title: t("home.capabilities.search.demos.compare.result2bTitle"),
+        url: "https://9to5mac.com/iphone-17-release-date",
+        snippet: t("home.capabilities.search.demos.compare.result2bSnippet"),
+        age: "3 days ago",
+        source: "9to5Mac",
+      },
+    ],
+    executionTime: 940,
+  });
 
   const response = mkAssistantMsg(
     "compare-response",
@@ -616,17 +572,10 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
 
   const userMsg = useMemo(
     () =>
-      baseMockMsg({
+      mkUserMsg({
         id: `memory-user-${activeId}`,
         threadId: `demo-memory-${activeId}`,
-        role: ChatMessageRole.USER,
         content: userMessages[activeId],
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
       }),
     [activeId, userMessages],
   );
@@ -665,7 +614,7 @@ function MemoryVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
               roles: [UserPermissionRole.ADMIN],
             }}
           />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <MotionDiv
               key={activeId}
               initial={{ opacity: 0, y: 8 }}
@@ -719,7 +668,7 @@ function buildModelsDemoGroup(
   const seq = `models-${activeId}-seq`;
   const model =
     activeId === "mainstream"
-      ? ChatModelId.GPT_5_5
+      ? ChatModelId.GPT_6_1_SOL
       : activeId === "open"
         ? DEFAULT_CHAT_MODEL_ID
         : ChatModelId.UNCENSORED_LM_V1_2;
@@ -779,17 +728,10 @@ function ModelsVisual({
 
   const userMsg = useMemo(
     () =>
-      baseMockMsg({
+      mkUserMsg({
         id: `models-user-${activeId}`,
         threadId: `demo-models-${activeId}`,
-        role: ChatMessageRole.USER,
         content: t("home.capabilities.models.demo.userQuestion"),
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
       }),
     [activeId, t],
   );
@@ -900,7 +842,7 @@ function ModelsVisual({
                 roles: [UserPermissionRole.ADMIN],
               }}
             />
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <MotionDiv
                 key={activeId}
                 initial={{ opacity: 0, y: 4 }}
@@ -976,17 +918,10 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
 
   const userMsg = useMemo(
     () =>
-      baseMockMsg({
+      mkUserMsg({
         id: `search-user-${activeId}`,
         threadId: `demo-search-${activeId}`,
-        role: ChatMessageRole.USER,
         content: userMessages[activeId],
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
       }),
     [activeId, userMessages],
   );
@@ -1025,7 +960,7 @@ function SearchVisual({ locale }: { locale: CountryLanguage }): JSX.Element {
               roles: [UserPermissionRole.ADMIN],
             }}
           />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <MotionDiv
               key={activeId}
               initial={{ opacity: 0, y: 8 }}
@@ -1140,7 +1075,6 @@ export function CapabilityShowcase({
   modelCountsByTier,
 }: CapabilityShowcaseProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [ref] = useInView({ triggerOnce: true, threshold: 0.05 });
 
   const interpolation = {
     modelCount: totalModelCount,
@@ -1148,7 +1082,7 @@ export function CapabilityShowcase({
   };
 
   return (
-    <Div className="relative overflow-hidden" ref={ref as never}>
+    <Div className="relative overflow-hidden">
       <Div className="container relative px-4 md:px-6">
         <CapabilityBlock
           label={t("home.capabilities.models.label")}

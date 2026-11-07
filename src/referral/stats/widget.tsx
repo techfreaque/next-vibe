@@ -4,13 +4,14 @@
 
 "use client";
 
-import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
+import { Span } from "next-vibe/ui/components/span";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetTranslation,
   useWidgetValue,
@@ -28,50 +29,57 @@ function formatDollars(credits: number): string {
 }
 
 /**
- * Stat card component with modern design
+ * One stat tile: label, big number, one-line hint.
  */
 function StatCard({
   title,
   IconComponent,
-  iconColorClassName: iconColor,
-  iconBgClassName: iconBg,
+  highlight = false,
   value,
-  valueColorClassName: valueColor,
   description,
   formatAsDollars = false,
 }: {
   title: string;
   IconComponent: React.ComponentType<{ className?: string }>;
-  iconColorClassName: string;
-  iconBgClassName: string;
+  highlight?: boolean;
   value: number;
-  valueColorClassName: string;
   description: string;
   formatAsDollars?: boolean;
 }): React.JSX.Element {
-  const valueClassName = `text-2xl font-bold tabular-nums tracking-tight ${valueColor}`;
-  const iconContainerClassName = `flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${iconBg}`;
-  const iconClassName = `h-6 w-6 ${iconColor}`;
-
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
-        <Div className="flex items-start justify-between gap-4">
-          <Div className="flex-1 space-y-1">
-            <Div className="text-sm font-medium text-muted-foreground">
-              {title}
-            </Div>
-            <Div className={valueClassName}>
-              {formatAsDollars ? formatDollars(value) : value.toLocaleString()}
-            </Div>
-            <Div className="text-xs text-muted-foreground">{description}</Div>
-          </Div>
-          <Div className={iconContainerClassName}>
-            <IconComponent className={iconClassName} />
-          </Div>
-        </Div>
-      </CardContent>
-    </Card>
+    <Div
+      className={cn(
+        "flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm sm:p-5",
+        highlight && "border-primary/40 ring-1 ring-primary/20",
+      )}
+    >
+      <Div className="flex items-center justify-between gap-2">
+        <Span className="text-xs font-medium text-muted-foreground sm:text-sm">
+          {title}
+        </Span>
+        <Span
+          className={cn(
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+            highlight
+              ? "bg-primary/10 text-primary"
+              : "bg-muted text-muted-foreground",
+          )}
+        >
+          <IconComponent className="h-4 w-4" />
+        </Span>
+      </Div>
+      <Span
+        className={cn(
+          "text-2xl font-semibold tabular-nums tracking-tight",
+          highlight ? "text-primary" : "text-foreground",
+        )}
+      >
+        {formatAsDollars ? formatDollars(value) : value.toLocaleString()}
+      </Span>
+      <Span className="text-xs leading-snug text-muted-foreground">
+        {description}
+      </Span>
+    </Div>
   );
 }
 
@@ -93,65 +101,39 @@ export function ReferralStatsContainer(): React.JSX.Element {
     stats.availableCreditsValue === 0;
 
   return (
-    <Div className="space-y-4">
+    <Div className="flex flex-col gap-3">
       {allZero && (
-        <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-muted/50 border text-sm text-muted-foreground">
-          <Link2 className="h-4 w-4 shrink-0 text-violet-400" />
+        <Div className="flex items-center gap-3 rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+          <Link2 className="h-4 w-4 shrink-0 text-primary" />
           <Div>{t("stats.widget.emptyMessage")}</Div>
         </Div>
       )}
-      <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           title={t(stats.totalSignupsTitle)}
           IconComponent={Users}
-          iconColorClassName={"text-slate-700 dark:text-slate-300"}
-          iconBgClassName={"bg-slate-100 dark:bg-slate-800"}
           value={stats.totalSignupsValue}
-          valueColorClassName={"text-foreground"}
           description={t(stats.totalSignupsDescription)}
         />
-
         <StatCard
           title={t(stats.totalRevenueTitle)}
           IconComponent={TrendingUp}
-          iconColorClassName={"text-emerald-700 dark:text-emerald-300"}
-          iconBgClassName={"bg-emerald-100 dark:bg-emerald-900/30"}
           value={stats.totalRevenueValue}
-          valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
           description={t(stats.totalRevenueDescription)}
           formatAsDollars
         />
-
         <StatCard
           title={t(stats.totalEarnedTitle)}
           IconComponent={DollarSign}
-          iconColorClassName={"text-info"}
-          iconBgClassName={"bg-info/10"}
           value={stats.totalEarnedValue}
-          valueColorClassName={"text-info"}
           description={t(stats.totalEarnedDescription)}
           formatAsDollars
         />
-
         <StatCard
           title={t(stats.availableCreditsTitle)}
           IconComponent={Wallet}
-          iconColorClassName={
-            stats.availableCreditsReadyForPayout
-              ? "text-violet-700 dark:text-violet-300"
-              : "text-warning"
-          }
-          iconBgClassName={
-            stats.availableCreditsReadyForPayout
-              ? "bg-violet-100 dark:bg-violet-900/30"
-              : "bg-warning/10"
-          }
+          highlight
           value={stats.availableCreditsValue}
-          valueColorClassName={
-            stats.availableCreditsReadyForPayout
-              ? "text-violet-600 dark:text-violet-400"
-              : "text-warning"
-          }
           description={t(stats.availableCreditsDescription, {
             minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
           })}

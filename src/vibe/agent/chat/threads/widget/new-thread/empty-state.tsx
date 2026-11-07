@@ -2,16 +2,32 @@
 
 import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { Compass } from "next-vibe/ui/components/icons/Compass";
+import { Flame } from "next-vibe/ui/components/icons/Flame";
+import { Image } from "next-vibe/ui/components/icons/Image";
+import { Lightbulb } from "next-vibe/ui/components/icons/Lightbulb";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 
 import { DOM_IDS, LAYOUT } from "@/_pages/chat/lib/config/constants";
 
+import { useChatInputStore } from "../../../../ai-stream/stream/hooks/input-store";
 import { getDefaultFolderConfig } from "../../../config";
+import { useTourState } from "../../../tour-state";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../i18n";
+
+const STARTERS = [
+  { id: "explain", icon: Lightbulb },
+  { id: "search", icon: Search },
+  { id: "image", icon: Image },
+  { id: "honest", icon: Flame },
+] as const;
 
 interface ChatEmptyStateProps {
   locale: CountryLanguage;
@@ -28,6 +44,8 @@ export function ChatEmptyState({
 }: ChatEmptyStateProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+  const setInput = useChatInputStore((s) => s.setInput);
+  const requestTour = useTourState((s) => s.requestTour);
 
   const folderConfig = getDefaultFolderConfig(rootFolderId);
   const color = folderConfig?.color || "blue";
@@ -129,24 +147,80 @@ export function ChatEmptyState({
               }
         }
       >
-        <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 flex flex-col items-center">
-          {/* Folder icon */}
+        <Div className="mx-auto flex max-w-2xl flex-col items-center px-4 pt-20">
+          {/* Where you are: folder + what it means for your data */}
           <Div
-            className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg")}`}
+            className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${getColorClasses("bg")}`}
           >
-            <Div className={`text-4xl ${getColorClasses("text")}`}>
+            <Div className={getColorClasses("text")}>
               <Icon
                 icon={folderConfig?.icon || "message-circle"}
-                className="h-10 w-10"
+                className="h-7 w-7"
               />
             </Div>
           </Div>
-
-          {/* Title and description */}
-          <H1 className="text-3xl font-bold mb-2 text-center">{getTitle()}</H1>
-          <P className="text-muted-foreground text-center mb-8">
+          <H1 className="mb-2 text-balance text-center text-2xl font-semibold tracking-tight sm:text-3xl">
+            {getTitle()}
+          </H1>
+          <P className="mb-8 max-w-md text-balance text-center text-sm text-muted-foreground sm:text-base">
             {getDescription()}
           </P>
+
+          {/* What to do now: tap a starter, it lands in the message box */}
+          {rootFolderId !== "cron" && (
+            <Div className="flex w-full flex-col gap-3">
+              <Span className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("widget.suggestedPrompts.tryOne")}
+              </Span>
+              <Div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {STARTERS.map(({ id, icon: StarterIcon }) => (
+                  <Button
+                    key={id}
+                    type="button"
+                    variant="outline"
+                    data-starter={id}
+                    className="h-auto justify-start gap-3 whitespace-normal rounded-xl bg-card px-3.5 py-3 text-left font-normal shadow-sm hover:border-primary/40 hover:bg-card"
+                    onClick={() =>
+                      setInput(
+                        t(`widget.suggestedPrompts.starters.${id}.prompt`),
+                      )
+                    }
+                  >
+                    <Span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getColorClasses("bg")} ${getColorClasses("text")}`}
+                    >
+                      <StarterIcon className="h-4 w-4" />
+                    </Span>
+                    <Span className="flex min-w-0 flex-col">
+                      <Span className="text-sm font-medium">
+                        {t(`widget.suggestedPrompts.starters.${id}.label`)}
+                      </Span>
+                      <Span className="line-clamp-2 text-xs text-muted-foreground">
+                        {t(`widget.suggestedPrompts.starters.${id}.prompt`)}
+                      </Span>
+                    </Span>
+                  </Button>
+                ))}
+              </Div>
+
+              {/* How to change who answers + optional tour */}
+              <Div className="mt-3 flex flex-col items-center gap-1 text-center">
+                <P className="text-xs text-muted-foreground">
+                  {t("widget.suggestedPrompts.switchHint")}
+                </P>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-8 gap-1.5 text-xs"
+                  onClick={requestTour}
+                >
+                  <Compass className="h-3.5 w-3.5" />
+                  {t("widget.suggestedPrompts.takeTour")}
+                </Button>
+              </Div>
+            </Div>
+          )}
         </Div>
       </Div>
     </Div>

@@ -52,7 +52,7 @@ export const biologistSkill: Skill = {
       variantName: "skills.biologist.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_6,
+        manualModelId: ChatModelId.GROK_4_7,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

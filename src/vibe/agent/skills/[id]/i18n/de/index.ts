@@ -62,14 +62,14 @@ export const translations: typeof enTranslations = {
     addAnotherTooltip:
       "Eine weitere Instanz dieses Charakters zu deiner Sammlung hinzufügen",
     variants: {
-      title: "Varianten",
+      title: "Modell wählen",
     },
     addToCollection: "Zu deiner Sammlung hinzufügen:",
-    addAllToFavorites: "Alle hinzufügen",
-    quickAdd: "Schnell hinzufügen",
+    addAllToFavorites: "Alle Modelle hinzufügen",
+    quickAdd: "Hinzufügen",
     tweakAndAdd: "Anpassen & hinzufügen",
     edit: "Bearbeiten",
-    copyAndCustomize: "Kopieren & anpassen",
+    copyAndCustomize: "Eigene Version erstellen",
     delete: "Löschen",
     vote: "Bewerten",
     report: "Melden",
@@ -194,6 +194,7 @@ export const translations: typeof enTranslations = {
     },
     share: {
       button: "Teilen & Verdienen",
+      titleNamed: "{{name}} teilen und verdienen",
       title: "Teile dieses Skill & verdiene",
       description:
         "Teile dieses Skill mit deinem Empfehlungslink. Verdiene 10% wiederkehrende Provision von jedem neuen Nutzer.",

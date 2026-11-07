@@ -105,7 +105,7 @@ export const researchAgentSkill: Skill = {
       variantName: "skills.researchAgent.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        manualModelId: ChatModelId.GEMINI_4_ARGON,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -129,7 +129,7 @@ export const researchAgentSkill: Skill = {
       variantName: "skills.researchAgent.variants.flash" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_8_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -177,7 +177,7 @@ export const researchAgentSkill: Skill = {
       variantName: "skills.researchAgent.variants.claude" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

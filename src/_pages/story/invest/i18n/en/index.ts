@@ -2,10 +2,21 @@ export const translations = {
   title: "Invest in {{appName}}",
   description:
     "Back the open AI platform that mainstream providers can't build.",
+  hero: {
+    eyebrow: "Invest",
+    ctaPrimary: "Read the brief",
+    ctaSecondary: "See the framework",
+  },
+  cta: {
+    title: "Want in?",
+    subtitle:
+      "Tickets from $5,000. Tell us who you are and what you want to back - we answer every message.",
+    button: "Get in touch",
+  },
   meta: {
     title: "Invest in {{appName}}",
     description:
-      "We accept investments from $5,000 upward. Back the open AI platform built on next-vibe - 42 models, production-ready, structurally uncensorable.",
+      "Tickets from $5,000. Back the open-source AI platform built on next-vibe - 100+ models, in production, and the user sets the filter.",
     category: "Invest",
     imageAlt: "Invest in {{appName}}",
     keywords:

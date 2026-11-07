@@ -67,7 +67,7 @@ export function Logo({
       </Div>
       <Span
         className={cn(
-          "font-inter text-base font-bold tracking-tight whitespace-nowrap",
+          "font-sans text-base font-bold tracking-tight whitespace-nowrap",
           "text-gray-900 dark:text-white",
         )}
       >

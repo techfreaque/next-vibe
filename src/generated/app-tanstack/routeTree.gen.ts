@@ -45,6 +45,7 @@ import { Route as LocaleStoryAboutUsIndexRouteImport } from './routes/$locale.st
 import { Route as LocaleStoryBlogIndexRouteImport } from './routes/$locale.story.blog.index'
 import { Route as LocaleStoryBuildASkillIndexRouteImport } from './routes/$locale.story.build-a-skill.index'
 import { Route as LocaleStoryCareersIndexRouteImport } from './routes/$locale.story.careers.index'
+import { Route as LocaleStoryEarnIndexRouteImport } from './routes/$locale.story.earn.index'
 import { Route as LocaleStoryFrameworkIndexRouteImport } from './routes/$locale.story.framework.index'
 import { Route as LocaleStoryImprintIndexRouteImport } from './routes/$locale.story.imprint.index'
 import { Route as LocaleStoryInvestIndexRouteImport } from './routes/$locale.story.invest.index'
@@ -147,6 +148,10 @@ import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.use
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
+import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
+import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
+import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from './routes/$locale.story.blog.interactive-coding-agent.index'
+import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
 import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from './routes/$locale.story.blog.referral-for-affiliate-pros.index'
@@ -156,6 +161,7 @@ import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './r
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
+import { Route as LocaleStoryBlogWhatsNewNovember2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-november-2026.index'
 import { Route as LocaleStoryNewsletterEmailIndexRouteImport } from './routes/$locale.story.newsletter.$email.index'
 import { Route as LocaleStoryNewsletterUnsubscribeIndexRouteImport } from './routes/$locale.story.newsletter.unsubscribe.index'
 import { Route as LocaleUserAccountReferralIndexRouteImport } from './routes/$locale.user._account.referral.index'
@@ -776,6 +782,11 @@ const LocaleStoryCareersIndexRoute = LocaleStoryCareersIndexRouteImport.update({
   path: '/careers/',
   getParentRoute: () => LocaleStoryRoute,
 } as any)
+const LocaleStoryEarnIndexRoute = LocaleStoryEarnIndexRouteImport.update({
+  id: '/earn/',
+  path: '/earn/',
+  getParentRoute: () => LocaleStoryRoute,
+} as any)
 const LocaleStoryFrameworkIndexRoute =
   LocaleStoryFrameworkIndexRouteImport.update({
     id: '/framework/',
@@ -1349,6 +1360,30 @@ const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
     path: '/blog/dead-trading-bot-to-monitoring-engine/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute =
+  LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport.update({
+    id: '/blog/e2e-tests-found-real-bugs/',
+    path: '/blog/e2e-tests-found-real-bugs/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute =
+  LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport.update({
+    id: '/blog/hermes-thea-two-way-remote/',
+    path: '/blog/hermes-thea-two-way-remote/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogInteractiveCodingAgentIndexRoute =
+  LocaleStoryBlogInteractiveCodingAgentIndexRouteImport.update({
+    id: '/blog/interactive-coding-agent/',
+    path: '/blog/interactive-coding-agent/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute =
+  LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport.update({
+    id: '/blog/model-refresh-uncensored-providers/',
+    path: '/blog/model-refresh-uncensored-providers/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogOneCodebase13PlatformsIndexRoute =
   LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport.update({
     id: '/blog/one-codebase-13-platforms/',
@@ -1401,6 +1436,12 @@ const LocaleStoryBlogWhatsNewMay2026IndexRoute =
   LocaleStoryBlogWhatsNewMay2026IndexRouteImport.update({
     id: '/blog/whats-new-may-2026/',
     path: '/blog/whats-new-may-2026/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogWhatsNewNovember2026IndexRoute =
+  LocaleStoryBlogWhatsNewNovember2026IndexRouteImport.update({
+    id: '/blog/whats-new-november-2026/',
+    path: '/blog/whats-new-november-2026/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryNewsletterEmailIndexRoute =
@@ -4150,6 +4191,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill/': typeof LocaleStoryBuildASkillIndexRoute
   '/$locale/story/careers/': typeof LocaleStoryCareersIndexRoute
+  '/$locale/story/earn/': typeof LocaleStoryEarnIndexRoute
   '/$locale/story/framework/': typeof LocaleStoryFrameworkIndexRoute
   '/$locale/story/imprint/': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
@@ -4386,6 +4428,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
+  '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
@@ -4395,6 +4441,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
+  '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/referral/': typeof LocaleUserAccountReferralIndexRoute
@@ -4729,6 +4776,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill': typeof LocaleStoryBuildASkillIndexRoute
   '/$locale/story/careers': typeof LocaleStoryCareersIndexRoute
+  '/$locale/story/earn': typeof LocaleStoryEarnIndexRoute
   '/$locale/story/framework': typeof LocaleStoryFrameworkIndexRoute
   '/$locale/story/imprint': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest': typeof LocaleStoryInvestIndexRoute
@@ -4965,6 +5013,10 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
+  '/$locale/story/blog/interactive-coding-agent': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
@@ -4974,6 +5026,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
+  '/$locale/story/blog/whats-new-november-2026': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
   '/$locale/story/newsletter/$email': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/referral': typeof LocaleUserAccountReferralIndexRoute
@@ -5315,6 +5368,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill/': typeof LocaleStoryBuildASkillIndexRoute
   '/$locale/story/careers/': typeof LocaleStoryCareersIndexRoute
+  '/$locale/story/earn/': typeof LocaleStoryEarnIndexRoute
   '/$locale/story/framework/': typeof LocaleStoryFrameworkIndexRoute
   '/$locale/story/imprint/': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
@@ -5551,6 +5605,10 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
+  '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
@@ -5560,6 +5618,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
+  '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/_account/referral/': typeof LocaleUserAccountReferralIndexRoute
@@ -5901,6 +5960,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/'
     | '/$locale/story/build-a-skill/'
     | '/$locale/story/careers/'
+    | '/$locale/story/earn/'
     | '/$locale/story/framework/'
     | '/$locale/story/imprint/'
     | '/$locale/story/invest/'
@@ -6137,6 +6197,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
+    | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/hermes-thea-two-way-remote/'
+    | '/$locale/story/blog/interactive-coding-agent/'
+    | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
@@ -6146,6 +6210,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
+    | '/$locale/story/blog/whats-new-november-2026/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
     | '/$locale/user/referral/'
@@ -6480,6 +6545,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog'
     | '/$locale/story/build-a-skill'
     | '/$locale/story/careers'
+    | '/$locale/story/earn'
     | '/$locale/story/framework'
     | '/$locale/story/imprint'
     | '/$locale/story/invest'
@@ -6716,6 +6782,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
+    | '/$locale/story/blog/e2e-tests-found-real-bugs'
+    | '/$locale/story/blog/hermes-thea-two-way-remote'
+    | '/$locale/story/blog/interactive-coding-agent'
+    | '/$locale/story/blog/model-refresh-uncensored-providers'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
     | '/$locale/story/blog/referral-for-affiliate-pros'
@@ -6725,6 +6795,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
+    | '/$locale/story/blog/whats-new-november-2026'
     | '/$locale/story/newsletter/$email'
     | '/$locale/story/newsletter/unsubscribe'
     | '/$locale/user/referral'
@@ -7065,6 +7136,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/'
     | '/$locale/story/build-a-skill/'
     | '/$locale/story/careers/'
+    | '/$locale/story/earn/'
     | '/$locale/story/framework/'
     | '/$locale/story/imprint/'
     | '/$locale/story/invest/'
@@ -7301,6 +7373,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
+    | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/hermes-thea-two-way-remote/'
+    | '/$locale/story/blog/interactive-coding-agent/'
+    | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
@@ -7310,6 +7386,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
+    | '/$locale/story/blog/whats-new-november-2026/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
     | '/$locale/user/_account/referral/'
@@ -8162,6 +8239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryCareersIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/earn/': {
+      id: '/$locale/story/earn/'
+      path: '/earn'
+      fullPath: '/$locale/story/earn/'
+      preLoaderRoute: typeof LocaleStoryEarnIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/framework/': {
       id: '/$locale/story/framework/'
       path: '/framework'
@@ -8876,6 +8960,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/e2e-tests-found-real-bugs/': {
+      id: '/$locale/story/blog/e2e-tests-found-real-bugs/'
+      path: '/blog/e2e-tests-found-real-bugs'
+      fullPath: '/$locale/story/blog/e2e-tests-found-real-bugs/'
+      preLoaderRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/hermes-thea-two-way-remote/': {
+      id: '/$locale/story/blog/hermes-thea-two-way-remote/'
+      path: '/blog/hermes-thea-two-way-remote'
+      fullPath: '/$locale/story/blog/hermes-thea-two-way-remote/'
+      preLoaderRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/interactive-coding-agent/': {
+      id: '/$locale/story/blog/interactive-coding-agent/'
+      path: '/blog/interactive-coding-agent'
+      fullPath: '/$locale/story/blog/interactive-coding-agent/'
+      preLoaderRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/model-refresh-uncensored-providers/': {
+      id: '/$locale/story/blog/model-refresh-uncensored-providers/'
+      path: '/blog/model-refresh-uncensored-providers'
+      fullPath: '/$locale/story/blog/model-refresh-uncensored-providers/'
+      preLoaderRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/one-codebase-13-platforms/': {
       id: '/$locale/story/blog/one-codebase-13-platforms/'
       path: '/blog/one-codebase-13-platforms'
@@ -8937,6 +9049,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/whats-new-may-2026'
       fullPath: '/$locale/story/blog/whats-new-may-2026/'
       preLoaderRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/whats-new-november-2026/': {
+      id: '/$locale/story/blog/whats-new-november-2026/'
+      path: '/blog/whats-new-november-2026'
+      fullPath: '/$locale/story/blog/whats-new-november-2026/'
+      preLoaderRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/newsletter/$email/': {
@@ -12012,6 +12131,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogIndexRoute: typeof LocaleStoryBlogIndexRoute
   LocaleStoryBuildASkillIndexRoute: typeof LocaleStoryBuildASkillIndexRoute
   LocaleStoryCareersIndexRoute: typeof LocaleStoryCareersIndexRoute
+  LocaleStoryEarnIndexRoute: typeof LocaleStoryEarnIndexRoute
   LocaleStoryFrameworkIndexRoute: typeof LocaleStoryFrameworkIndexRoute
   LocaleStoryImprintIndexRoute: typeof LocaleStoryImprintIndexRoute
   LocaleStoryInvestIndexRoute: typeof LocaleStoryInvestIndexRoute
@@ -12020,6 +12140,10 @@ interface LocaleStoryRouteChildren {
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
+  LocaleStoryBlogInteractiveCodingAgentIndexRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   LocaleStoryBlogReferralForAffiliateProsIndexRoute: typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
@@ -12029,6 +12153,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
+  LocaleStoryBlogWhatsNewNovember2026IndexRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
   LocaleStoryNewsletterEmailIndexRoute: typeof LocaleStoryNewsletterEmailIndexRoute
   LocaleStoryNewsletterUnsubscribeIndexRoute: typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   LocaleStoryNewsletterUnsubscribeEmailIndexRoute: typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
@@ -12040,6 +12165,7 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryBlogIndexRoute: LocaleStoryBlogIndexRoute,
   LocaleStoryBuildASkillIndexRoute: LocaleStoryBuildASkillIndexRoute,
   LocaleStoryCareersIndexRoute: LocaleStoryCareersIndexRoute,
+  LocaleStoryEarnIndexRoute: LocaleStoryEarnIndexRoute,
   LocaleStoryFrameworkIndexRoute: LocaleStoryFrameworkIndexRoute,
   LocaleStoryImprintIndexRoute: LocaleStoryImprintIndexRoute,
   LocaleStoryInvestIndexRoute: LocaleStoryInvestIndexRoute,
@@ -12049,6 +12175,14 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
     LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute,
+  LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute:
+    LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute,
+  LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute:
+    LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute,
+  LocaleStoryBlogInteractiveCodingAgentIndexRoute:
+    LocaleStoryBlogInteractiveCodingAgentIndexRoute,
+  LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute:
+    LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute,
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute:
     LocaleStoryBlogOneCodebase13PlatformsIndexRoute,
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute:
@@ -12067,6 +12201,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogWhatsNewApril2026IndexRoute,
   LocaleStoryBlogWhatsNewMay2026IndexRoute:
     LocaleStoryBlogWhatsNewMay2026IndexRoute,
+  LocaleStoryBlogWhatsNewNovember2026IndexRoute:
+    LocaleStoryBlogWhatsNewNovember2026IndexRoute,
   LocaleStoryNewsletterEmailIndexRoute: LocaleStoryNewsletterEmailIndexRoute,
   LocaleStoryNewsletterUnsubscribeIndexRoute:
     LocaleStoryNewsletterUnsubscribeIndexRoute,

@@ -12,7 +12,6 @@ import { Section } from "next-vibe/ui/components/section";
 import { Span } from "next-vibe/ui/components/span";
 import { H2, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
-import { useInView } from "react-intersection-observer";
 
 import { CapabilityShowcase } from "./capability-showcase";
 import { scopedTranslation } from "./i18n";
@@ -54,7 +53,7 @@ export function TabUnbottled({
   );
 }
 
-function UnbottledCta({
+export function UnbottledCta({
   locale,
   totalModelCount,
   hasUser,
@@ -64,19 +63,15 @@ function UnbottledCta({
   hasUser: boolean;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <Section className="relative overflow-hidden bg-[#07000f]">
-      <Div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,rgba(139,92,246,0.18)_0%,transparent_70%)]" />
-      <Div
-        className="container relative px-4 md:px-6 py-24 md:py-32"
-        ref={ref as never}
-      >
+    <Section className="dark relative overflow-hidden bg-background">
+      <Div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,hsl(var(--primary)/0.22)_0%,transparent_70%)]" />
+      <Div className="container relative px-4 md:px-6 py-24 md:py-32">
         <MotionDiv
           className="max-w-2xl mx-auto text-center"
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <H2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-white leading-[0.95] mb-6">
@@ -90,7 +85,7 @@ function UnbottledCta({
           <Div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               size="lg"
-              className="bg-violet-600 hover:bg-violet-500 text-white border-0 font-semibold shadow-lg shadow-violet-900/40 px-8"
+              className="h-12 border-0 bg-primary px-8 font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90"
               asChild
             >
               <Link href={`/${locale}/threads`}>

@@ -584,7 +584,7 @@ export const translations: typeof enTranslations = {
       geminiFlash25Flash:
         "Gemini 2.5 Flash - Googles effizientes multimodales Modell mit 1M-Token-Kontext für schnelle Aufgaben",
       geminiFlash25Pro:
-        "Gemini 2.5 Flash Pro - Googles Vorgänger-Pro-Modell mit großem Kontext und starkem Reasoning",
+        "Gemini 2.5 Pro - Googles Vorgänger-Pro-Modell mit großem Kontext und starkem Reasoning",
       deepseekV31:
         "DeepSeek V3.1 - DeepSeeks Vorgänger-Modell mit starken Coding- und Analysefähigkeiten",
       deepseekR1:
@@ -848,6 +848,58 @@ export const translations: typeof enTranslations = {
         "Meta Muse Spark 1.2 - Metas multimodales Reasoning-Modell mit Bild-, Audio- und Videoeingaben. Stärkt die modale Kreuzanalyse. 1,05M-Token-Kontext.",
       mistralMedium35:
         "Mistral Medium 3.5 - Mistral AIs leistungsfähiges Mittelklasse-Modell mit Bildverständnis. 262K-Token-Kontext.",
+      claudeOpus55:
+        "Claude Opus 5.5 - Anthropics Spitzenmodell. Für die härtesten Agenten-, Code- und Analyseaufgaben, 20 % günstiger als Opus 5. 1M-Token-Kontext.",
+      claudeSonnet55:
+        "Claude Sonnet 5.5 - Anthropics Arbeitspferd. Code- und Agentenleistung nah an Opus zum Sonnet-Preis. 1M-Token-Kontext.",
+      claudeHaiku55:
+        "Claude Haiku 5.5 - Anthropics schnellstes Modell. Bildverständnis, Tools und 1M-Kontext für ein Zehntel des Haiku-4.5-Preises.",
+      claudeFable51:
+        "Claude Fable 5.1 - Anthropics Frontier-Denker. Tiefe Synthese, langfristige Planung, präziser als Fable 5. 1M-Token-Kontext.",
+      gpt6Astra:
+        "GPT-6 Astra - OpenAIs leistungsstärkstes Modell. Maximale Denktiefe für die schwierigsten Probleme. 1,05M-Token-Kontext.",
+      gpt6AstraPro:
+        "GPT-6 Astra Pro - GPT-6 Astra mit erweitertem Denkaufwand. Langsamer, gründlicher. 1,05M-Token-Kontext.",
+      gpt61Sol:
+        "GPT-6.1 Sol - OpenAIs Premium-Denker. Spitzenleistung zum Bruchteil des GPT-5.6-Sol-Preises. 1,05M-Token-Kontext.",
+      gpt61SolPro:
+        "GPT-6.1 Sol Pro - GPT-6.1 Sol mit erweitertem Denkaufwand für komplexe Analysen und Code. 1,05M-Token-Kontext.",
+      gpt61Terra:
+        "GPT-6.1 Terra - OpenAIs ausgewogene Mittelklasse. Starker Code und Logik zum Alltagspreis. 1,05M-Token-Kontext.",
+      gpt61TerraPro:
+        "GPT-6.1 Terra Pro - GPT-6.1 Terra mit tieferem Denken für analyseintensive Arbeit. 1,05M-Token-Kontext.",
+      gpt6Luna:
+        "GPT-6 Luna - OpenAIs Leichtgewicht. Schnelle Antworten für Centbeträge. 1,05M-Token-Kontext.",
+      gpt6LunaPro:
+        "GPT-6 Luna Pro - GPT-6 Luna mit mehr Denkleistung. Besserer Code und präzisere Befolgung, gleicher Niedrigpreis. 1,05M-Token-Kontext.",
+      gemini4Argon:
+        "Gemini 4 Argon - Googles neues Flaggschiff. Text, Bild, Video und Audio rein, Spitzen-Logik raus. 1M-Token-Kontext.",
+      gemini38Flash:
+        "Gemini 3.8 Flash - Googles neuestes Flash. Schnelles multimodales Modell mit starkem Code. 1M-Token-Kontext.",
+      grok47:
+        "Grok 4.7 - xAIs neuester Grok. Schärfere Logik und Code, offene Inhaltsrichtlinie, Bildverständnis. 500K-Token-Kontext.",
+      kimiK31Pro:
+        "Kimi K3.1 Pro - Moonshot AIs stärkstes Modell. Multimodale Logik und lange Agentenläufe. 1M-Token-Kontext.",
+      deepseekV41Flash:
+        "DeepSeek V4.1 Flash - DeepSeeks schnelles offenes Modell, jetzt mit Bildverständnis. Ernsthafter Code fast umsonst. 1M-Token-Kontext.",
+      qwen38Flash:
+        "Qwen 3.8 Flash - Alibabas schnelles multimodales Modell. Text, Bild und Video zum Sparpreis. 1M-Token-Kontext.",
+      glm53:
+        "GLM-5.3 - Z.AIs neuestes Basismodell. Starke Logik und Code zum Kampfpreis. 1M-Token-Kontext.",
+      glm53Flash:
+        "GLM-5.3 Flash - Z.AIs schnelles multimodales Modell. Text, Bild und Video für große Volumen. 1M-Token-Kontext.",
+      mimoV26Pro:
+        "MiMo V2.6 Pro - Xiaomis Premium-Denker. Text, Bild, Video und Audio rein, tiefe Analyse raus. 1,05M-Token-Kontext.",
+      mimoV26Flash:
+        "MiMo V2.6 Flash - Xiaomis schnelles multimodales Modell. Extrem günstig, solider Coder. 1,05M-Token-Kontext.",
+      metaMuseSpark13:
+        "Meta Muse Spark 1.3 - Metas multimodaler Denker. Modalitätsübergreifende Analyse über Text, Bild und Video. 1M-Token-Kontext.",
+      metaMuseWonder:
+        "Meta Muse Wonder - Metas Flaggschiff. Spitzen-Logik, Code und kreative Arbeit über alle Modalitäten. 1M-Token-Kontext.",
+      mistralLarge4:
+        "Mistral Large 4 - Mistral AIs neues Flaggschiff. Europäisch, mit Bildverständnis, stark im Code, günstiger als Medium 3.5. 1M-Token-Kontext.",
+      veniceDeepseekV41FlashUncensored:
+        "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash ohne Verweigerungen, bereitgestellt von Venice.ai. Echte Leistung, keine Belehrungen, inklusive Tools. 1M-Token-Kontext.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - xAIs neuestes Bildgenerierungsmodell mit verbesserter Prompt-Treue und Bildqualität.",
       qwenImage3:

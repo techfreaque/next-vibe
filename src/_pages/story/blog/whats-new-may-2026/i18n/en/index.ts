@@ -11,8 +11,6 @@ export const translations = {
 
   hero: {
     backToBlog: "Back to Blog",
-    brand: "{{appName}} - ",
-    icon: "🧠",
     category: "Product Update",
     readTime: "6 min read",
     title: "Cortex. Dreamer. Autopilot. Your AI remembers now.",
@@ -100,5 +98,11 @@ export const translations = {
     p2: "Open a chat and ask your AI to show you the Cortex, generate an image, or set up your Dreamer. It knows what to do.",
     cta: "Open {{appName}}",
     signature: "— Max & the unbottled.ai team",
+  },
+
+  cta: {
+    title: "Your AI remembers now. Go talk to it.",
+    subtitle:
+      "Cortex, Dreamer and Autopilot are live for every account. Open a chat and ask what it knows about you.",
   },
 };

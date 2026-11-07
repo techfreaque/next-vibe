@@ -43,6 +43,7 @@ import {
 import {
   checkMediaBalance,
   deductMediaCredits,
+  keepsExplicitMediaModel,
 } from "../shared/media-generation";
 import { NO_SKILL_ID } from "../skills/constants";
 import { buildFavoriteConfig } from "../skills/favorites/repository";
@@ -64,6 +65,7 @@ import { generateWithOpenAI } from "./providers/openai";
 import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
 import { generateImageWithUnbottled } from "./providers/unbottled";
+import { generateWithVenice } from "./providers/venice";
 
 /**
  * Calculate image generation credit cost with option-aware pricing.
@@ -289,6 +291,17 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size: data.size,
           inputMediaUrl: data.inputMediaUrl,
+          logger,
+          locale,
+          fetchImpl,
+        });
+        break;
+
+      case ApiProvider.VENICE_AI:
+        generationResult = await generateWithVenice({
+          providerModel: imageModel.providerModel,
+          prompt: data.prompt,
+          size: data.size,
           logger,
           locale,
           fetchImpl,
@@ -596,10 +609,21 @@ export class ImageGenerationRepository {
     return success({ imageUrl, creditCost });
   }
 
-  static async getRequestDefaults(ctx: {
-    user: JwtPayloadType;
-    toolExecutionContext: ToolExecutionContext;
-  }): Promise<Partial<ImageGenerationPostRequestInput>> {
+  /**
+   * A human's explicit model pick wins; AI/MCP callers (or an empty pick) get
+   * the favorite/skill model.
+   */
+  static async getRequestDefaults(
+    ctx: {
+      user: JwtPayloadType;
+      toolExecutionContext: ToolExecutionContext;
+      platform: Platform;
+    },
+    requestedModel: string | undefined,
+  ): Promise<Partial<ImageGenerationPostRequestInput>> {
+    if (keepsExplicitMediaModel(ctx.platform, requestedModel)) {
+      return {};
+    }
     const availability = await getEnvAvailability();
     const userId =
       ctx.user && !ctx.user.isPublic && "id" in ctx.user

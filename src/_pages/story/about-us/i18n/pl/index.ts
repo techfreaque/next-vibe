@@ -16,63 +16,75 @@ export const translations: typeof enTranslations = {
       "Dowiedz się o naszej misji dotyczącej niecenzurowanych rozmów z AI",
   },
   hero: {
+    eyebrow: "O {{appName}}",
+    title: "AI, która słucha Ciebie.",
     subtitle:
-      "{{modelCount}} modeli. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki, zaplanowane zadania. Uruchom bezpłatnie na {{appName}} - lub hostuj samodzielnie.",
+      "{{modelCount}} modeli. {{skillCount}} skilli. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki, zadania cykliczne. Za darmo na {{appName}} - albo na własnym serwerze.",
+    ctaPrimary: "Zacznij rozmowę",
+    ctaSecondary: "Czytaj build log",
+  },
+  stats: {
+    models: "modeli AI",
+    skills: "skilli",
+    tools: "narzędzi",
+    founded: "rok założenia",
   },
   backToHome: "Powrót do strony głównej",
   title: "O {{appName}}",
-  subtitle: "Pionierujemy niecenzurowane rozmowy z AI",
+  subtitle: "Pionierzy nieocenzurowanych rozmów z AI",
   description:
-    "Mamy misję demokratyzacji dostępu do niecenzurowanej AI. Założona w {{foundedYear}}, {{appName}} zapewnia platformę, na której użytkownicy mogą prowadzić szczere, niefiltrowane rozmowy z najbardziej zaawansowanymi modelami AI na świecie.",
+    "Od {{foundedYear}} roku {{appName}} daje Ci najlepsze modele AI na świecie - bez działu polityk, który decyduje, o co wolno Ci zapytać. Ty wybierasz model. Ty ustawiasz filtr.",
   values: {
-    title: "Nasze wartości",
-    description: "Zasady, które kierują wszystkim, co robimy w {{appName}}",
+    title: "Tu nie idziemy na kompromisy",
+    description: "Cztery zasady, które musi spełnić każda funkcja {{appName}}.",
     excellence: {
-      title: "Doskonałość",
+      title: "Ty wybierasz filtr",
       description:
-        "Dążymy do doskonałości we wszystkim, co robimy, od wydajności naszej platformy po obsługę klienta.",
+        "Modele mainstreamowe, otwarte albo bez cenzury. Poziom ustawiasz dla każdej rozmowy. Nikt nie decyduje za Ciebie.",
     },
     innovation: {
-      title: "Innowacja",
+      title: "W całości open source",
       description:
-        "Ciągle innowujemy, aby zapewnić Ci najnowsze modele AI i funkcje.",
+        "{{appName}} działa na next-vibe - open source na GitHubie. Czytaj kod, forkuj, uruchamiaj na własnym sprzęcie.",
     },
     integrity: {
-      title: "Integralność",
+      title: "Prywatność domyślnie",
       description:
-        "Działamy z przejrzystością i uczciwością, szanując Twoją prywatność i dane.",
+        "Tryb incognito trzyma rozmowy na Twoim urządzeniu. Twoje dane są Twoje - nie są produktem na sprzedaż.",
     },
     collaboration: {
-      title: "Współpraca",
+      title: "Budujemy publicznie",
       description:
-        "Współpracujemy z naszą społecznością, aby zbudować najlepszą platformę do czatu AI.",
+        "Roadmapa, decyzje architektoniczne i ślepe zaułki - wszystko na blogu. Twój feedback staje się funkcjami.",
     },
   },
   mission: {
-    title: "Nasza misja",
-    subtitle: "Demokratyzacja dostępu do niecenzurowanej AI",
+    title: "Twoje AI. Twoje zasady.",
+    subtitle: "Nieocenzurowane AI dla każdego",
     description:
-      "Wierzymy, że AI powinno być dostępne dla każdego, bez cenzury ani ograniczeń. Naszą misją jest zapewnienie platformy, na której użytkownicy mogą prowadzić szczere rozmowy z AI.",
+      "Każdy duży dostawca AI filtruje, o co możesz zapytać - a zasad nigdy nie widzisz. Uważamy, że dorośli potrafią decydować sami. Dlatego {{appName}} zbiera każdy model i każdy poziom filtra w jednym miejscu - i oddaje Ci przełącznik.",
     vision: {
-      title: "Nasza wizja",
+      title: "Wizja",
       description:
-        "Zostanie wiodącą na świecie platformą dla niecenzurowanych rozmów z AI, umożliwiając użytkownikom dostęp do najbardziej zaawansowanych modeli AI.",
+        "Jeden dom dla każdego poważnego modelu AI - mainstreamowego, otwartego i bez cenzury - w którym to Ty ustalasz granice.",
     },
     approach: {
-      title: "Nasze podejście",
+      title: "Podejście",
       description:
-        "Łączymy najnowocześniejszą technologię AI z filozofią zorientowaną na użytkownika, zapewniając prywatność, bezpieczeństwo i wolność słowa.",
+        "Szybko dostarczać najlepsze modele, dawać im prawdziwe narzędzia - wyszukiwanie, pamięć, automatyzację - i traktować prywatność jako standard, nie dopłatę.",
     },
     commitment: {
-      title: "Nasze zobowiązanie",
+      title: "Zobowiązanie",
       description:
-        "Zobowiązujemy się do utrzymania platformy, która szanuje prywatność użytkowników, zapewnia przejrzystą wycenę i oferuje wyjątkowe doświadczenia AI.",
+        "Przejrzyste ceny. Zero dark patterns. Platforma, którą możesz opuścić w każdej chwili - stawiając u siebie dokładnie ten sam kod.",
     },
   },
   contact: {
-    title: "Skontaktuj się",
-    description: "Masz pytania lub opinie? Chętnie od Ciebie usłyszymy.",
-    cta: "Skontaktuj się z nami",
+    title: "Pytania? Napisz do nas.",
+    description:
+      "Feedback, partnerstwa, prasa, bugi - każdą wiadomość czyta człowiek.",
+    cta: "Napisz do nas",
+    selfHost: "Postaw u siebie",
   },
   post: {
     title: "Tytuł",

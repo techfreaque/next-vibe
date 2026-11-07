@@ -12,8 +12,6 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "{{appName}} - ",
-    icon: "🌱",
     category: "Für Einsteiger",
     readTime: "5 Min. Lesezeit",
     title: "Zwei Wege zum Verdienen. Du musst dich nicht entscheiden.",
@@ -47,9 +45,9 @@ export const translations: typeof enTranslations = {
   },
   skillAngle: {
     title: "Der Skill-Weg - passives Einkommen, das du einmal baust",
-    p1: "Ein Skill ist eine individuelle KI-Persona: Name, Persönlichkeit, System-Prompt. Veröffentlichen. Fertig. Jeder kann ihn finden und nutzen - meldet sich jemand über den Skill-Link an, verdienst du 5 % seiner Zahlungen, für immer, on top der 10 % Empfehlungsprovision.",
+    p1: "Ein Skill ist eine individuelle KI-Persona: Name, Persönlichkeit, System-Prompt. Veröffentlichen. Fertig. Jeder kann ihn finden und nutzen - meldet sich jemand über den Link eines anderen Mitglieds zu deinem Skill an, verdienst du 5 % seiner Zahlungen, für immer. Dein eigener Skill-Link bringt die vollen 10 % direkt.",
     p2: "Was Einsteiger meist übersehen: Die 5 % sind an dich als Autor gebunden, nicht daran, wer den Link geteilt hat. Entdeckt jemand deinen Skill im Verzeichnis und schickt ihn weiter - meldet sich der Freund an - wirst du trotzdem gutgeschrieben. Die Plattform trackt die Skill-Autorenschaft, nicht wer ihn verbreitet hat. Dein Skill arbeitet für dich, auch wenn du gerade nichts tust.",
-    p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Fang einfach an: ein Skill für dein Hobby, deinen Job, deine Muttersprache. Veröffentlichen, Link teilen, fertig. Jede Anmeldung darüber bringt dir beide Provisionen gleichzeitig - 10 % direkt + 5 % Skill = 15 % von diesem Nutzer, für immer.",
+    p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Fang einfach an: ein Skill für dein Hobby, deinen Job, deine Muttersprache. Veröffentlichen, Link teilen, fertig. Jede Anmeldung über deinen eigenen Link bringt dir 10 %, für immer. Jede Anmeldung, die andere zu deinem Skill bringen, bringt dir 5 %.",
   },
   multilevel: {
     title: "Es gibt auch eine Kette - so funktioniert sie",
@@ -80,7 +78,6 @@ export const translations: typeof enTranslations = {
     step1Body:
       "Kein bezahltes Abo nötig. Das Empfehlungsprogramm steht allen offen.",
     step2Title: "Zur Empfehlungsseite gehen",
-    step2Body: "Öffne die Empfehlungsseite. ",
     step2Link: "Öffne die Empfehlungsseite.",
     step2Suffix: " Code erstellen - alles, was du dir gut merken kannst.",
     step3Title: "Link teilen - oder einen Skill veröffentlichen",
@@ -96,6 +93,5 @@ export const translations: typeof enTranslations = {
     p2: "Wenn du tiefer einsteigen willst - Provisionsstruktur verstehen, beste Promotion-Wege finden oder Fragen stellen - ist unser Discord der richtige Ort.",
     createCode: "Empfehlungscode holen",
     joinDiscord: "Discord beitreten",
-    backToBlog: "Zurück zum Blog",
   },
 };

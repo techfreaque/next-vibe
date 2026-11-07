@@ -65,7 +65,7 @@ export const friendlySkill: Skill = {
       variantName: "skills.friendly.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.DEEPSEEK_V4_FLASH,
+        manualModelId: ChatModelId.DEEPSEEK_V4_1_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

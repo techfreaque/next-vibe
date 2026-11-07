@@ -6,9 +6,11 @@ import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Key } from "next-vibe/ui/components/icons/Key";
+import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
@@ -56,7 +58,7 @@ export function UserSessionsContainer(): JSX.Element {
       );
       setRevoking(null);
       if (!result.success) {
-        setRevokeError(result.message ?? "Failed to revoke session");
+        setRevokeError(result.message ?? t("widget.revokeFailed"));
         return;
       }
       endpointMutations?.read?.refetch?.();
@@ -70,7 +72,7 @@ export function UserSessionsContainer(): JSX.Element {
   const { sessions } = data;
 
   return (
-    <WidgetShell>
+    <WidgetShell className="gap-4">
       <WidgetHeader
         title={t("list.title")}
         backButton={
@@ -97,6 +99,10 @@ export function UserSessionsContainer(): JSX.Element {
         </Alert>
       ) : undefined}
 
+      <P className="m-0 px-1 text-sm text-muted-foreground">
+        {t("widget.intro")}
+      </P>
+
       {sessions.length === 0 ? (
         <EmptyBlock
           icon={<Key />}
@@ -104,12 +110,18 @@ export function UserSessionsContainer(): JSX.Element {
           message={t("widget.emptyHint")}
         />
       ) : (
-        <Div className="flex flex-col divide-y divide-border">
+        <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
           {sessions.map((session) => (
-            <Div key={session.id} className="flex items-center gap-3 py-3 px-1">
-              <Div className="flex-1 min-w-0">
-                <Div className="flex items-center gap-2 flex-wrap">
-                  <Span className="text-sm font-medium truncate">
+            <Div
+              key={session.id}
+              className="flex min-h-16 items-center gap-3 px-4 py-3"
+            >
+              <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <Monitor className="h-4 w-4" />
+              </Span>
+              <Div className="min-w-0 flex-1">
+                <Div className="flex flex-wrap items-center gap-2">
+                  <Span className="truncate text-sm font-medium">
                     {session.name ?? t("widget.browserSession")}
                   </Span>
                   {session.isCurrentSession && (
@@ -130,10 +142,9 @@ export function UserSessionsContainer(): JSX.Element {
               </Div>
               {!session.isCurrentSession && (
                 <Button
-                  size="sm"
                   variant="outline"
                   disabled={revoking === session.id}
-                  className="shrink-0 text-destructive hover:text-destructive"
+                  className="h-10 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={(): void => handleRevoke(session)}
                 >
                   {revoking === session.id

@@ -89,6 +89,14 @@ export const {
     value: process.env.NEXT_PUBLIC_AGENT_VENICE_AI,
     example: false,
   },
+  NEXT_PUBLIC_AGENT_NANO_GPT: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => v === "true"),
+    value: process.env.NEXT_PUBLIC_AGENT_NANO_GPT,
+    example: false,
+  },
   NEXT_PUBLIC_AGENT_SCRAPPEY: {
     schema: z
       .string()

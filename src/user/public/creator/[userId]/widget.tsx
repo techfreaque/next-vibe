@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "next-vibe/ui/components/avatar";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/components/link";
 import { Nav } from "next-vibe/ui/components/nav";
 import { Span } from "next-vibe/ui/components/span";
@@ -87,57 +83,36 @@ export function CreatorProfileWidget(): JSX.Element {
   }, [favorites]);
 
   const accent = data?.creatorAccentColor ?? DEFAULT_ACCENT;
-  const scopedPaletteStyle = useMemo(
-    () => buildScopedPaletteStyle(accent, true),
-    [accent],
-  );
+  // The creator's accent only recolours primary/ring — page surfaces stay on
+  // the app's light/dark tokens so the profile reads right in both themes.
+  const accentStyle = useMemo((): Record<string, string> => {
+    const palette = buildScopedPaletteStyle(accent, false);
+    return {
+      "--primary": palette["--primary"],
+      "--primary-foreground": palette["--primary-foreground"],
+      "--ring": palette["--ring"],
+    };
+  }, [accent]);
 
   if (!data) {
     return (
-      <Div
-        style={{
-          minHeight: "100vh",
-          background: "#16082a",
-          color: "#fff",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 16,
-          textAlign: "center",
-          padding: "0 24px",
-        }}
-      >
-        <H2 style={{ fontSize: 24, fontWeight: 700 }}>
+      <Div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 bg-background px-4 text-center">
+        <H2 className="m-0 border-0 p-0 text-2xl font-semibold tracking-tight text-foreground">
           {t("widget.notFound.title")}
         </H2>
-        <P style={{ color: "rgba(255,255,255,0.5)", maxWidth: 360 }}>
+        <P className="m-0 max-w-sm text-sm text-muted-foreground">
           {t("widget.notFound.description")}
         </P>
-        <Link href={`/${locale}` as never}>
-          <Button variant="outline">{t("widget.notFound.back")}</Button>
+        <Link href={`/${locale}`}>
+          <Button variant="outline" className="h-11">
+            {t("widget.notFound.back")}
+          </Button>
         </Link>
       </Div>
     );
   }
 
   const skills = data.skills;
-
-  const avatarNode = (
-    <Avatar className="h-full w-full">
-      {data.avatarUrl && (
-        <AvatarImage src={data.avatarUrl} alt={data.publicName} />
-      )}
-      <AvatarFallback className="text-2xl font-bold bg-violet-900/60 text-violet-200">
-        {data.publicName
-          .split(" ")
-          .map((w: string) => w[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2)}
-      </AvatarFallback>
-    </Avatar>
-  );
 
   const nameSubline =
     skills.length > 0
@@ -152,60 +127,29 @@ export function CreatorProfileWidget(): JSX.Element {
   );
 
   return (
-    <Div
-      style={{
-        minHeight: "100vh",
-        background: "#0f0520",
-        color: "#fff",
-        fontFamily: "inherit",
-        ...scopedPaletteStyle,
-      }}
-    >
-      {/* ── NAV ── */}
-      <Nav
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          padding: "0 24px",
-          height: 52,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "rgba(15,5,32,0.9)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-        }}
-      >
-        <Link
-          href={`/${locale}`}
-          className="text-xs no-underline text-white/50 hover:text-white/80 transition-colors"
-        >
-          {t("widget.nav.backArrow")} {data.appName}
-        </Link>
-      </Nav>
+    <Div style={{ fontFamily: "inherit", ...accentStyle }}>
+      <Div className="min-h-screen bg-background text-foreground">
+        {/* ── NAV ── */}
+        <Nav className="sticky top-0 z-50 flex h-14 items-center border-b bg-background/85 px-4 backdrop-blur sm:px-6">
+          <Link
+            href={`/${locale}`}
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {data.appName}
+          </Link>
+        </Nav>
 
-      {/* ── HERO ── */}
-      <ProfileHero
-        profile={data}
-        avatarNode={avatarNode}
-        nameSubline={nameSubline}
-        belowAvatarRow={belowAvatarRow}
-      />
+        {/* ── HERO ── */}
+        <ProfileHero
+          profile={data}
+          nameSubline={nameSubline}
+          belowAvatarRow={belowAvatarRow}
+        />
 
-      {/* ── SKILLS + EXTRAS ── */}
-      <Div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 24px 80px",
-        }}
-      >
-        {/* Skills - rendered via CollapsibleSkillSection */}
-        {skills.length > 0 && (
-          <Div style={{ marginBottom: 36 }}>
+        {/* ── SKILLS + EXTRAS ── */}
+        <Div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 pb-20 pt-8 sm:px-6">
+          {skills.length > 0 && (
             <CollapsibleSkillSection
               skills={skills}
               idx={0}
@@ -221,64 +165,31 @@ export function CreatorProfileWidget(): JSX.Element {
             >
               {skillsFieldChildren}
             </CollapsibleSkillSection>
-          </Div>
-        )}
+          )}
 
-        {/* Lead capture */}
-        {data.leadMagnetActive && skills.length > 0 && (
-          <Div style={{ marginTop: 36 }}>
+          {data.leadMagnetActive && skills.length > 0 && (
             <LeadCaptureForm
               skillId={skills[0].id}
               headline={data.leadMagnetHeadline}
               buttonText={data.leadMagnetButtonText}
             />
-          </Div>
-        )}
+          )}
 
-        {/* Referral code */}
-        {data.referralCode && (
-          <Div
-            style={{
-              marginTop: 48,
-              padding: "16px 20px",
-              borderRadius: 12,
-              border: `1px solid ${accent}30`,
-              background: `${accent}08`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 16,
-            }}
-          >
-            <Span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>
-              {t("widget.referral.label")}
-            </Span>
-            <Span
-              style={{
-                fontFamily: "monospace",
-                fontSize: 13,
-                color: accent,
-                fontWeight: 600,
-                letterSpacing: "0.06em",
-              }}
-            >
-              {data.referralCode}
-            </Span>
-          </Div>
-        )}
+          {data.referralCode && (
+            <Div className="flex items-center justify-between gap-4 rounded-xl border bg-card px-5 py-4 shadow-sm">
+              <Span className="text-sm text-muted-foreground">
+                {t("widget.referral.label")}
+              </Span>
+              <Span className="font-mono text-sm font-semibold tracking-wider text-primary">
+                {data.referralCode}
+              </Span>
+            </Div>
+          )}
 
-        {/* Footer */}
-        <Span
-          style={{
-            display: "block",
-            textAlign: "center",
-            marginTop: 56,
-            fontSize: 12,
-            color: "rgba(255,255,255,0.18)",
-          }}
-        >
-          {t("widget.nav.copyright")} {data.appName}
-        </Span>
+          <Span className="mt-6 block text-center text-xs text-muted-foreground/70">
+            {t("widget.nav.copyright")} {data.appName}
+          </Span>
+        </Div>
       </Div>
     </Div>
   );

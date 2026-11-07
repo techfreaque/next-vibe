@@ -219,9 +219,13 @@ export const translations: typeof enTranslations = {
       description: "Twoje aktualne saldo kredytów i podział",
     },
     balance: {
-      title: "Twoje saldo kredytów",
+      subscribe: "Zobacz plany",
+      freePlanHint:
+        "{{count}} darmowych kredytów miesięcznie. Z subskrypcją {{subCredits}} i pakiety doładowań.",
+      freePlan: "Korzystasz z planu darmowego",
+      title: "Twoje kredyty",
       adminTitle: "Limit wydatków",
-      description: "Używaj kredytów w {{modelCount}} modelach AI",
+      description: "Jedno saldo na wszystkie modele ({{modelCount}}).",
       adminDescription:
         "Kredyty działają jako limit wydatków - kontroluj dozwolone użycie AI przez wszystkich użytkowników.",
       credit: "{{count}} kredyt",
@@ -329,6 +333,7 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      emptyHint: "Każdy kredyt na plus i na minus trafi tutaj.",
       title: "Pobierz historię kredytów",
       titleShort: "Historia",
       description: "Pobierz stronicowaną historię transakcji kredytowych",
@@ -336,7 +341,7 @@ export const translations: typeof enTranslations = {
         title: "Historia kredytów",
         description: "Zobacz swoją historię transakcji kredytowych",
       },
-      emptyState: "Brak transakcji kredytowych",
+      emptyState: "Brak transakcji",
       balance: "Saldo po: {{count}}",
       limit: {
         label: "Limit",

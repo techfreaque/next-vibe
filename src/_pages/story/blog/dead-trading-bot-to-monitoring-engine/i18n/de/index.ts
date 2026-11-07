@@ -23,7 +23,6 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Ich hab vor Jahren einen Trading-Bot aufgegeben. Seine Architektur wurde zum spannendsten Teil von next-vibe. Jede Node im Graph ist ein Endpoint - aufrufbar über die CLI, auffindbar für KI, direkt in die Plattform integriert.",
     readTime: "14 Min. Lesezeit",
-    date: "Architektur",
   },
   origin: {
     title: "Der Trading-Bot, den ich aufgegeben hab",
@@ -322,9 +321,6 @@ export const translations: typeof enTranslations = {
     },
   },
   ui: {
-    checkMark: "✓",
-    crossMark: "✗",
-    arrowMark: "→",
     emaFunctionLabel: "computeEma()",
   },
 };

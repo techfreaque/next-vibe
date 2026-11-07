@@ -1,5 +1,4 @@
 export const translations = {
-  backToHome: "Back to Home",
   errors: {
     unknown: "An unknown error occurred",
     title: "Error",

@@ -16,7 +16,6 @@ import { Link } from "next-vibe/ui/components/link";
 import { MotionDiv } from "next-vibe/ui/components/motion";
 import { H2, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
-import { useInView } from "react-intersection-observer";
 
 import { scopedTranslation } from "./i18n";
 
@@ -30,15 +29,14 @@ export function SelfHostSection({
   totalToolCount,
 }: SelfHostSectionProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const interpolation = { endpointCount: totalToolCount };
 
   return (
-    <Div className="bg-muted/30" ref={ref as never}>
+    <Div className="bg-muted/30">
       <Div className="container px-4 md:px-6 py-24 md:py-32">
         <MotionDiv
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <Div className="text-center mb-12">

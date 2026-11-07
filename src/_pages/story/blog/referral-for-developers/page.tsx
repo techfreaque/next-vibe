@@ -1,21 +1,34 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { Code } from "next-vibe/ui/components/icons/Code";
+import { Info } from "next-vibe/ui/components/icons/Info";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Quote } from "next-vibe/ui/components/icons/Quote";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
-import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, Muted, P } from "next-vibe/ui/components/typography";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleEnd,
+  ArticleHeader,
+  ArticleLead,
+  ArticleP,
+  ArticleSection,
+} from "../../_shared/article";
+import { Callout, Cta } from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -52,23 +65,25 @@ export async function tanstackLoader({
   return { locale };
 }
 
-function MathRow({
-  profile,
-  spend,
-  direct,
-  skill,
+function ChainList({
+  items,
 }: {
-  profile: string;
-  spend: string;
-  direct: string;
-  skill: string;
+  items: ReadonlyArray<{ key: string; label: string; total: boolean }>;
 }): JSX.Element {
   return (
-    <Div className="grid grid-cols-4 px-4 py-3 border-t text-sm font-mono">
-      <Span className="text-gray-300">{profile}</Span>
-      <Span className="text-gray-400">{spend}</Span>
-      <Span className="text-cyan-300">{direct}</Span>
-      <Span className="text-emerald-400 font-semibold">{skill}</Span>
+    <Div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+      {items.map((item) => (
+        <Div
+          key={item.key}
+          className={
+            item.total
+              ? "bg-primary/5 px-4 py-3 text-sm font-semibold text-primary md:px-5"
+              : "px-4 py-3 text-sm text-foreground/90 md:px-5"
+          }
+        >
+          {item.label}
+        </Div>
+      ))}
     </Div>
   );
 }
@@ -79,227 +94,152 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
+
+  const examples = [
+    t("useCase.examples.0", { appName }),
+    t("useCase.examples.1", { appName }),
+    t("useCase.examples.2", { appName }),
+    t("useCase.examples.3", { appName }),
+  ];
+
+  const mathRows = ([0, 1, 2, 3] as const).map((i) => ({
+    profile: t(`math.rows.${i}.profile`),
+    spend: t(`math.rows.${i}.spend`),
+    direct: t(`math.rows.${i}.direct`),
+    skill: t(`math.rows.${i}.skill`),
+  }));
+
+  const chainKeys = [
+    "level0",
+    "level1",
+    "level2",
+    "level3",
+    "level4",
+    "total",
+  ] as const;
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Header bar */}
-      <Div className="bg-cyan-700 border-b border-cyan-800">
-        <Div className="container mx-auto px-4 py-3 max-w-4xl">
-          <Div className="flex items-center gap-3">
-            <Code className="h-5 w-5 text-white/80" />
-            <P className="text-white font-semibold text-sm font-mono">
-              {t("hero.brand", { appName })}
-              {t("hero.category")}
-            </P>
-          </Div>
-        </Div>
-      </Div>
+      <ArticleHeader
+        back={back}
+        category={t("hero.category")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("referral-for-developers", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
 
-      {/* Hero */}
-      <Div className="bg-cyan-50 dark:bg-cyan-950/20 border-b border-cyan-100 dark:border-cyan-900/40">
-        <Div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("hero.backToBlog")}
-          </Link>
-
-          <Div className="flex items-center gap-3 mb-6">
-            <Div className="px-3 py-1 bg-cyan-700 rounded-full text-white text-xs font-semibold uppercase tracking-wider font-mono">
-              {t("hero.category")}
-            </Div>
-            <Muted className="text-xs font-mono">{t("hero.readTime")}</Muted>
-          </Div>
-
-          <H1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-xl text-muted-foreground max-w-2xl">
-            {t("hero.subtitle")}
-          </P>
-        </Div>
-      </Div>
-
-      <Div className="container mx-auto px-4 py-16 max-w-4xl space-y-16">
-        {/* Use case */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("useCase.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("useCase.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("useCase.p2", { appName })}
-          </P>
-          <Div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
-            <Div className="flex items-center gap-2 px-4 py-3 border-b border-gray-700">
-              <Code className="h-4 w-4 text-cyan-400" />
-              <Span className="text-cyan-400 text-sm font-mono">{`// examples`}</Span>
-            </Div>
-            <Div className="p-4 space-y-3">
-              {[
-                t("useCase.examples.0", { appName }),
-                t("useCase.examples.1", { appName }),
-                t("useCase.examples.2", { appName }),
-                t("useCase.examples.3", { appName }),
-              ].map((example, i) => (
-                <P
-                  key={i}
-                  className="text-gray-300 text-sm font-mono leading-relaxed"
-                >
-                  {`"${example}"`}
-                </P>
-              ))}
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Skill angle */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("skillAngle.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("skillAngle.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("skillAngle.p2")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("skillAngle.p3")}
-          </P>
-        </Div>
-
-        <Separator />
-
-        {/* Math table */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-2">{t("math.title")}</H2>
-          <Muted className="mb-6">{t("math.subtitle")}</Muted>
-
-          <Div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-900 mb-6">
-            <Div className="grid grid-cols-4 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide font-mono">
-              <Span>{t("math.tableHeaderProfile")}</Span>
-              <Span>{t("math.tableHeaderSpend")}</Span>
-              <Span>{t("math.tableHeaderDirect")}</Span>
-              <Span>{t("math.tableHeaderSkill")}</Span>
-            </Div>
-            {([0, 1, 2, 3] as const).map((i) => (
-              <MathRow
-                key={i}
-                profile={t(`math.rows.${i}.profile`)}
-                spend={t(`math.rows.${i}.spend`)}
-                direct={t(`math.rows.${i}.direct`)}
-                skill={t(`math.rows.${i}.skill`)}
-              />
-            ))}
-          </Div>
-
-          <Div className="p-4 rounded-lg bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800 text-sm text-cyan-800 dark:text-cyan-200 mb-4">
-            {t("math.note", { appName })}
-          </Div>
-          <Div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 text-sm text-emerald-800 dark:text-emerald-200">
-            <Div className="flex items-start gap-2">
-              <TrendingUp className="h-4 w-4 mt-0.5 shrink-0" />
-              <Span>{t("math.growthNote", { appName })}</Span>
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Chain */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("chain.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("chain.p1")}
-          </P>
-          <Div className="space-y-2 mb-6">
-            {(
-              [
-                "level0",
-                "level1",
-                "level2",
-                "level3",
-                "level4",
-                "total",
-              ] as const
-            ).map((key) => (
+      <ArticleBody>
+        <ArticleSection title={t("useCase.title")}>
+          <ArticleLead>{t("useCase.p1")}</ArticleLead>
+          <ArticleP>{t("useCase.p2", { appName })}</ArticleP>
+          <Div className="flex flex-col gap-3">
+            {examples.map((example) => (
               <Div
-                key={key}
-                className={`flex items-start gap-3 p-3 rounded-lg text-sm ${
-                  key === "total"
-                    ? "bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 font-semibold"
-                    : "bg-gray-900/60 border border-gray-700/40 text-gray-300"
-                }`}
+                key={example}
+                className="flex gap-3 rounded-xl border border-border bg-card p-4"
               >
-                <Span className="font-mono">{t(`chain.${key}`)}</Span>
+                <Quote className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <P className="text-sm leading-relaxed text-foreground/90 md:text-base">
+                  {example}
+                </P>
               </Div>
             ))}
           </Div>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("chain.p2")}
-          </P>
-        </Div>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("skillAngle.title")}>
+          <ArticleP>{t("skillAngle.p1")}</ArticleP>
+          <ArticleP>{t("skillAngle.p2")}</ArticleP>
+          <ArticleP>{t("skillAngle.p3")}</ArticleP>
+        </ArticleSection>
 
-        {/* Crypto */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("crypto.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("crypto.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("crypto.p2", { appName })}
-          </P>
-        </Div>
-
-        <Separator />
-
-        {/* Close */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("close.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("close.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-            {t("close.p2")}
-          </P>
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-cyan-700 hover:bg-cyan-800 text-white"
-            >
-              <Link href={`/${locale}/user/(account)/referral`}>
-                {t("close.createCode")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link
-                href={configT("social.discordInvite")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageSquare className="h-4 w-4" />
-                {t("close.joinDiscord")}
-              </Link>
-            </Button>
+        <ArticleSection title={t("math.title")} intro={t("math.subtitle")}>
+          <Div className="overflow-hidden rounded-xl border border-border bg-card">
+            <Table className="min-w-[34rem]">
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("math.tableHeaderProfile")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("math.tableHeaderSpend")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("math.tableHeaderDirect")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-primary">
+                    {t("math.tableHeaderSkill")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mathRows.map((row) => (
+                  <TableRow key={row.profile}>
+                    <TableCell className="text-foreground">
+                      {row.profile}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground tabular-nums">
+                      {row.spend}
+                    </TableCell>
+                    <TableCell className="text-foreground tabular-nums">
+                      {row.direct}
+                    </TableCell>
+                    <TableCell className="font-semibold text-primary tabular-nums">
+                      {row.skill}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Div>
-        </Div>
+          <Callout tone="neutral" icon={Info}>
+            {t("math.note", { appName })}
+          </Callout>
+          <Callout tone="success" icon={TrendingUp}>
+            {t("math.growthNote", { appName })}
+          </Callout>
+        </ArticleSection>
 
-        <Div className="flex justify-start pt-4">
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/story/blog`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("hero.backToBlog")}
-            </Link>
-          </Button>
-        </Div>
-      </Div>
+        <ArticleSection title={t("chain.title")}>
+          <ArticleP>{t("chain.p1")}</ArticleP>
+          <ChainList
+            items={chainKeys.map((key) => ({
+              key,
+              label: t(`chain.${key}`),
+              total: key === "total",
+            }))}
+          />
+          <ArticleP>{t("chain.p2")}</ArticleP>
+        </ArticleSection>
+
+        <ArticleSection title={t("crypto.title")}>
+          <ArticleP>{t("crypto.p1")}</ArticleP>
+          <ArticleP>{t("crypto.p2", { appName })}</ArticleP>
+        </ArticleSection>
+
+        <ArticleEnd
+          back={back}
+          title={t("close.title")}
+          subtitle={`${t("close.p1")} ${t("close.p2")}`}
+          actions={
+            <>
+              <Cta
+                href={`/${locale}/user/referral`}
+                label={t("close.createCode")}
+              />
+              <Cta
+                href={configT("social.discordInvite")}
+                label={t("close.joinDiscord")}
+                icon={MessageSquare}
+                variant="secondary"
+                external
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

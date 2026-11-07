@@ -119,8 +119,8 @@ function makeUserMessage(content: string, id: string): ChatMessage {
 }
 
 const PROVIDER_TO_MODEL: Record<string, ChatModelId> = {
-  "claude-code": ChatModelId.CLAUDE_CODE_SONNET,
-  "open-code": ChatModelId.CLAUDE_CODE_SONNET, // fallback until OpenCode model added
+  "claude-code": ChatModelId.CLAUDE_SONNET_5_5,
+  "open-code": ChatModelId.CLAUDE_SONNET_5_5, // fallback until OpenCode model added
 };
 
 function makeAssistantMessage(
@@ -378,7 +378,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
         assistantContent,
         assistantMsgId,
         isAssistantLoading,
-        PROVIDER_TO_MODEL[providerValue] ?? ChatModelId.CLAUDE_CODE_SONNET,
+        PROVIDER_TO_MODEL[providerValue] ?? ChatModelId.CLAUDE_SONNET_5_5,
       ),
     [assistantContent, assistantMsgId, isAssistantLoading, providerValue],
   );
@@ -577,7 +577,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
             <WidgetChatInput
               content={promptValue}
               onContentChange={handleContentChange}
-              modelId={ChatModelId.CLAUDE_CODE_SONNET}
+              modelId={ChatModelId.CLAUDE_SONNET_5_5}
               skillId={NO_SKILL_ID}
               onModelChange={() => undefined}
               onSkillChange={() => undefined}

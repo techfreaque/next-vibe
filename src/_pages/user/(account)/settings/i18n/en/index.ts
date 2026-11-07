@@ -1,13 +1,13 @@
 export const translations = {
   title: "Settings",
-  description: "Manage your profile, creator presence, and email list.",
+  description: "Profile, plan, security. All in one place.",
   nav: {
     back: "Back",
     referral: "Referral Program",
   },
   unauthenticated: {
-    title: "Sign in to access settings",
-    subtitle: "You need to be logged in to manage your profile.",
+    title: "Sign in to see your settings",
+    subtitle: "Profile, plan and security live behind your login.",
     logIn: "Log In",
     signUp: "Create Account",
   },

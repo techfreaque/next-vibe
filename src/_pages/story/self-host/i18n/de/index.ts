@@ -44,6 +44,8 @@ export const translations: typeof enTranslations = {
       title: "Dev-Server starten",
       description:
         "Startet PostgreSQL in Docker, führt Migrationen durch, befüllt Daten und öffnet localhost:3000.",
+      noDocker:
+        'Kein Docker? DATABASE_URL="file:///absoluter/pfad/data.db" in die .env setzen - vibe dev läuft dann auf eingebettetem PGlite.',
     },
     step3: {
       title: "Einloggen und konfigurieren",

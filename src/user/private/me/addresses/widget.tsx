@@ -143,16 +143,15 @@ export function UserAddressesContainer(): JSX.Element {
             actions={
               <>
                 <Button
-                  size="sm"
                   variant="outline"
+                  className="h-10"
                   onClick={(): void => handleEdit(address.id)}
                 >
                   {t("list.widget.edit")}
                 </Button>
                 <Button
-                  size="sm"
                   variant="outline"
-                  className="text-destructive"
+                  className="h-10 text-destructive hover:text-destructive"
                   onClick={(): void => handleDelete(address.id)}
                 >
                   {t("list.widget.delete")}
@@ -198,7 +197,7 @@ export function UserAddressCreateContainer({
         }
       />
 
-      <Div className="flex flex-col gap-4 p-1">
+      <Div className="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm sm:p-6">
         <FormAlertWidget field={emptyField} />
 
         <TextFieldWidget
@@ -206,12 +205,12 @@ export function UserAddressCreateContainer({
           field={children.addressLabel}
         />
 
-        <Div className="grid grid-cols-2 gap-4">
+        <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <TextFieldWidget fieldName="fullName" field={children.fullName} />
           <TextFieldWidget fieldName="company" field={children.company} />
         </Div>
 
-        <Div className="grid grid-cols-2 gap-4">
+        <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <PhoneFieldWidget fieldName="phone" field={children.phone} />
           <TextFieldWidget fieldName="vatNumber" field={children.vatNumber} />
         </Div>
@@ -225,17 +224,17 @@ export function UserAddressCreateContainer({
           field={children.addressLine2}
         />
 
-        <Div className="grid grid-cols-2 gap-4">
+        <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <TextFieldWidget fieldName="city" field={children.city} />
           <TextFieldWidget fieldName="region" field={children.region} />
         </Div>
 
-        <Div className="grid grid-cols-2 gap-4">
+        <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <TextFieldWidget fieldName="postalCode" field={children.postalCode} />
           <TextFieldWidget fieldName="country" field={children.country} />
         </Div>
 
-        <Div className="grid grid-cols-2 gap-4">
+        <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <BooleanFieldWidget
             fieldName="isDefaultBilling"
             field={children.isDefaultBilling}

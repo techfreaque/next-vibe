@@ -62,26 +62,26 @@ export const translations: typeof enTranslations = {
       howItWorks: {
         title: "Jak działają kredyty",
         description:
-          "Subskrybuj dla {{subCredits}} miesięcznych kredytów i kupuj dodatkowe pakiety w razie potrzeby",
+          "Jedna waluta dla każdego modelu. Subskrybuj, doładuj albo zacznij za darmo.",
         expiring: {
-          title: "Subskrypcja miesięczna",
+          title: "Plan miesięczny",
           description:
-            "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI. Idealne dla regularnych użytkowników!",
+            "{{subPrice}}/mies. {{subCredits}} kredytów co miesiąc i dostęp do {{modelCount}} modeli AI.",
         },
         permanent: {
-          title: "Dodatkowe pakiety kredytów",
+          title: "Pakiety kredytów",
           description:
-            "{{packPrice}} za {{packCredits}} kredytów - Potrzebujesz więcej niż {{subCredits}} kredytów? Kup dodatkowe pakiety, które nigdy nie wygasają. Wymaga aktywnej subskrypcji.",
+            "{{packPrice}} za {{packCredits}} kredytów. Nie wygasają. Dla subskrybentów, którym {{subCredits}} to za mało.",
         },
         free: {
-          title: "Darmowe kredyty testowe",
-          description:
-            "Każdy otrzymuje {{count}} darmowych kredytów do wypróbowania naszej usługi. Nie wymaga karty kredytowej!",
+          title: "Darmowe kredyty",
+          description: "{{count}} kredytów na start. Bez karty.",
         },
       },
       costs: {
-        title: "Koszty kredytów",
-        description: "Zobacz, ile kosztuje każda funkcja",
+        title: "Ile to kosztuje",
+        description:
+          "Kredyty za wiadomość, obraz, klip lub wywołanie narzędzia.",
         models: {
           title: "Modele AI (na wiadomość)",
           gpt4: "GPT-4",
@@ -114,10 +114,10 @@ export const translations: typeof enTranslations = {
         },
       },
       cta: {
-        title: "Gotowy, aby zacząć?",
+        title: "Odblokuj wszystkie modele.",
         description:
-          "Subskrybuj dla miesięcznych kredytów i rozmawiaj ze wszystkimi {{modelCount}} modelami AI. Subskrybenci mogą kupować dodatkowe pakiety kredytów!",
-        button: "Subskrybuj teraz",
+          "Miesięczne kredyty na {{modelCount}} modeli AI. Doładowuj pakietami, kiedy chcesz.",
+        button: "Subskrybuj",
       },
     },
     buy: {

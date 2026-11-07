@@ -1,59 +1,59 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  emailPlaceholder: "Geben Sie Ihre E-Mail ein",
+  emailPlaceholder: "Gib deine E-Mail ein",
   page: {
-    title: "Bleiben Sie auf dem Laufenden mit {{appName}}",
-    description: "Erhalten Sie die neuesten KI-Nachrichten, Updates und Tipps",
-    subtitle: "Erhalten Sie die neuesten KI-Nachrichten und Updates",
+    eyebrow: "Der {{appName}}-Newsletter",
+    title: "Eine Mail im Monat. Nur was neu ist.",
+    description:
+      "Neue Modelle, neue Features, Prompts, die funktionieren - monatlich.",
+    subtitle: "Neue Modelle, neue Features, Prompts, die funktionieren.",
     heroDescription:
-      "Abonnieren Sie unseren Newsletter, um Updates über neue KI-Modelle, Funktionen und Tipps zu erhalten, wie Sie das Beste aus unzensiertem KI-Chat herausholen.",
+      "Neue Modelle am Tag ihres Starts, Features, die du kennen solltest, Setups mit echten Ergebnissen. Einmal im Monat. Abmeldung mit einem Klick.",
     invalidEmail: {
       title: "Ungültige E-Mail",
       description:
-        "Die angegebene E-Mail-Adresse ist ungültig. Bitte überprüfen Sie sie und versuchen Sie es erneut.",
+        "Diese Adresse sieht nicht richtig aus. Prüf sie und versuch es nochmal.",
     },
     emailProvided: {
-      title: "Verwalten Sie Ihr Abonnement",
-      description:
-        "Aktualisieren Sie Ihre Newsletter-Einstellungen oder melden Sie sich jederzeit ab.",
+      title: "Abo verwalten",
+      description: "Newsletter-Einstellungen ändern oder jederzeit abmelden.",
     },
-    unsubscribeText: "Möchten Sie sich abmelden?",
-    unsubscribeLink: "Hier klicken",
+    unsubscribeText: "Genug gelesen?",
+    unsubscribeLink: "Hier abmelden",
+    privacyNote: "Kein Spam. Keine Weitergabe deiner Adresse. Niemals.",
     cta: {
-      title: "Bereit, informiert zu bleiben?",
-      description:
-        "Schließen Sie sich Tausenden von KI-Enthusiasten an, die die neuesten Updates erhalten",
+      title: "Hol dir die nächste Ausgabe.",
+      description: "Eine Mail im Monat. Null Füllstoff.",
       subscribeButton: "Abonnieren",
     },
     benefits: {
-      title: "Was Sie erhalten",
-      subtitle: "Bleiben Sie mit exklusiven KI-Einblicken vorne",
+      title: "Was in deinem Postfach landet",
+      subtitle: "Vier Dinge. Sonst nichts.",
       benefit1: {
-        title: "Neue KI-Modell-Ankündigungen",
+        title: "Neue Modelle zuerst",
         description:
-          "Seien Sie der Erste, der erfährt, wenn wir neue KI-Modelle zur Plattform hinzufügen.",
+          "Jedes neue Modell - wofür es taugt, was es kostet, wann du es wählst.",
       },
       benefit2: {
-        title: "Feature-Updates",
+        title: "Ausgelieferte Features",
         description:
-          "Werden Sie über neue Funktionen, Verbesserungen und Plattform-Updates benachrichtigt.",
+          "Was sich geändert hat, warum es zählt, wie du es heute nutzt.",
       },
       benefit3: {
-        title: "KI-Tipps & Tricks",
+        title: "Prompts, die funktionieren",
         description:
-          "Lernen Sie, wie Sie bessere Ergebnisse von KI erhalten mit unseren Experten-Tipps und Anwendungsfällen.",
+          "Echte Setups und Skills mit Ergebnissen - kopieren, anpassen, loslegen.",
       },
       benefit4: {
         title: "Exklusive Angebote",
-        description:
-          "Erhalten Sie spezielle Rabatte und frühen Zugang zu neuen Funktionen.",
+        description: "Rabatte und Frühzugang vor allen anderen.",
       },
     },
     frequency: {
-      title: "E-Mail-Häufigkeit",
+      title: "Monatlich. Das war's.",
       description:
-        "Wir versenden Newsletter monatlich. Sie können sich jederzeit abmelden.",
+        "Eine Mail pro Monat. Abmeldung jederzeit - ein Klick, keine Rückfragen.",
     },
   },
   subscription: {

@@ -75,7 +75,7 @@ export const editorSkill: Skill = {
       variantName: "skills.editor.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

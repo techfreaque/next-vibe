@@ -73,7 +73,11 @@ export const translations: typeof enTranslations = {
       "Ponieważ każdy węzeł to standardowy endpoint, są indywidualnie testowalne przez CLI, dostępne dla agentów AI przez MCP i buforowane z tą samą infrastrukturą co wszystko inne. Silnik grafu nie wymyśla własnego języka. Harmonogramuje endpointy.",
   },
   cta: {
+    title: "Przeczytaj kod. Uruchom go sam.",
+    subtitle:
+      "next-vibe jest open source. Sklonuj, odpal vibe dev i w jedno popołudnie wypuść pierwszy endpoint na każdą powierzchnię.",
     github: "Zobacz na GitHubie",
     clone: "git clone https://github.com/techfreaque/next-vibe",
+    framework: "Poznaj next-vibe",
   },
 };

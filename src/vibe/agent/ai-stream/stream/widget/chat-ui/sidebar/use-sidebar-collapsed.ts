@@ -11,7 +11,7 @@
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { getScreenWidth } from "next-vibe/ui/lib/screen";
-import { storage } from "next-vibe/ui/lib/storage";
+import { getLocalItem, setLocalItem } from "next-vibe/ui/lib/storage";
 import { useEffect } from "react";
 import { create } from "zustand";
 
@@ -20,8 +20,10 @@ const MOBILE_BREAKPOINT = 930; // px
 
 interface SidebarState {
   collapsed: boolean;
-  /** Whether storage/screen-size check has completed */
+  /** Whether the storage/screen-size check has started */
   initialized: boolean;
+  /** Whether the storage/screen-size check has completed */
+  ready: boolean;
   /** Toggle or set collapsed state. Persists to storage. */
   setCollapsed: (collapsed: boolean) => void;
   /** Load initial state from storage or screen size. Called once on mount. */
@@ -31,30 +33,27 @@ interface SidebarState {
 const useSidebarStore = create<SidebarState>((set, get) => ({
   collapsed: false,
   initialized: false,
+  ready: false,
 
   setCollapsed: (collapsed): void => {
-    set({ collapsed });
-    void storage.setItem(STORAGE_KEY, JSON.stringify(collapsed));
+    set({ collapsed, ready: true });
+    setLocalItem(STORAGE_KEY, String(collapsed));
   },
 
   initialize: (logger): void => {
     if (get().initialized) {
       return;
     }
-    set({ initialized: true });
-
-    void (async (): Promise<void> => {
-      try {
-        const stored = await storage.getItem(STORAGE_KEY);
-        if (stored !== null) {
-          set({ collapsed: JSON.parse(stored) as boolean });
-        } else {
-          set({ collapsed: getScreenWidth(logger) < MOBILE_BREAKPOINT });
-        }
-      } catch {
-        set({ collapsed: getScreenWidth(logger) < MOBILE_BREAKPOINT });
-      }
-    })();
+    // Synchronous read on mount: state and UI agree before anyone can tap the toggle
+    const stored = getLocalItem(STORAGE_KEY);
+    set({
+      initialized: true,
+      ready: true,
+      collapsed:
+        stored !== null
+          ? stored === "true"
+          : getScreenWidth(logger) < MOBILE_BREAKPOINT,
+    });
   },
 }));
 
@@ -80,4 +79,12 @@ export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   }, [initialize, logger]);
 
   return [collapsed, setCollapsed];
+}
+
+/**
+ * True once the persisted / screen-size state has loaded.
+ * Mobile overlays wait for this so the sidebar never flashes open on load.
+ */
+export function useSidebarInitialized(): boolean {
+  return useSidebarStore((s) => s.initialized && s.ready);
 }

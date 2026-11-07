@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
       "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
   },
   printAriaLabel: "Drukuj politykę prywatności",
+  onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Polityka prywatności",
   lastUpdated: "Ostatnia aktualizacja: styczeń 2025",

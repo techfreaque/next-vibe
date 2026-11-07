@@ -21,6 +21,8 @@ import {
   chatModelOptions,
   getBestChatModel,
   getChatModelById,
+  isLegacyChatModel,
+  resolveChatModelSuccessor,
 } from "../ai-stream/models";
 import type {
   AudioVisionModelSelection,
@@ -238,9 +240,13 @@ export class SkillsRepositoryClient {
       );
     });
 
+    // Legacy models never win an automatic pick while a current one qualifies.
+    const current = filtered.filter((model) => !isLegacyChatModel(model.id));
+    const candidates = current.length > 0 ? current : filtered;
+
     // Apply sorting if specified
     if (filters.sortBy) {
-      return filtered.toSorted((a, b) => {
+      return candidates.toSorted((a, b) => {
         const dir1 = filters.sortDirection ?? ModelSortDirection.DESC;
         const v1a = this.getSortValue(a, filters.sortBy);
         const v1b = this.getSortValue(b, filters.sortBy);
@@ -258,7 +264,7 @@ export class SkillsRepositoryClient {
       });
     }
 
-    return filtered;
+    return candidates;
   }
 
   private static getFilteredModelsInternal(
@@ -267,15 +273,30 @@ export class SkillsRepositoryClient {
     availability: AgentEnvAvailability,
   ): ChatModelOption[] {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
-      const model = getChatModelById(modelSelection.manualModelId);
       const isAdmin =
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-      if (model?.adminOnly && !isAdmin) {
-        return [];
+      // Legacy picks resolve to their successor first, then the original id.
+      const successorId = resolveChatModelSuccessor(
+        modelSelection.manualModelId,
+      );
+      const candidateIds =
+        successorId === modelSelection.manualModelId
+          ? [successorId]
+          : [successorId, modelSelection.manualModelId];
+      for (const candidateId of candidateIds) {
+        const model = getChatModelById(candidateId);
+        if (model.adminOnly && !isAdmin) {
+          continue;
+        }
+        if (isModelProviderAvailable(model, availability)) {
+          return [model];
+        }
       }
-      // If provider unavailable, fall through to filter fallback
-      if (model && isModelProviderAvailable(model, availability)) {
-        return [model];
+      if (
+        getChatModelById(modelSelection.manualModelId).adminOnly &&
+        !isAdmin
+      ) {
+        return [];
       }
       // Fall through to FILTERS using the selection's filter constraints
       return this.applyHardFilters(

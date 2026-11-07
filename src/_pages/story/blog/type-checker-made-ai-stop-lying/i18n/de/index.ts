@@ -116,7 +116,7 @@ export const translations: typeof enTranslations = {
       "Schau zu, wie Claude Code dreimal gegen den Checker anrennt, bevor es den richtigen Typ findet",
     round1Title: "Runde 1 - KI schreibt `any`",
     round1Description:
-      'Frag Claude Code: "Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben - nimm whatever type makes this work."',
+      'Frag Claude Code: "Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben - nimm einfach irgendeinen Typ, der funktioniert."',
     round1Result: "Claude Code schreibt die einfache Lösung:",
     round1Error:
       "2 Fehler gefunden. Beide `any`. Claude Code sieht das über das MCP-Tool.",

@@ -48,7 +48,12 @@ import {
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "../../constants";
-import { type ChatModelId, getBestChatModel } from "../../models";
+import {
+  type ChatModelId,
+  getBestChatModel,
+  resolveChatModelForUser,
+  resolveChatModelSuccessor,
+} from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import {
   type AudioVisionModelId,
@@ -228,9 +233,21 @@ export async function resolveModelSkill(params: {
 
   // ── 1. Explicit model + its skill id (frontend already resolved both).
   // favoriteConfig rides through untouched as downstream context.
+  // A legacy id (stale settings/thread default, API caller) resolves to its
+  // successor when the successor is servable — otherwise it is kept as-is.
   if (model) {
+    const resolvedModel =
+      resolveChatModelSuccessor(model) === model
+        ? model
+        : resolveChatModelForUser(model, user, await getEnvAvailability());
+    if (resolvedModel !== model) {
+      logger.debug("[resolveModelSkill] Legacy model resolved to successor", {
+        from: model,
+        to: resolvedModel,
+      });
+    }
     return success({
-      model,
+      model: resolvedModel,
       skill: skill ?? NO_SKILL_ID,
       favoriteConfig,
     });

@@ -58,12 +58,12 @@ const baseFields = {
       .optional()
       .default(
         claudeCodeEnabled
-          ? ChatModelId.CLAUDE_CODE_HAIKU
+          ? ChatModelId.CLAUDE_HAIKU_5_5
           : DEFAULT_CHAT_MODEL_ID,
       ),
-    example: "claude-code-haiku",
+    example: "claude-haiku-5.5",
     comment:
-      "AI model to use in integration tests. Defaults to claude-code-haiku when CLAUDE_CODE_ENABLED resolves true, otherwise the platform default chat model.",
+      "AI model to use in integration tests. Defaults to claude-haiku-5.5 (served via Claude Code) when CLAUDE_CODE_ENABLED resolves true, otherwise the platform default chat model.",
     commented: true,
   },
   OPENROUTER_API_KEY: {
@@ -102,6 +102,14 @@ const baseFields = {
     schema: z.string().optional(),
     example: "your-venice-ai-key",
     comment: "Venice AI API key - get yours at https://venice.ai",
+    commented: true,
+    sensitive: true,
+  },
+  NANO_GPT_API_KEY: {
+    schema: z.string().optional(),
+    example: "your-nano-gpt-key",
+    comment:
+      "NanoGPT API key - uncensored GLM 5.3, DeepSeek V4.1 and abliterated models, pay with crypto. Get yours at https://nano-gpt.com/api",
     commented: true,
     sensitive: true,
   },
@@ -313,6 +321,7 @@ export const agentPublicFlags = {
   NEXT_PUBLIC_AGENT_FREEDOM_GPT: Boolean(agentEnv.FREEDOMGPT_API_KEY),
   NEXT_PUBLIC_AGENT_GAB_AI: Boolean(agentEnv.GAB_AI_API_KEY),
   NEXT_PUBLIC_AGENT_VENICE_AI: Boolean(agentEnv.VENICE_AI_API_KEY),
+  NEXT_PUBLIC_AGENT_NANO_GPT: Boolean(agentEnv.NANO_GPT_API_KEY),
   NEXT_PUBLIC_AGENT_SCRAPPEY: Boolean(agentEnv.SCRAPPEY_API_KEY),
   NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES: Boolean(agentEnv.OPENAI_API_KEY),
   NEXT_PUBLIC_AGENT_OPEN_AI_STT: Boolean(agentEnv.OPENAI_API_KEY),

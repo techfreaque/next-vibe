@@ -83,8 +83,10 @@ export function getReferralParams(
     REFERRAL_CONFIG.DIRECT_PERCENTAGE + REFERRAL_CONFIG.UPLINE_PERCENTAGE,
   );
 
+  // Skill creator share = first upline slot. It is only paid when ANOTHER
+  // member's link brought the user in - a creator sharing their own skill is
+  // the direct referrer and earns DIRECT_PERCENTAGE, never direct + bonus.
   const skillBonusPct = percentages[1] ?? 0;
-  const skillTotalPct = REFERRAL_CONFIG.DIRECT_PERCENTAGE + skillBonusPct;
 
   const noobUsers = 10;
   const midUsers = 50;
@@ -94,15 +96,15 @@ export function getReferralParams(
   const noobEarningCents = Math.round(
     noobUsers * subPrice * REFERRAL_CONFIG.DIRECT_PERCENTAGE,
   );
+  // Direct referrals (own referral + own skill links) earn DIRECT_PERCENTAGE;
+  // users others bring in through your skill / your upline earn skillBonusPct.
   const midEarningCents = Math.round(
-    30 * subPrice * REFERRAL_CONFIG.DIRECT_PERCENTAGE +
-      20 * subPrice * skillTotalPct +
-      10 * subPrice * (percentages[1] ?? 0),
+    midUsers * subPrice * REFERRAL_CONFIG.DIRECT_PERCENTAGE +
+      10 * subPrice * skillBonusPct,
   );
   const proEarningCents = Math.round(
-    120 * subPrice * REFERRAL_CONFIG.DIRECT_PERCENTAGE +
-      80 * subPrice * skillTotalPct +
-      50 * subPrice * (percentages[1] ?? 0),
+    proUsers * subPrice * REFERRAL_CONFIG.DIRECT_PERCENTAGE +
+      50 * subPrice * skillBonusPct,
   );
 
   return {
@@ -110,7 +112,6 @@ export function getReferralParams(
     uplinePct,
     totalPct,
     skillBonusPct: fmtPct(skillBonusPct),
-    skillPct: fmtPct(skillTotalPct),
     level2Pct: fmtPct(percentages[1] ?? 0),
     level3Pct: fmtPct(percentages[2] ?? 0),
     maxUplineLevels: String(REFERRAL_CONFIG.MAX_UPLINE_LEVELS),

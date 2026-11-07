@@ -260,9 +260,9 @@ export const AUDIO_VISION = {
     sortDirection: ModelSortDirection.ASC,
   } satisfies AudioVisionModelSelection,
 
-  /** Gemini 2.5 Flash - pinned for quality-sensitive audio analysis. */
+  /** Gemini 3.8 Flash - pinned for quality-sensitive audio analysis. */
   geminiFlash: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: AudioVisionModelId.GEMINI_2_5_FLASH,
+    manualModelId: AudioVisionModelId.GEMINI_3_8_FLASH,
   } satisfies AudioVisionModelSelection,
 } as const;

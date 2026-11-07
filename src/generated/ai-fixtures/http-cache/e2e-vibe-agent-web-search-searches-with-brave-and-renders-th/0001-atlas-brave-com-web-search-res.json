@@ -1,0 +1,593 @@
+{
+  "type": "json",
+  "url": "https://api.search.brave.com/res/v1/web/search?q=bun+runtime&count=1&safesearch=moderate",
+  "status": 200,
+  "headers": {
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Sat, 07 Nov 2026 00:34:59 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "server-timing": "search-roundtrip;dur=55.761",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "vary": "Accept-Encoding, Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site, Sec-Fetch-User",
+    "x-content-type-options": "nosniff",
+    "x-download-options": "noopen",
+    "x-frame-options": "SAMEORIGIN",
+    "x-ratelimit-limit": "50, 0",
+    "x-ratelimit-policy": "50;w=1, 0;w=2592000",
+    "x-ratelimit-remaining": "49, 0",
+    "x-ratelimit-reset": "1, 2071499",
+    "x-xss-protection": "1; mode=block"
+  },
+  "body": {
+    "type": "search",
+    "query": {
+      "original": "bun runtime",
+      "show_strict_warning": false,
+      "is_navigational": true,
+      "is_news_breaking": false,
+      "spellcheck_off": false,
+      "country": "us",
+      "bad_results": false,
+      "should_fallback": false,
+      "postal_code": "",
+      "city": "",
+      "header_country": "",
+      "more_results_available": true,
+      "state": "",
+      "related_queries": [
+        "bun rewrite",
+        "bun runtime size",
+        "what language is bun written in",
+        "bun javascriptcore",
+        "bun github",
+        "bun vs node",
+        "bun vs deno",
+        "bun rust",
+        "bun js",
+        "bun vs vite"
+      ]
+    },
+    "discussions": {
+      "type": "search",
+      "results": [
+        {
+          "title": "What is Bun and what is it used for?",
+          "url": "https://www.reddit.com/r/devsarg/comments/1i7uezp/qu%C3%A9_es_bun_y_para_qu%C3%A9_se_utiliza/?tl=en",
+          "is_source_local": false,
+          "is_source_both": false,
+          "description": "I think it lacks a lot, that the \"seems to be the fastest\" is from an Arial 12 source. And why would I complicate my life? If I'm working on a serious project, I choose the most suitable Node framework and that's it. Imagine using Bun at work right now.",
+          "fetched_content_timestamp": 1793962637,
+          "language": "en",
+          "family_friendly": true,
+          "type": "discussion",
+          "subtype": "generic",
+          "is_live": false,
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "reddit.com",
+            "hostname": "www.reddit.com",
+            "favicon": "https://imgs.search.brave.com/U-eHNCapRHVNWWCVPPMTIvOofZULh0_A_FQKe8xTE4I/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvN2ZiNTU0M2Nj/MTFhZjRiYWViZDlk/MjJiMjBjMzFjMDRk/Y2IzYWI0MGI0MjVk/OGY5NzQzOGQ5NzQ5/NWJhMWI0NC93d3cu/cmVkZGl0LmNvbS8",
+            "path": "› r  › devsarg  › comments  › 1i7uezp  › qué_es_bun_y_para_qué_se_utiliza"
+          },
+          "age": "January 23, 2025",
+          "data": {
+            "forum_name": "r/devsarg",
+            "num_answers": 47,
+            "score": "37",
+            "title": "What is Bun and what is it used for?",
+            "question": "<p>\n      Hi, as I mentioned in a previous comment, I&#39;m going to explain (in the short time I&#39;ve been using Bun) what it is and what it&#39;s used for.\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">What is Bun?</h1><p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs\" rel=\"noopener nofollow ugc\" target=\"_blank\">Bun</a> is a runtime and all-in-one toolkit for both Javascript and Typescript. It&#39;s written in <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://ziglang.org/\" rel=\"noopener nofollow ugc\" target=\"_blank\">Zig</a> and is designed as an alternative to Node.js but &quot;on steroids&quot;. It&#39;s characterized by its speed and efficient memory usage, in addition to offering a suite of different tools for developing apps.\n    </p><p>\n      In their own words:\n    </p><blockquote>\n      <p>\n      Bun is designed as a faster, leaner, more modern replacement for Node.js.\n    </p>\n    </blockquote><h1 class=\"text-24-scalable xs:text-20-scalable\">Bun&#39;s Goals:</h1><ul>\n        <li>\n      <p>\n      <strong>Speed</strong>: In execution times, it seems to be the fastest, and they strive to maintain this.\n    </p>\n    </li><li>\n      <p>\n      <strong>TS and .jsx file support</strong>: Bun directly transpiles Typescript and <code>.jsx</code> or <code>.tsx</code> files to vanilla Javascript.\n    </p>\n    </li><li>\n      <p>\n      <strong>Implement web standards</strong>: Such as <code>fetch</code>, <code>WebSocket</code>, etc. In fact, it&#39;s very simple <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/api/websockets\" rel=\"noopener nofollow ugc\" target=\"_blank\">to create a WS server with Bun</a> and use the native WebSocket package; the upgrade can be achieved very easily.\n    </p>\n    </li><li>\n      <p>\n      <strong>Node.js compatibility</strong>: Their long-term goal is to achieve complete compatibility with Node.js, and they have achieved this in many areas, although not all. They have a <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/runtime/nodejs-apis\" rel=\"noopener nofollow ugc\" target=\"_blank\">dedicated section</a> where you can see the current status.\n    </p>\n    </li>\n      </ul><p>\n      Bun is not just a Node runtime; it&#39;s a complete set of tools for developing apps, with a package manager, a transpiler, a complete test suite, etc. I personally tested it on the backend side, and where I noticed the most difference as a developer was in the test suite.\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">Test runner:</h1><p>\n      Before, I always tested with <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://jestjs.io/\" rel=\"noopener nofollow ugc\" target=\"_blank\">Jest</a> as it&#39;s one of the most well-known, then I tried Bun, and I really felt a difference in testing speed; the tests run much faster. I recommend that you give the <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/cli/test\" rel=\"noopener nofollow ugc\" target=\"_blank\">test runner</a> a try, at least in some tests, or in your side projects. In fact, they already show how you can migrate from Jest to Bun when testing; you can see it <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/guides/test/migrate-from-jest\" rel=\"noopener nofollow ugc\" target=\"_blank\">here</a>.\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">Backend examples:</h1><p>\n      Since this is the only place where I used it, I&#39;ll give some simple examples for the backend side.\n    </p><p>\n      First, you need to <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/installation\" rel=\"noopener nofollow ugc\" target=\"_blank\">install Bun</a>, but once installed, you can run the following command to create a project:\n    </p><pre>\nbun init</pre><p>\n      This command will create a <code>index.ts</code> file ready to run and start developing. And to easily start a server, you can copy this code into the index.ts file and run it with the command <code>bun run index.ts</code>\n    </p><pre>\nconst server = Bun.serve({\n  fetch(req) {\n    const url = new URL(req.url);\n    if (url.pathname === &quot;/ping&quot;) return new Response(&quot;pong&quot;);\n    return new Response(&quot;Page not found - 404&quot;);\n  },\n});\n\nconsole.log(`Listening on http://localhost:${server.port} ...`);</pre><p>\n      This will start a simple Bun server on port :3000. Using <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://curl.se/\" rel=\"noopener nofollow ugc\" target=\"_blank\">curl</a> or any client, you can hit the endpoint to see what happens:\n    </p><pre>\n&gt; curl http://localhost:3000/ping \npong%</pre><p>\n      It returns a pong as we configured previously, but if we now hit another route that doesn&#39;t exist, like &quot;/hello&quot;, this happens:\n    </p><pre>\n&gt; curl http://localhost:3000/hello\nPage not found - 404%</pre><p>\n      By default, it gives us a response indicating that the resource we want to access does not exist.\n    </p><p>\n      And in many more ways, the <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/api/http\" rel=\"noopener nofollow ugc\" target=\"_blank\">native HTTP server</a> is very powerful.\n    </p><p>\n      This is a very simple example, but it&#39;s a way to start an HTTP server solely with Bun, and in turn, everything can be done with Bun; you could create a simple complete API to see how far you can go, testing, starting the HTTP server, and more. The idea of this post is to introduce people to Bun and encourage them to give it a try.\n    </p><p>\n      I really wanted to elaborate more on the new features they introduced, but I think it&#39;s getting too long, so I prefer to leave the link to the blog so you can check it out on your own if you&#39;re still interested: <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/blog\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/blog </a> . Especially the <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/blog/bun-v1.2\" rel=\"noopener nofollow ugc\" target=\"_blank\">latest update</a> they released.\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">Final</h1><p>\n      I&#39;d like to know your opinions, what you thought of the post, and if you&#39;d prefer to see more of this kind of thing.\n    </p><p>\n      I liked it because it forced me to research and know what I&#39;m talking about. Of course, I didn&#39;t use Bun 100% or get the most out of it, but it&#39;s something that interests me, and it seems to be on the right track, and in my experience, it was pleasant to develop with it.  Besides, I think the best way to learn something on your own is by teaching it.\n    </p><p>\n      Thanks for reading!\n    </p><h1 class=\"text-24-scalable xs:text-20-scalable\">Sources</h1><ul>\n        <li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/quickstart\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/docs/quickstart </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/runtime/nodejs-apis\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/docs/runtime/nodejs-apis </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/cli/test\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/docs/cli/test </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/guides/test/migrate-from-jest\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/guides/test/migrate-from-jest </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/guides\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/guides </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/blog/bun-v1.2\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/blog/bun-v1.2 </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/installation\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/docs/installation </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://bun.sh/docs/api/http\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://bun.sh/docs/api/http </a>\n    </p>\n    </li><li>\n      <p>\n      <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://github.com/oven-sh/bun/tree/main/bench/express\" rel=\"noopener nofollow ugc\" target=\"_blank\"> https://github.com/oven-sh/bun/tree/main/bench/express </a>\n    </p>\n    </li>\n      </ul>",
+            "top_comment": "I think it lacks a lot, that the \"seems to be the fastest\" is from an Arial 12 source. And why would I complicate my life? If I'm working on a serious project, I choose the most suitable Node framework and that's it. Imagine using Bun at work right now."
+          }
+        },
+        {
+          "title": "Bun: Fast JavaScript runtime, transpiler, and NPM client written in Zig",
+          "url": "https://news.ycombinator.com/item?id=31993429",
+          "is_source_local": false,
+          "is_source_both": false,
+          "description": "One of the things I'm excited about is bun install · On Linux, it installs dependencies for a simple Next.js app about 20x faster than any other npm client available today",
+          "fetched_content_timestamp": 1793738426,
+          "language": "en",
+          "family_friendly": true,
+          "type": "discussion",
+          "subtype": "generic",
+          "is_live": false,
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "news.ycombinator.com",
+            "hostname": "news.ycombinator.com",
+            "favicon": "https://imgs.search.brave.com/IwlBJ1haXFCsBjLHWEmYcTLoygQjeo-P8RVhPJfs_Zc/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvY2Q0YzBhMWVj/ZmJjOTBiZmNlZDlm/MjNmNTdmZGU2NTAz/ZDIzOWNiNDgyMjA1/NTU2ZDkwNzcwY2Qz/ZjU4YmYxNi9uZXdz/Lnljb21iaW5hdG9y/LmNvbS8",
+            "path": "› item"
+          },
+          "age": "July 26, 2022",
+          "data": {
+            "forum_name": "news.ycombinator.com",
+            "num_answers": 314,
+            "score": "1431",
+            "title": "Bun: Fast JavaScript runtime, transpiler, and NPM client written in Zig",
+            "top_comment": "One of the things I'm excited about is bun install · On Linux, it installs dependencies for a simple Next.js app about 20x faster than any other npm client available today"
+          }
+        },
+        {
+          "title": "Curious about real-world experiences with Bun.js for JavaScript projects",
+          "url": "https://www.reddit.com/r/bun/comments/1ggl7rd/curious_about_realworld_experiences_with_bunjs/",
+          "is_source_local": false,
+          "is_source_both": false,
+          "description": "Hi! Im cofounder of a startup that creates deploys AI assistants for the hospitality industry and we use Bunjs. What i loved about it is the developer experience and I hope the performance will keep up with our expectations as we scale. By developer experience i mean that usually code meant for nodejs also runs with bun, but without setting up ts traspiler. I once or twice encountered a bun-related bug but it was quickly resolved. I also tried deno 2.0 but there’s a lot of rewriting you need to do to make your code compatible with it and i like that i can always switch back to node if i feel like it. Also love elysiajs btw",
+          "fetched_content_timestamp": 1793941786,
+          "language": "en",
+          "family_friendly": true,
+          "type": "discussion",
+          "subtype": "generic",
+          "is_live": false,
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "reddit.com",
+            "hostname": "www.reddit.com",
+            "favicon": "https://imgs.search.brave.com/U-eHNCapRHVNWWCVPPMTIvOofZULh0_A_FQKe8xTE4I/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvN2ZiNTU0M2Nj/MTFhZjRiYWViZDlk/MjJiMjBjMzFjMDRk/Y2IzYWI0MGI0MjVk/OGY5NzQzOGQ5NzQ5/NWJhMWI0NC93d3cu/cmVkZGl0LmNvbS8",
+            "path": "› r  › bun  › comments  › 1ggl7rd  › curious_about_realworld_experiences_with_bunjs"
+          },
+          "age": "October 31, 2024",
+          "data": {
+            "forum_name": "r/bun",
+            "num_answers": 16,
+            "score": "16",
+            "title": "Curious about real-world experiences with Bun.js for JavaScript projects",
+            "question": "<p>\n      I&#39;m exploring different JavaScript runtimes and came across <a rpl class=\"relative pointer-events-auto a\n  \n  \n  \n  \n  underline\n  \n  cursor-pointer\" href=\"https://www.scalablepath.com/nodejs/bun-node-alternative\" rel=\"noopener nofollow ugc\" target=\"_blank\">this comparison of Bun and Node.js</a>, which discusses Bun&#39;s performance-focused features, like its native TypeScript and ESM support, that might simplify certain setups. Has anyone here tried using Bun in real-world scenarios? I’m especially curious about any noticeable differences in development speed or resource efficiency for complex projects. Any insights or stories would be awesome!\n    </p>",
+            "top_comment": "Hi! Im cofounder of a startup that creates deploys AI assistants for the hospitality industry and we use Bunjs. What i loved about it is the developer experience and I hope the performance will keep up with our expectations as we scale. By developer experience i mean that usually code meant for nodejs also runs with bun, but without setting up ts traspiler. I once or twice encountered a bun-related bug but it was quickly resolved. I also tried deno 2.0 but there’s a lot of rewriting you need to do to make your code compatible with it and i like that i can always switch back to node if i feel like it. Also love elysiajs btw"
+          }
+        }
+      ],
+      "mutated_by_goggles": false
+    },
+    "infobox": {
+      "type": "graph",
+      "results": [
+        {
+          "title": "Bun",
+          "url": "https://en.wikipedia.org/wiki/Bun_(software)",
+          "is_source_local": false,
+          "is_source_both": false,
+          "description": "JavaScript runtime",
+          "family_friendly": true,
+          "type": "infobox",
+          "position": 2,
+          "label": "software",
+          "category": "programming",
+          "long_desc": "Bun is a JavaScript runtime, package manager and test runner designed as a drop-in replacement for Node.js. Bun uses Safari's JavaScriptCore as its JavaScript engine, unlike Node.js and Deno, which run on the V8 engine used by Chromium. Bun was originally developed by Jarred Sumner, with its ...",
+          "attributes": [
+            [
+              "Original author",
+              "Jarred Sumner"
+            ],
+            [
+              "Developer",
+              "<a href='https://en.wikipedia.org/wiki/Anthropic'>Anthropic</a>"
+            ],
+            [
+              "Release",
+              "September 14, 2021; 5 years ago"
+            ],
+            [
+              "Stable release",
+              "1.4.4<br>/ 22 October 2026; 15 days ago"
+            ],
+            [
+              "Written in",
+              "<a href='https://en.wikipedia.org/wiki/Rust_(programming_language)'>Rust</a>, <a href='https://en.wikipedia.org/wiki/C++'>C++</a> (<a href='https://en.wikipedia.org/wiki/JavaScriptCore'>JSC</a> bindings), <a href='https://en.wikipedia.org/wiki/C_(programming_language)'>C</a> (<a href='https://en.wikipedia.org/wiki/WebSocket'>WebSocket</a> bindings), <a href='https://en.wikipedia.org/wiki/TypeScript'>TypeScript</a>, <a href='https://en.wikipedia.org/wiki/JavaScript'>JavaScript</a>"
+            ],
+            [
+              "Operating system",
+              "<a href='https://en.wikipedia.org/wiki/Linux'>Linux</a>, <a href='https://en.wikipedia.org/wiki/MacOS'>macOS</a>, <a href='https://en.wikipedia.org/wiki/Microsoft_Windows'>Windows</a>"
+            ],
+            [
+              "Type",
+              "<a href='https://en.wikipedia.org/wiki/Runtime_system'>Runtime environment</a>"
+            ],
+            [
+              "License",
+              "<a href='https://en.wikipedia.org/wiki/MIT_license'>MIT license</a>"
+            ],
+            [
+              "Repository",
+              "github.com/oven-sh/bun"
+            ]
+          ],
+          "profiles": [
+            {
+              "name": "Wikipedia",
+              "url": "https://en.wikipedia.org/wiki/Bun_(software)",
+              "long_name": "en.wikipedia.org",
+              "img": "https://imgs.search.brave.com/m6XxME4ek8DGIUcEPCqjRoDjf2e54EwL9pQzyzogLYk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQwNGZhZWY0/ZTQ1YWUzYzQ3MDUw/MmMzMGY3NTQ0ZjNj/NDUwMDk5ZTI3MWRk/NWYyNTM4N2UwOTE0/NTI3ZDQzNy9lbi53/aWtpcGVkaWEub3Jn/Lw"
+            },
+            {
+              "name": "YouTube",
+              "url": "https://www.youtube.com/channel/UCzamaGPj4jr3YwJRW7M3qqA",
+              "long_name": "youtube.com",
+              "img": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v"
+            },
+            {
+              "name": "LinkedIn",
+              "url": "https://www.linkedin.com/company/ovensh/",
+              "long_name": "linkedin.com",
+              "img": "https://imgs.search.brave.com/B3dmoKTAgUkkbrvzAxFg_MfHAm5WmWy0N-4kH1AGWOo/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNGE1YzZjOWNj/NmNiODQ4NzI0ODg1/MGY5ZGQ2YzhjZTRm/N2NjOGIzZjc1NTlj/NDM2ZGI5Yjk3ZWI1/YzBmNzJmZS93d3cu/bGlua2VkaW4uY29t/Lw"
+            },
+            {
+              "name": "GitHub",
+              "url": "https://github.com/oven-sh",
+              "long_name": "github.com",
+              "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+            },
+            {
+              "name": "Crunchbase",
+              "url": "https://www.crunchbase.com/organization/oven",
+              "long_name": "crunchbase.com",
+              "img": "https://imgs.search.brave.com/XeBQZ7s3vc5JqDU6Po7ADNs0E1W-Cw07jYI9SaF_k9c/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYzczZDk0MDEy/NDYwMzBjYTE2MWYx/NzhhOGRkZGE4YmQz/NTJlNmMwNDY4N2Ew/MjcwNGU0Mzc4NDA3/YTBlMGIxMy93d3cu/Y3J1bmNoYmFzZS5j/b20v"
+            },
+            {
+              "name": "Npm",
+              "url": "https://www.npmjs.com/package/bun",
+              "long_name": "npmjs.com",
+              "img": "https://imgs.search.brave.com/129PsExJCizx2_pC-7e4exnT1C0gWE4PUinIWjrXr-4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMzg1ZTZiOGFm/M2NhY2JjMmE1NmJl/ZTRlODIwNDVhZWIy/OWRjZDgzYjYyYjcw/NjhmNzQzMWM0NDBk/Y2U3MGIzMi93d3cu/bnBtanMuY29tLw"
+            },
+            {
+              "name": "Wikidata",
+              "url": "http://www.wikidata.org/entity/Q113048518",
+              "long_name": "wikidata.org",
+              "img": "https://imgs.search.brave.com/8vIq-V97PH8S0N-pyaeHgq_gFHOA8hXjBunynHio-Uw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYzdkMGIyYTky/OTJjN2RjNDEyNWYx/MGQxNjAzNmZlNDk4/ZTRmNDczNjk0ZTZl/N2IxZjI0NTVkMGE3/YTBiYjEzYi93d3cu/d2lraWRhdGEub3Jn/Lw"
+            },
+            {
+              "name": "Namu",
+              "url": "https://namu.wiki/w/Bun",
+              "long_name": "namu.wiki",
+              "img": "https://imgs.search.brave.com/ASqhh3dK7hFX53bmp7XVZpSxqVtrrhYb5NAiPa7b2QU/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZjY4MDQzMTIz/ZjZmOGYxZjdhYjkw/ODEwZTVjNjBlYWYy/M2JkZTkxNDIxNDZk/M2Y0NTg4MjhmMDg2/NjBjYTE4YS9uYW11/Lndpa2kv"
+            },
+            {
+              "name": "X",
+              "url": "https://x.com/bunjavascript",
+              "long_name": "x.com",
+              "img": "https://imgs.search.brave.com/VpOsyUaQQGp5MT_drqEzgpxdO8o12jax0jeq0Vojuto/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMmQzM2JiZDhi/OWVhNGYxZmRkNDli/NzAxODUzMzFhYTNm/ODcxNmE4ZGQ5OTE3/MWU4OGZjNDQyZDdh/NzQ4MWE4YS94LmNv/bS8"
+            },
+            {
+              "name": "Docker",
+              "url": "https://hub.docker.com/r/oven/bun",
+              "long_name": "hub.docker.com",
+              "img": "https://imgs.search.brave.com/S7njLdIrCeKw_shq07pmSSNoUDWH94kApohtGW-sT6E/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZDEyZWVlNDgz/ODk0YzAzODFjOTA0/Mjc0YjdmNGQzZTJk/Nzg0MjY0Njc5YzE1/NjI4ODdmNjU2MWEy/NzYzMTkxOS9odWIu/ZG9ja2VyLmNvbS8"
+            }
+          ],
+          "website_url": "https://bun.sh/",
+          "ratings": [],
+          "providers": [
+            {
+              "type": "external",
+              "name": "Wikipedia",
+              "url": "https://en.wikipedia.org/wiki/Bun_(software)",
+              "img": "https://imgs.search.brave.com/m6XxME4ek8DGIUcEPCqjRoDjf2e54EwL9pQzyzogLYk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQwNGZhZWY0/ZTQ1YWUzYzQ3MDUw/MmMzMGY3NTQ0ZjNj/NDUwMDk5ZTI3MWRk/NWYyNTM4N2UwOTE0/NTI3ZDQzNy9lbi53/aWtpcGVkaWEub3Jn/Lw"
+            }
+          ],
+          "images": [
+            {
+              "src": "https://imgs.search.brave.com/Fovdhy-05LHNDkPr2juUESf5r9sgkiYaBhG_PM9kPQE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly90aHVt/Yi53aWtpbWVkaWEu/b3JnL3dpa2lwZWRp/YS9jb21tb25zL3Ro/dW1iLzMvMzgvQnVu/X2pzX2xvZ28ucG5n/LzEyODBweC1CdW5f/anNfbG9nby5wbmc_/dXRtX3NvdXJjZT1l/bi53aWtpcGVkaWEu/b3JnJmFtcDt1dG1f/Y2FtcGFpZ249aW5k/ZXgmYW1wO3V0bV9j/b250ZW50PXRodW1i/bmFpbA",
+              "alt": "Bun (software) - Wikipedia",
+              "original": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Bun_js_logo.png/1280px-Bun_js_logo.png?utm_source=en.wikipedia.org&amp;utm_campaign=index&amp;utm_content=thumbnail",
+              "logo": true
+            }
+          ],
+          "subtype": "generic",
+          "found_in_urls": [
+            "https://bun.com/",
+            "https://en.wikipedia.org/wiki/Bun_(software)",
+            "https://x.com/bunjavascript?lang=en",
+            "https://www.npmjs.com/package/bun"
+          ]
+        }
+      ]
+    },
+    "mixed": {
+      "type": "mixed",
+      "main": [
+        {
+          "type": "web",
+          "index": 0,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 1,
+          "all": false
+        },
+        {
+          "type": "discussions",
+          "all": true
+        },
+        {
+          "type": "videos",
+          "all": true
+        },
+        {
+          "type": "infobox",
+          "index": 0,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 2,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 3,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 4,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 5,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 6,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 7,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 8,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 9,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 10,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 11,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 12,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 13,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 14,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 15,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 16,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 17,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 18,
+          "all": false
+        },
+        {
+          "type": "web",
+          "index": 19,
+          "all": false
+        }
+      ],
+      "top": [],
+      "side": []
+    },
+    "videos": {
+      "type": "videos",
+      "results": [
+        {
+          "type": "video_result",
+          "url": "https://www.youtube.com/shorts/IWn8BBtai7k",
+          "title": "Bun is the best JavaScript runtime #coding #programming ...",
+          "description": "This is a snippet from my video on \"10 reasons to love Bun\". Here I talk about how Bun makes it significantly easier to work with different databases.",
+          "fetched_content_timestamp": 1789728968,
+          "video": {
+            "duration": "00:45",
+            "creator": "Xander Gouws",
+            "publisher": "YouTube"
+          },
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "youtube.com",
+            "hostname": "www.youtube.com",
+            "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+            "path": "› shorts  › IWn8BBtai7k"
+          },
+          "thumbnail": {
+            "src": "https://imgs.search.brave.com/6tXbhEmPsRFX9UUHjsWY8NYp7OC-_iQQDOdSuTiudBA/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9J/V244QkJ0YWk3ay9v/YXIyLmpwZz9zcXA9/LW9heW13RWtDSlVE/RU5BRlNGcVFBZ0h5/cTRxcEF4TUlBUlVB/QUFBQUpRQUF5RUk5/QUlDaVEzZ0ImYW1w/O3JzPUFPbjRDTER4/R1h0SzYxZENSOXVH/Z1M3ZVdTSjZXZUdp/X2cmYW1wO3VzcXA9/Q0Nr",
+            "original": "https://i.ytimg.com/vi/IWn8BBtai7k/oar2.jpg?sqp=-oaymwEkCJUDENAFSFqQAgHyq4qpAxMIARUAAAAAJQAAyEI9AICiQ3gB&amp;rs=AOn4CLDxGXtK61dCR9uGgS7eWSJ6WeGi_g&amp;usqp=CCk"
+          }
+        },
+        {
+          "type": "video_result",
+          "url": "https://www.youtube.com/watch?v=f--3aG0XfCw",
+          "title": "Next.js at the speed of Bun - YouTube",
+          "description": "Next.js + Bun unlocks a whole new level of developer productivity and performance. Learn how Bun's fast runtime, built-in tooling, and native APIs can boost ...",
+          "age": "December 15, 2025",
+          "page_age": "2025-12-15T15:47:55",
+          "fetched_content_timestamp": 1793590344,
+          "video": {
+            "duration": "18:51",
+            "creator": "Vercel",
+            "publisher": "YouTube"
+          },
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "youtube.com",
+            "hostname": "www.youtube.com",
+            "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+            "path": "› watch"
+          },
+          "thumbnail": {
+            "src": "https://imgs.search.brave.com/0VqgAIgg9tQKCELfS48HIHUf0XJ-q8ws3ok7A1DjiGY/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9m/LS0zYUcwWGZDdy9t/YXhyZXNkZWZhdWx0/LmpwZw",
+            "original": "https://i.ytimg.com/vi/f--3aG0XfCw/maxresdefault.jpg"
+          }
+        },
+        {
+          "type": "video_result",
+          "url": "https://www.youtube.com/watch?v=0tvA6yKP0ww",
+          "title": "Bun 1.3 Can Now Replace Your Entire JavaScript Stack - YouTube",
+          "description": "Bun 1.3 brings amazing new features that might make Vite and Express unnecessary for your next project! In this video, you'll learn how Bun now serves HTML f...",
+          "age": "October 14, 2025",
+          "page_age": "2025-10-14T16:14:23",
+          "fetched_content_timestamp": 1793120620,
+          "video": {
+            "duration": "03:36",
+            "creator": "Better Stack",
+            "publisher": "YouTube"
+          },
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "youtube.com",
+            "hostname": "www.youtube.com",
+            "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+            "path": "› watch"
+          },
+          "thumbnail": {
+            "src": "https://imgs.search.brave.com/cflElH85WgqygrYx5i4xwAZRzO5r1WzkItdMDifkFuA/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS8w/dHZBNnlLUDB3dy9t/YXhyZXNkZWZhdWx0/LmpwZw",
+            "original": "https://i.ytimg.com/vi/0tvA6yKP0ww/maxresdefault.jpg"
+          }
+        },
+        {
+          "type": "video_result",
+          "url": "https://www.reddit.com/r/programming/comments/1o3pvk5/bun_13_is_here/",
+          "title": "r/programming on Reddit: Bun 1.3 is here",
+          "description": "Even as a simple package manager, I always hated with passion having to wait a minute for npm install. bun install runs in 1-5 seconds for me, always. ... My guess is that they’re going to offer LTS support once 1.0 goes EOL. ... Alternative nodejs runtime Nodesource took 30 mil in funding ...",
+          "age": "October 11, 2025",
+          "page_age": "2025-10-11T19:26:18",
+          "fetched_content_timestamp": 1792201842,
+          "video": {},
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "reddit.com",
+            "hostname": "www.reddit.com",
+            "favicon": "https://imgs.search.brave.com/U-eHNCapRHVNWWCVPPMTIvOofZULh0_A_FQKe8xTE4I/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvN2ZiNTU0M2Nj/MTFhZjRiYWViZDlk/MjJiMjBjMzFjMDRk/Y2IzYWI0MGI0MjVk/OGY5NzQzOGQ5NzQ5/NWJhMWI0NC93d3cu/cmVkZGl0LmNvbS8",
+            "path": "› r  › programming  › comments  › 1o3pvk5  › bun_13_is_here"
+          },
+          "thumbnail": {
+            "src": "https://imgs.search.brave.com/NwULM7oa9Fm7LWNCcQeWqJcAep-dmLkODKr5ipCvVjU/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9leHRl/cm5hbC1wcmV2aWV3/LnJlZGQuaXQvYnVu/LTEtMy1pcy1oZXJl/LXYwLXY2WUhTOFh2/eFFJTWY4WUt4LUNs/QnVDN1ZFZ1lURW4t/SVlHR0J4aG9uaGcu/anBlZz9mb3JtYXQ9/cGpwZyZhbXA7YXV0/bz13ZWJwJmFtcDtz/PWU5YWZkNzQzYzlk/ODY5ZGQzNzQ4N2Fm/OWRmMWQ2MWRhYmJj/NWNkYTI",
+            "original": "https://external-preview.redd.it/bun-1-3-is-here-v0-v6YHS8XvxQIMf8YKx-ClBuC7VEgYTEn-IYGGBxhonhg.jpeg?format=pjpg&amp;auto=webp&amp;s=e9afd743c9d869dd37487af9df1d61dabbc5cda2"
+          }
+        }
+      ],
+      "mutated_by_goggles": false
+    },
+    "web": {
+      "type": "search",
+      "results": [
+        {
+          "title": "Bun — A fast all-in-one JavaScript runtime",
+          "url": "https://bun.com/",
+          "is_source_local": false,
+          "is_source_both": false,
+          "description": "Bundle, install, and run JavaScript &amp; TypeScript — all in Bun. Bun is <strong>a fast JavaScript runtime &amp; toolkit with a bundler, test runner, and npm-compatible package manager built in</strong>.",
+          "page_age": "2026-08-24T03:35:03",
+          "profile": {
+            "name": "Bun",
+            "url": "https://bun.com/",
+            "long_name": "bun.com",
+            "img": "https://imgs.search.brave.com/mnTqESuI-Rhp-OWoCRElzgnxf5zY_Inl2PE42iIjsZc/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTFkNmM0MmUw/ODQ2NTM1MWQwNmIy/NjlmMzlkN2VmNTVi/OGVjMjZkODNlYzgw/NWRjYzkyMjI3NjNi/M2ZkYzVmNS9idW4u/Y29tLw"
+          },
+          "language": "en",
+          "family_friendly": true,
+          "type": "search_result",
+          "subtype": "generic",
+          "is_live": false,
+          "meta_url": {
+            "scheme": "https",
+            "netloc": "bun.com",
+            "hostname": "bun.com",
+            "favicon": "https://imgs.search.brave.com/mnTqESuI-Rhp-OWoCRElzgnxf5zY_Inl2PE42iIjsZc/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTFkNmM0MmUw/ODQ2NTM1MWQwNmIy/NjlmMzlkN2VmNTVi/OGVjMjZkODNlYzgw/NWRjYzkyMjI3NjNi/M2ZkYzVmNS9idW4u/Y29tLw",
+            "path": ""
+          },
+          "thumbnail": {
+            "src": "https://imgs.search.brave.com/GJkKE5CX-uOzqIvvhp3Sx_voAcVvUq3Lmf1EJDXRStw/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9idW4u/Y29tL3NoYXJlX3Y0/LnBuZw",
+            "original": "https://bun.com/share_v4.png",
+            "logo": false
+          },
+          "age": "August 24, 2026",
+          "cluster_type": "generic",
+          "cluster": [
+            {
+              "title": "Docs",
+              "url": "https://bun.com/docs",
+              "is_source_local": false,
+              "is_source_both": false,
+              "description": "Hello world in minutes with <strong>Bun</strong>.serve. <strong>Runtime</strong>: Execute JavaScript/TypeScript files and package scripts with near-zero overhead.",
+              "family_friendly": true
+            },
+            {
+              "title": "Blog",
+              "url": "https://bun.com/blog",
+              "is_source_local": false,
+              "is_source_both": false,
+              "description": "CPU profiling with --cpu-prof, ... dependency resolution, <strong>bun</strong> list alias, and numerous bug fixes across install, HTTP/HTTPS, N-API, <strong>bun</strong> test, <strong>bun</strong> build, and <strong>runtime</strong>....",
+              "family_friendly": true
+            },
+            {
+              "title": "Bundler",
+              "url": "https://bun.com/docs/bundler",
+              "is_source_local": false,
+              "is_source_both": false,
+              "description": "For bundles that run in the <strong>Bun</strong> <strong>runtime</strong>. In many cases, it isn&#x27;t necessary to bundle server-side code; you can directly execute the source code without modification. However, bundling your server code can reduce startup times and improve running performance.",
+              "family_friendly": true
+            },
+            {
+              "title": "Bun × Anthropic",
+              "url": "https://bun.com/blog/bun-joins-anthropic",
+              "is_source_local": false,
+              "is_source_both": false,
+              "description": "I spent much of that first year in a very cramped apartment in Oakland, just coding and tweeting about <strong>Bun</strong>. To get Next.js server side rendering to work, we needed a JavaScript <strong>runtime</strong>.",
+              "family_friendly": true
+            }
+          ],
+          "organization": {
+            "type": "organization",
+            "name": "Bun",
+            "contact_points": []
+          },
+          "extra_snippets": [
+            "Runtime, package manager, test runner and bundler in a single binary.",
+            "05Ship a single binary$ bun build ./cli.ts --compile --outfile todoBundle your app and the Bun runtime into one executable. Cross-compile for Linux, macOS and Windows from any machine.",
+            "Use bun install or bun test in an existing Node.js project, or run the whole thing on Bun.",
+            "Runs JavaScript & TypeScript on JavaScriptCore. Node.js APIs, node_modules and your framework work as-is.$ bun run index.tsx"
+          ]
+        }
+      ],
+      "family_friendly": true
+    }
+  }
+}

@@ -3,12 +3,15 @@ export const translations: typeof enTranslations = {
   category: "Benutzer",
 
   widget: {
+    intro:
+      "Alle Geräte, die bei deinem Konto angemeldet sind. Melde ab, was du nicht kennst.",
+    revokeFailed: "Gerät konnte nicht abgemeldet werden. Nochmal versuchen.",
     back: "Zurück",
     loading: "Sitzungen werden geladen…",
     empty: "Keine aktiven Sitzungen",
     emptyHint: "Eine Sitzung wird bei jedem Login erstellt",
     browserSession: "Browser-Sitzung",
-    revoke: "Widerrufen",
+    revoke: "Abmelden",
     revoking: "Wird widerrufen…",
     currentSession: "Aktuell",
     created: "Erstellt",
@@ -17,7 +20,7 @@ export const translations: typeof enTranslations = {
   },
 
   list: {
-    title: "Meine Sitzungen",
+    title: "Angemeldete Geräte",
     titleShort: "Meine Sitzungen",
     description: "Alle aktiven Sitzungen für Ihr Konto auflisten",
     tag: "Sitzungen",

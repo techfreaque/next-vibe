@@ -389,9 +389,12 @@ export function CortexExecWidget(_props: {
     }
   }, [searchParams, form]);
 
-  // Sync path to URL search param on every change
+  // Sync path to URL search param when the user changes it. The path the
+  // widget mounted with is never written: embedded renders (chat tool-call
+  // cards, static demos) mount pre-filled and must not rewrite the host URL.
+  const [initialPath] = useState(path);
   useEffect(() => {
-    if (!path) {
+    if (!path || path === initialPath) {
       return;
     }
     const currentHref = getCurrentUrl();
@@ -404,7 +407,7 @@ export function CortexExecWidget(_props: {
     }
     url.searchParams.set("path", path);
     replaceState(url.toString());
-  }, [path, replaceState]);
+  }, [path, initialPath, replaceState]);
 
   // Derive machinePath from path: the /ssh/<slug> prefix
   const machinePath = useMemo((): string => {

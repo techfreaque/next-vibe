@@ -12,9 +12,7 @@ export async function tanstackLoader(): Promise<
 }
 
 export function TanstackPage({ children }: SignupLayoutData): JSX.Element {
-  return (
-    <Div className="container max-w-2xl mx-auto py-8 px-4">{children}</Div>
-  );
+  return <Div className="w-full">{children}</Div>;
 }
 
 export default function SignupLayout({

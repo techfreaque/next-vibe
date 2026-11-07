@@ -21,7 +21,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
 import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Link } from "next-vibe/ui/components/link";
+import { H2, P } from "next-vibe/ui/components/typography";
 import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
 import { KeyboardAvoidingView } from "next-vibe/ui/components/keyboard-avoiding-view";
 import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
@@ -37,8 +41,15 @@ import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-typ
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 
@@ -254,6 +265,9 @@ function AiStreamChatArea(): JSX.Element {
 
 // ─── Main Widget ─────────────────────────────────────────────────────────────
 
+const noopUnsubscribe = (): void => undefined;
+const subscribeNever = (): (() => void) => noopUnsubscribe;
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   const user = useWidgetUser();
@@ -289,19 +303,47 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   // Navigation hooks
   const router = useRouter();
   const pathname = usePathname();
+
+  // Guests can only use incognito + the public feed. A link to a thread in a
+  // private/shared folder gets a sign-in gate (they followed it on purpose);
+  // anything else redirects once to a fresh incognito chat.
+  const isRestrictedFolder =
+    !isAuthenticated &&
+    currentRootFolderId !== DefaultFolderId.INCOGNITO &&
+    currentRootFolderId !== DefaultFolderId.PUBLIC;
+  // Thread id is client-only state: gate after hydration so SSR markup matches
+  const hydrated = React.useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
+  const showSignInGate =
+    hydrated && isRestrictedFolder && Boolean(activeThreadId);
+  const shouldRedirect = isRestrictedFolder && !activeThreadId;
+  // useRouter() returns a new object every render - keep it out of the deps,
+  // or each render re-fires push() and the navigation never completes.
+  const routerRef = useRef(router);
+  useLayoutEffect(() => {
+    routerRef.current = router;
+  });
+  const redirectedRef = useRef(false);
   useEffect(() => {
-    if (
-      !isAuthenticated &&
-      currentRootFolderId !== DefaultFolderId.INCOGNITO &&
-      currentRootFolderId !== DefaultFolderId.PUBLIC
-    ) {
-      logger.info(
-        "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
-        { attemptedFolder: currentRootFolderId },
-      );
-      router.push(`/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`);
+    if (!shouldRedirect) {
+      redirectedRef.current = false;
+      return;
     }
-  }, [isAuthenticated, currentRootFolderId, locale, logger, router]);
+    if (redirectedRef.current) {
+      return;
+    }
+    redirectedRef.current = true;
+    logger.info(
+      "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
+      { attemptedFolder: currentRootFolderId },
+    );
+    routerRef.current.push(
+      `/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`,
+    );
+  }, [shouldRedirect, currentRootFolderId, locale, logger]);
 
   return (
     <>
@@ -340,6 +382,8 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
                     },
                   }}
                 />
+              ) : showSignInGate ? (
+                <SignInGate locale={locale} returnPath={pathname} />
               ) : (
                 <AiStreamChatArea />
               )}
@@ -392,7 +436,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
               <AlertDialogAction
                 onClick={() => {
                   router.push(
-                    `/${locale}/login?returnUrl=${encodeURIComponent(pathname)}`,
+                    `/${locale}/user/login?callbackUrl=${encodeURIComponent(pathname)}`,
                   );
                 }}
               >
@@ -408,10 +452,55 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
         <WelcomeTour
           isAuthenticated={isAuthenticated}
           locale={locale}
-          autoStart={true}
+          autoStart={false}
           totalModelCount={totalModelCount}
         />
       </ErrorBoundary>
     </>
+  );
+}
+
+/** Shown to guests who open a link to a thread they can't read without an account. */
+function SignInGate({
+  locale,
+  returnPath,
+}: {
+  locale: CountryLanguage;
+  returnPath: string;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  return (
+    <Div className="flex h-full flex-1 items-center justify-center p-6">
+      <Div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <Div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Lock className="h-5 w-5" />
+        </Div>
+        <H2 className="border-0 pb-0 text-lg font-semibold text-foreground">
+          {t("components.signInGate.title")}
+        </H2>
+        <P className="text-sm text-muted-foreground">
+          {t("components.signInGate.description")}
+        </P>
+        <Div className="flex w-full flex-col gap-2">
+          <Button asChild className="w-full">
+            <Link
+              href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(returnPath)}`}
+            >
+              {t("components.signInGate.signIn")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link href={`/${locale}/user/signup`}>
+              {t("components.signInGate.signUp")}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" className="w-full">
+            <Link href={`/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`}>
+              {t("components.signInGate.incognito")}
+            </Link>
+          </Button>
+        </Div>
+      </Div>
+    </Div>
   );
 }

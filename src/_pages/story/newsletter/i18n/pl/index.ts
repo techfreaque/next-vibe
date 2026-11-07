@@ -1,59 +1,60 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  emailPlaceholder: "Wprowadź swój e-mail",
+  emailPlaceholder: "Wpisz swój e-mail",
   page: {
-    title: "Bądź na bieżąco z {{appName}}",
-    description: "Otrzymuj najnowsze wiadomości AI, aktualizacje i wskazówki",
-    subtitle: "Otrzymuj najnowsze wiadomości i aktualizacje AI",
+    eyebrow: "Newsletter {{appName}}",
+    title: "Jeden mail w miesiącu. Tylko konkrety.",
+    description:
+      "Nowe modele, nowe funkcje, prompty, które działają - co miesiąc.",
+    subtitle: "Nowe modele, nowe funkcje, prompty, które działają.",
     heroDescription:
-      "Dołącz do naszego newslettera, aby otrzymywać aktualizacje o nowych modelach AI, funkcjach i wskazówkach, jak najlepiej wykorzystać niecenzurowany czat AI.",
+      "Nowe modele w dniu premiery, funkcje warte uwagi, ustawienia, które dają wyniki. Raz w miesiącu. Wypis jednym kliknięciem.",
     invalidEmail: {
       title: "Nieprawidłowy e-mail",
       description:
-        "Podany adres e-mail jest nieprawidłowy. Sprawdź i spróbuj ponownie.",
+        "Ten adres wygląda na błędny. Sprawdź go i spróbuj jeszcze raz.",
     },
     emailProvided: {
-      title: "Zarządzaj swoją subskrypcją",
+      title: "Zarządzaj subskrypcją",
       description:
-        "Zaktualizuj swoje preferencje newslettera lub wypisz się w dowolnym momencie.",
+        "Zmień ustawienia newslettera albo wypisz się w każdej chwili.",
     },
-    unsubscribeText: "Chcesz się wypisać?",
-    unsubscribeLink: "Kliknij tutaj",
+    unsubscribeText: "Masz dość?",
+    unsubscribeLink: "Wypisz się tutaj",
+    privacyNote: "Zero spamu. Nikomu nie przekazujemy Twojego adresu. Nigdy.",
     cta: {
-      title: "Gotowy, aby być na bieżąco?",
-      description:
-        "Dołącz do tysięcy entuzjastów AI otrzymujących najnowsze aktualizacje",
-      subscribeButton: "Subskrybuj",
+      title: "Odbierz kolejne wydanie.",
+      description: "Jeden mail w miesiącu. Zero lania wody.",
+      subscribeButton: "Zapisz się",
     },
     benefits: {
-      title: "Co otrzymasz",
-      subtitle: "Bądź na bieżąco z ekskluzywnymi informacjami o AI",
+      title: "Co trafi do Twojej skrzynki",
+      subtitle: "Cztery rzeczy. Nic więcej.",
       benefit1: {
-        title: "Ogłoszenia nowych modeli AI",
+        title: "Nowe modele jako pierwszy",
         description:
-          "Bądź pierwszym, który dowie się, kiedy dodamy nowe modele AI do platformy.",
+          "Każdy nowy model - w czym jest dobry, ile kosztuje, kiedy go wybrać.",
       },
       benefit2: {
-        title: "Aktualizacje funkcji",
+        title: "Wdrożone funkcje",
         description:
-          "Otrzymuj powiadomienia o nowych funkcjach, ulepszeniach i aktualizacjach platformy.",
+          "Co się zmieniło, dlaczego to ważne, jak użyć tego od dziś.",
       },
       benefit3: {
-        title: "Wskazówki i triki AI",
+        title: "Prompty, które działają",
         description:
-          "Dowiedz się, jak uzyskać lepsze wyniki z AI dzięki naszym eksperckim wskazówkom i przypadkom użycia.",
+          "Prawdziwe ustawienia i skille, które dają wyniki - kopiuj, dopasuj, działaj.",
       },
       benefit4: {
-        title: "Ekskluzywne oferty",
-        description:
-          "Otrzymuj specjalne zniżki i wczesny dostęp do nowych funkcji.",
+        title: "Oferty dla subskrybentów",
+        description: "Zniżki i wcześniejszy dostęp przed wszystkimi.",
       },
     },
     frequency: {
-      title: "Częstotliwość e-maili",
+      title: "Co miesiąc. Tyle.",
       description:
-        "Wysyłamy newslettery raz w miesiącu. Możesz wypisać się w dowolnym momencie.",
+        "Jeden mail w miesiącu. Wypis w każdej chwili - jedno kliknięcie, bez pytań.",
     },
   },
   subscription: {

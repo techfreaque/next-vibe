@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
       "Lesen Sie die Nutzungsbedingungen für die Verwendung von {{appName}}",
   },
   printAriaLabel: "Nutzungsbedingungen drucken",
+  onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Nutzungsbedingungen",
   lastUpdated: "Zuletzt aktualisiert: Januar 2025",

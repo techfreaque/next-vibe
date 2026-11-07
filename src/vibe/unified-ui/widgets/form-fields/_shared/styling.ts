@@ -28,8 +28,8 @@ export function getFieldStyleClassName(
   const baseInputClassName = cn(
     "transition-all duration-200 ease-in-out",
     "border border-input bg-background",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:border-blue-500",
-    "hover:border-blue-400",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:border-primary",
+    "hover:border-primary/50",
     "disabled:cursor-not-allowed disabled:opacity-50",
   );
 
@@ -44,18 +44,12 @@ export function getFieldStyleClassName(
   // Error state - consistent red styling with better spacing and improved dark mode readability
   if (hasError) {
     return {
-      containerClassName: cn(
-        baseContainerClassName,
-        "p-4 rounded-lg border border-red-200/60 dark:border-red-800/60 bg-red-50/60 dark:bg-red-950/30",
-      ),
-      labelClassName: cn(
-        baseLabelClassName,
-        "text-red-600 dark:text-red-400 font-semibold",
-      ),
+      // Error: flag the input itself — no tinted box around the whole field
+      containerClassName: baseContainerClassName,
+      labelClassName: cn(baseLabelClassName, "text-destructive"),
       inputClassName: cn(
         baseInputClassName,
-        "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/20",
-        "bg-red-50/40 dark:bg-red-950/20",
+        "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20",
       ),
       errorClassName: cn(
         "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",

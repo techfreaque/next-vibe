@@ -442,6 +442,7 @@ export const translations: typeof enTranslations = {
     save: "Zapisz profil",
     saving: "Zapisywanie...",
     editProfile: "Edytuj profil",
+    changePhoto: "Zmień zdjęcie",
     cancelEdit: "Anuluj",
     memberSince: "Członek od",
     profileCard: {
@@ -455,7 +456,7 @@ export const translations: typeof enTranslations = {
     emailCard: {
       title: "Twoja lista e-mail",
       description:
-        "Odwiedzający Twoją stronę skilla i profil twórcy mogą się zapisać. Lista jest Twoja - bez pośredników.",
+        "Zbieraj subskrybentów ze swoich skilli i profilu. Twoja lista, bez pośredników.",
       manage: "Zarządzaj",
     },
     previewCard: {
@@ -479,15 +480,18 @@ export const translations: typeof enTranslations = {
       hubSubtitle: "{{count}} opublikowanych",
     },
     nav: {
+      logoutHint: "Wyloguj na tym urządzeniu",
       logout: "Wyloguj się",
       back: "Wstecz",
     },
     sections: {
       account: "Konto",
+      basics: "Podstawowe dane",
+      basicsHint: "Imię, e-mail do logowania i powiadomienia.",
       subscription: "Subskrypcja",
-      subscriptionHint: "Brak aktywnego planu — ulepsz, by odblokować funkcje",
+      subscriptionHint: "Subskrybuj, by dostawać kredyty co miesiąc.",
       manageSubscription: "Zarządzaj",
-      noSubscription: "Brak aktywnego planu",
+      noSubscription: "Plan darmowy",
       upgrade: "Uaktualnij",
       addresses: "Adresy rozliczeniowe",
       addressCount: "{{count}} zapisanych",
@@ -500,15 +504,16 @@ export const translations: typeof enTranslations = {
       credits: "Kredyty",
       creditsAvailable: "dostępnych",
       password: "Hasło",
-      passwordHint: "Zmień hasło do konta",
+      passwordHint: "Zmień hasło",
       sessions: "Aktywne sesje",
-      sessionsHint: "Zarządzaj swoimi sesjami",
+      sessionsHint: "Zobacz urządzenia i wyloguj je",
       creator: "Twórca",
       referral: "Program poleceń",
-      referralHint: "Zaproś znajomych i zdobądź nagrody",
+      referralHint: "Zarabiaj na każdej płatności, którą przyprowadzisz",
     },
     deleteAccount: {
       dangerZone: "Strefa zagrożenia",
+      dangerDescription: "Bez odwrotu: profil, czaty, skille, pliki, kredyty.",
       button: "Usuń konto",
       confirmTitle: "Trwale usuń swoje konto",
       confirmDescription:

@@ -109,6 +109,10 @@ export type ButtonProps = {
   "data-tour"?: string;
   "data-testid"?: string;
   "aria-label"?: string;
+  "aria-pressed"?: boolean;
+  "aria-expanded"?: boolean;
+  "aria-selected"?: boolean;
+  "aria-current"?: "true" | "page" | "step";
 } & StyleType;
 
 export function Button({

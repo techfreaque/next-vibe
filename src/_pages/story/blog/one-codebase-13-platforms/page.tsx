@@ -1,39 +1,34 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/components/icons/Clock";
-import { Code } from "next-vibe/ui/components/icons/Code";
+import { Github } from "next-vibe/ui/components/icons/Github";
 import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
-import { Link } from "next-vibe/ui/components/link";
-import { CodeBlock } from "next-vibe/ui/components/markdown";
-import { Separator } from "next-vibe/ui/components/separator";
-import {
-  BlockQuote,
-  H1,
-  H2,
-  H3,
-  Lead,
-  Muted,
-  P,
-} from "next-vibe/ui/components/typography";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleCode,
+  ArticleEnd,
+  ArticleH3,
+  ArticleHeader,
+  ArticleLead,
+  ArticleP,
+  ArticleQuote,
+  ArticleSection,
+} from "../../_shared/article";
+import { Callout, Cta } from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -70,42 +65,24 @@ export async function tanstackLoader({
   return { locale };
 }
 
-function PlatformCard({
+function PlatformTile({
   label,
   description,
-  index,
 }: {
   label: string;
   description: string;
-  index: number;
 }): JSX.Element {
-  const colors = [
-    "border-l-blue-500 bg-blue-50 dark:bg-blue-950/30",
-    "border-l-purple-500 bg-purple-50 dark:bg-purple-950/30",
-    "border-l-green-500 bg-green-50 dark:bg-green-950/30",
-    "border-l-orange-500 bg-orange-50 dark:bg-orange-950/30",
-    "border-l-pink-500 bg-pink-50 dark:bg-pink-950/30",
-    "border-l-cyan-500 bg-cyan-50 dark:bg-cyan-950/30",
-    "border-l-yellow-500 bg-yellow-50 dark:bg-yellow-950/30",
-    "border-l-red-500 bg-red-50 dark:bg-red-950/30",
-    "border-l-indigo-500 bg-indigo-50 dark:bg-indigo-950/30",
-    "border-l-teal-500 bg-teal-50 dark:bg-teal-950/30",
-    "border-l-violet-500 bg-violet-50 dark:bg-violet-950/30",
-    "border-l-emerald-500 bg-emerald-50 dark:bg-emerald-950/30",
-    "border-l-rose-500 bg-rose-50 dark:bg-rose-950/30",
-  ];
-  const colorClass = colors[index % colors.length];
   return (
-    <Div
-      className={`border-l-4 rounded-r-lg p-4 ${colorClass} transition-all hover:shadow-md`}
-    >
-      <P className="font-semibold text-sm mb-1">{label}</P>
-      <Muted className="text-xs leading-relaxed">{description}</Muted>
+    <Div className="rounded-xl border border-border bg-card p-4">
+      <P className="text-sm font-semibold leading-snug">{label}</P>
+      <P className="mt-1 text-sm leading-relaxed text-muted-foreground">
+        {description}
+      </P>
     </Div>
   );
 }
 
-function DemoFlowStep({
+function FlowStep({
   actor,
   label,
   description,
@@ -118,80 +95,78 @@ function DemoFlowStep({
   index: number;
   isLast: boolean;
 }): JSX.Element {
-  const actorColors: Record<string, string> = {
-    You: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    Du: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    Ty: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    Thea: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    "Local Hermes":
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    "Lokaler Hermes":
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    "Lokalny Hermes":
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    "Claude Code":
-      "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-    Result:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-    Ergebnis:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-    Wynik:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-  };
-
-  const actorColor =
-    actorColors[actor] ??
-    "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
-
   return (
-    <Div className="flex gap-4">
+    <Div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-4">
       <Div className="flex flex-col items-center">
-        <Div className="w-8 h-8 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 flex items-center justify-center text-sm font-bold flex-shrink-0">
+        <Span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-sm font-semibold text-primary">
           {index + 1}
-        </Div>
-        {!isLast && (
-          <Div className="w-0.5 h-full bg-gray-200 dark:bg-gray-700 mt-2 min-h-8" />
-        )}
+        </Span>
+        {!isLast && <Div className="mt-2 w-px flex-1 bg-border" />}
       </Div>
-      <Div className="pb-6 flex-1">
-        <Div className="flex items-center gap-2 mb-1 flex-wrap">
-          <Div
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${actorColor}`}
-          >
+      <Div className={isLast ? "min-w-0" : "min-w-0 pb-6"}>
+        <Div className="flex flex-wrap items-center gap-2">
+          <Span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-semibold text-foreground">
             {actor}
-          </Div>
-          <P className="font-semibold text-sm">{label}</P>
+          </Span>
+          <Span className="text-sm font-semibold">{label}</Span>
         </Div>
-        <Muted className="text-sm leading-relaxed">{description}</Muted>
+        <P className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </P>
       </Div>
     </Div>
   );
 }
 
-function CalloutBox({
-  children,
-  variant,
-}: {
-  children: JSX.Element | string;
-  variant: "info" | "warning" | "tip";
-}): JSX.Element {
-  const styles = {
-    info: "border-blue-400 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100",
-    warning:
-      "border-orange-400 bg-orange-50 dark:bg-orange-950/40 text-orange-900 dark:text-orange-100",
-    tip: "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100",
-  };
-  return (
-    <Div className={`border-l-4 rounded-r-xl p-5 my-6 ${styles[variant]}`}>
-      {children}
-    </Div>
-  );
-}
+const DEFINITION_CODE = `const { POST } = createEndpoint({
+  scopedTranslation,
+  aliases: [EXPLAIN_TO_MY_BOSS_ALIAS],
+  method: Methods.POST,
+  path: ["explain", "to-my-boss"],
+  title: "post.title",
+  description: "post.description",
+  icon: "sparkles",
+  category: "endpointCategories.ai",
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    usage: { request: "data", response: true },
+    children: {
+      decision: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "post.fields.decision.label",
+        description: "post.fields.decision.description",
+        schema: z.string().min(1).max(2000),
+        columns: 12,
+      }),
+      justification: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.fields.justification.content",
+        schema: z.string(),
+      }),
+    },
+  }),
+  errorTypes: { /* ... all 9 required error types ... */ },
+  successTypes: { title: "post.success.title", description: "post.success.description" },
+  examples: { requests: { default: { decision: "Migrate to Bun" } }, responses: { default: { justification: "..." } } },
+});`;
+
+const ROUTE_CODE = `import { endpointsHandler } from "next-vibe/core/route/multi";
+import { Methods } from "next-vibe/core/definition/enums";
+import definitions from "./definition";
+import { explainToMyBoss } from "./repository";
+
+export const { POST, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.POST]: { handler: ({ data, logger }) => explainToMyBoss(data, logger) },
+});`;
 
 export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("backToBlog") };
 
   const platforms = [
     t("platformsSection.platforms.webApi.label"),
@@ -263,79 +238,50 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
     },
   ];
 
+  const stats = [
+    {
+      stat: t("underTheHoodSection.statEndpoints"),
+      detail: t("underTheHoodSection.statEndpointsDetail"),
+      icon: Layers,
+    },
+    {
+      stat: t("underTheHoodSection.statAny"),
+      detail: t("underTheHoodSection.statAnyDetail"),
+      icon: Terminal,
+    },
+    {
+      stat: t("underTheHoodSection.statLanguages"),
+      detail: t("underTheHoodSection.statLanguagesDetail"),
+      icon: CheckCircle,
+    },
+  ];
+
   return (
-    <Div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <Div className="relative bg-gray-950 text-white overflow-hidden">
-        <Div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-gray-950 to-purple-900/30" />
-        <Div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%221%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')]" />
+    <Div className="min-h-screen bg-background">
+      <ArticleHeader
+        back={back}
+        category={t("category")}
+        readTime={t("readingTime")}
+        date={formatPostDate("one-codebase-13-platforms", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
 
-        <Div className="container mx-auto px-4 py-20 relative z-10 max-w-4xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-gray-400 hover:text-white mb-10 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToBlog")}
-          </Link>
-
-          <Div className="flex items-center gap-3 mb-6">
-            <Div className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wide">
-              {t("category")}
-            </Div>
-            <Div className="flex items-center gap-1.5 text-gray-400 text-sm">
-              <Clock className="h-3.5 w-3.5" />
-              {t("readingTime")}
-            </Div>
-          </Div>
-
-          <H1 className="text-4xl md:text-6xl font-black mb-6 leading-tight bg-clip-text text-transparent bg-linear-to-r from-white via-blue-100 to-purple-200">
-            {t("hero.title")}
-          </H1>
-
-          <Lead className="text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">
-            {t("hero.subtitle")}
-          </Lead>
-
-          {/* Eyebrow file bar */}
-          <Div className="mt-10 inline-block">
-            <Div className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 font-mono text-sm text-green-400 flex items-center gap-2">
-              <Div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              {t("hero.fileBarLabel")}
-            </Div>
-          </Div>
-        </Div>
-      </Div>
-
-      {/* ── ARTICLE BODY ─────────────────────────────────────────────────── */}
-      <Div className="container mx-auto px-4 max-w-4xl py-16">
-        {/* Opening hook */}
-        <Div className="mb-16">
-          <P className="text-2xl font-semibold text-gray-900 dark:text-white leading-snug mb-6">
-            {t("intro.hook")}
-          </P>
-          <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("intro.para1", { appName })}
-          </P>
-          <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("intro.para2")}
-          </P>
+      <ArticleBody>
+        <Div className="flex flex-col gap-5">
+          <Span className="w-fit max-w-full rounded-lg border border-border bg-muted px-3 py-1.5 font-mono text-xs text-muted-foreground break-words">
+            {t("hero.fileBarLabel")}
+          </Span>
+          <ArticleLead>{t("intro.hook")}</ArticleLead>
+          <ArticleP>{t("intro.para1", { appName })}</ArticleP>
+          <ArticleP>{t("intro.para2")}</ArticleP>
         </Div>
 
-        <Separator className="my-12" />
-
-        {/* ── FILE TREE ──────────────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <H2 className="text-3xl font-bold mb-4">
-            {t("fileTreeSection.title")}
-          </H2>
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-            {t("fileTreeSection.intro")}
-          </P>
-
-          {/* Decorated terminal block */}
-          <CodeBlock
+        <ArticleSection title={t("fileTreeSection.title")}>
+          <ArticleP>{t("fileTreeSection.intro")}</ArticleP>
+          <ArticleCode
             language="bash"
+            filename={t("hero.fileTreePath")}
             code={[
               t("fileTreeSection.fileTree.line1"),
               t("fileTreeSection.fileTree.line2"),
@@ -345,50 +291,32 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
               t("fileTreeSection.fileTree.line6"),
             ].join("\n")}
           />
+          <ArticleP>{t("fileTreeSection.explanation")}</ArticleP>
+        </ArticleSection>
 
-          <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("fileTreeSection.explanation")}
-          </P>
-        </Div>
-
-        {/* ── PLATFORMS TABLE ────────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <H2 className="text-3xl font-bold mb-3">
-            {t("platformsSection.title")}
-          </H2>
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
-            {t("platformsSection.subtitle")}
-          </P>
-
-          <Div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+        <ArticleSection
+          title={t("platformsSection.title")}
+          intro={t("platformsSection.subtitle")}
+        >
+          <Div className="grid gap-3 sm:grid-cols-2">
             {platforms.map((label, i) => (
-              <PlatformCard
+              <PlatformTile
                 key={label}
                 label={label}
                 description={platformDescriptions[i] ?? ""}
-                index={i}
               />
             ))}
           </Div>
+          <Callout icon={AlertTriangle} tone="warning">
+            <Span className="font-semibold">{t("deleteFolderQuote")}</Span>
+          </Callout>
+        </ArticleSection>
 
-          <CalloutBox variant="warning">
-            <P className="font-semibold text-lg leading-snug">
-              {t("deleteFolderQuote")}
-            </P>
-          </CalloutBox>
-        </Div>
-
-        {/* ── PLATFORM MARKERS ───────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <H2 className="text-3xl font-bold mb-4">
-            {t("platformMarkersSection.title")}
-          </H2>
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-            {t("platformMarkersSection.para1")}
-          </P>
-
-          <CodeBlock
+        <ArticleSection title={t("platformMarkersSection.title")}>
+          <ArticleP>{t("platformMarkersSection.para1")}</ArticleP>
+          <ArticleCode
             language="typescript"
+            filename="definition.ts"
             code={[
               t("platformMarkersSection.codeComment"),
               t("hero.codeBlockLabel"),
@@ -399,57 +327,23 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
               t("hero.closingBracket"),
             ].join("\n")}
           />
+          <ArticleP>{t("platformMarkersSection.para2")}</ArticleP>
+        </ArticleSection>
 
-          <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("platformMarkersSection.para2")}
-          </P>
-        </Div>
+        <ArticleQuote>{t("noApiSplitQuote")}</ArticleQuote>
 
-        {/* Pull quote: no API split */}
-        <BlockQuote className="my-12 text-2xl font-semibold border-l-4 border-blue-500 pl-6 text-gray-900 dark:text-white leading-snug">
-          {t("noApiSplitQuote")}
-        </BlockQuote>
-
-        <Separator className="my-12" />
-
-        {/* ── DEMO SECTION ───────────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <Div className="flex items-center gap-3 mb-4">
-            <Div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
-              <Bot className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </Div>
-            <H2 className="text-3xl font-bold">{t("demoSection.title")}</H2>
-          </Div>
-
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {t("demoSection.subtitle")}
-          </P>
-
-          <Card className="mb-8 border-purple-200 dark:border-purple-800/50 bg-purple-50/50 dark:bg-purple-950/20">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold text-purple-900 dark:text-purple-100">
-                {t("hero.theaCardTitle")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <P className="text-purple-800 dark:text-purple-200 text-sm leading-relaxed">
-                {t("demoSection.theaIntro")}
-              </P>
-            </CardContent>
-          </Card>
-
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
-            {t("demoSection.demoStory")}
-          </P>
-
-          {/* Demo flow diagram */}
-          <Div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-800 mb-8">
-            <H3 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-yellow-500" />
-              {t("demoSection.title")}
-            </H3>
+        <ArticleSection title={t("demoSection.title")}>
+          <ArticleP>{t("demoSection.subtitle")}</ArticleP>
+          <Callout icon={Bot}>
+            <P className="font-semibold">{t("hero.theaCardTitle")}</P>
+            <P className="mt-1 text-muted-foreground">
+              {t("demoSection.theaIntro")}
+            </P>
+          </Callout>
+          <ArticleP>{t("demoSection.demoStory")}</ArticleP>
+          <Div className="rounded-xl border border-border bg-card p-5 md:p-6">
             {demoSteps.map((step, i) => (
-              <DemoFlowStep
+              <FlowStep
                 key={i}
                 actor={step.actor}
                 label={step.label}
@@ -459,111 +353,43 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
               />
             ))}
           </Div>
-
-          {/* Proof section */}
-          <H3 className="text-2xl font-bold mb-3">
-            {t("demoSection.proofTitle")}
-          </H3>
-          <P className="text-lg text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {t("demoSection.proofPara")}
-          </P>
-
-          <Div className="space-y-3 mb-6">
-            {(
-              [
-                "demoSection.proof1",
-                "demoSection.proof2",
-                "demoSection.proof3",
-              ] as const
-            ).map((key) => (
-              <Div
-                key={key}
-                className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
-              >
-                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <P className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  {t(key)}
-                </P>
-              </Div>
+          <ArticleH3>{t("demoSection.proofTitle")}</ArticleH3>
+          <ArticleP>{t("demoSection.proofPara")}</ArticleP>
+          <Div className="flex flex-col gap-3">
+            {[
+              t("demoSection.proof1"),
+              t("demoSection.proof2"),
+              t("demoSection.proof3"),
+            ].map((proof) => (
+              <Callout key={proof} icon={CheckCircle} tone="success">
+                {proof}
+              </Callout>
             ))}
           </Div>
-
-          <P className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed italic">
+          <ArticleP className="italic">
             {t("demoSection.proofClosing")}
-          </P>
-        </Div>
+          </ArticleP>
+        </ArticleSection>
 
-        <Separator className="my-12" />
-
-        {/* ── UNDER THE HOOD ─────────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <Div className="flex items-center gap-3 mb-6">
-            <Div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center">
-              <Code className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            </Div>
-            <H2 className="text-3xl font-bold">
-              {t("underTheHoodSection.title")}
-            </H2>
-          </Div>
-
-          {/* definition.ts */}
-          <H3 className="text-xl font-bold mb-2 font-mono text-blue-600 dark:text-blue-400">
+        <ArticleSection title={t("underTheHoodSection.title")}>
+          <ArticleH3 className="font-mono">
             {t("underTheHoodSection.definitionTitle")}
-          </H3>
-          <P className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {t("underTheHoodSection.definitionPara")}
-          </P>
-
-          <CodeBlock
+          </ArticleH3>
+          <ArticleP>{t("underTheHoodSection.definitionPara")}</ArticleP>
+          <ArticleCode
             language="typescript"
-            code={`// definition.ts
-const { POST } = createEndpoint({
-  scopedTranslation,
-  aliases: [EXPLAIN_TO_MY_BOSS_ALIAS],
-  method: Methods.POST,
-  path: ["explain", "to-my-boss"],
-  title: "post.title",
-  description: "post.description",
-  icon: "sparkles",
-  category: "endpointCategories.ai",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    usage: { request: "data", response: true },
-    children: {
-      decision: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        label: "post.fields.decision.label",
-        description: "post.fields.decision.description",
-        schema: z.string().min(1).max(2000),
-        columns: 12,
-      }),
-      justification: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.fields.justification.content",
-        schema: z.string(),
-      }),
-    },
-  }),
-  errorTypes: { /* ... all 9 required error types ... */ },
-  successTypes: { title: "post.success.title", description: "post.success.description" },
-  examples: { requests: { default: { decision: "Migrate to Bun" } }, responses: { default: { justification: "..." } } },
-});`}
+            filename="definition.ts"
+            code={DEFINITION_CODE}
           />
 
-          {/* repository.ts */}
-          <H3 className="text-xl font-bold mb-2 font-mono text-green-600 dark:text-green-400">
+          <ArticleH3 className="font-mono">
             {t("underTheHoodSection.repositoryTitle")}
-          </H3>
-          <P className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {t("underTheHoodSection.repositoryPara")}
-          </P>
-
-          <CodeBlock
+          </ArticleH3>
+          <ArticleP>{t("underTheHoodSection.repositoryPara")}</ArticleP>
+          <ArticleCode
             language="typescript"
-            code={`// repository.ts
-${t("underTheHoodSection.repositoryCodeComment")}
+            filename="repository.ts"
+            code={`${t("underTheHoodSection.repositoryCodeComment")}
 export async function explainToMyBoss(
   data: { decision: string },
   logger: Logger,
@@ -578,142 +404,94 @@ export async function explainToMyBoss(
 }`}
           />
 
-          {/* route.ts */}
-          <H3 className="text-xl font-bold mb-2 font-mono text-yellow-600 dark:text-yellow-400">
+          <ArticleH3 className="font-mono">
             {t("underTheHoodSection.routeTitle")}
-          </H3>
-          <P className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {t("underTheHoodSection.routePara")}
-          </P>
-
-          <CodeBlock
+          </ArticleH3>
+          <ArticleP>{t("underTheHoodSection.routePara")}</ArticleP>
+          <ArticleCode
             language="typescript"
-            code={`// route.ts
-import { endpointsHandler } from "next-vibe/core/route/multi";
-import { Methods } from "next-vibe/core/definition/enums";
-import definitions from "./definition";
-import { explainToMyBoss } from "./repository";
-
-export const { POST, tools } = endpointsHandler({
-  endpoint: definitions,
-  [Methods.POST]: { handler: ({ data, logger }) => explainToMyBoss(data, logger) },
-});`}
+            filename="route.ts"
+            code={ROUTE_CODE}
           />
 
-          {/* Stats grid */}
-          <H3 className="text-xl font-bold mb-4">
-            {t("underTheHoodSection.statsTitle")}
-          </H3>
-
-          <Div className="grid sm:grid-cols-3 gap-4 mb-6">
-            {[
-              {
-                stat: t("underTheHoodSection.statEndpoints"),
-                detail: t("underTheHoodSection.statEndpointsDetail"),
-                icon: <Layers className="h-5 w-5 text-blue-500" />,
-              },
-              {
-                stat: t("underTheHoodSection.statAny"),
-                detail: t("underTheHoodSection.statAnyDetail"),
-                icon: <Terminal className="h-5 w-5 text-green-500" />,
-              },
-              {
-                stat: t("underTheHoodSection.statLanguages"),
-                detail: t("underTheHoodSection.statLanguagesDetail"),
-                icon: <CheckCircle className="h-5 w-5 text-purple-500" />,
-              },
-            ].map(({ stat, detail, icon }) => (
-              <Card
+          <ArticleH3>{t("underTheHoodSection.statsTitle")}</ArticleH3>
+          <Div className="grid gap-3 sm:grid-cols-3">
+            {stats.map(({ stat, detail, icon: Icon }) => (
+              <Div
                 key={stat}
-                className="text-center p-4 border-2 border-gray-100 dark:border-gray-800"
+                className="rounded-xl border border-border bg-card p-5"
               >
-                <Div className="flex justify-center mb-2">{icon}</Div>
-                <P className="font-bold text-lg mb-1">{stat}</P>
-                <Muted className="text-xs leading-snug">{detail}</Muted>
-              </Card>
-            ))}
-          </Div>
-
-          <CalloutBox variant="tip">
-            <P className="font-semibold">
-              {t("underTheHoodSection.statsClosing")}
-            </P>
-          </CalloutBox>
-        </Div>
-
-        {/* Pull quote: one pattern */}
-        <BlockQuote className="my-12 text-2xl font-black border-l-4 border-purple-500 pl-6 text-gray-900 dark:text-white leading-tight">
-          {t("onePatternQuote")}
-        </BlockQuote>
-
-        <Separator className="my-12" />
-
-        {/* ── VIBE SENSE TEASER ──────────────────────────────────────────── */}
-        <Div className="mb-16">
-          <Card className="overflow-hidden border-2 border-emerald-200 dark:border-emerald-800/60 bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40">
-            <CardHeader className="pb-2">
-              <Div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
-                {t("vibeSenseTeaser.eyebrow")}
-              </Div>
-              <CardTitle className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
-                {t("vibeSenseTeaser.title")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <P className="text-emerald-800 dark:text-emerald-200 mb-4 leading-relaxed">
-                {t("vibeSenseTeaser.description")}
-              </P>
-
-              <Div className="bg-emerald-900 dark:bg-emerald-950 rounded-lg px-4 py-2.5 mb-4 inline-block">
-                <P className="font-mono text-sm text-emerald-300">
-                  {t("hero.vibeCliCommand")}
+                <Icon className="h-5 w-5 text-primary" />
+                <P className="mt-3 text-lg font-semibold tracking-tight">
+                  {stat}
+                </P>
+                <P className="mt-1 text-sm leading-snug text-muted-foreground">
+                  {detail}
                 </P>
               </Div>
-
-              <P className="text-sm font-bold text-emerald-700 dark:text-emerald-300 italic mb-4 text-lg">
-                {t("vibeSenseTeaser.calloutLine")}
-              </P>
-
-              <P className="text-emerald-800 dark:text-emerald-200 text-sm mb-5 leading-relaxed">
-                {t("vibeSenseTeaser.teaser")}
-              </P>
-
-              <Button
-                asChild
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                <Link href={`/${locale}/story/blog`}>
-                  {t("vibeSenseTeaser.cta")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </Div>
-
-        {/* ── CLOSING ────────────────────────────────────────────────────── */}
-        <Div className="text-center py-12 px-8 bg-gray-950 dark:bg-gray-900 rounded-2xl border border-gray-800">
-          <Div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-6">
-            <Zap className="h-6 w-6 text-blue-400" />
+            ))}
           </Div>
-          <H2 className="text-3xl font-black text-white mb-4">
-            {t("closing.title")}
-          </H2>
-          <P className="text-gray-300 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
-            {t("closing.para")}
+          <Callout icon={Zap} tone="success">
+            <Span className="font-semibold">
+              {t("underTheHoodSection.statsClosing")}
+            </Span>
+          </Callout>
+        </ArticleSection>
+
+        <ArticleQuote>{t("onePatternQuote")}</ArticleQuote>
+
+        <Div className="rounded-xl border border-border bg-card p-6 md:p-8">
+          <Span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            {t("vibeSenseTeaser.eyebrow")}
+          </Span>
+          <H3 className="mt-2 text-2xl font-semibold tracking-tight text-balance">
+            {t("vibeSenseTeaser.title")}
+          </H3>
+          <P className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground md:text-base">
+            {t("vibeSenseTeaser.description")}
           </P>
-          <Button asChild size="lg" className="bg-blue-500 hover:bg-blue-600">
-            <Link
-              href={t("closing.ctaLink")}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("closing.cta")}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <Div className="mt-4 overflow-x-auto rounded-lg border border-border bg-muted px-4 py-2.5">
+            <Span className="font-mono text-sm whitespace-nowrap text-foreground">
+              {t("hero.vibeCliCommand")}
+            </Span>
+          </Div>
+          <P className="mt-4 text-lg font-semibold">
+            {t("vibeSenseTeaser.calloutLine")}
+          </P>
+          <P className="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground md:text-base">
+            {t("vibeSenseTeaser.teaser")}
+          </P>
+          <Div className="mt-6">
+            <Cta
+              href={`/${locale}/story/blog/dead-trading-bot-to-monitoring-engine`}
+              label={t("vibeSenseTeaser.cta")}
+              variant="secondary"
+              arrow
+            />
+          </Div>
         </Div>
-      </Div>
+
+        <ArticleEnd
+          back={back}
+          title={t("closing.title")}
+          subtitle={t("closing.para")}
+          actions={
+            <>
+              <Cta
+                href={GITHUB_REPO_URL}
+                label={t("closing.cta")}
+                icon={Github}
+                external
+              />
+              <Cta
+                href={`/${locale}/story/framework`}
+                label={t("closing.frameworkCta")}
+                variant="secondary"
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

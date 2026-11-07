@@ -1114,7 +1114,7 @@ export const translations: typeof enTranslations = {
     title: "Emulieren",
     titleShort: "Emulieren",
     description:
-      "Netzwerkbedingungen (offline/3G/4G) oder CPU-Drosselung auf der aktuellen Seite emulieren.",
+      "Netzwerkbedingungen (offline/3G/4G) oder CPU-Drosselung auf der aktuellen Seite emulieren. Jeder Aufruf ist absolut: nicht gesetzte Felder werden zurückgesetzt. Ein User-Agent-Override gilt ab der nächsten Navigation, die Seite danach neu laden.",
     dynamicTitle: "Emulieren: {{config}}",
     form: {
       label: "Gerät emulieren",

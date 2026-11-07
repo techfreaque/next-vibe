@@ -16,6 +16,42 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    modelRefresh: {
+      title: "Najnowsze modele już są. Bez cenzury - na poważnie.",
+      category: "Nowe modele",
+      excerpt:
+        "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 i świeże modele otwarte. Do tego NanoGPT, większa oferta Venice i pierwsze modele graficzne bez cenzury.",
+      readTime: "5 min czytania",
+    },
+    whatsNewNovember2026: {
+      title:
+        "Pół roku na jednej stronie: szybciej, bezpieczniej, działa wszędzie.",
+      category: "Aktualizacja produktu",
+      excerpt:
+        "Stop znaczy stop. Dyktowanie działa na iPhonie. Twoje AI idzie za Tobą między komputerami. Self-hosting bez Dockera. Wszystko od maja.",
+      readTime: "6 min czytania",
+    },
+    hermesThea: {
+      title: "Dwa AI. Jedna rozmowa. W obie strony.",
+      category: "Hermes i Thea",
+      excerpt:
+        "Hermes na Twoim komputerze, Thea na serwerze - teraz każde z nich przekazuje wątki drugiemu. A brak klucza API już nie zatrzymuje tury.",
+      readTime: "6 min czytania",
+    },
+    codingAgent: {
+      title: "Twoje AI otwiera terminal i przekazuje robotę Claude Code.",
+      category: "Agent kodujący",
+      excerpt:
+        "Narzędzie coding-agent zleca prawdziwe zmiany w kodzie Claude Code albo OpenCode - w tle lub na żywo w oknie terminala, z automatycznym meldunkiem. Teraz także między instancjami.",
+      readTime: "5 min czytania",
+    },
+    e2eTests: {
+      title: "Robot kliknął każdy przycisk. Znalazł osiem luk bezpieczeństwa.",
+      category: "Inżynieria",
+      excerpt:
+        "Przestaliśmy testować kawałki, zaczęliśmy testować strony. Prawdziwa przeglądarka na każdym endpoincie klienta - i open redirect, SSRF oraz wycieki danych, które wyłapała.",
+      readTime: "7 min czytania",
+    },
     whatsNewMay2026: {
       title: "Cortex. Dreamer. Autopilot. Twoja AI w koncu pamieta.",
       category: "Aktualizacja produktu",
@@ -86,31 +122,28 @@ export const translations: typeof enTranslations = {
       title: "Stwórz skill. Udostępnij link. Zarabiaj co miesiąc.",
       category: "Ekonomia Skilli",
       excerpt:
-        "Skille to wstępnie skonfigurowane ustawienia AI, które tworzysz raz i udostępniasz wszędzie. Link w URL skilla przynosi Ci 15% cyklicznie od każdej rejestracji przez niego.",
+        "Skille to wstępnie skonfigurowane ustawienia AI, które tworzysz raz i udostępniasz wszędzie. Link w URL skilla przynosi Ci 10% cyklicznie od każdej rejestracji przez niego.",
       readTime: "7 min czytania",
     },
     referralLanding: {
       title:
-        "10% bezpośrednio. 15% przez skill. 20% łącznie. Cyklicznie wiecznie.",
+        "10% bezpośrednio. +5%, gdy inni udostępniają Twój skill. Na zawsze.",
       category: "Polecenia",
       excerpt:
         "Pełna mechanika programu poleceń i skilli - podział łańcucha, dokładne procenty na każdym poziomie, opcje wypłat i jak bonus za skill się nakłada.",
       readTime: "4 min czytania",
     },
   },
+  cta: {
+    title: "Nowe wpisy prosto na Twoją skrzynkę.",
+    subtitle:
+      "Architektura od kuchni i nowości w produkcie, gdy tylko wyjdą. Bez lania wody, wypis jednym kliknięciem.",
+    newsletter: "Zapisz się do newslettera",
+    framework: "Poznaj next-vibe",
+  },
   labels: {
     readMore: "Czytaj więcej",
     allPosts: "Wszystkie posty",
     featured: "Wyróżniony",
-    new: "Nowy",
-    draft: "Szkic",
-    referralSection: "Program poleceń",
-  },
-  ui: {
-    heroTagline: "next-vibe · {{appName}}",
-    featuredFileBar:
-      "definition.ts → web · cli · mcp · native · cron · 10 więcej",
-    vibeFrameEmbedCaption:
-      "Dowolny endpoint. Dwa tagi script. Na każdej stronie.",
   },
 };

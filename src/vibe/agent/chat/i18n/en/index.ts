@@ -577,7 +577,7 @@ export const translations = {
       geminiFlash25Flash:
         "Gemini 2.5 Flash - Google's efficient multimodal model with 1M token context for fast tasks",
       geminiFlash25Pro:
-        "Gemini 2.5 Flash Pro - Google's previous-generation Pro model with large context and strong reasoning",
+        "Gemini 2.5 Pro - Google's previous-generation Pro model with large context and strong reasoning",
       deepseekV31:
         "DeepSeek V3.1 - DeepSeek's previous-generation model with strong coding and analysis capabilities",
       deepseekR1:
@@ -841,6 +841,58 @@ export const translations = {
         "Meta Muse Spark 1.2 - Meta's multimodal reasoning model with vision, audio, and video inputs. Strong at cross-modal analysis. 1.05M-token context.",
       mistralMedium35:
         "Mistral Medium 3.5 - Mistral AI's capable mid-tier model with vision support and strong coding. 262K-token context.",
+      claudeOpus55:
+        "Claude Opus 5.5 - Anthropic's top model. Hardest agentic, coding and analysis work, now 20% cheaper than Opus 5. 1M-token context.",
+      claudeSonnet55:
+        "Claude Sonnet 5.5 - Anthropic's workhorse. Near-Opus coding and agent skills at Sonnet price. 1M-token context.",
+      claudeHaiku55:
+        "Claude Haiku 5.5 - Anthropic's fastest model. Vision, tools and 1M context for a tenth of Haiku 4.5's price.",
+      claudeFable51:
+        "Claude Fable 5.1 - Anthropic's frontier reasoner. Deep synthesis, long-horizon planning, sharper than Fable 5. 1M-token context.",
+      gpt6Astra:
+        "GPT-6 Astra - OpenAI's most capable model. Maximum reasoning depth for the hardest problems. 1.05M-token context.",
+      gpt6AstraPro:
+        "GPT-6 Astra Pro - GPT-6 Astra with extended reasoning effort. Slower, more thorough. 1.05M-token context.",
+      gpt61Sol:
+        "GPT-6.1 Sol - OpenAI's premium reasoner. Frontier performance at a fraction of GPT-5.6 Sol's price. 1.05M-token context.",
+      gpt61SolPro:
+        "GPT-6.1 Sol Pro - GPT-6.1 Sol with extended reasoning effort for complex analysis and code. 1.05M-token context.",
+      gpt61Terra:
+        "GPT-6.1 Terra - OpenAI's balanced mid-tier. Strong coding and reasoning, everyday price. 1.05M-token context.",
+      gpt61TerraPro:
+        "GPT-6.1 Terra Pro - GPT-6.1 Terra with deeper reasoning for analysis-heavy work. 1.05M-token context.",
+      gpt6Luna:
+        "GPT-6 Luna - OpenAI's lightweight model. Fast answers for pennies. 1.05M-token context.",
+      gpt6LunaPro:
+        "GPT-6 Luna Pro - GPT-6 Luna with extra reasoning. Better code and instruction-following, same low price. 1.05M-token context.",
+      gemini4Argon:
+        "Gemini 4 Argon - Google's new flagship. Text, image, video and audio in, frontier reasoning out. 1M-token context.",
+      gemini38Flash:
+        "Gemini 3.8 Flash - Google's latest Flash. Fast multimodal model with strong coding. 1M-token context.",
+      grok47:
+        "Grok 4.7 - xAI's latest Grok. Sharper reasoning and code, open content policy, vision. 500K-token context.",
+      kimiK31Pro:
+        "Kimi K3.1 Pro - Moonshot AI's strongest model. Multimodal reasoning and long agent runs. 1M-token context.",
+      deepseekV41Flash:
+        "DeepSeek V4.1 Flash - DeepSeek's fast open model, now with vision. Serious coding for almost nothing. 1M-token context.",
+      qwen38Flash:
+        "Qwen 3.8 Flash - Alibaba's fast multimodal model. Text, image and video at budget price. 1M-token context.",
+      glm53:
+        "GLM-5.3 - Z.AI's latest foundation model. Strong reasoning and code at an aggressive price. 1M-token context.",
+      glm53Flash:
+        "GLM-5.3 Flash - Z.AI's fast multimodal model. Text, image and video for high-volume work. 1M-token context.",
+      mimoV26Pro:
+        "MiMo V2.6 Pro - Xiaomi's premium reasoner. Text, image, video and audio in, deep analysis out. 1.05M-token context.",
+      mimoV26Flash:
+        "MiMo V2.6 Flash - Xiaomi's fast multimodal model. Ultra-cheap, capable coder. 1.05M-token context.",
+      metaMuseSpark13:
+        "Meta Muse Spark 1.3 - Meta's multimodal reasoner. Cross-modal analysis across text, image and video. 1M-token context.",
+      metaMuseWonder:
+        "Meta Muse Wonder - Meta's flagship. Frontier reasoning, code and creative work across every modality. 1M-token context.",
+      mistralLarge4:
+        "Mistral Large 4 - Mistral AI's new flagship. European, vision-capable, strong at code, cheaper than Medium 3.5. 1M-token context.",
+      veniceDeepseekV41FlashUncensored:
+        "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash with the refusals removed, served by Venice.ai. Real capability, no lectures, tools included. 1M-token context.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - xAI's latest image generation model with improved prompt adherence and visual quality.",
       qwenImage3:

@@ -25,7 +25,6 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Lata temu porzuciłem bota tradingowego. Jego architektura stała się najciekawszą częścią next-vibe. Każdy węzeł w grafie jest endpointem - wywoływalnym z CLI, wykrywalnym przez AI, wbudowanym w twoją platformę.",
     readTime: "14 min czytania",
-    date: "Architektura",
   },
   origin: {
     title: "Bot tradingowy, który porzuciłem",
@@ -326,9 +325,6 @@ export const translations: typeof enTranslations = {
     },
   },
   ui: {
-    checkMark: "✓",
-    crossMark: "✗",
-    arrowMark: "→",
     emaFunctionLabel: "computeEma()",
   },
 };

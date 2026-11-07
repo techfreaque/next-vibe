@@ -16,13 +16,13 @@ export const translations: typeof enTranslations = {
   },
   unsubscribe: {
     page: {
-      title: "Vom Newsletter abmelden",
-      description: "Es tut uns leid, Sie gehen zu sehen",
+      title: "Abmelden",
+      description: "Adresse eingeben, Button drücken, fertig. Ohne Drama.",
       subtitle: "Verwalten Sie Ihr Newsletter-Abonnement",
       emailProvided: {
         title: "Abmeldung bestätigen",
         description:
-          "Sind Sie sicher, dass Sie sich von unserem Newsletter abmelden möchten?",
+          "Diese Adresse bekommt danach keinen Newsletter mehr. Ein Klick.",
       },
       unsubscribeButton: "Abmelden",
       unsubscribing: "Wird abgemeldet...",
@@ -30,26 +30,26 @@ export const translations: typeof enTranslations = {
         subscribed: "Diese Adresse erhält unseren Newsletter.",
         notSubscribed: "Diese Adresse steht nicht auf unserer Liste.",
       },
-      subscribeText: "Haben Sie Ihre Meinung geändert?",
+      subscribeText: "Doch anders überlegt?",
       subscribeLink: "Erneut abonnieren",
       info: {
         title: "Was als Nächstes passiert",
         description: "Hier ist, was Sie über die Abmeldung wissen müssen:",
         immediate: {
-          title: "Sofortige Wirkung",
-          description: "Sie erhalten sofort keine Newsletter-E-Mails mehr.",
+          title: "Sofort.",
+          description:
+            "Ab jetzt landet kein Newsletter mehr in deinem Postfach.",
         },
         resubscribe: {
-          title: "Einfach wieder abonnieren",
-          description:
-            "Sie können jederzeit wieder abonnieren, wenn Sie Ihre Meinung ändern.",
+          title: "Umkehrbar.",
+          description: "Du kannst jederzeit wieder abonnieren.",
         },
       },
       alternatives: {
         title: "Bevor Sie gehen",
         description: "Erwägen Sie diese Alternativen:",
         subscribe: "E-Mail-Häufigkeit anpassen",
-        contact: "Kontaktieren Sie uns mit Feedback",
+        contact: "Sag uns, was wir besser machen sollen",
       },
     },
   },

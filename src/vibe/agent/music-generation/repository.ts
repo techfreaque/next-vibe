@@ -26,6 +26,7 @@ import { ApiProvider, calculateCreditCost } from "../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
+  keepsExplicitMediaModel,
 } from "../shared/media-generation";
 import {
   type MusicGenerationPostRequestInput,
@@ -306,10 +307,21 @@ export class MusicGenerationRepository {
     });
   }
 
-  static async getRequestDefaults(ctx: {
-    user: JwtPayloadType;
-    toolExecutionContext: ToolExecutionContext;
-  }): Promise<Partial<MusicGenerationPostRequestInput>> {
+  /**
+   * A human's explicit model pick wins; AI/MCP callers (or an empty pick) get
+   * the favorite/skill model.
+   */
+  static async getRequestDefaults(
+    ctx: {
+      user: JwtPayloadType;
+      toolExecutionContext: ToolExecutionContext;
+      platform: Platform;
+    },
+    requestedModel: string | undefined,
+  ): Promise<Partial<MusicGenerationPostRequestInput>> {
+    if (keepsExplicitMediaModel(ctx.platform, requestedModel)) {
+      return {};
+    }
     const { getEnvAvailability } = await import("../env-availability");
     const availability = await getEnvAvailability();
     const userId =

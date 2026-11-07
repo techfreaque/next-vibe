@@ -55,6 +55,10 @@ export function getMissingProviderKeyMessage(
       return agentEnv.VENICE_AI_API_KEY
         ? null
         : buildMissingKeyMessage("veniceAI");
+    case ApiProvider.NANO_GPT:
+      return agentEnv.NANO_GPT_API_KEY
+        ? null
+        : buildMissingKeyMessage("nanoGPT");
     case ApiProvider.OPENAI_IMAGES:
       return agentEnv.OPENAI_API_KEY
         ? null

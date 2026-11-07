@@ -1,6 +1,8 @@
 import { PageLayout } from "next-vibe/ui/components/page-layout";
 import type { JSX, ReactNode } from "react";
 
+import { AuthShell } from "../_components/auth-shell";
+
 export interface AuthLayoutData {
   children?: ReactNode;
 }
@@ -12,7 +14,11 @@ export async function tanstackLoader(): Promise<
 }
 
 export function TanstackPage({ children }: AuthLayoutData): JSX.Element {
-  return <PageLayout scrollable={true}>{children}</PageLayout>;
+  return (
+    <PageLayout scrollable={true}>
+      <AuthShell>{children}</AuthShell>
+    </PageLayout>
+  );
 }
 
 export default function AuthLayout({

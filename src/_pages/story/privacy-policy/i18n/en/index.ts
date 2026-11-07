@@ -15,6 +15,7 @@ export const translations = {
       "Learn how {{appName}} protects your privacy and handles your data",
   },
   printAriaLabel: "Print privacy policy",
+  onThisPage: "On this page",
   printButton: "Print",
   title: "Privacy Policy",
   lastUpdated: "Last updated: January 2025",

@@ -270,7 +270,7 @@ export const vibeCoderSkill: Skill = {
       variantName: "skills.vibeCoder.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -294,7 +294,7 @@ export const vibeCoderSkill: Skill = {
       variantName: "skills.vibeCoder.variants.max" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_OPUS_5,
+        manualModelId: ChatModelId.CLAUDE_OPUS_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -318,7 +318,7 @@ export const vibeCoderSkill: Skill = {
       variantName: "skills.vibeCoder.variants.broad" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_6_TERRA,
+        manualModelId: ChatModelId.GPT_6_1_TERRA,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

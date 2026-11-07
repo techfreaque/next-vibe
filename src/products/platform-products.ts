@@ -434,8 +434,12 @@ export class ProductsRepositoryImpl implements ProductsRepository {
 
     const subPrice = subscription.priceByCountry[country].price;
     const subCurrency = subscription.priceByCountry[country].currency;
-    const packPrice = creditPack.priceByCountry[country].price;
-    const packCurrency = creditPack.priceByCountry[country].currency;
+    // Packs are one-time purchases: checkout charges oneTimePriceByCountry
+    const packPriceData = (
+      creditPack.oneTimePriceByCountry ?? creditPack.priceByCountry
+    )[country];
+    const packPrice = packPriceData.price;
+    const packCurrency = packPriceData.currency;
 
     const subCurrencySymbol =
       subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
@@ -475,7 +479,10 @@ export function getPricingParams(
   const pack = productDefinitions[ProductIds.CREDIT_PACK];
 
   const subPriceData = sub.priceByCountry[country];
-  const packPriceData = pack.priceByCountry[country];
+  // Packs are one-time purchases: checkout charges oneTimePriceByCountry
+  const packPriceData = (pack.oneTimePriceByCountry ?? pack.priceByCountry)[
+    country
+  ];
 
   const subSymbol = currencySymbol(subPriceData.currency);
   const packSymbol = currencySymbol(packPriceData.currency);

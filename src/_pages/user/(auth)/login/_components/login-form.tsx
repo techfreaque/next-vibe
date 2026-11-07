@@ -77,8 +77,8 @@ function DevQuickLogin({
   );
 
   return (
-    <Div className="mt-6 border-t border-gray-700 pt-6">
-      <P className="text-sm text-gray-400 mb-3 text-center">
+    <Div className="mt-6 rounded-xl border border-dashed bg-card/50 p-4">
+      <P className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {t("dev.quickLogin")}
       </P>
       <Div className="flex flex-col gap-2">
@@ -86,13 +86,14 @@ function DevQuickLogin({
           <Button
             key={seedUser.email}
             variant="outline"
-            size="sm"
             disabled={loadingEmail !== null}
             onClick={() => handleQuickLogin(seedUser.email)}
-            className="justify-between"
+            className="h-11 justify-between bg-card"
           >
             <Span>{seedUser.email}</Span>
-            <Span className="text-xs opacity-60">{seedUser.role}</Span>
+            <Span className="text-xs text-muted-foreground">
+              {seedUser.role}
+            </Span>
           </Button>
         ))}
       </Div>

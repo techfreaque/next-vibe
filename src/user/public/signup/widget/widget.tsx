@@ -24,13 +24,17 @@ import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Heart } from "next-vibe/ui/components/icons/Heart";
 import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "next-vibe/ui/components/radio-group";
 import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { useEffect, useMemo, useState } from "react";
 
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/referral/lead/current/definition";
-import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
@@ -56,6 +60,9 @@ import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 import type definition from "../definition";
 
+/** Radio value for "support nobody" (radix items need a non-empty value) */
+const NO_SUPPORTED_SKILL = "__none__";
+
 /**
  * Props for custom widget
  */
@@ -77,7 +84,6 @@ export function SignupFormContainer({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const availability = useProviderAvailability();
   const data = useWidgetValue<typeof definition.POST>();
 
   const referralEndpoint = useEndpoint(
@@ -96,7 +102,7 @@ export function SignupFormContainer({
                 referralCode: string | null;
                 referralLabel: string | null;
               };
-            }) => {
+            }): void => {
               if (responseData.referralCode) {
                 form.setValue("referralCode", responseData.referralCode);
               }
@@ -129,7 +135,7 @@ export function SignupFormContainer({
 
   // Load UUID skills on mount, then async-resolve names for any missing ones
   useEffect(() => {
-    void (async () => {
+    void (async (): Promise<void> => {
       const initial =
         await ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution();
       setUuidSkills(initial);
@@ -175,14 +181,16 @@ export function SignupFormContainer({
   }, []);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("form.title")}</CardTitle>
+    <Card className="rounded-xl shadow-sm">
+      <CardHeader className="gap-1.5 p-6 pb-2 text-center sm:p-8 sm:pb-2">
+        <CardTitle className="text-2xl tracking-tight">
+          {t("form.title")}
+        </CardTitle>
         <CardDescription>{t("form.description")}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
-        {/* Name Fields - Grid 2 columns */}
-        <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="flex flex-col gap-5 p-6 pt-4 sm:p-8 sm:pt-4">
+        {/* Names stack — the auth card is phone-width on every screen */}
+        <Div className="flex flex-col gap-5">
           <TextFieldWidget
             fieldName="privateName"
             field={children.privateName}
@@ -216,22 +224,22 @@ export function SignupFormContainer({
           render={({ field: formField, fieldState }) => (
             <FormItem className="space-y-2">
               <Div className="flex flex-col gap-1">
-                <Div className="flex items-center space-x-3">
+                <Div className="flex items-start gap-3">
                   <FormControl>
                     <Checkbox
                       id={formField.name}
                       name={formField.name}
                       checked={formField.value as boolean}
                       onCheckedChange={(checked) => formField.onChange(checked)}
-                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
                   <Label
                     htmlFor={formField.name}
-                    className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5"
+                    className="flex cursor-pointer flex-col gap-0.5 text-sm font-medium leading-snug"
                   >
                     <Span>{t("fields.acceptTerms.label")}</Span>
-                    <Span className="text-xs text-muted-foreground opacity-75">
+                    <Span className="text-xs font-normal text-muted-foreground">
                       {t("fields.acceptTerms.descriptionPrefix")}{" "}
                       <Link
                         href={`/${locale}/story/terms-of-service`}
@@ -269,13 +277,13 @@ export function SignupFormContainer({
         {prefillCode ? (
           <Div className="flex flex-col gap-2">
             <Label>{t("fields.referralCode.labelPrefilled")}</Label>
-            <Div className="flex items-center gap-3 rounded-md border border-border bg-muted px-3 py-2 h-9">
+            <Div className="flex h-11 items-center gap-3 rounded-md border border-border bg-muted px-3 py-2">
               <Gift className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-medium">{displayLabel}</span>
+              <Span className="text-sm font-medium">{displayLabel}</Span>
             </Div>
-            <p className="text-sm text-muted-foreground">
+            <P className="m-0 text-sm text-muted-foreground">
               {t("fields.referralCode.descriptionPrefilled")}
-            </p>
+            </P>
           </Div>
         ) : (
           <TextFieldWidget
@@ -292,19 +300,27 @@ export function SignupFormContainer({
             render={({ field: formField }) => (
               <FormItem className="space-y-3">
                 <Div className="flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-pink-500 shrink-0" />
+                  <Heart className="h-4 w-4 shrink-0 text-primary" />
                   <Label className="text-sm font-medium">
                     {t("fields.supportedSkillId.selectorTitle")}
                   </Label>
                 </Div>
-                <p className="text-sm text-muted-foreground">
+                <P className="m-0 text-sm text-muted-foreground">
                   {t("fields.supportedSkillId.selectorDescription")}
-                </p>
-                <Div className="flex flex-col gap-2">
+                </P>
+                <RadioGroup
+                  className="flex flex-col gap-2"
+                  value={formField.value ?? NO_SUPPORTED_SKILL}
+                  onValueChange={(value) =>
+                    formField.onChange(
+                      value === NO_SUPPORTED_SKILL ? undefined : value,
+                    )
+                  }
+                >
                   {uuidSkills.map(({ skillId, name }) => (
                     <Div
                       key={skillId}
-                      className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+                      className={`flex min-h-11 items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
                         formField.value === skillId
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-muted-foreground/50"
@@ -312,12 +328,7 @@ export function SignupFormContainer({
                       onClick={() => formField.onChange(skillId)}
                     >
                       <FormControl>
-                        <input
-                          type="radio"
-                          className="accent-primary"
-                          checked={formField.value === skillId}
-                          onChange={() => formField.onChange(skillId)}
-                        />
+                        <RadioGroupItem value={skillId} />
                       </FormControl>
                       <Span className="text-sm">
                         {name ?? `${skillId.slice(0, 8)}…`}
@@ -325,7 +336,7 @@ export function SignupFormContainer({
                     </Div>
                   ))}
                   <Div
-                    className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
+                    className={`flex min-h-11 items-center gap-3 rounded-md border px-3 py-2 cursor-pointer transition-colors ${
                       !formField.value
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-muted-foreground/50"
@@ -333,18 +344,13 @@ export function SignupFormContainer({
                     onClick={() => formField.onChange(undefined)}
                   >
                     <FormControl>
-                      <input
-                        type="radio"
-                        className="accent-primary"
-                        checked={!formField.value}
-                        onChange={() => formField.onChange(undefined)}
-                      />
+                      <RadioGroupItem value={NO_SUPPORTED_SKILL} />
                     </FormControl>
                     <Span className="text-sm text-muted-foreground">
                       {t("fields.supportedSkillId.selectorNone")}
                     </Span>
                   </Div>
-                </Div>
+                </RadioGroup>
               </FormItem>
             )}
           />
@@ -367,10 +373,12 @@ export function SignupFormContainer({
         />
 
         {/* Footer Link */}
-        <LinkWidget
-          field={children.alreadyHaveAccount}
-          fieldName="alreadyHaveAccount"
-        />
+        <Div className="flex justify-center border-t pt-4 text-sm">
+          <LinkWidget
+            field={children.alreadyHaveAccount}
+            fieldName="alreadyHaveAccount"
+          />
+        </Div>
       </CardContent>
     </Card>
   );

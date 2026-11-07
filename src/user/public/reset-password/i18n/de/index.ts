@@ -166,9 +166,8 @@ export const translations: typeof enTranslations = {
     tag: "Passwort-Reset",
     ui: {
       title: "Passwort zurücksetzen",
-      subtitle:
-        "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen",
-      sendResetLink: "Reset-Link senden",
+      subtitle: "E-Mail eingeben. Wir schicken dir einen Link.",
+      sendResetLink: "Link senden",
       alreadyHaveAccount: "Bereits ein Konto? Anmelden",
     },
     actions: {
@@ -197,9 +196,9 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       email: {
-        label: "E-Mail-Adresse",
+        label: "E-Mail",
         description: "Geben Sie Ihre E-Mail-Adresse ein",
-        placeholder: "ihre@email.de",
+        placeholder: "du@beispiel.de",
         help: "Geben Sie die mit Ihrem Konto verknüpfte E-Mail-Adresse ein",
         validation: {
           invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",

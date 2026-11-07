@@ -90,7 +90,7 @@ export const systemMonitorSkill: Skill = {
       variantName: "skills.systemMonitor.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_8_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -115,7 +115,7 @@ export const systemMonitorSkill: Skill = {
       variantName: "skills.systemMonitor.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

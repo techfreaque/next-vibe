@@ -1434,7 +1434,29 @@ export const translations: typeof enTranslations = {
         dolphinLlama3_70B:
           "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
         veniceUncensored:
-          "Venice Uncensored 1.1 - Najbardziej niecenzurowany model AI z obsługą wywoływania narzędzi. Zaprojektowany dla maksymalnej kreatywnej wolności i autentycznej interakcji. Idealny do otwartej eksploracji, gier fabularnych i niefiltrowanego dialogu z minimalnymi ograniczeniami treści.",
+          "Venice Uncensored 1.2 - Dolphin Mistral 24B w edycji Venice. Najmniej odmów na rynku. Roleplay, fikcja, rozmowa bez filtrów. Rozumie obrazy, kontekst 128K.",
+        veniceUncensoredRoleplay:
+          "Venice Role Play Uncensored - Model 24B dla postaci, które nie wychodzą z roli. Mroczne sceny, fikcja dla dorosłych, długie kampanie. Bez moralizowania w środku historii.",
+        gemma4Uncensored:
+          "Gemma 4 26B Uncensored - Gemma 4 26B MoE od Google bez filtra. Szybka, tania, rozumie obrazy. Kontekst 256K.",
+        qwen36PlusUncensored:
+          "Qwen 3.6 Plus Uncensored - Model rozumujący Alibaby bez odmów. Mocny w kodzie i analizie. Rozumie obrazy.",
+        glm47FlashHeretic:
+          "GLM 4.7 Flash Heretic - GLM 4.7 Flash po abliteracji. Grosze za wiadomość, szybkie odpowiedzi, zero pouczania.",
+        glm53Abliterated:
+          "GLM 5.3 Abliterated - Pełny GLM-5.3, któremu Abliteration.ai wycięło odmowy prosto z wag. Czołowe rozumowanie, narzędzia, kontekst 1M. Najcięższy kaliber.",
+        deepseekV41FlashAbliterated:
+          "DeepSeek V4.1 Flash Abliterated - DeepSeek V4.1 Flash bez odmów od Abliteration.ai. MoE 552B, mocne rozumowanie, rozumie obrazy, używa narzędzi. Kontekst 1M.",
+        mimoV26FlashAbliterated:
+          "MiMo V2.6 Flash Abliterated - szybki multimodalny model Xiaomi z wyciętym kierunkiem odmów. Tani, rozumie obrazy, używa narzędzi. Kontekst 1M.",
+        glm53Uncensored:
+          "GLM 5.3 Uncensored - Pełny model rozumujący GLM 5.3 bez cenzury. Kod, teksty i narzędzia na czołowym poziomie za ułamek ceny GLM 5.3 Abliterated. Eksperymentalny.",
+        glm53FlashUncensored:
+          "GLM 5.3 Flash Uncensored - MoE 320B bez cenzury. Szybki, tani, rozumie obrazy, kontekst 1M. Codzienne narzędzie do pracy bez filtrów.",
+        veniceLustifyV8:
+          "Lustify v8 - Checkpoint SDXL do fotorealistycznych obrazów dla dorosłych. Bez rozmycia, bez odmów. Jeden cent za obraz.",
+        veniceChroma:
+          "Chroma - Niecenzurowany otwarty model klasy Flux. Długie prompty, szeroki zakres artystyczny, bez rozmycia. Jeden cent za obraz.",
         claudeOpus45:
           "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
         claudeOpus46:
@@ -1513,7 +1535,7 @@ export const translations: typeof enTranslations = {
         geminiFlash25Flash:
           "Gemini 2.5 Flash - Wydajny multimodalny model Google z kontekstem 1M tokenów dla szybkich zadań",
         geminiFlash25Pro:
-          "Gemini 2.5 Flash Pro - Poprzedni model Pro Google z dużym kontekstem i silnym rozumowaniem",
+          "Gemini 2.5 Pro - Poprzedni model Pro Google z dużym kontekstem i silnym rozumowaniem",
         deepseekV31:
           "DeepSeek V3.1 - Poprzednia generacja modelu DeepSeek z silnymi możliwościami kodowania i analizy",
         deepseekR1:
@@ -1775,6 +1797,58 @@ export const translations: typeof enTranslations = {
           "Meta Muse Spark 1.2 - Multimodalny model reasoning Meta z wejściami obrazowymi, audio i wideo. Kontekst 1,05M tokenów.",
         mistralMedium35:
           "Mistral Medium 3.5 - Wydajny model klasy średniej Mistral AI z obsługą obrazów. Kontekst 262K tokenów.",
+        claudeOpus55:
+          "Claude Opus 5.5 - Najmocniejszy model Anthropic. Najtrudniejsze zadania agentowe, kod i analiza, o 20% taniej niż Opus 5. Kontekst 1M tokenów.",
+        claudeSonnet55:
+          "Claude Sonnet 5.5 - Koń pociągowy Anthropic. Kod i agenci prawie na poziomie Opus w cenie Sonneta. Kontekst 1M tokenów.",
+        claudeHaiku55:
+          "Claude Haiku 5.5 - Najszybszy model Anthropic. Obrazy, narzędzia i kontekst 1M za dziesiątą część ceny Haiku 4.5.",
+        claudeFable51:
+          "Claude Fable 5.1 - Graniczny model rozumujący Anthropic. Głęboka synteza, planowanie długoterminowe, ostrzejszy niż Fable 5. Kontekst 1M tokenów.",
+        gpt6Astra:
+          "GPT-6 Astra - Najpotężniejszy model OpenAI. Maksymalna głębia rozumowania na najtrudniejsze problemy. Kontekst 1,05M tokenów.",
+        gpt6AstraPro:
+          "GPT-6 Astra Pro - GPT-6 Astra z rozszerzonym rozumowaniem. Wolniej, ale dokładniej. Kontekst 1,05M tokenów.",
+        gpt61Sol:
+          "GPT-6.1 Sol - Premium model rozumujący OpenAI. Najwyższa wydajność za ułamek ceny GPT-5.6 Sol. Kontekst 1,05M tokenów.",
+        gpt61SolPro:
+          "GPT-6.1 Sol Pro - GPT-6.1 Sol z rozszerzonym rozumowaniem do złożonej analizy i kodu. Kontekst 1,05M tokenów.",
+        gpt61Terra:
+          "GPT-6.1 Terra - Zrównoważona średnia półka OpenAI. Mocny kod i rozumowanie w codziennej cenie. Kontekst 1,05M tokenów.",
+        gpt61TerraPro:
+          "GPT-6.1 Terra Pro - GPT-6.1 Terra z głębszym rozumowaniem do pracy analitycznej. Kontekst 1,05M tokenów.",
+        gpt6Luna:
+          "GPT-6 Luna - Lekki model OpenAI. Szybkie odpowiedzi za grosze. Kontekst 1,05M tokenów.",
+        gpt6LunaPro:
+          "GPT-6 Luna Pro - GPT-6 Luna z dodatkowym rozumowaniem. Lepszy kod i wykonywanie poleceń w tej samej niskiej cenie. Kontekst 1,05M tokenów.",
+        gemini4Argon:
+          "Gemini 4 Argon - Nowy flagowiec Google. Tekst, obraz, wideo i audio na wejściu, najwyższe rozumowanie na wyjściu. Kontekst 1M tokenów.",
+        gemini38Flash:
+          "Gemini 3.8 Flash - Najnowszy Flash od Google. Szybki model multimodalny z mocnym kodem. Kontekst 1M tokenów.",
+        grok47:
+          "Grok 4.7 - Najnowszy Grok od xAI. Ostrzejsze rozumowanie i kod, otwarta polityka treści, obrazy. Kontekst 500K tokenów.",
+        kimiK31Pro:
+          "Kimi K3.1 Pro - Najmocniejszy model Moonshot AI. Rozumowanie multimodalne i długie przebiegi agentów. Kontekst 1M tokenów.",
+        deepseekV41Flash:
+          "DeepSeek V4.1 Flash - Szybki otwarty model DeepSeek, teraz z obsługą obrazów. Poważny kod prawie za darmo. Kontekst 1M tokenów.",
+        qwen38Flash:
+          "Qwen 3.8 Flash - Szybki model multimodalny Alibaby. Tekst, obraz i wideo w budżetowej cenie. Kontekst 1M tokenów.",
+        glm53:
+          "GLM-5.3 - Najnowszy model bazowy Z.AI. Mocne rozumowanie i kod w agresywnej cenie. Kontekst 1M tokenów.",
+        glm53Flash:
+          "GLM-5.3 Flash - Szybki model multimodalny Z.AI. Tekst, obraz i wideo do pracy na dużą skalę. Kontekst 1M tokenów.",
+        mimoV26Pro:
+          "MiMo V2.6 Pro - Premium model rozumujący Xiaomi. Tekst, obraz, wideo i audio na wejściu, głęboka analiza na wyjściu. Kontekst 1,05M tokenów.",
+        mimoV26Flash:
+          "MiMo V2.6 Flash - Szybki model multimodalny Xiaomi. Bardzo tani, solidny w kodzie. Kontekst 1,05M tokenów.",
+        metaMuseSpark13:
+          "Meta Muse Spark 1.3 - Multimodalny model rozumujący Meta. Analiza tekstu, obrazu i wideo naraz. Kontekst 1M tokenów.",
+        metaMuseWonder:
+          "Meta Muse Wonder - Flagowiec Meta. Najwyższe rozumowanie, kod i praca twórcza we wszystkich modalnościach. Kontekst 1M tokenów.",
+        mistralLarge4:
+          "Mistral Large 4 - Nowy flagowiec Mistral AI. Europejski, rozumie obrazy, mocny w kodzie, tańszy niż Medium 3.5. Kontekst 1M tokenów.",
+        veniceDeepseekV41FlashUncensored:
+          "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash bez odmów, serwowany przez Venice.ai. Prawdziwe możliwości, zero moralizowania, z narzędziami. Kontekst 1M tokenów.",
         grokImagineImage2:
           "Grok Imagine Image 2.0 - Najnowszy model generowania obrazów xAI z lepszą wiernością i jakością.",
         qwenImage3:

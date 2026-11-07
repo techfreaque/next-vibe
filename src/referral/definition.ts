@@ -17,6 +17,8 @@ import {
 } from "next-vibe/core/definition/enums";
 import { success } from "next-vibe/core/route/response.schema";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
@@ -28,6 +30,12 @@ import { z } from "zod";
 
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import { scopedTranslation } from "./i18n";
+
+const ReferralCodeCreateContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({
+    default: m.ReferralCodeCreateContainer,
+  })),
+);
 
 export const { POST } = createEndpoint({
   scopedTranslation,
@@ -82,12 +90,9 @@ export const { POST } = createEndpoint({
     },
   },
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    noCard: true,
-    layoutType: LayoutType.STACKED,
-    className: "flex flex-col gap-4",
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ReferralCodeCreateContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // Fields grid
       fieldsGrid: objectField(scopedTranslation, {

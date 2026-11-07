@@ -1,101 +1,22 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { useWidgetUser } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import { useCallback, useState } from "react";
 
-import { CompanionStep } from "./companion-step";
-import { GuestStep } from "./guest-step";
-import { UsecasesStep } from "./usecases-step";
-import { WelcomeStep } from "./welcome-step";
-
-type OnboardingStep = "welcome" | "guest" | "companion" | "usecases";
+import { SetupStep } from "./setup-step";
 
 interface SelectorOnboardingProps {
   locale: CountryLanguage;
   onDone: (firstCompanionId: string | null) => void;
 }
 
+/**
+ * First-run setup shown inside the selector when the user has no favorites.
+ * One screen: companion (preselected) + optional specialists + start.
+ */
 export function SelectorOnboarding({
   locale,
   onDone,
 }: SelectorOnboardingProps): JSX.Element {
-  const user = useWidgetUser();
-
-  const [step, setStep] = useState<OnboardingStep>("welcome");
-  const [selectedCompanionId, setSelectedCompanionId] = useState<string | null>(
-    null,
-  );
-
-  const goToNext = useCallback(
-    (current: OnboardingStep) => {
-      if (current === "welcome") {
-        setStep(user.isPublic ? "guest" : "companion");
-        return;
-      }
-      if (current === "guest") {
-        setStep("companion");
-        return;
-      }
-      if (current === "companion") {
-        setStep("usecases");
-        return;
-      }
-    },
-    [user.isPublic],
-  );
-
-  const goBack = useCallback(
-    (current: OnboardingStep) => {
-      if (current === "guest") {
-        setStep("welcome");
-        return;
-      }
-      if (current === "companion") {
-        setStep(user.isPublic ? "guest" : "welcome");
-        return;
-      }
-      if (current === "usecases") {
-        setStep("companion");
-        return;
-      }
-    },
-    [user.isPublic],
-  );
-
-  if (step === "guest") {
-    return (
-      <GuestStep
-        locale={locale}
-        onContinue={() => goToNext("guest")}
-        onBack={() => goBack("guest")}
-      />
-    );
-  }
-
-  if (step === "companion") {
-    return (
-      <CompanionStep
-        selectedId={selectedCompanionId}
-        locale={locale}
-        setSelectedId={setSelectedCompanionId}
-        onContinue={() => goToNext("companion")}
-        onBack={() => goBack("companion")}
-      />
-    );
-  }
-
-  if (step === "usecases" && selectedCompanionId) {
-    return (
-      <UsecasesStep
-        companionId={selectedCompanionId}
-        locale={locale}
-        onDone={onDone}
-        onBack={() => goBack("usecases")}
-      />
-    );
-  }
-
-  return <WelcomeStep locale={locale} onContinue={() => goToNext("welcome")} />;
+  return <SetupStep locale={locale} onDone={onDone} />;
 }

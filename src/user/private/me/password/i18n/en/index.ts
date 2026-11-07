@@ -1,9 +1,9 @@
 export const translations = {
   category: "User Profile",
 
-  title: "Change Password",
+  title: "Change password",
   titleShort: "Change Password",
-  description: "Update your account password securely",
+  description: "Confirm your current password, then set a new one.",
   tag: "password-change",
   debug: {
     updatingPassword: "Updating password",
@@ -22,21 +22,21 @@ export const translations = {
     },
   },
   currentPassword: {
-    label: "Current Password",
+    label: "Current password",
     description: "Enter your current password",
-    placeholder: "Enter current password",
+    placeholder: "Your current password",
     help: "Enter your current password to verify your identity before changing it",
   },
   newPassword: {
-    label: "New Password",
-    description: "Enter your new password (minimum 8 characters)",
-    placeholder: "Enter new password",
+    label: "New password",
+    description: "At least 8 characters.",
+    placeholder: "At least 8 characters",
     help: "Choose a strong password with at least 8 characters including letters, numbers, and symbols",
   },
   confirmPassword: {
-    label: "Confirm Password",
+    label: "Repeat new password",
     description: "Confirm your new password",
-    placeholder: "Confirm new password",
+    placeholder: "Type it again",
     help: "Re-enter your new password to ensure it was typed correctly",
   },
   twoFactorCode: {
@@ -121,11 +121,12 @@ export const translations = {
     updated: "Password updated successfully",
     securityTip: "For enhanced security, enable two-factor authentication",
     nextSteps: {
-      logoutOther: "All other sessions have been logged out for security",
+      logoutOther:
+        "Every other session is signed out. Use the new password next time.",
       enable2fa:
         "Consider enabling two-factor authentication for better security",
     },
-    title: "Password Updated",
+    title: "Password updated",
     description: "Your password has been successfully updated",
   },
   update: {
@@ -139,5 +140,10 @@ export const translations = {
         description: "An unexpected error occurred while updating password",
       },
     },
+  },
+  widget: {
+    back: "Back",
+    submit: "Update password",
+    submitting: "Updating...",
   },
 };

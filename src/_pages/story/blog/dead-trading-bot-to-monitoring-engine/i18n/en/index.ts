@@ -22,7 +22,6 @@ export const translations = {
     subtitle:
       "I abandoned a trading bot years ago. Its architecture became the most interesting part of next-vibe. Every node in the graph is an endpoint - callable from the CLI, discoverable by AI, wired into your platform.",
     readTime: "14 min read",
-    date: "Architecture",
   },
   origin: {
     title: "The trading bot I abandoned",
@@ -322,9 +321,6 @@ export const translations = {
     },
   },
   ui: {
-    checkMark: "✓",
-    crossMark: "✗",
-    arrowMark: "→",
     emaFunctionLabel: "computeEma()",
   },
 };

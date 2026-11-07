@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
-import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
   FormField,
@@ -27,6 +27,7 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
@@ -36,12 +37,10 @@ import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { Film } from "next-vibe/ui/components/icons/Film";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
-import { LogIn } from "next-vibe/ui/components/icons/LogIn";
 import { Maximize } from "next-vibe/ui/components/icons/Maximize";
 import { Mic } from "next-vibe/ui/components/icons/Mic";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
-import { Share2 } from "next-vibe/ui/components/icons/Share2";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Star } from "next-vibe/ui/components/icons/Star";
 import { ThumbsUp } from "next-vibe/ui/components/icons/ThumbsUp";
@@ -66,9 +65,7 @@ import {
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
-import { getDocumentBody } from "next-vibe/ui/lib/dom";
-import { getCurrentOrigin, openUrl } from "next-vibe/ui/lib/location";
-import { getScreenWidth } from "next-vibe/ui/lib/screen";
+import { openUrl } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -93,8 +90,7 @@ import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/te
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { LeadCaptureForm } from "@/lead-magnet/capture/widget";
 
@@ -185,6 +181,7 @@ import type {
   SkillGetResponseOutput,
 } from "./definition";
 import { useSkill } from "./hooks";
+import { ShareSkillDialog } from "./share-skill";
 
 /**
  * Props for PATCH custom widget
@@ -1050,7 +1047,8 @@ export function SkillViewContainer({
         };
 
     return (
-      <Div className="flex flex-col">
+      // Landing is designed dark: scope dark tokens so cards/text follow it in any site theme
+      <Div className="dark flex flex-col text-foreground">
         {/* ── NAV ── */}
         <Div
           style={{
@@ -1231,11 +1229,9 @@ export function SkillViewContainer({
               )}
               <ShareEarnButton
                 skillId={skillId ?? ""}
-                user={user}
-                logger={logger}
+                skillName={skillData?.name ?? null}
                 locale={locale}
                 t={t}
-                navigation={navigation}
               />
             </Div>
           )}
@@ -1775,20 +1771,7 @@ export function SkillViewContainer({
 
           {/* name */}
           {skillData?.name ? (
-            <Span
-              style={{
-                display: "block",
-                fontSize: "clamp(32px, 8vw, 56px)",
-                fontWeight: 900,
-                letterSpacing: "-0.04em",
-                lineHeight: 0.95,
-                background: `linear-gradient(150deg, #fff 30%, ${accent}aa 90%)`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                marginBottom: 10,
-              }}
-            >
+            <Span className="mb-2.5 block text-[clamp(32px,8vw,52px)] font-extrabold leading-[0.95] tracking-tight text-foreground">
               {skillData.name}
             </Span>
           ) : (
@@ -1874,6 +1857,15 @@ export function SkillViewContainer({
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                  )}
+                  {skillId && (
+                    <ShareEarnButton
+                      skillId={skillId}
+                      skillName={skillData?.name ?? null}
+                      locale={locale}
+                      t={t}
+                      className="h-7 border-0 px-2 text-xs"
+                    />
                   )}
                   {isOwner && skillId && (
                     <Button
@@ -2152,110 +2144,115 @@ function VariantCard({
   return (
     <Div
       className={cn(
-        "rounded-lg border overflow-hidden transition-colors",
-        isDefault && "border-primary/30",
+        "overflow-hidden rounded-xl border bg-card transition-colors",
+        isActive
+          ? "border-primary/50 ring-1 ring-primary/30"
+          : isDefault
+            ? "border-primary/30"
+            : "border-border",
       )}
     >
-      {/* Header - always visible, click to expand */}
+      {/* Header - always visible, click to expand. Two lines so names never get crushed. */}
       <Div
-        className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors"
+        className="flex cursor-pointer items-start gap-2.5 px-3 py-2.5 transition-colors hover:bg-accent/40"
         onClick={() => setExpanded((p) => !p)}
       >
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform",
+            "mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform",
             expanded && "rotate-180",
           )}
         />
 
-        {/* Variant name + default badge */}
-        <Div className="flex-1 min-w-0 flex items-center gap-2">
-          <Span className="text-sm font-medium truncate">
-            {variantDisplayName}
-          </Span>
-          {isDefault && (
-            <Span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium shrink-0">
-              {t("patch.variants.defaultBadge")}
+        <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          {/* Line 1: variant name + default badge */}
+          <Div className="flex min-w-0 items-center gap-2">
+            <Span className="truncate text-sm font-semibold">
+              {variantDisplayName}
             </Span>
+            {isDefault && (
+              <Span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                {t("patch.variants.defaultBadge")}
+              </Span>
+            )}
+          </Div>
+          {/* Line 2: model · provider · cost - wraps instead of truncating to nothing */}
+          {resolved.chat && (
+            <Div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
+              <Span className="inline-flex min-w-0 items-center gap-1">
+                {provider?.icon && (
+                  <Icon icon={provider.icon} className="h-3 w-3 shrink-0" />
+                )}
+                <Span className="truncate">{resolved.chat.name}</Span>
+              </Span>
+              {provider && (
+                <>
+                  <Span
+                    aria-hidden
+                    className="h-1 w-1 shrink-0 rounded-full bg-current opacity-40"
+                  />
+                  <Span className="truncate">{provider.name}</Span>
+                </>
+              )}
+              <Span
+                aria-hidden
+                className="h-1 w-1 shrink-0 rounded-full bg-current opacity-40"
+              />
+              <ModelCreditDisplay
+                modelId={resolved.chat.id}
+                variant="text"
+                className="text-xs text-muted-foreground"
+                locale={locale}
+              />
+            </Div>
           )}
         </Div>
 
-        {/* Model pill */}
-        {resolved.chat && (
-          <Div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0 overflow-hidden shrink">
-            {provider?.icon && (
-              <Icon icon={provider.icon} className="w-3 h-3" />
-            )}
-            <Span className="truncate max-w-[100px]">{resolved.chat.name}</Span>
-            {provider && (
-              <Span aria-hidden className="text-muted-foreground/50">
-                {
-                  // oxlint-disable-next-line i18n/no-literal-string
-                  "·"
-                }
-              </Span>
-            )}
-            {provider && (
-              <Span className="truncate max-w-[60px]">{provider.name}</Span>
-            )}
-            <Span aria-hidden className="text-muted-foreground/50">
-              {
-                // oxlint-disable-next-line i18n/no-literal-string
-                "·"
-              }
-            </Span>
-            <ModelCreditDisplay
-              modelId={resolved.chat.id}
-              variant="text"
-              className="text-xs text-muted-foreground"
-              locale={locale}
-            />
-          </Div>
-        )}
-
-        {/* Primary action - always visible in header */}
+        {/* Action - compact, outline so the page keeps one primary CTA */}
         <Div
-          className="flex items-center gap-1 shrink-0"
+          className="flex shrink-0 items-center"
           onClick={(e) => e.stopPropagation()}
         >
           {!isFavorited ? (
             <Button
               type="button"
-              variant="default"
+              variant="outline"
               size="sm"
-              className="h-7 gap-1 text-xs px-2.5"
+              className="h-8 gap-1 px-2.5 text-xs"
               onClick={addToFavorites}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Zap className="h-3 w-3" />
+                <Plus className="h-3.5 w-3.5" />
               )}
               {t("get.quickAdd")}
             </Button>
           ) : isActive ? (
             <Button
-              variant="outline"
+              type="button"
+              variant="ghost"
               size="sm"
-              className="h-7 gap-1 text-xs px-2.5"
+              className="h-8 gap-1 px-2.5 text-xs text-primary hover:text-primary"
               onClick={handleGoToChat}
             >
-              <ArrowRight className="h-3 w-3" />
+              <CheckCircle2 className="h-3.5 w-3.5" />
               {t("get.goToChat")}
             </Button>
           ) : (
             <Button
+              type="button"
               variant="secondary"
               size="sm"
-              className="h-7 gap-1 text-xs px-2.5"
+              className="h-8 gap-1 px-2.5 text-xs"
               onClick={handleUseNow}
               disabled={isActivating}
             >
               {isActivating ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Star className="h-3 w-3" />
+                <ArrowRight className="h-3.5 w-3.5" />
               )}
               {t("get.useNow")}
             </Button>
@@ -2945,14 +2942,7 @@ export function SkillCard({
             variant={isAddedToFav ? "default" : "outline"}
             size="sm"
           />
-          <ShareEarnButton
-            skillId={skillId}
-            locale={locale}
-            t={t}
-            user={user}
-            logger={logger}
-            navigation={navigation}
-          />
+          <ShareEarnButton skillId={skillId} locale={locale} t={t} />
         </Div>
       )}
     </Div>
@@ -2966,321 +2956,39 @@ export function SkillCard({
  */
 function ShareEarnButton({
   skillId,
+  skillName,
   locale,
   t,
-  user,
-  logger,
-  navigation,
+  className,
 }: {
   skillId: string;
+  skillName?: string | null;
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation>;
-  user: ReturnType<typeof useWidgetContext>["user"];
-  logger: ReturnType<typeof useWidgetContext>["logger"];
-  navigation: ReturnType<typeof useWidgetNavigation>;
+  className?: string;
 }): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const [codes, setCodes] = useState<Array<{
-    code: string;
-    label: string | null;
-  }> | null>(null);
-  const [selectedCode, setSelectedCode] = useState<string | null>(null);
-  const [newCode, setNewCode] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [popoverRect, setPopoverRect] = useState<DOMRect | null>(null);
-  const wrapperRef = useRef<DivRefObject>(null);
-
-  useEffect(() => {
-    if (open && wrapperRef.current) {
-      setPopoverRect(wrapperRef.current.getBoundingClientRect());
-    }
-  }, [open]);
-
-  const handleSignup = (): void => {
-    setOpen(false);
-    void (async (): Promise<void> => {
-      const def = await import("@/user/public/signup/definition");
-      navigation.push(def.default.POST);
-    })();
-  };
-
-  const handleLogin = (): void => {
-    setOpen(false);
-    void (async (): Promise<void> => {
-      const def = await import("@/user/public/login/definition");
-      navigation.push(def.default.POST);
-    })();
-  };
-
-  const handleOpen = async (): Promise<void> => {
-    if (open) {
-      setOpen(false);
-      return;
-    }
-    setOpen(true);
-
-    // Public users can't create referral codes - show auth prompt
-    if (user.isPublic) {
-      return;
-    }
-
-    if (codes !== null) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-      const codesListDef = await import("@/referral/codes/list/definition");
-      const result = await apiClient.fetch(
-        codesListDef.default.GET,
-        logger,
-        user,
-        {},
-        undefined,
-        locale,
-      );
-      if (result.success) {
-        const fetchedCodes = result.data.codes.map((c) => ({
-          code: c.code,
-          label: c.label,
-        }));
-        setCodes(fetchedCodes);
-        if (fetchedCodes.length > 0 && fetchedCodes[0]) {
-          setSelectedCode(fetchedCodes[0].code);
-        }
-      } else {
-        setCodes([]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreate = async (): Promise<void> => {
-    if (!newCode.trim() || newCode.trim().length < 3) {
-      return;
-    }
-    setCreating(true);
-    try {
-      const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-      const referralDef = await import("@/referral/definition");
-      const result = await apiClient.fetch(
-        referralDef.default.POST,
-        logger,
-        user,
-        { fieldsGrid: { code: newCode.trim() } },
-        undefined,
-        locale,
-      );
-      if (result.success) {
-        const createdCode = newCode.trim();
-        setCodes((prev) => [
-          { code: createdCode, label: null },
-          ...(prev ?? []),
-        ]);
-        setSelectedCode(createdCode);
-        setNewCode("");
-      }
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const shareUrl = selectedCode
-    ? `${getCurrentOrigin()}/track?ref=${encodeURIComponent(selectedCode)}&url=${encodeURIComponent(`/${locale}/skill/${skillId}`)}`
-    : null;
-
-  const handleCopy = async (): Promise<void> => {
-    if (shareUrl) {
-      await copyToClipboard(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  // Only touched once open (client-side) — document does not exist during SSR
-  const popoverContent =
-    open && popoverRect
-      ? createPortal(
-          <Div
-            style={{
-              position: "fixed",
-              zIndex: 9999,
-              width: 320,
-              top: popoverRect.bottom + 8,
-              right: getScreenWidth(logger) - popoverRect.right,
-              borderRadius: 12,
-              border: "1px solid hsl(var(--border))",
-              backgroundColor: "hsl(var(--popover))",
-              boxShadow:
-                "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-              padding: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
-            <Div className="flex items-center justify-between">
-              <Div className="flex items-center gap-2">
-                <Share2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <Span className="font-semibold text-sm">
-                  {t("get.share.title")}
-                </Span>
-              </Div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => setOpen(false)}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </Div>
-
-            <Span className="text-xs text-muted-foreground">
-              {t("get.share.description")}
-            </Span>
-
-            {user.isPublic ? (
-              <Div className="flex flex-col gap-3 pt-1">
-                <Span className="text-xs text-muted-foreground">
-                  {t("get.share.authRequired")}
-                </Span>
-                <Div className="flex flex-col gap-2">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="gap-2"
-                    onClick={handleSignup}
-                  >
-                    <UserPlus className="h-3.5 w-3.5" />
-                    {t("get.share.signup")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    onClick={handleLogin}
-                  >
-                    <LogIn className="h-3.5 w-3.5" />
-                    {t("get.share.login")}
-                  </Button>
-                </Div>
-              </Div>
-            ) : loading ? (
-              <Div className="flex items-center justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              </Div>
-            ) : codes !== null && codes.length > 0 ? (
-              <>
-                <Div className="flex flex-col gap-1.5">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("get.share.selectCode")}
-                  </Span>
-                  {codes.map((c) => (
-                    <Button
-                      key={c.code}
-                      variant={selectedCode === c.code ? "default" : "outline"}
-                      size="sm"
-                      className="justify-start gap-2 font-mono text-xs"
-                      onClick={() => setSelectedCode(c.code)}
-                    >
-                      {c.code}
-                      {c.label && (
-                        <Span className="font-sans text-muted-foreground">
-                          {c.label}
-                        </Span>
-                      )}
-                    </Button>
-                  ))}
-                </Div>
-
-                {shareUrl && (
-                  <Div className="flex flex-col gap-1.5">
-                    <Span className="text-xs font-medium text-muted-foreground">
-                      {t("get.share.linkReady")}
-                    </Span>
-                    <Div className="flex items-center gap-2">
-                      <Div className="flex-1 rounded-md border bg-muted/50 px-2.5 py-1.5 text-xs font-mono truncate">
-                        {shareUrl}
-                      </Div>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="gap-1 shrink-0"
-                        onClick={handleCopy}
-                      >
-                        {copied ? (
-                          <>
-                            <Check className="h-3.5 w-3.5" />
-                            {t("get.share.copied")}
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3.5 w-3.5" />
-                            {t("get.share.copyLink")}
-                          </>
-                        )}
-                      </Button>
-                    </Div>
-                  </Div>
-                )}
-              </>
-            ) : (
-              <Div className="flex flex-col gap-2">
-                <Span className="text-xs text-muted-foreground">
-                  {t("get.share.noCodesYet")}
-                </Span>
-                <Div className="flex gap-2">
-                  <Input
-                    value={newCode}
-                    onChange={(e) => setNewCode(e.target.value)}
-                    placeholder={t("get.share.codePlaceholder")}
-                    className="h-8 text-xs font-mono"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        void handleCreate();
-                      }
-                    }}
-                  />
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleCreate}
-                    disabled={creating || newCode.trim().length < 3}
-                    className="shrink-0"
-                  >
-                    {creating ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      t("get.share.createCode")
-                    )}
-                  </Button>
-                </Div>
-              </Div>
-            )}
-          </Div>,
-          getDocumentBody(),
-        )
-      : null;
-
   return (
     <>
-      <Div ref={wrapperRef} className="inline-flex">
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
-          onClick={handleOpen}
-        >
-          <DollarSign className="h-3.5 w-3.5" />
-          {t("get.share.button")}
-        </Button>
-      </Div>
-      {popoverContent}
+      <Button
+        variant="outline"
+        size="sm"
+        className={cn(
+          "gap-1.5 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 [.dark_&]:text-emerald-400 [.dark_&]:hover:bg-emerald-950/30 [.dark_&]:hover:text-emerald-300",
+          className,
+        )}
+        onClick={() => setOpen(true)}
+      >
+        <DollarSign className="h-3.5 w-3.5" />
+        {t("get.share.button")}
+      </Button>
+      <ShareSkillDialog
+        skillId={skillId}
+        skillName={skillName ?? null}
+        locale={locale}
+        open={open}
+        onOpenChange={setOpen}
+      />
     </>
   );
 }

@@ -43,6 +43,7 @@ import { ElevenLabsPriceFetcher } from "./providers/elevenlabs";
 import { FalAiPriceFetcher } from "./providers/fal-ai";
 import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
 import { ModelslabPriceFetcher } from "./providers/modelslab";
+import { NanoGptPriceFetcher } from "./providers/nano-gpt";
 import { OpenAiImagePriceFetcher } from "./providers/openai-images";
 import { OpenAiSttPriceFetcher } from "./providers/openai-stt";
 import { OpenAiTtsPriceFetcher } from "./providers/openai-tts";
@@ -52,6 +53,7 @@ import { OpenRouterVideoPriceFetcher } from "./providers/openrouter-video";
 import { ReplicatePriceFetcher } from "./providers/replicate";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
+import { VenicePriceFetcher } from "./providers/venice-ai";
 
 export type { PriceFetcher, ProviderPriceResult };
 
@@ -71,6 +73,8 @@ const BASE_FETCHERS: PriceFetcher[] = [
   new ModelslabPriceFetcher(),
   new UncensoredAiPriceFetcher(),
   new FreedomGptPriceFetcher(),
+  new VenicePriceFetcher(),
+  new NanoGptPriceFetcher(),
 ];
 
 /** Unbottled fetcher - web-only, instantiated per call with platform */
@@ -148,7 +152,7 @@ function applyPriceUpdate(
   // Find all blocks matching providerModel → field, update each
   // We do this line-by-line within the matched block to preserve formatting
   const blockRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[\\s\\S]*?)(${field}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)`,
+    `(providerModel:\\s*"${escapedProviderModel}"[^}]*?)(${field}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)`,
     "g",
   );
 
@@ -193,7 +197,7 @@ function applyCacheCostUpdate(
 
   // Try to update existing field first
   const updateRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[\\s\\S]*?)(${field}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)`,
+    `(providerModel:\\s*"${escapedProviderModel}"[^}]*?)(${field}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)`,
   );
   if (updateRegex.test(content)) {
     let changed = false;
@@ -222,7 +226,7 @@ function applyCacheCostUpdate(
 
   // Insert after insertAfterField (value may be numeric or an identifier like calculateCreditCost)
   const insertRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[\\s\\S]*?${insertAfterField}:\\s*[\\w.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
+    `(providerModel:\\s*"${escapedProviderModel}"[^}]*?${insertAfterField}:\\s*[\\w.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
   );
   if (insertRegex.test(content)) {
     const updated = content.replace(
@@ -549,7 +553,7 @@ function buildUnbottledEntrySource(
     );
   }
 
-  return `      {\n${lines.join("\n")}\n      },\n    `;
+  return `      {\n${lines.join("\n")}\n      },\n`;
 }
 
 export function addProviderEntry(
@@ -603,7 +607,12 @@ export function addProviderEntry(
     return { content, changed: false };
   }
 
-  const updated = content.slice(0, closeIdx) + entry + content.slice(closeIdx);
+  // Insert at the start of the `]` line so the entry keeps its own 6-space
+  // indent (inserting right before `]` stacked the `    ]` indent on top).
+  const lineStart = content.lastIndexOf("\n", closeIdx) + 1;
+  const insertAt =
+    content.slice(lineStart, closeIdx).trim() === "" ? lineStart : closeIdx;
+  const updated = content.slice(0, insertAt) + entry + content.slice(insertAt);
   return { content: updated, changed: true };
 }
 
@@ -702,7 +711,7 @@ export function updateUnbottledEntry(
     removeEnd++;
   }
 
-  const updated = `${content.slice(0, removeStart)}\n    ${newEntry.trimEnd()}\n${content.slice(removeEnd)}`;
+  const updated = `${content.slice(0, removeStart)}\n${newEntry.trimEnd()}\n${content.slice(removeEnd)}`;
 
   if (updated === content) {
     return { content, changed: false };
@@ -842,7 +851,8 @@ export class ModelPricesRepository {
       const agentDir = join(getSrcDir(), "vibe/agent");
       // Role file paths - model definitions live in modality-specific subdirs
       const roleFilePaths: Record<string, string> = {
-        chat: join(agentDir, "ai-stream/models.ts"),
+        // Definitions live in models-definitions.ts (models.ts only re-exports).
+        chat: join(agentDir, "ai-stream/models-definitions.ts"),
         "image-gen": join(agentDir, "image-generation/models.ts"),
         "music-gen": join(agentDir, "music-generation/models.ts"),
         "video-gen": join(agentDir, "video-generation/models.ts"),
@@ -942,7 +952,7 @@ export class ModelPricesRepository {
           // For inputTokenCost: also migrate creditCost: <number> → creditCost: calculateCreditCost
           if (update.field === "inputTokenCost") {
             const migrateRegex = new RegExp(
-              `(providerModel:\\s*"${escaped}"[\\s\\S]*?)(creditCost:\\s*)[\\d.]+([,]?(?:\\s*//[^\n]*)?)`,
+              `(providerModel:\\s*"${escaped}"[^}]*?)(creditCost:\\s*)[\\d.]+([,]?(?:\\s*//[^\n]*)?)`,
             );
             if (migrateRegex.test(roleFileContents[role])) {
               roleFileContents[role] = roleFileContents[role].replace(
@@ -1225,9 +1235,11 @@ export class ModelPricesRepository {
           );
 
           if (modelIdsToDisable.has(modelId)) {
-            // Add enabled: false after the opening brace if not already present
+            // Add enabled: false after the opening brace if not already present.
+            // Anchored to the block's first line — a lazy [\s\S]*? scan would
+            // match a LATER model's `enabled: false` and skip this one.
             const alreadyDisabled = new RegExp(
-              `\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{[\\s\\S]*?enabled:\\s*false`,
+              `\\[${enumPrefix}\\.${enumKey}\\]:\\s*\\{\\n    enabled:\\s*false`,
             );
             if (
               !alreadyDisabled.test(roleFileContents[role]) &&

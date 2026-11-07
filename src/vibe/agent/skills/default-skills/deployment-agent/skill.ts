@@ -92,7 +92,7 @@ export const deploymentAgentSkill: Skill = {
       variantName: "skills.deploymentAgent.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -117,7 +117,7 @@ export const deploymentAgentSkill: Skill = {
       variantName: "skills.deploymentAgent.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

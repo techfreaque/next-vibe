@@ -59,14 +59,14 @@ export const translations = {
     addAnother: "Add another",
     addAnotherTooltip: "Add another instance of this skill to your collection",
     variants: {
-      title: "Variants",
+      title: "Choose a model",
     },
     addToCollection: "Add to your collection:",
-    addAllToFavorites: "Add All",
-    quickAdd: "Quick Add",
+    addAllToFavorites: "Add all models",
+    quickAdd: "Add",
     tweakAndAdd: "Tweak & Add",
     edit: "Edit",
-    copyAndCustomize: "Copy & Customize",
+    copyAndCustomize: "Make my own version",
     delete: "Delete",
     vote: "Vote",
     report: "Report",
@@ -189,6 +189,7 @@ export const translations = {
     },
     share: {
       button: "Share & Earn",
+      titleNamed: "Share {{name}} and earn",
       title: "Share this skill & earn",
       description:
         "Share this skill with your referral link. Earn 10% recurring commission from every user who signs up.",

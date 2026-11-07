@@ -11,8 +11,6 @@ export const translations = {
 
   hero: {
     backToBlog: "Back to Blog",
-    brand: "{{appName}} - ",
-    icon: "🧭",
     category: "Product Update",
     readTime: "7 min read",
     title: "123 models. Eyes, ears, hands. One companion.",
@@ -166,5 +164,11 @@ export const translations = {
     p1: "The app is meaningfully different from what it was. If you left early - and we know a lot of people did - it's worth another try.",
     p2: "And if you find something still broken: good. Tell us. That's exactly the kind of signal that moves things forward.",
     cta: "Open {{appName}}",
+  },
+
+  cta: {
+    title: "123 models. One chat. Go break it.",
+    subtitle:
+      "Pick a companion, throw any file at it, and tell us what still feels rough.",
   },
 };

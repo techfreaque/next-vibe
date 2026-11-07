@@ -96,7 +96,7 @@ export const cronManagerSkill: Skill = {
       variantName: "skills.cronManager.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        manualModelId: ChatModelId.GEMINI_4_ARGON,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -121,7 +121,7 @@ export const cronManagerSkill: Skill = {
       variantName: "skills.cronManager.variants.fast" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_8_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

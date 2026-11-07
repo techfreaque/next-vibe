@@ -596,42 +596,19 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    back: "Zurück",
-    welcome: {
-      title: "Eine KI für alles. Die richtige für jeden Moment.",
-      line1:
-        "Ein Begleiter für alltägliche Gespräche. Spezialisten für Coding, Recherche, Schreiben - du wählst einen, wenn die Aufgabe es verlangt.",
-      line2:
-        "Gleicher Chat. Du wechselst, wenn es drauf ankommt. Dauert Sekunden.",
-      line3: "Lass uns dich in unter einer Minute einrichten.",
-      continue: "Los geht's",
-    },
-    guest: {
-      title: "Du surfst als Gast",
-      line1:
-        "Deine Einstellungen, dein Begleiter und dein Chatverlauf werden nur lokal auf diesem Gerät gespeichert.",
-      line2:
-        "Melde dich an, um alles geräteübergreifend zu synchronisieren - und dein Setup nie zu verlieren.",
-      signIn: "Anmelden / Konto erstellen",
-      continueAnyway: "Als Gast fortfahren",
-      note: "Du kannst dich jederzeit über das Menü anmelden.",
-    },
-    companion: {
-      title: "Wähle deinen Begleiter",
-      subtitle: "Dein täglicher Gesprächspartner",
-      modelTitle: "Welches Modell soll es antreiben?",
-      customSetup: "Erweiterte Einrichtung →",
-      next: "Weiter",
-      selectFirst: "Wähle einen Begleiter zum Fortfahren",
+    setup: {
+      title: "Richte deine KI ein",
+      subtitle:
+        "Wähle deinen Gesprächspartner. Spezialisten nach Bedarf. Alles jederzeit änderbar.",
+      companionLabel: "Dein Begleiter",
+      specialistsLabel: "Spezialisten hinzufügen",
+      optional: "optional",
+      guestNote: "Gastmodus - dein Setup bleibt nur auf diesem Gerät.",
+      signIn: "Anmelden und synchronisieren",
+      start: "Chat starten",
+      saving: "Wird eingerichtet...",
     },
     usecases: {
-      title: "Wofür wirst du es hauptsächlich nutzen?",
-      subtitle:
-        "Wir fügen automatisch die richtigen Spezialisten zu deinem KI-Toolkit hinzu.",
-      saving: "Einrichtung...",
-      start: "Chat starten",
-      hintNoneSelected:
-        "Wähle Bereiche für Spezialisten oder tippe auf Start zum Überspringen",
       noProviderAvailable:
         "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true) um fortzufahren.",
       coding: {

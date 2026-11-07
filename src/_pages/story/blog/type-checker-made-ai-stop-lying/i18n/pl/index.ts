@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
       "Obserwuj, jak Claude Code trafia na sprawdzacz trzy razy przed znalezieniem właściwego typu",
     round1Title: "Runda 1 - AI pisze `any`",
     round1Description:
-      'Zapytaj Claude Code: "Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty - użyj whatever type makes this work."',
+      'Zapytaj Claude Code: "Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty - użyj dowolnego typu, byle działało."',
     round1Result: "Claude Code pisze proste rozwiązanie:",
     round1Error:
       "2 błędy znalezione. Oba `any`. Claude Code może to zobaczyć przez narzędzie MCP.",

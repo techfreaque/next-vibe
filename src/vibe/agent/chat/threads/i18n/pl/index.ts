@@ -352,6 +352,31 @@ export const translations: typeof enTranslations = {
       },
     },
     suggestedPrompts: {
+      tryOne: "Wypróbuj",
+      starters: {
+        explain: {
+          label: "Wyjaśnij prosto",
+          prompt:
+            "Wyjaśnij mi inflację, jakbym miał 12 lat. Krótko i konkretnie.",
+        },
+        search: {
+          label: "Szukaj w sieci",
+          prompt:
+            "Jakie były najważniejsze newsy technologiczne w tym tygodniu? Wyszukaj i podaj źródła.",
+        },
+        image: {
+          label: "Stwórz obraz",
+          prompt:
+            "Wygeneruj obraz przytulnej chatki w śnieżycy nocą, z ciepłym światłem w oknach.",
+        },
+        honest: {
+          label: "Bez owijania",
+          prompt:
+            "Daj mi najmocniejsze argumenty za i przeciw kryptowalutom. Bez wykrętów i zastrzeżeń.",
+        },
+      },
+      switchHint: "Chcesz inne AI? Stuknij jego nazwę pod polem wiadomości.",
+      takeTour: "Krótki przewodnik (1 minuta)",
       title: "Jak mogę pomóc?",
       privateTitle: "Twój prywatny asystent AI",
       privateDescription:

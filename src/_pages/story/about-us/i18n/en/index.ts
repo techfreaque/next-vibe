@@ -14,63 +14,75 @@ export const translations = {
       "Learn about our mission for uncensored AI conversations",
   },
   hero: {
+    eyebrow: "About {{appName}}",
+    title: "AI that answers to you.",
     subtitle:
       "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on {{appName}} - or self-host your own.",
+    ctaPrimary: "Start chatting",
+    ctaSecondary: "Read the build log",
+  },
+  stats: {
+    models: "AI models",
+    skills: "skills",
+    tools: "tools",
+    founded: "founded",
   },
   backToHome: "Back to Home",
   title: "About {{appName}}",
   subtitle: "Pioneering Uncensored AI Conversations",
   description:
-    "We're on a mission to democratize access to uncensored AI. Founded in {{foundedYear}}, {{appName}} provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
+    "Founded in {{foundedYear}}, {{appName}} gives you the world's best AI models without a policy team deciding what you may ask. You pick the model. You set the filter.",
   values: {
-    title: "Our Values",
-    description: "The principles that guide everything we do at {{appName}}",
+    title: "What we won't compromise on",
+    description: "Four rules every feature of {{appName}} has to pass.",
     excellence: {
-      title: "Excellence",
+      title: "You choose the filter",
       description:
-        "We strive for excellence in everything we do, from our platform's performance to our customer support.",
+        "Mainstream, open or uncensored models. Pick the level per conversation. No one decides for you.",
     },
     innovation: {
-      title: "Innovation",
+      title: "Open source, all of it",
       description:
-        "We continuously innovate to bring you the latest AI models and features.",
+        "{{appName}} runs on next-vibe, open source on GitHub. Read the code, fork it, run it on your own hardware.",
     },
     integrity: {
-      title: "Integrity",
+      title: "Private by default",
       description:
-        "We operate with transparency and honesty, respecting your privacy and data.",
+        "Incognito mode keeps conversations on your device. Your data stays yours - not a product we sell.",
     },
     collaboration: {
-      title: "Collaboration",
+      title: "Built in public",
       description:
-        "We work together with our community to build the best AI chat platform.",
+        "Roadmap, architecture decisions and dead ends - all on the blog. Your feedback ships as features.",
     },
   },
   mission: {
-    title: "Our Mission",
+    title: "Your AI. Your rules.",
     subtitle: "Democratizing Access to Uncensored AI",
     description:
-      "We believe that AI should be accessible to everyone, without censorship or restrictions. Our mission is to provide a platform where users can have honest conversations with AI.",
+      "Every big AI provider filters what you can ask - and you never see the rules. We think adults can decide for themselves. So {{appName}} puts every model and every filter level in one place, and hands you the switch.",
     vision: {
-      title: "Our Vision",
+      title: "The vision",
       description:
-        "To become the world's leading platform for uncensored AI conversations, empowering users with access to the most advanced AI models.",
+        "One home for every serious AI model - mainstream, open and uncensored - where you decide what's off-limits.",
     },
     approach: {
-      title: "Our Approach",
+      title: "The approach",
       description:
-        "We combine cutting-edge AI technology with a user-first philosophy, ensuring privacy, security, and freedom of expression.",
+        "Ship the best models fast, wrap them in real tools - search, memory, automation - and keep privacy the default, not an upsell.",
     },
     commitment: {
-      title: "Our Commitment",
+      title: "The commitment",
       description:
-        "We're committed to maintaining a platform that respects user privacy, provides transparent pricing, and delivers exceptional AI experiences.",
+        "Transparent pricing. No dark patterns. A platform you can leave any time - by self-hosting the exact same code.",
     },
   },
   contact: {
-    title: "Get in Touch",
-    description: "Have questions or feedback? We'd love to hear from you.",
-    cta: "Contact Us",
+    title: "Questions? Talk to us.",
+    description:
+      "Feedback, partnerships, press, bugs - a human reads every message.",
+    cta: "Contact us",
+    selfHost: "Self-host it",
   },
   post: {
     title: "About Us",

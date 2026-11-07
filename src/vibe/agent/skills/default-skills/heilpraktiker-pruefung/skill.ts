@@ -262,7 +262,7 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
       variantName: "skills.heilpraktikerPruefung.variants.precise" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_6_TERRA,
+        manualModelId: ChatModelId.GPT_6_1_TERRA,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -286,7 +286,7 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
       variantName: "skills.heilpraktikerPruefung.variants.thorough" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -310,7 +310,7 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
       variantName: "skills.heilpraktikerPruefung.variants.quick" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

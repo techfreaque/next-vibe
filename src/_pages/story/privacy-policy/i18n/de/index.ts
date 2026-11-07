@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
       "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
   },
   printAriaLabel: "Datenschutzrichtlinie drucken",
+  onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Datenschutzrichtlinie",
   lastUpdated: "Zuletzt aktualisiert: Januar 2025",

@@ -68,7 +68,7 @@ export const translatorSkill: Skill = {
       variantName: "skills.translator.variants.gemini" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GEMINI_3_6_FLASH,
+        manualModelId: ChatModelId.GEMINI_3_8_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

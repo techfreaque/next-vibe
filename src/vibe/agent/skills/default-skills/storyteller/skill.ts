@@ -132,7 +132,7 @@ export const storytellerSkill: Skill = {
       variantName: "skills.storyteller.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GLM_5_2,
+        manualModelId: ChatModelId.GLM_5_3,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

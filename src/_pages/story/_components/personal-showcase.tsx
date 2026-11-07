@@ -1,13 +1,10 @@
 "use client";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
-import { ChatMessageRole } from "next-vibe/agent/chat/enum";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
@@ -17,14 +14,31 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import type codingAgentDefinitions from "next-vibe/agent/coding-agent/definition";
+import type cortexExecDefinitions from "next-vibe/agent/cortex/exec/definition";
+import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
+import type cronTasksDefinitions from "next-vibe/tasks/cron/tasks/definition";
+import {
+  CronTaskEnabledFilter,
+  CronTaskHiddenFilter,
+  CronTaskPriority,
+  CronTaskStatus,
+  TaskCategory,
+  TaskOutputMode,
+} from "next-vibe/tasks/enum";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { useInView } from "react-intersection-observer";
 
-import type { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { ExecBackend } from "@/ssh/enum";
 
+import { mkAssistantMsg, mkDemoToolMsg, mkUserMsg } from "./demo-messages";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
+
+type CodingAgentEndpoint = typeof codingAgentDefinitions.POST;
+type CortexExecEndpoint = typeof cortexExecDefinitions.POST;
+type CortexSearchEndpoint = typeof cortexSearchDefinitions.GET;
+type TaskListEndpoint = typeof cronTasksDefinitions.GET;
 
 type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
@@ -49,14 +63,12 @@ function PersonalBlock({
   reversed,
   delay,
 }: PersonalBlockProps): JSX.Element {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
   return (
-    <Div ref={ref as never} className="py-16 md:py-24">
+    <Div className="py-16 md:py-24">
       <MotionDiv
         className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
-        initial={{ opacity: 0, y: 30 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay }}
       >
         <Div className={reversed ? "md:[direction:ltr]" : ""}>
@@ -77,87 +89,91 @@ function PersonalBlock({
 }
 
 // ---------------------------------------------------------------------------
-// Mock helpers (local copies - same shape as capability-showcase)
+// Demo builders
 // ---------------------------------------------------------------------------
 
-function baseMockMsg(overrides: {
+type CronTaskRow = TaskListEndpoint["types"]["ResponseOutput"]["tasks"][number];
+
+function mkCronTaskRow(params: {
   id: string;
-  threadId: string;
-  role: ChatMessage["role"];
-  content: string | null;
-  parentId: string | null;
-  depth: number;
-  sequenceId: string | null;
-  isAI: boolean;
-  model: ChatMessage["model"];
-  metadata: ChatMessage["metadata"];
-}): ChatMessage {
-  const now = new Date();
+  routeId: string;
+  displayName: string;
+  schedule: string;
+  category: CronTaskRow["category"];
+  lastExecutedAt: string;
+  nextExecutionAt: string;
+  lastExecutionStatus: CronTaskRow["lastExecutionStatus"];
+  lastExecutionError: string | null;
+  executionCount: number;
+  consecutiveFailures: number;
+  errorCount: number;
+}): CronTaskRow {
+  const createdAt = new Date("2026-01-12T10:00:00Z");
   return {
-    authorId: null,
-    authorName: null,
-    skill: null,
-    errorType: null,
-    errorMessage: null,
-    errorCode: null,
-    upvotes: 0,
-    downvotes: 0,
-    createdAt: now,
-    updatedAt: now,
-    ...overrides,
+    id: params.id,
+    shortId: params.id,
+    routeId: params.routeId,
+    displayName: params.displayName,
+    description: null,
+    version: "1",
+    category: params.category,
+    schedule: params.schedule,
+    timezone: "UTC",
+    enabled: true,
+    hidden: false,
+    priority: CronTaskPriority.MEDIUM,
+    timeout: 300000,
+    retries: 3,
+    retryDelay: 5000,
+    outputMode: TaskOutputMode.NOTIFY_ON_FAILURE,
+    owner: { type: "system" },
+    lastExecutedAt: params.lastExecutedAt,
+    lastExecutionStatus: params.lastExecutionStatus,
+    lastExecutionError: params.lastExecutionError,
+    lastExecutionDuration: 1200,
+    nextExecutionAt: params.nextExecutionAt,
+    executionCount: params.executionCount,
+    consecutiveFailures: params.consecutiveFailures,
+    successCount: params.executionCount - params.errorCount,
+    errorCount: params.errorCount,
+    averageExecutionTime: 1100,
+    taskInput: {},
+    runOnce: false,
+    notificationTargets: [],
+    targetInstance: null,
+    tags: [],
+    createdAt,
+    updatedAt: createdAt,
   };
 }
 
-function mkToolMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  toolCallId: string,
-  toolName: keyof typeof pathToAliasMap,
-  args: WidgetData,
-  result: WidgetData,
-  executionTime: number,
-): ChatMessage {
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.TOOL,
-    content: null,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: {
-      toolCall: { toolCallId, toolName, args, result, executionTime },
+function mkSshExecMsg(params: {
+  id: string;
+  threadId: string;
+  sequenceId: string;
+  toolCallId: string;
+  command: string;
+  output: string;
+  executionTime: number;
+}): ChatMessage {
+  return mkDemoToolMsg<CortexExecEndpoint>({
+    id: params.id,
+    threadId: params.threadId,
+    sequenceId: params.sequenceId,
+    toolCallId: params.toolCallId,
+    toolName: "cortex-exec",
+    args: { path: "/ssh/prod-1", command: params.command },
+    result: {
+      output: params.output,
+      exitCode: 0,
+      cwd: "/srv/app",
+      terminalId: "3f0c9a52-7d1e-4b8a-9c2f-5e6a1b0d4c71",
+      backend: ExecBackend.SSH,
+      truncated: false,
     },
+    executionTime: params.executionTime,
   });
 }
-
-function mkAssistantMsg(
-  id: string,
-  tid: string,
-  seq: string,
-  content: string,
-  meta?: Partial<ChatMessage["metadata"]>,
-): ChatMessage {
-  return baseMockMsg({
-    id,
-    threadId: tid,
-    role: ChatMessageRole.ASSISTANT,
-    content,
-    parentId: "user",
-    depth: 1,
-    sequenceId: seq,
-    isAI: true,
-    model: ChatModelId.CLAUDE_OPUS_4_6,
-    metadata: { ...meta },
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Demo builders
-// ---------------------------------------------------------------------------
 
 // Heartbeat: Thea wakes up on schedule, checks task queue, spots email failure, recalls fix policy, spawns Claude Code
 function buildHeartbeatGroup(t: ScopedT): MessageGroup {
@@ -171,43 +187,76 @@ function buildHeartbeatGroup(t: ScopedT): MessageGroup {
     t("home.personal.demos.heartbeat.reasoning1"),
   );
 
-  const taskListTool = mkToolMsg(
-    "heartbeat-tasks",
-    tid,
-    seq,
-    "toolu_tasks1",
-    "task-list",
-    { includeCompleted: false, limit: 20 },
-    {
-      tasks: [
-        {
-          id: "email-send-daily",
-          displayName: "Daily digest email",
-          status: "FAILED",
-          lastRun: "2026-03-29T06:00:00Z",
-          failCount: 3,
-          lastError: t("home.personal.demos.heartbeat.taskError"),
-        },
-        {
-          id: "db-backup",
-          displayName: "Nightly database backup",
-          status: "SUCCESS",
-          lastRun: "2026-03-29T03:00:00Z",
-          failCount: 0,
-        },
-        {
-          id: "memory-cleanup",
-          displayName: "Memory archival",
-          status: "SUCCESS",
-          lastRun: "2026-03-28T22:00:00Z",
-          failCount: 0,
-        },
-      ],
-      total: 3,
-      failed: 1,
+  const taskListTool = mkDemoToolMsg<TaskListEndpoint>({
+    id: "heartbeat-tasks",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_tasks1",
+    toolName: "task-list",
+    args: {
+      enabled: CronTaskEnabledFilter.ALL,
+      hidden: CronTaskHiddenFilter.VISIBLE,
+      sort: "name_asc",
+      limit: "20",
     },
-    280,
-  );
+    result: {
+      tasks: [
+        mkCronTaskRow({
+          id: "email-send-daily",
+          routeId: "email-campaigns",
+          displayName: "Daily digest email",
+          schedule: "0 6 * * *",
+          category: TaskCategory.SYSTEM,
+          lastExecutedAt: "2026-03-29T06:00:00Z",
+          nextExecutionAt: "2026-03-30T06:00:00Z",
+          lastExecutionStatus: CronTaskStatus.FAILED,
+          lastExecutionError: t("home.personal.demos.heartbeat.taskError"),
+          executionCount: 88,
+          consecutiveFailures: 3,
+          errorCount: 3,
+        }),
+        mkCronTaskRow({
+          id: "db-backup",
+          routeId: "cortex-exec",
+          displayName: "Nightly database backup",
+          schedule: "0 3 * * *",
+          category: TaskCategory.DATABASE,
+          lastExecutedAt: "2026-03-29T03:00:00Z",
+          nextExecutionAt: "2026-03-30T03:00:00Z",
+          lastExecutionStatus: CronTaskStatus.COMPLETED,
+          lastExecutionError: null,
+          executionCount: 88,
+          consecutiveFailures: 0,
+          errorCount: 0,
+        }),
+        mkCronTaskRow({
+          id: "memory-cleanup",
+          routeId: "ai-run",
+          displayName: "Memory archival",
+          schedule: "0 22 * * *",
+          category: TaskCategory.MAINTENANCE,
+          lastExecutedAt: "2026-03-28T22:00:00Z",
+          nextExecutionAt: "2026-03-29T22:00:00Z",
+          lastExecutionStatus: CronTaskStatus.COMPLETED,
+          lastExecutionError: null,
+          executionCount: 87,
+          consecutiveFailures: 0,
+          errorCount: 0,
+        }),
+      ],
+      totalTasks: 3,
+      countsByStatus: {
+        all: 3,
+        running: 0,
+        completed: 2,
+        failed: 1,
+        pending: 0,
+        disabled: 0,
+      },
+      countsByHidden: { visible: 3, hidden: 0, all: 3 },
+    },
+    executionTime: 280,
+  });
 
   const reasoning2 = mkAssistantMsg(
     "heartbeat-reasoning2",
@@ -216,28 +265,29 @@ function buildHeartbeatGroup(t: ScopedT): MessageGroup {
     t("home.personal.demos.heartbeat.reasoning2"),
   );
 
-  const memoryTool = mkToolMsg(
-    "heartbeat-memory",
-    tid,
-    seq,
-    "toolu_mem1",
-    "cortex-search",
-    { query: t("home.personal.demos.heartbeat.memoryQuery") },
-    {
+  const memoryQuery = t("home.personal.demos.heartbeat.memoryQuery");
+  const memoryTool = mkDemoToolMsg<CortexSearchEndpoint>({
+    id: "heartbeat-memory",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_mem1",
+    toolName: "cortex-search",
+    args: { query: memoryQuery, path: "/memories", maxResults: 5 },
+    result: {
+      responseQuery: memoryQuery,
       results: [
         {
-          memoryNumber: 4,
-          content: t("home.personal.demos.heartbeat.memoryResult"),
-          tags: ["email", "smtp", "auto-fix"],
-          priority: 85,
-          isArchived: false,
-          createdAt: "2026-02-10T09:00:00Z",
+          resultPath: "/memories/ops/email-smtp-playbook.md",
+          excerpt: t("home.personal.demos.heartbeat.memoryResult"),
+          score: 0.94,
+          updatedAt: new Date("2026-02-10T09:00:00Z"),
         },
       ],
       total: 1,
+      searchMode: "hybrid",
     },
-    290,
-  );
+    executionTime: 290,
+  });
 
   const reasoning3 = mkAssistantMsg(
     "heartbeat-reasoning3",
@@ -246,39 +296,35 @@ function buildHeartbeatGroup(t: ScopedT): MessageGroup {
     t("home.personal.demos.heartbeat.reasoning3"),
   );
 
-  const codingTool = mkToolMsg(
-    "heartbeat-code",
-    tid,
-    seq,
-    "toolu_cc1",
-    "coding-agent",
-    {
+  const codingTool = mkDemoToolMsg<CodingAgentEndpoint>({
+    id: "heartbeat-code",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_cc1",
+    toolName: "coding-agent",
+    args: {
       prompt: t("home.personal.demos.heartbeat.taskInput"),
       provider: "claude-code",
       interactiveMode: false,
       taskTitle: t("home.personal.demos.heartbeat.taskTitle"),
     },
-    {
+    result: {
       output: t("home.personal.demos.heartbeat.taskOutput"),
       durationMs: 11800,
     },
-    11800,
-  );
+    executionTime: 11800,
+  });
 
-  const rebuildTool = mkToolMsg(
-    "heartbeat-rebuild",
-    tid,
-    seq,
-    "toolu_rebuild1",
-    "rebuild",
-    {},
-    {
-      status: "success",
-      message: t("home.personal.demos.heartbeat.rebuildOutput"),
-      durationMs: 18600,
-    },
-    18600,
-  );
+  // `rebuild` is not AI-callable - the AI rebuilds through its SSH terminal.
+  const rebuildTool = mkSshExecMsg({
+    id: "heartbeat-rebuild",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_rebuild1",
+    command: "vibe rebuild",
+    output: t("home.personal.demos.heartbeat.rebuildOutput"),
+    executionTime: 18600,
+  });
 
   const response = mkAssistantMsg(
     "heartbeat-response",
@@ -315,46 +361,28 @@ function buildSshGroup(t: ScopedT): MessageGroup {
     t("home.personal.demos.ssh.reasoning"),
   );
 
-  const pullTool = mkToolMsg(
-    "ssh-pull",
-    tid,
-    seq,
-    "toolu_ssh1",
-    "cortex-exec",
-    {
-      command:
-        "cd /srv/app && git pull origin main && bun install --frozen-lockfile",
-    },
-    {
-      stdout:
-        "Already up to date.\nFast-forward\n next-vibe/agent/models/models.ts | 3 +--\n 1 file changed\nbun install v1.2.4 - 0 new packages",
-      stderr: "",
-      exitCode: 0,
-      status: "SUCCESS",
-      durationMs: 1240,
-      backend: "SSH",
-    },
-    1240,
-  );
+  const pullTool = mkSshExecMsg({
+    id: "ssh-pull",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_ssh1",
+    command:
+      "cd /srv/app && git pull origin main && bun install --frozen-lockfile",
+    output:
+      "Updating 4f2a91c..9be07d3\nFast-forward\n src/agent/models/models.ts | 3 +--\n 1 file changed, 1 insertion(+), 2 deletions(-)\nbun install v1.2.4\nChecked 812 installs across 903 packages (no changes)",
+    executionTime: 1240,
+  });
 
-  const restartTool = mkToolMsg(
-    "ssh-restart",
-    tid,
-    seq,
-    "toolu_ssh2",
-    "cortex-exec",
-    { command: "pm2 reload ecosystem.config.js --update-env" },
-    {
-      stdout:
-        "Reloading app unbottled-ai [0] ✓\nReloading app unbottled-ai [1] ✓\n[PM2] Done. Zero-downtime reload complete.",
-      stderr: "",
-      exitCode: 0,
-      status: "SUCCESS",
-      durationMs: 3100,
-      backend: "SSH",
-    },
-    3100,
-  );
+  const restartTool = mkSshExecMsg({
+    id: "ssh-restart",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_ssh2",
+    command: "pm2 reload ecosystem.config.js --update-env",
+    output:
+      "[PM2] Applying action reloadProcessId on app [unbottled-ai](ids: [ 0, 1 ])\n[PM2] [unbottled-ai](0) ✓\n[PM2] [unbottled-ai](1) ✓\n[PM2] Done. Zero-downtime reload complete.",
+    executionTime: 3100,
+  });
 
   const response = mkAssistantMsg(
     "ssh-response",
@@ -383,25 +411,25 @@ function buildClaudeCodeGroup(t: ScopedT): MessageGroup {
     t("home.personal.demos.claudeCode.reasoning"),
   );
 
-  const codingTool = mkToolMsg(
-    "cc-spawn",
-    tid,
-    seq,
-    "toolu_cc2",
-    "coding-agent",
-    {
+  const codingTool = mkDemoToolMsg<CodingAgentEndpoint>({
+    id: "cc-spawn",
+    threadId: tid,
+    sequenceId: seq,
+    toolCallId: "toolu_cc2",
+    toolName: "coding-agent",
+    args: {
       prompt: t("home.personal.demos.claudeCode.taskInput"),
       provider: "claude-code",
       interactiveMode: false,
       taskTitle: "Build HackerNews digest tool",
     },
-    {
+    result: {
       output:
         "Created: hackernews/top endpoint + daily cron wired at 08:00. Character filter set for TypeScript, self-hosting, AI. First digest queued for tomorrow.",
       durationMs: 31200,
     },
-    31200,
-  );
+    executionTime: 31200,
+  });
 
   const response = mkAssistantMsg(
     "cc-response",
@@ -458,17 +486,10 @@ function PersonalDemoVisual({
 
   const userMsg = useMemo(
     () =>
-      baseMockMsg({
+      mkUserMsg({
         id: `personal-user-${activeId}`,
         threadId: `demo-personal-${activeId}`,
-        role: ChatMessageRole.USER,
         content: userMessages[activeId],
-        parentId: null,
-        depth: 0,
-        sequenceId: null,
-        isAI: false,
-        model: null,
-        metadata: {},
       }),
     [activeId, userMessages],
   );
@@ -507,7 +528,7 @@ function PersonalDemoVisual({
               roles: [UserPermissionRole.ADMIN],
             }}
           />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <MotionDiv
               key={activeId}
               initial={{ opacity: 0, y: 8 }}

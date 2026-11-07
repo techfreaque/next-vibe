@@ -5,6 +5,10 @@
 "use client";
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Div } from "next-vibe/ui/components/div";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Receipt } from "next-vibe/ui/components/icons/Receipt";
+import { Span } from "next-vibe/ui/components/span";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
@@ -16,6 +20,8 @@ import {
 import { PaginationWidget } from "next-vibe/unified-ui/widgets/containers/pagination/widget";
 
 import { CreditsTabHeader } from "../credits-tab-header";
+import { CreditTransactionTypeDB } from "../enum";
+import { scopedTranslation as creditsScopedTranslation } from "../i18n";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -30,67 +36,89 @@ export function CreditHistoryContainer({
   const tField = useWidgetTranslation<typeof definition.GET>();
   const value = useWidgetValue<typeof definition.GET>();
   const children = field.children;
+  const creditsT = creditsScopedTranslation.scopedT(locale).t;
 
   const transactions = value?.transactions ?? [];
   const paginationInfo = value?.paginationInfo;
 
   return (
-    <WidgetShell>
+    <WidgetShell className="gap-6">
       <CreditsTabHeader activeTab="history" />
 
-      {/* Transactions List */}
-      <Div className="flex flex-col gap-3">
-        {transactions.length > 0 ? (
-          transactions.map((transaction) => {
+      {transactions.length > 0 ? (
+        <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+          {transactions.map((transaction) => {
             const isPositive = transaction.amount > 0;
+            const typeKey = CreditTransactionTypeDB.find(
+              (key) => key === transaction.type,
+            );
+            const typeLabel = typeKey ? creditsT(typeKey) : transaction.type;
 
             return (
               <Div
                 key={transaction.id}
-                className={cn(
-                  "p-4 rounded-lg border flex items-center justify-between",
-                  isPositive
-                    ? "bg-success/10 border-success/30"
-                    : "bg-destructive/10 border-destructive/30",
-                )}
+                className="flex items-center gap-3 px-4 py-3.5 sm:px-5"
               >
-                <Div className="flex flex-col gap-1">
-                  {transaction.type && (
-                    <Div className="text-sm">{transaction.type}</Div>
+                <Span
+                  className={cn(
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+                    isPositive
+                      ? "bg-success/10 text-success"
+                      : "bg-muted text-muted-foreground",
                   )}
-                  <Div className="text-sm">
+                >
+                  {isPositive ? (
+                    <Plus className="h-4 w-4" />
+                  ) : (
+                    <Minus className="h-4 w-4" />
+                  )}
+                </Span>
+                <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <Span className="truncate text-sm font-medium">
+                    {typeLabel}
+                  </Span>
+                  <Span className="text-xs text-muted-foreground">
                     {formatSimpleDate(transaction.createdAt, locale)}
-                  </Div>
+                  </Span>
                 </Div>
-
-                <Div className="text-right flex flex-col gap-1">
-                  <Div
+                <Div className="flex shrink-0 flex-col items-end gap-0.5">
+                  <Span
                     className={cn(
-                      "text-lg font-bold",
-                      isPositive ? "text-success" : "text-destructive",
+                      "text-sm font-semibold tabular-nums",
+                      isPositive ? "text-success" : "text-foreground",
                     )}
                   >
                     {isPositive ? "+" : ""}
                     {transaction.amount}
-                  </Div>
-                  <Div className="text-xs text-muted-foreground">
+                  </Span>
+                  <Span className="text-xs tabular-nums text-muted-foreground">
                     {tField("history.get.balance", {
                       count: transaction.balanceAfter,
                     })}
-                  </Div>
+                  </Span>
                 </Div>
               </Div>
             );
-          })
-        ) : (
-          <Div className="text-center text-muted-foreground py-8">
-            {tField("history.get.emptyState")}
+          })}
+        </Div>
+      ) : (
+        <Div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-12 text-center">
+          <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <Receipt className="h-5 w-5" />
+          </Span>
+          <Div className="flex flex-col gap-1">
+            <Span className="text-sm font-semibold">
+              {tField("history.get.emptyState")}
+            </Span>
+            <Span className="text-sm text-muted-foreground">
+              {tField("history.get.emptyHint")}
+            </Span>
           </Div>
-        )}
-      </Div>
+        </Div>
+      )}
 
       {/* Pagination */}
-      {paginationInfo && (
+      {paginationInfo && transactions.length > 0 && (
         <PaginationWidget
           field={withValue(children.paginationInfo, paginationInfo, value)}
           fieldName={"paginationInfo"}

@@ -61,7 +61,8 @@ export const translations: typeof enTranslations = {
   widget: {
     title: "Połączenia zdalne",
     addButton: "Dodaj połączenie",
-    emptyState: "Brak połączeń zdalnych.",
+    emptyState:
+      "Połącz kolejną instancję, a wspomnienia i narzędzia będą synchronizować się w obie strony co minutę.",
     emptyStateCloud:
       "Połącz swoją lokalną instalację tutaj, gdy będzie gotowa. Wspomnienia i narzędzia synchronizują się automatycznie.",
     connectedBadge: "Połączono",
@@ -132,7 +133,7 @@ export const translations: typeof enTranslations = {
       benefit1: "Wspomnienia synchronizują się dwukierunkowo, automatycznie",
       benefit2: "AI w chmurze odkrywa i uruchamia twoje lokalne narzędzia",
       benefit3: "Deleguj zadania z chmury do tego komputera",
-      noConnectionsYet: "Brak połączeń.",
+      noConnectionsYet: "Nic jeszcze nie połączono",
       connectionsTitle: "Połączone instancje",
     },
     selfIdentity: {

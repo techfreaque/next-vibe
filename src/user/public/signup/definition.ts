@@ -68,6 +68,7 @@ const { POST } = createEndpoint({
         description: "fields.privateName.description",
         placeholder: "fields.privateName.placeholder",
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         columns: 6,
@@ -93,6 +94,7 @@ const { POST } = createEndpoint({
         columns: 6,
         order: 5,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         schema: z
@@ -115,6 +117,7 @@ const { POST } = createEndpoint({
         placeholder: "fields.email.placeholder",
         columns: 12,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         order: 7,
@@ -140,6 +143,7 @@ const { POST } = createEndpoint({
         columns: 6,
         order: 9,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         schema: z
@@ -161,6 +165,7 @@ const { POST } = createEndpoint({
         columns: 6,
         order: 11,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         schema: z
@@ -179,7 +184,8 @@ const { POST } = createEndpoint({
         description: "fields.subscribeToNewsletter.description",
         columns: 12,
         theme: {
-          descriptionStyle: "inline",
+          style: "none",
+          descriptionStyle: "tooltip",
         },
         order: 13,
         schema: z.boolean().optional().default(true),
@@ -192,6 +198,7 @@ const { POST } = createEndpoint({
         description: "fields.acceptTerms.description",
         columns: 12,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         order: 15,
@@ -209,6 +216,7 @@ const { POST } = createEndpoint({
         columns: 12,
         order: 17,
         theme: {
+          style: "none",
           descriptionStyle: "inline",
         },
         // Show as readonly card when prefilled from server (only if value unchanged)

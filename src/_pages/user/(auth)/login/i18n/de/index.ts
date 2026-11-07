@@ -1,7 +1,6 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  backToHome: "Zurück zur Startseite",
   auth: {
     login: {
       title: "Anmelden",

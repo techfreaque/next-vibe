@@ -16,7 +16,11 @@ interface TourState {
   onboardingComplete: boolean;
   onboardingCompanionId: string | null;
   currentStepIndex: number;
+  /** Set by "Take the tour" buttons; WelcomeTour starts and clears it */
+  tourRequested: boolean;
   advanceTour: (() => void) | null;
+  requestTour: () => void;
+  clearTourRequest: () => void;
   setTourActive: (active: boolean) => void;
   setModelSelectorOpen: (open: boolean) => void;
   setModelSelectorOnboarding: (onboarding: boolean) => void;
@@ -35,7 +39,14 @@ export const useTourState = create<TourState>()(
       onboardingComplete: false,
       onboardingCompanionId: null,
       currentStepIndex: 0,
+      tourRequested: false,
       advanceTour: null,
+      requestTour: (): void => {
+        set({ tourRequested: true });
+      },
+      clearTourRequest: (): void => {
+        set({ tourRequested: false });
+      },
       setTourActive: (active: boolean): void => {
         set({ isActive: active });
       },
@@ -72,6 +83,7 @@ export const useTourState = create<TourState>()(
         modelSelectorOpen: false,
         modelSelectorOnboarding: false,
         currentStepIndex: 0,
+        tourRequested: false,
         advanceTour: null,
       }),
       storage: {

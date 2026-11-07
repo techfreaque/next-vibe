@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://api.edenai.run/v2/audio/speech_to_text_async",
+  "status": 200,
+  "headers": {
+    "allow": "GET, POST, DELETE, HEAD, OPTIONS",
+    "connection": "keep-alive",
+    "content-length": "301",
+    "content-type": "application/json",
+    "cross-origin-opener-policy": "same-origin",
+    "date": "Sat, 07 Nov 2026 00:34:09 GMT",
+    "referrer-policy": "same-origin",
+    "server": "granian",
+    "vary": "Accept, origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "body": {
+    "public_id": "8d451fdb-7ab6-418a-97f0-45e992ed9885",
+    "status": "finished",
+    "error": null,
+    "results": {
+      "openai": {
+        "id": "91d11701-3c0d-4b23-a8d3-e5cf29eb83ac",
+        "model": null,
+        "error": null,
+        "final_status": "succeeded",
+        "cost": 0.00005,
+        "text": "BEEP",
+        "diarization": {
+          "entries": [],
+          "error_message": null,
+          "total_speakers": 0
+        }
+      }
+    }
+  }
+}

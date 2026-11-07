@@ -6,7 +6,7 @@
  * return the final assistant message text (think-tags stripped) + token info.
  *
  * Use this from CLI to get tool results fed into an AI prompt in one shot:
- *   vibe agent_ai-stream_run_POST --model=claude-haiku-4-5-20251001 \
+ *   vibe agent_ai-stream_run_POST --model=claude-haiku-5.5 \
  *     --skill=default --prompt="Summarise these skills"
  */
 

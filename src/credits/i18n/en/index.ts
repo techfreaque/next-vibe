@@ -138,9 +138,13 @@ export const translations = {
       description: "Your current credit balance and breakdown",
     },
     balance: {
-      title: "Your Credit Balance",
+      subscribe: "See plans",
+      freePlanHint:
+        "{{count}} free credits a month. Subscribe for {{subCredits}} and top-up packs.",
+      freePlan: "You're on the free plan",
+      title: "Your credits",
       adminTitle: "Spending Limit",
-      description: "Use your credits across {{modelCount}} AI models",
+      description: "One balance for all {{modelCount}} models.",
       adminDescription:
         "Credits act as a spending cap - control how much AI usage is allowed across all users.",
       credit: "{{count}} credit",
@@ -246,6 +250,7 @@ export const translations = {
   },
   history: {
     get: {
+      emptyHint: "Every credit in and out lands here.",
       title: "Get Credit History",
       titleShort: "Credit History",
       description: "Retrieve paginated credit transaction history",
@@ -253,7 +258,7 @@ export const translations = {
         title: "Credit History",
         description: "View your credit transaction history",
       },
-      emptyState: "No credit transactions yet",
+      emptyState: "No transactions yet",
       balance: "Balance after: {{count}}",
       limit: {
         label: "Limit",

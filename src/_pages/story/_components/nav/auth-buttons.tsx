@@ -21,12 +21,17 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
 
   return (
     <Div className="flex items-center gap-2">
-      <Button variant="ghost" asChild size="sm">
+      <Button
+        variant="ghost"
+        asChild
+        size="sm"
+        className="hidden h-9 sm:inline-flex"
+      >
         <Link href={`/${locale}/user/login`}>{t("nav.user.login")}</Link>
       </Button>
-      {/* Signup - always visible, compact on mobile */}
-      <Button asChild size="sm">
-        <Link href={`/${locale}/user/signup`}>{t("nav.user.signup")}</Link>
+      {/* Chatting needs no account - the primary action is the product itself */}
+      <Button asChild size="sm" className="h-10 px-3.5 sm:h-9">
+        <Link href={`/${locale}/threads`}>{t("nav.startChatting")}</Link>
       </Button>
     </Div>
   );

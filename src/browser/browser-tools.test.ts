@@ -1403,6 +1403,14 @@ describe("Browser Tools", () => {
       const SID = "browser-test-emulate";
       await closeTestTabs([SID], testUser);
       const localBase = (await getChromeTabs()).length;
+      const readState = async (fn: string): Promise<string> => {
+        const res = await run(
+          evaluateScriptEndpoints.POST,
+          { function: fn, instanceId: SID },
+          testUser,
+        );
+        return extractText(res.data);
+      };
       try {
         await run(
           newPageEndpoints.POST,
@@ -1413,18 +1421,15 @@ describe("Browser Tools", () => {
           },
           testUser,
         );
+
+        // emulate is absolute upstream: every omitted field is reset. A
+        // non-mobile viewport avoids the page reload a mobile/touch change causes.
         const applied = await run(
           emulateEndpoints.POST,
           {
             userAgent: "EmulateTest/1.0",
             colorScheme: "dark",
-            viewport: {
-              width: 412,
-              height: 800,
-              deviceScaleFactor: 2,
-              isMobile: true,
-              hasTouch: true,
-            },
+            viewport: { width: 412, height: 800, deviceScaleFactor: 2 },
             geolocation: { latitude: 52.5, longitude: 13.4 },
             networkConditions: "No emulation",
             instanceId: SID,
@@ -1432,46 +1437,74 @@ describe("Browser Tools", () => {
           testUser,
         );
         expect(applied.success, `emulate: ${applied.error ?? ""}`).toBe(true);
+        // A user agent override applies from the next navigation.
+        await run(
+          navigatePageEndpoints.POST,
+          { type: "reload", instanceId: SID },
+          testUser,
+        );
+        const state = await readState(
+          "() => JSON.stringify({ w: innerWidth, dpr: devicePixelRatio, ua: navigator.userAgent, dark: matchMedia('(prefers-color-scheme: dark)').matches })",
+        );
+        expect(state).toMatch(/w\\*":412/);
+        expect(state).toMatch(/dpr\\*":2/);
+        expect(state).toContain("EmulateTest/1.0");
+        expect(state).toMatch(/dark\\*":true/);
 
-        // A mobile viewport makes Chrome reload the page, and navigator.userAgent
-        // only reflects the override in the new document, so poll until it lands.
-        let text = "";
-        for (let attempt = 0; attempt < 20; attempt += 1) {
-          const state = await run(
-            evaluateScriptEndpoints.POST,
-            {
-              function:
-                "() => JSON.stringify({ dpr: devicePixelRatio, ua: navigator.userAgent, dark: matchMedia('(prefers-color-scheme: dark)').matches })",
-              instanceId: SID,
+        // mobile + touch flags reach upstream (the page reloads, so poll).
+        const mobile = await run(
+          emulateEndpoints.POST,
+          {
+            viewport: {
+              width: 390,
+              height: 800,
+              deviceScaleFactor: 3,
+              isMobile: true,
+              hasTouch: true,
             },
-            testUser,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        expect(mobile.success, `mobile: ${mobile.error ?? ""}`).toBe(true);
+        let touch = "";
+        for (let attempt = 0; attempt < 20; attempt += 1) {
+          touch = await readState(
+            "() => JSON.stringify({ dpr: devicePixelRatio, touch: navigator.maxTouchPoints > 0 })",
           );
-          text = extractText(state.data);
-          if (text.includes("EmulateTest/1.0")) {
+          if (/touch\\*":true/.test(touch)) {
             break;
           }
           await new Promise<void>((resolve) => {
             setTimeout(resolve, 250);
           });
         }
-        // Mobile + dpr 2 applied (layout width stays ~980 without a meta viewport).
-        expect(text).toMatch(/dpr\\*":2/);
-        expect(text).toContain("EmulateTest/1.0");
-        expect(text).toMatch(/dark\\*":true/);
+        expect(touch).toMatch(/dpr\\*":3/);
+        expect(touch).toMatch(/touch\\*":true/);
 
-        // null clears the user agent override (maps to the empty string upstream).
+        // Omitted fields reset; null clears the user agent explicitly.
         const cleared = await run(
           emulateEndpoints.POST,
           { userAgent: null, instanceId: SID },
           testUser,
         );
         expect(cleared.success, `clear: ${cleared.error ?? ""}`).toBe(true);
-        const ua = await run(
-          evaluateScriptEndpoints.POST,
-          { function: "() => navigator.userAgent", instanceId: SID },
+        await run(
+          navigatePageEndpoints.POST,
+          { type: "reload", instanceId: SID },
           testUser,
         );
-        expect(extractText(ua.data)).not.toContain("EmulateTest/1.0");
+        let ua = "";
+        for (let attempt = 0; attempt < 20; attempt += 1) {
+          ua = await readState("() => navigator.userAgent");
+          if (!ua.includes("EmulateTest/1.0")) {
+            break;
+          }
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 250);
+          });
+        }
+        expect(ua).not.toContain("EmulateTest/1.0");
       } finally {
         await closeTestTabs([SID], testUser);
         await assertTabCount(localBase, 0, "B_EMULATE: cleaned up");

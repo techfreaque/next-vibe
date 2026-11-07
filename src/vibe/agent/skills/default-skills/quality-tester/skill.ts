@@ -63,9 +63,9 @@ If everything works, respond normally to the user. Only flag issues - don't narr
       variantName: "skills.qualityTester.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        // DeepSeek V4 Flash: same tool-calling capability class as kimi at a
+        // DeepSeek V4.1 Flash: same tool-calling capability class as kimi at a
         // fraction of the price — the QA suites hammer this model constantly.
-        manualModelId: ChatModelId.DEEPSEEK_V4_FLASH,
+        manualModelId: ChatModelId.DEEPSEEK_V4_1_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.BRILLIANT,

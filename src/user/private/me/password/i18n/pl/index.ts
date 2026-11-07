@@ -3,9 +3,9 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Profil użytkownika",
 
-  title: "Zmień Hasło",
+  title: "Zmień hasło",
   titleShort: "Zmień hasło",
-  description: "Bezpiecznie zaktualizuj hasło do swojego konta",
+  description: "Potwierdź obecne hasło i ustaw nowe.",
   tag: "zmiana-hasła",
   debug: {
     updatingPassword: "Aktualizowanie hasła",
@@ -24,21 +24,21 @@ export const translations: typeof enTranslations = {
     },
   },
   currentPassword: {
-    label: "Obecne Hasło",
+    label: "Obecne hasło",
     description: "Wprowadź swoje obecne hasło",
-    placeholder: "Wprowadź obecne hasło",
+    placeholder: "Twoje obecne hasło",
     help: "Wprowadź swoje obecne hasło, aby zweryfikować swoją tożsamość przed zmianą",
   },
   newPassword: {
-    label: "Nowe Hasło",
-    description: "Wprowadź nowe hasło (minimum 8 znaków)",
-    placeholder: "Wprowadź nowe hasło",
+    label: "Nowe hasło",
+    description: "Minimum 8 znaków.",
+    placeholder: "Minimum 8 znaków",
     help: "Wybierz silne hasło z co najmniej 8 znakami, w tym literami, cyframi i symbolami",
   },
   confirmPassword: {
-    label: "Potwierdź Hasło",
+    label: "Powtórz nowe hasło",
     description: "Potwierdź swoje nowe hasło",
-    placeholder: "Potwierdź nowe hasło",
+    placeholder: "Wpisz ponownie",
     help: "Ponownie wprowadź nowe hasło, aby upewnić się, że zostało wpisane poprawnie",
   },
   twoFactorCode: {
@@ -127,11 +127,11 @@ export const translations: typeof enTranslations = {
       "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
     nextSteps: {
       logoutOther:
-        "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
+        "Pozostałe sesje zostały wylogowane. Od teraz używaj nowego hasła.",
       enable2fa:
         "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
     },
-    title: "Hasło Zaktualizowane",
+    title: "Hasło zmienione",
     description: "Twoje hasło zostało pomyślnie zaktualizowane",
   },
   update: {
@@ -145,5 +145,10 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił nieoczekiwany błąd podczas aktualizacji hasła",
       },
     },
+  },
+  widget: {
+    back: "Wróć",
+    submit: "Zmień hasło",
+    submitting: "Zmieniam...",
   },
 };

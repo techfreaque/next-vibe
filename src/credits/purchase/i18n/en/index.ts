@@ -42,6 +42,7 @@ export const translations = {
       content: "Total Credits",
     },
     pack: {
+      qtyCredits: "{{count}} credits",
       title: "Credit Pack",
       description: "One-time credit pack for AI usage",
       perPack: "/ pack",

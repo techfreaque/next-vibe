@@ -1,30 +1,36 @@
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableSkillCount } from "next-vibe/agent/skills/config";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/components/card";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { Award } from "next-vibe/ui/components/icons/Award";
-import { Globe } from "next-vibe/ui/components/icons/Globe";
-import { Handshake } from "next-vibe/ui/components/icons/Handshake";
+import { Compass } from "next-vibe/ui/components/icons/Compass";
+import { Github } from "next-vibe/ui/components/icons/Github";
 import { Heart } from "next-vibe/ui/components/icons/Heart";
-import { Lightbulb } from "next-vibe/ui/components/icons/Lightbulb";
-import { Image } from "next-vibe/ui/components/image";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Sliders } from "next-vibe/ui/components/icons/Sliders";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  Callout,
+  Cta,
+  CtaBand,
+  FeatureCard,
+  FeatureGrid,
+  PageHero,
+  PageSection,
+  StatGrid,
+} from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
@@ -66,36 +72,11 @@ export const generateMetadata = async ({
   });
 };
 
-/**
- * Value card component for displaying company values
- */
-function ValueCard({
-  title,
-  description,
-  icon,
-}: {
-  title: string;
-  description: string;
-  icon: JSX.Element;
-}): JSX.Element {
-  return (
-    <Card className="h-full transition-all hover:shadow-md">
-      <CardHeader>
-        <Div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
-          {icon}
-        </Div>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <P className="text-muted-foreground">{description}</P>
-      </CardContent>
-    </Card>
-  );
-}
-
 export interface AboutUsPageData {
   locale: CountryLanguage;
   totalModelCount: number;
+  skillCount: number;
+  toolCount: number;
 }
 
 export async function tanstackLoader({
@@ -106,202 +87,157 @@ export async function tanstackLoader({
     false,
     await getEnvAvailability(),
   );
-  return { locale, totalModelCount };
+  const { endpointsMeta } = await import("@/generated/endpoints/meta/en");
+  return {
+    locale,
+    totalModelCount,
+    skillCount: getAvailableSkillCount([
+      UserPermissionRole.PUBLIC,
+      UserPermissionRole.CUSTOMER,
+    ]),
+    toolCount: endpointsMeta.length,
+  };
 }
+
+const FOUNDED_YEAR = 2024;
 
 export function TanstackPage({
   locale,
   totalModelCount,
+  skillCount,
+  toolCount,
 }: AboutUsPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
-  // Get values from translations
-  const values = [
+  const principles = [
     {
+      icon: Sliders,
       title: t("values.excellence.title"),
       description: t("values.excellence.description"),
-      icon: <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
+      icon: Github,
       title: t("values.innovation.title"),
-      description: t("values.innovation.description"),
-      icon: <Lightbulb className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
+      description: t("values.innovation.description", { appName }),
     },
     {
+      icon: Lock,
       title: t("values.integrity.title"),
       description: t("values.integrity.description"),
-      icon: <Heart className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
+      icon: Users,
       title: t("values.collaboration.title"),
       description: t("values.collaboration.description"),
-      icon: <Handshake className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
+    },
+  ];
+
+  const mission = [
+    {
+      icon: Compass,
+      title: t("mission.vision.title"),
+      description: t("mission.vision.description"),
+    },
+    {
+      icon: Zap,
+      title: t("mission.approach.title"),
+      description: t("mission.approach.description"),
+    },
+    {
+      icon: Shield,
+      title: t("mission.commitment.title"),
+      description: t("mission.commitment.description"),
     },
   ];
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      {/* Hero Section */}
-      <Div className="relative bg-blue-600 dark:bg-blue-900 text-white">
-        <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070')] bg-cover bg-center" />
-        <Div className="container mx-auto px-4 py-24 relative z-10">
-          <Link
-            href={`/${locale}/story`}
-            className="inline-flex items-center text-sm text-white/80 hover:text-white mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToHome")}
-          </Link>
-
-          <Div className="max-w-3xl">
-            <H1 className="text-4xl md:text-5xl font-bold mb-6">
-              {t("title", {
-                appName: appName,
-              })}
-            </H1>
-            <P className="text-xl md:text-2xl opacity-90 mb-8">
-              {t("subtitle")}
-            </P>
-            <P className="text-lg opacity-80">
-              {t("description", {
-                appName: appName,
-                foundedYear: 2024,
-              })}
-            </P>
-          </Div>
-        </Div>
-      </Div>
-
-      <Div className="container mx-auto px-4 py-16">
-        {/* Mission Section */}
-        <Div className="mb-24">
-          <Div className="max-w-4xl mx-auto text-center mb-16">
-            <H2 className="text-4xl font-bold mb-6">{t("mission.title")}</H2>
-            <P className="text-xl text-blue-600 dark:text-blue-400 font-semibold mb-8">
-              {t("mission.subtitle")}
-            </P>
-            <P className="text-lg text-muted-foreground leading-relaxed">
-              {t("mission.description", {
-                appName: appName,
-              })}
-            </P>
-          </Div>
-
-          {/* Mission Cards Grid */}
-          <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-blue-500">
-              <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-blue-150 bg-linear-to-br from-blue-100 to-blue-200 dark:bg-blue-850 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center mb-4">
-                  <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
-                </Div>
-                <CardTitle className="text-xl">
-                  {t("mission.vision.title")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <P className="text-muted-foreground leading-relaxed">
-                  {t("mission.vision.description", {
-                    appName: appName,
-                  })}
-                </P>
-              </CardContent>
-            </Card>
-
-            <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-green-500">
-              <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-green-150 bg-linear-to-br from-green-100 to-green-200 dark:bg-green-850 dark:from-green-900 dark:to-green-800 flex items-center justify-center mb-4">
-                  <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
-                </Div>
-                <CardTitle className="text-xl">
-                  {t("mission.approach.title")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <P className="text-muted-foreground leading-relaxed">
-                  {t("mission.approach.description")}
-                </P>
-              </CardContent>
-            </Card>
-
-            <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-purple-500 md:col-span-2 lg:col-span-1">
-              <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-purple-150 bg-linear-to-br from-purple-100 to-purple-200 dark:bg-purple-850 dark:from-purple-900 dark:to-purple-800 flex items-center justify-center mb-4">
-                  <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
-                </Div>
-                <CardTitle className="text-xl">
-                  {t("mission.commitment.title")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <P className="text-muted-foreground leading-relaxed">
-                  {t("mission.commitment.description")}
-                </P>
-              </CardContent>
-            </Card>
-          </Div>
-
-          {/* Hero Image */}
-          <Div className="relative rounded-2xl overflow-hidden h-[400px] shadow-2xl">
-            <Image
-              src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070"
-              alt={t("mission.title")}
-              fill
-              className="object-cover"
+    <Div className="min-h-screen bg-background">
+      <PageHero
+        eyebrow={t("hero.eyebrow", { appName })}
+        eyebrowIcon={Heart}
+        title={t("hero.title")}
+        subtitle={t("description", { appName, foundedYear: FOUNDED_YEAR })}
+        actions={
+          <>
+            <Cta
+              href={`/${locale}/threads`}
+              label={t("hero.ctaPrimary")}
+              icon={MessageSquare}
             />
-            <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-            <Div className="absolute bottom-8 left-8 right-8 text-white">
-              <H3 className="text-2xl font-bold mb-2">{appName}</H3>
-              <P className="text-lg opacity-90">
-                {t("hero.subtitle", {
-                  modelCount: totalModelCount,
-                  appName: appName,
-                })}
-              </P>
-            </Div>
-          </Div>
-        </Div>
+            <Cta
+              href={`/${locale}/story/blog`}
+              label={t("hero.ctaSecondary")}
+              variant="secondary"
+            />
+          </>
+        }
+      >
+        <StatGrid
+          items={[
+            { value: totalModelCount, label: t("stats.models") },
+            { value: skillCount, label: t("stats.skills") },
+            { value: `~${toolCount}`, label: t("stats.tools") },
+            { value: FOUNDED_YEAR, label: t("stats.founded") },
+          ]}
+        />
+      </PageHero>
 
-        {/* Values Section */}
-        <Div className="mb-24">
-          <Div className="max-w-3xl mx-auto text-center mb-12">
-            <H2 className="text-3xl font-bold mb-4">{t("values.title")}</H2>
-            <P className="text-lg text-muted-foreground">
-              {t("values.description", {
-                appName: appName,
-              })}
-            </P>
-          </Div>
+      <PageSection
+        label={t("mission.subtitle")}
+        title={t("mission.title")}
+        intro={t("mission.description", { appName })}
+      >
+        <FeatureGrid columns={3}>
+          {mission.map((item) => (
+            <FeatureCard key={item.title} icon={item.icon} title={item.title}>
+              {item.description}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+        <Callout icon={Server} className="mt-6 md:mt-8">
+          {t("hero.subtitle", {
+            modelCount: totalModelCount,
+            skillCount,
+            toolCount,
+            appName,
+          })}
+        </Callout>
+      </PageSection>
 
-          <Div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <ValueCard
-                key={index}
-                title={value.title}
-                description={value.description}
-                icon={value.icon}
-              />
-            ))}
-          </Div>
-        </Div>
+      <PageSection
+        tone="muted"
+        title={t("values.title")}
+        intro={t("values.description", { appName })}
+      >
+        <FeatureGrid columns={4}>
+          {principles.map((item) => (
+            <FeatureCard key={item.title} icon={item.icon} title={item.title}>
+              {item.description}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+      </PageSection>
 
-        {/* Contact Section */}
-        <Separator className="my-16" />
-
-        <Div className="max-w-3xl mx-auto text-center mb-12">
-          <H2 className="text-3xl font-bold mb-4">{t("contact.title")}</H2>
-          <P className="text-lg text-muted-foreground">
-            {t("contact.description")}
-          </P>
-        </Div>
-
-        <Div className="mt-12 text-center">
-          <Button asChild size="lg">
-            <Link href={`/${locale}/help`}>{t("contact.cta")}</Link>
-          </Button>
-        </Div>
-      </Div>
+      <CtaBand
+        title={t("contact.title")}
+        subtitle={t("contact.description")}
+        actions={
+          <>
+            <Cta
+              href={`/${locale}/help`}
+              label={t("contact.cta")}
+              icon={Mail}
+            />
+            <Cta
+              href={`/${locale}/story/self-host`}
+              label={t("contact.selfHost")}
+              variant="secondary"
+            />
+          </>
+        }
+      />
     </Div>
   );
 }

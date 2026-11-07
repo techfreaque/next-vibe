@@ -55,6 +55,9 @@ export enum ImageGenModelId {
   GROK_IMAGINE_IMAGE_2 = "grok-imagine-image-2",
   QWEN_IMAGE_3 = "qwen-image-3",
   QWEN_IMAGE_3_PRO = "qwen-image-3-pro",
+  // Uncensored image models via Venice.ai (added 2026-11-07)
+  LUSTIFY_V8 = "lustify-v8",
+  CHROMA = "chroma",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
@@ -1131,6 +1134,70 @@ export const imageGenModelDefinitions: Record<
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+  [ImageGenModelId.LUSTIFY_V8]: {
+    name: "Lustify v8",
+    by: "veniceAI",
+    description: "chat.models.descriptions.veniceLustifyV8",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text"], // updated: 2026-11-07 from venice-api
+    outputs: ["image"], // updated: 2026-11-07 from venice-api
+    providers: [
+      {
+        id: ImageGenModelId.LUSTIFY_V8,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "lustify-v8",
+        creditCostPerImage: 1, // updated: 2026-11-07 from venice-api ($0.01/image → 1 credit)
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.UNCENSORED,
+      ModelUtility.ADULT_EXPLICIT,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.UNCENSORED,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+  [ImageGenModelId.CHROMA]: {
+    name: "Chroma",
+    by: "veniceAI",
+    description: "chat.models.descriptions.veniceChroma",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text"], // updated: 2026-11-07 from venice-api
+    outputs: ["image"], // updated: 2026-11-07 from venice-api
+    providers: [
+      {
+        id: ImageGenModelId.CHROMA,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "chroma",
+        creditCostPerImage: 1, // updated: 2026-11-07 from venice-api ($0.01/image → 1 credit)
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
+      ModelUtility.ADULT_EXPLICIT,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.UNCENSORED,
     features: {
       ...defaultFeatures,
       streaming: false,

@@ -1,7 +1,6 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  backToHome: "Powrót do strony głównej",
   errors: {
     unknown: "Wystąpił nieznany błąd",
     title: "Błąd",

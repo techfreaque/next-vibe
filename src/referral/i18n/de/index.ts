@@ -53,8 +53,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Code erstellen",
     description: "Neuen Empfehlungscode erstellen",
     form: {
-      title: "Empfehlungscode erstellen",
-      description: "Neuen Empfehlungscode generieren zum Teilen",
+      title: "Neuer Empfehlungscode",
+      description:
+        "Ein Code pro Zielgruppe. Discord, Blog, Freunde. Jeder wird einzeln getrackt.",
     },
     submit: {
       label: "Code erstellen",
@@ -129,8 +130,9 @@ export const translations: typeof enTranslations = {
         description: "Ihre Empfehlungscodes erfolgreich abgerufen",
       },
       widget: {
-        empty: "Sie haben noch keine Empfehlungscodes",
-        emptyHint: "Erstellen Sie Ihren ersten Code oben ↑",
+        empty: "Du hast noch keinen Code",
+        emptyHint:
+          "Erstelle unten deinen ersten Code. Der Link ist sofort bereit.",
         copied: "Kopiert!",
         copy: "Link kopieren",
         visitors: "Besucher",
@@ -224,14 +226,14 @@ export const translations: typeof enTranslations = {
   form: {
     fields: {
       code: {
-        label: "Empfehlungscode",
-        description: "Eindeutiger Empfehlungscode",
-        placeholder: "Code eingeben",
+        label: "Code",
+        description: "Steht in deinem Link. 3-50 Zeichen.",
+        placeholder: "z. B. ALEX10",
       },
       label: {
-        label: "Bezeichnung",
-        description: "Optionale Bezeichnung für diesen Code",
-        placeholder: "Mein Empfehlungscode",
+        label: "Notiz (nur für dich)",
+        description: "Wo du ihn teilst.",
+        placeholder: "z. B. YouTube-Bio",
       },
       description: {
         label: "Beschreibung",
@@ -364,7 +366,7 @@ export const translations: typeof enTranslations = {
         "Einzigartige Codes für verschiedene Zielgruppen generieren - Freunde, soziale Medien oder Kampagnen.",
       step2Title: "Link teilen - oder Skill-Link",
       step2Body:
-        "Empfehlungslink: {{directPct}} jeder Zahlung von diesem Nutzer, für immer. Skill-Link: {{skillPct}} gesamt ({{directPct}} direkt + {{skillBonusPct}} Skill-Bonus) - zwei Einnahmequellen, ein Link.",
+        "Empfehlungslink: {{directPct}} jeder Zahlung von diesem Nutzer, für immer. Dein Skill, von anderen geteilt: {{skillBonusPct}} jeder Zahlung dieser Nutzer - Einnahmen aus Links, die du nie gepostet hast.",
       step3Title: "Bezahlt werden",
       step3Body:
         "Einnahmen sind sofort verfügbar. Als Chat-Credits nutzen oder in Krypto auszahlen.",

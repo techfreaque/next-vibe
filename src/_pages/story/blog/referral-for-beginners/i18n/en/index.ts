@@ -10,8 +10,6 @@ export const translations = {
   },
   hero: {
     backToBlog: "Back to Blog",
-    brand: "{{appName}} - ",
-    icon: "🌱",
     category: "For Beginners",
     readTime: "5 min read",
     title: "Two ways to earn. You don't need to pick one.",
@@ -45,9 +43,9 @@ export const translations = {
   },
   skillAngle: {
     title: "The skill path - passive income you build once",
-    p1: "A skill is a custom AI persona you configure: give it a name, a personality, a system prompt. Then publish it. Anyone can find it and use it - and if they sign up through your skill's link, you earn 5% of their payments, forever, on top of the 10% referral commission.",
+    p1: "A skill is a custom AI persona you configure: give it a name, a personality, a system prompt. Then publish it. Anyone can find it and use it - and when they sign up through another member's link to your skill, you earn 5% of their payments, forever. Your own skill link pays the full 10% direct.",
     p2: "The part most beginners miss: that 5% is tied to you as the author, not to whoever shared the link. If someone discovers your skill in the directory and shares it with a friend - their friend signs up - you still get credited. The platform tracks who created the skill, not who distributed it. Your skill earns for you even when you're not actively promoting it.",
-    p3: "Skills are free to create. No paid plan needed. Start with something simple: a skill for your hobby, your job, your native language. Publish it. Add the skill link wherever you already talk about AI. Every signup through it earns you both commissions at once - 10% direct + 5% skill = 15% total from that user, forever.",
+    p3: "Skills are free to create. No paid plan needed. Start with something simple: a skill for your hobby, your job, your native language. Publish it. Add the skill link wherever you already talk about AI. Every signup through your own link pays you 10%, forever. Every signup someone else drives to your skill pays you 5%.",
   },
   multilevel: {
     title: "There's also a chain - here's how it works",
@@ -75,7 +73,6 @@ export const translations = {
     step1Title: "Create a free account",
     step1Body: "No paid plan needed. The referral program is open to everyone.",
     step2Title: "Go to your referral dashboard",
-    step2Body: "Open the referral page. ",
     step2Link: "Open the referral page.",
     step2Suffix: " Create a code - anything memorable works.",
     step3Title: "Share your link - or publish a skill",
@@ -91,6 +88,5 @@ export const translations = {
     p2: "If you want to go deeper - understand the commission structure, find the best promotion angles, or ask other people how they do it - join our Discord.",
     createCode: "Get your referral code",
     joinDiscord: "Join the Discord",
-    backToBlog: "Back to Blog",
   },
 };

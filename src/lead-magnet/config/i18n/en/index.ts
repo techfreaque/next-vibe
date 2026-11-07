@@ -1,7 +1,7 @@
 export const translations = {
   get: {
     tag: "lead-magnet-config",
-    title: "Lead Magnet Config",
+    title: "Your email list",
     titleShort: "LM Config",
     description: "View your current lead magnet configuration",
     response: {
@@ -46,6 +46,7 @@ export const translations = {
     },
   },
   widget: {
+    delete: "Disconnect",
     back: "Back",
     loading: "Loading…",
     pitch: {

@@ -107,6 +107,7 @@ import {
   type AnyModelOption,
   ApiProvider,
   apiProviderDisplayNames,
+  deduplicateCheapestPerModel,
   getModelPrice,
   isModelProviderAvailable,
   modelProviders,
@@ -783,6 +784,10 @@ function getSetupRequiredMessage(
       return availability.veniceAI
         ? null
         : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
+    case ApiProvider.NANO_GPT:
+      return availability.nanoGPT
+        ? null
+        : `${t("selector.addEnvKey")}: NANO_GPT_API_KEY → nano-gpt.com/api`;
     case ApiProvider.CLAUDE_CODE:
       return availability.claudeCode
         ? null
@@ -1457,7 +1462,10 @@ export function ModelSelector({
       );
       return isAdmin
         ? all
-        : all.filter((m) => isProviderAvailable(m, availability));
+        : deduplicateCheapestPerModel(
+            all.filter((m) => isProviderAvailable(m, availability)),
+            false,
+          );
     }
 
     if (!isAdmin) {
@@ -1528,14 +1536,17 @@ export function ModelSelector({
           !modelMatchesRoleLocal(m, "stt")));
     const roleFilter = (m: AnyModelOptionWithVision): boolean =>
       !allowedRoles || allowedRoles.some((r) => modelMatchesRoleLocal(m, r));
-    return getAllModelOptions().filter(
-      (m) =>
-        !shownIds.has(m.id) &&
-        typeFilter(m) &&
-        roleFilter(m) &&
-        (isAdmin || isProviderAvailable(m, availability)) &&
-        (m.name.toLowerCase().includes(q) ||
-          modelProviders[m.provider]?.name.toLowerCase().includes(q)),
+    return deduplicateCheapestPerModel(
+      getAllModelOptions().filter(
+        (m) =>
+          !shownIds.has(m.id) &&
+          typeFilter(m) &&
+          roleFilter(m) &&
+          (isAdmin || isProviderAvailable(m, availability)) &&
+          (m.name.toLowerCase().includes(q) ||
+            modelProviders[m.provider]?.name.toLowerCase().includes(q)),
+      ),
+      isAdmin,
     );
   }, [
     searchQuery,
@@ -2118,7 +2129,7 @@ export function ModelSelector({
                           );
                           return (
                             <ModelCard
-                              key={model.id}
+                              key={`${model.id}:${model.apiProvider}`}
                               model={model}
                               isBest={model.id === bestFilteredModel?.id}
                               selected={
@@ -2184,7 +2195,7 @@ export function ModelSelector({
                   );
                   return (
                     <ModelCard
-                      key={model.id}
+                      key={`${model.id}:${model.apiProvider}`}
                       model={model}
                       isBest={false}
                       selected={

@@ -64,6 +64,12 @@ export interface ModelCreditDisplayProps {
   /** Additional CSS classes */
   className?: string;
 
+  /**
+   * false = plain text, no breakdown popover. Use inside other buttons/rows
+   * (a popover trigger can't nest inside a button). Defaults to true.
+   */
+  interactive?: boolean;
+
   /** User's locale for currency formatting */
   locale: CountryLanguage;
 }
@@ -155,6 +161,7 @@ export function ModelCreditDisplay({
   badgeVariant = "secondary",
   className,
   locale,
+  interactive = true,
 }: ModelCreditDisplayProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const model = findModel(modelId);
@@ -610,6 +617,10 @@ export function ModelCreditDisplay({
     ) : (
       <Span className={className}>{costText}</Span>
     );
+
+  if (!interactive) {
+    return baseContent;
+  }
 
   const handleMouseEnter = (): void => {
     if (closeTimeoutRef.current) {

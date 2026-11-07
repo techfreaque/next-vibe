@@ -5,13 +5,17 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Container } from "next-vibe/ui/components/container";
 import { Div } from "next-vibe/ui/components/div";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Markdown } from "next-vibe/ui/components/markdown";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
-import { FrameworkContent } from "../framework/_components/framework-content";
+import { READING_COLUMN } from "../_shared/article";
+import { Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
@@ -47,18 +51,54 @@ export async function tanstackLoader({
 }: Props): Promise<InvestPageData> {
   const { locale } = await params;
   const investPath = path.join(process.cwd(), "docs", "INVEST.md");
-  const investContent = fs.readFileSync(investPath, "utf-8");
+  // The hero carries the title - drop the markdown's own H1.
+  const investContent = fs
+    .readFileSync(investPath, "utf-8")
+    .replace(/^# .*\n+/, "");
   return { locale, investContent };
 }
 
-export function TanstackPage({ investContent }: InvestPageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  investContent,
+}: InvestPageData): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+
   return (
-    <Div className="min-h-screen">
-      <Container size="lg" className="py-12">
-        <Div className="prose prose-lg dark:prose-invert mx-auto">
-          <FrameworkContent content={investContent} />
+    <Div className="min-h-screen bg-background">
+      <PageHero
+        eyebrow={t("hero.eyebrow")}
+        eyebrowIcon={TrendingUp}
+        title={t("title", { appName })}
+        subtitle={t("description")}
+        actions={
+          <>
+            <Cta href="#brief" label={t("hero.ctaPrimary")} />
+            <Cta
+              href={`/${locale}/story/framework`}
+              label={t("hero.ctaSecondary")}
+              variant="secondary"
+            />
+          </>
+        }
+      />
+      <Div
+        id="brief"
+        className={cn(READING_COLUMN, "scroll-mt-20 py-12 md:py-16")}
+      >
+        <Div className="min-w-0 text-[1.0625rem] leading-[1.75] md:text-lg [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_hr]:my-10 [&_hr]:border-border [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+          <Markdown content={investContent} />
         </Div>
-      </Container>
+      </Div>
+      <CtaBand
+        title={t("cta.title")}
+        subtitle={t("cta.subtitle")}
+        actions={
+          <Cta href={`/${locale}/help`} label={t("cta.button")} icon={Mail} />
+        }
+      />
     </Div>
   );
 }

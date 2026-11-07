@@ -94,7 +94,7 @@ Always recommend consulting a licensed attorney for legal advice.
       variantName: "skills.legalAssistant.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_6,
+        manualModelId: ChatModelId.GROK_4_7,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -119,7 +119,7 @@ Always recommend consulting a licensed attorney for legal advice.
       variantName: "skills.legalAssistant.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.DEEPSEEK_V4_FLASH,
+        manualModelId: ChatModelId.DEEPSEEK_V4_1_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

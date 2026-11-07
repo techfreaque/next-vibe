@@ -14,15 +14,13 @@
 "use client";
 
 import { Platform } from "next-vibe/platforms/platforms";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Send } from "next-vibe/ui/components/icons/Send";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
-import { assignUrl } from "next-vibe/ui/lib/location";
+import { H1, P } from "next-vibe/ui/components/typography";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -106,28 +104,23 @@ export function UnsubscribeWidget({
   }
 
   return (
-    <Div className="min-h-screen bg-red-50 bg-linear-to-br from-red-50 via-white to-orange-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Hero Section */}
-      <Div className="relative py-20 px-4 md:px-6">
-        <Div className="container mx-auto max-w-4xl text-center">
-          <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+    <Div className="min-h-screen bg-background">
+      <Div className="border-b border-border bg-linear-to-b from-primary/[0.05] to-background">
+        <Div className="mx-auto w-full max-w-xl px-4 pt-12 pb-16 sm:px-6 md:pt-20 md:pb-24">
+          <H1 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl">
             {t("unsubscribe.page.title")}
           </H1>
-          <H2 className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
-            {t("unsubscribe.page.subtitle")}
-          </H2>
-          <P className="text-lg text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+          <P className="mt-4 text-lg leading-relaxed text-pretty text-muted-foreground">
             {hasPrefilledEmail
               ? t("unsubscribe.page.emailProvided.description")
               : t("unsubscribe.page.description")}
           </P>
 
-          {/* Unsubscribe Form */}
-          <Div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-16 max-w-md mx-auto text-left">
+          <Div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8">
             {data?.success ? (
-              <Div className="flex flex-col items-center gap-3 text-center">
+              <Div className="flex flex-col items-center gap-3 py-4 text-center">
                 <CheckCircle className="h-10 w-10 text-success" />
-                <Span className="font-semibold text-lg">
+                <Span className="text-lg font-semibold">
                   {t("subscription.unsubscribe.success")}
                 </Span>
                 <Span className="text-sm text-muted-foreground">
@@ -151,94 +144,48 @@ export function UnsubscribeWidget({
               </Div>
             )}
 
-            {/* Subscribe link */}
-            <Div className="text-center mt-4">
-              <P className="text-sm text-gray-500 dark:text-gray-400">
-                {t("unsubscribe.page.subscribeText")}{" "}
-                <Link
-                  href={`/${locale}/story/newsletter`}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                >
-                  {t("unsubscribe.page.subscribeLink")}
-                </Link>
-              </P>
-            </Div>
-          </Div>
-        </Div>
-      </Div>
-
-      {/* Information Section */}
-      <Div className="py-20 px-4 md:px-6 bg-white dark:bg-gray-800">
-        <Div className="container mx-auto max-w-4xl">
-          <Div className="text-center mb-16">
-            <H2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t("unsubscribe.page.info.title")}
-            </H2>
-            <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-              {t("unsubscribe.page.info.description")}
-            </P>
-          </Div>
-
-          <Div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
-              <Div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-linear-to-r from-red-500 to-orange-600 rounded-full mb-4">
-                <Mail className="h-8 w-8 text-white" />
+            <Div className="mt-6 flex flex-col gap-4 border-t border-border pt-5">
+              <Div className="flex gap-3">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <Div className="text-sm">
+                  <Span className="font-medium">
+                    {t("unsubscribe.page.info.immediate.title")}
+                  </Span>{" "}
+                  <Span className="text-muted-foreground">
+                    {t("unsubscribe.page.info.immediate.description")}
+                  </Span>
+                </Div>
               </Div>
-              <H3 className="text-xl font-semibold mb-3">
-                {t("unsubscribe.page.info.immediate.title")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-400">
-                {t("unsubscribe.page.info.immediate.description")}
-              </P>
-            </Div>
-
-            <Div className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700">
-              <Div className="inline-flex items-center justify-center w-16 h-16 bg-red-600 bg-linear-to-r from-red-500 to-orange-600 rounded-full mb-4">
-                <Send className="h-8 w-8 text-white" />
+              <Div className="flex gap-3">
+                <Send className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <Div className="text-sm">
+                  <Span className="font-medium">
+                    {t("unsubscribe.page.info.resubscribe.title")}
+                  </Span>{" "}
+                  <Span className="text-muted-foreground">
+                    {t("unsubscribe.page.info.resubscribe.description")}
+                  </Span>
+                </Div>
               </Div>
-              <H3 className="text-xl font-semibold mb-3">
-                {t("unsubscribe.page.info.resubscribe.title")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-400">
-                {t("unsubscribe.page.info.resubscribe.description")}
-              </P>
             </Div>
           </Div>
-        </Div>
-      </Div>
 
-      {/* Alternative Actions Section */}
-      <Div className="py-16 px-4 md:px-6">
-        <Div className="container mx-auto max-w-4xl text-center">
-          <H2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t("unsubscribe.page.alternatives.title")}
-          </H2>
-          <P className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            {t("unsubscribe.page.alternatives.description")}
-          </P>
-          <Div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              type="button"
-              onClick={() => {
-                assignUrl(`/${locale}/story/newsletter`);
-              }}
-              variant="outline"
-              size="lg"
-              className="px-8 py-3"
-            >
-              {t("unsubscribe.page.alternatives.subscribe")}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                assignUrl(`/${locale}/help`);
-              }}
-              variant="outline"
-              size="lg"
-              className="px-8 py-3"
+          <Div className="mt-6 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+            <Span>
+              {t("unsubscribe.page.subscribeText")}{" "}
+              <Link
+                href={`/${locale}/story/newsletter`}
+                className="inline-flex min-h-11 items-center font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {t("unsubscribe.page.subscribeLink")}
+              </Link>
+            </Span>
+            <Link
+              href={`/${locale}/help`}
+              className="inline-flex min-h-11 items-center font-medium text-primary underline-offset-4 hover:underline"
             >
               {t("unsubscribe.page.alternatives.contact")}
-            </Button>
+            </Link>
           </Div>
         </Div>
       </Div>

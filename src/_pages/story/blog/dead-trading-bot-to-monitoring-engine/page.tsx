@@ -1,41 +1,44 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button } from "next-vibe/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
 import { Bell } from "next-vibe/ui/components/icons/Bell";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { FileText } from "next-vibe/ui/components/icons/FileText";
 import { Folder } from "next-vibe/ui/components/icons/Folder";
 import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
-import { Layers } from "next-vibe/ui/components/icons/Layers";
+import { Github } from "next-vibe/ui/components/icons/Github";
 import { Lightbulb } from "next-vibe/ui/components/icons/Lightbulb";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
-import { Link } from "next-vibe/ui/components/link";
-import { CodeBlock } from "next-vibe/ui/components/markdown";
-import { Separator } from "next-vibe/ui/components/separator";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
+import { P } from "next-vibe/ui/components/typography";
+import type { IconComponent } from "next-vibe/ui/lib/helper";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 
+import {
+  ArticleBody,
+  ArticleCode,
+  ArticleEnd,
+  ArticleH3,
+  ArticleHeader,
+  ArticleLead,
+  ArticleP,
+  ArticleQuote,
+  ArticleSection,
+} from "../../_shared/article";
+import { Callout, Cta } from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
@@ -86,362 +89,149 @@ export async function tanstackLoader({
   return { locale };
 }
 
-const ARCH_NODE_COLORS: Record<string, string> = {
-  blue: "bg-blue-500/20 border border-blue-500/40",
-  purple: "bg-purple-500/20 border border-purple-500/40",
-  yellow: "bg-yellow-500/20 border border-yellow-500/40",
-  emerald: "bg-emerald-500/20 border border-emerald-500/40",
-};
-
-/**
- * Architecture flow node - label and description passed as translated strings
- */
+/** One stage of the pipeline: data source → indicator → evaluator → action. */
 function ArchNode({
+  step,
   label,
   description,
-  variant,
-  icon,
+  icon: Icon,
+}: {
+  step: number;
+  label: string;
+  description: string;
+  icon: IconComponent;
+}): JSX.Element {
+  return (
+    <Div className="flex gap-4 rounded-xl border border-border bg-card p-4 md:flex-col md:gap-3">
+      <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-5 w-5" />
+      </Div>
+      <Div className="min-w-0">
+        <Span className="font-mono text-xs text-muted-foreground">
+          {String(step).padStart(2, "0")}
+        </Span>
+        <P className="font-mono text-sm font-semibold text-foreground">
+          {label}
+        </P>
+        <P className="mt-1 text-sm leading-snug text-muted-foreground">
+          {description}
+        </P>
+      </Div>
+    </Div>
+  );
+}
+
+interface TreeEntry {
+  name: string;
+  isDir: boolean;
+  depth: 0 | 1 | 2;
+}
+
+/** Folder listing - monospace, indented by depth, no palette colors. */
+function FileTree({
+  title,
+  entries,
+  footer,
+}: {
+  title: string;
+  entries: ReadonlyArray<TreeEntry>;
+  footer: string;
+}): JSX.Element {
+  return (
+    <Div className="min-w-0 rounded-xl border border-border bg-card p-4 md:p-5">
+      <Div className="mb-3 flex items-center gap-2 border-b border-border pb-3">
+        <Folder className="h-4 w-4 text-primary" />
+        <Span className="font-mono text-sm font-semibold text-foreground">
+          {title}
+        </Span>
+      </Div>
+      <Div className="overflow-x-auto">
+        {entries.map((entry) => (
+          <Div
+            key={`${entry.depth}-${entry.name}`}
+            className={cn(
+              "flex items-center gap-2 py-0.5 font-mono text-[13px] whitespace-nowrap",
+              entry.depth === 1 && "pl-4",
+              entry.depth === 2 && "pl-8",
+            )}
+          >
+            {entry.isDir ? (
+              <Folder className="h-3.5 w-3.5 shrink-0 text-primary/70" />
+            ) : (
+              <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            )}
+            <Span
+              className={
+                entry.isDir ? "text-foreground" : "text-muted-foreground"
+              }
+            >
+              {entry.name}
+            </Span>
+          </Div>
+        ))}
+      </Div>
+      <P className="mt-2 pl-4 font-mono text-xs text-muted-foreground">
+        {footer}
+      </P>
+    </Div>
+  );
+}
+
+function dataSourceTree(
+  root: string,
+  first: string,
+  rest: ReadonlyArray<string>,
+): TreeEntry[] {
+  return [
+    { name: root, isDir: true, depth: 0 },
+    { name: first, isDir: true, depth: 1 },
+    { name: "constants.ts", isDir: false, depth: 2 },
+    { name: "definition.ts", isDir: false, depth: 2 },
+    { name: "i18n/", isDir: true, depth: 2 },
+    { name: "repository.ts", isDir: false, depth: 2 },
+    { name: "route.ts", isDir: false, depth: 2 },
+    ...rest.map((name): TreeEntry => ({ name, isDir: true, depth: 1 })),
+  ];
+}
+
+/** One column of the lead-funnel graph. */
+function FunnelColumn({
+  label,
+  description,
+  nodes,
 }: {
   label: string;
   description: string;
-  variant: string;
-  icon: JSX.Element;
-}): JSX.Element {
-  const colorClass = ARCH_NODE_COLORS[variant] ?? "";
-  return (
-    <Div className="flex flex-col items-center text-center">
-      <Div
-        className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg ${colorClass}`}
-      >
-        {icon}
-      </Div>
-      <Div className="font-mono text-sm font-bold mb-1">{label}</Div>
-      <P className="text-xs text-muted-foreground leading-snug max-w-[140px]">
-        {description}
-      </P>
-    </Div>
-  );
-}
-
-/**
- * A file tree node - indentation via className padding levels
- */
-function FileTreeItem({
-  name,
-  isDir,
-  paddingClass,
-}: {
-  name: string;
-  isDir: boolean;
-  paddingClass: string;
+  nodes: ReadonlyArray<{ name: string; description: string }>;
 }): JSX.Element {
   return (
-    <Div
-      className={`flex items-center gap-2 py-0.5 font-mono text-sm ${paddingClass}`}
-    >
-      {isDir ? (
-        <Folder className="h-4 w-4 text-yellow-400 shrink-0" />
-      ) : (
-        <FileText className="h-4 w-4 text-blue-400 shrink-0" />
-      )}
-      <Span className={isDir ? "text-yellow-300" : "text-gray-300"}>
-        {name}
+    <Div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+      <Span className="w-fit rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-primary">
+        {label}
       </Span>
-    </Div>
-  );
-}
-
-const FUNNEL_NODE_COLORS: Record<string, string> = {
-  blue: "border-blue-500/20 bg-blue-500/5 hover:border-blue-500/40",
-  purple: "border-purple-500/20 bg-purple-500/5 hover:border-purple-500/40",
-  yellow: "border-yellow-500/20 bg-yellow-500/5 hover:border-yellow-500/40",
-};
-
-/**
- * A single funnel column step node
- */
-function FunnelNode({
-  name,
-  description,
-  variant,
-}: {
-  name: string;
-  description: string;
-  variant: string;
-}): JSX.Element {
-  const colorClass = FUNNEL_NODE_COLORS[variant] ?? "";
-  return (
-    <Div className={`rounded-lg border p-3 ${colorClass}`}>
-      <Div className="font-mono text-xs font-semibold mb-1">{name}</Div>
-      <P className="text-xs text-muted-foreground leading-snug">
+      <P className="text-sm leading-relaxed text-muted-foreground">
         {description}
       </P>
+      <Div className="flex flex-col gap-2">
+        {nodes.map((node) => (
+          <Div
+            key={node.name}
+            className="rounded-lg border border-border bg-muted/50 p-3"
+          >
+            <P className="font-mono text-xs font-semibold text-foreground">
+              {node.name}
+            </P>
+            <P className="mt-0.5 text-xs leading-snug text-muted-foreground">
+              {node.description}
+            </P>
+          </Div>
+        ))}
+      </Div>
     </Div>
   );
 }
 
-export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
-
-  return (
-    <Div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* ── HERO ─────────────────────────────────────────────────── */}
-      <Div className="relative overflow-hidden bg-gray-950 border-b border-gray-800">
-        {/* Ambient grid - bg-image via className only, no style prop */}
-        <Div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(0,255,128,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,128,0.15)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <Div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <Div className="container mx-auto px-4 py-24 relative z-10 max-w-4xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-emerald-400/80 hover:text-emerald-400 mb-10 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t(`backToBlog`)}
-          </Link>
-
-          <Badge className="mb-6 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 font-mono text-xs tracking-wider uppercase">
-            {t(`hero.eyebrow`)}
-          </Badge>
-
-          <H1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
-            {t(`hero.title`)}
-          </H1>
-
-          <P className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-            {t(`hero.subtitle`)}
-          </P>
-
-          <Div className="flex items-center gap-6 text-sm text-gray-500">
-            <Div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-emerald-500" />
-              {t(`hero.readTime`)}
-            </Div>
-            <Div className="flex items-center gap-2">
-              <Layers className="h-4 w-4 text-emerald-500" />
-              {t(`hero.date`)}
-            </Div>
-          </Div>
-        </Div>
-      </Div>
-
-      <Div className="container mx-auto px-4 py-16 max-w-4xl">
-        {/* ── ORIGIN STORY ────────────────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-8 text-white">
-            {t(`origin.title`)}
-          </H2>
-
-          <Div className="space-y-6 mb-10">
-            <P className="text-lg text-gray-300 leading-relaxed">
-              {t(`origin.paragraph1`)}
-            </P>
-            <P className="text-lg text-gray-300 leading-relaxed">
-              {t(`origin.paragraph2`)}
-            </P>
-            <P className="text-lg text-gray-300 leading-relaxed">
-              {t(`origin.paragraph3`)}
-            </P>
-          </Div>
-
-          {/* Quote callout */}
-          <Div className="border-l-4 border-emerald-500 pl-6 py-2 my-10 bg-emerald-500/5 rounded-r-xl">
-            <P className="text-xl font-medium text-emerald-300 italic leading-relaxed">
-              &ldquo;{t(`origin.quoteText`)}&rdquo;
-            </P>
-          </Div>
-
-          {/* Timeline */}
-          <Div className="relative">
-            <Div className="absolute left-6 top-0 bottom-0 w-px bg-gray-700" />
-            <Div className="space-y-8">
-              {(["octane", "insight", "rebuilt"] as const).map((step) => (
-                <Div key={step} className="flex gap-6 relative pl-16">
-                  <Div className="absolute left-4 top-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-gray-950 shadow-lg shadow-emerald-500/50" />
-                  <Div>
-                    <Div className="font-semibold text-white mb-1">
-                      {t(`origin.timeline.${step}.label`)}
-                    </Div>
-                    <P className="text-gray-400 text-sm leading-relaxed">
-                      {t(`origin.timeline.${step}.description`)}
-                    </P>
-                  </Div>
-                </Div>
-              ))}
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── THE INSIGHT ─────────────────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-6 text-white">
-            {t(`insight.title`)}
-          </H2>
-          <P className="text-lg text-gray-300 leading-relaxed mb-6">
-            {t(`insight.intro`)}
-          </P>
-          <P className="text-lg text-gray-300 leading-relaxed mb-10">
-            {t(`insight.realization`)}
-          </P>
-
-          <Div className="grid sm:grid-cols-2 gap-4">
-            {(
-              [
-                "userGrowth",
-                "emailHealth",
-                "creditEconomy",
-                "revenueAnomaly",
-              ] as const
-            ).map((key) => (
-              <Card
-                key={key}
-                className="bg-gray-900 border-gray-800 hover:border-emerald-500/40 transition-colors"
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-semibold text-emerald-400">
-                    {t(`insight.examples.${key}.label`)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <P className="text-sm text-gray-400">
-                    {t(`insight.examples.${key}.description`)}
-                  </P>
-                </CardContent>
-              </Card>
-            ))}
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── ARCHITECTURE DIAGRAM ────────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-3 text-white">
-            {t(`architecture.title`)}
-          </H2>
-          <P className="text-gray-400 mb-12">{t(`architecture.subtitle`)}</P>
-
-          {/* Visual flow */}
-          <Div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 mb-12 overflow-x-auto pb-4">
-            <ArchNode
-              label={t(`architecture.dataSource.label`)}
-              description={t(`architecture.dataSource.description`)}
-              variant="blue"
-              icon={<BarChart3 className="h-7 w-7 text-blue-400" />}
-            />
-            <ArrowRight className="h-5 w-5 text-gray-600 md:rotate-0 rotate-90 shrink-0" />
-            <ArchNode
-              label={t(`architecture.indicator.label`)}
-              description={t(`architecture.indicator.description`)}
-              variant="purple"
-              icon={<TrendingUp className="h-7 w-7 text-purple-400" />}
-            />
-            <ArrowRight className="h-5 w-5 text-gray-600 md:rotate-0 rotate-90 shrink-0" />
-            <ArchNode
-              label={t(`architecture.evaluator.label`)}
-              description={t(`architecture.evaluator.description`)}
-              variant="yellow"
-              icon={<GitBranch className="h-7 w-7 text-yellow-400" />}
-            />
-            <ArrowRight className="h-5 w-5 text-gray-600 md:rotate-0 rotate-90 shrink-0" />
-            <ArchNode
-              label={t(`architecture.action.label`)}
-              description={t(`architecture.action.description`)}
-              variant="emerald"
-              icon={<Zap className="h-7 w-7 text-emerald-400" />}
-            />
-          </Div>
-
-          {/* Node detail cards */}
-          <Div className="grid sm:grid-cols-2 gap-4">
-            {(
-              [
-                {
-                  key: "dataSource",
-                  borderClass: "border-l-blue-500",
-                  badgeClass: "bg-blue-500/20 text-blue-400",
-                },
-                {
-                  key: "indicator",
-                  borderClass: "border-l-purple-500",
-                  badgeClass: "bg-purple-500/20 text-purple-400",
-                },
-                {
-                  key: "evaluator",
-                  borderClass: "border-l-yellow-500",
-                  badgeClass: "bg-yellow-500/20 text-yellow-400",
-                },
-                {
-                  key: "action",
-                  borderClass: "border-l-emerald-500",
-                  badgeClass: "bg-emerald-500/20 text-emerald-400",
-                },
-              ] as const
-            ).map(({ key, borderClass, badgeClass }) => (
-              <Card
-                key={key}
-                className={`bg-gray-900 border-gray-800 border-l-4 ${borderClass}`}
-              >
-                <CardHeader className="pb-2">
-                  <Badge className={`w-fit text-xs font-mono ${badgeClass}`}>
-                    {t(`architecture.${key}.label`)}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  <P className="text-sm text-gray-400 leading-relaxed">
-                    {t(`architecture.${key}.description`)}
-                  </P>
-                </CardContent>
-              </Card>
-            ))}
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── UNIFIED ARCHITECTURE ────────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-3 text-white">
-            {t(`unified.title`)}
-          </H2>
-          <P className="text-gray-400 mb-10">{t(`unified.intro`)}</P>
-
-          {/* Old vs new comparison */}
-          <Div className="grid md:grid-cols-2 gap-6 mb-10">
-            <Card className="bg-gray-900 border-gray-700 border-l-4 border-l-red-500/60">
-              <CardHeader className="pb-3">
-                <Badge className="w-fit bg-red-500/20 text-red-400 text-xs">
-                  {t(`unified.oldApproach.label`)}
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                <P className="text-sm text-gray-400 leading-relaxed">
-                  {t(`unified.oldApproach.description`)}
-                </P>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-900 border-gray-700 border-l-4 border-l-emerald-500">
-              <CardHeader className="pb-3">
-                <Badge className="w-fit bg-emerald-500/20 text-emerald-400 text-xs">
-                  {t(`unified.newApproach.label`)}
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                <P className="text-sm text-gray-400 leading-relaxed">
-                  {t(`unified.newApproach.description`)}
-                </P>
-              </CardContent>
-            </Card>
-          </Div>
-
-          {/* CLI demo */}
-          <Div className="mb-6">
-            <CodeBlock
-              language="bash"
-              code={`$ vibe vibe-sense-ema --period=7
+const CLI_DEMO = `$ vibe vibe-sense-ema --period=7
 
   ┌─────────────────────────────────────────┐
   │  analytics/indicators/ema               │
@@ -450,182 +240,9 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
   │  period   7                             │
   │  points   365 input → 365 output        │
   │  result   [ { timestamp, value }, ... ] │
-  └─────────────────────────────────────────┘`}
-            />
-            <P className="text-xs text-gray-500 mt-2 text-center">
-              {t(`unified.cliCaption`)}
-            </P>
-          </Div>
+  └─────────────────────────────────────────┘`;
 
-          {/* Insight highlight */}
-          <Div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 text-center">
-            <P className="text-lg font-semibold text-emerald-300 mb-2">
-              {t(`unified.insight`)}
-            </P>
-            <P className="text-2xl font-bold text-white">
-              {t(`unified.keyLine`)}
-            </P>
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── ACTION CALLOUT ──────────────────────────────────────── */}
-        <Div className="mb-20">
-          <Div className="bg-orange-500/5 border border-orange-500/30 rounded-2xl p-8">
-            <Div className="flex items-start gap-4 mb-6">
-              <Div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0 mt-1">
-                <AlertCircle className="h-5 w-5 text-orange-400" />
-              </Div>
-              <H2 className="text-2xl font-bold text-white">
-                {t(`actionCallout.title`)}
-              </H2>
-            </Div>
-
-            <P className="text-lg text-gray-300 leading-relaxed mb-8">
-              {t(`actionCallout.body`)}
-            </P>
-
-            <Div className="flex flex-wrap gap-3 mb-8">
-              {(["noWebhook", "noAlerting", "noZapier"] as const).map((key) => (
-                <Div
-                  key={key}
-                  className="flex items-center gap-2 bg-red-500/20 border border-red-500/30 rounded-lg px-3 py-1.5 text-sm text-red-300"
-                >
-                  <Span className="text-red-400 font-bold">
-                    {t(`ui.crossMark`)}
-                  </Span>
-                  {t(`actionCallout.${key}`)}
-                </Div>
-              ))}
-            </Div>
-
-            <P className="text-xl font-bold text-emerald-400 mb-8">
-              {t(`actionCallout.punchline`)}
-            </P>
-
-            <Div className="grid sm:grid-cols-3 gap-4">
-              {(["alert", "campaign", "ai"] as const).map((key) => (
-                <Div
-                  key={key}
-                  className="bg-gray-950/60 rounded-xl p-4 border border-gray-700"
-                >
-                  <Div className="flex items-center gap-2 mb-2">
-                    {key === "alert" && (
-                      <Bell className="h-4 w-4 text-yellow-400" />
-                    )}
-                    {key === "campaign" && (
-                      <Zap className="h-4 w-4 text-blue-400" />
-                    )}
-                    {key === "ai" && (
-                      <Bot className="h-4 w-4 text-purple-400" />
-                    )}
-                    <Span className="text-sm font-semibold text-white">
-                      {t(`actionCallout.examples.${key}.label`)}
-                    </Span>
-                  </Div>
-                  <P className="text-xs text-gray-400">
-                    {t(`actionCallout.examples.${key}.description`)}
-                  </P>
-                </Div>
-              ))}
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── LEAD FUNNEL WALKTHROUGH ─────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-3 text-white">
-            {t(`funnel.title`)}
-          </H2>
-          <P className="text-gray-400 mb-10">{t(`funnel.subtitle`)}</P>
-
-          <Div className="grid md:grid-cols-3 gap-6">
-            <Div className="rounded-xl border border-blue-500/40 bg-blue-500/5 p-4">
-              <Badge className="mb-3 text-xs font-mono bg-blue-500/20 text-blue-400">
-                {t(`funnel.column1.label`)}
-              </Badge>
-              <P className="text-xs text-gray-400 mb-4 leading-relaxed">
-                {t(`funnel.column1.description`)}
-              </P>
-              <Div className="space-y-2">
-                {(["created", "converted", "bounced", "active"] as const).map(
-                  (node) => (
-                    <FunnelNode
-                      key={node}
-                      name={t(`funnel.column1.nodes.${node}.name`)}
-                      description={t(
-                        `funnel.column1.nodes.${node}.description`,
-                      )}
-                      variant="blue"
-                    />
-                  ),
-                )}
-              </Div>
-            </Div>
-
-            <Div className="rounded-xl border border-purple-500/40 bg-purple-500/5 p-4">
-              <Badge className="mb-3 text-xs font-mono bg-purple-500/20 text-purple-400">
-                {t(`funnel.column2.label`)}
-              </Badge>
-              <P className="text-xs text-gray-400 mb-4 leading-relaxed">
-                {t(`funnel.column2.description`)}
-              </P>
-              <Div className="space-y-2">
-                {(["ema7", "conversionRate"] as const).map((node) => (
-                  <FunnelNode
-                    key={node}
-                    name={t(`funnel.column2.nodes.${node}.name`)}
-                    description={t(`funnel.column2.nodes.${node}.description`)}
-                    variant="purple"
-                  />
-                ))}
-              </Div>
-            </Div>
-
-            <Div className="rounded-xl border border-yellow-500/40 bg-yellow-500/5 p-4">
-              <Badge className="mb-3 text-xs font-mono bg-yellow-500/20 text-yellow-400">
-                {t(`funnel.column3.label`)}
-              </Badge>
-              <P className="text-xs text-gray-400 mb-4 leading-relaxed">
-                {t(`funnel.column3.description`)}
-              </P>
-              <Div className="space-y-2">
-                {(["leadDrop", "zeroLeads", "lowConversion"] as const).map(
-                  (node) => (
-                    <FunnelNode
-                      key={node}
-                      name={t(`funnel.column3.nodes.${node}.name`)}
-                      description={t(
-                        `funnel.column3.nodes.${node}.description`,
-                      )}
-                      variant="yellow"
-                    />
-                  ),
-                )}
-              </Div>
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── EMA = ENDPOINT CODE REVEAL ──────────────────────────── */}
-        <Div className="mb-20">
-          <Div className="grid md:grid-cols-2 gap-8 items-start">
-            <Div>
-              <H2 className="text-2xl font-bold mb-4 text-white">
-                {t(`unified.title`)}
-              </H2>
-              <P className="text-gray-400 leading-relaxed mb-6">
-                {t(`unified.cliCaption`)}
-              </P>
-              <CodeBlock
-                language="typescript"
-                code={`// analytics/indicators/ema/definition.ts
-const { POST } = createEndpoint({
+const EMA_DEFINITION = `const { POST } = createEndpoint({
   scopedTranslation,
   aliases: [EMA_ALIAS],
   method: Methods.POST,
@@ -656,21 +273,9 @@ const { POST } = createEndpoint({
   errorTypes: { /* all 9 required */ },
   successTypes: { title: "post.success.title", ... },
   examples: { requests: { default: { source: [...], period: 3 } }, ... },
-});`}
-              />
-            </Div>
+});`;
 
-            <Div>
-              <H3 className="text-lg font-semibold mb-4 text-emerald-400 font-mono">
-                {t(`ui.emaFunctionLabel`)}
-              </H3>
-              <P className="text-gray-400 text-sm mb-4">
-                {t(`unified.insight`)}
-              </P>
-              <CodeBlock
-                language="typescript"
-                code={`// analytics/indicators/ema/repository.ts
-// Pure computation. No DB access.
+const EMA_REPOSITORY = `// Pure computation. No DB access.
 export class EmaIndicatorRepository {
   static computeEma(points: TimeSeries, period: number): TimeSeries {
     if (points.length === 0) return [];
@@ -689,271 +294,353 @@ export class EmaIndicatorRepository {
 // handler: ({ data }) => {
 //   const result = EmaIndicatorRepository.computeEma(data.source, data.period);
 //   return success({ result, meta: { ... } });
-// }`}
-              />
-            </Div>
-          </Div>
-        </Div>
+// }`;
 
-        <Separator className="border-gray-800 mb-20" />
+const QUICKSTART = `git clone https://github.com/techfreaque/next-vibe
+cd next-vibe
+cp .env.example .env
+bun install
+vibe dev`;
 
-        {/* ── DOMAIN-OWNED DATA SOURCES ───────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-3 text-white">
-            {t(`domainOwned.title`)}
-          </H2>
-          <P className="text-gray-400 mb-10">{t(`domainOwned.subtitle`)}</P>
+export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const back = { href: `/${locale}/story/blog`, label: t("backToBlog") };
 
-          {/* File trees side by side */}
-          <Div className="grid md:grid-cols-2 gap-6 mb-10">
-            <Div className="bg-gray-950 rounded-xl border border-gray-800 p-5">
-              <Div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-800">
-                <Folder className="h-4 w-4 text-yellow-400" />
-                <Span className="font-mono text-sm text-yellow-300 font-semibold">
-                  {t(`domainOwned.leadsLabel`)}
-                </Span>
+  const archNodes = [
+    { key: "dataSource", icon: BarChart3 },
+    { key: "indicator", icon: TrendingUp },
+    { key: "evaluator", icon: GitBranch },
+    { key: "action", icon: Zap },
+  ] as const;
+
+  const actionExamples = [
+    { key: "alert", icon: Bell },
+    { key: "campaign", icon: Zap },
+    { key: "ai", icon: Bot },
+  ] as const;
+
+  return (
+    <Div className="min-h-screen bg-background">
+      <ArticleHeader
+        back={back}
+        category={t("hero.eyebrow")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("dead-trading-bot-to-monitoring-engine", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
+
+      <ArticleBody>
+        {/* ── Origin story ─────────────────────────────────────────── */}
+        <ArticleSection title={t("origin.title")}>
+          <ArticleLead>{t("origin.paragraph1")}</ArticleLead>
+          <ArticleP>{t("origin.paragraph2")}</ArticleP>
+          <ArticleP>{t("origin.paragraph3")}</ArticleP>
+          <ArticleQuote>{t("origin.quoteText")}</ArticleQuote>
+          <Div className="relative flex flex-col gap-6 pl-8">
+            <Div className="absolute top-2 bottom-2 left-[7px] w-px bg-border" />
+            {(["octane", "insight", "rebuilt"] as const).map((step) => (
+              <Div key={step} className="relative">
+                <Div className="absolute top-1.5 -left-8 h-[15px] w-[15px] rounded-full border-2 border-background bg-primary" />
+                <P className="font-semibold text-foreground">
+                  {t(`origin.timeline.${step}.label`)}
+                </P>
+                <P className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {t(`origin.timeline.${step}.description`)}
+                </P>
               </Div>
-              <FileTreeItem
-                name="leads/data-sources/"
-                isDir
-                paddingClass="pl-0"
-              />
-              <FileTreeItem name="leads-created/" isDir paddingClass="pl-4" />
-              <FileTreeItem
-                name="constants.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem
-                name="definition.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem name="i18n/" isDir paddingClass="pl-8" />
-              <FileTreeItem
-                name="repository.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem name="route.ts" isDir={false} paddingClass="pl-8" />
-              <FileTreeItem name="leads-converted/" isDir paddingClass="pl-4" />
-              <FileTreeItem name="leads-bounced/" isDir paddingClass="pl-4" />
-              <FileTreeItem name="leads-active/" isDir paddingClass="pl-4" />
-              <FileTreeItem
-                name="leads-campaign-running/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="leads-email-opens/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="leads-email-clicks/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="leads-engagements/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="leads-form-submits/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="leads-website-visits/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <Span className="pl-4 text-xs text-gray-600 font-mono">
-                {t(`domainOwned.leadsCount`)}
-              </Span>
-            </Div>
-
-            <Div className="bg-gray-950 rounded-xl border border-gray-800 p-5">
-              <Div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-800">
-                <Folder className="h-4 w-4 text-yellow-400" />
-                <Span className="font-mono text-sm text-yellow-300 font-semibold">
-                  {t(`domainOwned.creditsLabel`)}
-                </Span>
-              </Div>
-              <FileTreeItem
-                name="credits/data-sources/"
-                isDir
-                paddingClass="pl-0"
-              />
-              <FileTreeItem
-                name="credits-spent-total/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="constants.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem
-                name="definition.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem name="i18n/" isDir paddingClass="pl-8" />
-              <FileTreeItem
-                name="repository.ts"
-                isDir={false}
-                paddingClass="pl-8"
-              />
-              <FileTreeItem name="route.ts" isDir={false} paddingClass="pl-8" />
-              <FileTreeItem
-                name="credits-purchased/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem name="credits-earned/" isDir paddingClass="pl-4" />
-              <FileTreeItem
-                name="credits-refunded/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="credits-balance-total/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="credits-subscription-revenue/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="credits-transactions-count/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <FileTreeItem
-                name="credits-wallets-total/"
-                isDir
-                paddingClass="pl-4"
-              />
-              <Span className="pl-4 text-xs text-gray-600 font-mono">
-                {t(`domainOwned.creditsCount`)}
-              </Span>
-            </Div>
+            ))}
           </Div>
+        </ArticleSection>
 
-          <P className="text-gray-300 leading-relaxed mb-6">
-            {t(`domainOwned.explanation`)}
-          </P>
+        {/* ── The insight ──────────────────────────────────────────── */}
+        <ArticleSection title={t("insight.title")}>
+          <ArticleP>{t("insight.intro")}</ArticleP>
+          <ArticleP>{t("insight.realization")}</ArticleP>
+          <Div className="grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                "userGrowth",
+                "emailHealth",
+                "creditEconomy",
+                "revenueAnomaly",
+              ] as const
+            ).map((key) => (
+              <Div
+                key={key}
+                className="rounded-xl border border-border bg-card p-5"
+              >
+                <P className="text-sm font-semibold text-primary">
+                  {t(`insight.examples.${key}.label`)}
+                </P>
+                <P className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {t(`insight.examples.${key}.description`)}
+                </P>
+              </Div>
+            ))}
+          </Div>
+        </ArticleSection>
 
-          <Card className="bg-gray-900 border-gray-800 border-l-4 border-l-purple-500 mb-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-purple-400 font-mono">
-                {t(`domainOwned.indicators.label`)}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <P className="text-sm text-gray-400">
-                {t(`domainOwned.indicators.description`)}
+        {/* ── Architecture ─────────────────────────────────────────── */}
+        <ArticleSection
+          title={t("architecture.title")}
+          intro={t("architecture.subtitle")}
+        >
+          <Div className="grid gap-3 md:grid-cols-4">
+            {archNodes.map(({ key, icon }, index) => (
+              <ArchNode
+                key={key}
+                step={index + 1}
+                label={t(`architecture.${key}.label`)}
+                description={t(`architecture.${key}.description`)}
+                icon={icon}
+              />
+            ))}
+          </Div>
+        </ArticleSection>
+
+        {/* ── Unified architecture ─────────────────────────────────── */}
+        <ArticleSection title={t("unified.title")} intro={t("unified.intro")}>
+          <Div className="grid gap-3 md:grid-cols-2">
+            <Div className="rounded-xl border border-destructive/25 bg-destructive/5 p-5">
+              <Span className="text-xs font-semibold uppercase tracking-wider text-destructive">
+                {t("unified.oldApproach.label")}
+              </Span>
+              <P className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {t("unified.oldApproach.description")}
               </P>
-            </CardContent>
-          </Card>
-
-          <P className="text-gray-400 leading-relaxed mb-6">
-            {t(`domainOwned.registration`)}
-          </P>
-
-          <Div className="border-l-4 border-emerald-500 pl-6 py-2 bg-emerald-500/5 rounded-r-xl">
-            <P className="text-lg font-semibold text-emerald-300">
-              {t(`domainOwned.keyLine`)}
+            </Div>
+            <Div className="rounded-xl border border-success/25 bg-success/5 p-5">
+              <Span className="text-xs font-semibold uppercase tracking-wider text-success">
+                {t("unified.newApproach.label")}
+              </Span>
+              <P className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {t("unified.newApproach.description")}
+              </P>
+            </Div>
+          </Div>
+          <Div>
+            <ArticleCode code={CLI_DEMO} language="bash" filename="terminal" />
+            <P className="mt-2 text-center text-xs text-muted-foreground">
+              {t("unified.cliCaption")}
             </P>
           </Div>
-        </Div>
+          <Callout tone="primary">
+            <P className="font-medium text-foreground">
+              {t("unified.insight")}
+            </P>
+            <P className="mt-2 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+              {t("unified.keyLine")}
+            </P>
+          </Callout>
+        </ArticleSection>
 
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── VERSIONING / BACKTEST / PERSIST ─────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-3 text-white">
-            {t(`safety.title`)}
-          </H2>
-          <P className="text-gray-400 mb-10">{t(`safety.subtitle`)}</P>
-
-          <Div className="space-y-6 mb-10">
-            <Card className="bg-gray-900 border-gray-800 border-l-4 border-l-blue-500">
-              <CardHeader className="pb-2">
-                <Div className="flex items-center gap-3">
-                  <GitBranch className="h-5 w-5 text-blue-400" />
-                  <CardTitle className="text-white">
-                    {t(`safety.versioning.label`)}
-                  </CardTitle>
+        {/* ── Action callout ───────────────────────────────────────── */}
+        <ArticleSection>
+          <Div className="flex flex-col gap-6 rounded-2xl border border-warning/30 bg-warning/5 p-5 md:p-8">
+            <Div className="flex items-start gap-3">
+              <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/15 text-warning">
+                <AlertCircle className="h-5 w-5" />
+              </Div>
+              <ArticleH3 className="mt-1.5 text-xl md:text-2xl">
+                {t("actionCallout.title")}
+              </ArticleH3>
+            </Div>
+            <ArticleP>{t("actionCallout.body")}</ArticleP>
+            <Div className="flex flex-wrap gap-2">
+              {(["noWebhook", "noAlerting", "noZapier"] as const).map((key) => (
+                <Span
+                  key={key}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/25 bg-destructive/10 px-3 py-1.5 text-sm text-destructive"
+                >
+                  <XCircle className="h-4 w-4" />
+                  {t(`actionCallout.${key}`)}
+                </Span>
+              ))}
+            </Div>
+            <P className="text-xl font-semibold tracking-tight text-foreground">
+              {t("actionCallout.punchline")}
+            </P>
+            <Div className="grid gap-3 sm:grid-cols-3">
+              {actionExamples.map(({ key, icon: Icon }) => (
+                <Div
+                  key={key}
+                  className="rounded-xl border border-border bg-card p-4"
+                >
+                  <Div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-primary" />
+                    <Span className="text-sm font-semibold text-foreground">
+                      {t(`actionCallout.examples.${key}.label`)}
+                    </Span>
+                  </Div>
+                  <P className="mt-1.5 text-sm leading-snug text-muted-foreground">
+                    {t(`actionCallout.examples.${key}.description`)}
+                  </P>
                 </Div>
-              </CardHeader>
-              <CardContent>
-                <P className="text-gray-400">
-                  {t(`safety.versioning.description`)}
-                </P>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-900 border-gray-800 border-l-4 border-l-yellow-500">
-              <CardHeader className="pb-2">
-                <Div className="flex items-center gap-3">
-                  <Code className="h-5 w-5 text-yellow-400" />
-                  <CardTitle className="text-white">
-                    {t(`safety.backtest.label`)}
-                  </CardTitle>
-                </Div>
-              </CardHeader>
-              <CardContent>
-                <P className="text-gray-400">
-                  {t(`safety.backtest.description`)}
-                </P>
-              </CardContent>
-            </Card>
+              ))}
+            </Div>
           </Div>
+        </ArticleSection>
 
-          {/* Persist modes */}
-          <H3 className="text-lg font-semibold text-white mb-4">
-            {t(`safety.persist.label`)}
-          </H3>
-          <Div className="grid sm:grid-cols-3 gap-4">
+        {/* ── Lead funnel walkthrough ──────────────────────────────── */}
+        <ArticleSection title={t("funnel.title")} intro={t("funnel.subtitle")}>
+          <Div className="grid gap-3 md:grid-cols-3">
+            <FunnelColumn
+              label={t("funnel.column1.label")}
+              description={t("funnel.column1.description")}
+              nodes={(
+                ["created", "converted", "bounced", "active"] as const
+              ).map((node) => ({
+                name: t(`funnel.column1.nodes.${node}.name`),
+                description: t(`funnel.column1.nodes.${node}.description`),
+              }))}
+            />
+            <FunnelColumn
+              label={t("funnel.column2.label")}
+              description={t("funnel.column2.description")}
+              nodes={(["ema7", "conversionRate"] as const).map((node) => ({
+                name: t(`funnel.column2.nodes.${node}.name`),
+                description: t(`funnel.column2.nodes.${node}.description`),
+              }))}
+            />
+            <FunnelColumn
+              label={t("funnel.column3.label")}
+              description={t("funnel.column3.description")}
+              nodes={(["leadDrop", "zeroLeads", "lowConversion"] as const).map(
+                (node) => ({
+                  name: t(`funnel.column3.nodes.${node}.name`),
+                  description: t(`funnel.column3.nodes.${node}.description`),
+                }),
+              )}
+            />
+          </Div>
+        </ArticleSection>
+
+        {/* ── EMA = endpoint ───────────────────────────────────────── */}
+        <ArticleSection
+          label={t("ui.emaFunctionLabel")}
+          title={t("unified.title")}
+          intro={t("unified.cliCaption")}
+        >
+          <ArticleCode
+            code={EMA_DEFINITION}
+            language="typescript"
+            filename="analytics/indicators/ema/definition.ts"
+          />
+          <ArticleP>{t("unified.insight")}</ArticleP>
+          <ArticleCode
+            code={EMA_REPOSITORY}
+            language="typescript"
+            filename="analytics/indicators/ema/repository.ts"
+          />
+        </ArticleSection>
+
+        {/* ── Domain-owned data sources ────────────────────────────── */}
+        <ArticleSection
+          title={t("domainOwned.title")}
+          intro={t("domainOwned.subtitle")}
+        >
+          <Div className="grid gap-3 md:grid-cols-2">
+            <FileTree
+              title={t("domainOwned.leadsLabel")}
+              footer={t("domainOwned.leadsCount")}
+              entries={dataSourceTree("leads/data-sources/", "leads-created/", [
+                "leads-converted/",
+                "leads-bounced/",
+                "leads-active/",
+                "leads-campaign-running/",
+                "leads-email-opens/",
+                "leads-email-clicks/",
+                "leads-engagements/",
+                "leads-form-submits/",
+                "leads-website-visits/",
+              ])}
+            />
+            <FileTree
+              title={t("domainOwned.creditsLabel")}
+              footer={t("domainOwned.creditsCount")}
+              entries={dataSourceTree(
+                "credits/data-sources/",
+                "credits-spent-total/",
+                [
+                  "credits-purchased/",
+                  "credits-earned/",
+                  "credits-refunded/",
+                  "credits-balance-total/",
+                  "credits-subscription-revenue/",
+                  "credits-transactions-count/",
+                  "credits-wallets-total/",
+                ],
+              )}
+            />
+          </Div>
+          <ArticleP>{t("domainOwned.explanation")}</ArticleP>
+          <Div className="rounded-xl border border-border bg-card p-5">
+            <P className="font-mono text-sm font-semibold text-primary">
+              {t("domainOwned.indicators.label")}
+            </P>
+            <P className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
+              {t("domainOwned.indicators.description")}
+            </P>
+          </Div>
+          <ArticleP>{t("domainOwned.registration")}</ArticleP>
+          <ArticleQuote>{t("domainOwned.keyLine")}</ArticleQuote>
+        </ArticleSection>
+
+        {/* ── Versioning / backtest / persist ──────────────────────── */}
+        <ArticleSection title={t("safety.title")} intro={t("safety.subtitle")}>
+          {(
+            [
+              { key: "versioning", icon: GitBranch },
+              { key: "backtest", icon: Code },
+            ] as const
+          ).map(({ key, icon: Icon }) => (
+            <Div
+              key={key}
+              className="flex gap-4 rounded-xl border border-border bg-card p-5"
+            >
+              <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" />
+              </Div>
+              <Div className="min-w-0">
+                <P className="font-semibold text-foreground">
+                  {t(`safety.${key}.label`)}
+                </P>
+                <P className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {t(`safety.${key}.description`)}
+                </P>
+              </Div>
+            </Div>
+          ))}
+          <ArticleH3>{t("safety.persist.label")}</ArticleH3>
+          <Div className="grid gap-3 sm:grid-cols-3">
             {(["always", "snapshot", "never"] as const).map((mode) => (
               <Div
                 key={mode}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-4"
+                className="rounded-xl border border-border bg-card p-4"
               >
-                <Div className="font-mono text-sm font-bold text-emerald-400 mb-2">
+                <P className="font-mono text-sm font-semibold text-primary">
                   {t(`safety.persist.${mode}.label`)}
-                </Div>
-                <P className="text-xs text-gray-400 leading-relaxed">
+                </P>
+                <P className="mt-1 text-sm leading-snug text-muted-foreground">
                   {t(`safety.persist.${mode}.description`)}
                 </P>
               </Div>
             ))}
           </Div>
-        </Div>
+        </ArticleSection>
 
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── WHAT SHIPS ──────────────────────────────────────────── */}
-        <Div className="mb-20">
-          <H2 className="text-3xl font-bold mb-10 text-white">
-            {t(`ships.title`)}
-          </H2>
-
-          <Div className="grid md:grid-cols-2 gap-8">
-            <Div className="bg-emerald-500/5 border border-emerald-500/30 rounded-2xl p-6">
-              <Div className="flex items-center gap-3 mb-6">
-                <CheckCircle className="h-5 w-5 text-emerald-400" />
-                <H3 className="text-lg font-semibold text-emerald-300">
-                  {t(`ships.prodReady.label`)}
-                </H3>
+        {/* ── What ships ───────────────────────────────────────────── */}
+        <ArticleSection title={t("ships.title")}>
+          <Div className="grid gap-3 md:grid-cols-2">
+            <Div className="rounded-xl border border-success/25 bg-success/5 p-5 md:p-6">
+              <Div className="mb-4 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-success" />
+                <ArticleH3 className="mt-0 text-base md:text-lg">
+                  {t("ships.prodReady.label")}
+                </ArticleH3>
               </Div>
-              <Div className="space-y-3">
+              <Div className="flex flex-col gap-3">
                 {(
                   [
                     "engine",
@@ -964,32 +651,27 @@ export class EmaIndicatorRepository {
                     "seeds",
                   ] as const
                 ).map((key) => (
-                  <Div key={key} className="flex gap-3">
-                    <Span className="text-emerald-500 text-sm mt-0.5 shrink-0">
-                      {t(`ui.checkMark`)}
-                    </Span>
-                    <P className="text-sm text-gray-300">
+                  <Div key={key} className="flex gap-2.5">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <P className="text-sm leading-relaxed text-foreground/90">
                       {t(`ships.prodReady.items.${key}`)}
                     </P>
                   </Div>
                 ))}
               </Div>
             </Div>
-
-            <Div className="bg-blue-500/5 border border-blue-500/30 rounded-2xl p-6">
-              <Div className="flex items-center gap-3 mb-6">
-                <Lightbulb className="h-5 w-5 text-blue-400" />
-                <H3 className="text-lg font-semibold text-blue-300">
-                  {t(`ships.coming.label`)}
-                </H3>
+            <Div className="rounded-xl border border-primary/25 bg-primary/5 p-5 md:p-6">
+              <Div className="mb-4 flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-primary" />
+                <ArticleH3 className="mt-0 text-base md:text-lg">
+                  {t("ships.coming.label")}
+                </ArticleH3>
               </Div>
-              <Div className="space-y-3">
+              <Div className="flex flex-col gap-3">
                 {(["builder", "trading", "marketplace"] as const).map((key) => (
-                  <Div key={key} className="flex gap-3">
-                    <Span className="text-blue-500 text-sm mt-0.5 shrink-0">
-                      {t(`ui.arrowMark`)}
-                    </Span>
-                    <P className="text-sm text-gray-300">
+                  <Div key={key} className="flex gap-2.5">
+                    <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <P className="text-sm leading-relaxed text-foreground/90">
                       {t(`ships.coming.items.${key}`)}
                     </P>
                   </Div>
@@ -997,90 +679,38 @@ export class EmaIndicatorRepository {
               </Div>
             </Div>
           </Div>
-        </Div>
+        </ArticleSection>
 
-        <Separator className="border-gray-800 mb-20" />
-
-        {/* ── VISION + CLOSE ──────────────────────────────────────── */}
-        <Div className="mb-16">
-          <H2 className="text-3xl font-bold mb-8 text-white">
-            {t(`vision.title`)}
-          </H2>
-
-          <Div className="space-y-6 mb-10">
-            <P className="text-lg text-gray-300 leading-relaxed">
-              {t(`vision.paragraph1`)}
-            </P>
-            <P className="text-lg text-gray-300 leading-relaxed">
-              {t(`vision.paragraph2`)}
-            </P>
+        {/* ── Vision ───────────────────────────────────────────────── */}
+        <ArticleSection title={t("vision.title")}>
+          <ArticleP>{t("vision.paragraph1")}</ArticleP>
+          <ArticleP>{t("vision.paragraph2")}</ArticleP>
+          <ArticleQuote>{t("vision.keyLine")}</ArticleQuote>
+          <Div className="flex items-center gap-2">
+            <Terminal className="h-5 w-5 text-primary" />
+            <Span className="font-semibold text-foreground">
+              {t("vision.quickstart.label")}
+            </Span>
           </Div>
+          <ArticleCode code={QUICKSTART} language="bash" />
+          <P className="text-sm text-muted-foreground">
+            {t("vision.quickstart.description")}
+          </P>
+        </ArticleSection>
 
-          {/* Key line quote */}
-          <Div className="border-l-4 border-emerald-500 pl-6 py-3 my-10 bg-emerald-500/5 rounded-r-xl">
-            <P className="text-xl font-semibold text-emerald-300 leading-relaxed">
-              {t(`vision.keyLine`)}
-            </P>
-          </Div>
-
-          {/* Quick start */}
-          <Div className="mb-10">
-            <Div className="flex items-center gap-2 mb-4">
-              <Terminal className="h-5 w-5 text-emerald-400" />
-              <Span className="font-semibold text-white">
-                {t(`vision.quickstart.label`)}
-              </Span>
-            </Div>
-            <CodeBlock
-              language="bash"
-              code={`git clone https://github.com/techfreaque/next-vibe
-cd next-vibe
-cp .env.example .env
-bun install
-vibe dev`}
+        <ArticleEnd
+          back={{ href: back.href, label: t("vision.cta.secondary") }}
+          title={t("vision.closeTagline")}
+          actions={
+            <Cta
+              href={GITHUB_REPO_URL}
+              label={t("vision.cta.primary")}
+              icon={Github}
+              external
             />
-            <P className="text-sm text-gray-500 mt-3">
-              {t(`vision.quickstart.description`)}
-            </P>
-          </Div>
-
-          {/* Final tagline */}
-          <Div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 text-center mb-10">
-            <P className="text-2xl font-bold text-white leading-relaxed">
-              {t(`vision.closeTagline`)}
-            </P>
-          </Div>
-
-          {/* CTAs */}
-          <Div className="flex flex-wrap gap-4 justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              <Link
-                href={GITHUB_REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t(`vision.cta.primary`)}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-gray-700 text-gray-300 hover:text-white"
-            >
-              <Link href={`/${locale}/story/blog`}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                {t(`vision.cta.secondary`)}
-              </Link>
-            </Button>
-          </Div>
-        </Div>
-      </Div>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

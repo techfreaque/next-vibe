@@ -3,23 +3,45 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { Info } from "next-vibe/ui/components/icons/Info";
 import { Languages } from "next-vibe/ui/components/icons/Languages";
 import { Palette } from "next-vibe/ui/components/icons/Palette";
 import { ShieldOff } from "next-vibe/ui/components/icons/ShieldOff";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
-import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, Muted, P } from "next-vibe/ui/components/typography";
-import type { ComponentType, JSX } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleEnd,
+  ArticleH3,
+  ArticleHeader,
+  ArticleLead,
+  ArticleList,
+  ArticleP,
+  ArticleQuote,
+  ArticleSection,
+} from "../../_shared/article";
+import {
+  Callout,
+  Cta,
+  FeatureCard,
+  FeatureGrid,
+  Step,
+  StepList,
+} from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -62,48 +84,6 @@ export async function tanstackLoader({
   };
 }
 
-function StepCard({
-  number,
-  title,
-  body,
-}: {
-  number: number;
-  title: string;
-  body: string;
-}): JSX.Element {
-  return (
-    <Div className="flex gap-4">
-      <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-        {number}
-      </Div>
-      <Div>
-        <Div className="font-semibold text-sm mb-1">{title}</Div>
-        <Div className="text-sm text-muted-foreground">{body}</Div>
-      </Div>
-    </Div>
-  );
-}
-
-function ExampleCard({
-  icon: IconComponent,
-  title,
-  body,
-}: {
-  icon: ComponentType<{ className?: string }>;
-  title: string;
-  body: string;
-}): JSX.Element {
-  return (
-    <Div className="rounded-xl border p-4 bg-muted/20">
-      <Div className="flex items-center gap-2 mb-2">
-        <IconComponent className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-        <Div className="font-semibold text-sm">{title}</Div>
-      </Div>
-      <Div className="text-sm text-muted-foreground">{body}</Div>
-    </Div>
-  );
-}
-
 export function TanstackPage({
   locale,
   modelCount,
@@ -111,306 +91,203 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
+
+  const buildSteps = [
+    {
+      title: t("whatAreSkills.build1Title"),
+      body: t("whatAreSkills.build1Body"),
+    },
+    {
+      title: t("whatAreSkills.build2Title"),
+      body: t("whatAreSkills.build2Body"),
+    },
+    {
+      title: t("whatAreSkills.build3Title"),
+      body: t("whatAreSkills.build3Body"),
+    },
+  ];
+
+  const examples = [
+    {
+      icon: Code,
+      title: t("examples.example1Title"),
+      body: t("examples.example1Body"),
+    },
+    {
+      icon: Palette,
+      title: t("examples.example2Title"),
+      body: t("examples.example2Body"),
+    },
+    {
+      icon: ShieldOff,
+      title: t("examples.example3Title"),
+      body: t("examples.example3Body"),
+    },
+    {
+      icon: Languages,
+      title: t("examples.example4Title"),
+      body: t("examples.example4Body"),
+    },
+  ];
+
+  const mathRows = (["row1", "row2", "row3", "row4"] as const).map((row) => ({
+    profile: t(`theMath.${row}Profile`),
+    spend: t(`theMath.${row}Spend`),
+    earn: t(`theMath.${row}Earn`),
+  }));
+
+  const howToSteps = [
+    { title: t("howTo.step1Title"), body: t("howTo.step1Body") },
+    { title: t("howTo.step2Title"), body: t("howTo.step2Body") },
+    { title: t("howTo.step3Title"), body: t("howTo.step3Body") },
+    { title: t("howTo.step4Title"), body: t("howTo.step4Body") },
+    { title: t("howTo.step5Title"), body: t("howTo.step5Body") },
+  ];
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Header bar */}
-      <Div className="bg-violet-600 border-b border-violet-700">
-        <Div className="container mx-auto px-4 py-3 max-w-4xl">
-          <Div className="flex items-center gap-3">
-            <Div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center font-bold text-white text-xs">
-              {t("hero.icon")}
-            </Div>
-            <P className="text-white font-semibold text-sm">
-              {t("hero.brand", { appName })}
-              {t("hero.category")}
-            </P>
-          </Div>
-        </Div>
-      </Div>
+      <ArticleHeader
+        back={back}
+        category={t("hero.category")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("skill-sharing-economy", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
 
-      {/* Hero */}
-      <Div className="bg-violet-50 dark:bg-violet-950/20 border-b border-violet-100 dark:border-violet-900/40">
-        <Div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-violet-700 dark:text-violet-400 hover:text-violet-900 dark:hover:text-violet-300 mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("hero.backToBlog")}
-          </Link>
+      <ArticleBody>
+        <ArticleQuote>{t("hero.quote")}</ArticleQuote>
 
-          <Div className="flex items-center gap-3 mb-6">
-            <Div className="px-3 py-1 bg-violet-600 rounded-full text-white text-xs font-semibold uppercase tracking-wider">
-              {t("hero.category")}
-            </Div>
-            <Muted className="text-xs">{t("hero.readTime")}</Muted>
-          </Div>
-
-          <H1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-xl text-muted-foreground mb-6 max-w-2xl">
-            {t("hero.subtitle")}
-          </P>
-          <Div className="inline-block px-5 py-3 rounded-xl bg-white dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 text-violet-800 dark:text-violet-200 text-sm italic max-w-xl">
-            {t("hero.quote")}
-          </Div>
-        </Div>
-      </Div>
-
-      <Div className="container mx-auto px-4 py-16 max-w-4xl space-y-16">
-        {/* What are skills */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">
-            {t("whatAreSkills.title", { appName })}
-          </H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("whatAreSkills.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("whatAreSkills.p2", { modelCount })}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-            {t("whatAreSkills.p3")}
-          </P>
-
-          <Div className="font-semibold text-sm mb-4">
-            {t("whatAreSkills.buildTitle")}
-          </Div>
-          <Div className="space-y-4">
-            {(
-              [
-                {
-                  num: 1,
-                  title: t("whatAreSkills.build1Title"),
-                  body: t("whatAreSkills.build1Body"),
-                },
-                {
-                  num: 2,
-                  title: t("whatAreSkills.build2Title"),
-                  body: t("whatAreSkills.build2Body"),
-                },
-                {
-                  num: 3,
-                  title: t("whatAreSkills.build3Title"),
-                  body: t("whatAreSkills.build3Body"),
-                },
-              ] as const
-            ).map(({ num, title, body }) => (
-              <Div key={num} className="flex gap-4">
-                <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                  {num}
-                </Div>
-                <Div>
-                  <Div className="font-semibold text-sm mb-1">{title}</Div>
-                  <Div className="text-sm text-muted-foreground leading-relaxed">
-                    {body}
-                  </Div>
-                </Div>
-              </Div>
+        <ArticleSection title={t("whatAreSkills.title", { appName })}>
+          <ArticleLead>{t("whatAreSkills.p1")}</ArticleLead>
+          <ArticleP>{t("whatAreSkills.p2", { modelCount })}</ArticleP>
+          <ArticleP>{t("whatAreSkills.p3")}</ArticleP>
+          <ArticleH3>{t("whatAreSkills.buildTitle")}</ArticleH3>
+          <StepList>
+            {buildSteps.map((step, index) => (
+              <Step
+                key={step.title}
+                number={index + 1}
+                title={step.title}
+                description={step.body}
+              />
             ))}
+          </StepList>
+        </ArticleSection>
+
+        <ArticleSection title={t("shareLink.title")}>
+          <ArticleP>{t("shareLink.p1")}</ArticleP>
+          <ArticleList
+            items={[t("shareLink.bullet1"), t("shareLink.bullet2")]}
+          />
+          <ArticleP>{t("shareLink.p2")}</ArticleP>
+          <ArticleP>{t("shareLink.p3")}</ArticleP>
+          <Div className="overflow-x-auto rounded-xl border border-border bg-muted/60 px-4 py-3 font-mono text-xs text-foreground md:text-sm">
+            {t("shareLink.p4", { appName })}
           </Div>
-        </Div>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* The share link mechanic */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("shareLink.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("shareLink.p1")}
-          </P>
-          <Div className="space-y-2 mb-6 pl-4 border-l-2 border-violet-300 dark:border-violet-700">
-            <P className="text-gray-700 dark:text-gray-300 text-sm">
-              {t("shareLink.bullet1")}
-            </P>
-            <P className="text-gray-700 dark:text-gray-300 text-sm">
-              {t("shareLink.bullet2")}
-            </P>
-          </Div>
-          <Div className="p-4 rounded-lg bg-muted/50 border font-mono text-xs mb-6 overflow-x-auto">
-            {t("shareLink.p2", { appName })}
-          </Div>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("shareLink.p3")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("shareLink.p4")}
-          </P>
-        </Div>
-
-        <Separator />
-
-        {/* Examples */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("examples.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("examples.p1")}
-          </P>
-          <Div className="grid sm:grid-cols-2 gap-4">
-            <ExampleCard
-              icon={Code}
-              title={t("examples.example1Title")}
-              body={t("examples.example1Body")}
-            />
-            <ExampleCard
-              icon={Palette}
-              title={t("examples.example2Title")}
-              body={t("examples.example2Body")}
-            />
-            <ExampleCard
-              icon={ShieldOff}
-              title={t("examples.example3Title")}
-              body={t("examples.example3Body")}
-            />
-            <ExampleCard
-              icon={Languages}
-              title={t("examples.example4Title")}
-              body={t("examples.example4Body")}
-            />
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* The math */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("theMath.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("theMath.p1")}
-          </P>
-          <Div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-900 mb-6">
-            <Div className="grid grid-cols-3 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              <Span>{t("theMath.tableHeaderProfile")}</Span>
-              <Span>{t("theMath.tableHeaderSpend")}</Span>
-              <Span className="text-violet-400">
-                {t("theMath.tableHeaderEarn")}
-              </Span>
-            </Div>
-            {(["row1", "row2", "row3", "row4"] as const).map((row) => (
-              <Div
-                key={row}
-                className="grid grid-cols-3 px-4 py-3 border-t border-gray-700/60 text-sm"
+        <ArticleSection title={t("examples.title")}>
+          <ArticleP>{t("examples.p1")}</ArticleP>
+          <FeatureGrid columns={2}>
+            {examples.map((example) => (
+              <FeatureCard
+                key={example.title}
+                icon={example.icon}
+                title={example.title}
               >
-                <Span className="text-gray-300">
-                  {t(`theMath.${row}Profile`)}
-                </Span>
-                <Span className="text-gray-400">
-                  {t(`theMath.${row}Spend`)}
-                </Span>
-                <Span className="text-violet-400 font-semibold">
-                  {t(`theMath.${row}Earn`)}
-                </Span>
-              </Div>
+                {example.body}
+              </FeatureCard>
             ))}
+          </FeatureGrid>
+        </ArticleSection>
+
+        <ArticleSection title={t("theMath.title")}>
+          <ArticleP>{t("theMath.p1")}</ArticleP>
+          <Div className="overflow-hidden rounded-xl border border-border bg-card">
+            <Table className="min-w-[30rem]">
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("theMath.tableHeaderProfile")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("theMath.tableHeaderSpend")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide text-primary">
+                    {t("theMath.tableHeaderEarn")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mathRows.map((row) => (
+                  <TableRow key={row.profile}>
+                    <TableCell className="text-foreground">
+                      {row.profile}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground tabular-nums">
+                      {row.spend}
+                    </TableCell>
+                    <TableCell className="font-semibold text-primary tabular-nums">
+                      {row.earn}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Div>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("theMath.p2")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {t("theMath.p3")}
-          </P>
-        </Div>
+          <ArticleP>{t("theMath.p2")}</ArticleP>
+          <ArticleP>{t("theMath.p3")}</ArticleP>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* Chain */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("chain.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("chain.p1")}
-          </P>
-          <Div className="space-y-2 mb-6">
+        <ArticleSection title={t("chain.title")}>
+          <ArticleP>{t("chain.p1")}</ArticleP>
+          <Div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
             {(["level1", "level2", "level3", "level4"] as const).map((key) => (
               <Div
                 key={key}
-                className="flex items-start gap-3 p-3 rounded-lg bg-gray-900/60 border border-gray-700/40 text-gray-300 text-sm"
+                className="px-4 py-3 text-sm text-foreground/90 md:px-5"
               >
-                <Span>{t(`chain.${key}`)}</Span>
+                {t(`chain.${key}`)}
               </Div>
             ))}
           </Div>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed">
+          <Callout tone="neutral" icon={Info}>
             {t("chain.p2")}
-          </P>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("howTo.title")}>
+          <StepList>
+            {howToSteps.map((step, index) => (
+              <Step
+                key={step.title}
+                number={index + 1}
+                title={step.title}
+                description={step.body}
+              />
+            ))}
+          </StepList>
+        </ArticleSection>
 
-        {/* How to */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-8">{t("howTo.title")}</H2>
-          <Div className="space-y-6">
-            <StepCard
-              number={1}
-              title={t("howTo.step1Title")}
-              body={t("howTo.step1Body")}
-            />
-            <StepCard
-              number={2}
-              title={t("howTo.step2Title")}
-              body={t("howTo.step2Body")}
-            />
-            <StepCard
-              number={3}
-              title={t("howTo.step3Title")}
-              body={t("howTo.step3Body")}
-            />
-            <StepCard
-              number={4}
-              title={t("howTo.step4Title")}
-              body={t("howTo.step4Body")}
-            />
-            <StepCard
-              number={5}
-              title={t("howTo.step5Title")}
-              body={t("howTo.step5Body")}
-            />
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Close */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("close.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("close.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-            {t("close.p2")}
-          </P>
-
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
-            >
-              <Link href={`/${locale}/threads`}>
-                {t("close.createSkill")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link href={`/${locale}/user/(account)/referral`}>
-                <DollarSign className="h-4 w-4" />
-                {t("close.referralPage")}
-              </Link>
-            </Button>
-          </Div>
-        </Div>
-
-        <Div className="flex justify-start pt-4">
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/story/blog`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("hero.backToBlog")}
-            </Link>
-          </Button>
-        </Div>
-      </Div>
+        <ArticleEnd
+          back={back}
+          title={t("close.title")}
+          subtitle={`${t("close.p1")} ${t("close.p2")}`}
+          actions={
+            <>
+              <Cta href={`/${locale}/threads`} label={t("close.createSkill")} />
+              <Cta
+                href={`/${locale}/user/referral`}
+                label={t("close.referralPage")}
+                icon={DollarSign}
+                variant="secondary"
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

@@ -1,19 +1,32 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
-import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, Muted, P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { Gift } from "next-vibe/ui/components/icons/Gift";
+import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Moon } from "next-vibe/ui/components/icons/Moon";
+import { Music } from "next-vibe/ui/components/icons/Music";
+import { H3, P } from "next-vibe/ui/components/typography";
+import type { IconComponent } from "next-vibe/ui/lib/helper";
+import type { JSX, ReactNode } from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleEnd,
+  ArticleHeader,
+  ArticleList,
+  ArticleP,
+  ArticleQuote,
+  ArticleSection,
+} from "../../_shared/article";
+import { Callout, Cta, FeatureCard } from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -52,53 +65,37 @@ export async function tanstackLoader({
   return { locale };
 }
 
-// ── Feature card component ──────────────────────────────────────────────────
+// ── Local building blocks ───────────────────────────────────────────────────
 
-type FeatureVariant = "cortex" | "dreamer" | "autopilot";
-
-const FEATURE_STYLE: Record<
-  FeatureVariant,
-  { header: string; border: string; bg: string; tagline: string }
-> = {
-  cortex: {
-    header: "bg-indigo-700",
-    border: "border-indigo-200 dark:border-indigo-800",
-    bg: "bg-indigo-50 dark:bg-indigo-950/20",
-    tagline: "text-indigo-200",
-  },
-  dreamer: {
-    header: "bg-slate-800",
-    border: "border-slate-200 dark:border-slate-700",
-    bg: "bg-slate-50 dark:bg-slate-950/20",
-    tagline: "text-slate-300",
-  },
-  autopilot: {
-    header: "bg-emerald-700",
-    border: "border-emerald-200 dark:border-emerald-800",
-    bg: "bg-emerald-50 dark:bg-emerald-950/20",
-    tagline: "text-emerald-200",
-  },
-};
-
-function FeatureCard({
-  variant,
+function SystemCard({
+  icon: Icon,
   title,
   tagline,
   children,
 }: {
-  variant: FeatureVariant;
+  icon: IconComponent;
   title: string;
   tagline: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }): JSX.Element {
-  const s = FEATURE_STYLE[variant];
   return (
-    <Div className={`rounded-xl border overflow-hidden ${s.border}`}>
-      <Div className={`px-5 py-4 ${s.header}`}>
-        <Div className="font-bold text-white">{title}</Div>
-        <Div className={`text-xs mt-0.5 ${s.tagline}`}>{tagline}</Div>
+    <Div className="flex h-full flex-col rounded-xl border border-border bg-card p-6 shadow-xs">
+      <Div className="flex items-start gap-4">
+        <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </Div>
+        <Div className="min-w-0">
+          <H3 className="text-lg font-semibold leading-snug tracking-tight">
+            {title}
+          </H3>
+          <P className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            {tagline}
+          </P>
+        </Div>
       </Div>
-      <Div className={`px-5 py-4 space-y-3 ${s.bg}`}>{children}</Div>
+      <Div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 text-[0.9375rem] leading-relaxed text-foreground/90">
+        {children}
+      </Div>
     </Div>
   );
 }
@@ -109,267 +106,150 @@ export function TanstackPage({ locale }: WhatsNewMay2026PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <Div className="bg-indigo-700 border-b border-indigo-800">
-        <Div className="container mx-auto px-4 py-3 max-w-3xl flex items-center gap-3">
-          <Div className="w-5 h-5 bg-white/20 rounded flex items-center justify-center text-white text-xs">
-            {t("hero.icon")}
-          </Div>
-          <P className="text-white font-semibold text-sm">
-            {t("hero.brand", { appName })}
-            {t("hero.category")}
-          </P>
-        </Div>
-      </Div>
+      <ArticleHeader
+        back={back}
+        category={t("hero.category")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("whats-new-may-2026", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
 
-      {/* Hero */}
-      <Div className="bg-gradient-to-b from-indigo-50 to-background dark:from-indigo-950/20 dark:to-background border-b border-indigo-100 dark:border-indigo-900/30">
-        <Div className="container mx-auto px-4 pt-8 pb-12 max-w-3xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
-            {t("hero.backToBlog")}
-          </Link>
-          <Div className="flex items-center gap-2 mb-5">
-            <Div className="px-2.5 py-0.5 bg-indigo-700 rounded-full text-white text-xs font-semibold uppercase tracking-wider">
-              {t("hero.category")}
-            </Div>
-            <Muted className="text-xs">{t("hero.readTime")}</Muted>
-          </Div>
-          <H1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-lg text-muted-foreground mb-8 max-w-2xl">
-            {t("hero.subtitle")}
-          </P>
-          <Div className="px-5 py-4 rounded-xl bg-white dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 text-sm italic max-w-xl">
-            {t("hero.quote")}
-          </Div>
-        </Div>
-      </Div>
+      <ArticleBody>
+        <ArticleQuote>{t("hero.quote")}</ArticleQuote>
 
-      <Div className="container mx-auto px-4 py-12 max-w-3xl space-y-14">
-        {/* ── Honest ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("honest.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("honest.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed">
-            {t("honest.p2")}
-          </P>
-        </Div>
+        <ArticleSection title={t("honest.title")}>
+          <ArticleP>{t("honest.p1")}</ArticleP>
+          <ArticleP>{t("honest.p2")}</ArticleP>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── What changed ── */}
-        <Div>
-          <Div className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4">
-            {t("whatsNew.label")}
-          </Div>
-          <Div className="space-y-2.5 mb-6">
-            {(
-              [
-                { key: "whatsNew.item1", dot: "bg-indigo-500" },
-                { key: "whatsNew.item2", dot: "bg-slate-500" },
-                { key: "whatsNew.item3", dot: "bg-emerald-500" },
-                { key: "whatsNew.item4", dot: "bg-purple-500" },
-                { key: "whatsNew.item5", dot: "bg-blue-400" },
-                { key: "whatsNew.item6", dot: "bg-amber-500" },
-              ] as const
-            ).map(({ key, dot }) => (
-              <Div key={key} className="flex items-baseline gap-3">
-                <Div
-                  className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`}
-                />
-                <Span className="text-sm text-foreground">{t(key)}</Span>
-              </Div>
-            ))}
-          </Div>
-          <Div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
+        <ArticleSection label={t("whatsNew.label")}>
+          <ArticleList
+            items={[
+              t("whatsNew.item1"),
+              t("whatsNew.item2"),
+              t("whatsNew.item3"),
+              t("whatsNew.item4"),
+              t("whatsNew.item5"),
+              t("whatsNew.item6"),
+            ]}
+          />
+          <Callout icon={Info} tone="neutral">
             {t("whatsNew.betaNote")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Media Generation ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-3">{t("media.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-6">
-            {t("media.lead")}
-          </P>
-          <Div className="grid sm:grid-cols-2 gap-3 mb-5">
-            <Div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-4 py-4">
-              <Div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                {t("media.imageLabel")}
-              </Div>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("media.image")}
-              </P>
-            </Div>
-            <Div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-4 py-4">
-              <Div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                {t("media.musicLabel")}
-              </Div>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("media.music")}
-              </P>
-            </Div>
+        <ArticleSection title={t("media.title")}>
+          <ArticleP>{t("media.lead")}</ArticleP>
+          <Div className="grid gap-4 sm:grid-cols-2">
+            <FeatureCard icon={ImageIcon} title={t("media.imageLabel")}>
+              {t("media.image")}
+            </FeatureCard>
+            <FeatureCard icon={Music} title={t("media.musicLabel")}>
+              {t("media.music")}
+            </FeatureCard>
           </Div>
-          <Div className="rounded-lg bg-muted/40 border px-4 py-3 text-sm text-muted-foreground">
+          <Callout icon={Info} tone="neutral">
             {t("media.note")}
-          </Div>
-        </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Three Feature Cards: Cortex, Dreamer, Autopilot ── */}
-        <Div className="space-y-6">
-          {/* Cortex */}
-          <FeatureCard
-            variant="cortex"
+        <Div className="flex flex-col gap-4">
+          <SystemCard
+            icon={Brain}
             title={t("cortex.title")}
             tagline={t("cortex.tagline")}
           >
-            <P className="text-sm text-muted-foreground leading-relaxed">
-              {t("cortex.p1")}
-            </P>
-            <P className="text-sm text-muted-foreground leading-relaxed">
-              {t("cortex.p2")}
-            </P>
-            <P className="text-sm text-muted-foreground leading-relaxed">
-              {t("cortex.p3")}
-            </P>
-            <Div className="rounded-lg bg-muted/40 border px-3 py-2 text-xs text-muted-foreground">
+            <P>{t("cortex.p1")}</P>
+            <P>{t("cortex.p2")}</P>
+            <P>{t("cortex.p3")}</P>
+            <P className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
               {t("cortex.note")}
-            </Div>
-          </FeatureCard>
-
-          {/* Dreamer + Autopilot side by side on larger screens */}
-          <Div className="grid sm:grid-cols-2 gap-4">
-            <FeatureCard
-              variant="dreamer"
+            </P>
+          </SystemCard>
+          <Div className="grid gap-4 md:grid-cols-2">
+            <SystemCard
+              icon={Moon}
               title={t("dreamer.title")}
               tagline={t("dreamer.tagline")}
             >
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("dreamer.p1")}
-              </P>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("dreamer.p2")}
-              </P>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("dreamer.p3")}
-              </P>
-            </FeatureCard>
-
-            <FeatureCard
-              variant="autopilot"
+              <P>{t("dreamer.p1")}</P>
+              <P>{t("dreamer.p2")}</P>
+              <P>{t("dreamer.p3")}</P>
+            </SystemCard>
+            <SystemCard
+              icon={Bot}
               title={t("autopilot.title")}
               tagline={t("autopilot.tagline")}
             >
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("autopilot.p1")}
-              </P>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("autopilot.p2")}
-              </P>
-            </FeatureCard>
+              <P>{t("autopilot.p1")}</P>
+              <P>{t("autopilot.p2")}</P>
+            </SystemCard>
           </Div>
         </Div>
 
-        <Separator />
+        <ArticleSection title={t("mission.title")}>
+          <ArticleP>{t("mission.p1")}</ArticleP>
+          <ArticleP>{t("mission.p2")}</ArticleP>
+          <ArticleP>{t("mission.p3")}</ArticleP>
+          <ArticleP>{t("mission.p4")}</ArticleP>
+        </ArticleSection>
 
-        {/* ── Mission ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("mission.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("mission.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("mission.p2")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("mission.p3")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed">
-            {t("mission.p4")}
-          </P>
-        </Div>
-
-        <Separator />
-
-        {/* ── Feedback ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">
-            {t("feedback.title", { credits: FEEDBACK_REWARD_CREDITS })}
-          </H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("feedback.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-6">
+        <ArticleSection
+          title={t("feedback.title", { credits: FEEDBACK_REWARD_CREDITS })}
+        >
+          <ArticleP>{t("feedback.p1")}</ArticleP>
+          <ArticleP>
             {t("feedback.p2", { credits: FEEDBACK_REWARD_CREDITS })}
-          </P>
-          <Div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 px-5 py-4 mb-4">
-            <Div className="font-semibold text-indigo-900 dark:text-indigo-200 text-sm mb-1">
+          </ArticleP>
+          <Callout icon={Gift}>
+            <P className="font-semibold">
               {t("feedback.rewardTitle", { credits: FEEDBACK_REWARD_CREDITS })}
-            </Div>
-            <P className="text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed mb-4">
+            </P>
+            <P className="mt-1 text-muted-foreground">
               {t("feedback.rewardBody")}
             </P>
-            <Button
-              asChild
-              size="sm"
-              className="bg-indigo-700 hover:bg-indigo-800 text-white"
-            >
-              <Link href={`/${locale}/help`}>{t("feedback.cta")}</Link>
-            </Button>
-          </Div>
-        </Div>
+            <Div className="mt-4">
+              <Cta
+                href={`/${locale}/help`}
+                label={t("feedback.cta")}
+                variant="secondary"
+              />
+            </Div>
+          </Callout>
+        </ArticleSection>
 
-        <Separator />
-
-        {/* ── Close ── */}
-        <Div>
-          <H2 className="text-xl font-bold mb-4">{t("close.title")}</H2>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("close.p1")}
-          </P>
-          <P className="text-muted-foreground leading-relaxed mb-3">
-            {t("close.p2")}
-          </P>
-          <P className="text-muted-foreground text-sm italic mb-8">
+        <ArticleSection title={t("close.title")}>
+          <ArticleP>{t("close.p1")}</ArticleP>
+          <ArticleP>{t("close.p2")}</ArticleP>
+          <ArticleP className="text-muted-foreground italic">
             {t("close.signature")}
-          </P>
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-indigo-700 hover:bg-indigo-800 text-white"
-            >
-              <Link href={`/${locale}/threads`}>
-                {t("close.cta", { appName })}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </Div>
-        </Div>
+          </ArticleP>
+        </ArticleSection>
 
-        <Div className="pt-2">
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/story/blog`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("hero.backToBlog")}
-            </Link>
-          </Button>
-        </Div>
-      </Div>
+        <ArticleEnd
+          back={back}
+          title={t("cta.title")}
+          subtitle={t("cta.subtitle")}
+          actions={
+            <>
+              <Cta
+                href={`/${locale}/threads`}
+                label={t("close.cta", { appName })}
+              />
+              <Cta
+                href={`/${locale}/help`}
+                label={t("feedback.cta")}
+                variant="secondary"
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

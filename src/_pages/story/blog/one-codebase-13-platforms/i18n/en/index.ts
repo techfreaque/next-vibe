@@ -10,7 +10,6 @@ export const translations = {
   },
   readingTime: "12 min read",
   category: "Architecture",
-  publishedDate: "March 2025",
   backToBlog: "Back to Blog",
 
   hero: {
@@ -238,6 +237,6 @@ export const translations = {
     title: "Define it once. It exists everywhere.",
     para: "WordPress gave everyone the power to publish. next-vibe gives you the power to build platforms that work on web, mobile, CLI, AI agents, and automation - that watch themselves, reason about their own data, and act on what they find.",
     cta: "Star next-vibe on GitHub",
-    ctaLink: "https://github.com/techfreaque/next-vibe",
+    frameworkCta: "Explore next-vibe",
   },
 };

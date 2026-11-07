@@ -1,5 +1,4 @@
 export const translations = {
-  backToHome: "Back to Home",
   errors: {
     failedToLoadBrowserIdentity:
       "Failed to load browser identity. Please refresh the page.",

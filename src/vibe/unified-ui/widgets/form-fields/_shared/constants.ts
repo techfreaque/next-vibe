@@ -5,10 +5,11 @@
 import type { RequiredFieldTheme } from "../../../_shared/field-config-types";
 
 /**
- * Default theme for required fields
+ * Default theme for required fields. Plain fields by default — the tinted
+ * "highlight" boxes are opt-in per field (`theme: { style: "highlight" }`).
  */
 export const DEFAULT_THEME: RequiredFieldTheme = {
-  style: "highlight",
+  style: "none",
   showAllRequired: true,
   requiredColor: "blue",
   completedColor: "green",

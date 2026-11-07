@@ -13,6 +13,7 @@ export interface AgentEnvAvailability {
   freedomGPT: boolean;
   gabAI: boolean;
   veniceAI: boolean;
+  nanoGPT: boolean;
   scrappey: boolean;
   openAiImages: boolean;
   openAiStt: boolean;
@@ -49,6 +50,7 @@ const envAvailability: AgentEnvAvailability = (() => {
     freedomGPT: agentPublicFlags.NEXT_PUBLIC_AGENT_FREEDOM_GPT,
     gabAI: agentPublicFlags.NEXT_PUBLIC_AGENT_GAB_AI,
     veniceAI: agentPublicFlags.NEXT_PUBLIC_AGENT_VENICE_AI,
+    nanoGPT: agentPublicFlags.NEXT_PUBLIC_AGENT_NANO_GPT,
     scrappey: agentPublicFlags.NEXT_PUBLIC_AGENT_SCRAPPEY,
     openAiImages: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
     openAiStt: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
@@ -112,6 +114,11 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "VENICE_AI_API_KEY",
     url: "https://venice.ai",
     label: "Venice AI",
+  },
+  nanoGPT: {
+    envKey: "NANO_GPT_API_KEY",
+    url: "https://nano-gpt.com/api",
+    label: "NanoGPT",
   },
   scrappey: {
     envKey: "SCRAPPEY_API_KEY",

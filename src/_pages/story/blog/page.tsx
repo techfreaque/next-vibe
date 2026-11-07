@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/components/badge";
-import { Card, CardContent, CardHeader } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Calendar } from "next-vibe/ui/components/icons/Calendar";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
+import { Section } from "next-vibe/ui/components/section";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
-import type { JSX, ReactNode } from "react";
+import { H2, H3, P } from "next-vibe/ui/components/typography";
+import type { JSX } from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
+import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
 export const revalidate = 3600;
 
@@ -54,43 +56,86 @@ export async function tanstackLoader({
   return { locale };
 }
 
-interface BlogPost {
-  slug: string;
-  customHref?: string;
-  titleKey: string;
-  categoryKey: string;
-  excerptKey: string;
-  readTimeKey: string;
-  emoji: string;
-  accentColor: string;
-  accentBg: string;
-  accentBorder: string;
-  badgeColor: string;
+interface BlogCardData {
+  href: string;
+  title: string;
+  category: string;
+  excerpt: string;
+  readTime: string;
+  date: string | undefined;
 }
 
-function ReadTimeBadge({ children }: { children: ReactNode }): JSX.Element {
+function PostMeta({ post }: { post: BlogCardData }): JSX.Element {
   return (
-    <Span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-      <Clock className="h-3 w-3" />
-      {children}
-    </Span>
+    <Div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+      <Span className="rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 font-semibold text-primary">
+        {post.category}
+      </Span>
+      {post.date !== undefined && (
+        <Span className="inline-flex items-center gap-1">
+          <Calendar className="h-3 w-3" />
+          {post.date}
+        </Span>
+      )}
+      <Span className="inline-flex items-center gap-1">
+        <Clock className="h-3 w-3" />
+        {post.readTime}
+      </Span>
+    </Div>
   );
 }
 
-function CategoryBadge({
-  label,
-  className,
+function FeaturedPostCard({
+  post,
+  readMore,
 }: {
-  label: string;
-  className: string;
+  post: BlogCardData;
+  readMore: string;
 }): JSX.Element {
   return (
-    <Badge
-      variant="outline"
-      className={`text-xs font-medium px-2 py-0.5 transition-colors ${className}`}
+    <Link
+      href={post.href}
+      className="group block rounded-2xl border border-border bg-card p-6 shadow-xs transition-colors hover:border-primary/40 md:p-10"
     >
-      {label}
-    </Badge>
+      <PostMeta post={post} />
+      <H2 className="mt-4 max-w-3xl border-none pb-0 text-2xl font-semibold tracking-tight text-balance md:text-4xl">
+        {post.title}
+      </H2>
+      <P className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+        {post.excerpt}
+      </P>
+      <Span className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary">
+        {readMore}
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </Span>
+    </Link>
+  );
+}
+
+function PostCard({
+  post,
+  readMore,
+}: {
+  post: BlogCardData;
+  readMore: string;
+}): JSX.Element {
+  return (
+    <Link
+      href={post.href}
+      className="group flex h-full flex-col rounded-xl border border-border bg-card p-6 shadow-xs transition-colors hover:border-primary/40"
+    >
+      <PostMeta post={post} />
+      <H3 className="mt-4 text-lg font-semibold leading-snug tracking-tight text-balance">
+        {post.title}
+      </H3>
+      <P className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        {post.excerpt}
+      </P>
+      <Span className="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-4 text-sm font-medium text-primary">
+        {readMore}
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+      </Span>
+    </Link>
   );
 }
 
@@ -98,294 +143,167 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const credits = FEEDBACK_REWARD_CREDITS;
 
-  // Posts ordered to mix technical and referral content
-  const ALL_POSTS: BlogPost[] = [
+  const post = (
+    slug: BlogPostSlug,
+    content: Omit<BlogCardData, "href" | "date">,
+  ): BlogCardData => ({
+    href: `/${locale}/story/blog/${slug}`,
+    date: formatPostDate(slug, locale),
+    ...content,
+  });
+
+  // Newest first; product updates lead, deep dives and referral guides follow.
+  const posts: BlogCardData[] = [
+    post("model-refresh-uncensored-providers", {
+      title: t("posts.modelRefresh.title"),
+      category: t("posts.modelRefresh.category"),
+      excerpt: t("posts.modelRefresh.excerpt"),
+      readTime: t("posts.modelRefresh.readTime"),
+    }),
+    post("whats-new-november-2026", {
+      title: t("posts.whatsNewNovember2026.title"),
+      category: t("posts.whatsNewNovember2026.category"),
+      excerpt: t("posts.whatsNewNovember2026.excerpt"),
+      readTime: t("posts.whatsNewNovember2026.readTime"),
+    }),
+    post("hermes-thea-two-way-remote", {
+      title: t("posts.hermesThea.title"),
+      category: t("posts.hermesThea.category"),
+      excerpt: t("posts.hermesThea.excerpt"),
+      readTime: t("posts.hermesThea.readTime"),
+    }),
+    post("interactive-coding-agent", {
+      title: t("posts.codingAgent.title"),
+      category: t("posts.codingAgent.category"),
+      excerpt: t("posts.codingAgent.excerpt"),
+      readTime: t("posts.codingAgent.readTime"),
+    }),
+    post("e2e-tests-found-real-bugs", {
+      title: t("posts.e2eTests.title"),
+      category: t("posts.e2eTests.category"),
+      excerpt: t("posts.e2eTests.excerpt"),
+      readTime: t("posts.e2eTests.readTime"),
+    }),
+    post("whats-new-may-2026", {
+      title: t("posts.whatsNewMay2026.title"),
+      category: t("posts.whatsNewMay2026.category"),
+      excerpt: t("posts.whatsNewMay2026.excerpt", { credits }),
+      readTime: t("posts.whatsNewMay2026.readTime"),
+    }),
+    post("whats-new-april-2026", {
+      title: t("posts.whatsNewApril2026.title"),
+      category: t("posts.whatsNewApril2026.category"),
+      excerpt: t("posts.whatsNewApril2026.excerpt"),
+      readTime: t("posts.whatsNewApril2026.readTime"),
+    }),
+    post("one-endpoint-every-surface", {
+      title: t("posts.oneEndpoint.title"),
+      category: t("posts.oneEndpoint.category"),
+      excerpt: t("posts.oneEndpoint.excerpt"),
+      readTime: t("posts.oneEndpoint.readTime"),
+    }),
+    post("skill-sharing-economy", {
+      title: t("posts.skillSharingEconomy.title"),
+      category: t("posts.skillSharingEconomy.category"),
+      excerpt: t("posts.skillSharingEconomy.excerpt"),
+      readTime: t("posts.skillSharingEconomy.readTime"),
+    }),
+    post("one-codebase-13-platforms", {
+      title: t("posts.oneCodebase.title"),
+      category: t("posts.oneCodebase.category"),
+      excerpt: t("posts.oneCodebase.excerpt"),
+      readTime: t("posts.oneCodebase.readTime"),
+    }),
+    post("type-checker-made-ai-stop-lying", {
+      title: t("posts.typeChecker.title"),
+      category: t("posts.typeChecker.category"),
+      excerpt: t("posts.typeChecker.excerpt"),
+      readTime: t("posts.typeChecker.readTime"),
+    }),
+    post("dead-trading-bot-to-monitoring-engine", {
+      title: t("posts.tradingBot.title"),
+      category: t("posts.tradingBot.category"),
+      excerpt: t("posts.tradingBot.excerpt"),
+      readTime: t("posts.tradingBot.readTime"),
+    }),
+    post("referral-for-beginners", {
+      title: t("posts.referralBeginners.title"),
+      category: t("posts.referralBeginners.category"),
+      excerpt: t("posts.referralBeginners.excerpt"),
+      readTime: t("posts.referralBeginners.readTime"),
+    }),
+    post("referral-for-developers", {
+      title: t("posts.referralDevelopers.title"),
+      category: t("posts.referralDevelopers.category"),
+      excerpt: t("posts.referralDevelopers.excerpt"),
+      readTime: t("posts.referralDevelopers.readTime"),
+    }),
+    post("referral-for-affiliate-pros", {
+      title: t("posts.referralAffiliatePros.title"),
+      category: t("posts.referralAffiliatePros.category"),
+      excerpt: t("posts.referralAffiliatePros.excerpt"),
+      readTime: t("posts.referralAffiliatePros.readTime"),
+    }),
     {
-      slug: "whats-new-may-2026",
-      titleKey: "posts.whatsNewMay2026.title",
-      categoryKey: "posts.whatsNewMay2026.category",
-      excerptKey: "posts.whatsNewMay2026.excerpt",
-      readTimeKey: "posts.whatsNewMay2026.readTime",
-      emoji: "🧠",
-      accentColor: "text-indigo-600 dark:text-indigo-400",
-      accentBg: "bg-indigo-50 dark:bg-indigo-950/30",
-      accentBorder: "border-indigo-200 dark:border-indigo-800/50",
-      badgeColor:
-        "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800/50",
-    },
-    {
-      slug: "whats-new-april-2026",
-      titleKey: "posts.whatsNewApril2026.title",
-      categoryKey: "posts.whatsNewApril2026.category",
-      excerptKey: "posts.whatsNewApril2026.excerpt",
-      readTimeKey: "posts.whatsNewApril2026.readTime",
-      emoji: "🧭",
-      accentColor: "text-purple-600 dark:text-purple-400",
-      accentBg: "bg-purple-50 dark:bg-purple-950/30",
-      accentBorder: "border-purple-200 dark:border-purple-800/50",
-      badgeColor:
-        "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800/50",
-    },
-    {
-      slug: "one-codebase-13-platforms",
-      titleKey: "posts.oneCodebase.title",
-      categoryKey: "posts.oneCodebase.category",
-      excerptKey: "posts.oneCodebase.excerpt",
-      readTimeKey: "posts.oneCodebase.readTime",
-      emoji: "🧬",
-      accentColor: "text-cyan-500 dark:text-cyan-400",
-      accentBg: "bg-cyan-50 dark:bg-cyan-950/30",
-      accentBorder: "border-cyan-200 dark:border-cyan-800/50",
-      badgeColor:
-        "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/50",
-    },
-    {
-      slug: "skill-sharing-economy",
-      titleKey: "posts.skillSharingEconomy.title",
-      categoryKey: "posts.skillSharingEconomy.category",
-      excerptKey: "posts.skillSharingEconomy.excerpt",
-      readTimeKey: "posts.skillSharingEconomy.readTime",
-      emoji: "💡",
-      accentColor: "text-amber-600 dark:text-amber-400",
-      accentBg: "bg-amber-50 dark:bg-amber-950/30",
-      accentBorder: "border-amber-200 dark:border-amber-800/50",
-      badgeColor:
-        "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/50",
-    },
-    {
-      slug: "type-checker-made-ai-stop-lying",
-      titleKey: "posts.typeChecker.title",
-      categoryKey: "posts.typeChecker.category",
-      excerptKey: "posts.typeChecker.excerpt",
-      readTimeKey: "posts.typeChecker.readTime",
-      emoji: "🛡",
-      accentColor: "text-violet-600 dark:text-violet-400",
-      accentBg: "bg-violet-50 dark:bg-violet-950/30",
-      accentBorder: "border-violet-200 dark:border-violet-800/50",
-      badgeColor:
-        "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/50",
-    },
-    {
-      slug: "referral-for-beginners",
-      titleKey: "posts.referralBeginners.title",
-      categoryKey: "posts.referralBeginners.category",
-      excerptKey: "posts.referralBeginners.excerpt",
-      readTimeKey: "posts.referralBeginners.readTime",
-      emoji: "🌱",
-      accentColor: "text-emerald-600 dark:text-emerald-400",
-      accentBg: "bg-emerald-50 dark:bg-emerald-950/30",
-      accentBorder: "border-emerald-200 dark:border-emerald-800/50",
-      badgeColor:
-        "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
-    },
-    {
-      slug: "dead-trading-bot-to-monitoring-engine",
-      titleKey: "posts.tradingBot.title",
-      categoryKey: "posts.tradingBot.category",
-      excerptKey: "posts.tradingBot.excerpt",
-      readTimeKey: "posts.tradingBot.readTime",
-      emoji: "📊",
-      accentColor: "text-emerald-600 dark:text-emerald-400",
-      accentBg: "bg-emerald-50 dark:bg-emerald-950/30",
-      accentBorder: "border-emerald-200 dark:border-emerald-800/50",
-      badgeColor:
-        "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
-    },
-    {
-      slug: "referral-for-developers",
-      titleKey: "posts.referralDevelopers.title",
-      categoryKey: "posts.referralDevelopers.category",
-      excerptKey: "posts.referralDevelopers.excerpt",
-      readTimeKey: "posts.referralDevelopers.readTime",
-      emoji: "🔗",
-      accentColor: "text-cyan-600 dark:text-cyan-400",
-      accentBg: "bg-cyan-50 dark:bg-cyan-950/30",
-      accentBorder: "border-cyan-200 dark:border-cyan-800/50",
-      badgeColor:
-        "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/50",
-    },
-    {
-      slug: "referral-for-affiliate-pros",
-      titleKey: "posts.referralAffiliatePros.title",
-      categoryKey: "posts.referralAffiliatePros.category",
-      excerptKey: "posts.referralAffiliatePros.excerpt",
-      readTimeKey: "posts.referralAffiliatePros.readTime",
-      emoji: "📈",
-      accentColor: "text-violet-600 dark:text-violet-400",
-      accentBg: "bg-violet-50 dark:bg-violet-950/30",
-      accentBorder: "border-violet-200 dark:border-violet-800/50",
-      badgeColor:
-        "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/50",
-    },
-    {
-      slug: "one-endpoint-every-surface",
-      titleKey: "posts.oneEndpoint.title",
-      categoryKey: "posts.oneEndpoint.category",
-      excerptKey: "posts.oneEndpoint.excerpt",
-      readTimeKey: "posts.oneEndpoint.readTime",
-      emoji: "🔗",
-      accentColor: "text-blue-600 dark:text-blue-400",
-      accentBg: "bg-blue-50 dark:bg-blue-950/30",
-      accentBorder: "border-blue-200 dark:border-blue-800/50",
-      badgeColor:
-        "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50",
-    },
-    {
-      slug: "referral-landing",
-      customHref: `/${locale}/story/referral`,
-      titleKey: "posts.referralLanding.title",
-      categoryKey: "posts.referralLanding.category",
-      excerptKey: "posts.referralLanding.excerpt",
-      readTimeKey: "posts.referralLanding.readTime",
-      emoji: "💸",
-      accentColor: "text-rose-600 dark:text-rose-400",
-      accentBg: "bg-rose-50 dark:bg-rose-950/30",
-      accentBorder: "border-rose-200 dark:border-rose-800/50",
-      badgeColor:
-        "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
+      href: `/${locale}/story/earn`,
+      date: undefined,
+      title: t("posts.referralLanding.title"),
+      category: t("posts.referralLanding.category"),
+      excerpt: t("posts.referralLanding.excerpt"),
+      readTime: t("posts.referralLanding.readTime"),
     },
   ];
 
-  const [featured, ...rest] = ALL_POSTS;
+  const [featured, ...rest] = posts;
+  const readMore = t("labels.readMore");
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Hero header */}
-      <Div className="relative overflow-hidden border-b">
-        <Div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-background" />
-        <Div className="container relative mx-auto px-4 pt-20 pb-16">
-          <Div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium text-muted-foreground mb-6">
-            <BookOpen className="h-3.5 w-3.5" />
-            {t("labels.allPosts")}
-          </Div>
-          <H1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            {t("page.title")}
-          </H1>
-          <P className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-            {t("page.subtitle", { appName })}
-          </P>
-        </Div>
-      </Div>
+      <PageHero
+        eyebrow={t("labels.allPosts")}
+        eyebrowIcon={BookOpen}
+        title={t("page.title")}
+        subtitle={t("page.subtitle", { appName })}
+      />
 
-      <Div className="container mx-auto px-4 py-16 space-y-16">
-        {/* Featured post */}
-        {featured !== undefined && (
-          <Div>
-            <Div className="flex items-center gap-2 mb-6">
-              <Span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+      <Section className="py-12 md:py-20">
+        <Div className={CONTAINER}>
+          {featured !== undefined && (
+            <Div className="mb-12 md:mb-16">
+              <Span className="mb-4 block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 {t("labels.featured")}
               </Span>
-              <Separator className="flex-1" />
+              <FeaturedPostCard post={featured} readMore={readMore} />
             </Div>
-
-            <Link
-              href={
-                featured.customHref ?? `/${locale}/story/blog/${featured.slug}`
-              }
-              className="block group"
-            >
-              <Card
-                className={`relative overflow-hidden border-2 ${featured.accentBorder} transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5`}
-              >
-                <Div className="md:grid md:grid-cols-5 md:gap-0">
-                  <Div className="md:col-span-3">
-                    <CardHeader className="pt-8 pb-4 px-8">
-                      <Div className="flex flex-wrap items-center gap-3 mb-4">
-                        <CategoryBadge
-                          label={t(
-                            featured.categoryKey as Parameters<typeof t>[0],
-                          )}
-                          className={featured.badgeColor}
-                        />
-                        <ReadTimeBadge>
-                          {t(featured.readTimeKey as Parameters<typeof t>[0])}
-                        </ReadTimeBadge>
-                      </Div>
-                      <H2 className="text-2xl md:text-3xl font-bold leading-tight">
-                        {t(featured.titleKey as Parameters<typeof t>[0])}
-                      </H2>
-                    </CardHeader>
-
-                    <CardContent className="px-8 pb-8">
-                      <P className="text-muted-foreground text-base leading-relaxed mb-6">
-                        {t(featured.excerptKey as Parameters<typeof t>[0], {
-                          credits: FEEDBACK_REWARD_CREDITS,
-                        })}
-                      </P>
-                      <Span
-                        className={`inline-flex items-center gap-2 text-sm font-medium ${featured.accentColor} group-hover:gap-3 transition-all`}
-                      >
-                        {t("labels.readMore")}
-                        <ArrowRight className="h-4 w-4" />
-                      </Span>
-                    </CardContent>
-                  </Div>
-
-                  {/* Accent panel instead of code block */}
-                  <Div
-                    className={`hidden md:flex md:col-span-2 items-center justify-center ${featured.accentBg} border-l ${featured.accentBorder}`}
-                  >
-                    <Span className="text-7xl">{featured.emoji}</Span>
-                  </Div>
-                </Div>
-              </Card>
-            </Link>
+          )}
+          <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+            {rest.map((item) => (
+              <PostCard key={item.href} post={item} readMore={readMore} />
+            ))}
           </Div>
-        )}
-
-        {/* All remaining posts - 2-column grid, mixed */}
-        <Div className="grid md:grid-cols-2 gap-6">
-          {rest.map((post) => (
-            <Link
-              key={post.slug}
-              href={post.customHref ?? `/${locale}/story/blog/${post.slug}`}
-              className="block group"
-            >
-              <Card
-                className={`h-full relative overflow-hidden border ${post.accentBorder} transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
-              >
-                {/* Top accent stripe */}
-                <Div
-                  className={`h-1.5 ${post.accentBg} border-b ${post.accentBorder}`}
-                />
-                <CardHeader className="pb-3">
-                  <Div className="flex items-center gap-3 mb-3">
-                    <Span className="text-2xl">{post.emoji}</Span>
-                    <Div className="flex items-center gap-2">
-                      <CategoryBadge
-                        label={t(post.categoryKey as Parameters<typeof t>[0])}
-                        className={post.badgeColor}
-                      />
-                      <ReadTimeBadge>
-                        {t(post.readTimeKey as Parameters<typeof t>[0])}
-                      </ReadTimeBadge>
-                    </Div>
-                  </Div>
-                  <H3 className="text-lg font-bold leading-snug">
-                    {t(post.titleKey as Parameters<typeof t>[0])}
-                  </H3>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <P className="text-sm text-muted-foreground leading-relaxed">
-                    {t(post.excerptKey as Parameters<typeof t>[0], {
-                      credits: FEEDBACK_REWARD_CREDITS,
-                    })}
-                  </P>
-                  <Div className="flex items-center justify-end pt-1">
-                    <Span
-                      className={`inline-flex items-center gap-1 text-xs font-medium ${post.accentColor} group-hover:gap-2 transition-all`}
-                    >
-                      {t("labels.readMore")}
-                      <ArrowRight className="h-3 w-3" />
-                    </Span>
-                  </Div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
         </Div>
-      </Div>
+      </Section>
+
+      <CtaBand
+        title={t("cta.title")}
+        subtitle={t("cta.subtitle")}
+        actions={
+          <>
+            <Cta
+              href={`/${locale}/story/newsletter`}
+              label={t("cta.newsletter")}
+              icon={Mail}
+            />
+            <Cta
+              href={`/${locale}/story/framework`}
+              label={t("cta.framework")}
+              variant="secondary"
+            />
+          </>
+        }
+      />
     </Div>
   );
 }

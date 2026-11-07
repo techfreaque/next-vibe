@@ -2,19 +2,37 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button } from "next-vibe/ui/components/button";
-import { Card, CardContent, CardHeader } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Building } from "next-vibe/ui/components/icons/Building";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Code } from "next-vibe/ui/components/icons/Code";
+import { Cpu } from "next-vibe/ui/components/icons/Cpu";
+import { Layers } from "next-vibe/ui/components/icons/Layers";
+import { Monitor } from "next-vibe/ui/components/icons/Monitor";
+import { Plug } from "next-vibe/ui/components/icons/Plug";
+import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
+import { Users } from "next-vibe/ui/components/icons/Users";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  Callout,
+  CardLink,
+  Cta,
+  CtaBand,
+  FeatureCard,
+  FeatureGrid,
+  PageHero,
+  PageSection,
+} from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 
 interface Props {
@@ -61,194 +79,130 @@ export async function tanstackLoader({
   return { locale };
 }
 
-const SURFACE_COLORS = [
-  "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50",
-  "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/50",
-  "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/50",
-  "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50",
-  "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/50",
-  "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/50",
+const AUDIENCE = [
+  { key: "freelancers", icon: Users },
+  { key: "businessDevs", icon: Building },
+  { key: "industrialDevs", icon: Cpu },
+  { key: "enterpriseDevs", icon: Layers },
 ] as const;
 
-const AUDIENCE_ICONS = ["🧑‍💻", "🏭", "⚙️", "🏢"] as const;
+const USE_CASES = [
+  { key: "erpIntegration", icon: Plug },
+  { key: "desktopAutomation", icon: Monitor },
+  { key: "productionLine", icon: Settings },
+  { key: "autopilotScheduling", icon: Clock },
+  { key: "vibeSenseMonitoring", icon: Activity },
+  { key: "skillEconomy", icon: TrendingUp },
+] as const;
 
-const USE_CASE_ICONS = ["🔌", "🖥️", "🏗️", "⏱️", "📡", "💸"] as const;
+const SURFACE_KEYS = ["web", "cli", "mcp", "native", "cron", "ai"] as const;
 
 export function TanstackPage({ locale }: CareersPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
-  const audienceKeys = [
-    "freelancers",
-    "businessDevs",
-    "industrialDevs",
-    "enterpriseDevs",
-  ] as const;
-
-  const caseKeys = [
-    "erpIntegration",
-    "desktopAutomation",
-    "productionLine",
-    "autopilotScheduling",
-    "vibeSenseMonitoring",
-    "skillEconomy",
-  ] as const;
-
-  const surfaceKeys = ["web", "cli", "mcp", "native", "cron", "ai"] as const;
-
   return (
     <Div className="min-h-screen bg-background">
-      {/* Hero */}
-      <Div className="relative overflow-hidden border-b">
-        <Div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-background" />
-        <Div className="container relative mx-auto px-4 pt-20 pb-16 max-w-4xl">
-          <Span className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium text-muted-foreground mb-6">
-            {t("hero.eyebrow")}
-          </Span>
-          <H1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
-            {t("hero.subtitle")}
-          </P>
-          <Div className="flex flex-wrap gap-3">
-            <Button size="lg" asChild>
-              <Link href={`/${locale}/story/blog`}>
-                {t("hero.ctaPrimary")}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href={`/${locale}/story/blog`}>
-                {t("hero.ctaSecondary")}
-              </Link>
-            </Button>
-          </Div>
-        </Div>
-      </Div>
+      <PageHero
+        eyebrow={t("hero.eyebrow")}
+        eyebrowIcon={Code}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+        actions={
+          <>
+            <Cta
+              href={`/${locale}/story/framework`}
+              label={t("hero.ctaPrimary")}
+            />
+            <Cta
+              href={`${GITHUB_REPO_URL}/blob/main/docs/README.md`}
+              label={t("hero.ctaSecondary")}
+              icon={BookOpen}
+              variant="secondary"
+              external
+            />
+          </>
+        }
+      />
 
-      <Div className="container mx-auto px-4 py-16 max-w-5xl space-y-20">
-        {/* Architecture callout */}
-        <Div>
-          <Div className="text-center mb-8">
-            <H2 className="text-2xl md:text-3xl font-bold mb-3">
-              {t("architecture.title")}
-            </H2>
-            <P className="text-muted-foreground">
-              {t("architecture.subtitle")}
-            </P>
-          </Div>
-          <Div className="flex flex-wrap justify-center gap-2 mb-6">
-            {surfaceKeys.map((key, i) => (
-              <Badge
+      {/* Architecture */}
+      <PageSection
+        title={t("architecture.title")}
+        intro={t("architecture.subtitle")}
+      >
+        <Div className="rounded-2xl border border-border bg-card p-6 shadow-xs md:p-10">
+          <Div className="flex flex-wrap gap-2">
+            {SURFACE_KEYS.map((key) => (
+              <Span
                 key={key}
-                variant="outline"
-                className={`text-sm px-3 py-1 ${SURFACE_COLORS[i % SURFACE_COLORS.length]}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
               >
+                <Check className="h-3.5 w-3.5" />
                 {t(`architecture.surfaces.${key}`)}
-              </Badge>
+              </Span>
             ))}
           </Div>
-          <P className="text-center text-sm text-muted-foreground max-w-2xl mx-auto">
+          <P className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
             {t("architecture.description")}
           </P>
         </Div>
+      </PageSection>
 
-        <Separator />
+      {/* Audience */}
+      <PageSection tone="muted" title={t("audience.title")}>
+        <FeatureGrid columns={4}>
+          {AUDIENCE.map(({ key, icon }) => (
+            <FeatureCard
+              key={key}
+              icon={icon}
+              title={t(`audience.items.${key}.title`)}
+            >
+              {t(`audience.items.${key}.description`)}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+      </PageSection>
 
-        {/* Who builds with next-vibe */}
-        <Div>
-          <H2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-            {t("audience.title")}
-          </H2>
-          <Div className="grid md:grid-cols-2 gap-6">
-            {audienceKeys.map((key, i) => (
-              <Card key={key} className="border">
-                <CardHeader className="pb-2">
-                  <Div className="flex items-center gap-3">
-                    <Span className="text-2xl">{AUDIENCE_ICONS[i]}</Span>
-                    <H3 className="font-semibold text-base">
-                      {t(`audience.items.${key}.title`)}
-                    </H3>
-                  </Div>
-                </CardHeader>
-                <CardContent>
-                  <P className="text-sm text-muted-foreground leading-relaxed">
-                    {t(`audience.items.${key}.description`)}
-                  </P>
-                </CardContent>
-              </Card>
-            ))}
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Use cases */}
-        <Div>
-          <H2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-            {t("useCases.title")}
-          </H2>
-          <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {caseKeys.map((key, i) => (
-              <Card
-                key={key}
-                className="border hover:shadow-md transition-shadow"
-              >
-                <CardHeader className="pb-2">
-                  <Span className="text-2xl mb-1 block">
-                    {USE_CASE_ICONS[i]}
-                  </Span>
-                  <H3 className="font-semibold text-sm leading-snug">
-                    {t(`useCases.items.${key}.title`)}
-                  </H3>
-                </CardHeader>
-                <CardContent>
-                  <P className="text-xs text-muted-foreground leading-relaxed">
-                    {t(`useCases.items.${key}.description`)}
-                  </P>
-                </CardContent>
-              </Card>
-            ))}
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Referral / skill economy */}
-        <Div className="rounded-xl border bg-muted/30 p-8 md:p-12 text-center">
-          <H2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t("referral.title")}
-          </H2>
-          <P className="text-muted-foreground max-w-xl mx-auto mb-6">
+      {/* Use cases */}
+      <PageSection title={t("useCases.title")}>
+        <FeatureGrid columns={3}>
+          {USE_CASES.map(({ key, icon }) => (
+            <FeatureCard
+              key={key}
+              icon={icon}
+              title={t(`useCases.items.${key}.title`)}
+            >
+              {t(`useCases.items.${key}.description`)}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+        <Callout icon={TrendingUp} className="mt-6 md:mt-8">
+          <Span className="font-semibold">{t("referral.title")}</Span>{" "}
+          <Span className="text-muted-foreground">
             {t("referral.description")}
-          </P>
-          <Button variant="outline" asChild>
-            <Link href={`/${locale}/story/referral`}>
-              {t("referral.cta")}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </Div>
-
-        {/* CTA */}
-        <Div className="text-center space-y-4">
-          <H2 className="text-2xl md:text-3xl font-bold">{t("cta.title")}</H2>
-          <P className="text-muted-foreground max-w-xl mx-auto">
-            {t("cta.subtitle")}
-          </P>
-          <Div className="flex flex-wrap justify-center gap-3 pt-2">
-            <Button size="lg" asChild>
-              <Link href={`/${locale}/chat`}>
-                {t("cta.primary")}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href={`/${locale}/story/blog`}>{t("cta.secondary")}</Link>
-            </Button>
+          </Span>
+          <Div className="mt-2">
+            <CardLink
+              href={`/${locale}/story/earn`}
+              label={t("referral.cta")}
+            />
           </Div>
-        </Div>
-      </Div>
+        </Callout>
+      </PageSection>
+
+      <CtaBand
+        title={t("cta.title")}
+        subtitle={t("cta.subtitle")}
+        actions={
+          <>
+            <Cta href={`/${locale}/threads`} label={t("cta.primary")} />
+            <Cta
+              href={`/${locale}/story/blog`}
+              label={t("cta.secondary")}
+              variant="secondary"
+            />
+          </>
+        }
+      />
     </Div>
   );
 }

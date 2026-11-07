@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
       content: "Gesamt-Credits",
     },
     pack: {
+      qtyCredits: "{{count}} Credits",
       title: "Credit-Paket",
       description: "Einmaliges Credit-Paket für KI-Nutzung",
       perPack: "/ Paket",

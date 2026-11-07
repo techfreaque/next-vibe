@@ -1059,7 +1059,7 @@ export const translations = {
     title: "Emulate",
     titleShort: "Emulate",
     description:
-      "Emulate network conditions (offline/3G/4G) or CPU throttling on the current page.",
+      "Emulate network conditions (offline/3G/4G) or CPU throttling on the current page. Each call is absolute: omitted fields are reset. A user agent override applies from the next navigation, so reload the page after setting it.",
     dynamicTitle: "Emulate: {{config}}",
     form: {
       label: "Emulate Device",

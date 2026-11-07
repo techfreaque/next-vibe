@@ -1,0 +1,11 @@
+{
+  "url": "https://publisher.scrappey.com/api/v1?key=%5Bredacted%5D",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "cmd": "request.get",
+    "url": "https://example.com/"
+  }
+}

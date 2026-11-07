@@ -596,41 +596,19 @@ export const translations = {
     },
   },
   onboarding: {
-    back: "Back",
-    welcome: {
-      title: "One AI for everything. The right one for each thing.",
-      line1:
-        "A companion for everyday conversation. Specialists for coding, research, writing - you pick one when the task calls for it.",
-      line2: "Same chat. You switch when it matters. Takes seconds.",
-      line3: "Let's get you set up in under a minute.",
-      continue: "Get Started",
-    },
-    guest: {
-      title: "You're browsing as a guest",
-      line1:
-        "Your settings, companion, and chat history are saved locally on this device only.",
-      line2:
-        "Sign in to keep everything synced across devices - and make sure you never lose your setup.",
-      signIn: "Sign In / Create Account",
-      continueAnyway: "Continue as Guest",
-      note: "You can sign in later from the menu at any time.",
-    },
-    companion: {
-      title: "Choose your companion",
-      subtitle: "Your main chat partner for everyday use",
-      modelTitle: "Which model should power it?",
-      customSetup: "Advanced setup →",
-      next: "Next",
-      selectFirst: "Pick a companion to continue",
+    setup: {
+      title: "Set up your AI",
+      subtitle:
+        "Pick who you talk to. Add specialists if you want. Change anything later.",
+      companionLabel: "Your companion",
+      specialistsLabel: "Add specialists",
+      optional: "optional",
+      guestNote: "Guest mode - your setup lives on this device only.",
+      signIn: "Sign in to sync",
+      start: "Start chatting",
+      saving: "Setting up...",
     },
     usecases: {
-      title: "What will you mostly use it for?",
-      subtitle:
-        "We'll add the right specialists to your AI's toolkit automatically.",
-      saving: "Setting up...",
-      start: "Start Chatting",
-      hintNoneSelected:
-        "Select areas to set up specialist skills, or tap Start to skip",
       noProviderAvailable:
         "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
       coding: {

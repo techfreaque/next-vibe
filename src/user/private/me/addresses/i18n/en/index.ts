@@ -3,7 +3,7 @@ export const translations = {
   tag: "addresses",
 
   list: {
-    title: "My Addresses",
+    title: "Billing addresses",
     titleShort: "My Addresses",
     description: "List your saved addresses",
     response: {
@@ -17,7 +17,7 @@ export const translations = {
       billing: "Billing",
       delivery: "Delivery",
       empty: "No saved addresses",
-      emptyHint: "Save addresses for faster checkout",
+      emptyHint: "Save one to skip typing it at checkout.",
       emptyCta: "Add your first address",
       loading: "Loading addresses…",
     },

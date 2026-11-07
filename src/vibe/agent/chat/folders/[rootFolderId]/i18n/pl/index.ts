@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       },
     },
     folderList: {
+      menu: "Akcje folderu",
       newChatInFolder: "Nowy czat w folderze",
       moveUp: "Przenieś wyżej",
       moveDown: "Przenieś niżej",

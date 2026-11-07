@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     admin: "admin",
   },
   get: {
+    perDayUnit: "Credits/Tag",
     title: "Öffentliches Gratis-Tageslimit abrufen",
     titleShort: "Gratis-Limit",
     description: "Heutige globale Gratis-Guthaben-Ausgaben und Limit anzeigen",

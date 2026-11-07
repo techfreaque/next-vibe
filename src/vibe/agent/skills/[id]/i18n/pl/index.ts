@@ -61,14 +61,14 @@ export const translations: typeof enTranslations = {
     addAnother: "Dodaj kolejną",
     addAnotherTooltip: "Dodaj kolejną instancję tej postaci do swojej kolekcji",
     variants: {
-      title: "Warianty",
+      title: "Wybierz model",
     },
     addToCollection: "Dodaj do swojej kolekcji:",
-    addAllToFavorites: "Dodaj wszystkie",
-    quickAdd: "Szybko dodaj",
+    addAllToFavorites: "Dodaj wszystkie modele",
+    quickAdd: "Dodaj",
     tweakAndAdd: "Dostosuj i dodaj",
     edit: "Edytuj",
-    copyAndCustomize: "Kopiuj i dostosuj",
+    copyAndCustomize: "Stwórz własną wersję",
     delete: "Usuń",
     vote: "Oceń",
     report: "Zgłoś",
@@ -191,6 +191,7 @@ export const translations: typeof enTranslations = {
     },
     share: {
       button: "Udostepnij i zarabiaj",
+      titleNamed: "Udostępnij {{name}} i zarabiaj",
       title: "Udostepnij ten skill i zarabiaj",
       description:
         "Udostepnij ten skill ze swoim linkiem polecajacym. Zarabiaj 10% prowizji od kazdego nowego uzytkownika.",

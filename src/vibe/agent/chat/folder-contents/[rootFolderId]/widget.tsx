@@ -372,7 +372,9 @@ function ThreadRow({
   };
 
   const hasMenuItems =
-    item.canEdit ?? item.canManagePermissions ?? item.canDelete;
+    Boolean(item.canEdit) ||
+    Boolean(item.canManagePermissions) ||
+    Boolean(item.canDelete);
 
   return (
     <>
@@ -421,196 +423,201 @@ function ThreadRow({
         {!isEditing &&
           (isHovered || isTouched || isActive || isTouch) &&
           hasMenuItems && (
-            <DropdownMenu
-              open={dropdownOpen}
-              onOpenChange={(open) => {
-                setDropdownOpen(open);
-                if (!open) {
-                  setIsHovered(false);
-                  setIsTouched(false);
-                }
-              }}
-            >
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDropdownOpen(true);
-                  }}
-                >
-                  <MoreVertical className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                onCloseAutoFocus={(e) => e?.preventDefault()}
-                onClick={(e) => e.stopPropagation()}
+            <Div onClick={(e) => e.stopPropagation()}>
+              {/* Taps on the menu must never reach the row (it navigates) */}
+              <DropdownMenu
+                open={dropdownOpen}
+                onOpenChange={(open) => {
+                  setDropdownOpen(open);
+                  if (!open) {
+                    setIsHovered(false);
+                    setIsTouched(false);
+                  }
+                }}
               >
-                {item.canEdit && (
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      setDropdownOpen(false);
-                      void mutateThread({ pinned: !item.pinned });
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    aria-label={t("widget.actions.menu")}
+                    title={t("widget.actions.menu")}
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen(true);
                     }}
-                    className="cursor-pointer"
                   >
-                    {item.pinned ? (
-                      <PinOff className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Pin className="h-4 w-4 mr-2" />
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  onCloseAutoFocus={(e) => e?.preventDefault()}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {item.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setDropdownOpen(false);
+                        void mutateThread({ pinned: !item.pinned });
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {item.pinned ? (
+                        <PinOff className="h-4 w-4 mr-2" />
+                      ) : (
+                        <Pin className="h-4 w-4 mr-2" />
+                      )}
+                      {item.pinned
+                        ? tFolders("widget.folderList.unpin")
+                        : tFolders("widget.folderList.pin")}
+                    </DropdownMenuItem>
+                  )}
+                  {item.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setDropdownOpen(false);
+                        setIsEditing(true);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      {tFolders("widget.actions.rename")}
+                    </DropdownMenuItem>
+                  )}
+                  {item.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setDropdownOpen(false);
+                        void mutateThread({ archived: !item.archived });
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {item.archived ? (
+                        <ArchiveRestore className="h-4 w-4 mr-2" />
+                      ) : (
+                        <Archive className="h-4 w-4 mr-2" />
+                      )}
+                      {item.archived
+                        ? t("widget.actions.unarchive")
+                        : t("widget.actions.archive")}
+                    </DropdownMenuItem>
+                  )}
+                  {item.canEdit &&
+                    item.rootFolderId === DefaultFolderId.PRIVATE && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setDropdownOpen(false);
+                            void (async (): Promise<void> => {
+                              // Remove from private folder cache
+                              apiClient.updateEndpointData(
+                                definitions.GET,
+                                logger,
+                                (old) => {
+                                  if (!old?.success) {
+                                    return old;
+                                  }
+                                  return success({
+                                    ...old.data,
+                                    items: old.data.items.filter(
+                                      (i) => i.id !== item.id,
+                                    ),
+                                  });
+                                },
+                                {
+                                  urlPathParams: {
+                                    rootFolderId: item.rootFolderId,
+                                  },
+                                  requestData: {
+                                    subFolderId: item.folderId ?? null,
+                                    threadIds: null,
+                                  },
+                                },
+                              );
+                              const threadDef =
+                                await import("../../threads/[threadId]/definition");
+                              await apiClient.mutate(
+                                threadDef.default.PATCH,
+                                logger,
+                                user,
+                                {
+                                  rootFolderId: DefaultFolderId.SHARED,
+                                  folderId: null,
+                                },
+                                { threadId: item.id },
+                                locale,
+                              );
+                            })();
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          {tFolders("widget.sharedThread.moveToShared")}
+                        </DropdownMenuItem>
+                      </>
                     )}
-                    {item.pinned
-                      ? tFolders("widget.folderList.unpin")
-                      : tFolders("widget.folderList.pin")}
-                  </DropdownMenuItem>
-                )}
-                {item.canEdit && (
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      setDropdownOpen(false);
-                      setIsEditing(true);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    {tFolders("widget.actions.rename")}
-                  </DropdownMenuItem>
-                )}
-                {item.canEdit && (
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      setDropdownOpen(false);
-                      void mutateThread({ archived: !item.archived });
-                    }}
-                    className="cursor-pointer"
-                  >
-                    {item.archived ? (
-                      <ArchiveRestore className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Archive className="h-4 w-4 mr-2" />
-                    )}
-                    {item.archived
-                      ? t("widget.actions.unarchive")
-                      : t("widget.actions.archive")}
-                  </DropdownMenuItem>
-                )}
-                {item.canEdit &&
-                  item.rootFolderId === DefaultFolderId.PRIVATE && (
+                  {item.canEdit && allFolders.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer">
+                          <FolderInput className="h-4 w-4 mr-2" />
+                          {t("widget.actions.moveToFolder")}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {item.folderId !== null && (
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setDropdownOpen(false);
+                                void mutateThread({ folderId: null });
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <Icon icon="folder" className="h-4 w-4 mr-2" />
+                              {getFolderName(item.rootFolderId, tChat)}
+                            </DropdownMenuItem>
+                          )}
+                          {allFolders.map((folder) => (
+                            <DropdownMenuItem
+                              key={folder.id}
+                              onSelect={() => {
+                                setDropdownOpen(false);
+                                void mutateThread({ folderId: folder.id });
+                              }}
+                              disabled={item.folderId === folder.id}
+                              className="cursor-pointer"
+                            >
+                              <Icon
+                                icon={folder.icon ?? "folder"}
+                                className="h-4 w-4 mr-2"
+                              />
+                              {folder.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    </>
+                  )}
+                  {item.canDelete && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onSelect={() => {
                           setDropdownOpen(false);
-                          void (async (): Promise<void> => {
-                            // Remove from private folder cache
-                            apiClient.updateEndpointData(
-                              definitions.GET,
-                              logger,
-                              (old) => {
-                                if (!old?.success) {
-                                  return old;
-                                }
-                                return success({
-                                  ...old.data,
-                                  items: old.data.items.filter(
-                                    (i) => i.id !== item.id,
-                                  ),
-                                });
-                              },
-                              {
-                                urlPathParams: {
-                                  rootFolderId: item.rootFolderId,
-                                },
-                                requestData: {
-                                  subFolderId: item.folderId ?? null,
-                                  threadIds: null,
-                                },
-                              },
-                            );
-                            const threadDef =
-                              await import("../../threads/[threadId]/definition");
-                            await apiClient.mutate(
-                              threadDef.default.PATCH,
-                              logger,
-                              user,
-                              {
-                                rootFolderId: DefaultFolderId.SHARED,
-                                folderId: null,
-                              },
-                              { threadId: item.id },
-                              locale,
-                            );
-                          })();
+                          setDeleteDialogOpen(true);
                         }}
-                        className="cursor-pointer"
+                        className="text-destructive cursor-pointer"
                       >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        {tFolders("widget.sharedThread.moveToShared")}
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {tFolders("widget.common.delete")}
                       </DropdownMenuItem>
                     </>
                   )}
-                {item.canEdit && allFolders.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="cursor-pointer">
-                        <FolderInput className="h-4 w-4 mr-2" />
-                        {t("widget.actions.moveToFolder")}
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        {item.folderId !== null && (
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setDropdownOpen(false);
-                              void mutateThread({ folderId: null });
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {getFolderName(item.rootFolderId, tChat)}
-                          </DropdownMenuItem>
-                        )}
-                        {allFolders.map((folder) => (
-                          <DropdownMenuItem
-                            key={folder.id}
-                            onSelect={() => {
-                              setDropdownOpen(false);
-                              void mutateThread({ folderId: folder.id });
-                            }}
-                            disabled={item.folderId === folder.id}
-                            className="cursor-pointer"
-                          >
-                            <Icon
-                              icon={folder.icon ?? "folder"}
-                              className="h-4 w-4 mr-2"
-                            />
-                            {folder.name}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  </>
-                )}
-                {item.canDelete && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setDeleteDialogOpen(true);
-                      }}
-                      className="text-destructive cursor-pointer"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      {tFolders("widget.common.delete")}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </Div>
           )}
 
         {isThreadStreaming && (
@@ -832,7 +839,9 @@ function ThreadRowShared({
   };
 
   const hasMenuItems =
-    item.canEdit ?? item.canManagePermissions ?? item.canDelete;
+    Boolean(item.canEdit) ||
+    Boolean(item.canManagePermissions) ||
+    Boolean(item.canDelete);
 
   /* eslint-disable i18next/no-literal-string */
   const shareStatusLine =
@@ -915,111 +924,116 @@ function ThreadRowShared({
           {!isEditing && (isHovered || isTouched || isActive || isTouch) && (
             <Div className="flex items-center gap-1 shrink-0">
               {hasMenuItems && (
-                <DropdownMenu
-                  open={dropdownOpen}
-                  onOpenChange={(open) => {
-                    setDropdownOpen(open);
-                    if (!open) {
-                      setIsHovered(false);
-                      setIsTouched(false);
-                    }
-                  }}
-                >
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-6"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDropdownOpen(true);
-                      }}
-                    >
-                      <MoreVertical className="h-3.5 w-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    onCloseAutoFocus={(e) => e?.preventDefault()}
-                    onClick={(e) => e.stopPropagation()}
+                <Div onClick={(e) => e.stopPropagation()}>
+                  {/* Taps on the menu must never reach the row (it navigates) */}
+                  <DropdownMenu
+                    open={dropdownOpen}
+                    onOpenChange={(open) => {
+                      setDropdownOpen(open);
+                      if (!open) {
+                        setIsHovered(false);
+                        setIsTouched(false);
+                      }
+                    }}
                   >
-                    {item.canEdit && (
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setDropdownOpen(false);
-                          void mutateThread({ pinned: !item.pinned });
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        aria-label={tFolders("widget.folderList.menu")}
+                        title={tFolders("widget.folderList.menu")}
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDropdownOpen(true);
                         }}
-                        className="cursor-pointer"
                       >
-                        {item.pinned ? (
-                          <PinOff className="h-4 w-4 mr-2" />
-                        ) : (
-                          <Pin className="h-4 w-4 mr-2" />
-                        )}
-                        {item.pinned
-                          ? tFolders("widget.folderList.unpin")
-                          : tFolders("widget.folderList.pin")}
-                      </DropdownMenuItem>
-                    )}
-                    {item.canEdit && (
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setDropdownOpen(false);
-                          setIsEditing(true);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        {tFolders("widget.actions.rename")}
-                      </DropdownMenuItem>
-                    )}
-                    {item.canEdit && (
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setDropdownOpen(false);
-                          void mutateThread({ archived: !item.archived });
-                        }}
-                        className="cursor-pointer"
-                      >
-                        {item.archived ? (
-                          <ArchiveRestore className="h-4 w-4 mr-2" />
-                        ) : (
-                          <Archive className="h-4 w-4 mr-2" />
-                        )}
-                        {item.archived
-                          ? t("widget.actions.unarchive")
-                          : t("widget.actions.archive")}
-                      </DropdownMenuItem>
-                    )}
-                    {item.canEdit && (
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setDropdownOpen(false);
-                          setShareDialogOpen(true);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        {tFolders("widget.sharedThread.shareAction")}
-                      </DropdownMenuItem>
-                    )}
-                    {item.canDelete && (
-                      <>
-                        <DropdownMenuSeparator />
+                        <MoreVertical className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      onCloseAutoFocus={(e) => e?.preventDefault()}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {item.canEdit && (
                         <DropdownMenuItem
                           onSelect={() => {
                             setDropdownOpen(false);
-                            setDeleteDialogOpen(true);
+                            void mutateThread({ pinned: !item.pinned });
                           }}
-                          className="text-destructive cursor-pointer"
+                          className="cursor-pointer"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          {tFolders("widget.common.delete")}
+                          {item.pinned ? (
+                            <PinOff className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Pin className="h-4 w-4 mr-2" />
+                          )}
+                          {item.pinned
+                            ? tFolders("widget.folderList.unpin")
+                            : tFolders("widget.folderList.pin")}
                         </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      )}
+                      {item.canEdit && (
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setDropdownOpen(false);
+                            setIsEditing(true);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          {tFolders("widget.actions.rename")}
+                        </DropdownMenuItem>
+                      )}
+                      {item.canEdit && (
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setDropdownOpen(false);
+                            void mutateThread({ archived: !item.archived });
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {item.archived ? (
+                            <ArchiveRestore className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Archive className="h-4 w-4 mr-2" />
+                          )}
+                          {item.archived
+                            ? t("widget.actions.unarchive")
+                            : t("widget.actions.archive")}
+                        </DropdownMenuItem>
+                      )}
+                      {item.canEdit && (
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setDropdownOpen(false);
+                            setShareDialogOpen(true);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          {tFolders("widget.sharedThread.shareAction")}
+                        </DropdownMenuItem>
+                      )}
+                      {item.canDelete && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setDropdownOpen(false);
+                              setDeleteDialogOpen(true);
+                            }}
+                            className="text-destructive cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            {tFolders("widget.common.delete")}
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Div>
               )}
             </Div>
           )}
@@ -1432,141 +1446,146 @@ function FolderRow({
               </Button>
             )}
             {hasMenuItems && (
-              <DropdownMenu
-                open={dropdownOpen}
-                onOpenChange={(open) => {
-                  setDropdownOpen(open);
-                  if (!open) {
-                    setIsHovered(false);
-                  }
-                }}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => setDropdownOpen(true)}
-                  >
-                    <MoreVertical className="h-3.5 w-3.5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  onCloseAutoFocus={(e) => e.preventDefault()}
+              <Div onClick={(e) => e.stopPropagation()}>
+                {/* Taps on the menu must never reach the row (it navigates) */}
+                <DropdownMenu
+                  open={dropdownOpen}
+                  onOpenChange={(open) => {
+                    setDropdownOpen(open);
+                    if (!open) {
+                      setIsHovered(false);
+                    }
+                  }}
                 >
-                  {!isDefault && item.canManage && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        void mutateFolder({ pinned: !item.pinned });
-                      }}
-                      className="cursor-pointer"
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-label={t("widget.folderList.menu")}
+                      title={t("widget.folderList.menu")}
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setDropdownOpen(true)}
                     >
-                      {item.pinned ? (
-                        <PinOff className="h-4 w-4 mr-2" />
-                      ) : (
-                        <Pin className="h-4 w-4 mr-2" />
-                      )}
-                      {item.pinned
-                        ? t("widget.folderList.unpin")
-                        : t("widget.folderList.pin")}
-                    </DropdownMenuItem>
-                  )}
-                  {item.canManage && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setNewSubfolderDialogOpen(true);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <FolderPlus className="h-4 w-4 mr-2" />
-                      {t("widget.folderList.newSubfolder")}
-                    </DropdownMenuItem>
-                  )}
-                  {item.canManagePermissions && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setPermissionsDialogOpen(true);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <Shield className="h-4 w-4 mr-2" />
-                      {t("widget.folderList.managePermissions")}
-                    </DropdownMenuItem>
-                  )}
-                  {!isDefault && item.canManage && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setRenameDialogOpen(true);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      {t("widget.folderList.renameFolder")}
-                    </DropdownMenuItem>
-                  )}
-                  {!isDefault &&
-                    item.canManage &&
-                    (item.parentId !== null ||
-                      allFolders.some((f) => f.id !== item.id)) && (
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="cursor-pointer">
-                          <FolderInput className="h-4 w-4 mr-2" />
-                          {t("widget.folderList.moveToFolder")}
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          {item.parentId !== null && (
-                            <DropdownMenuItem
-                              onSelect={() => {
-                                setDropdownOpen(false);
-                                void mutateFolder({ parentId: null });
-                              }}
-                              className="cursor-pointer"
-                            >
-                              <Icon icon="folder" className="h-4 w-4 mr-2" />
-                              {getFolderName(activeRootFolderId, tChat)}
-                            </DropdownMenuItem>
-                          )}
-                          {allFolders
-                            .filter((f) => f.id !== item.id)
-                            .map((folder) => (
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                  >
+                    {!isDefault && item.canManage && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          void mutateFolder({ pinned: !item.pinned });
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {item.pinned ? (
+                          <PinOff className="h-4 w-4 mr-2" />
+                        ) : (
+                          <Pin className="h-4 w-4 mr-2" />
+                        )}
+                        {item.pinned
+                          ? t("widget.folderList.unpin")
+                          : t("widget.folderList.pin")}
+                      </DropdownMenuItem>
+                    )}
+                    {item.canManage && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setNewSubfolderDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <FolderPlus className="h-4 w-4 mr-2" />
+                        {t("widget.folderList.newSubfolder")}
+                      </DropdownMenuItem>
+                    )}
+                    {item.canManagePermissions && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setPermissionsDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        {t("widget.folderList.managePermissions")}
+                      </DropdownMenuItem>
+                    )}
+                    {!isDefault && item.canManage && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setRenameDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        {t("widget.folderList.renameFolder")}
+                      </DropdownMenuItem>
+                    )}
+                    {!isDefault &&
+                      item.canManage &&
+                      (item.parentId !== null ||
+                        allFolders.some((f) => f.id !== item.id)) && (
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="cursor-pointer">
+                            <FolderInput className="h-4 w-4 mr-2" />
+                            {t("widget.folderList.moveToFolder")}
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            {item.parentId !== null && (
                               <DropdownMenuItem
-                                key={folder.id}
                                 onSelect={() => {
                                   setDropdownOpen(false);
-                                  void mutateFolder({ parentId: folder.id });
+                                  void mutateFolder({ parentId: null });
                                 }}
-                                disabled={item.parentId === folder.id}
                                 className="cursor-pointer"
                               >
-                                <Icon
-                                  icon={folder.icon ?? "folder"}
-                                  className="h-4 w-4 mr-2"
-                                />
-                                {folder.name}
+                                <Icon icon="folder" className="h-4 w-4 mr-2" />
+                                {getFolderName(activeRootFolderId, tChat)}
                               </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
+                            )}
+                            {allFolders
+                              .filter((f) => f.id !== item.id)
+                              .map((folder) => (
+                                <DropdownMenuItem
+                                  key={folder.id}
+                                  onSelect={() => {
+                                    setDropdownOpen(false);
+                                    void mutateFolder({ parentId: folder.id });
+                                  }}
+                                  disabled={item.parentId === folder.id}
+                                  className="cursor-pointer"
+                                >
+                                  <Icon
+                                    icon={folder.icon ?? "folder"}
+                                    className="h-4 w-4 mr-2"
+                                  />
+                                  {folder.name}
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      )}
+                    {!isDefault && item.canDelete && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
+                          setDeleteDialogOpen(true);
+                        }}
+                        className="text-destructive cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {t("widget.folderList.deleteFolder")}
+                      </DropdownMenuItem>
                     )}
-                  {!isDefault && item.canDelete && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setDeleteDialogOpen(true);
-                      }}
-                      className="text-destructive cursor-pointer"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      {t("widget.folderList.deleteFolder")}
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </Div>
             )}
           </Div>
         </Div>

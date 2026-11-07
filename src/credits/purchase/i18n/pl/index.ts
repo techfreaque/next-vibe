@@ -43,6 +43,7 @@ export const translations: typeof enTranslations = {
       content: "Całkowita liczba kredytów",
     },
     pack: {
+      qtyCredits: "{{count}} kredytów",
       title: "Pakiet kredytów",
       description: "Jednorazowy pakiet kredytów do użycia AI",
       perPack: "/ pakiet",

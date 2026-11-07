@@ -18,13 +18,12 @@ export const translations: typeof enTranslations = {
   },
 
   hero: {
-    eyebrow: "next-vibe Entwicklerplattform",
-    title:
-      "Wenn ein Mensch es am Computer tun kann, kann next-vibe es automatisieren.",
+    eyebrow: "Karriere",
+    title: "Keine Stellenbörse. Die Arbeit ist offen.",
     subtitle:
-      "Eine Endpoint-Definition wird gleichzeitig zu Webformular, CLI-Befehl, MCP-Tool, nativem Screen und KI-Skill. Von kleinen Skripten bis zur vollständigen Produktionslinienautomatisierung.",
-    ctaPrimary: "Jetzt starten",
-    ctaSecondary: "Dokumentation lesen",
+      "Hier stehen keine Stellenanzeigen. Die Arbeit ist offen: next-vibe für Kunden ausliefern, echte Unternehmen automatisieren, mit veröffentlichten Skills verdienen. Alles, was du brauchst, liegt auf GitHub.",
+    ctaPrimary: "Jetzt loslegen",
+    ctaSecondary: "Doku lesen",
   },
 
   audience: {
@@ -84,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Verkaufe, was du baust",
         description:
-          "Automatisierung als Skill verpacken. Link teilen. 15% wiederkehrende Provision von jedem Signup über deine URL.",
+          "Automatisierung als Skill verpacken. Link teilen. 10% von jeder Zahlung jedes Users, der sich darüber anmeldet - wiederkehrend, solange er zahlt.",
       },
     },
   },
@@ -108,7 +107,7 @@ export const translations: typeof enTranslations = {
   referral: {
     title: "Bauen. Teilen. Daran verdienen.",
     description:
-      "Jeder veröffentlichte Skill trägt deinen Referral-Link. 10% direkt, 15% via Skill, 20% gestapelt. Wiederkehrend für immer von jedem User, der über dich kommt.",
+      "Jeder geteilte Skill trägt deinen Referral-Link. 10% von jeder Zahlung der User, die du bringst. Plus 5%, wenn der Link eines anderen einen User zu deinem Skill führt. Wiederkehrend, solange sie zahlen.",
     cta: "So funktioniert die Skill Economy",
   },
 

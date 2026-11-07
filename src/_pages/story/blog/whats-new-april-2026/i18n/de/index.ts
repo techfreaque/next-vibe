@@ -12,8 +12,6 @@ export const translations: typeof enTranslations = {
 
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "{{appName}} - ",
-    icon: "🧭",
     category: "Produkt-Update",
     readTime: "7 Min. Lesezeit",
     title: "123 Modelle. Sehen, hören, erschaffen. Ein Begleiter.",
@@ -157,9 +155,9 @@ export const translations: typeof enTranslations = {
     p1: "Wenn du {{appName}} früher ausprobiert hast und eine schlechte Erfahrung hattest - sag uns, was schiefgelaufen ist. Nicht zum Streiten. Nur um es zu beheben.",
     p2: "Wenn du es jetzt nutzt und etwas fehlt oder kaputt ist - genauso. Was wir als nächstes bauen, hängt direkt davon ab, was Nutzer wirklich sagen.",
     rewardTitle:
-      "{{credits}} Credits fuer nuetzliches Feedback — ein voller Monat gratis",
+      "{{credits}} Credits für nützliches Feedback — ein voller Monat gratis",
     rewardBody:
-      "Sag uns, was kaputt ist, was fehlt, was du dir wuenschst. Wenn dein Feedback uns hilft, ein echtes Problem zu finden oder ein echtes Beduerfnis zu verstehen, fuegen wir {{credits}} Credits zu deinem Konto hinzu — ein kompletter Monat Abo. Kein Haken.",
+      "Sag uns, was kaputt ist, was fehlt, was du dir wünschst. Wenn dein Feedback uns hilft, ein echtes Problem zu finden oder ein echtes Bedürfnis zu verstehen, fügen wir {{credits}} Credits zu deinem Konto hinzu — ein kompletter Monat Abo. Kein Haken.",
     payingNote:
       "Zahlende Abonnenten: fehlende Must-have-Features kommen an die Spitze der Warteschlange. Nenn sie.",
     cta: "Feedback senden",
@@ -170,5 +168,11 @@ export const translations: typeof enTranslations = {
     p1: "Die App ist deutlich anders als sie war. Wenn du früh abgesprungen bist - und wir wissen, dass viele das getan haben - ist es einen neuen Versuch wert.",
     p2: "Und wenn du noch etwas Kaputtes findest: gut. Sag es uns. Genau das bringt Dinge voran.",
     cta: "{{appName}} öffnen",
+  },
+
+  cta: {
+    title: "123 Modelle. Ein Chat. Probier ihn aus.",
+    subtitle:
+      "Wähl einen Begleiter, wirf ihm jede Datei hin und sag uns, was noch hakt.",
   },
 };

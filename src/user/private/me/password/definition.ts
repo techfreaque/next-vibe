@@ -20,7 +20,14 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+
 import { scopedTranslation } from "./i18n";
+
+const PasswordChangeContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PasswordChangeContainer })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -39,13 +46,9 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "title",
-    description: "description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: PasswordChangeContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // === CURRENT PASSWORD VERIFICATION ===
       currentCredentials: objectField(scopedTranslation, {

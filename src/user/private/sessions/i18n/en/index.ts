@@ -2,12 +2,15 @@ export const translations = {
   category: "Users",
 
   widget: {
+    intro:
+      "Every device signed in to your account. Sign out anything you don't recognise.",
+    revokeFailed: "Couldn't sign that device out. Try again.",
     back: "Back",
     loading: "Loading sessions…",
     empty: "No active sessions",
     emptyHint: "A session is created each time you log in",
     browserSession: "Browser session",
-    revoke: "Revoke",
+    revoke: "Sign out",
     revoking: "Revoking…",
     currentSession: "Current",
     created: "Created",
@@ -16,7 +19,7 @@ export const translations = {
   },
 
   list: {
-    title: "My Sessions",
+    title: "Signed-in devices",
     titleShort: "My Sessions",
     description: "List all active sessions for your account",
     tag: "Sessions",

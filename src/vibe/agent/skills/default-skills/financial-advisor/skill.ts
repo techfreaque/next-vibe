@@ -104,7 +104,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.elonTusk" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_6,
+        manualModelId: ChatModelId.GROK_4_7,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -153,7 +153,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_OPUS_5,
+        manualModelId: ChatModelId.CLAUDE_OPUS_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -177,7 +177,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       variantName: "skills.financialAdvisor.variants.yolo" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_5_6_TERRA,
+        manualModelId: ChatModelId.GPT_6_1_TERRA,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

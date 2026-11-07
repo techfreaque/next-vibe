@@ -5,26 +5,19 @@ import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
-import { Button } from "next-vibe/ui/components/button";
-import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Code } from "next-vibe/ui/components/icons/Code";
-import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
-import { Link } from "next-vibe/ui/components/link";
-import { Markdown } from "next-vibe/ui/components/markdown";
-import { Separator } from "next-vibe/ui/components/separator";
+import { Database } from "next-vibe/ui/components/icons/Database";
+import { FileCode } from "next-vibe/ui/components/icons/FileCode";
+import { Github } from "next-vibe/ui/components/icons/Github";
+import { Layers } from "next-vibe/ui/components/icons/Layers";
+import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { X } from "next-vibe/ui/components/icons/X";
+import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
-import {
-  BlockQuote,
-  H1,
-  H2,
-  H3,
-  Lead,
-  Muted,
-  P,
-} from "next-vibe/ui/components/typography";
+import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import {
@@ -34,7 +27,20 @@ import {
 } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import { Architecture } from "../_components/architecture";
 import { ContactFormSection } from "../_components/contact-form-section";
+import { NextVibeShowcase } from "../_components/nextvibe-showcase";
+import {
+  Callout,
+  Cta,
+  CtaRow,
+  FeatureGrid,
+  PageHero,
+  PageSection,
+  StatGrid,
+  Step,
+  StepList,
+} from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -291,23 +297,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-// ─── Platform grid data ───────────────────────────────────────────────────────
-
-const SURFACE_COLORS = [
-  "border-l-violet-500",
-  "border-l-cyan-500",
-  "border-l-emerald-500",
-  "border-l-orange-500",
-  "border-l-pink-500",
-  "border-l-blue-500",
-  "border-l-amber-500",
-  "border-l-teal-500",
-  "border-l-indigo-500",
-  "border-l-red-500",
-  "border-l-purple-500",
-  "border-l-lime-500",
-  "border-l-sky-500",
-] as const;
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 type BannedPatternKey =
   | "any"
@@ -326,6 +316,33 @@ const BANNED_KEYS: BannedPatternKey[] = [
   "hardcodedStrings",
 ];
 
+/** Split a ```lang fenced snippet into language + raw code. */
+function unfence(markdown: string): { language: string; code: string } {
+  const lines = markdown.split("\n");
+  const language = (lines[0] ?? "").replace("```", "") || "text";
+  return { language, code: lines.slice(1, -1).join("\n") };
+}
+
+function CodeFile({
+  markdown,
+  filename,
+}: {
+  markdown: string;
+  filename: string;
+}): JSX.Element {
+  const { language, code } = unfence(markdown);
+  return (
+    <Div className="min-w-0 max-w-full">
+      <CodeSnippet
+        code={code}
+        language={language}
+        filename={filename}
+        variant="file"
+      />
+    </Div>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export function TanstackPage({
@@ -342,6 +359,7 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const docsUrl = `${GITHUB_REPO_URL}/blob/main/docs/README.md`;
 
   const publicUser: JWTPublicPayloadType = {
     isPublic: true,
@@ -349,331 +367,230 @@ export function TanstackPage({
     roles: [UserPermissionRole.PUBLIC],
   };
 
+  const files = [
+    {
+      icon: FileCode,
+      title: t("pattern.definitionTitle"),
+      body: t("pattern.definitionBody"),
+      code: definitionCode,
+      filename: "definition.ts",
+    },
+    {
+      icon: Database,
+      title: t("pattern.routeTitle"),
+      body: t("pattern.routeBody"),
+      code: routeCode,
+      filename: "repository.ts",
+    },
+    {
+      icon: Layers,
+      title: t("pattern.widgetTitle"),
+      body: t("pattern.widgetBody"),
+      code: widgetCode,
+      filename: "widget.tsx",
+    },
+  ];
+
   return (
-    <Div className="min-h-screen">
-      {/* ─── Hero ─────────────────────────────────────────────────────── */}
-      <Div className="relative overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-cyan-950/20">
-        <Div className="container mx-auto px-4 md:px-6 py-20 md:py-28">
-          <Div className="max-w-3xl">
-            <Span className="inline-block text-xs font-semibold tracking-widest uppercase text-cyan-500 mb-4">
-              {t("hero.eyebrow")}
-            </Span>
-            <H1 className="text-4xl md:text-6xl font-black tracking-tight leading-none mb-2">
-              {t("hero.title")}
-              <Span className="block text-cyan-400">
-                {t("hero.titleAccent")}
-              </Span>
-            </H1>
-            <Lead className="mt-6 text-muted-foreground max-w-2xl">
-              {t("hero.subtitle")}
-            </Lead>
-            <Div className="flex flex-wrap gap-3 mt-8">
-              <Button
-                asChild
-                size="lg"
-                className="bg-cyan-600 hover:bg-cyan-500 text-white"
-              >
-                <Link href={GITHUB_REPO_URL} target="_blank">
-                  <GitBranch className="mr-2 h-4 w-4" />
-                  {t("hero.ctaGithub")}
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link
-                  href={`${GITHUB_REPO_URL}/blob/main/docs/README.md`}
-                  target="_blank"
-                >
-                  {t("hero.ctaDocs")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </Div>
-          </Div>
+    <Div className="min-h-screen bg-background">
+      <PageHero
+        eyebrow={t("hero.eyebrow")}
+        eyebrowIcon={Code}
+        title={
+          <>
+            {t("hero.title")}{" "}
+            <Span className="text-primary">{t("hero.titleAccent")}</Span>
+          </>
+        }
+        subtitle={t("hero.subtitle")}
+        actions={
+          <>
+            <Cta
+              href={GITHUB_REPO_URL}
+              label={t("hero.ctaGithub")}
+              icon={Github}
+              external
+            />
+            <Cta
+              href={docsUrl}
+              label={t("hero.ctaDocs")}
+              variant="secondary"
+              arrow
+              external
+            />
+          </>
+        }
+      >
+        <StatGrid
+          items={[
+            { value: `${endpointCount}+`, label: t("hero.stat1Label") },
+            { value: t("hero.stat2Value"), label: t("hero.stat2Label") },
+            { value: PLATFORM_COUNT, label: t("hero.stat3Label") },
+            { value: t("hero.stat4Value"), label: t("hero.stat4Label") },
+          ]}
+        />
+      </PageHero>
 
-          {/* Stats */}
-          <Div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-2xl">
-            {(
-              [
-                { value: `${endpointCount}+`, label: t("hero.stat1Label") },
-                { value: t("hero.stat2Value"), label: t("hero.stat2Label") },
-                { value: String(PLATFORM_COUNT), label: t("hero.stat3Label") },
-                { value: t("hero.stat4Value"), label: t("hero.stat4Label") },
-              ] as const
-            ).map((stat) => (
-              <Div key={stat.label}>
-                <Div className="text-3xl font-black text-cyan-400">
-                  {stat.value}
-                </Div>
-                <Muted className="text-sm mt-1">{stat.label}</Muted>
-              </Div>
-            ))}
-          </Div>
-        </Div>
-      </Div>
-
-      {/* ─── Problem ──────────────────────────────────────────────────── */}
-      <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-        <Div className="max-w-3xl">
-          <Span className="text-xs font-semibold tracking-widest uppercase text-orange-500 mb-3 block">
-            {t("problem.eyebrow")}
-          </Span>
-          <H2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-            {t("problem.title")}
-          </H2>
-          <P className="text-muted-foreground text-lg mb-8">
-            {t("problem.subtitle")}
-          </P>
-          <Div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-            {ENDPOINT_PLATFORMS.map((key) => (
-              <Div
-                key={key}
-                className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/30 px-4 py-3 text-sm text-muted-foreground line-through decoration-red-500/60"
-              >
-                <Span className="text-red-500 font-mono text-xs">✕</Span>
-                {t(`surfaces.items.${key}.label`)}
-              </Div>
-            ))}
-          </Div>
-          <BlockQuote className="border-l-cyan-500 bg-cyan-950/20 not-italic font-semibold text-foreground">
-            {t("problem.callout")}
-          </BlockQuote>
-        </Div>
-      </Div>
-
-      <Separator />
-
-      {/* ─── The Pattern ──────────────────────────────────────────────── */}
-      <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-        <Span className="text-xs font-semibold tracking-widest uppercase text-cyan-500 mb-3 block">
-          {t("pattern.eyebrow")}
-        </Span>
-        <H2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-          {t("pattern.title")}
-        </H2>
-        <P className="text-muted-foreground text-lg mb-12 max-w-2xl">
-          {t("pattern.subtitle")}
-        </P>
-
-        <Div className="space-y-10 max-w-3xl">
-          {/* definition.ts */}
-          <Div className="space-y-3">
-            <Div className="flex items-center gap-2">
-              <Code className="h-4 w-4 text-cyan-400" />
-              <H3 className="font-bold text-sm">
-                {t("pattern.definitionTitle")}
-              </H3>
-            </Div>
-            <P className="text-sm text-muted-foreground">
-              {t("pattern.definitionBody")}
-            </P>
-            <Markdown content={definitionCode} />
-          </Div>
-
-          {/* route.ts */}
-          <Div className="space-y-3">
-            <Div className="flex items-center gap-2">
-              <Code className="h-4 w-4 text-violet-400" />
-              <H3 className="font-bold text-sm">{t("pattern.routeTitle")}</H3>
-            </Div>
-            <P className="text-sm text-muted-foreground">
-              {t("pattern.routeBody")}
-            </P>
-            <Markdown content={routeCode} />
-          </Div>
-
-          {/* widget.tsx */}
-          <Div className="space-y-3">
-            <Div className="flex items-center gap-2">
-              <Code className="h-4 w-4 text-emerald-400" />
-              <H3 className="font-bold text-sm">{t("pattern.widgetTitle")}</H3>
-            </Div>
-            <P className="text-sm text-muted-foreground">
-              {t("pattern.widgetBody")}
-            </P>
-            <Markdown content={widgetCode} />
-          </Div>
-        </Div>
-
-        <BlockQuote className="mt-12 border-l-red-500 bg-red-950/10 not-italic font-medium text-foreground max-w-xl">
-          {t("pattern.deleteLine")}
-        </BlockQuote>
-      </Div>
-
-      <Separator />
-
-      {/* ─── Surfaces ─────────────────────────────────────────────────── */}
-      <Div className="bg-muted/5">
-        <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-          <Span className="text-xs font-semibold tracking-widest uppercase text-cyan-500 mb-3 block">
-            {t("surfaces.eyebrow")}
-          </Span>
-          <H2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-            {t("surfaces.title")}
-          </H2>
-          <P className="text-muted-foreground text-lg mb-12 max-w-2xl">
-            {t("surfaces.subtitle")}
-          </P>
-
-          <Div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {ENDPOINT_PLATFORMS.map((key, i) => (
-              <Card
-                key={key}
-                className={`border-l-4 ${SURFACE_COLORS[i % SURFACE_COLORS.length]} bg-card/50`}
-              >
-                <CardContent className="pt-4 pb-4">
-                  <Div className="font-semibold text-sm mb-1">
-                    {t(`surfaces.items.${key}.label`)}
-                  </Div>
-                  <Muted className="text-xs leading-relaxed">
-                    {t(`surfaces.items.${key}.description`)}
-                  </Muted>
-                </CardContent>
-              </Card>
-            ))}
-          </Div>
-        </Div>
-      </Div>
-
-      <Separator />
-
-      {/* ─── TypeScript rules ─────────────────────────────────────────── */}
-      <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-        <Span className="text-xs font-semibold tracking-widest uppercase text-red-500 mb-3 block">
-          {t("typescript.eyebrow")}
-        </Span>
-        <H2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-          {t("typescript.title")}
-        </H2>
-        <P className="text-muted-foreground text-lg mb-12 max-w-2xl">
-          {t("typescript.subtitle")}
-        </P>
-
-        <Div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          {BANNED_KEYS.map((key) => (
+      {/* Problem */}
+      <PageSection
+        label={t("problem.eyebrow")}
+        title={t("problem.title")}
+        intro={t("problem.subtitle")}
+      >
+        <Div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {ENDPOINT_PLATFORMS.map((key) => (
             <Div
               key={key}
-              className="rounded-lg border border-border/60 bg-muted/30 p-4"
+              className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-muted-foreground"
             >
-              <Div className="flex items-center gap-2 mb-2">
-                <Span className="font-mono text-xs font-bold text-red-400 bg-red-950/30 px-2 py-0.5 rounded">
-                  {t(`typescript.patterns.${key}.name`)}
-                </Span>
-              </Div>
-              <Muted className="text-xs leading-relaxed">
-                {t(`typescript.patterns.${key}.description`)}
-              </Muted>
+              <X className="h-3.5 w-3.5 shrink-0 text-destructive" />
+              <Span className="truncate line-through decoration-destructive/40">
+                {t(`surfaces.items.${key}.label`)}
+              </Span>
             </Div>
           ))}
         </Div>
+        <Callout icon={CheckCircle} className="mt-6 font-medium">
+          {t("problem.callout")}
+        </Callout>
+      </PageSection>
 
-        <Div className="flex items-start gap-3 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-4 max-w-2xl">
-          <CheckCircle className="h-4 w-4 text-cyan-400 mt-0.5 shrink-0" />
-          <Muted className="text-sm">{t("typescript.vibeCheck")}</Muted>
-        </Div>
-      </Div>
+      <NextVibeShowcase locale={locale} />
 
-      <Separator />
-
-      {/* ─── Quickstart ───────────────────────────────────────────────── */}
-      <Div className="bg-muted/5">
-        <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-          <Span className="text-xs font-semibold tracking-widest uppercase text-cyan-500 mb-3 block">
-            {t("quickstart.eyebrow")}
-          </Span>
-          <H2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-            {t("quickstart.title")}
-          </H2>
-          <P className="text-muted-foreground text-lg mb-12">
-            {t("quickstart.subtitle", { appName })}
-          </P>
-
-          <Div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
-            {(
-              [
-                {
-                  num: 1,
-                  label: t("quickstart.step1.label"),
-                  desc: t("quickstart.step1.description"),
-                  code: cloneCode,
-                },
-                {
-                  num: 2,
-                  label: t("quickstart.step2.label"),
-                  desc: t("quickstart.step2.description"),
-                  code: startCode,
-                },
-                {
-                  num: 3,
-                  label: t("quickstart.step3.label"),
-                  desc: t("quickstart.step3.description"),
-                  code: null,
-                },
-                {
-                  num: 4,
-                  label: t("quickstart.step4.label"),
-                  desc: t("quickstart.step4.description", { appName }),
-                  code: aiCode,
-                },
-              ] as const
-            ).map((step) => (
-              <Div key={step.num} className="space-y-3">
-                <Div className="flex items-center gap-3">
-                  <Span className="flex-shrink-0 w-7 h-7 rounded-full bg-cyan-600 text-white text-xs font-bold flex items-center justify-center">
-                    {step.num}
-                  </Span>
-                  <Span className="font-semibold text-sm">{step.label}</Span>
+      {/* Pattern */}
+      <PageSection
+        tone="muted"
+        label={t("pattern.eyebrow")}
+        title={t("pattern.title")}
+        intro={t("pattern.subtitle")}
+      >
+        <Div className="flex flex-col gap-12 md:gap-16">
+          {files.map((file) => (
+            <Div
+              key={file.filename}
+              className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-10"
+            >
+              <Div>
+                <Div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <file.icon className="h-5 w-5" />
                 </Div>
-                <Muted className="text-xs leading-relaxed pl-10">
-                  {step.desc}
-                </Muted>
-                {step.code !== null && <Markdown content={step.code} />}
+                <H3 className="text-lg font-semibold tracking-tight">
+                  {file.title}
+                </H3>
+                <P className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {file.body}
+                </P>
               </Div>
-            ))}
-          </Div>
-
-          <Div className="flex flex-wrap gap-3 mt-10">
-            <Button asChild variant="outline" size="sm">
-              <Link
-                href={`${GITHUB_REPO_URL}/blob/main/docs/README.md`}
-                target="_blank"
-              >
-                {t("quickstart.docsLink")}
-                <ArrowRight className="ml-1 h-3 w-3" />
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link href={GITHUB_REPO_URL} target="_blank">
-                <GitBranch className="mr-1 h-3 w-3" />
-                {t("quickstart.githubLink")}
-              </Link>
-            </Button>
-          </Div>
+              <CodeFile markdown={file.code} filename={file.filename} />
+            </Div>
+          ))}
         </Div>
-      </Div>
+        <Callout icon={Trash2} tone="warning" className="mt-12 font-medium">
+          {t("pattern.deleteLine")}
+        </Callout>
+      </PageSection>
 
-      {/* ─── Enterprise CTA ───────────────────────────────────────────── */}
-      <Div className="border-t border-border/40 bg-muted/10">
-        <Div className="container mx-auto px-4 md:px-6 py-20 md:py-24">
-          <Div className="max-w-4xl mx-auto">
-            <Div className="text-center mb-10">
-              <Span className="text-xs font-semibold tracking-widest uppercase text-cyan-500 mb-3 block">
-                {t("enterprise.eyebrow")}
+      {/* Surfaces - interactive platform explorer */}
+      <Architecture locale={locale} />
+
+      {/* TypeScript rules */}
+      <PageSection
+        tone="muted"
+        label={t("typescript.eyebrow")}
+        title={t("typescript.title")}
+        intro={t("typescript.subtitle")}
+      >
+        <FeatureGrid columns={3}>
+          {BANNED_KEYS.map((key) => (
+            <Div
+              key={key}
+              className="rounded-xl border border-border bg-card p-5 shadow-xs"
+            >
+              <Span className="inline-block rounded-md border border-destructive/25 bg-destructive/10 px-2 py-0.5 font-mono text-sm font-semibold text-destructive">
+                {t(`typescript.patterns.${key}.name`)}
               </Span>
-              <H2 className="text-3xl md:text-4xl font-bold mb-3">
-                {t("enterprise.title")}
-              </H2>
-              <P className="text-muted-foreground max-w-xl mx-auto">
-                {t("enterprise.description")}
+              <P className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {t(`typescript.patterns.${key}.description`)}
               </P>
             </Div>
-            <ContactFormSection
-              locale={locale}
-              user={publicUser}
-              platform={platform}
+          ))}
+        </FeatureGrid>
+        <Callout icon={CheckCircle} tone="success" className="mt-6">
+          {t("typescript.vibeCheck")}
+        </Callout>
+      </PageSection>
+
+      {/* Quickstart */}
+      <PageSection
+        id="quickstart"
+        label={t("quickstart.eyebrow")}
+        title={t("quickstart.title")}
+        intro={t("quickstart.subtitle", { appName })}
+      >
+        <Div className="max-w-3xl">
+          <StepList>
+            <Step
+              number={1}
+              title={t("quickstart.step1.label")}
+              description={t("quickstart.step1.description")}
+            >
+              <CodeFile markdown={cloneCode} filename="terminal" />
+            </Step>
+            <Step
+              number={2}
+              title={t("quickstart.step2.label")}
+              description={t("quickstart.step2.description")}
+            >
+              <CodeFile markdown={startCode} filename="terminal" />
+            </Step>
+            <Step
+              number={3}
+              title={t("quickstart.step3.label")}
+              description={t("quickstart.step3.description")}
             />
-          </Div>
+            <Step
+              number={4}
+              title={t("quickstart.step4.label")}
+              description={t("quickstart.step4.description", { appName })}
+            >
+              <CodeFile markdown={aiCode} filename="prompt" />
+            </Step>
+          </StepList>
+          <CtaRow className="mt-10">
+            <Cta
+              href={docsUrl}
+              label={t("quickstart.docsLink")}
+              variant="secondary"
+              icon={BookOpen}
+              external
+            />
+            <Cta
+              href={GITHUB_REPO_URL}
+              label={t("quickstart.githubLink")}
+              variant="secondary"
+              icon={Github}
+              external
+            />
+          </CtaRow>
         </Div>
-      </Div>
+      </PageSection>
+
+      {/* Enterprise / contact */}
+      <PageSection
+        tone="muted"
+        label={t("enterprise.eyebrow")}
+        title={t("enterprise.title")}
+        intro={t("enterprise.description")}
+        centeredHeader
+      >
+        <Div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 shadow-xs md:p-10">
+          <ContactFormSection
+            locale={locale}
+            user={publicUser}
+            platform={platform}
+          />
+        </Div>
+      </PageSection>
     </Div>
   );
 }

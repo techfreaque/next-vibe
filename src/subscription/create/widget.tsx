@@ -20,6 +20,8 @@ import {
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
@@ -265,7 +267,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   }, [packValue?.checkoutUrl]);
 
   return (
-    <WidgetShell>
+    <WidgetShell className="gap-6">
       <CreditsTabHeader activeTab="buy" />
 
       {/* Subscription provider modal */}
@@ -431,7 +433,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
                       {adminAmount}
                     </Span>
                     <Span className="text-xs text-muted-foreground">
-                      credits
+                      {tPurchase("post.pack.qtyCredits", { count: "" }).trim()}
                     </Span>
                   </Div>
                   <Button
@@ -570,10 +572,10 @@ export function SubscriptionCreateContainer(): JSX.Element {
                   </Button>
                   <Div className="flex-1 flex flex-col items-center justify-center h-14 select-none">
                     <Span className="text-2xl font-bold tabular-nums">
-                      {capAmount2.toLocaleString()}
+                      {capAmount2.toLocaleString(locale)}
                     </Span>
                     <Span className="text-xs text-muted-foreground">
-                      credits/day
+                      {tCap("get.perDayUnit")}
                     </Span>
                   </Div>
                   <Button
@@ -601,11 +603,11 @@ export function SubscriptionCreateContainer(): JSX.Element {
       )}
 
       {/* Subscription + Credit Pack grid */}
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         {/* Subscription card */}
-        <Card className="relative overflow-hidden border-2 border-primary">
-          <CardHeader>
-            <CardTitle className="text-2xl">
+        <Card className="relative flex flex-col overflow-hidden rounded-xl border-primary shadow-md ring-1 ring-primary">
+          <CardHeader className="gap-1 p-5 sm:p-6">
+            <CardTitle className="text-xl tracking-tight">
               {t("buy.subscription.title")}
             </CardTitle>
             <CardDescription>
@@ -620,8 +622,8 @@ export function SubscriptionCreateContainer(): JSX.Element {
               })}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <Div className="flex items-center justify-center gap-2 p-1 bg-muted rounded-lg">
+          <CardContent className="flex flex-1 flex-col gap-6 p-5 pt-0 sm:p-6 sm:pt-0">
+            <Div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
               <Button
                 type="button"
                 variant={
@@ -631,7 +633,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 }
                 size="sm"
                 onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
-                className="flex-1"
+                className="h-10"
               >
                 {t("billing.monthly")}
               </Button>
@@ -644,14 +646,14 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 }
                 size="sm"
                 onClick={() => setBillingInterval(BillingInterval.YEARLY)}
-                className="flex-1"
+                className="h-10"
               >
                 {t("billing.yearly")}
               </Button>
             </Div>
             <Div className="flex flex-col gap-2">
               <Div className="flex items-baseline gap-1">
-                <Div className="text-4xl font-bold">
+                <Div className="text-4xl font-semibold tracking-tight tabular-nums">
                   {formatPrice(
                     currentSubscriptionPrice,
                     locale,
@@ -676,44 +678,41 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 </Div>
               )}
             </Div>
-            <Div className="flex flex-col gap-3 text-sm">
-              <Div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-primary" />
+            <Div className="flex flex-1 flex-col gap-3 text-sm">
+              <Div className="flex items-center gap-2.5">
+                <Zap className="h-4 w-4 shrink-0 text-primary" />
                 <Span>
                   {t("buy.subscription.features.credits", {
                     count: subscriptionCredits,
                   })}
                 </Span>
               </Div>
-              <Div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-warning" />
+              <Div className="flex items-center gap-2.5">
+                <Calendar className="h-4 w-4 shrink-0 text-primary" />
                 <Span>
                   {t("buy.subscription.features.expiry", {
                     modelCount: totalModelCount,
                   })}
                 </Span>
               </Div>
-              <Div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-success" />
+              <Div className="flex items-center gap-2.5">
+                <TrendingUp className="h-4 w-4 shrink-0 text-primary" />
                 <Span>{t("buy.subscription.features.bestFor")}</Span>
               </Div>
             </Div>
             {!isAuthenticated ? (
-              <Div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="flex-1 hidden sm:flex"
-                >
+              <Div className="flex flex-col gap-2 sm:flex-row">
+                <Button variant="outline" asChild className="h-11 flex-1">
                   <Link href={`/${locale}/user/login`}>{t("buy.login")}</Link>
                 </Button>
-                <Button asChild className="flex-1" size="lg">
+                <Button asChild className="h-11 flex-1">
                   <Link href={`/${locale}/user/signup`}>{t("buy.signup")}</Link>
                 </Button>
               </Div>
             ) : isLoadingSubscription ? null : hasActiveSubscription ? (
-              <Div className="p-3 rounded-lg bg-success/10 border border-success/30">
-                <Div className="text-sm text-success-foreground">
+              <Div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-3.5 py-3">
+                <CheckCircle className="h-4 w-4 shrink-0 text-success" />
+                <Div className="text-sm font-medium text-foreground">
                   {t("buy.subscription.buttonAlreadySubscribed")}
                 </Div>
               </Div>
@@ -734,18 +733,18 @@ export function SubscriptionCreateContainer(): JSX.Element {
         </Card>
 
         {/* Credit pack card */}
-        <Card className="relative overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-2xl">
+        <Card className="relative flex flex-col overflow-hidden rounded-xl">
+          <CardHeader className="gap-1 p-5 sm:p-6">
+            <CardTitle className="text-xl tracking-tight">
               {tPurchase("post.pack.title")}
             </CardTitle>
             <CardDescription>
               {tPurchase("post.pack.description")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-6">
+          <CardContent className="flex flex-1 flex-col gap-6 p-5 pt-0 sm:p-6 sm:pt-0">
             <Div className="flex items-baseline gap-1">
-              <Div className="text-4xl font-bold">
+              <Div className="text-4xl font-semibold tracking-tight tabular-nums">
                 {formatPrice(packPrice, locale, packProduct.currency)}
               </Div>
               <Div className="text-sm text-muted-foreground">
@@ -753,20 +752,20 @@ export function SubscriptionCreateContainer(): JSX.Element {
               </Div>
             </Div>
             <Div className="flex flex-col gap-3 text-sm">
-              <Div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-success" />
+              <Div className="flex items-center gap-2.5">
+                <Sparkles className="h-4 w-4 shrink-0 text-primary" />
                 <Span>
                   {tPurchase("post.pack.features.credits", {
                     count: packCredits,
                   })}
                 </Span>
               </Div>
-              <Div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-success" />
+              <Div className="flex items-center gap-2.5">
+                <AlertCircle className="h-4 w-4 shrink-0 text-primary" />
                 <Span>{tPurchase("post.pack.features.expiry")}</Span>
               </Div>
-              <Div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-info" />
+              <Div className="flex items-center gap-2.5">
+                <TrendingUp className="h-4 w-4 shrink-0 text-primary" />
                 <Span>{tPurchase("post.pack.features.bestFor")}</Span>
               </Div>
             </Div>
@@ -793,7 +792,9 @@ export function SubscriptionCreateContainer(): JSX.Element {
                         {packQty}
                       </Span>
                       <Span className="text-xs text-muted-foreground">
-                        {packQty === 1 ? "pack" : "packs"}
+                        {tPurchase("post.pack.qtyCredits", {
+                          count: totalCredits.toLocaleString(locale),
+                        })}
                       </Span>
                     </Div>
                     <Button
@@ -848,9 +849,9 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 )}
               </Div>
             ) : (
-              <Div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/30">
-                <Div className="text-sm text-warning">
-                  <Info className="h-4 w-4 inline mr-2" />
+              <Div className="mt-auto flex items-start gap-2.5 rounded-lg border bg-muted/50 px-3.5 py-3">
+                <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <Div className="text-sm text-muted-foreground">
                   {tPurchase("post.pack.requiresSubscription")}
                 </Div>
               </Div>

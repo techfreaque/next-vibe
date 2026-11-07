@@ -164,9 +164,8 @@ export const translations: typeof enTranslations = {
     tag: "Reset hasła",
     ui: {
       title: "Zresetuj hasło",
-      subtitle:
-        "Wprowadź swój adres e-mail, a wyślemy Ci link do resetowania hasła",
-      sendResetLink: "Wyślij link resetujący",
+      subtitle: "Podaj e-mail. Wyślemy link do resetu.",
+      sendResetLink: "Wyślij link",
       alreadyHaveAccount: "Masz już konto? Zaloguj się",
     },
     actions: {
@@ -195,9 +194,9 @@ export const translations: typeof enTranslations = {
     },
     fields: {
       email: {
-        label: "Adres e-mail",
+        label: "E-mail",
         description: "Wprowadź swój adres e-mail",
-        placeholder: "twoj@email.pl",
+        placeholder: "ty@przyklad.pl",
         help: "Wprowadź adres e-mail powiązany z Twoim kontem",
         validation: {
           invalid: "Proszę wprowadzić prawidłowy adres e-mail",

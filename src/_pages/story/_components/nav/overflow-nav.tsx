@@ -254,6 +254,12 @@ export function OverflowNav({
     }
     const observer = new ResizeObserver(recalculate);
     observer.observe(container);
+    // Items grow when the web font swaps in - the container doesn't, so watch them too
+    for (const el of itemRefs.current) {
+      if (el) {
+        observer.observe(el);
+      }
+    }
     return (): void => observer.disconnect();
   }, [recalculate]);
 

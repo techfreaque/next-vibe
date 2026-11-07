@@ -12,8 +12,6 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Wróć do bloga",
-    brand: "{{appName}} - ",
-    icon: "🌱",
     category: "Dla początkujących",
     readTime: "5 min czytania",
     title: "Dwa sposoby na zarabianie. Nie musisz wybierać jednego.",
@@ -47,9 +45,9 @@ export const translations: typeof enTranslations = {
   },
   skillAngle: {
     title: "Ścieżka skilla - pasywny dochód budowany raz",
-    p1: "Skill to indywidualna persona AI: nazwa, osobowość, system prompt. Publikujesz. Gotowe. Każdy może go znaleźć i używać - a gdy ktoś zarejestruje się przez link do skilla, zarabiasz 5% jego płatności na zawsze, na dodatek do 10% prowizji za polecenie.",
+    p1: "Skill to indywidualna persona AI: nazwa, osobowość, system prompt. Publikujesz. Gotowe. Każdy może go znaleźć i używać - a gdy ktoś zarejestruje się przez link innego członka do Twojego skilla, zarabiasz 5% jego płatności na zawsze. Twój własny link do skilla daje pełne 10% bezpośrednio.",
     p2: "To, czego większość początkujących nie zauważa: te 5% są powiązane z Tobą jako autorem, nie z tym, kto udostępnił link. Jeśli ktoś odkryje Twój skill w katalogu i wyśle go znajomemu - znajomy się zarejestruje - i tak zostaniesz zaliczony. Platforma śledzi kto stworzył skill, nie kto go dystrybuował. Twój skill zarabia za Ciebie, nawet gdy aktywnie go nie promujesz.",
-    p3: "Skille są darmowe do stworzenia. Nie potrzeba płatnego planu. Zacznij od czegoś prostego: skill dla swojego hobby, pracy, języka ojczystego. Opublikuj, udostępnij link - gotowe. Każda rejestracja przez niego przynosi obie prowizje jednocześnie - 10% bezpośrednio + 5% skill = 15% od tego użytkownika, wiecznie.",
+    p3: "Skille są darmowe do stworzenia. Nie potrzeba płatnego planu. Zacznij od czegoś prostego: skill dla swojego hobby, pracy, języka ojczystego. Opublikuj, udostępnij link - gotowe. Każda rejestracja przez Twój własny link daje Ci 10% na zawsze. Każda rejestracja, którą inni przyprowadzą do Twojego skilla, daje Ci 5%.",
   },
   multilevel: {
     title: "Jest też łańcuch - oto jak działa",
@@ -80,7 +78,6 @@ export const translations: typeof enTranslations = {
     step1Body:
       "Nie potrzeba płatnego planu. Program jest otwarty dla wszystkich.",
     step2Title: "Przejdź do panelu poleceń",
-    step2Body: "Otwórz stronę poleceń. ",
     step2Link: "Otwórz stronę poleceń.",
     step2Suffix: " Utwórz kod - może być cokolwiek, co łatwo zapamiętasz.",
     step3Title: "Udostępnij link - lub opublikuj skill",
@@ -96,6 +93,5 @@ export const translations: typeof enTranslations = {
     p2: "Jeśli chcesz zgłębić temat - zrozumieć strukturę prowizji, znaleźć najlepsze sposoby promocji lub zapytać innych, jak to robią - dołącz do naszego Discorda.",
     createCode: "Uzyskaj kod polecający",
     joinDiscord: "Dołącz do Discorda",
-    backToBlog: "Wróć do bloga",
   },
 };

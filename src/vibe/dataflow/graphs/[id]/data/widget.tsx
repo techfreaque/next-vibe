@@ -406,6 +406,12 @@ interface PaneState {
   chart: IChartApi;
   container: HTMLDivElement;
   seriesMap: Map<string, LwcSeries>;
+  /**
+   * Invisible whitespace series holding the union of every pane's timestamps.
+   * Panes sync by LOGICAL range (bar index); without identical time points per
+   * pane, the same index lands on different dates and the panes drift apart.
+   */
+  timeAnchor?: LwcSeries;
 }
 
 /** Render series data into chart panes - used both by chart setup and data effect */
@@ -449,6 +455,36 @@ function renderSeriesData(
 
   // Group series by pane and render
   const paneGroups = groupByPane(series, displayConfigsRef.current);
+
+  // Union of all rendered timestamps - every pane gets the same bar indices
+  const allTimes = new Set<UTCTimestamp>();
+  for (const [, paneSeries] of paneGroups) {
+    for (const s of paneSeries) {
+      for (const p of s.points) {
+        allTimes.add(toChartTime(p.timestamp));
+      }
+    }
+  }
+  const anchorData = [...allTimes]
+    .toSorted((a, b) => a - b)
+    .map((time) => ({ time }));
+  if (LineSeriesCtorRef.current && panesRef.current.size > 1) {
+    for (const [, paneState] of panesRef.current) {
+      if (!paneState.timeAnchor) {
+        paneState.timeAnchor = paneState.chart.addSeries(
+          LineSeriesCtorRef.current,
+          {
+            lineVisible: false,
+            pointMarkersVisible: false,
+            crosshairMarkerVisible: false,
+            lastValueVisible: false,
+            priceLineVisible: false,
+          },
+        );
+      }
+      paneState.timeAnchor.setData(anchorData);
+    }
+  }
 
   for (const [paneNum, paneSeries] of paneGroups) {
     const paneState = panesRef.current.get(paneNum);
@@ -533,6 +569,23 @@ function renderSeriesData(
   }
 }
 
+/**
+ * Price axis width, or 0 when the axis has no widget yet. lightweight-charts'
+ * width() asserts (throws "Value is null") on a hidden axis and on one that was
+ * just made visible but not painted yet.
+ */
+function readScaleWidth(chart: IChartApi, side: "left" | "right"): number {
+  const scale = chart.priceScale(side);
+  if (!scale.options().visible) {
+    return 0;
+  }
+  try {
+    return scale.width();
+  } catch {
+    return 0;
+  }
+}
+
 /** Sync price scale widths across panes so chart areas align vertically.
  *  When ANY pane has a visible left scale, ALL panes show it for alignment.
  *  Returns the max left/right widths for legend positioning. */
@@ -548,8 +601,8 @@ function syncScaleWidths(
     if (pane.seriesMap.size === 0) {
       continue;
     }
-    const rw = pane.chart.priceScale("right").width();
-    const lw = pane.chart.priceScale("left").width();
+    const rw = readScaleWidth(pane.chart, "right");
+    const lw = readScaleWidth(pane.chart, "left");
     if (rw > 0) {
       maxRight = Math.max(maxRight, rw);
     }

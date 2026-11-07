@@ -1,0 +1,10 @@
+{
+  "url": "https://api.search.brave.com/res/v1/web/search?q=bun+runtime&count=1&safesearch=moderate",
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip",
+    "X-Subscription-Token": "[redacted]"
+  },
+  "body": ""
+}

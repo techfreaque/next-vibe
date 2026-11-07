@@ -121,7 +121,7 @@ describe("AI Stream Integration - Vibe-Coder Skill (direct, next-vibe-coder sett
         variantId: "budget",
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
-          manualModelId: ChatModelId.KIMI_K2_6,
+          manualModelId: ChatModelId.KIMI_K3,
           sortBy: ModelSortField.INTELLIGENCE,
           sortDirection: ModelSortDirection.DESC,
           contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },

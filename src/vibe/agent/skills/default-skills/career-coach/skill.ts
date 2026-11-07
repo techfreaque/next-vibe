@@ -73,7 +73,7 @@ export const careerCoachSkill: Skill = {
       variantName: "skills.careerCoach.variants.headhunter" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -98,7 +98,7 @@ export const careerCoachSkill: Skill = {
       variantName: "skills.careerCoach.variants.intern" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

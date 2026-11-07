@@ -13,8 +13,6 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "{{appName}} - ",
-    icon: "📊",
     category: "Für Affiliate-Profis",
     readTime: "6 Min. Lesezeit",
     title: "Ich bin Affiliate-Marketer. Was ist bei KI-Abos anders?",
@@ -51,7 +49,7 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "Die vollständige Provisionsstruktur",
     p1: "Direkte Empfehlung: 10 % jeder Zahlung von Leuten, die du direkt empfiehlst. Das gehört dir immer, für immer, unabhängig von allem anderen.",
-    p2: "Skill-Bonus: Wenn sich jemand über ein Skill anmeldet, das du veröffentlicht hast, verdienst du zusätzlich 5 % auf ihre Zahlungen - 15 % total von diesem Nutzer. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann. Entscheidend für Affiliate-Profis: Du verdienst die 5 % als Skill-Autor, auch wenn jemand anderes deinen Skill-Link teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis und schickt ihn weiter - du wirst trotzdem gutgeschrieben. Die Plattform trackt Skill-Autorenschaft, nicht wer den Link verteilt hat. Passive Attribution, die du nicht aktiv managen musst.",
+    p2: "Skill-Bonus: Meldet sich jemand über den Link eines anderen Mitglieds zu einem Skill an, den du veröffentlicht hast, verdienst du 5 % auf dessen Zahlungen - zusätzlich zu den 10 % für dieses Mitglied. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann. Entscheidend für Affiliate-Profis: Du verdienst die 5 % als Skill-Autor, auch wenn jemand anderes deinen Skill-Link teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis und schickt ihn weiter - du wirst trotzdem gutgeschrieben. Die Plattform trackt Skill-Autorenschaft, nicht wer den Link verteilt hat. Passive Attribution, die du nicht aktiv managen musst.",
     p3: "Mehrstufige Kette: Ein zusätzlicher 10 %-Pool wird über bis zu 5 Ebenen deiner Empfehlungskette verteilt, mit geometrischem Abfall - jede Ebene verdient halb so viel wie die darüber. Empfehlungen deiner Empfehlungen bringen dir ~5 %, deren Empfehlungen ~2,5 % usw. Maximale Gesamtausschüttung über alle Empfänger: ~20 % einer einzelnen Zahlung.",
     p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe - bau auf qualitativ hochwertige direkte Empfehlungen und publizierbare Skills.",
   },
@@ -100,6 +98,5 @@ export const translations: typeof enTranslations = {
     p2: "Wenn sich deine Zielgruppe mit einem der obigen Segmente überschneidet, ist ein Code und ein Post die Investition wert.",
     createCode: "Empfehlungscode erstellen",
     joinDiscord: "Discord beitreten",
-    backToBlog: "Zurück zum Blog",
   },
 };

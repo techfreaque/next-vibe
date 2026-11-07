@@ -1,4 +1,3 @@
-import { translations as _componentsTranslations } from "../../widget/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -95,10 +94,9 @@ export const translations: typeof enTranslations = {
   },
   fields: {
     privateName: {
-      label: "Dein privater Name",
-      description:
-        "Wie die KI dich in privaten Gesprächen ansprechen wird. Das bleibt zwischen dir und der KI - komplett privat.",
-      placeholder: "Gib deinen Namen ein",
+      label: "Privater Name",
+      description: "So spricht dich die KI an. Sieht sonst niemand.",
+      placeholder: "z. B. Alex",
       validation: {
         required: "Privater Name ist erforderlich",
         minLength: "Name muss mindestens 2 Zeichen lang sein",
@@ -106,10 +104,9 @@ export const translations: typeof enTranslations = {
       },
     },
     publicName: {
-      label: "Dein öffentlicher Name",
-      description:
-        "Deine Identität in öffentlichen Chats und Foren. Andere User und KIs werden diesen Namen sehen. Wähle weise - er repräsentiert dich in der Community.",
-      placeholder: "Gib deinen Anzeigenamen ein",
+      label: "Öffentlicher Name",
+      description: "Sichtbar in geteilten Chats und Foren.",
+      placeholder: "z. B. alex_baut",
       validation: {
         required: "Anzeigename ist erforderlich",
         minLength: "Anzeigename muss mindestens 2 Zeichen lang sein",
@@ -117,10 +114,9 @@ export const translations: typeof enTranslations = {
       },
     },
     email: {
-      label: "Deine E-Mail",
-      description:
-        "Deine Login-Zugangsdaten und Kontaktmethode. Bleibt privat - wird niemals mit anderen Usern oder KIs geteilt.",
-      placeholder: "E-Mail-Adresse eingeben",
+      label: "E-Mail",
+      description: "Nur für den Login. Wird nie geteilt.",
+      placeholder: "du@beispiel.de",
       help: "Dies wird deine Login-E-Mail und primäre Kontaktmethode sein",
       validation: {
         required: "E-Mail ist erforderlich",
@@ -128,10 +124,10 @@ export const translations: typeof enTranslations = {
       },
     },
     password: {
-      label: "Dein Passwort",
+      label: "Passwort",
       description:
-        "Starke Passwörter schützen dein Konto. Wir implementieren bald Ende-zu-Ende-Verschlüsselung - ab diesem Zeitpunkt werden Passwort-Resets deinen Nachrichtenverlauf löschen, da nur du den Entschlüsselungsschlüssel besitzt. Speichere es also sicher ab.",
-      placeholder: "Passwort eingeben",
+        "Mindestens 8 Zeichen mit Groß-, Kleinbuchstaben und Zahl. Gut aufbewahren: Ende-zu-Ende-Verschlüsselung kommt, ein Reset löscht dann deinen Verlauf.",
+      placeholder: "Passwort festlegen",
       validation: {
         required: "Passwort ist erforderlich",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
@@ -149,7 +145,7 @@ export const translations: typeof enTranslations = {
     },
 
     acceptTerms: {
-      label: "AGB akzeptieren",
+      label: "Ich akzeptiere die Bedingungen",
       description:
         "Unsere Bedingungen respektieren deine Freiheit und Privatsphäre.",
       termsLink: "AGB",
@@ -162,16 +158,14 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Newsletter abonnieren",
-      description:
-        "Gelegentliche Updates über neue Modelle und Features. Kein Spam, nur was zählt.",
+      label: "Produkt-Updates erhalten",
+      description: "Neue Modelle und Features. Selten. Kein Spam.",
     },
 
     referralCode: {
       label: "Empfehlungscode (optional)",
-      description:
-        "Hast du einen Freund auf unbottled.ai? Gib seinen Code ein, um ihn zu unterstützen. Er wird dafür belohnt, dass er dich mitgebracht hat.",
-      placeholder: "Empfehlungscode eingeben (optional)",
+      description: "Code von Freunden? Sie verdienen mit, wenn du abonnierst.",
+      placeholder: "Code eingeben",
       labelPrefilled: "Empfehlungscode",
       descriptionPrefilled:
         "Dein Freund wird belohnt, wenn du ein Konto erstellst.",
@@ -190,9 +184,8 @@ export const translations: typeof enTranslations = {
     },
   },
   form: {
-    title: "Willkommen bei Uncensored AI",
-    description:
-      "Hilf mit, unzensierte, privatsphäre-orientierte und wirklich unabhängige KI aufzubauen. unbottled.ai ist Open Source und Community-getrieben - deine Registrierung unterstützt die Entwicklung von KI-Technologie, die deine Freiheit respektiert.",
+    title: "Konto erstellen",
+    description: "Jedes Modell. Deine Regeln. Kostenlos starten.",
   },
   footer: {
     alreadyHaveAccount: "Haben Sie bereits ein Konto? Anmelden",

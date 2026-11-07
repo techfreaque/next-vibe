@@ -14,13 +14,13 @@ export const translations = {
   },
   unsubscribe: {
     page: {
-      title: "Unsubscribe from Newsletter",
-      description: "We're sorry to see you go",
+      title: "Unsubscribe",
+      description: "Type your address, hit the button, done. No guilt trip.",
       subtitle: "Manage your newsletter subscription",
       emailProvided: {
         title: "Confirm Unsubscribe",
         description:
-          "Are you sure you want to unsubscribe from our newsletter?",
+          "This address will stop getting our newsletter. One click.",
       },
       unsubscribeButton: "Unsubscribe",
       unsubscribing: "Unsubscribing...",
@@ -34,12 +34,12 @@ export const translations = {
         title: "What Happens Next",
         description: "Here's what you need to know about unsubscribing:",
         immediate: {
-          title: "Immediate Effect",
+          title: "Instant.",
           description:
             "You'll stop receiving our newsletter emails immediately.",
         },
         resubscribe: {
-          title: "Easy to Resubscribe",
+          title: "Reversible.",
           description:
             "You can always subscribe again if you change your mind.",
         },
@@ -48,7 +48,7 @@ export const translations = {
         title: "Before You Go",
         description: "Consider these alternatives:",
         subscribe: "Adjust email frequency instead",
-        contact: "Contact us with feedback",
+        contact: "Tell us what to fix",
       },
     },
   },

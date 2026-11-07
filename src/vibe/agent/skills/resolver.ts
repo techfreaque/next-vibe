@@ -15,7 +15,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "../ai-stream/models";
-import { getBestChatModel } from "../ai-stream/models";
+import { getBestChatModel, resolveChatModelForUser } from "../ai-stream/models";
 import type { BridgeSkill } from "../ai-stream/repository/core/modality-resolver";
 import { isUuid, parseSkillId } from "../chat/slugify";
 import { getEnvAvailability } from "../env-availability";
@@ -327,7 +327,8 @@ export async function resolveFavorite(
 
   if (sel && isManualSelection(sel) && "manualModelId" in sel) {
     return {
-      model: sel.manualModelId,
+      // Legacy ids resolve to their successor when it is servable.
+      model: resolveChatModelForUser(sel.manualModelId, user, availability),
       skill,
       favoriteConfig: favorite,
     };

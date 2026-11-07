@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "addresses",
 
   list: {
-    title: "Meine Adressen",
+    title: "Rechnungsadressen",
     titleShort: "Meine Adressen",
     description: "Gespeicherte Adressen anzeigen",
     response: {
@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
       billing: "Rechnung",
       delivery: "Lieferung",
       empty: "Keine gespeicherten Adressen",
-      emptyHint: "Adressen speichern für schnelleres Bestellen",
+      emptyHint: "Einmal speichern, beim Bezahlen nicht mehr tippen.",
       emptyCta: "Erste Adresse hinzufügen",
       loading: "Adressen werden geladen…",
     },

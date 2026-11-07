@@ -12,8 +12,6 @@ export const translations: typeof enTranslations = {
 
   hero: {
     backToBlog: "Wróć do bloga",
-    brand: "{{appName}} - ",
-    icon: "🧭",
     category: "Aktualizacja produktu",
     readTime: "7 min czytania",
     title: "123 modele. Widzenie, słyszenie, tworzenie. Jeden towarzysz.",
@@ -170,5 +168,11 @@ export const translations: typeof enTranslations = {
     p1: "Aplikacja jest wyraźnie inna niż była. Jeśli odszedłeś wcześnie - a wiemy, że wiele osób to zrobiło - warto spróbować jeszcze raz.",
     p2: "I jeśli znajdziesz coś jeszcze zepsutego: dobrze. Powiedz nam. To właśnie ten rodzaj sygnału, który popycha rzeczy naprzód.",
     cta: "Otwórz {{appName}}",
+  },
+
+  cta: {
+    title: "123 modele. Jeden czat. Sprawdź go.",
+    subtitle:
+      "Wybierz towarzysza, wrzuć mu dowolny plik i powiedz nam, co jeszcze zgrzyta.",
   },
 };

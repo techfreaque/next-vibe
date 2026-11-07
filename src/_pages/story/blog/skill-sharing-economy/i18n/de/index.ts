@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Skill erstellen. Link teilen. Jeden Monat verdienen.",
     description:
-      "{{appName}} Skills sind vorkonfigurierte KI-Setups, die du einmal baust und überall teilst. Der Share-Link positioniert dich in der Empfehlungskette - 10 % + 5 % Bonus von jeder Zahlung, die dieser Nutzer je macht.",
+      "{{appName}} Skills sind vorkonfigurierte KI-Setups, die du einmal baust und überall teilst. Der Share-Link positioniert dich in der Empfehlungskette - 10 % von jeder Zahlung, die dieser Nutzer je macht, plus 5 %, wenn andere deinen Skill teilen.",
     category: "Skill Economy",
     imageAlt:
       "Eine Person erstellt KI-Skills und verdient jeden Monat wiederkehrend",
@@ -13,13 +13,11 @@ export const translations: typeof enTranslations = {
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    brand: "{{appName}} - ",
-    icon: "✦",
     category: "Skill Economy",
     readTime: "7 Min. Lesezeit",
     title: "Skill erstellen. Link teilen. Jeden Monat verdienen.",
     subtitle:
-      "Baue ein vorkonfiguriertes KI-Setup einmal. Teile es überall. Verdiene 10 % + 5 % von jeder Zahlung der Leute, die sich dadurch anmelden, für immer.",
+      "Baue ein vorkonfiguriertes KI-Setup einmal. Teile es überall. Verdiene 10 % von jeder Zahlung der Leute, die sich dadurch anmelden, für immer.",
     quote:
       '"Ich hab einen klinischen Reasoning-Skill für Medizinstudenten gebaut. Nach drei Monaten bezahlt er mein eigenes Abo - und mehr."',
   },
@@ -46,8 +44,8 @@ export const translations: typeof enTranslations = {
       "Zeigt Besuchern das Skill - was es kann, wie es konfiguriert ist, was für eine KI es ist",
     bullet2:
       "Positioniert dich in der Empfehlungskette - jeder, der sich über diesen Link anmeldet, wird dir zugeordnet",
-    p2: "Das bedeutet in der Praxis: Wenn sich jemand über deinen Skill-Link anmeldet, wirst du gleichzeitig ihr direkter Empfehler UND ihr Skill-Ersteller. Du verdienst 10 % jeder Zahlung, die sie je machen (direkte Empfehlungsprovision) plus 5 % zusätzlich (Skill-Bonus) - 15 % total von diesem einen Nutzer, für immer.",
-    p3: "Das ist keine einmalige Belohnung. Kein Anmeldebonus. Jede Abo-Verlängerung, jede Aufladung, jeder Kauf - du verdienst 15 % davon. Du hast die Arbeit einmal gemacht.",
+    p2: "Das bedeutet in der Praxis: Wenn sich jemand über deinen Skill-Link anmeldet, bist du der direkte Empfehler. Du verdienst 10 % jeder Zahlung, die diese Person je macht - für immer. Und teilt ein anderes Mitglied deinen Skill mit seinem eigenen Link, bekommst du als Skill-Ersteller trotzdem 5 % - von Nutzern, die du nie angesprochen hast.",
+    p3: "Das ist keine einmalige Belohnung. Kein Anmeldebonus. Jede Abo-Verlängerung, jede Aufladung, jeder Kauf - du verdienst 10 % davon. Du hast die Arbeit einmal gemacht.",
     p4: "Die URL sieht so aus: {{appName}}/track?ref=DEIN_CODE&url=/de/skill/SKILL_ID",
   },
   examples: {
@@ -67,25 +65,25 @@ export const translations: typeof enTranslations = {
       "Kennt deinen Stack, setzt deine Team-Konventionen durch. Geteilt in Engineering-Communities voller Leute, die 100–200 $/Monat für KI ausgeben. Hochwertige Anmeldungen, die bleiben.",
   },
   theMath: {
-    title: "Die Rechnung: 15 % pro Nutzer pro Monat, für immer",
-    p1: "Wenn sich jemand über deinen Skill-Link anmeldet und abonniert, verdienst du 15 % jeder Zahlung - 10 % direkte Empfehlung + 5 % Skill-Bonus. Nicht nur den ersten Monat. Jeden Monat, solange sie abonniert sind.",
+    title: "Die Rechnung: 10 % pro Nutzer pro Monat, für immer",
+    p1: "Wenn sich jemand über deinen Skill-Link anmeldet und abonniert, verdienst du 10 % jeder Zahlung. Teilen andere deinen Skill, kassierst du zusätzlich 5 % auf deren Anmeldungen. Nicht nur den ersten Monat. Jeden Monat, solange sie abonniert sind.",
     tableHeaderProfile: "Nutzerprofil",
     tableHeaderSpend: "Monatliche Ausgaben",
     tableHeaderEarn: "Du verdienst/Monat (via Skill-Link)",
     row1Profile: "Gelegenheitsnutzer",
     row1Spend: "~8 $/Monat",
-    row1Earn: "1,20 $/Monat",
+    row1Earn: "0,80 $/Monat",
     row2Profile: "Regulärer Abonnent",
     row2Spend: "20 $/Monat",
-    row2Earn: "3,00 $/Monat",
+    row2Earn: "2,00 $/Monat",
     row3Profile: "Intensiver KI-Nutzer",
     row3Spend: "100 $/Monat",
-    row3Earn: "15,00 $/Monat",
+    row3Earn: "10,00 $/Monat",
     row4Profile: "Entwickler / Power User",
     row4Spend: "200 $+/Monat",
-    row4Earn: "30,00 $+/Monat",
+    row4Earn: "20,00 $+/Monat",
     p2: "Das Skill ist der Haken. Der Link ist die Einnahme. Du verdienst, ob jemand dein Skill täglich nutzt oder nach der Anmeldung wechselt - die Empfehlungszuordnung bleibt bei dir.",
-    p3: "Teile ein Skill an fünf Stellen. Ein Prozentsatz klickt durch. Ein Prozentsatz meldet sich an. Diese Anmeldungen zahlen dir 15 % jeden Monat. Nächsten Monat ein weiteres Skill teilen. Deine Einnahmen wachsen ohne proportional mehr Arbeit.",
+    p3: "Teile ein Skill an fünf Stellen. Ein Prozentsatz klickt durch. Ein Prozentsatz meldet sich an. Diese Anmeldungen zahlen dir 10 % jeden Monat. Nächsten Monat ein weiteres Skill teilen. Deine Einnahmen wachsen ohne proportional mehr Arbeit.",
   },
   chain: {
     title: "Du verdienst auch, wenn deine Nutzer andere empfehlen",
@@ -94,7 +92,7 @@ export const translations: typeof enTranslations = {
     level2: "Ebene 3: ~2,5 % jeder Zahlung",
     level3: "Ebene 4: ~1,25 % jeder Zahlung",
     level4: "Ebene 5: ~0,625 % jeder Zahlung",
-    p2: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 15 %, die du von direkten Skill-Empfehlungen verdienst, sind das eigentliche Einkommen. Behandle Ketten-Einnahmen als Bonus - optimiere nicht für Tiefe, optimiere für qualitativ hochwertige Shares.",
+    p2: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 %, die du von direkten Skill-Empfehlungen verdienst, sind das eigentliche Einkommen. Behandle Ketten-Einnahmen als Bonus - optimiere nicht für Tiefe, optimiere für qualitativ hochwertige Shares.",
   },
   howTo: {
     title: "5 Minuten bis zu deinem ersten Share-Link",
@@ -106,18 +104,18 @@ export const translations: typeof enTranslations = {
       "Klick auf das Skill, um die Detailseite zu sehen. Hier findest du den Share & Earn Button.",
     step3Title: "Share-Link generieren",
     step3Body:
-      "Klick auf Share & Earn. Falls du einen Empfehlungscode hast, wähle ihn aus. Falls nicht, erstelle einen in drei Sekunden. Dein Link trägt automatisch sowohl deinen Empfehlungscode als auch die Skill-ID - beide Provisionen werden automatisch getrackt.",
+      "Klick auf Share & Earn. Falls du einen Empfehlungscode hast, wähle ihn aus. Falls nicht, erstelle einen in drei Sekunden. Dein Link trägt deinen Empfehlungscode und die Skill-ID - die Zuordnung läuft automatisch.",
     step4Title: "Dort teilen, wo es zählt",
     step4Body:
       "Poste ihn in Communities, wo Leute das Skill tatsächlich nutzen würden - Discord-Server, Subreddits, Forum-Threads, Blog-Posts, Slack-Channels. Spezifisch schlägt breit.",
     step5Title: "Dashboard beobachten",
     step5Body:
-      "Dein Empfehlungs-Dashboard zeigt Besucher, Anmeldungen und Einnahmen in Echtzeit. Jede neue Anmeldung über deinen Link ist 15 % wiederkehrendes Einkommen.",
+      "Dein Empfehlungs-Dashboard zeigt Besucher, Anmeldungen und Einnahmen in Echtzeit. Jede neue Anmeldung über deinen Link ist 10 % wiederkehrendes Einkommen.",
   },
   close: {
     title: "Das Skill ist das Produkt. Der Link ist die Einnahme.",
     p1: 'Die meisten denken bei Empfehlungsprogrammen an generische Anmeldelinks. Das funktioniert, aber es ist ein schwieriger Verkauf. "Hier ist ein Link zu einer KI-Plattform" geht nirgendwo hin. "Hier ist eine KI, die wie ein erfahrener Kliniker denkt" ist etwas, das Leute tatsächlich verschicken.',
-    p2: "Bau, was du selbst nutzen würdest. Mach es spezifisch. Dann teil den Link. Die 15 % ergeben sich von selbst.",
+    p2: "Bau, was du selbst nutzen würdest. Mach es spezifisch. Dann teil den Link. Die 10 % ergeben sich von selbst.",
     createSkill: "Erstelle deinen ersten Skill",
     referralPage: "Empfehlungscode einrichten",
   },

@@ -57,28 +57,27 @@ export const translations = {
     },
     overview: {
       howItWorks: {
-        title: "How Credits Work",
+        title: "How credits work",
         description:
-          "Subscribe for {{subCredits}} monthly credits, and buy extra credit packs when you need more",
+          "One currency for every model. Subscribe, top up, or start free.",
         expiring: {
-          title: "Monthly Subscription",
+          title: "Monthly plan",
           description:
-            "{{subPrice}}/month - {{subCredits}} credits per month with all {{modelCount}} AI models. Perfect for regular users!",
+            "{{subPrice}}/month. {{subCredits}} credits every month, all {{modelCount}} models.",
         },
         permanent: {
-          title: "Extra Credit Packs",
+          title: "Credit packs",
           description:
-            "{{packPrice}} for {{packCredits}} credits - Need more than {{subCredits}} credits? Buy additional packs that never expire. Requires active subscription.",
+            "{{packPrice}} for {{packCredits}} credits. Never expire. For subscribers who burn through {{subCredits}}.",
         },
         free: {
-          title: "Free Credits",
-          description:
-            "Everyone gets {{count}} free credits to try our uncensored AI chat platform. No credit card required!",
+          title: "Free credits",
+          description: "{{count}} credits to start. No card needed.",
         },
       },
       costs: {
-        title: "Credit Costs",
-        description: "See how much each feature costs",
+        title: "What things cost",
+        description: "Credits per message, image, clip or tool call.",
         models: {
           title: "AI Models (per message)",
           gpt4: "GPT-4",
@@ -110,10 +109,10 @@ export const translations = {
         },
       },
       cta: {
-        title: "Ready to get started?",
+        title: "Unlock every model.",
         description:
-          "Subscribe for monthly credits and chat with all {{modelCount}} AI models. Subscribers can buy extra credit packs when needed!",
-        button: "Subscribe Now",
+          "Monthly credits across all {{modelCount}} models. Top up with packs anytime.",
+        button: "Subscribe",
       },
     },
     buy: {

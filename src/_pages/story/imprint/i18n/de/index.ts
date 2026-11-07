@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
       "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
   },
   printAriaLabel: "Impressum drucken",
+  onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Impressum",
   lastUpdated: "Zuletzt aktualisiert: Januar 2025",

@@ -8,7 +8,6 @@ import "server-only";
 import { Methods } from "next-vibe/core/definition/enums";
 import { endpointsHandler } from "next-vibe/core/route/multi";
 
-import { keepsExplicitMediaModel } from "../shared/media-generation";
 import endpoints from "./definition";
 import { VideoGenerationRepository } from "./repository";
 
@@ -33,10 +32,7 @@ export const { POST, tools } = endpointsHandler({
         toolExecutionContext,
         platform,
       ),
-    // A human's explicit model pick wins; AI/MCP callers get the favorite's.
     requestDefaults: (ctx, { requestData }) =>
-      keepsExplicitMediaModel(ctx.platform, requestData.model)
-        ? {}
-        : VideoGenerationRepository.getRequestDefaults(ctx),
+      VideoGenerationRepository.getRequestDefaults(ctx, requestData.model),
   },
 });

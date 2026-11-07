@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
     twitterDescription: "Przeczytaj warunki i zasady korzystania z {{appName}}",
   },
   printAriaLabel: "Drukuj warunki korzystania z usługi",
+  onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Warunki korzystania z usługi",
   lastUpdated: "Ostatnia aktualizacja: styczeń 2025",

@@ -56,7 +56,7 @@ const TEST_FAVORITE: FavoriteConfig = {
   variantId: null,
   modelSelection: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+    manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
   },
   voiceModelSelection: null,
   sttModelSelection: null,

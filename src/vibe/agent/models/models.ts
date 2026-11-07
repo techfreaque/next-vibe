@@ -37,7 +37,7 @@ import type {
   VideoGenModelId,
   VideoGenModelOption,
 } from "../video-generation/models";
-import { type Modality, type ModelUtilityValue } from "./enum";
+import { type Modality, ModelUtility, type ModelUtilityValue } from "./enum";
 
 // ============================================
 // CORE TYPES AND INTERFACES
@@ -85,6 +85,7 @@ export enum ApiProvider {
   FREEDOMGPT = "freedomgpt",
   UNCENSORED_AI = "uncensored-ai",
   VENICE_AI = "venice-ai",
+  NANO_GPT = "nano-gpt",
   OPENAI_IMAGES = "openai-images",
   REPLICATE = "replicate",
   FAL_AI = "fal-ai",
@@ -106,6 +107,7 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.FREEDOMGPT]: "FreedomGPT",
   [ApiProvider.UNCENSORED_AI]: "Uncensored.ai",
   [ApiProvider.VENICE_AI]: "Venice.ai",
+  [ApiProvider.NANO_GPT]: "NanoGPT",
   [ApiProvider.OPENAI_IMAGES]: "OpenAI Images",
   [ApiProvider.REPLICATE]: "Replicate",
   [ApiProvider.FAL_AI]: "Fal.ai",
@@ -587,6 +589,11 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Venice.ai",
     icon: "venice-ai-logo",
   },
+  abliterationAI: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Abliteration.ai",
+    icon: "shield-off",
+  },
   freedomGPT: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "FreedomGPT",
@@ -716,6 +723,8 @@ export function isApiProviderAvailable(
       return env.gabAI;
     case ApiProvider.VENICE_AI:
       return env.veniceAI;
+    case ApiProvider.NANO_GPT:
+      return env.nanoGPT;
     case ApiProvider.OPENAI_IMAGES:
       return env.openAiImages;
     case ApiProvider.REPLICATE:
@@ -1017,14 +1026,19 @@ export function filterRoleModels<
       (m) =>
         (!m.adminOnly || isAdmin) && isModelProviderAvailable(m, availability),
     );
-    return deduplicateCheapestPerModel(available, isAdmin);
+    return deduplicateCheapestPerModel(preferCurrentModels(available), isAdmin);
   }
   if (selection.selectionType === ModelSelectionType.MANUAL) {
     if (selection.manualModelId) {
       // Collect all pool entries for this model ID (multi-provider pools like TTS/STT
       // have one entry per provider, sorted cheapest-first).
-      const candidates = pool.filter((m) => m.id === selection.manualModelId);
-      if (candidates[0]?.adminOnly && !isAdmin) {
+      const allCandidates = pool.filter(
+        (m) => m.id === selection.manualModelId,
+      );
+      // Admin-only providers (e.g. Claude Code) are skipped for non-admins;
+      // a model served ONLY by admin-only providers stays unavailable to them.
+      const candidates = allCandidates.filter((m) => !m.adminOnly || isAdmin);
+      if (allCandidates.length > 0 && candidates.length === 0) {
         return [];
       }
       // Admins see all available providers for this model; non-admins pick cheapest.
@@ -1057,7 +1071,10 @@ export function filterRoleModels<
       meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB)
     );
   });
-  const deduped = deduplicateCheapestPerModel(filtered, isAdmin);
+  const deduped = deduplicateCheapestPerModel(
+    preferCurrentModels(filtered),
+    isAdmin,
+  );
   if (!selection.sortBy) {
     return deduped;
   }
@@ -1074,6 +1091,20 @@ export function filterRoleModels<
     const v2b = getRoleModelSortValue(b, selection.sortBy2);
     return dir2 === ModelSortDirection.ASC ? v2a - v2b : v2b - v2a;
   });
+}
+
+/**
+ * Automatic picks (no selection / FILTERS) never land on a LEGACY model while a
+ * current one qualifies. Legacy models stay resolvable by id (MANUAL) and are
+ * only used here as a last resort when nothing current matches.
+ */
+function preferCurrentModels<TOption extends ModelOptionBase>(
+  options: TOption[],
+): TOption[] {
+  const current = options.filter(
+    (m) => !m.utilities.includes(ModelUtility.LEGACY),
+  );
+  return current.length > 0 ? current : options;
 }
 
 function getRoleModelSortValue(

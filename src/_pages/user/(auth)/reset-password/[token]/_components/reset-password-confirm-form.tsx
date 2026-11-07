@@ -7,8 +7,10 @@ import type { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Link } from "next-vibe/ui/components/link";
 import { MotionDiv } from "next-vibe/ui/components/motion";
+import { Span } from "next-vibe/ui/components/span";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
@@ -47,21 +49,22 @@ export default function ResetPasswordConfirmForm({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
-          <CardContent className="pt-6 space-y-4">
-            <Div className="text-destructive text-center">
+        <Card className="rounded-xl shadow-sm">
+          <CardContent className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
+            <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+            </Span>
+            <Div className="text-base font-medium text-foreground">
               {tokenValidationResponse.success
                 ? (tokenValidationResponse.data?.response?.message ??
                   t("errors.unknown.title"))
                 : tokenValidationResponse.message}
             </Div>
-            <Div className="text-center">
-              <Button asChild>
-                <Link href={`/${locale}/user/reset-password`}>
-                  {t("actions.requestNewLink")}
-                </Link>
-              </Button>
-            </Div>
+            <Button asChild className="h-11 w-full">
+              <Link href={`/${locale}/user/reset-password`}>
+                {t("actions.requestNewLink")}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </MotionDiv>

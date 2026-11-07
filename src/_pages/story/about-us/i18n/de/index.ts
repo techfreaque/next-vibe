@@ -16,65 +16,76 @@ export const translations: typeof enTranslations = {
       "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
   },
   hero: {
+    eyebrow: "Über {{appName}}",
+    title: "KI, die dir gehorcht.",
     subtitle:
       "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Aufgaben. Kostenlos auf {{appName}} - oder selbst hosten.",
+    ctaPrimary: "Jetzt chatten",
+    ctaSecondary: "Zum Build-Log",
+  },
+  stats: {
+    models: "KI-Modelle",
+    skills: "Skills",
+    tools: "Tools",
+    founded: "gegründet",
   },
   backToHome: "Zurück zur Startseite",
   title: "Über {{appName}}",
-  subtitle: "Unzensierte KI-Gespräche pionierisieren",
+  subtitle: "Pioniere unzensierter KI-Gespräche",
   description:
-    "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet {{foundedYear}}, bietet {{appName}} eine Plattform, auf der Nutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
+    "Seit {{foundedYear}} liefert {{appName}} die besten KI-Modelle der Welt - ohne Richtlinien-Team, das entscheidet, was du fragen darfst. Du wählst das Modell. Du setzt den Filter.",
   values: {
-    title: "Unsere Werte",
+    title: "Wo wir keine Kompromisse machen",
     description:
-      "Die Grundsätze, die alles leiten, was wir bei {{appName}} tun",
+      "Vier Regeln, die jedes Feature von {{appName}} bestehen muss.",
     excellence: {
-      title: "Exzellenz",
+      title: "Du bestimmst den Filter",
       description:
-        "Wir streben nach Exzellenz in allem, was wir tun, von der Leistung unserer Plattform bis zum Kundensupport.",
+        "Mainstream-, offene oder unzensierte Modelle. Filterstufe pro Gespräch wählbar. Niemand entscheidet für dich.",
     },
     innovation: {
-      title: "Innovation",
+      title: "Komplett Open Source",
       description:
-        "Wir innovieren kontinuierlich, um Ihnen die neuesten KI-Modelle und Funktionen zu bringen.",
+        "{{appName}} läuft auf next-vibe - Open Source auf GitHub. Code lesen, forken, auf eigener Hardware betreiben.",
     },
     integrity: {
-      title: "Integrität",
+      title: "Privatsphäre ab Werk",
       description:
-        "Wir agieren mit Transparenz und Ehrlichkeit und respektieren Ihre Privatsphäre und Daten.",
+        "Im Inkognito-Modus bleiben Gespräche auf deinem Gerät. Deine Daten gehören dir - sie sind kein Produkt, das wir verkaufen.",
     },
     collaboration: {
-      title: "Zusammenarbeit",
+      title: "Öffentlich gebaut",
       description:
-        "Wir arbeiten gemeinsam mit unserer Community, um die beste KI-Chat-Plattform zu bauen.",
+        "Roadmap, Architekturentscheidungen, Sackgassen - alles im Blog. Dein Feedback wird zum Feature.",
     },
   },
   mission: {
-    title: "Unsere Mission",
-    subtitle: "Zugang zu unzensierter KI demokratisieren",
+    title: "Deine KI. Deine Regeln.",
+    subtitle: "Zugang zu unzensierter KI für alle",
     description:
-      "Wir glauben, dass KI für alle zugänglich sein sollte, ohne Zensur oder Einschränkungen. Unsere Mission ist es, eine Plattform bereitzustellen, auf der Nutzer ehrliche Gespräche mit KI führen können.",
+      "Jeder große KI-Anbieter filtert, was du fragen darfst - und die Regeln bekommst du nie zu sehen. Wir halten Erwachsene für mündig. Darum bündelt {{appName}} jedes Modell und jede Filterstufe an einem Ort - und gibt dir den Schalter in die Hand.",
     vision: {
-      title: "Unsere Vision",
+      title: "Die Vision",
       description:
-        "Die weltweit führende Plattform für unzensierte KI-Gespräche zu werden und Nutzern Zugang zu den fortschrittlichsten KI-Modellen zu ermöglichen.",
+        "Ein Zuhause für jedes ernstzunehmende KI-Modell - Mainstream, offen und unzensiert - in dem du festlegst, was tabu ist.",
     },
     approach: {
-      title: "Unser Ansatz",
+      title: "Der Ansatz",
       description:
-        "Wir verbinden modernste KI-Technologie mit einer Nutzer-zentrierten Philosophie und gewährleisten Privatsphäre, Sicherheit und Meinungsfreiheit.",
+        "Die besten Modelle schnell liefern, mit echten Werkzeugen ausstatten - Suche, Gedächtnis, Automatisierung - und Datenschutz zum Standard machen, nicht zum Aufpreis.",
     },
     commitment: {
-      title: "Unser Engagement",
+      title: "Das Versprechen",
       description:
-        "Wir verpflichten uns, eine Plattform zu betreiben, die die Privatsphäre der Nutzer respektiert, transparente Preisgestaltung bietet und außergewöhnliche KI-Erlebnisse liefert.",
+        "Transparente Preise. Keine Dark Patterns. Eine Plattform, die du jederzeit verlassen kannst - indem du exakt denselben Code selbst hostest.",
     },
   },
   contact: {
-    title: "Kontakt aufnehmen",
+    title: "Fragen? Schreib uns.",
     description:
-      "Haben Sie Fragen oder Feedback? Wir freuen uns von Ihnen zu hören.",
-    cta: "Kontaktieren Sie uns",
+      "Feedback, Partnerschaften, Presse, Bugs - jede Nachricht liest ein Mensch.",
+    cta: "Kontakt aufnehmen",
+    selfHost: "Selbst hosten",
   },
   post: {
     title: "Titel",

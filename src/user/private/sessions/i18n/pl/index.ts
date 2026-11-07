@@ -3,12 +3,15 @@ export const translations: typeof enTranslations = {
   category: "Użytkownicy",
 
   widget: {
+    intro:
+      "Wszystkie urządzenia zalogowane na Twoje konto. Wyloguj te, których nie znasz.",
+    revokeFailed: "Nie udało się wylogować urządzenia. Spróbuj ponownie.",
     back: "Wstecz",
     loading: "Ładowanie sesji…",
     empty: "Brak aktywnych sesji",
     emptyHint: "Sesja jest tworzona przy każdym logowaniu",
     browserSession: "Sesja przeglądarki",
-    revoke: "Unieważnij",
+    revoke: "Wyloguj",
     revoking: "Unieważnianie…",
     currentSession: "Aktualna",
     created: "Utworzona",
@@ -17,7 +20,7 @@ export const translations: typeof enTranslations = {
   },
 
   list: {
-    title: "Moje sesje",
+    title: "Zalogowane urządzenia",
     titleShort: "Moje sesje",
     description: "Wyświetl wszystkie aktywne sesje dla Twojego konta",
     tag: "Sesje",

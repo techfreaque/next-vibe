@@ -1,5 +1,4 @@
 export const translations = {
-  backToHome: "Back to Home",
   auth: {
     login: {
       title: "Sign In",

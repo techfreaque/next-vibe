@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/cron/table-tennis-word-answering-ping-2547c95a-1c11-42c9-88ba-de6612a729dd.md\n\n# Table Tennis Word Answering Ping\nFolder: cron\nDescription: The user asked a short wordplay question: which table-tennis word answers \"ping\". The answer given was the single lowercase word \"pong\". No further discussion or tool work was needed beyond this quick riddle response.",
+    "encoding_format": "float"
+  }
+}

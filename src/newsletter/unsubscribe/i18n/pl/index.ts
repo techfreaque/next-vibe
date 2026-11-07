@@ -16,12 +16,13 @@ export const translations: typeof enTranslations = {
   },
   unsubscribe: {
     page: {
-      title: "Wypisz się z newslettera",
-      description: "Przykro nam, że odchodzisz",
+      title: "Wypisz się",
+      description: "Wpisz adres, kliknij, gotowe. Bez wyrzutów sumienia.",
       subtitle: "Zarządzaj swoją subskrypcją newslettera",
       emailProvided: {
         title: "Potwierdź wypisanie",
-        description: "Czy na pewno chcesz wypisać się z naszego newslettera?",
+        description:
+          "Ten adres przestanie dostawać newsletter. Jedno kliknięcie.",
       },
       unsubscribeButton: "Wypisz się",
       unsubscribing: "Wypisywanie...",
@@ -35,12 +36,12 @@ export const translations: typeof enTranslations = {
         title: "Co się stanie dalej",
         description: "Oto, co musisz wiedzieć o wypisywaniu się:",
         immediate: {
-          title: "Natychmiastowy efekt",
+          title: "Od razu.",
           description:
             "Przestaniesz otrzymywać nasze e-maile z newsletterem natychmiast.",
         },
         resubscribe: {
-          title: "Łatwo ponownie subskrybować",
+          title: "Odwracalne.",
           description:
             "Zawsze możesz ponownie subskrybować, jeśli zmienisz zdanie.",
         },
@@ -49,7 +50,7 @@ export const translations: typeof enTranslations = {
         title: "Zanim odejdziesz",
         description: "Rozważ te alternatywy:",
         subscribe: "Dostosuj częstotliwość e-maili",
-        contact: "Skontaktuj się z nami z opiniami",
+        contact: "Powiedz nam, co poprawić",
       },
     },
   },

@@ -161,10 +161,9 @@ export const translations = {
     description: "Request password reset",
     tag: "Password Reset",
     ui: {
-      title: "Reset Your Password",
-      subtitle:
-        "Enter your email address and we'll send you a link to reset your password",
-      sendResetLink: "Send Reset Link",
+      title: "Reset your password",
+      subtitle: "Enter your email. We'll send you a reset link.",
+      sendResetLink: "Send reset link",
       alreadyHaveAccount: "Already have an account? Sign in",
     },
     actions: {
@@ -192,9 +191,9 @@ export const translations = {
     },
     fields: {
       email: {
-        label: "Email Address",
+        label: "Email",
         description: "Enter your email address",
-        placeholder: "your@email.com",
+        placeholder: "you@example.com",
         help: "Enter the email address associated with your account",
         validation: {
           invalid: "Please enter a valid email address",

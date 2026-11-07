@@ -6,7 +6,6 @@ import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import {
   Select,
@@ -170,9 +169,9 @@ export function LeadMagnetConfigContainer(): JSX.Element {
           ) : undefined
         }
       />
-      <Div className="flex flex-col gap-6 p-4">
+      <Div className="flex flex-col gap-6">
         {config ? (
-          <Div className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-3">
+          <Div className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 shadow-sm">
             <Div className="flex items-center gap-3">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
               <Div className="flex flex-col">
@@ -188,8 +187,10 @@ export function LeadMagnetConfigContainer(): JSX.Element {
             </Div>
             <Button
               variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive"
+              size="icon"
+              aria-label={t("widget.delete")}
+              title={t("widget.delete")}
+              className="h-11 w-11 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={handleDelete}
             >
               <Trash2 className="h-4 w-4" />
@@ -198,35 +199,28 @@ export function LeadMagnetConfigContainer(): JSX.Element {
         ) : (
           <>
             {/* Pitch block - explains the feature for first-time users */}
-            <Div className="rounded-lg border border-violet-300 dark:border-violet-500/20 bg-violet-100 dark:bg-violet-950/20 px-5 py-4 flex flex-col gap-3">
-              <Span className="text-sm font-semibold text-violet-900 dark:text-violet-200">
+            <Div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 px-5 py-4">
+              <Span className="text-base font-semibold text-foreground">
                 {t("widget.pitch.headline")}
               </Span>
-              <P className="text-sm text-violet-800 dark:text-muted-foreground leading-relaxed">
+              <P className="m-0 text-sm leading-relaxed text-muted-foreground">
                 {t("widget.pitch.body")}
               </P>
               <Div className="flex flex-col gap-1.5 pt-1">
-                {(
-                  [
-                    t("widget.pitch.step1"),
-                    t("widget.pitch.step2"),
-                    t("widget.pitch.step3"),
-                  ] as string[]
-                ).map((step, i) => (
+                {[
+                  t("widget.pitch.step1"),
+                  t("widget.pitch.step2"),
+                  t("widget.pitch.step3"),
+                ].map((step) => (
                   <Div
-                    key={i}
-                    className="flex items-center gap-2 text-xs text-violet-700 dark:text-muted-foreground"
+                    key={step}
+                    className="flex items-center gap-2 text-sm text-foreground/80"
                   >
-                    <ArrowRight className="h-3 w-3 shrink-0 text-violet-500 dark:text-violet-400" />
+                    <ArrowRight className="h-3.5 w-3.5 shrink-0 text-primary" />
                     <Span>{step}</Span>
                   </Div>
                 ))}
               </Div>
-            </Div>
-
-            <Div className="flex items-center gap-3 rounded-lg border border-dashed px-4 py-3 text-muted-foreground">
-              <Mail className="h-4 w-4 shrink-0" />
-              <Span className="text-sm">{t("widget.noConfig")}</Span>
             </Div>
           </>
         )}
@@ -258,7 +252,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
         </Div>
 
         {activeProvider && (
-          <Div className="rounded-lg border overflow-hidden">
+          <Div className="overflow-hidden rounded-xl border bg-card shadow-sm">
             <ProviderForm
               key={activeProvider}
               providerKey={activeProvider}

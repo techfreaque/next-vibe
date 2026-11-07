@@ -12,7 +12,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
@@ -54,7 +53,6 @@ export class SignupRepository {
    * @param user - User from JWT (public user for signup)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
-   * @param request - Next.js request object for platform detection
    * @returns Success or error result
    */
   static async registerUser(
@@ -62,7 +60,6 @@ export class SignupRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    request: NextRequest | undefined,
     platform: Platform,
     t: SignupT,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
@@ -476,22 +473,11 @@ export class SignupRepository {
         leadId,
       });
 
-      // Fetch user roles for lead conversion tracking
-      const userRolesResult = await UserRolesRepository.getUserRoles(
-        userResponse.data.id,
-        logger,
-        locale,
-      );
-      const userRoles = userRolesResult.success
-        ? userRolesResult.data
-        : [UserPermissionRole.CUSTOMER];
-
       // Link leadId to user (always happens during signup)
       await SignupRepository.handleLeadConversion(
         email,
         leadId,
         userResponse.data.id,
-        { id: userResponse.data.id, isPublic: false, leadId, roles: userRoles },
         locale,
         logger,
       );
@@ -553,7 +539,6 @@ export class SignupRepository {
     email: string,
     leadId: string,
     userId: string,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {

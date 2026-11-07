@@ -76,7 +76,12 @@ function getModelType(def: ModelDefinition): string {
   if (def.outputs.includes("video")) {
     return "video";
   }
-  if (def.outputs.includes("audio") || def.inputs.includes("audio")) {
+  // Audio-only input (STT) is an audio model; multimodal chat LLMs that also
+  // accept audio alongside text are text models.
+  if (
+    def.outputs.includes("audio") ||
+    (def.inputs.includes("audio") && !def.inputs.includes("text"))
+  ) {
     return "audio";
   }
   return "text";

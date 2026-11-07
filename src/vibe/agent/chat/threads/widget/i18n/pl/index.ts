@@ -82,6 +82,14 @@ export const translations: typeof enTranslations = {
     confirmations: {
       deleteMessage: "Czy na pewno chcesz usunąć tę wiadomość?",
     },
+    signInGate: {
+      title: "Zaloguj się, aby otworzyć ten wątek",
+      description:
+        "Ta rozmowa jest w prywatnym lub udostępnionym folderze. Zaloguj się na konto, które ma do niej dostęp.",
+      signIn: "Zaloguj się",
+      signUp: "Załóż darmowe konto",
+      incognito: "Zacznij prywatny czat",
+    },
     welcomeTour: {
       authDialog: {
         title: "Odblokuj prywatne i udostępnione foldery",

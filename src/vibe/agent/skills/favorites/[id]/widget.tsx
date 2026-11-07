@@ -537,7 +537,7 @@ export function FavoriteEditContainer({
   return (
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back, Delete, Submit */}
-      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+      <Div className="flex flex-row items-center gap-2 border-b border-border px-3 py-2">
         {activeSelector !== null ? (
           <Button
             type="button"
@@ -550,6 +550,9 @@ export function FavoriteEditContainer({
         ) : (
           <NavigateButtonWidget field={children.backButton} />
         )}
+        <Span className="min-w-0 self-center truncate text-base font-semibold tracking-tight">
+          {t("patch.container.title")}
+        </Span>
         <NavigateButtonWidget
           field={{
             ...children.deleteButton,

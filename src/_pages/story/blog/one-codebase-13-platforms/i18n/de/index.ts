@@ -12,7 +12,6 @@ export const translations: typeof enTranslations = {
   },
   readingTime: "12 Min. Lesezeit",
   category: "Architektur",
-  publishedDate: "März 2025",
   backToBlog: "Zurück zum Blog",
 
   hero: {
@@ -248,6 +247,6 @@ export const translations: typeof enTranslations = {
     title: "Einmal definieren. Überall vorhanden.",
     para: "WordPress gab jedem die Macht zu publizieren. next-vibe gibt dir die Macht, Plattformen zu bauen, die auf Web, Mobile, CLI, KI-Agenten und Automatisierung funktionieren - die sich selbst überwachen, über ihre eigenen Daten nachdenken und danach handeln.",
     cta: "next-vibe auf GitHub mit Stern versehen",
-    ctaLink: "https://github.com/techfreaque/next-vibe",
+    frameworkCta: "next-vibe entdecken",
   },
 };

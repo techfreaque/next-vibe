@@ -50,7 +50,7 @@ export function BuyPageClient({ locale, user, platform }: Props): JSX.Element {
   );
 
   return (
-    <Container className="py-8">
+    <Container className="px-0 py-4 sm:px-2 sm:py-8 lg:px-4">
       <EndpointsPage
         endpoint={subscriptionCreateDefinition}
         user={user}

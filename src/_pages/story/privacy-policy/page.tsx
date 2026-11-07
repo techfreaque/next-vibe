@@ -2,20 +2,15 @@ import type { Metadata, ResolvingMetadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Div } from "next-vibe/ui/components/div";
-import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
-import { Li } from "next-vibe/ui/components/li";
-import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
-import { Ul } from "next-vibe/ui/components/ul";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
-import { PrivacyPolicyClientInteraction } from "./_components/privacy-policy-client-content";
-import { SupportButton } from "./_components/support-button";
+import { LegalDocument, LegalH3, LegalList, LegalP } from "../_shared/legal";
+import { PrintButton } from "../_shared/print-button";
 import { scopedTranslation } from "./i18n";
 
 interface Props {
@@ -76,227 +71,149 @@ export function TanstackPage({
 }: PrivacyPolicyPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <Div className="container max-w-4xl mx-auto py-16 px-4">
-        {/* Header with icon */}
-        <Div className="mb-12 text-center">
-          <Div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
-            <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-          </Div>
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
-            {t("title")}
-          </H1>
-          <P className="text-lg text-gray-600 dark:text-gray-400">
-            {t("lastUpdated")}
-          </P>
-        </Div>
-
-        {/* Main content */}
-        <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-8">
-          <Div className="prose dark:prose-invert max-w-none">
-            <P className="lead text-lg">
-              {t("introduction", {
-                appName: configT("appName"),
-              })}
-            </P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
-              <Lock className="h-5 w-5 mr-2" />
-              {t("sections.informationCollect.title")}
-            </H2>
-            <P>{t("sections.informationCollect.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.personalData.title")}
-            </H3>
-            <P>{t("sections.personalData.description")}</P>
-            <Ul className="flex flex-col gap-1">
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.name")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.email")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.phone")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.company")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.billing")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.personalData.items.payment")}
-              </Li>
-            </Ul>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.socialMediaData.title")}
-            </H3>
-            <P>{t("sections.socialMediaData.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.derivativeData.title")}
-            </H3>
-            <P>{t("sections.derivativeData.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.useOfInformation.title")}
-            </H2>
-            <P>{t("sections.useOfInformation.description")}</P>
-            <Ul className="flex flex-col gap-1">
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.provide")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.process")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.send")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.respond")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.monitor")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.useOfInformation.items.personalize")}
-              </Li>
-            </Ul>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.disclosure.title")}
-            </H2>
-            <P>{t("sections.disclosure.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.businessTransfers.title")}
-            </H3>
-            <P>{t("sections.businessTransfers.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.thirdParty.title")}
-            </H3>
-            <P>{t("sections.thirdParty.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("sections.legal.title")}
-            </H3>
-            <P>{t("sections.legal.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.security.title")}
-            </H2>
-            <P>{t("sections.security.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.rights.title")}
-            </H2>
-            <P>{t("sections.rights.description")}</P>
-            <Ul className="flex flex-col gap-1">
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.rights.items.access")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.rights.items.correction")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.rights.items.deletion")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.rights.items.objection")}
-              </Li>
-              <Li className="flex items-start">
-                <Span className="mr-2 text-blue-500">•</Span>
-                {t("sections.rights.items.portability")}
-              </Li>
-            </Ul>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.cookies.title")}
-            </H2>
-            <P>{t("sections.cookies.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.thirdPartySites.title")}
-            </H2>
-            <P>{t("sections.thirdPartySites.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.children.title")}
-            </H2>
-            <P>{t("sections.children.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.changes.title")}
-            </H2>
-            <P>{t("sections.changes.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {configT("group.contact.title")}
-            </H2>
-            <SupportButton supportEmail={supportEmail} locale={locale} />
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.gdpr.title")}
-            </H2>
-            <P>{t("sections.gdpr.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("sections.ccpa.title")}
-            </H2>
-            <P>{t("sections.ccpa.description")}</P>
-          </Div>
-        </Div>
-
-        {/* Client component for interactive elements only */}
-        <PrivacyPolicyClientInteraction locale={locale} />
-      </Div>
-    </Div>
+    <LegalDocument
+      eyebrow={t("meta.category")}
+      eyebrowIcon={Shield}
+      title={t("title")}
+      lastUpdated={t("lastUpdated")}
+      tocLabel={t("onThisPage")}
+      actions={
+        <PrintButton label={t("printButton")} ariaLabel={t("printAriaLabel")} />
+      }
+      intro={<LegalP>{t("introduction", { appName })}</LegalP>}
+      sections={[
+        {
+          id: "information-we-collect",
+          title: t("sections.informationCollect.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.informationCollect.description")}</LegalP>
+              <LegalH3>{t("sections.personalData.title")}</LegalH3>
+              <LegalP>{t("sections.personalData.description")}</LegalP>
+              <LegalList
+                items={[
+                  t("sections.personalData.items.name"),
+                  t("sections.personalData.items.email"),
+                  t("sections.personalData.items.phone"),
+                  t("sections.personalData.items.company"),
+                  t("sections.personalData.items.billing"),
+                  t("sections.personalData.items.payment"),
+                ]}
+              />
+              <LegalH3>{t("sections.socialMediaData.title")}</LegalH3>
+              <LegalP>{t("sections.socialMediaData.description")}</LegalP>
+              <LegalH3>{t("sections.derivativeData.title")}</LegalH3>
+              <LegalP>{t("sections.derivativeData.description")}</LegalP>
+            </>
+          ),
+        },
+        {
+          id: "use-of-information",
+          title: t("sections.useOfInformation.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.useOfInformation.description")}</LegalP>
+              <LegalList
+                items={[
+                  t("sections.useOfInformation.items.provide"),
+                  t("sections.useOfInformation.items.process"),
+                  t("sections.useOfInformation.items.send"),
+                  t("sections.useOfInformation.items.respond"),
+                  t("sections.useOfInformation.items.monitor"),
+                  t("sections.useOfInformation.items.personalize"),
+                ]}
+              />
+            </>
+          ),
+        },
+        {
+          id: "disclosure",
+          title: t("sections.disclosure.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.disclosure.description")}</LegalP>
+              <LegalH3>{t("sections.businessTransfers.title")}</LegalH3>
+              <LegalP>{t("sections.businessTransfers.description")}</LegalP>
+              <LegalH3>{t("sections.thirdParty.title")}</LegalH3>
+              <LegalP>{t("sections.thirdParty.description")}</LegalP>
+              <LegalH3>{t("sections.legal.title")}</LegalH3>
+              <LegalP>{t("sections.legal.description")}</LegalP>
+            </>
+          ),
+        },
+        {
+          id: "security",
+          title: t("sections.security.title"),
+          content: <LegalP>{t("sections.security.description")}</LegalP>,
+        },
+        {
+          id: "your-rights",
+          title: t("sections.rights.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.rights.description")}</LegalP>
+              <LegalList
+                items={[
+                  t("sections.rights.items.access"),
+                  t("sections.rights.items.correction"),
+                  t("sections.rights.items.deletion"),
+                  t("sections.rights.items.objection"),
+                  t("sections.rights.items.portability"),
+                ]}
+              />
+            </>
+          ),
+        },
+        {
+          id: "cookies",
+          title: t("sections.cookies.title"),
+          content: <LegalP>{t("sections.cookies.description")}</LegalP>,
+        },
+        {
+          id: "third-party-sites",
+          title: t("sections.thirdPartySites.title"),
+          content: <LegalP>{t("sections.thirdPartySites.description")}</LegalP>,
+        },
+        {
+          id: "children",
+          title: t("sections.children.title"),
+          content: <LegalP>{t("sections.children.description")}</LegalP>,
+        },
+        {
+          id: "changes",
+          title: t("sections.changes.title"),
+          content: <LegalP>{t("sections.changes.description")}</LegalP>,
+        },
+        {
+          id: "contact",
+          title: configT("group.contact.title"),
+          content: (
+            <LegalP>
+              {configT("group.contact.description")}{" "}
+              <ExternalLink
+                href={`mailto:${supportEmail}`}
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {supportEmail}
+              </ExternalLink>
+            </LegalP>
+          ),
+        },
+        {
+          id: "gdpr",
+          title: t("sections.gdpr.title"),
+          content: <LegalP>{t("sections.gdpr.description")}</LegalP>,
+        },
+        {
+          id: "ccpa",
+          title: t("sections.ccpa.title"),
+          content: <LegalP>{t("sections.ccpa.description")}</LegalP>,
+        },
+      ]}
+    />
   );
 }
 

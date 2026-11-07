@@ -435,6 +435,7 @@ export const translations = {
     save: "Save Profile",
     saving: "Saving...",
     editProfile: "Edit Profile",
+    changePhoto: "Change photo",
     cancelEdit: "Cancel",
     memberSince: "Member since",
     profileCard: {
@@ -448,7 +449,7 @@ export const translations = {
     emailCard: {
       title: "Your email list",
       description:
-        "Visitors on your skill page and creator profile can subscribe. You own the list - no platform in the middle.",
+        "Collect subscribers from your skills and profile. Your list, no middleman.",
       manage: "Manage",
     },
     previewCard: {
@@ -472,15 +473,18 @@ export const translations = {
       hubSubtitle: "{{count}} published",
     },
     nav: {
+      logoutHint: "Sign out on this device",
       logout: "Log out",
       back: "Back",
     },
     sections: {
       account: "Account",
+      basics: "Basics",
+      basicsHint: "Your name, login email and updates.",
       subscription: "Subscription",
-      subscriptionHint: "No active plan — upgrade to unlock features",
+      subscriptionHint: "Subscribe for monthly credits.",
       manageSubscription: "Manage",
-      noSubscription: "No active plan",
+      noSubscription: "Free plan",
       upgrade: "Upgrade",
       addresses: "Billing addresses",
       addressCount: "{{count}} saved",
@@ -493,15 +497,17 @@ export const translations = {
       credits: "Credits",
       creditsAvailable: "available",
       password: "Password",
-      passwordHint: "Change your account password",
+      passwordHint: "Change your password",
       sessions: "Active sessions",
-      sessionsHint: "Manage where you're logged in",
+      sessionsHint: "See every device and sign them out",
       creator: "Creator",
       referral: "Referral program",
-      referralHint: "Invite friends and earn rewards",
+      referralHint: "Earn from every payment you bring in",
     },
     deleteAccount: {
       dangerZone: "Danger Zone",
+      dangerDescription:
+        "Gone for good: profile, chats, skills, files, credits.",
       button: "Delete Account",
       confirmTitle: "Delete your account permanently",
       confirmDescription:

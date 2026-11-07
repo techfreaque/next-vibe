@@ -18,13 +18,12 @@ export const translations: typeof enTranslations = {
   },
 
   hero: {
-    eyebrow: "Platforma deweloperska next-vibe",
-    title:
-      "Jeśli człowiek może to zrobić na komputerze, next-vibe może to zautomatyzować.",
+    eyebrow: "Kariera",
+    title: "Bez tablicy ogłoszeń. Praca jest otwarta.",
     subtitle:
-      "Jedna definicja endpointu staje się formularzem web, poleceniem CLI, narzędziem MCP, ekranem natywnym i skillem AI - jednocześnie. Od małych skryptów po pełną automatyzację linii produkcyjnej.",
+      "Nie publikujemy tu ofert pracy. Praca jest otwarta: wdrażaj next-vibe u klientów, automatyzuj prawdziwe firmy, zarabiaj na skillach, które publikujesz. Wszystko, czego potrzebujesz, jest na GitHubie.",
     ctaPrimary: "Zacznij budować",
-    ctaSecondary: "Przeczytaj dokumentację",
+    ctaSecondary: "Czytaj dokumentację",
   },
 
   audience: {
@@ -84,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Zarabiaj na tym, co budujesz",
         description:
-          "Zapakuj automatyzację jako skill. Udostępnij link. 15% prowizji cyklicznej od każdej rejestracji przez Twój URL.",
+          "Zapakuj automatyzację jako skill. Udostępnij link. 10% od każdej płatności każdego użytkownika, który się przez niego zarejestruje - cyklicznie, dopóki płaci.",
       },
     },
   },
@@ -107,7 +106,7 @@ export const translations: typeof enTranslations = {
   referral: {
     title: "Buduj. Udostępniaj. Zarabiaj.",
     description:
-      "Każdy opublikowany skill niesie Twój link polecający. 10% bezpośrednio, 15% przez skill, 20% łącznie. Cyklicznie na zawsze od każdego użytkownika, który przyszedł przez Ciebie.",
+      "Każdy udostępniony skill niesie Twój link polecający. 10% od każdej płatności użytkowników, których przyprowadzisz. Plus 5%, gdy cudzy link przyprowadzi kogoś do Twojego skilla. Cyklicznie, dopóki płacą.",
     cta: "Jak działa ekonomia skilli",
   },
 

@@ -629,9 +629,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       onSubmit={handleSubmit}
       className={cn(
         "@container",
-        "p-2 @sm:p-3 @md:p-4 backdrop-blur",
-        "border border-border rounded-t-lg",
-        ttsAutoplay ? "bg-success/10 border-success/30" : "bg-primary/10",
+        "p-2 @sm:p-3 backdrop-blur",
+        "border rounded-t-2xl shadow-[0_-4px_24px_-12px_rgb(0_0_0/0.12)]",
+        ttsAutoplay
+          ? "bg-success/10 border-success/30"
+          : "bg-card/95 border-border",
         className,
       )}
     >
@@ -703,8 +705,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
           {/* Hint overlay */}
           {!input && canPost && !noCredits && !insufficientCredits && (
-            <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
-              <Div className="text-sm text-foreground pt-2">
+            <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none flex flex-col justify-between pb-1">
+              <Div className="text-base text-muted-foreground pt-2 @sm:text-sm">
                 {isImageModel
                   ? t("input.imagePlaceholder")
                   : isAudioModel
@@ -712,7 +714,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                     : t("input.placeholder")}
               </Div>
               {!isGenerativeModel && (
-                <Div className="flex items-center gap-2 text-[11px] text-foreground/70">
+                <Div className="hidden @md:flex items-center gap-2 text-[11px] text-muted-foreground/80">
                   <Span>
                     <Kbd className="px-1 py-px rounded text-[10px] font-medium font-sans">
                       {t("input.keyboardShortcuts.enter")}
@@ -856,17 +858,19 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       )}
 
       {/* Controls */}
-      <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 flex-nowrap">
-        {/* Left: Selector + Tools + File Upload */}
-        <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
+      {/* Controls - narrow: selector gets its own row so you always see who you're talking to */}
+      <Div className="flex flex-row flex-wrap items-center gap-x-1 gap-y-1.5 @lg:flex-nowrap @lg:gap-1.5">
+        <Div className="flex min-w-0 basis-full @lg:basis-auto @lg:max-w-[45%]">
           <Selector
             skillId={selectedSkill}
             modelId={selectedModel}
             locale={locale}
-            buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
+            buttonClassName="h-9 min-h-9"
             initialSkillData={initialSkillData}
           />
-
+        </Div>
+        {/* Left: Tools + Cortex + File Upload */}
+        <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 flex-1 min-w-0">
           <ToolsButton disabled={!modelSupportsTools} locale={locale} />
 
           <CortexButton

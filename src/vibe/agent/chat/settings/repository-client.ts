@@ -12,7 +12,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { storage } from "next-vibe/ui/lib/storage";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
-import { type ChatModelId, getBestChatModel } from "../../ai-stream/models";
+import {
+  type ChatModelId,
+  getBestChatModel,
+  resolveChatModelForUser,
+} from "../../ai-stream/models";
 import type { AgentEnvAvailability } from "../../env-availability";
 import { ViewMode } from "../enum";
 import type {
@@ -142,7 +146,10 @@ export class ChatSettingsRepositoryClient {
       // Merge overrides with defaults
       // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
       return {
-        selectedModel: overrides.selectedModel ?? defaults.selectedModel,
+        // Stored legacy model ids resolve to their successor at read time.
+        selectedModel: overrides.selectedModel
+          ? resolveChatModelForUser(overrides.selectedModel, user, availability)
+          : defaults.selectedModel,
         selectedSkill: overrides.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId:
           "activeFavoriteId" in overrides

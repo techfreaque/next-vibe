@@ -16,6 +16,43 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    modelRefresh: {
+      title: "Die neuesten Modelle sind da. Unzensiert wird ernst.",
+      category: "Modell-Update",
+      excerpt:
+        "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 und frische offene Modelle. Dazu NanoGPT, ein größeres Venice-Angebot und die ersten unzensierten Bildmodelle.",
+      readTime: "5 Min. Lesezeit",
+    },
+    whatsNewNovember2026: {
+      title:
+        "Sechs Monate auf einer Seite: schneller, sicherer, läuft überall.",
+      category: "Produkt-Update",
+      excerpt:
+        "Stopp heißt Stopp. Spracheingabe läuft auf dem iPhone. Deine KI folgt dir über Rechner hinweg. Selbst hosten ohne Docker. Alles seit Mai.",
+      readTime: "6 Min. Lesezeit",
+    },
+    hermesThea: {
+      title: "Zwei KIs. Ein Gespräch. Beide Richtungen.",
+      category: "Hermes & Thea",
+      excerpt:
+        "Hermes auf deinem Rechner, Thea auf dem Server - jetzt übergibt jede der beiden Threads an die andere. Und ein fehlender API-Key bremst keinen Turn mehr aus.",
+      readTime: "6 Min. Lesezeit",
+    },
+    codingAgent: {
+      title: "Deine KI öffnet ein Terminal und übergibt an Claude Code.",
+      category: "Coding-Agent",
+      excerpt:
+        "Das Coding-Agent-Tool delegiert echte Code-Änderungen an Claude Code oder OpenCode - im Hintergrund oder live im Terminalfenster, mit automatischer Rückmeldung. Jetzt auch instanzübergreifend.",
+      readTime: "5 Min. Lesezeit",
+    },
+    e2eTests: {
+      title:
+        "Ein Roboter hat jeden Button geklickt. Er fand acht Sicherheitslücken.",
+      category: "Engineering",
+      excerpt:
+        "Schluss mit Einzelteil-Tests - wir testen Seiten. Ein echter Browser auf jedem kundenrelevanten Endpoint, und der Open Redirect, die SSRF und die Datenlecks, die er fand.",
+      readTime: "7 Min. Lesezeit",
+    },
     whatsNewMay2026: {
       title: "Cortex. Dreamer. Autopilot. Deine KI erinnert sich jetzt.",
       category: "Produkt-Update",
@@ -88,27 +125,23 @@ export const translations: typeof enTranslations = {
       readTime: "6 Min. Lesezeit",
     },
     referralLanding: {
-      title:
-        "10 % direkt. 15 % via Skill. 20 % total. Wiederkehrend für immer.",
+      title: "10 % direkt. +5 %, wenn andere deinen Skill teilen. Für immer.",
       category: "Empfehlungen",
       excerpt:
         "Die vollständige Mechanik des Empfehlungs- und Skill-Programms - Kettenaufschlüsselung, genaue Prozentsätze pro Ebene, Auszahlungsoptionen und wie der Skill-Bonus stapelt.",
       readTime: "4 Min. Lesezeit",
     },
   },
+  cta: {
+    title: "Neue Beiträge direkt ins Postfach.",
+    subtitle:
+      "Architektur-Deep-Dives und Produkt-Updates, sobald sie live sind. Kein Füllstoff, Abmeldung mit einem Klick.",
+    newsletter: "Newsletter abonnieren",
+    framework: "next-vibe entdecken",
+  },
   labels: {
     readMore: "Weiterlesen",
     allPosts: "Alle Beiträge",
     featured: "Empfohlen",
-    new: "Neu",
-    draft: "Entwurf",
-    referralSection: "Empfehlungsprogramm",
-  },
-  ui: {
-    heroTagline: "next-vibe · {{appName}}",
-    featuredFileBar:
-      "definition.ts → web · cli · mcp · native · cron · 10 mehr",
-    vibeFrameEmbedCaption:
-      "Jeder Endpoint. Zwei Script-Tags. Auf jeder Website.",
   },
 };

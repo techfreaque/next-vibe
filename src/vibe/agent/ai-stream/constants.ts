@@ -52,7 +52,7 @@ export const DEFAULT_IMAGE_VISION_MODEL_SELECTION: ImageVisionModelSelection = {
  */
 export const DEFAULT_VIDEO_VISION_MODEL_SELECTION: VideoVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: VideoVisionModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
+  manualModelId: VideoVisionModelId.GEMINI_3_5_FLASH_LITE,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,
@@ -64,7 +64,7 @@ export const DEFAULT_VIDEO_VISION_MODEL_SELECTION: VideoVisionModelSelection = {
  */
 export const DEFAULT_AUDIO_VISION_MODEL_SELECTION: AudioVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: AudioVisionModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
+  manualModelId: AudioVisionModelId.GEMINI_3_5_FLASH_LITE,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

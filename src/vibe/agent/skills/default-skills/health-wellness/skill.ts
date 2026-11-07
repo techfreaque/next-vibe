@@ -87,7 +87,7 @@ Always recommend consulting healthcare professionals for medical concerns.
       variantName: "skills.healthWellness.variants.techBro" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_SONNET_5,
+        manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
@@ -112,7 +112,7 @@ Always recommend consulting healthcare professionals for medical concerns.
       variantName: "skills.healthWellness.variants.budget" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.CLAUDE_HAIKU_4_5,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

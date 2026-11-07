@@ -14,26 +14,32 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { Camera } from "next-vibe/ui/components/icons/Camera";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Instagram } from "next-vibe/ui/components/icons/Instagram";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { LogOut } from "next-vibe/ui/components/icons/LogOut";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { Building } from "next-vibe/ui/components/icons/Building";
+import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { Music } from "next-vibe/ui/components/icons/Music";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
+import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Twitter } from "next-vibe/ui/components/icons/Twitter";
 import { Youtube } from "next-vibe/ui/components/icons/Youtube";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
-import { H2, P } from "next-vibe/ui/components/typography";
-import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { H2, H3, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
@@ -59,6 +65,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import {
   type JSX,
+  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -66,9 +73,7 @@ import {
   useState,
 } from "react";
 
-import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
 import {
-  DEFAULT_ACCENT,
   ProfileBio,
   ProfileSocialPills,
 } from "@/_pages/creator/[userId]/_shared/profile-content";
@@ -87,7 +92,10 @@ import type meDefinition from "./definition";
 import type { MeGetResponseOutput, MePostRequestOutput } from "./definition";
 import { useUser } from "./hooks";
 
-/** Compact tappable row used throughout the account hub */
+/** Placeholder while a value is still loading. */
+const PENDING_VALUE = "—";
+
+/** One tappable settings row — 56px+ tall, icon tile, title, hint, chevron. */
 function HubRow({
   icon,
   title,
@@ -95,10 +103,10 @@ function HubRow({
   badge,
   onClick,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   subtitle?: string;
-  badge?: React.ReactNode;
+  badge?: ReactNode;
   onClick: () => void;
 }): JSX.Element {
   return (
@@ -106,53 +114,44 @@ function HubRow({
       type="button"
       variant="ghost"
       onClick={onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        width: "100%",
-        padding: "10px 12px",
-        borderRadius: 10,
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        marginBottom: 4,
-        textAlign: "left",
-        height: "auto",
-        justifyContent: "flex-start",
-      }}
+      className="flex h-auto min-h-14 w-full items-center justify-start gap-3 rounded-none px-4 py-3 text-left hover:bg-muted/60"
     >
-      <Span
-        style={{ fontSize: 18, flexShrink: 0, width: 28, textAlign: "center" }}
-      >
+      <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
         {icon}
       </Span>
-      <Div style={{ flex: 1, minWidth: 0 }}>
-        <Span
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: "rgba(255,255,255,0.85)",
-            display: "block",
-          }}
-        >
+      <Div className="min-w-0 flex-1">
+        <Span className="block truncate text-sm font-medium text-foreground">
           {title}
         </Span>
         {subtitle && (
-          <Span
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.4)",
-              display: "block",
-              marginTop: 1,
-            }}
-          >
+          <Span className="mt-0.5 block whitespace-normal text-xs font-normal leading-snug text-muted-foreground">
             {subtitle}
           </Span>
         )}
       </Div>
-      {badge && <Div style={{ flexShrink: 0 }}>{badge}</Div>}
-      <ChevronRight className="h-4 w-4 shrink-0 text-white/25" />
+      {badge && <Div className="shrink-0">{badge}</Div>}
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/60" />
     </Button>
+  );
+}
+
+/** Titled group of HubRows inside one bordered card. */
+function HubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <Div className="flex flex-col gap-2">
+      <H3 className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </H3>
+      <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+        {children}
+      </Div>
+    </Div>
   );
 }
 
@@ -170,7 +169,7 @@ export function MeGetWidget(): JSX.Element {
     })();
   }, [navigate]);
 
-  return <Div style={{ background: "#0f0520", minHeight: "100vh" }} />;
+  return <Div className="min-h-64 bg-background" />;
 }
 
 export function MeDeleteWidget(): JSX.Element {
@@ -225,109 +224,44 @@ export function MeDeleteWidget(): JSX.Element {
 
   if (deleted) {
     return (
-      <Div
-        style={{
-          padding: 48,
-          textAlign: "center",
-          color: "rgba(255,255,255,0.6)",
-          fontSize: 14,
-        }}
-      >
+      <Div className="p-12 text-center text-sm text-muted-foreground">
         {t("widget.deleteAccount.success")}
       </Div>
     );
   }
 
   return (
-    <Div
-      style={{
-        background: "#0f0520",
-        color: "#fff",
-        padding: 24,
-        display: "flex",
-        flexDirection: "column",
-        gap: 20,
-      }}
-    >
-      <Div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <Div style={{ color: "#ef4444", flexShrink: 0, display: "flex" }}>
+    <Div className="flex flex-col gap-5 bg-background p-6 text-foreground">
+      <Div className="flex items-start gap-3">
+        <Span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
           <AlertTriangle className="h-5 w-5" />
+        </Span>
+        <Div className="flex flex-col gap-1">
+          <H2 className="m-0 border-0 p-0 text-lg font-semibold tracking-tight text-foreground">
+            {t("widget.deleteAccount.confirmTitle")}
+          </H2>
+          <P className="m-0 text-sm leading-relaxed text-muted-foreground">
+            {t("widget.deleteAccount.confirmDescription")}
+          </P>
         </Div>
-        <H2
-          style={{ color: "#ef4444", fontSize: 16, fontWeight: 700, margin: 0 }}
-        >
-          {t("widget.deleteAccount.confirmTitle")}
-        </H2>
       </Div>
 
-      <P
-        style={{
-          color: "rgba(255,255,255,0.55)",
-          fontSize: 13,
-          margin: 0,
-          lineHeight: 1.6,
-        }}
-      >
-        {t("widget.deleteAccount.confirmDescription")}
-      </P>
-
-      <Div
-        style={{
-          background: "rgba(239,68,68,0.06)",
-          border: "1px solid rgba(239,68,68,0.2)",
-          borderRadius: 8,
-          padding: "12px 16px",
-        }}
-      >
-        <Span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: "rgba(239,68,68,0.75)",
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-          }}
-        >
+      <Div className="rounded-lg border border-destructive/25 bg-destructive/5 px-4 py-3">
+        <Span className="text-xs font-semibold uppercase tracking-wider text-destructive">
           {t("widget.deleteAccount.whatGetsDeleted")}
         </Span>
-        <Div
-          style={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
-        >
+        <Div className="mt-2 flex flex-col gap-1.5">
           {deletedItems.map((item) => (
-            <Div
-              key={item}
-              style={{ display: "flex", alignItems: "center", gap: 8 }}
-            >
-              <Div
-                style={{
-                  width: 4,
-                  height: 4,
-                  borderRadius: "50%",
-                  background: "rgba(239,68,68,0.4)",
-                  flexShrink: 0,
-                }}
-              />
-              <Span
-                style={{
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.4)",
-                  lineHeight: 1.5,
-                }}
-              >
-                {item}
-              </Span>
+            <Div key={item} className="flex items-center gap-2">
+              <Span className="h-1.5 w-1.5 shrink-0 rounded-full bg-destructive/50" />
+              <Span className="text-sm text-muted-foreground">{item}</Span>
             </Div>
           ))}
         </Div>
       </Div>
 
-      <Div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <Span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+      <Div className="flex flex-col gap-2">
+        <Span className="text-sm font-medium text-foreground">
           {t("widget.deleteAccount.confirmLabel")}
         </Span>
         <Input
@@ -337,44 +271,34 @@ export function MeDeleteWidget(): JSX.Element {
           }}
           placeholder={t("widget.deleteAccount.confirmPlaceholder")}
           disabled={isDeleting}
-          style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+          className="h-11 font-mono tracking-wider"
         />
       </Div>
 
       {deleteError !== null && (
-        <Span style={{ fontSize: 12, color: "#ef4444" }}>{deleteError}</Span>
+        <Span className="text-sm text-destructive">{deleteError}</Span>
       )}
 
-      <Div style={{ display: "flex", gap: 10 }}>
+      <Div className="flex flex-col-reverse gap-2 sm:flex-row">
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
+          variant="outline"
           disabled={isDeleting}
           onClick={(): void => {
             pop();
           }}
-          style={{ flex: 1, color: "rgba(255,255,255,0.5)" }}
+          className="h-11 flex-1"
         >
           {t("widget.deleteAccount.cancelButton")}
         </Button>
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
+          variant="destructive"
           disabled={!canDelete || isDeleting}
           onClick={(): void => {
             void handleDelete();
           }}
-          style={{
-            flex: 1,
-            background: canDelete ? "rgba(239,68,68,0.12)" : undefined,
-            border: "1px solid",
-            borderColor: canDelete
-              ? "rgba(239,68,68,0.4)"
-              : "rgba(255,255,255,0.08)",
-            color: canDelete ? "#ef4444" : "rgba(255,255,255,0.2)",
-          }}
+          className="h-11 flex-1"
         >
           {isDeleting
             ? t("widget.deleteAccount.deleting")
@@ -426,18 +350,29 @@ type SocialKey =
   | "githubUrl"
   | "discordUrl";
 
+const SOCIAL_FIELDS: { key: SocialKey; icon: JSX.Element }[] = [
+  { key: "websiteUrl", icon: <Globe className="h-4 w-4" /> },
+  { key: "twitterUrl", icon: <Twitter className="h-4 w-4" /> },
+  { key: "youtubeUrl", icon: <Youtube className="h-4 w-4" /> },
+  { key: "instagramUrl", icon: <Instagram className="h-4 w-4" /> },
+  { key: "tiktokUrl", icon: <Music className="h-4 w-4" /> },
+  { key: "githubUrl", icon: <SiGithub className="h-4 w-4" /> },
+  { key: "discordUrl", icon: <SiDiscord className="h-4 w-4" /> },
+];
+
 /**
- * Avatar with upload-on-hover - fits inside the shared ProfileHero avatar slot.
- * The outer 88×88 ring/border is handled by ProfileHero; we just render
- * the inner Avatar + camera overlay here (no extra border).
+ * Avatar with upload. The camera badge is always visible — no hover-only
+ * affordance, so it works on touch.
  */
 function AvatarUploadButton({
   avatarUrl,
   initials,
+  label,
   onUploaded,
 }: {
   avatarUrl?: string | null;
   initials: string;
+  label: string;
   onUploaded: (url: string) => void;
 }): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -476,25 +411,27 @@ function AvatarUploadButton({
   const displayUrl = previewUrl ?? avatarUrl;
 
   return (
-    <Div className="relative group h-full w-full">
-      <Avatar className="h-full w-full">
+    <Div className="relative h-16 w-16 shrink-0 sm:h-20 sm:w-20">
+      <Avatar className="h-full w-full ring-2 ring-border ring-offset-2 ring-offset-card">
         {displayUrl && <AvatarImage src={displayUrl} alt="" />}
-        <AvatarFallback className="text-2xl font-bold bg-violet-900/60 text-violet-200">
+        <AvatarFallback className="bg-primary/10 text-xl font-semibold text-primary">
           {initials}
         </AvatarFallback>
       </Avatar>
       <Button
         type="button"
-        variant="ghost"
+        variant="outline"
+        size="icon"
         onClick={(): void => inputRef.current?.click()}
         disabled={uploading}
-        className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer p-0 h-auto w-auto"
-        aria-label={initials}
+        className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-card shadow-sm"
+        aria-label={label}
+        title={label}
       >
         {uploading ? (
-          <Span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <Span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         ) : (
-          <Camera className="h-5 w-5 text-white" />
+          <Camera className="h-3.5 w-3.5" />
         )}
       </Button>
       <Input
@@ -509,6 +446,31 @@ function AvatarUploadButton({
           }
         }}
       />
+    </Div>
+  );
+}
+
+/** Titled block inside the profile editor. */
+function EditorSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <Div className="flex flex-col gap-4 border-t px-5 py-5 sm:px-6">
+      <Div className="flex flex-col gap-0.5">
+        <H3 className="text-base font-semibold tracking-tight text-foreground">
+          {title}
+        </H3>
+        {description && (
+          <P className="m-0 text-sm text-muted-foreground">{description}</P>
+        )}
+      </Div>
+      {children}
     </Div>
   );
 }
@@ -561,7 +523,6 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     [profile],
   );
 
-  // Skills list context - reuse the real components from skills/widget.tsx
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const router = useRouter();
 
@@ -569,8 +530,10 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     navigate(logoutDef.POST, {});
   }, [navigate]);
 
+  // Open the list (it has its own empty state + add button) so saved
+  // addresses can be seen and edited, not only added.
   const handleAddAddress = useCallback((): void => {
-    navigate(addressesDef.POST, { popNavigationOnSuccess: 1 });
+    navigate(addressesDef.GET, {});
   }, [navigate]);
 
   const handleDeleteAccount = useCallback((): void => {
@@ -646,32 +609,40 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     }
   }, [profile, form]);
 
+  const handleStartEdit = useCallback((): void => {
+    // Open the editor on the saved profile — the form may have been
+    // re-initialised since the profile loaded (empty fields, and a
+    // cleared field would never register as a change).
+    if (profile) {
+      form.reset(profileFormValues(profile));
+    }
+    setEditing(true);
+  }, [profile, form]);
+
   const emptyField = useMemo(() => ({}), []);
 
-  const initials = useMemo(() => {
-    const name = profile?.publicName ?? profile?.privateName ?? "";
-    return (
-      name
+  const displayName = profile?.publicName ?? profile?.privateName ?? "";
+  const initials = useMemo(
+    () =>
+      displayName
         .split(" ")
         .map((w: string) => w[0])
         .join("")
         .toUpperCase()
-        .slice(0, 2) || "?"
-    );
-  }, [profile?.publicName, profile?.privateName]);
+        .slice(0, 2) || "?",
+    [displayName],
+  );
 
   const basicInfo = children.basicInfo.children;
   const profileInfo = children.profileInfo.children;
   const privacySettings = children.privacySettings.children;
-
-  const accent = profile?.creatorAccentColor ?? DEFAULT_ACCENT;
 
   // Shared profile shape for the shared components
   const profileData = useMemo(
     () =>
       profile
         ? {
-            publicName: profile.publicName ?? profile.privateName ?? "",
+            publicName: displayName,
             avatarUrl: liveAvatarUrl ?? profile.avatarUrl,
             bio: profile.bio,
             creatorAccentColor: profile.creatorAccentColor,
@@ -685,10 +656,10 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
             websiteUrl: profile.websiteUrl,
           }
         : {
-            publicName: "—",
+            publicName: PENDING_VALUE,
             avatarUrl: null,
           },
-    [profile, liveAvatarUrl],
+    [profile, liveAvatarUrl, displayName],
   );
 
   // Resolved slug for public profile links (null if no profile loaded yet)
@@ -702,160 +673,172 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     ? `${envClient.NEXT_PUBLIC_APP_URL}${profilePath}`
     : null;
 
-  const scopedPaletteStyle = useMemo(
-    () => buildScopedPaletteStyle(accent, true),
-    [accent],
-  );
-
-  // Icon constants defined outside JSX to satisfy i18n linting rules
-  const iconSkills = "🧠";
-  const iconSubscription = "💳";
-  const iconCredits = "⚡";
-  const iconAddresses = "📍";
-  const iconPassword = "🔒";
-  const iconSessions = "📱";
-  const iconEmail = "📧";
-  const iconReferral = "🔗";
+  const iconClass = "h-4 w-4";
 
   return (
-    <WidgetShell
-      scroll
-      padding="none"
-      style={{ background: "#0f0520", ...scopedPaletteStyle }}
-    >
-      {/* ── NAV BAR ── */}
-      <WidgetHeader
-        title=""
-        backButton={
-          canGoBack ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={(): void => {
-                pop();
-              }}
-              className="gap-1.5 -ml-1"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {t("widget.nav.back")}
-            </Button>
-          ) : undefined
-        }
-        actions={
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="gap-1.5 text-muted-foreground"
-          >
-            <LogOut className="h-4 w-4" />
-            {t("widget.nav.logout")}
-          </Button>
-        }
-      />
-
-      {/* ── IDENTITY CARD ── */}
-      <Form form={form} onSubmit={onSubmit}>
-        <FormAlertWidget field={emptyField} />
-
-        {/* Avatar + name + edit toggle */}
-        <Div
-          style={{
-            position: "relative",
-            background: `radial-gradient(ellipse at 50% -10%, ${accent}50 0%, transparent 70%)`,
-            padding: "24px 24px 20px",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 16,
+    <WidgetShell scroll className="gap-6 pb-8">
+      {/* ── BACK (only when pushed from another screen) ── */}
+      {canGoBack && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={(): void => {
+            pop();
           }}
+          className="-ml-2 w-fit gap-1.5 text-muted-foreground"
         >
-          {/* Avatar */}
-          <Div style={{ flexShrink: 0 }}>
-            <AvatarUploadButton
-              avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
-              initials={initials}
-              onUploaded={handleAvatarUploaded}
-            />
-          </Div>
+          <ChevronLeft className={iconClass} />
+          {t("widget.nav.back")}
+        </Button>
+      )}
 
-          {/* Name / email / roles */}
-          <Div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
-            <Div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                flexWrap: "wrap",
-              }}
-            >
-              <Span
-                style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: "rgba(255,255,255,0.95)",
-                  lineHeight: 1.2,
-                }}
-              >
-                {profile?.publicName ?? profile?.privateName ?? "—"}
-              </Span>
-              {profile?.userRoles?.map((r) => (
-                <Badge
-                  key={r.id}
-                  variant="outline"
-                  style={{
-                    borderColor: `${accent}60`,
-                    color: accent,
-                    fontSize: 10,
-                    padding: "1px 6px",
-                  }}
-                >
-                  {roleT(r.role)}
-                </Badge>
-              ))}
+      {/* ── PROFILE CARD ── */}
+      <Div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+        <Form form={form} onSubmit={onSubmit}>
+          <Div className="flex flex-col gap-5 p-5 sm:p-6">
+            <Div className="flex items-start gap-4">
+              <AvatarUploadButton
+                avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
+                initials={initials}
+                label={t("widget.changePhoto")}
+                onUploaded={handleAvatarUploaded}
+              />
+              <Div className="flex min-w-0 flex-1 flex-col gap-1 pt-1">
+                <Div className="flex flex-wrap items-center gap-2">
+                  <H2 className="m-0 truncate border-0 p-0 text-xl font-semibold tracking-tight text-foreground">
+                    {displayName || PENDING_VALUE}
+                  </H2>
+                  {profile?.userRoles?.map((r) => (
+                    <Badge
+                      key={r.id}
+                      variant="secondary"
+                      className="px-2 py-0 text-[11px] font-medium"
+                    >
+                      {roleT(r.role)}
+                    </Badge>
+                  ))}
+                </Div>
+                <Div className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+                  <Mail className="h-3.5 w-3.5 shrink-0" />
+                  <Span className="truncate">{profile?.email}</Span>
+                </Div>
+              </Div>
             </Div>
-            <Div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginTop: 3,
-              }}
-            >
-              <Mail className="h-3 w-3 text-white/40" />
-              <Span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                {profile?.email}
-              </Span>
-            </Div>
-          </Div>
 
-          {/* Edit / Save / Cancel + public profile link */}
-          <Div
-            style={{
-              flexShrink: 0,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: 6,
-            }}
-          >
-            {profileHref && (
-              <Link
-                href={profileHref}
-                className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 no-underline transition-colors"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {t("widget.viewPublicProfile")}
-              </Link>
-            )}
-            {editing ? (
-              <Div style={{ display: "flex", gap: 6 }}>
+            {!editing && profile?.bio && <ProfileBio bio={profile.bio} />}
+            {!editing && <ProfileSocialPills profile={profileData} />}
+
+            {!editing && (
+              <Div className="flex flex-col gap-2 sm:flex-row">
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="bg-white/10 text-white/70 hover:bg-white/20 text-xs h-7"
+                  className="h-11 gap-2 sm:h-10"
+                  onClick={handleStartEdit}
+                >
+                  <Pencil className={iconClass} />
+                  {t("widget.editProfile")}
+                </Button>
+                {profileHref && (
+                  <Link
+                    href={profileHref}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input px-4 text-sm font-medium text-foreground no-underline transition-colors hover:bg-accent sm:h-10"
+                  >
+                    <ExternalLink className={iconClass} />
+                    {t("widget.viewPublicProfile")}
+                  </Link>
+                )}
+              </Div>
+            )}
+          </Div>
+
+          <FormAlertWidget field={emptyField} />
+
+          {/* ── EDITOR ── */}
+          {editing && (
+            <>
+              <EditorSection
+                title={t("widget.sections.basics")}
+                description={t("widget.sections.basicsHint")}
+              >
+                <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <TextFieldWidget
+                    fieldName="basicInfo.privateName"
+                    field={basicInfo.privateName}
+                  />
+                  <TextFieldWidget
+                    fieldName="basicInfo.publicName"
+                    field={basicInfo.publicName}
+                  />
+                </Div>
+                <TextFieldWidget
+                  fieldName="basicInfo.email"
+                  field={basicInfo.email}
+                />
+                <BooleanFieldWidget
+                  fieldName="privacySettings.marketingConsent"
+                  field={privacySettings.marketingConsent}
+                />
+              </EditorSection>
+
+              <EditorSection
+                title={t("widget.profileCard.title")}
+                description={t("widget.profileCard.description")}
+              >
+                <MarkdownTextareaFieldWidget
+                  fieldName="profileInfo.bio"
+                  field={profileInfo.bio}
+                />
+                <Div className="flex flex-col gap-2">
+                  <TextFieldWidget
+                    fieldName="profileInfo.creatorSlug"
+                    field={profileInfo.creatorSlug}
+                  />
+                  <Div className="flex items-start gap-2.5 rounded-lg border border-warning/30 bg-warning/10 px-3.5 py-2.5">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+                    <Span className="text-xs leading-relaxed text-foreground/80">
+                      {t("widget.slugWarning")}
+                    </Span>
+                  </Div>
+                </Div>
+                <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <ColorFieldWidget
+                    fieldName="profileInfo.creatorAccentColor"
+                    field={profileInfo.creatorAccentColor}
+                  />
+                  <FileFieldWidget
+                    fieldName="profileInfo.creatorHeaderImageUrl"
+                    field={profileInfo.creatorHeaderImageUrl}
+                  />
+                </Div>
+              </EditorSection>
+
+              <EditorSection
+                title={t("widget.socialCard.title")}
+                description={t("widget.socialCard.description")}
+              >
+                <Div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {SOCIAL_FIELDS.map(({ key, icon }) => (
+                    <Div key={key} className="flex items-end gap-2">
+                      <Span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                        {icon}
+                      </Span>
+                      <Div className="min-w-0 flex-1">
+                        <UrlFieldWidget
+                          fieldName={`profileInfo.${key}`}
+                          field={profileInfo[key]}
+                        />
+                      </Div>
+                    </Div>
+                  ))}
+                </Div>
+              </EditorSection>
+
+              <Div className="sticky bottom-0 flex flex-col-reverse gap-2 border-t bg-card/95 px-5 py-4 backdrop-blur sm:flex-row sm:justify-end sm:px-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 sm:h-10"
                   onClick={handleCancelEdit}
                 >
                   {t("widget.cancelEdit")}
@@ -865,168 +848,21 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
                     text: "widget.save",
                     loadingText: "widget.saving",
                     icon: "save",
-                    iconSize: "xs",
-                    size: "sm",
-                    className: "text-xs h-7",
+                    size: "default",
+                    className: "h-11 sm:h-10",
                   }}
                 />
               </Div>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="bg-white/10 text-white/70 hover:bg-white/20 text-xs h-7 gap-1"
-                onClick={(): void => {
-                  // Open the editor on the saved profile — the form may have been
-                  // re-initialised since the profile loaded (empty fields, and a
-                  // cleared field would never register as a change).
-                  if (profile) {
-                    form.reset(profileFormValues(profile));
-                  }
-                  setEditing(true);
-                }}
-              >
-                <Pencil className="h-3 w-3" />
-                {t("widget.editProfile")}
-              </Button>
-            )}
-          </Div>
-        </Div>
-
-        {/* Bio + socials (view mode) */}
-        {!editing && profile?.bio && (
-          <Div style={{ padding: "0 24px 8px" }}>
-            <ProfileBio bio={profile.bio} />
-          </Div>
-        )}
-        {!editing && (
-          <Div style={{ padding: "0 24px 16px" }}>
-            <ProfileSocialPills profile={profileData} />
-          </Div>
-        )}
-
-        {/* Edit form (expanded inline) */}
-        {editing && (
-          <Div
-            style={{
-              padding: "16px 24px 24px",
-              borderTop: "1px solid rgba(255,255,255,0.07)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-            }}
-          >
-            <Div className="grid grid-cols-2 gap-4">
-              <TextFieldWidget
-                fieldName="basicInfo.privateName"
-                field={basicInfo.privateName}
-              />
-              <TextFieldWidget
-                fieldName="basicInfo.publicName"
-                field={basicInfo.publicName}
-              />
-            </Div>
-            <TextFieldWidget
-              fieldName="basicInfo.email"
-              field={basicInfo.email}
-            />
-            <BooleanFieldWidget
-              fieldName="privacySettings.marketingConsent"
-              field={privacySettings.marketingConsent}
-            />
-            <MarkdownTextareaFieldWidget
-              fieldName="profileInfo.bio"
-              field={profileInfo.bio}
-            />
-            <Div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <TextFieldWidget
-                fieldName="profileInfo.creatorSlug"
-                field={profileInfo.creatorSlug}
-              />
-              <Div
-                style={{
-                  background: "rgba(251,191,36,0.07)",
-                  border: "1px solid rgba(251,191,36,0.22)",
-                  borderRadius: 8,
-                  padding: "10px 14px",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 10,
-                }}
-              >
-                <Div
-                  style={{
-                    color: "rgb(251,191,36)",
-                    flexShrink: 0,
-                    paddingTop: 1,
-                  }}
-                >
-                  <AlertTriangle className="h-4 w-4" />
-                </Div>
-                <Span
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(251,191,36,0.9)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {t("widget.slugWarning")}
-                </Span>
-              </Div>
-            </Div>
-            <Div className="grid grid-cols-2 gap-4">
-              <ColorFieldWidget
-                fieldName="profileInfo.creatorAccentColor"
-                field={profileInfo.creatorAccentColor}
-              />
-              <FileFieldWidget
-                fieldName="profileInfo.creatorHeaderImageUrl"
-                field={profileInfo.creatorHeaderImageUrl}
-              />
-            </Div>
-            <Div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {(
-                [
-                  { key: "websiteUrl", icon: <Globe className="h-4 w-4" /> },
-                  { key: "twitterUrl", icon: <Twitter className="h-4 w-4" /> },
-                  { key: "youtubeUrl", icon: <Youtube className="h-4 w-4" /> },
-                  {
-                    key: "instagramUrl",
-                    icon: <Instagram className="h-4 w-4" />,
-                  },
-                  { key: "tiktokUrl", icon: <Music className="h-4 w-4" /> },
-                  { key: "githubUrl", icon: <SiGithub className="h-4 w-4" /> },
-                  {
-                    key: "discordUrl",
-                    icon: <SiDiscord className="h-4 w-4" />,
-                  },
-                ] as { key: SocialKey; icon: JSX.Element }[]
-              ).map(({ key, icon }) => (
-                <Div key={key} className="flex items-center gap-2">
-                  <Div
-                    style={{ color: "rgba(255,255,255,0.4)", flexShrink: 0 }}
-                  >
-                    {icon}
-                  </Div>
-                  <Div className="flex-1 min-w-0">
-                    <UrlFieldWidget
-                      fieldName={`profileInfo.${key}`}
-                      field={profileInfo[key]}
-                    />
-                  </Div>
-                </Div>
-              ))}
-            </Div>
-          </Div>
-        )}
-      </Form>
+            </>
+          )}
+        </Form>
+      </Div>
 
       {/* ── SKILLS ── */}
       {mySkills.length > 0 && (
-        <Div style={{ padding: "0 16px" }}>
+        <HubSection title={t("widget.skills.title")}>
           <HubRow
-            icon={iconSkills}
+            icon={<Brain className={iconClass} />}
             title={`${t("widget.skills.title")} (${mySkills.length.toString()})`}
             subtitle={t("widget.skills.hubSubtitle", {
               count: mySkills.length,
@@ -1035,33 +871,13 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
               navigate(skillsDef.GET, {});
             }}
           />
-        </Div>
+        </HubSection>
       )}
 
       {/* ── ACCOUNT ── */}
-      <Div
-        style={{
-          padding: "16px 16px 0",
-          display: "flex",
-          flexDirection: "column",
-          gap: 1,
-        }}
-      >
-        <Div
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "rgba(255,255,255,0.3)",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            padding: "0 4px 8px",
-          }}
-        >
-          {t("widget.sections.account")}
-        </Div>
-
+      <HubSection title={t("widget.sections.account")}>
         <HubRow
-          icon={iconSubscription}
+          icon={<CreditCard className={iconClass} />}
           title={
             subscription?.plan
               ? subscriptionT(subscription.plan)
@@ -1085,32 +901,27 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
                 }
               />
             ) : (
-              <Span
-                style={{
-                  fontSize: 11,
-                  color: accent,
-                  fontWeight: 600,
-                  background: `${accent}20`,
-                  padding: "2px 8px",
-                  borderRadius: 99,
-                }}
-              >
+              <Badge className="px-2 py-0.5 text-[11px]">
                 {t("widget.sections.upgrade")}
-              </Span>
+              </Badge>
             )
           }
           onClick={(): void => {
-            router.push(`/${locale}/subscription/buy`);
+            router.push(
+              subscription
+                ? `/${locale}/subscription/overview`
+                : `/${locale}/subscription/buy`,
+            );
           }}
         />
 
         <HubRow
-          icon={iconCredits}
+          icon={<Zap className={iconClass} />}
           title={t("widget.sections.credits")}
           subtitle={
             credits
-              ? `${credits.total.toLocaleString()} ${t("widget.sections.creditsAvailable")}`
-              : "—"
+              ? `${credits.total.toLocaleString(locale)} ${t("widget.sections.creditsAvailable")}`
+              : PENDING_VALUE
           }
           onClick={(): void => {
             router.push(`/${locale}/subscription/overview`);
@@ -1118,7 +929,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         />
 
         <HubRow
-          icon={iconAddresses}
+          icon={<Building className={iconClass} />}
           title={t("widget.sections.addresses")}
           subtitle={
             addresses.length > 0
@@ -1129,7 +940,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         />
 
         <HubRow
-          icon={iconPassword}
+          icon={<Lock className={iconClass} />}
           title={t("widget.sections.password")}
           subtitle={t("widget.sections.passwordHint")}
           onClick={(): void => {
@@ -1138,39 +949,19 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         />
 
         <HubRow
-          icon={iconSessions}
+          icon={<Monitor className={iconClass} />}
           title={t("widget.sections.sessions")}
           subtitle={t("widget.sections.sessionsHint")}
           onClick={(): void => {
             navigate(sessionsDef.GET, {});
           }}
         />
-      </Div>
+      </HubSection>
 
       {/* ── CREATOR ── */}
-      <Div
-        style={{
-          padding: "16px 16px 0",
-          display: "flex",
-          flexDirection: "column",
-          gap: 1,
-        }}
-      >
-        <Div
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "rgba(255,255,255,0.3)",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            padding: "0 4px 8px",
-          }}
-        >
-          {t("widget.sections.creator")}
-        </Div>
-
+      <HubSection title={t("widget.sections.creator")}>
         <HubRow
-          icon={iconEmail}
+          icon={<Mail className={iconClass} />}
           title={t("widget.emailCard.title")}
           subtitle={t("widget.emailCard.description")}
           onClick={(): void => {
@@ -1179,26 +970,48 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         />
 
         <HubRow
-          icon={iconReferral}
+          icon={<TrendingUp className={iconClass} />}
           title={t("widget.sections.referral")}
           subtitle={t("widget.sections.referralHint")}
           onClick={(): void => {
             router.push(`/${locale}/user/referral`);
           }}
         />
+      </HubSection>
+
+      {/* ── SIGN OUT ── */}
+      <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+        <HubRow
+          icon={<LogOut className={iconClass} />}
+          title={t("widget.nav.logout")}
+          subtitle={t("widget.nav.logoutHint")}
+          onClick={handleLogout}
+        />
       </Div>
 
-      {/* ── DANGER ── */}
-      <Div style={{ padding: "24px 16px 32px" }}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleDeleteAccount}
-          className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 border border-destructive/20 hover:border-destructive/40 transition-all"
-        >
-          {t("widget.deleteAccount.button")}
-        </Button>
+      {/* ── DANGER ZONE ── */}
+      <Div className="flex flex-col gap-2">
+        <H3 className="px-1 text-xs font-semibold uppercase tracking-wider text-destructive">
+          {t("widget.deleteAccount.dangerZone")}
+        </H3>
+        <Div className="flex flex-col gap-4 rounded-xl border border-destructive/30 bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <Div className="flex flex-col gap-0.5">
+            <Span className="text-sm font-medium text-foreground">
+              {t("widget.deleteAccount.button")}
+            </Span>
+            <Span className="text-xs leading-snug text-muted-foreground">
+              {t("widget.deleteAccount.dangerDescription")}
+            </Span>
+          </Div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleDeleteAccount}
+            className="h-11 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:h-10"
+          >
+            {t("widget.deleteAccount.button")}
+          </Button>
+        </Div>
       </Div>
     </WidgetShell>
   );

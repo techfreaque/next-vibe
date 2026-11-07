@@ -709,16 +709,16 @@ function LocalView({
         </Card>
       )}
 
-      {/* Connection list header */}
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <Link2 className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {connections.length > 0
-            ? t("widget.local.connectionsTitle")
-            : t("widget.local.noConnectionsYet")}
-        </Span>
-        {hasProblems && <AlertTriangle className="h-4 w-4 text-amber-500" />}
-      </Div>
+      {/* Connection list header — only when there is a list to head */}
+      {connections.length > 0 && (
+        <Div className="flex items-center gap-2 px-4 py-3 border-b">
+          <Link2 className="h-4 w-4 text-muted-foreground" />
+          <Span className="font-semibold text-sm mr-auto">
+            {t("widget.local.connectionsTitle")}
+          </Span>
+          {hasProblems && <AlertTriangle className="h-4 w-4 text-warning" />}
+        </Div>
+      )}
 
       {connections.length > 0 ? (
         <Div className="flex flex-col divide-y">
@@ -734,9 +734,18 @@ function LocalView({
           ))}
         </Div>
       ) : (
-        <Div className="flex flex-col items-center justify-center py-10 px-6 text-center text-muted-foreground gap-2">
-          <WifiOff className="h-8 w-8 opacity-30" />
-          <P className="text-sm">{t("widget.emptyState")}</P>
+        <Div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-10 text-center">
+          <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <WifiOff className="h-5 w-5" />
+          </Span>
+          <Div className="flex flex-col gap-1">
+            <Span className="text-sm font-semibold text-foreground">
+              {t("widget.local.noConnectionsYet")}
+            </Span>
+            <P className="m-0 max-w-sm text-sm text-muted-foreground">
+              {t("widget.emptyState")}
+            </P>
+          </Div>
         </Div>
       )}
     </Div>

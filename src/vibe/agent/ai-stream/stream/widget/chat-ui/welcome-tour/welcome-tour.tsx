@@ -221,6 +221,38 @@ export function WelcomeTour({
     needsBottomSheetExpanded,
   ]);
 
+  // Manual start ("Take the tour") - always a fresh tour, even if skipped before.
+  // Subscribing (instead of reading the flag in render) keeps the start out of the effect body.
+  const startRequestedTour = useCallback((): void => {
+    useTourState.getState().clearTourRequest();
+    if (isMobile) {
+      setSidebarCollapsed(true);
+    }
+    setSteps(tourSteps);
+    setStepIndex(0);
+    setTourActive(true);
+    void storage.setItem(TOUR_IN_PROGRESS_KEY, "true");
+    void storage.setItem(TOUR_LAST_STEP_KEY, "0");
+    setTimeout(() => setRun(true), 300);
+  }, [
+    isMobile,
+    setSidebarCollapsed,
+    setSteps,
+    setStepIndex,
+    setTourActive,
+    setRun,
+    tourSteps,
+  ]);
+  useEffect(
+    () =>
+      useTourState.subscribe((state, prev) => {
+        if (state.tourRequested && !prev.tourRequested) {
+          startRequestedTour();
+        }
+      }),
+    [startRequestedTour],
+  );
+
   // Advance to next step
   const goToNextStep = useCallback((): void => {
     const nextIndex = stepIndex + 1;

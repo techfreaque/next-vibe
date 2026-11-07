@@ -143,7 +143,9 @@ export class ChatFavoritesRepositoryClient {
         /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
       const uuidSkillIds = [
         ...new Set(
-          storedConfigs.map((c) => c.skillId).filter((id) => uuidRe.test(id)),
+          storedConfigs
+            .map((c) => parseSkillId(c.skillId).skillId)
+            .filter((id) => uuidRe.test(id)),
         ),
       ];
 
@@ -195,16 +197,18 @@ export class ChatFavoritesRepositoryClient {
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
         // UUID skills: use fetched data; built-in skills: use DEFAULT_SKILLS
-        const isUuid = uuidRe.test(config.skillId);
+        // skillId is stored merged ("thea__brilliant") - look skills up by base id
+        const { skillId: baseSkillId, variantId: configVariantId } =
+          parseSkillId(config.skillId);
+        const isUuid = uuidRe.test(baseSkillId);
         const fetchedSkill = isUuid
-          ? fetchedSkillMap.get(config.skillId)
+          ? fetchedSkillMap.get(baseSkillId)
           : undefined;
         const character = isUuid
           ? undefined
-          : DEFAULT_SKILLS.find((c) => c.id === config.skillId);
+          : DEFAULT_SKILLS.find((c) => c.id === baseSkillId);
 
         const variants = fetchedSkill?.variants ?? character?.variants ?? [];
-        const { variantId: configVariantId } = parseSkillId(config.skillId);
         const variant = configVariantId
           ? (variants.find((v) => v.id === configVariantId) ??
             variants.find((v) => v.isDefault) ??

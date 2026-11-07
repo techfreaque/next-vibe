@@ -2,8 +2,7 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { Info } from "next-vibe/ui/components/icons/Info";
-import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
-import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Server } from "next-vibe/ui/components/icons/Server";
 import { Tag } from "next-vibe/ui/components/icons/Tag";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import type { JSX } from "react";
@@ -26,6 +25,8 @@ export type NavPaths =
   | "/story/blog"
   | "/story/careers"
   | "/story/framework"
+  | "/story/self-host"
+  | "/story/earn"
   | "/story/invest"
   | "/help"
   | "/admin"
@@ -66,26 +67,36 @@ export interface NavParentItemType {
   children: NavChildItem[];
 }
 
+/**
+ * Public site navigation. Ordered by what visitors come for:
+ * price first, then the three "beyond chat" paths, then reading, then company.
+ * "Start chatting" lives in the auth buttons as the primary action.
+ */
 export const navItems: NavItemType[] = [
   {
-    icon: <Sparkles className="h-4 w-4" />,
-    title: "nav.features",
-    href: "/story",
+    icon: <Tag className="h-4 w-4" />,
+    title: "nav.pricing",
+    href: "/subscription/overview",
   },
   {
-    icon: <MessageSquare className="h-4 w-4" />,
-    title: "nav.goToApp",
-    href: "/threads",
+    icon: <Server className="h-4 w-4" />,
+    title: "nav.selfHost",
+    href: "/story/self-host",
+  },
+  {
+    icon: <Code className="h-4 w-4" />,
+    title: "nav.developers",
+    href: "/story/framework",
+  },
+  {
+    icon: <TrendingUp className="h-4 w-4" />,
+    title: "nav.earn",
+    href: "/story/earn",
   },
   {
     icon: <BookOpen className="h-4 w-4" />,
     title: "nav.blog.title",
     href: "/story/blog",
-  },
-  {
-    icon: <Tag className="h-4 w-4" />,
-    title: "nav.pricing",
-    href: "/subscription/overview",
   },
   {
     title: "nav.company",
@@ -108,12 +119,6 @@ export const navItems: NavItemType[] = [
         title: "nav.invest.title",
         description: "nav.invest.description",
         href: "/story/invest",
-      },
-      {
-        icon: <Code className="h-4 w-4" />,
-        title: "nav.framework.title",
-        description: "nav.framework.description",
-        href: "/story/framework",
       },
     ],
   },

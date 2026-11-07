@@ -59,7 +59,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import BadgeWidget from "next-vibe/unified-ui/widgets/display-only/badge/widget";
 import IconWidget from "next-vibe/unified-ui/widgets/display-only/icon/widget";
-import { SeparatorWidget } from "next-vibe/unified-ui/widgets/display-only/separator/widget";
 import TextWidget from "next-vibe/unified-ui/widgets/display-only/text/widget";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
@@ -316,25 +315,33 @@ export function SkillsListContainer({
         {!isOnboarding && (
           <Div
             className={cn(
-              "flex flex-row gap-2 px-4 py-4 sticky top-0 z-10",
+              "sticky top-0 z-10 flex flex-row items-center gap-2 border-b border-border px-3 py-2",
               isFullPage ? "bg-card" : "bg-popover",
             )}
           >
             <NavigateButtonWidget field={children.backButton} />
-            <Div className="ml-auto flex items-center gap-2">
+            <Span className="truncate text-base font-semibold tracking-tight">
+              {t("get.titleShort")}
+            </Span>
+            <Div className="ml-auto flex items-center gap-1.5">
               <Button
                 type="button"
                 variant="outline"
-                size="default"
+                size="sm"
+                className="h-9 gap-1.5"
                 onClick={handleCreateCustomClick}
               >
-                {t("get.createButton.label")}
+                <Plus className="h-4 w-4" />
+                <Span className="hidden min-[380px]:inline">
+                  {t("get.createButton.label")}
+                </Span>
               </Button>
               {!isFullPage && (
                 <Link
                   href={`/${locale}/skills`}
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   title={t("get.openFullPage")}
+                  aria-label={t("get.openFullPage")}
                 >
                   <Maximize className="h-4 w-4" />
                 </Link>
@@ -344,7 +351,7 @@ export function SkillsListContainer({
         )}
 
         {/* Loading Spinner */}
-        <Div className="border-t border-border flex items-center justify-center py-16">
+        <Div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </Div>
       </Div>
@@ -359,25 +366,33 @@ export function SkillsListContainer({
       {!isOnboarding && (
         <Div
           className={cn(
-            "flex flex-row gap-2 px-4 py-4 sticky top-0 z-10",
+            "sticky top-0 z-10 flex flex-row items-center gap-2 border-b border-border px-3 py-2",
             isFullPage ? "bg-card" : "bg-popover",
           )}
         >
           <NavigateButtonWidget field={children.backButton} />
-          <Div className="ml-auto flex items-center gap-2">
+          <Span className="truncate text-base font-semibold tracking-tight">
+            {t("get.titleShort")}
+          </Span>
+          <Div className="ml-auto flex items-center gap-1.5">
             <Button
               type="button"
               variant="outline"
-              size="default"
+              size="sm"
+              className="h-9 gap-1.5"
               onClick={handleCreateCustomClick}
             >
-              {t("get.createButton.label")}
+              <Plus className="h-4 w-4" />
+              <Span className="hidden min-[380px]:inline">
+                {t("get.createButton.label")}
+              </Span>
             </Button>
             {!isFullPage && (
               <Link
                 href={`/${locale}/skills`}
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 title={t("get.openFullPage")}
+                aria-label={t("get.openFullPage")}
               >
                 <Maximize className="h-4 w-4" />
               </Link>
@@ -387,8 +402,8 @@ export function SkillsListContainer({
       )}
 
       {/* Content - scroll is owned by the surrounding container (popover or page) */}
-      <Div className="border-t border-border">
-        <Div className="p-4">
+      <Div>
+        <Div className="p-3 sm:p-4">
           {/* Onboarding Success Banner */}
           {isOnboarding && companionSkill && (
             <Div className="bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/30 rounded-lg px-4 py-4 mb-6 shadow-sm">
@@ -409,38 +424,8 @@ export function SkillsListContainer({
               </Div>
             </Div>
           )}
-          {/* Direct Model Access Section */}
-          <TextWidget field={children.title} fieldName="title" />
-          <TextWidget field={children.description} fieldName="description" />
-
-          {/* Direct Model Card - Optimized for narrow width */}
-          <Div className="rounded-lg border border-primary/30 hover:border-primary/40 hover:shadow-md transition-colors mb-6 p-3">
-            <Div className="flex flex-col gap-3">
-              {/* Header: Icon + Name */}
-              <Div className="flex items-center gap-2">
-                <IconWidget field={children.icon} fieldName="icon" />
-                <TextWidget field={children.name} fieldName="name" />
-              </Div>
-
-              {/* Description */}
-              <TextWidget
-                field={children.modelDescription}
-                fieldName="modelDescription"
-              />
-
-              {/* Button - Full Width */}
-              <NavigateButtonWidget field={children.selectButton} />
-            </Div>
-          </Div>
-
-          <SeparatorWidget field={children.separator} />
-
-          {/* Skills Section */}
-          <TextWidget field={children.skillsTitle} fieldName="skillsTitle" />
-          <TextWidget field={children.skillsDesc} fieldName="skillsDesc" />
-
-          {/* Search + source filter */}
-          <Div className="flex flex-wrap items-center gap-2 mb-2">
+          {/* Search + source filter - first thing you see */}
+          <Div className="mb-4 flex flex-wrap items-center gap-2">
             {/* Search bar */}
             <Div className="relative flex-1 min-w-[140px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -455,7 +440,7 @@ export function SkillsListContainer({
                   })
                 }
                 placeholder={t("get.search.placeholder")}
-                className="pl-9 pr-8 h-9 text-sm"
+                className="h-10 pl-9 pr-9 text-sm"
               />
               {searchQuery && (
                 <Button
@@ -478,7 +463,7 @@ export function SkillsListContainer({
 
             {/* Source filter pills */}
             {!isOnboarding && (
-              <Div className="flex rounded-md border border-border p-0.5">
+              <Div className="flex rounded-lg bg-muted p-1">
                 {(
                   [
                     {
@@ -514,10 +499,10 @@ export function SkillsListContainer({
                         })
                       }
                       className={cn(
-                        "h-7 px-2.5 text-xs rounded-sm",
+                        "h-8 rounded-md px-3 text-xs font-medium",
                         isActive
-                          ? "bg-primary text-primary-foreground font-medium shadow-sm"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
                       )}
                     >
                       {t(filter.label)}
@@ -528,8 +513,25 @@ export function SkillsListContainer({
             )}
           </Div>
 
+          {/* Direct model access - compact row, any model without a skill */}
+          {!searchQuery.trim() && (
+            <Div className="mb-5 flex items-center gap-3 rounded-xl border border-dashed border-primary/35 bg-primary/[0.03] p-3">
+              <IconWidget field={children.icon} fieldName="icon" />
+              <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <TextWidget field={children.name} fieldName="name" />
+                <TextWidget
+                  field={children.modelDescription}
+                  fieldName="modelDescription"
+                />
+              </Div>
+              <Div className="shrink-0">
+                <NavigateButtonWidget field={children.selectButton} />
+              </Div>
+            </Div>
+          )}
+
           {/* Sections */}
-          <Div className="flex flex-col gap-6">
+          <Div className="flex flex-col gap-7">
             {filteredSections !== null && filteredSections.length === 0 ? (
               <Div className="text-center text-sm text-muted-foreground py-8">
                 {t("get.search.noResults")}
@@ -537,9 +539,9 @@ export function SkillsListContainer({
             ) : null}
             {(filteredSections ?? skillsData?.sections ?? []).map(
               (section, idx) => (
-                <Div key={idx} className="flex flex-col gap-4">
+                <Div key={idx} className="flex flex-col gap-3">
                   {/* Section Header */}
-                  <Div className="flex items-center gap-2">
+                  <Div className="flex items-center gap-2 px-0.5">
                     <IconWidget
                       field={withValue(
                         children.sections.child.children.sectionIcon,
@@ -889,12 +891,12 @@ export function VariantGroupCard({
   return (
     <Div
       className={cn(
-        "@container group/card relative rounded-lg border overflow-hidden transition-all hover:shadow-sm",
+        "@container group/card relative overflow-hidden rounded-xl border bg-card transition-colors",
         isActive
-          ? "border-l-4 border-l-primary border-primary/20 bg-primary/5"
+          ? "border-primary/50 ring-1 ring-primary/30"
           : isInCollection
-            ? "border-l-2 border-l-primary/50"
-            : "",
+            ? "border-primary/25"
+            : "border-border hover:border-primary/30",
       )}
     >
       {/* Group header - icon + name + tagline + description (click to detail) */}
@@ -957,6 +959,36 @@ export function VariantGroupCard({
             />
           </Div>
         </Div>
+        {/* Primary action: add every variant to favorites, or show it's added */}
+        {!onPick &&
+          (allVariantsFavorited ? (
+            <Span className="mt-0.5 inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-medium text-primary">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <Span className="hidden @[20rem]:inline">
+                {t("get.card.actions.added")}
+              </Span>
+            </Span>
+          ) : (
+            <Button
+              type="button"
+              variant={isInCollection ? "outline" : "default"}
+              size="sm"
+              className="mt-0.5 h-8 shrink-0 gap-1 px-2.5 text-xs"
+              onClick={(e): void => {
+                e.stopPropagation();
+                handleAddMissingVariants();
+              }}
+              disabled={isAddingMissing}
+              title={t("get.card.actions.addMissing")}
+            >
+              {isAddingMissing ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Plus className="h-3.5 w-3.5" />
+              )}
+              {t("get.card.actions.add")}
+            </Button>
+          ))}
         {/* Owner-only: Add Variant button */}
         {first.ownershipType === SkillOwnershipType.USER && (
           <Button
@@ -982,105 +1014,12 @@ export function VariantGroupCard({
         )}
       </Div>
 
-      {/* Top-right hover actions: Add Missing + View + Edit (owner) */}
-      <Div
-        className="absolute top-1.5 right-1.5 hidden group-hover/card:flex items-center gap-0.5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {!allVariantsFavorited && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 p-0 @sm:px-2 @sm:gap-1 opacity-60 hover:opacity-100"
-                  onClick={handleAddMissingVariants}
-                  disabled={isAddingMissing}
-                >
-                  {isAddingMissing ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Zap className="h-3.5 w-3.5" />
-                  )}
-                  <Span className="hidden @sm:inline text-xs">
-                    {t("get.card.actions.addMissing")}
-                  </Span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <Span>{t("get.card.actions.addMissing")}</Span>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 p-0 @sm:px-2 @sm:gap-1 opacity-60 hover:opacity-100"
-                onClick={() => {
-                  navigate(skillDetailDefinitions.GET, {
-                    urlPathParams: { id: skillId },
-                  });
-                }}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                <Span className="hidden @sm:inline text-xs">
-                  {t("get.card.actions.view")}
-                </Span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <Span>{t("get.card.actions.view")}</Span>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        {first.ownershipType === SkillOwnershipType.USER && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 p-0 @sm:px-2 @sm:gap-1 opacity-60 hover:opacity-100"
-                  onClick={(e): void => {
-                    e.stopPropagation();
-                    void (async (): Promise<void> => {
-                      const def = await import("./[id]/definition");
-                      navigate(def.default.PATCH, {
-                        urlPathParams: { id: skillId },
-                        prefillFromGet: true,
-                        getEndpoint: def.default.GET,
-                      });
-                    })();
-                  }}
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  <Span className="hidden @sm:inline text-xs">
-                    {t("get.card.actions.edit")}
-                  </Span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <Span>{t("get.card.actions.edit")}</Span>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </Div>
-
       {/* Variants toggle - rows are collapsed by default */}
       <Button
         type="button"
         variant="ghost"
         size="unset"
-        className="w-full flex items-center justify-start gap-2 px-3 py-2 border-t border-border/40 rounded-none text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+        className="flex h-9 w-full items-center justify-start gap-2 rounded-none border-t border-border/60 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
         onClick={(e) => {
           e.stopPropagation();
           setVariantsExpanded((v) => !v);
@@ -1367,12 +1306,12 @@ export function SkillCard({
     <Div
       key={char.skillId}
       className={cn(
-        "@container group/card relative rounded-lg border overflow-hidden transition-all",
+        "@container group/card relative overflow-hidden rounded-xl border bg-card transition-colors",
         isActive
-          ? "border-l-4 border-l-primary border-primary/20 bg-primary/5"
+          ? "border-primary/50 ring-1 ring-primary/30"
           : isInCollection
-            ? "border-l-2 border-l-primary/50 hover:shadow-sm"
-            : "hover:shadow-sm",
+            ? "border-primary/25"
+            : "border-border hover:border-primary/30",
       )}
       onMouseEnter={() => !isTouch && setShowActions(true)}
       onMouseLeave={() => !isTouch && setShowActions(false)}

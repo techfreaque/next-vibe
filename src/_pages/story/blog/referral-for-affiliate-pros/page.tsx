@@ -3,20 +3,38 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
-import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, Muted, P } from "next-vibe/ui/components/typography";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  ArticleBody,
+  ArticleEnd,
+  ArticleHeader,
+  ArticleLead,
+  ArticleList,
+  ArticleP,
+  ArticleSection,
+} from "../../_shared/article";
+import {
+  Callout,
+  Cta,
+  FeatureCard,
+  FeatureGrid,
+} from "../../_shared/marketing";
+import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -57,89 +75,6 @@ export async function tanstackLoader({
   };
 }
 
-function CommissionRow({
-  profile,
-  spend,
-  earn,
-  highlight,
-}: {
-  profile: string;
-  spend: string;
-  earn: string;
-  highlight?: boolean;
-}): JSX.Element {
-  return (
-    <Div
-      className={`grid grid-cols-3 px-4 py-3 border-t text-sm ${
-        highlight
-          ? "bg-violet-50 dark:bg-violet-950/20 font-semibold"
-          : "bg-background"
-      }`}
-    >
-      <Span
-        className={
-          highlight
-            ? "text-violet-700 dark:text-violet-300"
-            : "text-muted-foreground"
-        }
-      >
-        {profile}
-      </Span>
-      <Span
-        className={
-          highlight ? "text-violet-700 dark:text-violet-300" : "text-foreground"
-        }
-      >
-        {spend}
-      </Span>
-      <Span
-        className={
-          highlight
-            ? "text-violet-600 dark:text-violet-400 font-bold"
-            : "text-emerald-600 dark:text-emerald-400 font-semibold"
-        }
-      >
-        {earn}
-      </Span>
-    </Div>
-  );
-}
-
-function AudienceCard({
-  title,
-  body,
-}: {
-  title: string;
-  body: string;
-}): JSX.Element {
-  return (
-    <Div className="flex gap-4 p-5 rounded-xl border bg-muted/20">
-      <Div className="flex h-2 w-2 shrink-0 rounded-full bg-violet-500 mt-2" />
-      <Div>
-        <Div className="font-semibold text-sm mb-1">{title}</Div>
-        <Div className="text-sm text-muted-foreground">{body}</Div>
-      </Div>
-    </Div>
-  );
-}
-
-function AngleCard({
-  title,
-  body,
-}: {
-  title: string;
-  body: string;
-}): JSX.Element {
-  return (
-    <Div className="p-5 rounded-xl border bg-background">
-      <Div className="font-semibold text-sm mb-2 text-violet-700 dark:text-violet-300">
-        {title}
-      </Div>
-      <P className="text-sm text-muted-foreground leading-relaxed">{body}</P>
-    </Div>
-  );
-}
-
 export function TanstackPage({
   locale,
   modelCount,
@@ -147,264 +82,201 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
+
+  const commissionRows = [
+    {
+      profile: t("recurringMath.row1Profile"),
+      spend: t("recurringMath.row1Spend"),
+      earn: t("recurringMath.row1Earn"),
+      highlight: false,
+    },
+    {
+      profile: t("recurringMath.row2Profile"),
+      spend: t("recurringMath.row2Spend"),
+      earn: t("recurringMath.row2Earn"),
+      highlight: false,
+    },
+    {
+      profile: t("recurringMath.row3Profile"),
+      spend: t("recurringMath.row3Spend"),
+      earn: t("recurringMath.row3Earn"),
+      highlight: true,
+    },
+    {
+      profile: t("recurringMath.row4Profile"),
+      spend: t("recurringMath.row4Spend"),
+      earn: t("recurringMath.row4Earn"),
+      highlight: true,
+    },
+  ];
+
+  const audience = [
+    {
+      title: t("audience.group1Title"),
+      body: t("audience.group1Body"),
+    },
+    {
+      title: t("audience.group2Title"),
+      body: t("audience.group2Body"),
+    },
+    {
+      title: t("audience.group3Title"),
+      body: t("audience.group3Body"),
+    },
+    {
+      title: t("audience.group4Title"),
+      body: t("audience.group4Body", { modelCount }),
+    },
+  ];
+
+  const angles = [
+    {
+      title: t("promotion.angle1Title"),
+      body: t("promotion.angle1Body", { appName }),
+    },
+    {
+      title: t("promotion.angle2Title"),
+      body: t("promotion.angle2Body"),
+    },
+    {
+      title: t("promotion.angle3Title"),
+      body: t("promotion.angle3Body"),
+    },
+    {
+      title: t("promotion.angle4Title"),
+      body: t("promotion.angle4Body", { appName }),
+    },
+  ];
 
   return (
     <Div className="min-h-screen bg-background">
-      {/* Header bar */}
-      <Div className="bg-violet-700 border-b border-violet-800">
-        <Div className="container mx-auto px-4 py-3 max-w-4xl">
-          <Div className="flex items-center gap-3">
-            <Div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center font-bold text-white text-xs">
-              {t("hero.icon")}
-            </Div>
-            <P className="text-white font-semibold text-sm">
-              {t("hero.brand", { appName })}
-              {t("hero.category")}
-            </P>
+      <ArticleHeader
+        back={back}
+        category={t("hero.category")}
+        readTime={t("hero.readTime")}
+        date={formatPostDate("referral-for-affiliate-pros", locale)}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
+      />
+
+      <ArticleBody>
+        <ArticleSection title={t("recurringMath.title")}>
+          <ArticleLead>{t("recurringMath.p1", { appName })}</ArticleLead>
+          <ArticleP>{t("recurringMath.p2", { appName })}</ArticleP>
+          <FeatureGrid columns={2}>
+            <FeatureCard title={t("recurringMath.powerUserTitle")}>
+              {t("recurringMath.powerUserBody")}
+            </FeatureCard>
+            <FeatureCard title={t("recurringMath.floorTitle")}>
+              {t("recurringMath.floorBody", { appName })}
+            </FeatureCard>
+          </FeatureGrid>
+          <Div className="overflow-hidden rounded-xl border border-border bg-card">
+            <Table className="min-w-[30rem]">
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("recurringMath.tableHeaderProfile")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("recurringMath.tableHeaderSpend")}
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">
+                    {t("recurringMath.tableHeaderYouEarn")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {commissionRows.map((row) => (
+                  <TableRow
+                    key={row.profile}
+                    className={
+                      row.highlight
+                        ? "bg-primary/5 hover:bg-primary/10"
+                        : undefined
+                    }
+                  >
+                    <TableCell className="text-foreground">
+                      {row.profile}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground tabular-nums">
+                      {row.spend}
+                    </TableCell>
+                    <TableCell className="font-semibold text-primary tabular-nums">
+                      {row.earn}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Div>
-        </Div>
-      </Div>
+        </ArticleSection>
 
-      {/* Hero */}
-      <Div className="bg-violet-50 dark:bg-violet-950/20 border-b border-violet-100 dark:border-violet-900/40">
-        <Div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Link
-            href={`/${locale}/story/blog`}
-            className="inline-flex items-center text-sm text-violet-700 dark:text-violet-400 hover:text-violet-900 dark:hover:text-violet-300 mb-8 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("hero.backToBlog")}
-          </Link>
+        <ArticleSection title={t("structure.title")}>
+          <ArticleList ordered items={[t("structure.p1"), t("structure.p2")]} />
+          <Callout tone="warning" icon={TrendingUp}>
+            {t("structure.p3")}
+          </Callout>
+          <ArticleP className="text-muted-foreground">
+            {t("structure.p4")}
+          </ArticleP>
+        </ArticleSection>
 
-          <Div className="flex items-center gap-3 mb-6">
-            <Div className="px-3 py-1 bg-violet-700 rounded-full text-white text-xs font-semibold uppercase tracking-wider">
-              {t("hero.category")}
-            </Div>
-            <Muted className="text-xs">{t("hero.readTime")}</Muted>
-          </Div>
+        <ArticleSection
+          title={t("audience.title")}
+          intro={t("audience.intro", { appName, modelCount })}
+        >
+          <FeatureGrid columns={2}>
+            {audience.map((group) => (
+              <FeatureCard key={group.title} icon={Users} title={group.title}>
+                {group.body}
+              </FeatureCard>
+            ))}
+          </FeatureGrid>
+        </ArticleSection>
 
-          <H1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            {t("hero.title")}
-          </H1>
-          <P className="text-xl text-muted-foreground max-w-2xl">
-            {t("hero.subtitle")}
-          </P>
-        </Div>
-      </Div>
-
-      <Div className="container mx-auto px-4 py-16 max-w-4xl space-y-16">
-        {/* Recurring math */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">
-            {t("recurringMath.title")}
-          </H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("recurringMath.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {t("recurringMath.p2", { appName })}
-          </P>
-
-          <Div className="grid sm:grid-cols-2 gap-4 mb-6">
-            <Div className="p-5 rounded-xl bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800">
-              <Div className="font-semibold text-sm mb-2 text-violet-800 dark:text-violet-300">
-                {t("recurringMath.powerUserTitle")}
-              </Div>
-              <P className="text-sm text-violet-700 dark:text-violet-200 leading-relaxed">
-                {t("recurringMath.powerUserBody")}
-              </P>
-            </Div>
-            <Div className="p-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-              <Div className="font-semibold text-sm mb-2 text-emerald-800 dark:text-emerald-300">
-                {t("recurringMath.floorTitle")}
-              </Div>
-              <P className="text-sm text-emerald-700 dark:text-emerald-200 leading-relaxed">
-                {t("recurringMath.floorBody")}
-              </P>
-            </Div>
-          </Div>
-
-          <Div className="overflow-hidden rounded-xl border">
-            <Div className="grid grid-cols-3 bg-muted/60 px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              <Span>{t("recurringMath.tableHeaderProfile")}</Span>
-              <Span>{t("recurringMath.tableHeaderSpend")}</Span>
-              <Span>{t("recurringMath.tableHeaderYouEarn")}</Span>
-            </Div>
-            <CommissionRow
-              profile={t("recurringMath.row1Profile")}
-              spend={t("recurringMath.row1Spend")}
-              earn={t("recurringMath.row1Earn")}
-            />
-            <CommissionRow
-              profile={t("recurringMath.row2Profile")}
-              spend={t("recurringMath.row2Spend")}
-              earn={t("recurringMath.row2Earn")}
-            />
-            <CommissionRow
-              profile={t("recurringMath.row3Profile")}
-              spend={t("recurringMath.row3Spend")}
-              earn={t("recurringMath.row3Earn")}
-              highlight
-            />
-            <CommissionRow
-              profile={t("recurringMath.row4Profile")}
-              spend={t("recurringMath.row4Spend")}
-              earn={t("recurringMath.row4Earn")}
-              highlight
-            />
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Structure */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("structure.title")}</H2>
-          <Div className="space-y-4">
-            <Div className="flex items-start gap-3 p-4 rounded-lg bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800">
-              <Div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white text-xs font-bold mt-0.5">
-                1
-              </Div>
-              <P className="text-sm text-violet-800 dark:text-violet-200 leading-relaxed">
-                {t("structure.p1")}
-              </P>
-            </Div>
-            <Div className="flex items-start gap-3 p-4 rounded-lg bg-muted/30 border">
-              <Div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold mt-0.5">
-                2
-              </Div>
-              <P className="text-sm text-muted-foreground leading-relaxed">
-                {t("structure.p2")}
-              </P>
-            </Div>
-            <Div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-              <TrendingUp className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-              <P className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
-                {t("structure.p3")}
-              </P>
-            </Div>
-            <Div className="flex items-start gap-3 p-4 rounded-lg bg-muted/20 border border-muted">
-              <P className="text-sm text-muted-foreground leading-relaxed italic">
-                {t("structure.p4")}
-              </P>
-            </Div>
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Audience */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-3">{t("audience.title")}</H2>
-          <P className="text-muted-foreground mb-6">
-            {t("audience.intro", { appName, modelCount })}
-          </P>
-          <Div className="grid sm:grid-cols-2 gap-4">
-            <AudienceCard
-              title={t("audience.group1Title")}
-              body={t("audience.group1Body")}
-            />
-            <AudienceCard
-              title={t("audience.group2Title")}
-              body={t("audience.group2Body")}
-            />
-            <AudienceCard
-              title={t("audience.group3Title")}
-              body={t("audience.group3Body")}
-            />
-            <AudienceCard
-              title={t("audience.group4Title")}
-              body={t("audience.group4Body", { modelCount })}
-            />
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Promotion angles */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("promotion.title")}</H2>
-          <Div className="space-y-4">
-            <AngleCard
-              title={t("promotion.angle1Title")}
-              body={t("promotion.angle1Body", { appName })}
-            />
-            <AngleCard
-              title={t("promotion.angle2Title")}
-              body={t("promotion.angle2Body")}
-            />
-            <AngleCard
-              title={t("promotion.angle3Title")}
-              body={t("promotion.angle3Body")}
-            />
-            <AngleCard
-              title={t("promotion.angle4Title")}
-              body={t("promotion.angle4Body", { appName })}
-            />
-          </Div>
-        </Div>
-
-        <Separator />
-
-        {/* Payouts */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("payouts.title")}</H2>
-          <Div className="space-y-3">
-            {[t("payouts.p1"), t("payouts.p2"), t("payouts.p3")].map((p, i) => (
-              <P
-                key={i}
-                className="text-gray-700 dark:text-gray-300 leading-relaxed"
+        <ArticleSection title={t("promotion.title")}>
+          <Div className="flex flex-col gap-3">
+            {angles.map((angle, index) => (
+              <FeatureCard
+                key={angle.title}
+                label={String(index + 1).padStart(2, "0")}
+                title={angle.title}
               >
-                {p}
-              </P>
+                {angle.body}
+              </FeatureCard>
             ))}
           </Div>
-        </Div>
+        </ArticleSection>
 
-        <Separator />
+        <ArticleSection title={t("payouts.title")}>
+          <ArticleP>{t("payouts.p1")}</ArticleP>
+          <ArticleP>{t("payouts.p2")}</ArticleP>
+          <ArticleP>{t("payouts.p3")}</ArticleP>
+        </ArticleSection>
 
-        {/* Close */}
-        <Div>
-          <H2 className="text-2xl font-bold mb-6">{t("close.title")}</H2>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {t("close.p1")}
-          </P>
-          <P className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-            {t("close.p2")}
-          </P>
-          <Div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="gap-2 bg-violet-700 hover:bg-violet-800 text-white"
-            >
-              <Link href={`/${locale}/user/(account)/referral`}>
-                {t("close.createCode")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link
+        <ArticleEnd
+          back={back}
+          title={t("close.title")}
+          subtitle={`${t("close.p1")} ${t("close.p2")}`}
+          actions={
+            <>
+              <Cta
+                href={`/${locale}/user/referral`}
+                label={t("close.createCode")}
+              />
+              <Cta
                 href={configT("social.discordInvite")}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageSquare className="h-4 w-4" />
-                {t("close.joinDiscord")}
-              </Link>
-            </Button>
-          </Div>
-        </Div>
-
-        <Div className="flex justify-start pt-4">
-          <Button asChild variant="outline">
-            <Link href={`/${locale}/story/blog`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("hero.backToBlog")}
-            </Link>
-          </Button>
-        </Div>
-      </Div>
+                label={t("close.joinDiscord")}
+                icon={MessageSquare}
+                variant="secondary"
+                external
+              />
+            </>
+          }
+        />
+      </ArticleBody>
     </Div>
   );
 }

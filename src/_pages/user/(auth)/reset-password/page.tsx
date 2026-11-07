@@ -9,8 +9,6 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { Link } from "next-vibe/ui/components/link";
 import { redirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
@@ -127,15 +125,7 @@ export function TanstackPage({
   }
 
   return (
-    <Div className="container max-w-xl mx-auto py-8 px-4">
-      <Link
-        href={`/${locale}/threads`}
-        className="inline-flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mb-8"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("backToHome")}
-      </Link>
-
+    <Div className="w-full">
       <ResetPasswordForm locale={locale} user={user} platform={platform} />
     </Div>
   );

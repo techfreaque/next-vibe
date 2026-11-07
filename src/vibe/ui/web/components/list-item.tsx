@@ -67,7 +67,7 @@ export function ListItem({
         ) : null}
       </div>
       {actions ? (
-        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 flex-shrink-0 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-within:opacity-100">
           {actions}
         </div>
       ) : null}

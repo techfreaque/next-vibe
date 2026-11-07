@@ -138,7 +138,7 @@ export function TanstackPage({
   const { t } = pageT.scopedT(locale);
 
   const errorFallback = (
-    <Alert variant="destructive" className="mb-8">
+    <Alert variant="destructive">
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>{t("errors.title")}</AlertTitle>
       <AlertDescription>
@@ -153,7 +153,7 @@ export function TanstackPage({
 
   return (
     <ErrorBoundary fallback={errorFallback} locale={locale}>
-      <Div className="max-w-md mx-auto">
+      <Div className="w-full">
         <ResetPasswordConfirmForm
           user={user}
           locale={locale}

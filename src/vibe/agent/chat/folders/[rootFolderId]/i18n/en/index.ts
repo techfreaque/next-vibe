@@ -25,6 +25,7 @@ export const translations = {
       },
     },
     folderList: {
+      menu: "Folder actions",
       newChatInFolder: "New chat in folder",
       moveUp: "Move Up",
       moveDown: "Move Down",

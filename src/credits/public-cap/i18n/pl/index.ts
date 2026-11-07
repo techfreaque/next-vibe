@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     admin: "admin",
   },
   get: {
+    perDayUnit: "kredytów/dzień",
     title: "Pobierz publiczny dzienny limit",
     titleShort: "Dzienny limit",
     description:

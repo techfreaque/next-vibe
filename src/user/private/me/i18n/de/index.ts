@@ -447,6 +447,7 @@ export const translations: typeof enTranslations = {
     save: "Profil speichern",
     saving: "Wird gespeichert...",
     editProfile: "Profil bearbeiten",
+    changePhoto: "Foto ändern",
     cancelEdit: "Abbrechen",
     memberSince: "Mitglied seit",
     profileCard: {
@@ -460,7 +461,7 @@ export const translations: typeof enTranslations = {
     emailCard: {
       title: "Deine E-Mail-Liste",
       description:
-        "Besucher deiner Skill-Seite und deines Creator-Profils können sich eintragen. Die Liste gehört dir - kein Mittelsmann.",
+        "Sammle Abonnenten über deine Skills und dein Profil. Deine Liste, kein Mittelsmann.",
       manage: "Verwalten",
     },
     previewCard: {
@@ -484,15 +485,18 @@ export const translations: typeof enTranslations = {
       hubSubtitle: "{{count}} veröffentlicht",
     },
     nav: {
+      logoutHint: "Auf diesem Gerät abmelden",
       logout: "Abmelden",
       back: "Zurück",
     },
     sections: {
       account: "Konto",
+      basics: "Basisdaten",
+      basicsHint: "Name, Login-E-Mail und Updates.",
       subscription: "Abonnement",
-      subscriptionHint: "Kein aktiver Plan — Upgrade für mehr Funktionen",
+      subscriptionHint: "Abonniere für monatliche Credits.",
       manageSubscription: "Verwalten",
-      noSubscription: "Kein aktiver Plan",
+      noSubscription: "Gratis-Plan",
       upgrade: "Upgraden",
       addresses: "Rechnungsadressen",
       addressCount: "{{count}} gespeichert",
@@ -505,15 +509,17 @@ export const translations: typeof enTranslations = {
       credits: "Credits",
       creditsAvailable: "verfügbar",
       password: "Passwort",
-      passwordHint: "Kontopasswort ändern",
+      passwordHint: "Passwort ändern",
       sessions: "Aktive Sitzungen",
-      sessionsHint: "Verwalte deine Anmeldungen",
+      sessionsHint: "Alle Geräte sehen und abmelden",
       creator: "Creator",
       referral: "Empfehlungsprogramm",
-      referralHint: "Freunde einladen und Prämien erhalten",
+      referralHint: "Verdiene an jeder Zahlung, die du bringst",
     },
     deleteAccount: {
       dangerZone: "Gefahrenzone",
+      dangerDescription:
+        "Endgültig weg: Profil, Chats, Skills, Dateien, Credits.",
       button: "Konto löschen",
       confirmTitle: "Konto dauerhaft löschen",
       confirmDescription:

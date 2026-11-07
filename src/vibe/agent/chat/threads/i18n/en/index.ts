@@ -349,6 +349,31 @@ export const translations = {
       },
     },
     suggestedPrompts: {
+      tryOne: "Try one",
+      starters: {
+        explain: {
+          label: "Explain it simply",
+          prompt:
+            "Explain how inflation works like I'm 12. Short and concrete.",
+        },
+        search: {
+          label: "Search the web",
+          prompt:
+            "What were the biggest tech stories this week? Search and give me sources.",
+        },
+        image: {
+          label: "Make an image",
+          prompt:
+            "Generate an image of a cozy cabin in a snowstorm at night, warm light in the windows.",
+        },
+        honest: {
+          label: "Get the honest take",
+          prompt:
+            "Give me the strongest case for and against crypto. No hedging, no disclaimers.",
+        },
+      },
+      switchHint: "Want a different AI? Tap its name under the message box.",
+      takeTour: "Take the 1-minute tour",
       title: "How can I help you?",
       privateTitle: "Your Private AI Assistant",
       privateDescription:

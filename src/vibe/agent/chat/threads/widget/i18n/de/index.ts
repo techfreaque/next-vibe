@@ -82,6 +82,14 @@ export const translations: typeof enTranslations = {
     confirmations: {
       deleteMessage: "Möchten Sie diese Nachricht wirklich löschen?",
     },
+    signInGate: {
+      title: "Melde dich an, um diesen Thread zu öffnen",
+      description:
+        "Diese Unterhaltung liegt in einem privaten oder geteilten Ordner. Melde dich mit einem Konto an, das Zugriff hat.",
+      signIn: "Anmelden",
+      signUp: "Kostenloses Konto erstellen",
+      incognito: "Lieber einen privaten Chat starten",
+    },
     welcomeTour: {
       authDialog: {
         title: "Private & geteilte Ordner freischalten",

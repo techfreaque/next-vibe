@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
+import { Div } from "next-vibe/ui/components/div";
 
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -39,12 +40,12 @@ export function LoginFormContainer({
   const data = useWidgetValue<typeof definition.POST>();
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
+    <Card className="rounded-xl shadow-sm">
+      <CardHeader className="gap-1.5 p-6 pb-2 text-center sm:p-8 sm:pb-2">
+        <CardTitle className="text-2xl tracking-tight">{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="flex flex-col gap-5 p-6 pt-4 sm:p-8 sm:pt-4">
         <EmailFieldWidget fieldName="email" field={children.email} />
         <PasswordFieldWidget fieldName="password" field={children.password} />
         <BooleanFieldWidget
@@ -65,11 +66,16 @@ export function LoginFormContainer({
           field={children.submitButton}
         />
 
-        <LinkWidget
-          field={children.forgotPassword}
-          fieldName="forgotPassword"
-        />
-        <LinkWidget field={children.createAccount} fieldName="createAccount" />
+        <Div className="flex flex-col items-center gap-1 border-t pt-4 text-sm">
+          <LinkWidget
+            field={children.forgotPassword}
+            fieldName="forgotPassword"
+          />
+          <LinkWidget
+            field={children.createAccount}
+            fieldName="createAccount"
+          />
+        </Div>
       </CardContent>
     </Card>
   );

@@ -588,42 +588,19 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    back: "Wstecz",
-    welcome: {
-      title: "Jedno AI do wszystkiego. Właściwe do każdego zadania.",
-      line1:
-        "Towarzysz do codziennych rozmów. Specjaliści do kodowania, badań, pisania - wybierasz jednego, gdy zadanie tego wymaga.",
-      line2:
-        "Ten sam czat. Przełączasz się, kiedy ma to znaczenie. Zajmuje sekundy.",
-      line3: "Skonfigurujmy cię w mniej niż minutę.",
-      continue: "Zaczynamy",
-    },
-    guest: {
-      title: "Przeglądasz jako gość",
-      line1:
-        "Twoje ustawienia, towarzysz i historia czatu są zapisywane lokalnie tylko na tym urządzeniu.",
-      line2:
-        "Zaloguj się, aby synchronizować wszystko między urządzeniami - i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
-      signIn: "Zaloguj się / Utwórz konto",
-      continueAnyway: "Kontynuuj jako gość",
-      note: "Możesz zalogować się później z menu w dowolnym momencie.",
-    },
-    companion: {
-      title: "Wybierz swojego towarzysza",
-      subtitle: "Twój główny partner do codziennych rozmów",
-      modelTitle: "Który model ma go napędzać?",
-      customSetup: "Zaawansowana konfiguracja →",
-      next: "Dalej",
-      selectFirst: "Wybierz towarzysza, aby kontynuować",
+    setup: {
+      title: "Skonfiguruj swoje AI",
+      subtitle:
+        "Wybierz, z kim rozmawiasz. Specjaliści, jeśli chcesz. Wszystko zmienisz później.",
+      companionLabel: "Twój towarzysz",
+      specialistsLabel: "Dodaj specjalistów",
+      optional: "opcjonalnie",
+      guestNote: "Tryb gościa - konfiguracja zostaje tylko na tym urządzeniu.",
+      signIn: "Zaloguj się, by synchronizować",
+      start: "Zacznij rozmowę",
+      saving: "Konfiguruję...",
     },
     usecases: {
-      title: "Do czego głównie będziesz tego używać?",
-      subtitle:
-        "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
-      saving: "Konfigurowanie...",
-      start: "Rozpocznij czat",
-      hintNoneSelected:
-        "Wybierz obszary dla specjalistów lub naciśnij Start, aby pominąć",
       noProviderAvailable:
         "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true) aby kontynuować.",
       coding: {

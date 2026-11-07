@@ -17,7 +17,10 @@ import { useChatBootContext } from "../../../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import { SidebarFooter } from "./footer/sidebar-footer";
-import { useSidebarCollapsed } from "./use-sidebar-collapsed";
+import {
+  useSidebarCollapsed,
+  useSidebarInitialized,
+} from "./use-sidebar-collapsed";
 
 const SIDEBAR_WIDTH = "w-65";
 const SIDEBAR_MIN_WIDTH_PX = 245;
@@ -93,6 +96,7 @@ export function SidebarWrapper({
   children,
 }: SidebarWrapperProps): JSX.Element {
   const [collapsed, setSidebarCollapsed] = useSidebarCollapsed();
+  const sidebarReady = useSidebarInitialized();
   const { t } = scopedTranslation.scopedT(locale);
 
   const { width: windowWidth } = useWindowSize();
@@ -103,7 +107,7 @@ export function SidebarWrapper({
     return (
       <Div className="flex flex-row flex-1 min-h-0 w-full">
         <AnimatePresence initial={false}>
-          {!collapsed && (
+          {sidebarReady && !collapsed && (
             <MotionDiv
               key="mobile-sidebar"
               initial={{ x: -260 }}
@@ -128,7 +132,7 @@ export function SidebarWrapper({
         </AnimatePresence>
 
         <AnimatePresence initial={false}>
-          {!collapsed && (
+          {sidebarReady && !collapsed && (
             <MotionDiv
               key="mobile-backdrop"
               initial={{ opacity: 0 }}

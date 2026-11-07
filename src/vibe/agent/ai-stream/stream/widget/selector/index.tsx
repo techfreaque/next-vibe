@@ -88,7 +88,6 @@ export function Selector({
   );
   const currentSkill = currentCharaterHook.read?.data ?? null;
   const currentModel = useMemo(() => getChatModelById(modelId), [modelId]);
-  const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -98,63 +97,42 @@ export function Selector({
           variant="ghost"
           size={"sm"}
           className={cn(
-            "h-auto min-h-9 gap-1.5 px-2 py-1.5 hover:bg-accent text-sm font-normal touch-manipulation",
-            modelSupportsTools ? "@md:gap-2 @md:px-3" : "gap-2 px-3",
+            "h-9 min-w-0 max-w-full justify-start gap-2 rounded-lg px-1.5 text-sm font-normal hover:bg-accent touch-manipulation",
             buttonClassName,
           )}
           data-tour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
           suppressHydrationWarning
         >
-          {/* Skill icon/name/separator - not rendered on SSR to avoid hydration mismatch.
-              React Query fetches skill data server-side but the client starts with no cache,
-              causing a structural child mismatch. useIsClient() returns false on SSR / initial
-              hydration render and true only after the client has mounted. */}
-          {!isModelOnly && isClient && currentSkill?.icon && (
-            <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-              <Icon icon={currentSkill.icon} className="h-4 w-4" />
-            </Span>
-          )}
-
-          {!isModelOnly && isClient && currentSkill?.name && (
-            <Span
-              className={cn(
-                "max-w-[80px] @xl:max-w-[100px] truncate",
-                modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
-              )}
-            >
-              {currentSkill.name}
-            </Span>
-          )}
-
-          {!isModelOnly && isClient && currentSkill && (
-            <Span
-              className={cn(
-                modelSupportsTools ? "hidden @md:inline" : "inline",
-              )}
-            >
-              +
-            </Span>
-          )}
-
-          {/* Model icon */}
-          <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-            {currentModel?.icon ? (
-              <Icon icon={currentModel.icon} className="h-4 w-4" />
+          {/* Avatar: the character if one is active, otherwise the model.
+              Skill data is client-only (see useIsClient) to avoid hydration mismatch. */}
+          <Span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+            {!isModelOnly && isClient && currentSkill?.icon ? (
+              <Icon icon={currentSkill.icon} className="h-3.5 w-3.5" />
+            ) : currentModel?.icon ? (
+              <Icon icon={currentModel.icon} className="h-3.5 w-3.5" />
             ) : null}
           </Span>
 
-          {/* Model name - hidden when container is too narrow, shown earlier when no tools */}
+          {/* Who + which brain - truncates, never disappears */}
           <Span
-            className={cn(
-              "max-w-[80px] @xl:max-w-[105px] @2xl:max-w-[140px] truncate",
-              modelSupportsTools ? "hidden @xl:inline" : "hidden @md:inline",
-            )}
+            className="flex min-w-0 items-baseline gap-1.5"
             suppressHydrationWarning
           >
-            {currentModel?.name}
+            {!isModelOnly && isClient && currentSkill?.name ? (
+              <>
+                <Span className="truncate font-medium">
+                  {currentSkill.name}
+                </Span>
+                <Span className="min-w-0 truncate text-xs text-muted-foreground">
+                  {currentModel?.name}
+                </Span>
+              </>
+            ) : (
+              <Span className="truncate font-medium">{currentModel?.name}</Span>
+            )}
           </Span>
 
-          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 

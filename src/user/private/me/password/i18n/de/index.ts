@@ -3,9 +3,9 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Benutzerprofil",
 
-  title: "Passwort Ändern",
+  title: "Passwort ändern",
   titleShort: "Passwort ändern",
-  description: "Ändern Sie Ihr Kontokennwort sicher",
+  description: "Aktuelles Passwort bestätigen, dann ein neues festlegen.",
   tag: "passwort-ändern",
   debug: {
     updatingPassword: "Passwort wird aktualisiert",
@@ -26,19 +26,19 @@ export const translations: typeof enTranslations = {
   currentPassword: {
     label: "Aktuelles Passwort",
     description: "Geben Sie Ihr aktuelles Passwort ein",
-    placeholder: "Aktuelles Passwort eingeben",
+    placeholder: "Dein aktuelles Passwort",
     help: "Geben Sie Ihr aktuelles Passwort ein, um Ihre Identität zu bestätigen",
   },
   newPassword: {
     label: "Neues Passwort",
-    description: "Geben Sie Ihr neues Passwort ein (mindestens 8 Zeichen)",
-    placeholder: "Neues Passwort eingeben",
+    description: "Mindestens 8 Zeichen.",
+    placeholder: "Mindestens 8 Zeichen",
     help: "Wählen Sie ein starkes Passwort mit mindestens 8 Zeichen, einschließlich Buchstaben, Zahlen und Symbolen",
   },
   confirmPassword: {
-    label: "Passwort Bestätigen",
+    label: "Neues Passwort wiederholen",
     description: "Bestätigen Sie Ihr neues Passwort",
-    placeholder: "Neues Passwort bestätigen",
+    placeholder: "Noch einmal eingeben",
     help: "Geben Sie Ihr neues Passwort erneut ein, um sicherzustellen, dass es korrekt eingegeben wurde",
   },
   twoFactorCode: {
@@ -130,11 +130,11 @@ export const translations: typeof enTranslations = {
       "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
     nextSteps: {
       logoutOther:
-        "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
+        "Alle anderen Sitzungen sind abgemeldet. Ab jetzt gilt das neue Passwort.",
       enable2fa:
         "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
     },
-    title: "Passwort Aktualisiert",
+    title: "Passwort geändert",
     description: "Ihr Passwort wurde erfolgreich aktualisiert",
   },
   update: {
@@ -149,5 +149,10 @@ export const translations: typeof enTranslations = {
           "Beim Aktualisieren des Passworts ist ein unerwarteter Fehler aufgetreten",
       },
     },
+  },
+  widget: {
+    back: "Zurück",
+    submit: "Passwort ändern",
+    submitting: "Wird geändert...",
   },
 };

@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
     twitterDescription: "Informacje prawne i dane firmy {{appName}}",
   },
   printAriaLabel: "Drukuj stopkę",
+  onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Nota prawna",
   lastUpdated: "Ostatnia aktualizacja: styczeń 2025",

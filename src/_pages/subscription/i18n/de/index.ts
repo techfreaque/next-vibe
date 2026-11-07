@@ -60,28 +60,27 @@ export const translations: typeof enTranslations = {
     },
     overview: {
       howItWorks: {
-        title: "Wie Credits funktionieren",
+        title: "So funktionieren Credits",
         description:
-          "Abonnieren Sie für {{subCredits}} monatliche Credits und kaufen Sie zusätzliche Pakete bei Bedarf",
+          "Eine Währung für jedes Modell. Abonnieren, aufladen oder gratis starten.",
         expiring: {
-          title: "Monatsabonnement",
+          title: "Monatsabo",
           description:
-            "{{subPrice}}/Monat - {{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen. Perfekt für regelmäßige Nutzer!",
+            "{{subPrice}}/Monat. {{subCredits}} Credits jeden Monat, alle {{modelCount}} Modelle.",
         },
         permanent: {
-          title: "Zusätzliche Credit-Pakete",
+          title: "Credit-Pakete",
           description:
-            "{{packPrice}} für {{packCredits}} Credits - Benötigen Sie mehr als {{subCredits}} Credits? Kaufen Sie zusätzliche Pakete, die nie ablaufen. Erfordert aktives Abonnement.",
+            "{{packPrice}} für {{packCredits}} Credits. Verfallen nie. Für Abonnenten, denen {{subCredits}} nicht reichen.",
         },
         free: {
-          title: "Kostenlose Test-Credits",
-          description:
-            "Jeder erhält {{count}} kostenlose Credits zum Testen unseres Services. Keine Kreditkarte erforderlich!",
+          title: "Gratis-Credits",
+          description: "{{count}} Credits zum Start. Keine Karte nötig.",
         },
       },
       costs: {
-        title: "Credit-Kosten",
-        description: "Sehen Sie, wie viel jede Funktion kostet",
+        title: "Was es kostet",
+        description: "Credits pro Nachricht, Bild, Clip oder Tool-Aufruf.",
         models: {
           title: "KI-Modelle (pro Nachricht)",
           gpt4: "GPT-4",
@@ -113,9 +112,9 @@ export const translations: typeof enTranslations = {
         },
       },
       cta: {
-        title: "Bereit, loszulegen?",
+        title: "Alle Modelle freischalten.",
         description:
-          "Abonnieren Sie für monatliche Credits und chatten Sie mit allen {{modelCount}} KI-Modellen. Abonnenten können zusätzliche Credit-Pakete kaufen!",
+          "Monatliche Credits für alle {{modelCount}} Modelle. Jederzeit mit Paketen aufstocken.",
         button: "Jetzt abonnieren",
       },
     },

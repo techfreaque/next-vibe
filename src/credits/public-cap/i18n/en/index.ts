@@ -4,6 +4,7 @@ export const translations = {
     admin: "admin",
   },
   get: {
+    perDayUnit: "credits/day",
     title: "Get Public Free-Tier Cap",
     titleShort: "Free-Tier Cap",
     description: "View today's global free-tier credit spend and cap",

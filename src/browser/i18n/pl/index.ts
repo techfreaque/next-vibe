@@ -1073,7 +1073,7 @@ export const translations: typeof enTranslations = {
     title: "Emuluj",
     titleShort: "Emuluj",
     description:
-      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieÅ¼Äcej stronie.",
+      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieÅ¼Äcej stronie. Każde wywołanie jest bezwzględne: pominięte pola są resetowane. Nadpisanie user agenta działa od następnej nawigacji, więc po ustawieniu odśwież stronę.",
     dynamicTitle: "Emuluj: {{config}}",
     form: {
       label: "Emuluj urzÄdzenie",

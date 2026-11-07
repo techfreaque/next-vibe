@@ -71,7 +71,11 @@ export const translations = {
       "Because every node is a standard endpoint, they are individually testable via CLI, accessible to AI agents via MCP, and cacheable with the same infra as everything else. The graph engine does not invent its own language. It schedules endpoints.",
   },
   cta: {
+    title: "Read the code. Run it yourself.",
+    subtitle:
+      "next-vibe is open source. Clone it, run vibe dev, and ship your first endpoint to every surface in an afternoon.",
     github: "View on GitHub",
     clone: "git clone https://github.com/techfreaque/next-vibe",
+    framework: "Explore next-vibe",
   },
 };

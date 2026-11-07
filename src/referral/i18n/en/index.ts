@@ -51,11 +51,12 @@ export const translations = {
     titleShort: "Create Code",
     description: "Create a new referral code",
     form: {
-      title: "Create Referral Code",
-      description: "Generate a new referral code to share with others",
+      title: "New referral code",
+      description:
+        "One code per audience. Discord, blog, friends. Each tracked on its own.",
     },
     submit: {
-      label: "Create Code",
+      label: "Create code",
       loading: "Creating...",
     },
   },
@@ -128,7 +129,8 @@ export const translations = {
       },
       widget: {
         empty: "You don't have any referral codes yet",
-        emptyHint: "Create your first code above ↑",
+        emptyHint:
+          "Create your first code below. Your link is ready instantly.",
         copied: "Copied!",
         copy: "Copy Link",
         visitors: "Visitors",
@@ -222,14 +224,14 @@ export const translations = {
   form: {
     fields: {
       code: {
-        label: "Referral Code",
-        description: "Unique referral code",
-        placeholder: "Enter code",
+        label: "Code",
+        description: "What people type or see in your link. 3-50 characters.",
+        placeholder: "e.g. ALEX10",
       },
       label: {
-        label: "Label",
-        description: "Optional label for this code",
-        placeholder: "My referral code",
+        label: "Label (only you see it)",
+        description: "Where you'll share it.",
+        placeholder: "e.g. YouTube bio",
       },
       description: {
         label: "Description",
@@ -362,7 +364,7 @@ export const translations = {
         "Generate unique codes for different audiences - friends, social media, or campaigns.",
       step2Title: "Share your link - or a skill link",
       step2Body:
-        "Referral link: {{directPct}} of every payment from that user, forever. Skill link: {{skillPct}} total ({{directPct}} direct + {{skillBonusPct}} skill bonus) - two income sources, one link.",
+        "Referral link: {{directPct}} of every payment from that user, forever. Your skill shared by others: {{skillBonusPct}} of every payment from those users - income from links you never posted.",
       step3Title: "Get paid",
       step3Body:
         "Earnings are instant. Use them as chat credits or withdraw to crypto.",

@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     tag: "lead-magnet-config",
-    title: "Lead-Magnet-Konfiguration",
+    title: "Deine E-Mail-Liste",
     titleShort: "LM-Konfiguration",
     description: "Deine aktuelle Lead-Magnet-Konfiguration abrufen",
     response: {
@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    delete: "Trennen",
     back: "Zurück",
     loading: "Wird geladen…",
     pitch: {

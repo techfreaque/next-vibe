@@ -17,6 +17,7 @@ import { ApiProvider, type ModelOptionBase } from "../../../models/models";
 import { createClaudeCode } from "../../providers/claude-code";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
+import { createNanoGPT } from "../../providers/nano-gpt";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
@@ -38,6 +39,7 @@ export class ProviderFactory {
     | typeof createFreedomGPT
     | typeof createGabAI
     | typeof createVeniceAI
+    | typeof createNanoGPT
     | typeof createClaudeCode
   > {
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
@@ -56,6 +58,9 @@ export class ProviderFactory {
 
       case ApiProvider.VENICE_AI:
         return createVeniceAI(logger, fetchImpl);
+
+      case ApiProvider.NANO_GPT:
+        return createNanoGPT(logger, fetchImpl);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching

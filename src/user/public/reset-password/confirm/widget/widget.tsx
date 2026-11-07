@@ -56,12 +56,14 @@ export function ResetPasswordConfirmContainer({
   const [tokenFromLink] = useState(() => Boolean(form.getValues("token")));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("confirm.title")}</CardTitle>
+    <Card className="rounded-xl shadow-sm">
+      <CardHeader className="gap-1.5 p-6 pb-2 text-center sm:p-8 sm:pb-2">
+        <CardTitle className="text-2xl tracking-tight">
+          {t("confirm.title")}
+        </CardTitle>
         <CardDescription>{t("confirm.description")}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="flex flex-col gap-5 p-6 pt-4 sm:p-8 sm:pt-4">
         {/* Verification Section */}
         <Div className="flex flex-col gap-4">
           <Div className={tokenFromLink ? "hidden" : undefined}>
@@ -91,7 +93,7 @@ export function ResetPasswordConfirmContainer({
         <FormAlertWidget field={{}} />
 
         {/* Action Buttons */}
-        <Div className="flex gap-2">
+        <Div className="flex flex-col-reverse gap-2 sm:flex-row [&>*]:flex-1">
           {navigation?.canGoBack && (
             <Button
               type="button"

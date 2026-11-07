@@ -122,7 +122,7 @@ describe("E2E: profile settings", () => {
 
     const result = await form.submit();
     expect(result.sent, JSON.stringify(result)).toBe(true);
-    if (!result.sent) return;
+    if (!result.sent) {return;}
     expect(
       result.response.success,
       JSON.stringify({ status: result.status, type: result.contentType, body: result.response }),
@@ -159,7 +159,7 @@ describe("E2E: profile settings", () => {
     await form.fill({ profileInfo: { websiteUrl: "not a url" } });
     const result = await form.submit();
     expect(result.sent).toBe(false);
-    if (result.sent) return;
+    if (result.sent) {return;}
     expect(Object.keys(result.fieldErrors)).toContain("profileInfo.websiteUrl");
 
     const [unchanged] = await db
@@ -180,7 +180,7 @@ describe("E2E: profile settings", () => {
     await form.fill({ profileInfo: { websiteUrl: "" } });
     const result = await form.submit({ assertRequestBody: false });
     expect(result.sent, JSON.stringify(result)).toBe(true);
-    if (!result.sent) return;
+    if (!result.sent) {return;}
     // The cleared field must travel as a clear, not be dropped from the request
     expect(result.requestBody).toMatchObject({ profileInfo: { websiteUrl: "" } });
     expect(result.response.success, JSON.stringify(result.response)).toBe(true);

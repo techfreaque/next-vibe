@@ -19,6 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 
+import { resolveChatModelForUser } from "../../ai-stream/models";
 import { getEnvAvailability } from "../../env-availability";
 import { chatFolders, chatThreads } from "../db";
 import { chatSettings } from "./db";
@@ -169,12 +170,16 @@ export class ChatSettingsRepository {
       }
 
       const setting = settings[0];
+      const availability = await getEnvAvailability();
       const defaults = ChatSettingsRepositoryClient.getDefaults(
         user,
-        await getEnvAvailability(),
+        availability,
       );
       const result: ChatSettingsGetResponseOutput = {
-        selectedModel: setting.selectedModel ?? defaults.selectedModel,
+        // Stored legacy model ids resolve to their successor at read time.
+        selectedModel: setting.selectedModel
+          ? resolveChatModelForUser(setting.selectedModel, user, availability)
+          : defaults.selectedModel,
         selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId: setting.activeFavoriteId ?? defaults.activeFavoriteId,
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,

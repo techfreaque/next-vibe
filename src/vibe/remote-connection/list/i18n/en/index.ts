@@ -53,7 +53,8 @@ export const translations = {
   widget: {
     title: "Remote Connections",
     addButton: "Add Connection",
-    emptyState: "No remote connections yet.",
+    emptyState:
+      "Link another instance and your memories and tools sync both ways, every minute.",
     emptyStateCloud:
       "Link your local install here once it's running. Your memories and tools will sync automatically.",
     connectedBadge: "Connected",
@@ -128,7 +129,7 @@ export const translations = {
       benefit1: "Memories sync bidirectionally, automatically",
       benefit2: "Cloud AI discovers and runs your local tools",
       benefit3: "Delegate tasks from cloud to this machine",
-      noConnectionsYet: "No connections yet.",
+      noConnectionsYet: "Nothing linked yet",
       connectionsTitle: "Linked Connections",
     },
     // Self-identity
