@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { AssistantContent, ModelMessage } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { calculateCreditCost } from "next-vibe/agent/models/models";
@@ -26,6 +26,7 @@ import type {
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
@@ -38,6 +39,9 @@ import {
   aiSdkRunner,
   type InferenceRequest,
   type InferenceRunner,
+  type InferenceTool,
+  type InferenceToolCall,
+  type InferenceToolChoice,
   type InferenceUsage,
   type OpenAiFinishReason,
 } from "../../shared/inference";
@@ -50,6 +54,7 @@ import {
 } from "../../shared/openai";
 import type {
   OpenAiMessage,
+  OpenAiToolChoice,
   V1ChatCompletionsPostRequestOutput,
 } from "./definition";
 
@@ -73,16 +78,57 @@ type Converted =
   | { ok: true; messages: ModelMessage[]; estimatedInputTokens: number }
   | { ok: false; message: string; param: string };
 
+const jsonSchema = z.json();
+
+/** Tool-call arguments arrive as a JSON string; the provider layer wants the parsed value. */
+function parseArguments(
+  raw: string,
+): ReturnType<typeof jsonSchema.parse> | undefined {
+  if (raw.trim() === "") {
+    return {};
+  }
+  try {
+    const parsed = jsonSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
   const out: ModelMessage[] = [];
+  const toolNames = new Map<string, string>();
   let chars = 0;
   let images = 0;
   for (const [index, msg] of messages.entries()) {
     const param = `messages[${index}]`;
-    if (msg.role === "tool") {
-      return { ok: false, message: t("openai.toolsUnsupported"), param };
-    }
     const content = msg.content ?? "";
+    if (msg.role === "tool") {
+      if (!msg.tool_call_id) {
+        return {
+          ok: false,
+          message: t("openai.toolMessageNeedsId", { param }),
+          param,
+        };
+      }
+      const text =
+        typeof content === "string"
+          ? content
+          : content.map((p) => (p.type === "text" ? p.text : "")).join("");
+      chars += text.length;
+      out.push({
+        role: "tool",
+        content: [
+          {
+            type: "tool-result",
+            toolCallId: msg.tool_call_id,
+            toolName: toolNames.get(msg.tool_call_id) ?? msg.name ?? "tool",
+            output: { type: "text", value: text },
+          },
+        ],
+      });
+      continue;
+    }
     if (msg.role === "user") {
       if (typeof content === "string") {
         chars += content.length;
@@ -119,11 +165,39 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
         ? content
         : content.map((p) => (p.type === "text" ? p.text : "")).join("");
     chars += text.length;
-    out.push(
-      msg.role === "assistant"
-        ? { role: "assistant", content: text }
-        : { role: "system", content: text },
-    );
+    if (msg.role === "assistant") {
+      if (msg.tool_calls && msg.tool_calls.length > 0) {
+        const parts: Exclude<AssistantContent, string> = [];
+        if (text) {
+          parts.push({ type: "text", text });
+        }
+        for (const call of msg.tool_calls) {
+          const input = parseArguments(call.function.arguments);
+          if (input === undefined) {
+            return {
+              ok: false,
+              message: t("openai.badToolArguments", {
+                name: call.function.name,
+              }),
+              param: `${param}.tool_calls`,
+            };
+          }
+          chars += call.function.name.length + call.function.arguments.length;
+          toolNames.set(call.id, call.function.name);
+          parts.push({
+            type: "tool-call",
+            toolCallId: call.id,
+            toolName: call.function.name,
+            input,
+          });
+        }
+        out.push({ role: "assistant", content: parts });
+      } else {
+        out.push({ role: "assistant", content: text });
+      }
+      continue;
+    }
+    out.push({ role: "system", content: text });
   }
   return {
     ok: true,
@@ -131,6 +205,24 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
     estimatedInputTokens:
       Math.ceil(chars / CHARS_PER_TOKEN) + images * TOKENS_PER_IMAGE,
   };
+}
+
+function toolChoiceFor(
+  choice: OpenAiToolChoice | undefined,
+): InferenceToolChoice | undefined {
+  if (choice === undefined) {
+    return undefined;
+  }
+  return typeof choice === "string"
+    ? choice
+    : { toolName: choice.function.name };
+}
+
+function toolCallChars(calls: InferenceToolCall[]): number {
+  return calls.reduce(
+    (sum, call) => sum + call.name.length + call.arguments.length,
+    0,
+  );
 }
 
 function stopSequences(
@@ -173,15 +265,6 @@ export class V1ChatCompletionsRepository {
         "n",
       );
     }
-    if (data.tools && data.tools.length > 0) {
-      return openAiError(
-        400,
-        t("openai.toolsUnsupported"),
-        "invalid_request_error",
-        "unsupported_parameter",
-        "tools",
-      );
-    }
     const converted = convertMessages(data.messages, t);
     if (!converted.ok) {
       return openAiError(
@@ -206,6 +289,39 @@ export class V1ChatCompletionsRepository {
       );
     }
 
+    // 3b. Tools: client-defined functions. The model calls, the client runs.
+    const tools: InferenceTool[] = (data.tools ?? []).map((spec) => ({
+      name: spec.function.name,
+      description: spec.function.description,
+      parameters: spec.function.parameters,
+    }));
+    if (tools.length > 0 && !model.supportsTools) {
+      return openAiError(
+        400,
+        t("openai.toolsUnsupportedByModel"),
+        "invalid_request_error",
+        "tools_not_supported",
+        "tools",
+      );
+    }
+    const toolChoice =
+      tools.length > 0 ? toolChoiceFor(data.tool_choice) : undefined;
+    if (
+      typeof toolChoice === "object" &&
+      !tools.some((spec) => spec.name === toolChoice.toolName)
+    ) {
+      return openAiError(
+        400,
+        t("openai.toolChoiceUnknown", { name: toolChoice.toolName }),
+        "invalid_request_error",
+        "invalid_value",
+        "tool_choice",
+      );
+    }
+    const estimatedInputTokens =
+      converted.estimatedInputTokens +
+      Math.ceil(JSON.stringify(data.tools ?? []).length / CHARS_PER_TOKEN);
+
     // 4. Credits: fail-closed pre-flight (balance + free-tier cap)
     const requestedOutput = data.max_completion_tokens ?? data.max_tokens;
     const maxOutputTokens =
@@ -214,7 +330,7 @@ export class V1ChatCompletionsRepository {
         : Math.min(requestedOutput, V1_MAX_OUTPUT_TOKENS);
     const estimatedCost = calculateCreditCost(
       model,
-      converted.estimatedInputTokens,
+      estimatedInputTokens,
       maxOutputTokens ?? DEFAULT_ESTIMATED_OUTPUT_TOKENS,
     );
     const preflight = await V1ChatCompletionsRepository.preflight({
@@ -238,6 +354,8 @@ export class V1ChatCompletionsRepository {
       maxOutputTokens,
       stopSequences: stopSequences(data.stop),
       abortSignal: request?.signal,
+      tools,
+      toolChoice,
       logger,
       toolExecutionContext,
     };
@@ -249,7 +367,7 @@ export class V1ChatCompletionsRepository {
         user: payer,
         model,
         usage,
-        estimatedInputTokens: converted.estimatedInputTokens,
+        estimatedInputTokens: estimatedInputTokens,
         outputChars,
         locale,
         logger,
@@ -263,19 +381,25 @@ export class V1ChatCompletionsRepository {
         includeUsage: data.stream_options?.include_usage === true,
         model,
         logger,
-        estimatedInputTokens: converted.estimatedInputTokens,
+        estimatedInputTokens: estimatedInputTokens,
       });
     }
 
     // 5. Non-streaming
     try {
       const result = await runner.generate(inference);
-      const credits = await bill(result.usage, result.text.length);
-      const promptTokens =
-        result.usage?.inputTokens ?? converted.estimatedInputTokens;
+      const credits = await bill(
+        result.usage,
+        result.text.length + toolCallChars(result.toolCalls),
+      );
+      const promptTokens = result.usage?.inputTokens ?? estimatedInputTokens;
       const completionTokens =
         result.usage?.outputTokens ??
-        Math.ceil(result.text.length / CHARS_PER_TOKEN);
+        Math.ceil(
+          (result.text.length + toolCallChars(result.toolCalls)) /
+            CHARS_PER_TOKEN,
+        );
+      const hasToolCalls = result.toolCalls.length > 0;
       return openAiJson({
         id: newCompletionId(),
         object: "chat.completion",
@@ -284,8 +408,20 @@ export class V1ChatCompletionsRepository {
         choices: [
           {
             index: 0,
-            message: { role: "assistant", content: result.text },
-            finish_reason: result.finishReason,
+            message: {
+              role: "assistant",
+              content: hasToolCalls && result.text === "" ? null : result.text,
+              ...(hasToolCalls
+                ? {
+                    tool_calls: result.toolCalls.map((call) => ({
+                      id: call.id,
+                      type: "function" as const,
+                      function: { name: call.name, arguments: call.arguments },
+                    })),
+                  }
+                : {}),
+            },
+            finish_reason: hasToolCalls ? "tool_calls" : result.finishReason,
           },
         ],
         usage: {
@@ -433,7 +569,16 @@ export class V1ChatCompletionsRepository {
     const run: InferenceRequest = { ...inference, abortSignal: abort.signal };
 
     const chunk = (
-      delta: { role?: "assistant"; content?: string },
+      delta: {
+        role?: "assistant";
+        content?: string;
+        tool_calls?: Array<{
+          index: number;
+          id?: string;
+          type?: "function";
+          function: { name?: string; arguments: string };
+        }>;
+      },
       finishReason: OpenAiFinishReason | null,
     ): string =>
       `data: ${JSON.stringify({
@@ -457,12 +602,51 @@ export class V1ChatCompletionsRepository {
         let usage: InferenceUsage | undefined;
         let finishReason: OpenAiFinishReason = "stop";
         let failed: string | undefined;
+        // OpenAI addresses streamed calls by their position, not their id.
+        const callIndex = new Map<string, number>();
         send(chunk({ role: "assistant", content: "" }, null));
         try {
           for await (const event of runner.stream(run)) {
             if (event.type === "text") {
               outputChars += event.text.length;
               send(chunk({ content: event.text }, null));
+            } else if (event.type === "tool-call-start") {
+              const index = callIndex.size;
+              callIndex.set(event.id, index);
+              outputChars += event.name.length;
+              send(
+                chunk(
+                  {
+                    tool_calls: [
+                      {
+                        index,
+                        id: event.id,
+                        type: "function",
+                        function: { name: event.name, arguments: "" },
+                      },
+                    ],
+                  },
+                  null,
+                ),
+              );
+            } else if (event.type === "tool-call-delta") {
+              const index = callIndex.get(event.id);
+              if (index !== undefined) {
+                outputChars += event.argumentsDelta.length;
+                send(
+                  chunk(
+                    {
+                      tool_calls: [
+                        {
+                          index,
+                          function: { arguments: event.argumentsDelta },
+                        },
+                      ],
+                    },
+                    null,
+                  ),
+                );
+              }
             } else if (event.type === "finish") {
               usage = event.usage;
               finishReason = event.finishReason;
@@ -484,7 +668,7 @@ export class V1ChatCompletionsRepository {
             `data: ${JSON.stringify(openAiErrorBody(failed, "server_error", "upstream_error"))}\n\n`,
           );
         } else {
-          send(chunk({}, finishReason));
+          send(chunk({}, callIndex.size > 0 ? "tool_calls" : finishReason));
           if (includeUsage) {
             const promptTokens =
               usage?.inputTokens ?? params.estimatedInputTokens;

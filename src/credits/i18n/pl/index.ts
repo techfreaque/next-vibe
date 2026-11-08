@@ -222,6 +222,12 @@ export const translations: typeof enTranslations = {
       subscribe: "Zobacz plany",
       freePlanHint:
         "{{count}} darmowych kredytów miesięcznie, +{{bonus}} z newsletterem. Z subskrypcją {{subCredits}}, albo po prostu kup pakiet. Subskrypcja niepotrzebna.",
+      lowBalance: {
+        title: "Zostało {{count}} kredytów",
+        emptyTitle: "Skończyły Ci się kredyty",
+        hint: "Doładuj {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Subskrypcja niepotrzebna.",
+        cta: "Doładuj kredyty",
+      },
       freePlan: "Korzystasz z planu darmowego",
       guestPlan: "Saldo gościa",
       signUp: "Załóż darmowe konto",

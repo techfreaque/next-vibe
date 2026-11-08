@@ -99,6 +99,11 @@ const { GET } = createEndpoint({
         label: "list.response.baseUrl",
         schema: z.string(),
       }),
+      isPaid: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "list.response.isPaid",
+        schema: z.boolean(),
+      }),
       keys: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "list.response.keys",
@@ -125,6 +130,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         baseUrl: "https://example.com/api/en-US/v1",
+        isPaid: true,
         keys: [],
       },
     },

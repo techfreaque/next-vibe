@@ -956,7 +956,11 @@ export const endpointsMeta: EndpointMeta[] = [
     tags: ["API"],
     examples: {
       responses: {
-        default: { baseUrl: "https://example.com/api/en-US/v1", keys: [] },
+        default: {
+          baseUrl: "https://example.com/api/en-US/v1",
+          isPaid: true,
+          keys: [],
+        },
       },
     },
   },

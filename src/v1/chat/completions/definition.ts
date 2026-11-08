@@ -32,6 +32,12 @@ const contentPartSchema = z.union([
   }),
 ]);
 
+const toolCallSchema = z.object({
+  id: z.string().min(1),
+  type: z.literal("function"),
+  function: z.object({ name: z.string().min(1), arguments: z.string() }),
+});
+
 export const openAiMessageSchema = z.object({
   role: z.enum(["system", "developer", "user", "assistant", "tool"]),
   content: z
@@ -39,7 +45,37 @@ export const openAiMessageSchema = z.object({
     .nullable()
     .optional(),
   name: z.string().optional(),
+  /** assistant messages: the calls the model made in an earlier turn */
+  tool_calls: z.array(toolCallSchema).optional(),
+  /** tool messages: which call this result answers */
+  tool_call_id: z.string().optional(),
 });
+
+/** OpenAI function tool: { type: "function", function: { name, description, parameters } } */
+export const openAiToolSchema = z.object({
+  type: z.literal("function"),
+  function: z.object({
+    name: z
+      .string()
+      .min(1)
+      .max(64)
+      .regex(/^[a-zA-Z0-9_-]+$/),
+    description: z.string().optional(),
+    parameters: z.record(z.string(), z.json()).optional(),
+    strict: z.boolean().nullable().optional(),
+  }),
+});
+
+export const openAiToolChoiceSchema = z.union([
+  z.enum(["none", "auto", "required"]),
+  z.object({
+    type: z.literal("function"),
+    function: z.object({ name: z.string().min(1) }),
+  }),
+]);
+
+export type OpenAiTool = z.infer<typeof openAiToolSchema>;
+export type OpenAiToolChoice = z.infer<typeof openAiToolChoiceSchema>;
 
 export type OpenAiMessage = z.infer<typeof openAiMessageSchema>;
 
@@ -150,7 +186,21 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "completions.post.fields.tools.label",
         description: "completions.post.fields.tools.description",
-        schema: z.array(z.object({ type: z.string() }).loose()).optional(),
+        schema: z.array(openAiToolSchema).optional(),
+      }),
+      tool_choice: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "completions.post.fields.toolChoice.label",
+        description: "completions.post.fields.toolChoice.description",
+        schema: openAiToolChoiceSchema.optional(),
+      }),
+      parallel_tool_calls: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "completions.post.fields.parallelToolCalls.label",
+        description: "completions.post.fields.parallelToolCalls.description",
+        schema: z.boolean().optional(),
       }),
       object: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -11,6 +11,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
@@ -31,6 +32,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import revokeEndpoints from "./[id]/definition";
+import { API_DOCS_PATH } from "./constants";
 import apiKeysEndpoints from "./definition";
 
 function buildCurl(baseUrl: string, key: string): string {
@@ -177,6 +179,23 @@ export function ApiKeysContainer(): JSX.Element {
         </Alert>
       ) : undefined}
 
+      {data.isPaid ? undefined : (
+        <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">
+          <Span className="text-sm font-semibold">
+            {t("widget.upgradeTitle")}
+          </Span>
+          <P className="m-0 text-xs text-muted-foreground">
+            {t("widget.upgradeBody")}
+          </P>
+          <Link
+            href={`/${locale}/subscription`}
+            className="inline-flex h-10 items-center self-start rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            {t("widget.upgradeCta")}
+          </Link>
+        </Div>
+      )}
+
       {newKey ? (
         <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">
           <Span className="text-sm font-semibold">
@@ -226,36 +245,44 @@ export function ApiKeysContainer(): JSX.Element {
         <P className="m-0 text-xs text-muted-foreground">
           {t("widget.billingNote")}
         </P>
+        <Link
+          href={`/${locale}/${API_DOCS_PATH}`}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          {t("widget.docsLink")}
+        </Link>
       </Div>
 
-      <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
-        <Span className="text-sm font-semibold">{t("widget.nameLabel")}</Span>
-        <Div className="flex flex-col gap-2 sm:flex-row">
-          <Input
-            name="apiKeyName"
-            value={name}
-            onChange={(e): void => setName(e.target.value)}
-            onKeyDown={(e): void => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleCreate();
-              }
-            }}
-            placeholder={t("widget.namePlaceholder")}
-            aria-label={t("widget.nameLabel")}
-            disabled={creating}
-            className="h-10 flex-1"
-          />
-          <Button
-            type="button"
-            className="h-10 shrink-0"
-            disabled={creating || name.trim().length === 0}
-            onClick={handleCreate}
-          >
-            {creating ? t("widget.creating") : t("widget.create")}
-          </Button>
+      {data.isPaid ? (
+        <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
+          <Span className="text-sm font-semibold">{t("widget.nameLabel")}</Span>
+          <Div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              name="apiKeyName"
+              value={name}
+              onChange={(e): void => setName(e.target.value)}
+              onKeyDown={(e): void => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleCreate();
+                }
+              }}
+              placeholder={t("widget.namePlaceholder")}
+              aria-label={t("widget.nameLabel")}
+              disabled={creating}
+              className="h-10 flex-1"
+            />
+            <Button
+              type="button"
+              className="h-10 shrink-0"
+              disabled={creating || name.trim().length === 0}
+              onClick={handleCreate}
+            >
+              {creating ? t("widget.creating") : t("widget.create")}
+            </Button>
+          </Div>
         </Div>
-      </Div>
+      ) : undefined}
 
       <Span className="px-1 text-sm font-semibold">
         {t("widget.keysTitle")}

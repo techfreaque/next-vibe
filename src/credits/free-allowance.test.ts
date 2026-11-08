@@ -252,7 +252,7 @@ describe("free allowance pools (DB)", () => {
       linkReason: "test",
     });
 
-    // 30 spent across the pool against a 20 cap -> nothing left on either device
+    // 30 spent across the pool against the guest allowance -> nothing left on either device
     expect(await freeBalance(guestUser(a))).toBe(0);
     expect(await freeBalance(guestUser(b))).toBe(0);
   });

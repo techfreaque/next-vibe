@@ -543246,8 +543246,8 @@
         "OPENROUTER_API_KEY": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
-          "description": "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
+          "label": "OpenRouter API key - access hundreds of AI models. Get yours at https://openrouter.ai/keys",
+          "description": "OpenRouter API key - access hundreds of AI models. Get yours at https://openrouter.ai/keys",
           "placeholder": "sk-or-v1-...",
           "columns": 12,
           "schema": {

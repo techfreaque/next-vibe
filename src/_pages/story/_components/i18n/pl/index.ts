@@ -821,6 +821,7 @@ export const translations: typeof enTranslations = {
       features: "Funkcje",
       featuresUncensoredAi: "AI bez cenzury",
       featuresSelfHosted: "Własny agent AI",
+      featuresApiDocs: "Dokumentacja API",
       featuresOpenSource: "Framework open source",
       featuresReferral: "Dochód z poleceń",
       subscription: "Subskrypcja",

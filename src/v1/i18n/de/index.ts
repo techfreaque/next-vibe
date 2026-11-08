@@ -14,8 +14,16 @@ export const translations: typeof enTranslations = {
       "Ungültiger oder widerrufener API-Schlüssel. Prüfe den Schlüssel oder erstelle unter Einstellungen > API-Schlüssel einen neuen.",
     modelNotFound:
       "Das Modell '{{model}}' existiert nicht oder steht dir nicht zur Verfügung. Deine Modelle: GET /v1/models.",
-    toolsUnsupported:
-      "Tool- und Funktionsaufrufe werden von dieser API noch nicht unterstützt.",
+    paidRequired:
+      "Die API ist in bezahlten Tarifen verfügbar. Abonniere oder kaufe Credits, um /v1 aufzurufen: siehe Einstellungen > API-Schlüssel.",
+    toolsUnsupportedByModel:
+      "Dieses Modell unterstützt keine Tool-Aufrufe. Wähle ein Modell mit Tool-Unterstützung oder entferne 'tools'.",
+    badToolArguments:
+      "Die Argumente des Tool-Aufrufs '{{name}}' sind kein gültiges JSON.",
+    toolChoiceUnknown:
+      "tool_choice nennt '{{name}}', das nicht in 'tools' enthalten ist.",
+    toolMessageNeedsId:
+      "Die Tool-Nachricht {{param}} braucht eine tool_call_id.",
     nUnsupported: "Nur n=1 wird unterstützt.",
     badImageUrl:
       "image_url muss eine http(s)-URL oder eine base64-data:-URL sein.",
@@ -91,7 +99,18 @@ export const translations: typeof enTranslations = {
         },
         tools: {
           label: "Tools",
-          description: "Noch nicht unterstützt",
+          description:
+            "OpenAI-Funktions-Tools, die das Modell aufrufen darf: [{type:'function', function:{name, description, parameters}}]",
+        },
+        toolChoice: {
+          label: "Tool-Auswahl",
+          description:
+            "none, auto, required oder {type:'function', function:{name}}",
+        },
+        parallelToolCalls: {
+          label: "Parallele Tool-Aufrufe",
+          description:
+            "Nur aus Kompatibilitätsgründen akzeptiert; das Modell entscheidet",
         },
       },
       response: { object: "Objekttyp" },

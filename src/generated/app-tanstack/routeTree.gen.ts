@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LocaleIndexRouteImport } from './routes/$locale.index'
 import { Route as LocaleSplatRouteImport } from './routes/$locale.$'
+import { Route as LocaleDocsRouteImport } from './routes/$locale.docs'
 import { Route as LocaleHelpRouteImport } from './routes/$locale.help'
 import { Route as LocaleModelsRouteImport } from './routes/$locale.models'
 import { Route as LocaleStoryRouteImport } from './routes/$locale.story'
@@ -42,6 +43,7 @@ import { Route as ApiLocalePaymentRouteImport } from './routes/api.$locale.payme
 import { Route as ApiLocaleReferralRouteImport } from './routes/api.$locale.referral'
 import { Route as ApiLocaleSubscriptionRouteImport } from './routes/api.$locale.subscription'
 import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.creator.$userId.index'
+import { Route as LocaleDocsApiIndexRouteImport } from './routes/$locale.docs.api.index'
 import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$locale.invoice.$invoiceId.index'
 import { Route as LocaleModelsModelIdIndexRouteImport } from './routes/$locale.models.$modelId.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
@@ -676,6 +678,11 @@ const LocaleSplatRoute = LocaleSplatRouteImport.update({
   path: '/$locale/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleDocsRoute = LocaleDocsRouteImport.update({
+  id: '/$locale/docs',
+  path: '/$locale/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocaleHelpRoute = LocaleHelpRouteImport.update({
   id: '/$locale/help',
   path: '/$locale/help',
@@ -822,6 +829,11 @@ const LocaleCreatorUserIdIndexRoute =
     path: '/$locale/creator/$userId/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LocaleDocsApiIndexRoute = LocaleDocsApiIndexRouteImport.update({
+  id: '/api/',
+  path: '/api/',
+  getParentRoute: () => LocaleDocsRoute,
+} as any)
 const LocaleInvoiceInvoiceIdIndexRoute =
   LocaleInvoiceInvoiceIdIndexRouteImport.update({
     id: '/$locale/invoice/$invoiceId/',
@@ -4467,6 +4479,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale/help': typeof LocaleHelpRouteWithChildren
   '/$locale/models': typeof LocaleModelsRouteWithChildren
   '/$locale/story': typeof LocaleStoryRouteWithChildren
@@ -4595,6 +4608,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
@@ -5114,6 +5128,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
@@ -5236,6 +5251,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/docs/api': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
@@ -5756,6 +5772,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale/help': typeof LocaleHelpRouteWithChildren
   '/$locale/models': typeof LocaleModelsRouteWithChildren
   '/$locale/story': typeof LocaleStoryRouteWithChildren
@@ -5885,6 +5902,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
+  '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
@@ -6406,6 +6424,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/docs'
     | '/$locale/help'
     | '/$locale/models'
     | '/$locale/story'
@@ -6534,6 +6553,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
+    | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
     | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
@@ -7053,6 +7073,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/docs'
     | '/$locale'
     | '/$locale/frame/$'
     | '/$locale/threads/$'
@@ -7175,6 +7196,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId'
+    | '/$locale/docs/api'
     | '/$locale/invoice/$invoiceId'
     | '/$locale/models/$modelId'
     | '/$locale/shared/$token'
@@ -7694,6 +7716,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/docs'
     | '/$locale/help'
     | '/$locale/models'
     | '/$locale/story'
@@ -7823,6 +7846,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
+    | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
     | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
@@ -8343,6 +8367,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LocaleSplatRoute: typeof LocaleSplatRoute
+  LocaleDocsRoute: typeof LocaleDocsRouteWithChildren
   LocaleHelpRoute: typeof LocaleHelpRouteWithChildren
   LocaleModelsRoute: typeof LocaleModelsRouteWithChildren
   LocaleStoryRoute: typeof LocaleStoryRouteWithChildren
@@ -8791,6 +8816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/docs': {
+      id: '/$locale/docs'
+      path: '/$locale/docs'
+      fullPath: '/$locale/docs'
+      preLoaderRoute: typeof LocaleDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$locale/help': {
       id: '/$locale/help'
       path: '/$locale/help'
@@ -8993,6 +9025,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/creator/$userId/'
       preLoaderRoute: typeof LocaleCreatorUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/docs/api/': {
+      id: '/$locale/docs/api/'
+      path: '/api'
+      fullPath: '/$locale/docs/api/'
+      preLoaderRoute: typeof LocaleDocsApiIndexRouteImport
+      parentRoute: typeof LocaleDocsRoute
     }
     '/$locale/invoice/$invoiceId/': {
       id: '/$locale/invoice/$invoiceId/'
@@ -13288,6 +13327,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface LocaleDocsRouteChildren {
+  LocaleDocsApiIndexRoute: typeof LocaleDocsApiIndexRoute
+}
+
+const LocaleDocsRouteChildren: LocaleDocsRouteChildren = {
+  LocaleDocsApiIndexRoute: LocaleDocsApiIndexRoute,
+}
+
+const LocaleDocsRouteWithChildren = LocaleDocsRoute._addFileChildren(
+  LocaleDocsRouteChildren,
+)
+
 interface LocaleHelpRouteChildren {
   LocaleHelpIndexRoute: typeof LocaleHelpIndexRoute
 }
@@ -14393,6 +14444,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LocaleSplatRoute: LocaleSplatRoute,
+  LocaleDocsRoute: LocaleDocsRouteWithChildren,
   LocaleHelpRoute: LocaleHelpRouteWithChildren,
   LocaleModelsRoute: LocaleModelsRouteWithChildren,
   LocaleStoryRoute: LocaleStoryRouteWithChildren,

@@ -141,6 +141,12 @@ export const translations = {
       subscribe: "See plans",
       freePlanHint:
         "{{count}} free credits a month, +{{bonus}} with the newsletter. Subscribe for {{subCredits}}, or just buy a pack. No subscription needed.",
+      lowBalance: {
+        title: "{{count}} credits left",
+        emptyTitle: "You're out of credits",
+        hint: "Top up with {{packCredits}} credits for {{packPrice}}. They never expire. No subscription needed.",
+        cta: "Top up credits",
+      },
       freePlan: "You're on the free plan",
       guestPlan: "Guest balance",
       signUp: "Sign up free",

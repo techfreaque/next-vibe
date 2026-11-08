@@ -33,6 +33,7 @@ export class V1ModelsRepository {
         owned_by: m.provider,
         name: m.name,
         context_length: m.contextWindow,
+        supports_tools: m.supportsTools,
         input_modalities: m.inputs,
         output_modalities: m.outputs,
         pricing: {

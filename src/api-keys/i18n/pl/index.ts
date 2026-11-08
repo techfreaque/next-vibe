@@ -4,6 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
+    upgradeTitle: "Dostęp do API jest funkcją płatną",
+    upgradeBody:
+      "Wykup subskrypcję albo kup pakiet kredytów, aby odblokować klucze API i endpoint /v1 zgodny z OpenAI. Dokumentację możesz czytać także na darmowym koncie.",
+    upgradeCta: "Odblokuj",
+    docsLink: "Czytaj dokumentację API",
     back: "Wstecz",
     loading: "Wczytywanie kluczy API…",
     intro:
@@ -47,6 +52,7 @@ export const translations: typeof enTranslations = {
     tag: "API",
     response: {
       baseUrl: "Adres bazowy",
+      isPaid: "Plan płatny",
       keys: "Klucze",
     },
     success: {
@@ -75,6 +81,8 @@ export const translations: typeof enTranslations = {
       description: "Skopiuj go teraz. Nie pokażemy go ponownie.",
     },
     errors: {
+      paidRequired:
+        "API jest dostępne w planach płatnych. Wykup subskrypcję lub kup kredyty, aby tworzyć klucze API.",
       limit: "Masz już {{max}} aktywnych kluczy. Najpierw unieważnij jeden.",
     },
   },

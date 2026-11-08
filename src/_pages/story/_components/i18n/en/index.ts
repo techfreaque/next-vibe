@@ -812,6 +812,7 @@ export const translations = {
       features: "Features",
       featuresUncensoredAi: "Uncensored AI",
       featuresSelfHosted: "Self-Hosted Agent",
+      featuresApiDocs: "API docs",
       featuresOpenSource: "Open Source Framework",
       featuresReferral: "Referral Income",
       subscription: "Subscription",

@@ -886,7 +886,7 @@ export const ENV_KEYS = [
     key: "OPENROUTER_API_KEY",
     module: "agent",
     comment:
-      "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
+      "OpenRouter API key - access hundreds of AI models. Get yours at https://openrouter.ai/keys",
     example: "sk-or-v1-...",
     sensitive: true,
     fieldType: "text",

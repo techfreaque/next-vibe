@@ -951,7 +951,11 @@ export const endpointsMeta: EndpointMeta[] = [
     tags: ["API"],
     examples: {
       responses: {
-        default: { baseUrl: "https://example.com/api/en-US/v1", keys: [] },
+        default: {
+          baseUrl: "https://example.com/api/en-US/v1",
+          isPaid: true,
+          keys: [],
+        },
       },
     },
   },
@@ -16213,7 +16217,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "AI Stream Chat",
     titleShort: "AI Chat",
     description:
-      "Stream AI-powered chat responses using 100+ models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
+      "Stream AI-powered chat responses using any chat model (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
     icon: "sparkles",
     category: "ai",
     subCategory: "",

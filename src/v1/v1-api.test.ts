@@ -32,7 +32,10 @@ import {
 import { V1ChatCompletionsRepository } from "./chat/completions/repository";
 import { scopedTranslation } from "./i18n";
 import { V1ModelsRepository } from "./models/repository";
-import type { InferenceRunner } from "./shared/inference";
+import type { InferenceRequest, InferenceRunner } from "./shared/inference";
+import type { V1ChatCompletionsPostRequestOutput } from "./chat/completions/definition";
+import { generateApiKey } from "@/api-keys/keys";
+import { resetPaidCache } from "@/api-keys/paid";
 import { listUserChatModels } from "./shared/models";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -43,6 +46,7 @@ const fakeRunner: InferenceRunner = {
   generate: () =>
     Promise.resolve({
       text: "Hello from the fake model",
+      toolCalls: [],
       finishReason: "stop",
       usage: { inputTokens: 20_000, outputTokens: 2_000, cachedInputTokens: 0 },
     }),
@@ -98,15 +102,15 @@ async function balanceOf(user: JwtPrivatePayloadType): Promise<number> {
 
 async function completionsCall(
   bearer: string,
-  body: { model: string; stream?: boolean; messages?: Array<{ role: "user"; content: string }> },
+  body: Partial<V1ChatCompletionsPostRequestOutput> & { model: string },
+  runner: InferenceRunner = fakeRunner,
 ): Promise<Response> {
   const request = v1Request("/chat/completions", bearer, body);
   const user = (await authed(request)) ?? ApiKeyAuthAnonymous();
   const out = await V1ChatCompletionsRepository.complete({
     data: {
-      model: body.model,
+      ...body,
       messages: body.messages ?? [{ role: "user", content: "hi" }],
-      stream: body.stream,
     },
     user,
     locale: defaultLocale,
@@ -114,7 +118,7 @@ async function completionsCall(
     request,
     t,
     toolExecutionContext: rootlessToolExecutionContext(),
-    runner: fakeRunner,
+    runner,
   });
   return out.response;
 }
@@ -127,17 +131,22 @@ describe("OpenAI-compatible API", () => {
   let alice: E2ECreditUser;
   let bob: E2ECreditUser;
   let modelId = "";
+  let toolModelId = "";
+  let free: E2ECreditUser;
 
   beforeAll(async () => {
     alice = await createE2ECreditUser("v1-api-alice", 500);
     bob = await createE2ECreditUser("v1-api-bob", 500);
     const models = listUserChatModels(alice.user, await getEnvAvailability());
     modelId = models[0]?.id ?? "";
+    toolModelId = models.find((m) => m.supportsTools)?.id ?? "";
+    free = await createE2ECreditUser("v1-api-free", 0);
   });
 
   afterAll(async () => {
     await alice.remove();
     await bob.remove();
+    await free.remove();
   });
 
   it("a model is servable in this environment", () => {
@@ -322,6 +331,217 @@ describe("OpenAI-compatible API", () => {
       const body = (await res.json()) as { error: { code: string; type: string } };
       expect(body.error.code).toBe("insufficient_credits");
       expect(body.error.type).toBe("insufficient_quota");
+    });
+  });
+
+  describe("paid-plan gate", () => {
+    it("a free-tier account cannot create a key (402 PAYMENT_REQUIRED)", async () => {
+      resetPaidCache(free.user.id);
+      const res = await sendTestRequest({
+        endpoint: apiKeysEndpoints.POST,
+        data: { name: "free" },
+        user: free.user,
+        toolExecutionContext: undefined,
+      });
+      expect(res.success).toBe(false);
+      if (!res.success) {
+        expect(res.errorType.errorKey).toContain("payment_required");
+      }
+      const list = await sendTestRequest({
+        endpoint: apiKeysEndpoints.GET,
+        user: free.user,
+        toolExecutionContext: undefined,
+      });
+      expect(list.success && list.data.isPaid).toBe(false);
+    });
+
+    it("a free-tier key (made before lapsing) gets 402 paid_plan_required on /v1", async () => {
+      const generated = generateApiKey();
+      await db.insert(userApiKeys).values({
+        userId: free.user.id,
+        name: "legacy",
+        keyPrefix: generated.keyPrefix,
+        hashedKey: generated.hashedKey,
+      });
+      resetPaidCache(free.user.id);
+      const res = await completionsCall(generated.plaintext, { model: modelId });
+      expect(res.status).toBe(402);
+      const body = (await res.json()) as { error: { code: string; type: string; message: string } };
+      expect(body.error.code).toBe("paid_plan_required");
+      expect(body.error.type).toBe("insufficient_quota");
+      const request = v1Request("/models", generated.plaintext);
+      const models = await V1ModelsRepository.list((await authed(request)) ?? ApiKeyAuthAnonymous(), request, t);
+      expect(models.response.status).toBe(402);
+    });
+
+    it("a user with purchased credits is paid", async () => {
+      resetPaidCache(alice.user.id);
+      const list = await sendTestRequest({
+        endpoint: apiKeysEndpoints.GET,
+        user: alice.user,
+        toolExecutionContext: undefined,
+      });
+      expect(list.success && list.data.isPaid).toBe(true);
+    });
+  });
+
+  describe("tools / function calling", () => {
+    const weatherTool = {
+      type: "function" as const,
+      function: {
+        name: "get_weather",
+        description: "Weather for a city",
+        parameters: {
+          type: "object",
+          properties: { city: { type: "string" } },
+          required: ["city"],
+        },
+      },
+    };
+    let captured: InferenceRequest | undefined;
+    const toolRunner: InferenceRunner = {
+      generate: (request) => {
+        captured = request;
+        return Promise.resolve({
+          text: "",
+          toolCalls: [{ id: "call_1", name: "get_weather", arguments: '{"city":"Berlin"}' }],
+          finishReason: "tool_calls",
+          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0 },
+        });
+      },
+      async *stream(request) {
+        captured = request;
+        yield { type: "tool-call-start", id: "call_1", name: "get_weather" };
+        yield { type: "tool-call-delta", id: "call_1", argumentsDelta: '{"city":' };
+        yield { type: "tool-call-delta", id: "call_1", argumentsDelta: '"Berlin"}' };
+        yield {
+          type: "finish",
+          finishReason: "tool_calls",
+          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0 },
+        };
+      },
+    };
+
+    it("non-stream: passes tools through and returns OpenAI tool_calls", async () => {
+      const { key } = await createKey(alice.user, "tools");
+      captured = undefined;
+      const res = await completionsCall(
+        key,
+        { model: toolModelId, tools: [weatherTool], tool_choice: "required" },
+        toolRunner,
+      );
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        choices: Array<{
+          message: { content: string | null; tool_calls: Array<{ id: string; type: string; function: { name: string; arguments: string } }> };
+          finish_reason: string;
+        }>;
+      };
+      expect(body.choices[0]?.finish_reason).toBe("tool_calls");
+      expect(body.choices[0]?.message.content).toBeNull();
+      expect(body.choices[0]?.message.tool_calls).toEqual([
+        { id: "call_1", type: "function", function: { name: "get_weather", arguments: '{"city":"Berlin"}' } },
+      ]);
+      expect(captured?.tools?.[0]?.name).toBe("get_weather");
+      expect(captured?.toolChoice).toBe("required");
+    });
+
+    it("stream: emits tool_calls deltas by index and finishes with tool_calls", async () => {
+      const { key } = await createKey(alice.user, "tools-stream");
+      const res = await completionsCall(
+        key,
+        { model: toolModelId, tools: [weatherTool], stream: true },
+        toolRunner,
+      );
+      const text = await res.text();
+      const chunks = text
+        .split("\n\n")
+        .filter((e) => e.startsWith("data: ") && !e.includes("[DONE]"))
+        .map(
+          (e) =>
+            JSON.parse(e.slice(6)) as {
+              choices: Array<{
+                delta: { tool_calls?: Array<{ index: number; id?: string; function: { name?: string; arguments: string } }> };
+                finish_reason: string | null;
+              }>;
+            },
+        );
+      const calls = chunks.flatMap((c) => c.choices[0]?.delta.tool_calls ?? []);
+      expect(calls[0]).toMatchObject({ index: 0, id: "call_1", function: { name: "get_weather" } });
+      expect(calls.map((c) => c.function.arguments).join("")).toBe('{"city":"Berlin"}');
+      expect(calls.every((c) => c.index === 0)).toBe(true);
+      expect(chunks.at(-1)?.choices[0]?.finish_reason).toBe("tool_calls");
+    });
+
+    it("maps assistant tool_calls + tool results back into the model messages", async () => {
+      const { key } = await createKey(alice.user, "tools-roundtrip");
+      captured = undefined;
+      const res = await completionsCall(
+        key,
+        {
+          model: toolModelId,
+          tools: [weatherTool],
+          messages: [
+            { role: "user", content: "Weather in Berlin?" },
+            {
+              role: "assistant",
+              content: null,
+              tool_calls: [{ id: "call_1", type: "function", function: { name: "get_weather", arguments: '{"city":"Berlin"}' } }],
+            },
+            { role: "tool", tool_call_id: "call_1", content: "18C, cloudy" },
+          ],
+        },
+        fakeRunner,
+      );
+      expect(res.status).toBe(200);
+      // fakeRunner does not capture; run again through toolRunner to inspect messages
+      await completionsCall(
+        key,
+        {
+          model: toolModelId,
+          tools: [weatherTool],
+          messages: [
+            { role: "user", content: "Weather in Berlin?" },
+            {
+              role: "assistant",
+              content: null,
+              tool_calls: [{ id: "call_1", type: "function", function: { name: "get_weather", arguments: '{"city":"Berlin"}' } }],
+            },
+            { role: "tool", tool_call_id: "call_1", content: "18C, cloudy" },
+          ],
+        },
+        toolRunner,
+      );
+      const messages = captured?.messages ?? [];
+      expect(messages[1]).toMatchObject({
+        role: "assistant",
+        content: [{ type: "tool-call", toolCallId: "call_1", toolName: "get_weather", input: { city: "Berlin" } }],
+      });
+      expect(messages[2]).toMatchObject({
+        role: "tool",
+        content: [{ type: "tool-result", toolCallId: "call_1", toolName: "get_weather", output: { type: "text", value: "18C, cloudy" } }],
+      });
+    });
+
+    it("400 for a tool_choice that names an undeclared function", async () => {
+      const { key } = await createKey(alice.user, "tools-badchoice");
+      const res = await completionsCall(
+        key,
+        { model: toolModelId, tools: [weatherTool], tool_choice: { type: "function", function: { name: "nope" } } },
+        toolRunner,
+      );
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { error: { param: string } };
+      expect(body.error.param).toBe("tool_choice");
+    });
+
+    it("400 for a tool message without tool_call_id", async () => {
+      const { key } = await createKey(alice.user, "tools-noid");
+      const res = await completionsCall(key, {
+        model: toolModelId,
+        messages: [{ role: "tool", content: "x" }],
+      });
+      expect(res.status).toBe(400);
     });
   });
 });

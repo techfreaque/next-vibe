@@ -14,8 +14,15 @@ export const translations: typeof enTranslations = {
       "Nieprawidłowy lub unieważniony klucz API. Sprawdź klucz albo utwórz nowy w Ustawienia > Klucze API.",
     modelNotFound:
       "Model '{{model}}' nie istnieje lub nie jest dla Ciebie dostępny. Lista Twoich modeli: GET /v1/models.",
-    toolsUnsupported:
-      "Wywoływanie narzędzi i funkcji nie jest jeszcze obsługiwane w tym API.",
+    paidRequired:
+      "API jest dostępne w planach płatnych. Wykup subskrypcję lub kup kredyty, aby wywoływać /v1: zobacz Ustawienia > Klucze API.",
+    toolsUnsupportedByModel:
+      "Ten model nie obsługuje wywoływania narzędzi. Wybierz model z obsługą narzędzi albo usuń 'tools'.",
+    badToolArguments:
+      "Argumenty wywołania narzędzia '{{name}}' nie są poprawnym JSON-em.",
+    toolChoiceUnknown:
+      "tool_choice wskazuje '{{name}}', którego nie ma w 'tools'.",
+    toolMessageNeedsId: "Wiadomość narzędzia {{param}} wymaga tool_call_id.",
     nUnsupported: "Obsługiwane jest tylko n=1.",
     badImageUrl:
       "image_url musi być adresem http(s) albo adresem data: w base64.",
@@ -92,7 +99,17 @@ export const translations: typeof enTranslations = {
         },
         tools: {
           label: "Narzędzia",
-          description: "Jeszcze nieobsługiwane",
+          description:
+            "Narzędzia funkcyjne OpenAI, które model może wywołać: [{type:'function', function:{name, description, parameters}}]",
+        },
+        toolChoice: {
+          label: "Wybór narzędzia",
+          description:
+            "none, auto, required albo {type:'function', function:{name}}",
+        },
+        parallelToolCalls: {
+          label: "Równoległe wywołania narzędzi",
+          description: "Akceptowane dla zgodności; decyduje model",
         },
       },
       response: { object: "Typ obiektu" },

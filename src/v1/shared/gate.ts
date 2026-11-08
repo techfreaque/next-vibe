@@ -8,6 +8,7 @@ import "server-only";
 import type { UserApiKey } from "@/api-keys/db";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { consumeRateLimit } from "@/api-keys/keys";
+import { isPaidUser } from "@/api-keys/paid";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
 import type {
   JwtPayloadType,
@@ -50,6 +51,19 @@ export async function gateApiKeyRequest(
         t("openai.invalidKey"),
         "authentication_error",
         "invalid_api_key",
+      ),
+    };
+  }
+  // /v1 is a paid feature. A key created before the account lapsed to free-tier
+  // stops working too: 402 with a pointer to upgrade.
+  if (!(await isPaidUser(user.id))) {
+    return {
+      ok: false,
+      response: openAiError(
+        402,
+        t("openai.paidRequired"),
+        "insufficient_quota",
+        "paid_plan_required",
       ),
     };
   }

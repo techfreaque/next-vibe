@@ -4,6 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
+    upgradeTitle: "API-Zugang ist ein Bezahlfeature",
+    upgradeBody:
+      "Abonniere oder kaufe ein Credit-Paket, um API-Schlüssel und den OpenAI-kompatiblen /v1-Endpunkt freizuschalten. Die Doku kannst du auch im kostenlosen Tarif lesen.",
+    upgradeCta: "Jetzt freischalten",
+    docsLink: "API-Doku lesen",
     back: "Zurück",
     loading: "API-Schlüssel werden geladen…",
     intro:
@@ -49,6 +54,7 @@ export const translations: typeof enTranslations = {
     tag: "API",
     response: {
       baseUrl: "Basis-URL",
+      isPaid: "Bezahlter Tarif",
       keys: "Schlüssel",
     },
     success: {
@@ -77,6 +83,8 @@ export const translations: typeof enTranslations = {
       description: "Kopiere ihn jetzt. Er wird nicht noch einmal angezeigt.",
     },
     errors: {
+      paidRequired:
+        "Die API gibt es nur mit bezahltem Tarif. Abonniere oder kaufe Credits, um API-Schlüssel zu erstellen.",
       limit:
         "Du hast bereits {{max}} aktive Schlüssel. Widerrufe zuerst einen.",
     },

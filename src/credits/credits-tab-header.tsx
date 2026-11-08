@@ -30,7 +30,11 @@ import type { JSX } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
-import { ProductIds, productsRepository } from "@/products/repository-client";
+import {
+  getPricingParams,
+  ProductIds,
+  productsRepository,
+} from "@/products/repository-client";
 import { useSubscription } from "@/subscription/hooks";
 
 import creditsDefinition from "./definition";
@@ -99,6 +103,11 @@ export function CreditsTabHeader({
     ProductIds.SUBSCRIPTION,
     locale,
   );
+  const packProduct = productsRepository.getProduct(
+    ProductIds.CREDIT_PACK,
+    locale,
+  );
+  const pricing = getPricingParams(locale);
   // Monthly free allowance by tier (guest / signed-in / +newsletter)
   const freeTiers = {
     guest: FREE_CREDIT_ALLOWANCE.guest,
@@ -112,6 +121,10 @@ export function CreditsTabHeader({
       ? t("get.balance.credit", { count: totalFormatted })
       : t("get.balance.credits", { count: totalFormatted })
     : "—";
+  // Under a fifth of the signed-in monthly allowance counts as running low.
+  const lowBalanceThreshold = FREE_CREDIT_ALLOWANCE.signedIn / 5;
+  const isLowBalance = data !== undefined && data.total < lowBalanceThreshold;
+  const isEmptyBalance = data !== undefined && data.total <= 0;
   const headerTitle = isAdmin
     ? t("get.balance.adminTitle")
     : t("get.balance.title");
@@ -300,9 +313,42 @@ export function CreditsTabHeader({
         </Div>
       )}
 
+      {/* Low or empty balance: the moment to top up, with the real pack. */}
+      {isAuthenticated && !isAdmin && isLowBalance && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div className="flex flex-col gap-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm font-semibold">
+                {isEmptyBalance
+                  ? t("get.balance.lowBalance.emptyTitle")
+                  : t("get.balance.lowBalance.title", {
+                      count: totalFormatted,
+                    })}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {t("get.balance.lowBalance.hint", {
+                  packCredits: packProduct.credits,
+                  packPrice: pricing.packPrice,
+                })}
+              </Span>
+            </Div>
+            {activeTab !== "buy" && (
+              <Button
+                type="button"
+                className="h-11 shrink-0 sm:h-10"
+                onClick={() => handleTabClick("buy")}
+              >
+                {t("get.balance.lowBalance.cta")}
+              </Button>
+            )}
+          </Div>
+        </Div>
+      )}
+
       {/* No plan yet: what they're on and the one step up */}
       {isAuthenticated &&
         !isAdmin &&
+        !isLowBalance &&
         currentSubscription !== undefined &&
         !currentSubscription.hasSubscription && (
           <Div className="px-5 pb-5 sm:px-6">

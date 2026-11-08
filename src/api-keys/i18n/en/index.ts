@@ -2,6 +2,11 @@ export const translations = {
   category: "Account",
 
   widget: {
+    upgradeTitle: "API access is a paid feature",
+    upgradeBody:
+      "Subscribe or buy a credit pack to unlock API keys and the OpenAI-compatible /v1 endpoint. Free-tier accounts can still read the docs.",
+    upgradeCta: "Upgrade to unlock",
+    docsLink: "Read the API docs",
     back: "Back",
     loading: "Loading API keys…",
     intro:
@@ -45,6 +50,7 @@ export const translations = {
     tag: "API",
     response: {
       baseUrl: "Base URL",
+      isPaid: "Paid plan",
       keys: "Keys",
     },
     success: {
@@ -73,6 +79,8 @@ export const translations = {
       description: "Copy the key now. It won't be shown again.",
     },
     errors: {
+      paidRequired:
+        "The API is for paid plans. Subscribe or buy credits to create API keys.",
       limit: "You already have {{max}} active keys. Revoke one first.",
     },
   },

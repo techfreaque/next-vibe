@@ -250,24 +250,38 @@ export class ImagePushRepository {
       ImagePushRepository.parseSshTarget(sshTarget);
     const password = imagePushEnv.SSH_SERVER_PWD;
 
-    if (!password) {
+    // Prefer the system `ssh` client for every call. ssh2's app-level keepalive
+    // is reset only by INBOUND packets, so a multi-GB `docker save | ssh docker
+    // load` upload (almost entirely outbound) trips keepaliveCountMax mid-stream
+    // and the remote `gunzip` sees a truncated archive ("unexpected EOF"). The OS
+    // ssh client streams large uploads reliably. `sshpass -e` feeds SSH_SERVER_PWD
+    // through the SSHPASS env (never argv) when a password is set; the ssh2 library
+    // below is only a fallback for when the `sshpass` binary is unavailable.
+    const sshpassAvailable =
+      !password ||
+      spawnSync("sshpass", ["-V"], { stdio: "ignore" }).status === 0;
+
+    if (sshpassAvailable) {
+      const sshArgs = [
+        "-oServerAliveInterval=30",
+        "-oServerAliveCountMax=10000",
+        "-oTCPKeepAlive=yes",
+        "-oStrictHostKeyChecking=no",
+        `-oPort=${String(port)}`,
+        `${username}@${host}`,
+        remoteCmd,
+      ];
       return new Promise((resolve) => {
-        const child = spawn(
-          "ssh",
-          [
-            "-oServerAliveInterval=30",
-            "-oServerAliveCountMax=10",
-            "-oTCPKeepAlive=yes",
-            "-oStrictHostKeyChecking=no",
-            `-oPort=${String(port)}`,
-            `${username}@${host}`,
-            remoteCmd,
-          ],
-          {
-            stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
-            cwd: process.cwd(),
-          },
-        );
+        const child = password
+          ? spawn("sshpass", ["-e", "ssh", ...sshArgs], {
+              stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
+              cwd: process.cwd(),
+              env: { ...process.env, SSHPASS: password },
+            })
+          : spawn("ssh", sshArgs, {
+              stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
+              cwd: process.cwd(),
+            });
         if (stdin && child.stdin) {
           stdin.pipe(child.stdin);
         }
@@ -318,7 +332,13 @@ export class ImagePushRepository {
         username,
         password,
         keepaliveInterval: 30_000,
-        keepaliveCountMax: 10,
+        // ssh2's keepalive counter is reset only by inbound SSH packets, not by
+        // outbound upload bytes. A multi-GB `docker save | ssh docker load` push
+        // sends for many minutes while receiving nothing, so a low countMax trips
+        // mid-transfer and force-closes the connection -> remote `gunzip` sees a
+        // truncated stream ("unexpected EOF"). 240 * 30s = 2h ceiling: generous
+        // enough for any image transfer, still bounded for a genuinely dead link.
+        keepaliveCountMax: 240,
       });
     });
   }

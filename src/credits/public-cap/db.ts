@@ -56,8 +56,8 @@ export const publicFreeTierDailyCap = pgTable("public_free_tier_daily_cap", {
   capAmount: numericNumber("cap_amount").notNull().default(500),
 
   // Per-lead / per-IP daily sub-caps (credits) - stop one abuser eating the pool
-  perLeadCap: numericNumber("per_lead_cap").notNull().default(20),
-  perIpCap: numericNumber("per_ip_cap").notNull().default(40),
+  perLeadCap: numericNumber("per_lead_cap").notNull().default(70),
+  perIpCap: numericNumber("per_ip_cap").notNull().default(130),
 
   // When spendToday was last zeroed (midnight server time)
   lastResetAt: timestamp("last_reset_at").defaultNow().notNull(),

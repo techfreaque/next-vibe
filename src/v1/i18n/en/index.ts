@@ -12,8 +12,14 @@ export const translations = {
       "Invalid or revoked API key. Check the key or create a new one under Settings > API keys.",
     modelNotFound:
       "The model '{{model}}' does not exist or is not available to you. List your models with GET /v1/models.",
-    toolsUnsupported:
-      "Tool and function calling is not supported on this API yet.",
+    paidRequired:
+      "The API is available on paid plans. Subscribe or buy credits to call /v1: see Settings > API keys.",
+    toolsUnsupportedByModel:
+      "This model does not support tool calling. Pick a model with tool support or remove 'tools'.",
+    badToolArguments:
+      "The arguments of tool call '{{name}}' are not valid JSON.",
+    toolChoiceUnknown: "tool_choice names '{{name}}', which is not in 'tools'.",
+    toolMessageNeedsId: "Tool message {{param}} needs a tool_call_id.",
     nUnsupported: "Only n=1 is supported.",
     badImageUrl: "image_url must be an http(s) URL or a base64 data: URL.",
     insufficientCredits:
@@ -88,7 +94,17 @@ export const translations = {
         },
         tools: {
           label: "Tools",
-          description: "Not supported yet",
+          description:
+            "OpenAI function tools the model may call: [{type:'function', function:{name, description, parameters}}]",
+        },
+        toolChoice: {
+          label: "Tool choice",
+          description:
+            "none, auto, required, or {type:'function', function:{name}}",
+        },
+        parallelToolCalls: {
+          label: "Parallel tool calls",
+          description: "Accepted for compatibility; the model decides",
         },
       },
       response: { object: "Object type" },

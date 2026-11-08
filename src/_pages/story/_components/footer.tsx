@@ -6,6 +6,7 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Briefcase } from "next-vibe/ui/components/icons/Briefcase";
 import { Code } from "next-vibe/ui/components/icons/Code";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Folder } from "next-vibe/ui/components/icons/Folder";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
@@ -91,6 +92,15 @@ const Footer: React.FC<FooterProps> = ({
                 >
                   <Server className="h-4 w-4" />
                   {t("footer.platform.featuresSelfHosted")}
+                </Link>
+              </Li>
+              <Li>
+                <Link
+                  href={`/${locale}/docs/api`}
+                  className="hover:text-foreground transition-colors flex items-center gap-2"
+                >
+                  <Terminal className="h-4 w-4" />
+                  {t("footer.platform.featuresApiDocs")}
                 </Link>
               </Li>
               <Li>

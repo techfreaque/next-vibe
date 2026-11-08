@@ -27,6 +27,7 @@ import type {
 } from "./definition";
 import type { ApiKeysT } from "./i18n";
 import { generateApiKey, resetRateLimit } from "./keys";
+import { isPaidUser } from "./paid";
 
 /** Public base URL of the OpenAI-compatible API, derived from the request. */
 export function buildApiBaseUrl(
@@ -67,7 +68,11 @@ export class ApiKeysRepository {
           and(eq(userApiKeys.userId, user.id), isNull(userApiKeys.revokedAt)),
         )
         .orderBy(desc(userApiKeys.createdAt));
-      return success({ baseUrl: buildApiBaseUrl(request, locale), keys: rows });
+      return success({
+        baseUrl: buildApiBaseUrl(request, locale),
+        isPaid: await isPaidUser(user.id),
+        keys: rows,
+      });
     } catch (error) {
       logger.error("Failed to list API keys", parseError(error));
       return fail({
@@ -87,6 +92,13 @@ export class ApiKeysRepository {
     t: ApiKeysT,
   ): Promise<ResponseType<ApiKeysPostResponseOutput>> {
     try {
+      // /v1 is a paid feature: no plan and no purchase history, no key.
+      if (!(await isPaidUser(user.id))) {
+        return fail({
+          message: t("create.errors.paidRequired"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
+      }
       const [active] = await db
         .select({ n: count() })
         .from(userApiKeys)

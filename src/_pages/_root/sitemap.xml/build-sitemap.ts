@@ -32,6 +32,7 @@ export const SITEMAP_STATIC_PATHS: readonly string[] = [
   "/story/imprint",
   "/story/privacy-policy",
   "/story/terms-of-service",
+  "/docs/api",
   "/subscription/overview",
   "/help",
   "/skills",
