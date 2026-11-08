@@ -3,26 +3,58 @@
  * Static class for parsing CLI arguments and handling input data processing
  */
 
-import type { z } from "zod";
-
+import { resolveInputPath } from "./input-path";
 import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { FieldDataType } from "../../../core/definition/enums";
 import type { WidgetData } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { hasChildren } from "../../../unified-ui/_shared/type-guards";
 import { SchemaUIHandler } from "../../../unified-ui/renderers/cli/response/schema-handler";
+import { readFileSync } from "node:fs";
+import type { z } from "zod";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling
  */
+/**
+ * The opaque zod schema internals the CLI probes to learn a field's type.
+ * Named rather than `object`/`unknown` so the reads below need no assertion.
+ */
+interface ZodIntrospectable {
+  readonly [key: string]: WidgetData;
+}
+
+/** Narrow a property to a string, or undefined. No assertion. */
+function readZodString(
+  obj: ZodIntrospectable,
+  key: string,
+): string | undefined {
+  const value = obj[key];
+  return typeof value === "string" ? value : undefined;
+}
+
+/** Narrow a property to a nested schema object, or undefined. No assertion. */
+function readZodObject(
+  obj: ZodIntrospectable,
+  key: string,
+): ZodIntrospectable | undefined {
+  const value = obj[key];
+  return typeof value === "object" && value !== null
+    ? Object.fromEntries(Object.entries(value))
+    : undefined;
+}
+
 export class CliInputParser {
   /**
    * Convert kebab-case to camelCase
    * Example: "force-update" -> "forceUpdate"
    */
   private static kebabToCamelCase(str: string): string {
-    return str.replaceAll(/-([a-z])/g, (match) => match[1].toUpperCase());
+    return str.replaceAll(/-([a-z])/g, (match) =>
+      (match[1] ?? "").toUpperCase(),
+    );
   }
 
   /**
@@ -38,9 +70,13 @@ export class CliInputParser {
     // Convert kebab-case path segments to camelCase for API compatibility
     const keys = path.split(".").map((s) => this.kebabToCamelCase(s));
 
+    const firstKey = keys[0];
+    if (firstKey === undefined) {
+      return;
+    }
     if (keys.length === 1) {
       // Simple key, no nesting
-      obj[keys[0]] = value;
+      obj[firstKey] = value;
       return;
     }
 
@@ -48,6 +84,9 @@ export class CliInputParser {
     let current: Record<string, WidgetData> = obj;
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
+      if (key === undefined) {
+        continue;
+      }
       const existing = current[key];
 
       if (
@@ -68,7 +107,9 @@ export class CliInputParser {
 
     // Set the final value
     const finalKey = keys[keys.length - 1];
-    current[finalKey] = value;
+    if (finalKey !== undefined) {
+      current[finalKey] = value;
+    }
   }
 
   /**
@@ -109,7 +150,15 @@ export class CliInputParser {
   /**
    * Convert CLI argument value to appropriate type
    */
-  private static convertCliValue(value: string): string | number | boolean {
+  private static convertCliValue(
+    value: string,
+    key: string,
+    stringFields: Set<string>,
+  ): string | number | boolean {
+    if (stringFields.has(key)) {
+      return value;
+    }
+
     // Handle boolean values first
     if (value === "true") {
       return true;
@@ -160,18 +209,22 @@ export class CliInputParser {
    *   --key                boolean true (no following non-flag token)
    *   -k                   single-dash short flags - always boolean, no lookahead
    *   positional           collected into positionalArgs
+   *   --                   everything after it is positional, whatever it looks like (a command line to pass on)
    *
    * Multi-value arrays use positional args + firstCliArgKey (collects all positionals).
    */
   private static parseTokens(
     tokens: string[],
     booleanFields: Set<string> = new Set(),
+    endpointFields: Set<string> = new Set(),
+    stringFields: Set<string> = new Set(),
   ): {
     positionalArgs: string[];
     namedArgs: Record<string, WidgetData>;
   } {
     const positionalArgs: string[] = [];
     const namedArgs: Record<string, WidgetData> = {};
+    const fileValueKeys = new Set<string>();
     let i = 0;
 
     while (i < tokens.length) {
@@ -182,24 +235,101 @@ export class CliInputParser {
         continue;
       }
 
+      if (arg === "--") {
+        positionalArgs.push(...tokens.slice(i + 1));
+        break;
+      }
+
       if (arg.startsWith("--")) {
         const sliced = arg.slice(2);
         const eqIndex = sliced.indexOf("=");
+        const flagName = eqIndex === -1 ? sliced : sliced.slice(0, eqIndex);
+        // --text-file and --textFile both name the file variant of `text`.
+        const fileKeyMatch = /^(.+?)(?:-file|File)$/.exec(flagName);
+        const fileFieldKey = fileKeyMatch?.[1];
+        const fileFieldCamel = fileFieldKey
+          ? this.kebabToCamelCase(fileFieldKey)
+          : undefined;
+        const literalFileField = fileFieldCamel
+          ? `${fileFieldCamel}File`
+          : undefined;
+
+        if (
+          fileFieldKey &&
+          fileFieldCamel &&
+          endpointFields.has(fileFieldCamel) &&
+          !endpointFields.has(literalFileField ?? "")
+        ) {
+          const key = fileFieldCamel;
+          if (Object.hasOwn(namedArgs, key) || fileValueKeys.has(key)) {
+            // oxlint-disable-next-line restricted/no-throw -- reported by the CLI action handler's catch
+            throw new Error(
+              `Cannot provide both --${fileFieldKey} and --${fileFieldKey}-file`,
+            );
+          }
+
+          let filePath: string;
+          let nextIndex: number;
+          if (eqIndex !== -1) {
+            filePath = sliced.slice(eqIndex + 1);
+            nextIndex = i + 1;
+          } else {
+            const peeked = this.peekValue(tokens, i + 1);
+            if (!peeked) {
+              // oxlint-disable-next-line restricted/no-throw -- reported by the CLI action handler's catch
+              throw new Error(`Missing file path for --${sliced}`);
+            }
+            filePath = peeked.value;
+            nextIndex = peeked.nextIndex;
+          }
+
+          const resolvedPath = resolveInputPath(filePath);
+          try {
+            namedArgs[key] = readFileSync(resolvedPath, "utf8").replace(
+              /^\uFEFF/,
+              "",
+            );
+          } catch {
+            // oxlint-disable-next-line restricted/no-throw -- reported by the CLI action handler's catch
+            throw new Error(
+              `Cannot read --${flagName} "${filePath}" (looked for ${resolvedPath})`,
+            );
+          }
+          fileValueKeys.add(key);
+          i = nextIndex;
+          continue;
+        }
 
         if (eqIndex !== -1) {
           // --key=value - explicit value, no lookahead
           const key = this.kebabToCamelCase(sliced.slice(0, eqIndex));
-          const value = this.convertCliValue(sliced.slice(eqIndex + 1));
+          if (fileValueKeys.has(key)) {
+            // oxlint-disable-next-line restricted/no-throw -- reported by the CLI action handler's catch
+            throw new Error(`Cannot provide both --${key} and --${key}-file`);
+          }
+          const value = this.convertCliValue(
+            sliced.slice(eqIndex + 1),
+            key,
+            stringFields,
+          );
           namedArgs[key] = value;
           i++;
         } else {
           // --key - lookahead only when not a known boolean field
           const key = this.kebabToCamelCase(sliced);
+          if (fileValueKeys.has(key)) {
+            // oxlint-disable-next-line restricted/no-throw -- reported by the CLI action handler's catch
+            throw new Error(`Cannot provide both --${key} and --${key}-file`);
+          }
           const isBoolean = booleanFields.has(key) || booleanFields.has(sliced);
           if (!isBoolean) {
             const peeked = this.peekValue(tokens, i + 1);
             if (peeked) {
-              namedArgs[key] = this.convertCliValue(peeked.value);
+              namedArgs[key] = this.convertCliValue(
+                peeked.value,
+                key,
+                stringFields,
+              );
               i = peeked.nextIndex;
               continue;
             }
@@ -237,6 +367,8 @@ export class CliInputParser {
     return this.parseTokens(
       args,
       this.buildBooleanFieldNames(endpoint ?? null),
+      this.buildEndpointFieldNames(endpoint ?? null),
+      this.buildFieldNamesOfType(endpoint ?? null, "string"),
     );
   }
 
@@ -285,13 +417,15 @@ export class CliInputParser {
     return this.parseTokens(
       relevantArgs,
       this.buildBooleanFieldNames(endpoint ?? null),
+      this.buildEndpointFieldNames(endpoint ?? null),
+      this.buildFieldNamesOfType(endpoint ?? null, "string"),
     );
   }
 
   /**
    * Merge data objects, with later sources taking precedence
    */
-  // oxlint-disable-next-line restricted/no-unknown -- generic merge helper must accept arbitrary record shapes
+  // oxlint-disable-next-line restricted/no-unknown
   private static mergeData<TData extends Record<string, unknown>>(
     ...sources: Array<TData | null | undefined>
   ): Partial<TData> {
@@ -356,56 +490,66 @@ export class CliInputParser {
    * Resolve the core type string of a Zod field, unwrapping optional/default/nullable wrappers.
    * Works with both Zod v3 (_def.typeName) and Zod v4 (.type / .def.type).
    */
-  // oxlint-disable-next-line restricted/no-unknown -- Zod schema introspection requires opaque field type to support both v3 (_def.typeName) and v4 (.type/.def.type) APIs
+  // eslint-disable-next-line restricted/no-unknown -- Zod schema introspection requires opaque field type to support both v3 (_def.typeName) and v4 (.type/.def.type) APIs
   private static resolveZodType(field: unknown): string | undefined {
     if (!field || typeof field !== "object") {
       return undefined;
     }
-    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
-    const f = field as Record<string, unknown>;
+    // Property reads go through the typed helpers above so the opaque zod
+    // internals need no `as` assertion (banned by this repo's rules).
+    const probe: ZodIntrospectable = Object.fromEntries(Object.entries(field));
 
     // Zod v4: .type is the direct type string on the field itself
-    if (typeof f.type === "string" && f.type !== "object") {
+    const directType = readZodString(probe, "type");
+    if (directType !== undefined && directType !== "object") {
       if (
-        f.type === "optional" ||
-        f.type === "default" ||
-        f.type === "nullable"
+        directType === "optional" ||
+        directType === "default" ||
+        directType === "nullable"
       ) {
         // Unwrap to inner - check .def.innerType for v4
-        // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
-        const def = f.def as Record<string, unknown> | undefined;
-        return this.resolveZodType(def?.innerType);
+        const def = readZodObject(probe, "def");
+        return def
+          ? this.resolveZodType(readZodObject(def, "innerType"))
+          : undefined;
       }
-      return f.type;
+      return directType;
     }
 
     // Zod v4: .def.type
-    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
-    const def = f.def as Record<string, unknown> | undefined;
-    if (def && typeof def.type === "string") {
-      if (
-        def.type === "optional" ||
-        def.type === "default" ||
-        def.type === "nullable"
-      ) {
-        return this.resolveZodType(def.innerType);
+    const def = readZodObject(probe, "def");
+    if (def) {
+      const defType = readZodString(def, "type");
+      if (defType !== undefined) {
+        if (
+          defType === "optional" ||
+          defType === "default" ||
+          defType === "nullable"
+        ) {
+          return this.resolveZodType(readZodObject(def, "innerType"));
+        }
+        return defType;
       }
-      return def.type;
     }
 
     // Zod v3: ._def.typeName
-    // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
-    const _def = f._def as Record<string, unknown> | undefined;
-    if (_def && typeof _def.typeName === "string") {
-      const typeName = _def.typeName as string;
-      if (
-        typeName === "ZodDefault" ||
-        typeName === "ZodOptional" ||
-        typeName === "ZodNullable"
-      ) {
-        return this.resolveZodType(_def.innerType);
+    // oxlint-disable-next-line no-underscore-dangle -- `_def` is zod's internal schema descriptor
+    const legacyDef = readZodObject(probe, "_def");
+    if (legacyDef) {
+      const typeName = readZodString(legacyDef, "typeName");
+      if (typeName !== undefined) {
+        if (
+          typeName === "ZodDefault" ||
+          typeName === "ZodOptional" ||
+          typeName === "ZodNullable"
+        ) {
+          return this.resolveZodType(readZodObject(legacyDef, "innerType"));
+        }
+        if (typeName === "ZodString") {
+          return "string";
+        }
+        return typeName === "ZodBoolean" ? "boolean" : typeName;
       }
-      return typeName === "ZodBoolean" ? "boolean" : typeName;
     }
 
     return undefined;
@@ -419,24 +563,39 @@ export class CliInputParser {
   private static buildBooleanFieldNames(
     endpointDefinition: CreateApiEndpointAny | null,
   ): Set<string> {
-    const booleans = new Set<string>();
+    return this.buildFieldNamesOfType(endpointDefinition, "boolean");
+  }
+
+  /**
+   * Collect the field names whose (unwrapped) zod type is `type`.
+   * Works with both Zod v3 and Zod v4.
+   */
+  private static buildFieldNamesOfType(
+    endpointDefinition: CreateApiEndpointAny | null,
+    type: "boolean" | "string",
+  ): Set<string> {
+    const names = new Set<string>();
     if (!endpointDefinition) {
-      return booleans;
+      return names;
     }
 
     const schema = endpointDefinition.requestSchema;
     if (!schema) {
-      return booleans;
+      return names;
     }
 
     try {
-      // oxlint-disable-next-line restricted/no-unknown -- Zod internals are opaque; must use Record<string, unknown> to safely access .shape property
-      const shape = (schema as { shape?: Record<string, unknown> }).shape;
-      if (shape && typeof shape === "object") {
+      // eslint-disable-next-line restricted/no-unknown -- zod internals are opaque
+      const shapeValue: unknown = Reflect.get(schema, "shape");
+      const shape =
+        typeof shapeValue === "object" && shapeValue !== null
+          ? shapeValue
+          : undefined;
+      if (shape) {
         for (const [key, fieldSchema] of Object.entries(shape)) {
-          if (this.resolveZodType(fieldSchema) === "boolean") {
-            booleans.add(key);
-            booleans.add(this.kebabToCamelCase(key));
+          if (this.resolveZodType(fieldSchema) === type) {
+            names.add(key);
+            names.add(this.kebabToCamelCase(key));
           }
         }
       }
@@ -444,7 +603,22 @@ export class CliInputParser {
       // Best-effort - ignore errors
     }
 
-    return booleans;
+    return names;
+  }
+
+  private static buildEndpointFieldNames(
+    endpointDefinition: CreateApiEndpointAny | null,
+  ): Set<string> {
+    const fields = endpointDefinition?.fields;
+    if (!fields || !hasChildren(fields)) {
+      return new Set();
+    }
+    return new Set(
+      Object.keys(fields.children).flatMap((name) => [
+        name,
+        this.kebabToCamelCase(name),
+      ]),
+    );
   }
 
   /**
@@ -479,8 +653,9 @@ export class CliInputParser {
 
     // Only add shortcuts for unique first letters
     for (const [letter, names] of firstLetterMap) {
-      if (names.length === 1) {
-        shortcuts.set(letter, names[0]);
+      const only = names[0];
+      if (names.length === 1 && only !== undefined) {
+        shortcuts.set(letter, only);
       }
     }
 
@@ -567,11 +742,16 @@ export class CliInputParser {
 
       // Use setNestedValue to expand dot-notation keys (e.g. response.output → { response: { output } })
       if (key.includes(".")) {
-        this.setNestedValue(
-          data as Record<string, WidgetData>,
-          key,
-          normalizedValue as string | number | boolean,
-        );
+        // `data` is already Record<string, WidgetData>; normalizeCliValue
+        // returns exactly the primitive union setNestedValue accepts, so the
+        // upstream assertions here were redundant.
+        if (
+          typeof normalizedValue === "string" ||
+          typeof normalizedValue === "number" ||
+          typeof normalizedValue === "boolean"
+        ) {
+          this.setNestedValue(data, key, normalizedValue);
+        }
       } else {
         const camelCaseKey = this.kebabToCamelCase(key);
         data[camelCaseKey] = normalizedValue;
@@ -583,12 +763,30 @@ export class CliInputParser {
     if (firstCliArgKey && positionalArgs.length > 0) {
       const existing = data[firstCliArgKey];
       const existingArr: string[] = Array.isArray(existing)
-        ? (existing as string[])
+        ? existing.filter((v): v is string => typeof v === "string")
         : existing && typeof existing === "string"
           ? [existing]
           : [];
       const merged = [...existingArr, ...positionalArgs];
-      data[firstCliArgKey] = merged.length === 1 ? merged[0] : merged;
+      // A single positional stays an array when the field itself is
+      // array-valued (e.g. a multi-select picker) - otherwise "one stage"
+      // would arrive as a bare string and fail the array schema.
+      const fields = endpoint?.fields;
+      const target =
+        fields && hasChildren(fields)
+          ? fields.children[firstCliArgKey]
+          : undefined;
+      const isArrayField =
+        target !== undefined &&
+        "fieldType" in target &&
+        (target.fieldType === FieldDataType.TEXT_ARRAY ||
+          target.fieldType === FieldDataType.MULTISELECT ||
+          target.fieldType === FieldDataType.TAGS ||
+          (target.fieldType === FieldDataType.ENTITY_PICKER &&
+            "multiple" in target &&
+            target.multiple === true));
+      data[firstCliArgKey] =
+        merged.length === 1 && !isArrayField ? merged[0] : merged;
     }
 
     return Object.keys(data).length > 0 ? data : null;
@@ -706,11 +904,17 @@ export class CliInputParser {
         const merged = { ...(contextData ?? {}), ...(cliData ?? {}) };
         const parsed = endpoint.requestUrlPathParamsSchema.safeParse(merged);
 
-        if (
+        // safeParse returns the schema's own output type; narrowing it with
+        // a runtime object check gives the same guarantee the upstream
+        // assertions asserted, without asserting past the checker.
+        const parsedData: CliUrlParams | undefined =
           parsed.success &&
-          Object.keys(parsed.data as Record<string, WidgetData>).length > 0
-        ) {
-          inputData.urlPathParams = parsed.data as CliUrlParams;
+          typeof parsed.data === "object" &&
+          parsed.data !== null
+            ? Object.fromEntries(Object.entries(parsed.data))
+            : undefined;
+        if (parsedData && Object.keys(parsedData).length > 0) {
+          inputData.urlPathParams = parsedData;
         } else if (interactive) {
           // Fall back to interactive prompt when data doesn't satisfy the schema.
           // Skip when interactive:false — the Ink UI will collect URL params via

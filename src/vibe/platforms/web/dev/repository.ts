@@ -38,6 +38,7 @@ import { DEV_WATCHER_TASK_NAME } from "../../../tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "../../../tasks/unified-runner/repository";
 import type { Task } from "../../../tasks/unified-runner/types";
 import { ServerFramework } from "../enum";
+import { patchPublicUrlPort } from "../public-url";
 import {
   ATLAS_PID_FILE,
   cleanupPidFile,
@@ -69,32 +70,6 @@ export class DevRepository {
       return parsed.port ? parseInt(parsed.port, 10) : undefined;
     } catch {
       return undefined;
-    }
-  }
-
-  /**
-   * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
-   * Only patches localhost URLs - production URLs are left untouched.
-   * Child processes inherit process.env so they automatically get the correct URL.
-   */
-  private static patchPublicUrlPort(port: number): void {
-    const current = process.env["NEXT_PUBLIC_APP_URL"];
-    // Use Object.assign to avoid Next.js inlining NEXT_PUBLIC_* vars at build time,
-    // which would turn the assignment into `"literal string" = value` (invalid JS).
-    if (!current) {
-      Object.assign(process.env, {
-        NEXT_PUBLIC_APP_URL: `http://localhost:${String(port)}`,
-      });
-      return;
-    }
-    try {
-      const parsed = new URL(current);
-      if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-        parsed.port = String(port);
-        Object.assign(process.env, { NEXT_PUBLIC_APP_URL: parsed.toString() });
-      }
-    } catch {
-      // Not a valid URL - leave it as-is
     }
   }
 
@@ -253,7 +228,7 @@ export class DevRepository {
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
     // This ensures runtime env reads (and all child processes) see the correct URL.
-    DevRepository.patchPublicUrlPort(port);
+    patchPublicUrlPort(port, { setIfMissing: true });
 
     DevRepository.logStartupInfo(port, logger, data);
 

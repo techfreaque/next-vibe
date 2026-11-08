@@ -18,6 +18,7 @@ import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { SeedRepository } from "../../../database/seed/repository";
 import type { EndpointLogger } from "../../../logger/types";
+import { patchPublicUrlPort } from "../public-url";
 
 import { GenerateAllRepository } from "../../../core/generators/repository";
 import { DatabaseMigrationRepository } from "../../../database/migrate/repository";
@@ -51,23 +52,7 @@ export class BuildRepository {
     // patch NEXT_PUBLIC_APP_URL to match so the build bakes in the correct port.
     const runningPort = readPidFilePort(VIBE_START_PID_FILE);
     if (runningPort !== null) {
-      const currentUrl = process.env["NEXT_PUBLIC_APP_URL"];
-      if (currentUrl) {
-        try {
-          const parsed = new URL(currentUrl);
-          if (
-            parsed.hostname === "localhost" ||
-            parsed.hostname === "127.0.0.1"
-          ) {
-            parsed.port = String(runningPort);
-            Object.assign(process.env, {
-              NEXT_PUBLIC_APP_URL: parsed.toString(),
-            });
-          }
-        } catch {
-          // Not a valid URL - leave unchanged
-        }
-      }
+      patchPublicUrlPort(runningPort, { setIfMissing: false });
     }
 
     try {
