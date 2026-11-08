@@ -164,6 +164,67 @@ export class TextToSpeechRepository {
   }
 
   /**
+   * Convert text to speech via NanoGPT (OpenAI-compatible /audio/speech).
+   * providerModel = "<nanoModelId>:<voice>" (e.g. "Kokoro-82m:af_bella").
+   */
+  private static async callNanoGptTTS(
+    text: string,
+    providerModel: string,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+    fetchImpl: typeof globalThis.fetch,
+  ): Promise<ResponseType<string>> {
+    if (!agentEnv.NANO_GPT_API_KEY) {
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.nanoGPT;
+      return fail({
+        message: t("post.errors.notConfigured", { label, envKey, url }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    const sep = providerModel.indexOf(":");
+    const model = sep === -1 ? providerModel : providerModel.slice(0, sep);
+    const voice = sep === -1 ? undefined : providerModel.slice(sep + 1);
+
+    logger.debug("[TTS] Calling NanoGPT TTS API", { model, voice });
+
+    const response = await fetchImpl(
+      "https://api.nano-gpt.com/api/v1/audio/speech",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.NANO_GPT_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          input: text,
+          voice,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error("[TTS] NanoGPT TTS API error", {
+        status: response.status,
+        error: errorText,
+      });
+      return fail({
+        message: t("post.errors.conversionFailed", { error: errorText }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    // eslint-disable-next-line i18next/no-literal-string
+    return success(`data:${contentType};base64,${base64Audio}`);
+  }
+
+  /**
    * Convert text to speech via Eden AI TTS API
    * providerModel = "openai" (the Eden AI provider name)
    * voiceGender = "MALE" | "FEMALE" based on voiceMeta
@@ -432,6 +493,16 @@ export class TextToSpeechRepository {
           );
           break;
         }
+
+        case ApiProvider.NANO_GPT:
+          audioResult = await TextToSpeechRepository.callNanoGptTTS(
+            data.text,
+            modelOption.providerModel,
+            logger,
+            t,
+            fetchImpl,
+          );
+          break;
 
         case ApiProvider.ELEVENLABS:
           audioResult = await TextToSpeechRepository.callElevenLabsTTS(

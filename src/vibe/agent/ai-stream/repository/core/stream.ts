@@ -114,6 +114,11 @@ export class ToolExecutionContextImpl {
   // Loop control - set to true when model requests to stop the tool loop
   shouldStopLoop = false;
 
+  /** Text of the last provider `error` stream part (already logged, classified
+   *  transient/real, where it arrived). finalize uses it to avoid re-logging a
+   *  finishReason=error that carries no detail of its own. */
+  lastProviderErrorText: string | null = null;
+
   /** Set to true when prepareStep injects a queued message mid-stream.
    *  Prevents processNextQueuedMessage from double-processing in the finally block. */
   queueInjectedInStream = false;

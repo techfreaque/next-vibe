@@ -295,6 +295,8 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
   );
   const [selected, setSelected] = useState<Set<UseCase>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
+  /** Seeding produced no favorites - stay here with a retry instead of an empty list */
+  const [seedFailed, setSeedFailed] = useState(false);
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -389,14 +391,31 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
       return;
     }
     setIsSaving(true);
+    setSeedFailed(false);
+    // One failed create must not abort the rest: keep what saved, log the miss
+    const addFavoriteSafe: typeof addFavorite = async (data) => {
+      try {
+        return await addFavorite(data);
+      } catch (e) {
+        logger.error(
+          "Onboarding: failed to add favorite",
+          e instanceof Error ? e.message : String(e),
+        );
+        return null;
+      }
+    };
     try {
       const { firstCompanionId, entries } = await seedFavorites(
         companionId,
         selected,
-        addFavorite,
+        addFavoriteSafe,
         userRoles,
         availability,
       );
+      if (entries.length === 0) {
+        setSeedFailed(true);
+        return;
+      }
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone(firstCompanionId);
       try {
@@ -435,6 +454,7 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
         "Onboarding seeding failed",
         e instanceof Error ? e.message : String(e),
       );
+      setSeedFailed(true);
     } finally {
       setIsSaving(false);
     }
@@ -528,7 +548,19 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
       </Div>
 
       {/* Sticky CTA */}
-      <Div className="sticky bottom-0 border-t border-border bg-popover px-5 py-3">
+      <Div className="sticky bottom-0 flex flex-col gap-2 border-t border-border bg-popover px-5 py-3">
+        {seedFailed && !isSaving && (
+          <Div
+            role="alert"
+            data-testid="selector-setup-error"
+            className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2"
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            <Span className="text-xs font-medium text-destructive">
+              {t("onboarding.setup.failed")}
+            </Span>
+          </Div>
+        )}
         <Button
           type="button"
           className="w-full h-11 text-base gap-2"
@@ -542,7 +574,9 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
             </>
           ) : (
             <>
-              {t("onboarding.setup.start")}
+              {seedFailed
+                ? t("onboarding.setup.retry")
+                : t("onboarding.setup.start")}
               <ArrowRight className="h-4 w-4" />
             </>
           )}

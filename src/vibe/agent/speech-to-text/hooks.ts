@@ -290,11 +290,17 @@ export function useEdenAISpeech({
           // display-ready - no client-side substitution left to do.
           const errorMessage =
             apiError.message ?? t("hooks.stt.transcription-failed");
-          logger.error("STT: API returned error", {
-            errorType: apiError.errorType,
-            errorMessage: apiError.message,
-            chunkCount: audioFiles.length,
-          });
+          // 4xx (no credits, bad audio) is the user's condition - warn;
+          // a server-side failure is an error.
+          const isServerFailure = (apiError.errorType?.errorCode ?? 500) >= 500;
+          (isServerFailure ? logger.error : logger.warn).bind(logger)(
+            "STT: API returned error",
+            {
+              errorType: apiError.errorType,
+              errorMessage: apiError.message,
+              chunkCount: audioFiles.length,
+            },
+          );
           // Keep savedAudioFilesRef so user can retry
           setError(errorMessage);
           onError?.(errorMessage);

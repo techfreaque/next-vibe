@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
           q1: {
             question: "Co to jest {{appName}}?",
             answer:
-              "{{appName}} to platforma czatu AI bez cenzury z dostępem do {{modelCount}} modeli AI. Łączymy uczciwe rozmowy AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i wsparcie wielu modeli.",
+              "{{appName}} to platforma czatu AI bez cenzury z dostępem do {{modelCount}} modeli AI. Łączymy uczciwe rozmowy AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe skille i wsparcie wielu modeli.",
           },
           q2: {
             question: "Jakie metody płatności akceptujecie?",
@@ -50,7 +50,7 @@ export const translations: typeof enTranslations = {
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",
             answer:
-              "Tak! Oferujemy szyfrowanie end-to-end dla prywatnych folderów, tryb incognito dla czatów tylko sesyjnych i pełną zgodność z RODO. Twoje rozmowy są Twoje - nigdy nie sprzedajemy Twoich danych.",
+              "Tak! Prywatne foldery widzisz tylko Ty, tryb incognito trzyma czaty poza naszymi serwerami, a w ustawieniach możesz wyeksportować wszystkie swoje dane lub usunąć konto wraz z powiązanymi danymi osobowymi. Twoje rozmowy są Twoje - nigdy nie sprzedajemy Twoich danych. Szyfrowanie end-to-end już wkrótce.",
           },
         },
       },

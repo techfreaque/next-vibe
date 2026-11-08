@@ -295,6 +295,11 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Aufgabeneingabe",
         description: "JSON-Eingabedaten für die Aufgabe",
+        placeholder: '{ "dryRun": false }',
+        invalidJson:
+          "Kein gültiges JSON. Prüfen Sie Anführungszeichen, Kommas und Klammern.",
+        notObject:
+          'Die Aufgabeneingabe muss ein JSON-Objekt sein, z. B. { "key": "value" }.',
       },
       runOnce: {
         label: "Einmal ausführen",
@@ -471,6 +476,22 @@ export const translations: typeof enTranslations = {
       noMatchesDesc:
         "Versuchen Sie, Ihre Suche oder Filterkriterien anzupassen",
       clearFilters: "Filter löschen",
+    },
+    create: {
+      created: "Aufgabe angelegt",
+      route: "Route",
+      schedule: "Zeitplan",
+      nextRun: "Nächster Lauf",
+      notScheduled: "Nicht geplant",
+      owner: "Eigentümer",
+      ownerSystem: "System",
+      ownerYou: "Sie",
+      ownerUser: "Benutzer {{id}}",
+      enabled: "Aktiv",
+      disabled: "Inaktiv",
+      taskInput: "Aufgabeneingabe",
+      noInput: "Keine Eingabe - die Route läuft mit ihren Standardwerten.",
+      openTask: "Aufgabe öffnen",
     },
   },
 };

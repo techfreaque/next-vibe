@@ -5,7 +5,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+
 import signupEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 const endpoint = signupEndpoints.POST;
 
@@ -233,6 +236,56 @@ describe("POST /user/public/signup", () => {
     expect(
       res.success,
       `Signup with uppercase email failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+  });
+
+  it("rejects an unknown referral code before creating the account", async () => {
+    const email = uniqueEmail();
+    const res = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: {
+        privateName: "Referral Test",
+        publicName: "RefTester",
+        email,
+        password: "SecurePass123",
+        confirmPassword: "SecurePass123",
+        acceptTerms: true,
+        subscribeToNewsletter: false,
+        referralCode: `NO-SUCH-CODE-${Date.now()}`,
+      },
+      user: publicUser(),
+    });
+
+    expect(res.success).toBe(false);
+    if (res.success) return;
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
+    expect(res.message).toBe(
+      scopedTranslation
+        .scopedT(defaultLocale)
+        .t("fields.referralCode.validation.invalid"),
+    );
+
+    // Nothing was created — the same email still signs up cleanly
+    const retry = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: {
+        privateName: "Referral Test",
+        publicName: "RefTester",
+        email,
+        password: "SecurePass123",
+        confirmPassword: "SecurePass123",
+        acceptTerms: true,
+        subscribeToNewsletter: false,
+      },
+      user: publicUser(),
+    });
+    expect(
+      retry.success,
+      `Retry without code failed: ${String(retry.success === false && retry.message)}`,
     ).toBe(true);
   });
 });

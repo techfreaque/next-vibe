@@ -6,6 +6,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
 import { Menu } from "next-vibe/ui/components/icons/Menu";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Link } from "next-vibe/ui/components/link";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
@@ -22,6 +23,7 @@ import type { NavItemType } from "./nav-constants";
 interface MobileMenuClientProps {
   locale: CountryLanguage;
   navigationItems: NavItemType[];
+  isPublic: boolean;
 }
 
 // Helper function to get badge classes based on variant
@@ -62,6 +64,7 @@ function getBadgeClasses(variant: BadgeVariant | null): string {
 export function MobileMenuClient({
   locale,
   navigationItems,
+  isPublic,
 }: MobileMenuClientProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,9 +129,39 @@ export function MobileMenuClient({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            <Div className="container py-6 flex flex-col gap-6 px-4">
+            <Div className="mx-auto w-full max-w-6xl py-6 flex flex-col gap-6 px-4 sm:px-6">
               {/* Theme toggle inside mobile menu */}
               <ThemeToggleMobile locale={locale} />
+
+              {/* App entry / auth - prominent, above the marketing nav */}
+              <Div className="flex flex-col gap-2 border-b pb-6">
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full justify-center gap-2"
+                  onClick={toggleMenu}
+                >
+                  <Link href={`/${locale}/threads`}>
+                    <MessageSquare className="h-4 w-4" />
+                    <Span>
+                      {isPublic ? t("nav.startChatting") : t("nav.goToApp")}
+                    </Span>
+                  </Link>
+                </Button>
+                {isPublic && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="lg"
+                    className="w-full justify-center"
+                    onClick={toggleMenu}
+                  >
+                    <Link href={`/${locale}/user/login`}>
+                      {t("nav.user.login")}
+                    </Link>
+                  </Button>
+                )}
+              </Div>
 
               {/* Dynamic Navigation items */}
               <Div className="flex flex-col gap-3">

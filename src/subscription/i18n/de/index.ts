@@ -591,15 +591,14 @@ export const translations: typeof enTranslations = {
         models: "Zugriff auf alle {{modelCount}} KI-Modelle",
         nolimits: "Keine Tageslimits - nutz alle Credits wann du willst",
         uncensored: "Unzensierte Modelle ohne Inhaltsfilter",
-        packs:
-          "Extra Credit-Pakete kaufen, die niemals ablaufen (nur für Abonnenten)",
+        packs: "Extra Credit-Pakete kaufen, die niemals ablaufen",
         cancel: "Jederzeit kündbar, keine Fragen gestellt",
       },
       cta: "Jetzt Chatten",
       packs: {
         title: "Mehr Credits benötigt?",
         description:
-          "Kaufe Credit-Pakete jederzeit - {{packPrice}} für {{packCredits}} Credits. Sie verfallen nie und stapeln sich auf dein monatliches Kontingent. Nur für Abonnenten verfügbar.",
+          "Kaufe Credit-Pakete jederzeit, mit oder ohne Abo - {{packPrice}} für {{packCredits}} Credits oder {{largePackPrice}} für {{largePackCredits}}. Sie verfallen nie und stapeln sich auf jedes Monatskontingent.",
         cta: "Credit-Paket kaufen",
       },
       manage: "Abo jederzeit verwalten oder kündigen in",

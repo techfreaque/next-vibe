@@ -55,6 +55,13 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     delete: "Trennen",
+    confirmDelete: {
+      title: "{{provider}} trennen?",
+      description:
+        "Neue Abonnenten landen nicht mehr in deiner Liste. Bereits erfasste Kontakte bleiben erhalten.",
+      cancel: "Verbunden lassen",
+      proceed: "Trennen",
+    },
     back: "Zurück",
     loading: "Wird geladen…",
     pitch: {

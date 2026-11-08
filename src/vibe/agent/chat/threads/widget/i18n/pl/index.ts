@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
     navigation: {
       subscription: "Subskrypcja i Kredyty",
       referral: "Program Poleceń",
-      settings: "Mój profil",
+      settings: "Mój profil i ustawienia",
       leadMagnet: "Lead Magnet",
       help: "Opinie i Wsparcie",
       about: "O nas",
@@ -201,7 +201,7 @@ export const translations: typeof enTranslations = {
       subscriptionButton: {
         title: "Kredyty i subskrypcja",
         description:
-          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Bezpłatni użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc.",
+          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, +{{bonusCredits}} z newsletterem.",
       },
       chatInput: {
         title: "Wpisz swoją wiadomość",

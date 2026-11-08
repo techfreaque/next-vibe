@@ -70,7 +70,7 @@ export function SettingsPageClient({
   return (
     <Div className="bg-background">
       {/* Widgets bring their own 16px gutter (WidgetShell p-4) — the header matches it */}
-      <Div className="mx-auto flex max-w-2xl flex-col gap-2 py-8 sm:py-12">
+      <Div className="mx-auto flex max-w-3xl flex-col gap-2 py-8 sm:py-12">
         <Div className="flex flex-col gap-1 px-4">
           <H1 className="m-0 text-2xl font-semibold tracking-tight sm:text-3xl lg:text-3xl">
             {t("title")}

@@ -3,6 +3,7 @@ import "server-only";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 /**
  * Virtual Mount Resolver
  * Routes Cortex paths to the appropriate data source and renders as markdown
@@ -203,6 +204,11 @@ export async function getVirtualMountCounts(
   };
 }
 
+/** Machine mounts (/ssh) are admin-only — see readSshPath */
+function isSshAllowed(user: JwtPrivatePayloadType): boolean {
+  return user.roles.includes(UserPermissionRole.ADMIN);
+}
+
 /**
  * Resolve a virtual path write - delegates to mount-specific handler
  */
@@ -219,6 +225,9 @@ export async function resolveVirtualWrite(
     }
     case "/ssh": {
       const { writeSshPath } = await import("./ssh");
+      if (!isSshAllowed(ctx.user)) {
+        return null;
+      }
       return writeSshPath(ctx.userId, path, content);
     }
     default:
@@ -241,6 +250,9 @@ export async function resolveVirtualDelete(
     }
     case "/ssh": {
       const { deleteSshPath } = await import("./ssh");
+      if (!isSshAllowed(ctx.user)) {
+        return null;
+      }
       return deleteSshPath(ctx.userId, path);
     }
     default:
@@ -264,6 +276,9 @@ export async function resolveVirtualMove(
     }
     case "/ssh": {
       const { moveSshPath } = await import("./ssh");
+      if (!isSshAllowed(ctx.user)) {
+        return null;
+      }
       return moveSshPath(ctx.userId, fromPath, toPath);
     }
     default:

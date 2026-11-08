@@ -670,8 +670,9 @@ export async function toAiSdkMessages(
       // Build separate tool result messages (one per tool call with result)
       const toolResultMessages: ModelMessage[] = [];
 
-      // Track seen toolCallIds to prevent duplicates (API rejects non-unique IDs)
-      const seenToolCallIds = new Set<string>();
+      // Seen toolCallIds → their args, to keep ids unique (API rejects
+      // non-unique IDs) while telling true copies from provider id reuse.
+      const seenToolCallIds = new Map<string, string>();
 
       for (const toolMsg of toolMessages) {
         const toolCall = toolMsg.metadata!.toolCall!;
@@ -692,28 +693,58 @@ export async function toAiSdkMessages(
         // This lets revival AI see: [original pending call] → [STEP_OK response] → [deferred final result]
         // giving it full context about the async lifecycle.
         // In non-revival context: original is superseded (stripped), so deferred uses its real ID.
-        const effectiveToolCallId =
+        let effectiveToolCallId =
           isRevival && toolCall.isDeferred && toolCall.originalToolCallId
             ? `deferred-${toolCall.toolCallId}`
             : toolCall.toolCallId;
 
         // Duplicate toolCallIds must never reach the provider (API rejects
-        // non-unique IDs). With superseded originals stripped above, a
-        // duplicate here means two non-deferred rows share a toolCallId -
-        // an invariant violation in message creation, not a display concern.
-        if (seenToolCallIds.has(effectiveToolCallId)) {
-          logger.error(
-            "[MessageConverter] Duplicate toolCallId in batch - dropping later occurrence",
+        // non-unique IDs). Two cases:
+        //  - the SAME call stored twice (same args AND same outcome) → drop
+        //    the copy. Args alone are not enough: a retry of the same call
+        //    after an error has identical args but a different result, and
+        //    dropping it would erase what the model actually got back.
+        //  - DIFFERENT calls sharing an id: providers that number calls per
+        //    response ("execute-tool_0", "functions.x:0") reuse ids across
+        //    steps, and consecutive tool-only steps land in one group here.
+        //    Dropping those erased real history - give the later one a
+        //    unique id instead (call + result stay paired: both use
+        //    effectiveToolCallId below). Suffix is [A-Za-z0-9_-] only so it
+        //    stays valid for Anthropic's tool_use id pattern.
+        const argsKey = JSON.stringify({
+          args: toolCall.args ?? null,
+          result: toolCall.result ?? null,
+          error: toolCall.error ?? null,
+        });
+        const seenArgs = seenToolCallIds.get(effectiveToolCallId);
+        if (seenArgs !== undefined) {
+          if (seenArgs === argsKey) {
+            logger.warn(
+              "[MessageConverter] Same tool call stored twice in batch - dropping the copy",
+              {
+                toolCallId: effectiveToolCallId,
+                toolName: toolCall.toolName,
+                messageId: isChatMessage(toolMsg) ? toolMsg.id : "unknown",
+              },
+            );
+            continue;
+          }
+          let suffix = 2;
+          while (seenToolCallIds.has(`${effectiveToolCallId}_dup${suffix}`)) {
+            suffix++;
+          }
+          logger.debug(
+            "[MessageConverter] Provider reused a toolCallId across steps - renaming later call",
             {
               toolCallId: effectiveToolCallId,
+              renamedTo: `${effectiveToolCallId}_dup${suffix}`,
               toolName: toolCall.toolName,
-              messageId: isChatMessage(toolMsg) ? toolMsg.id : "unknown",
             },
           );
-          continue;
+          effectiveToolCallId = `${effectiveToolCallId}_dup${suffix}`;
         }
 
-        seenToolCallIds.add(effectiveToolCallId);
+        seenToolCallIds.set(effectiveToolCallId, argsKey);
 
         // Add tool call to assistant message content.
         toolCallContent.push({

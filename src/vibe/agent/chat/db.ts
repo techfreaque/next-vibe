@@ -38,6 +38,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -73,6 +74,9 @@ import type { Modality } from "../models/enum";
 import type { FavoriteConfig } from "../skills/favorites/db";
 import {
   ChatMessageRoleDB,
+  ThreadModerationStatus,
+  ThreadModerationStatusDB,
+  ThreadReportReasonDB,
   ThreadStatusDB,
   ThreadStreamingState,
   ThreadStreamingStateDB,
@@ -332,6 +336,10 @@ export const chatFolders = pgTable(
     icon: text("icon").$type<IconKey | null>(),
     color: text("color"), // hex color for visual distinction
 
+    // Project instructions - injected into the system prompt of every chat in
+    // this folder (and its subfolders). null/empty = plain folder.
+    instructions: text("instructions"),
+
     // Hierarchy - self-reference requires AnyPgColumn to break circular inference
     parentId: uuid("parent_id").references((): AnyPgColumn => chatFolders.id, {
       onDelete: "cascade",
@@ -486,6 +494,16 @@ export const chatThreads = pgTable(
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
+
+    // Community moderation (PUBLIC feed + SHARED links). Anything other than
+    // VISIBLE is hidden from the feed and share links for everyone but the
+    // owner and admins. reportCount = open (unresolved) distinct reporters.
+    moderationStatus: text("moderation_status", {
+      enum: ThreadModerationStatusDB,
+    })
+      .notNull()
+      .default(ThreadModerationStatus.VISIBLE),
+    reportCount: integer("report_count").notNull().default(0),
 
     streamingState: text("streaming_state", { enum: ThreadStreamingStateDB })
       .$type<ThreadStreamingState>()
@@ -663,6 +681,53 @@ const {
   ...CHAT_MESSAGE_COLUMNS_REST
 } = getTableColumns(chatMessages);
 export const CHAT_MESSAGE_COLUMNS = CHAT_MESSAGE_COLUMNS_REST;
+
+/**
+ * Thread Reports Table
+ * Community reports against PUBLIC feed threads / SHARED link threads.
+ * One report per reporter per thread (reporterKey = userId, else leadId).
+ * resolvedAt is stamped when an admin acts on the thread, so a dismissed
+ * thread starts clean but the same reporter cannot report it again.
+ */
+export const threadReports = pgTable(
+  "thread_reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    threadId: uuid("thread_id")
+      .notNull()
+      .references(() => chatThreads.id, { onDelete: "cascade" }),
+    // Optional: the specific message being reported
+    messageId: uuid("message_id").references(() => chatMessages.id, {
+      onDelete: "set null",
+    }),
+    // userId for signed-in reporters, leadId for guests
+    reporterKey: text("reporter_key").notNull(),
+    reporterUserId: uuid("reporter_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reporterLeadId: uuid("reporter_lead_id"),
+    // Hashed IP (never stored raw) - rate limiting only
+    ipHash: text("ip_hash"),
+    reason: text("reason", { enum: ThreadReportReasonDB }).notNull(),
+    note: text("note"),
+    resolvedAt: timestamp("resolved_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    threadReporterIdx: uniqueIndex("thread_reports_thread_reporter_idx").on(
+      table.threadId,
+      table.reporterKey,
+    ),
+    leadIdx: index("thread_reports_lead_idx").on(
+      table.reporterLeadId,
+      table.createdAt,
+    ),
+    ipIdx: index("thread_reports_ip_idx").on(table.ipHash, table.createdAt),
+  }),
+);
+
+export type ThreadReport = typeof threadReports.$inferSelect;
+export type NewThreadReport = typeof threadReports.$inferInsert;
 
 /**
  * Thread Share Links Table

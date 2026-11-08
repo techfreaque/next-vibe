@@ -29,7 +29,6 @@ export const translations: typeof enTranslations = {
     floorTitle: "ARPU wächst mit der Plattform",
     floorBody:
       "Jedes Mal, wenn {{appName}} neue Modelle, Features oder Modalitäten hinzufügt, geben bestehende Abonnenten mehr aus. Empfehlungen von vor sechs Monaten sind heute mehr wert als damals - ohne zusätzliche Arbeit deinerseits.",
-    tableTitle: "Was du pro Empfehlung pro Monat verdienst",
     tableHeaderProfile: "Nutzerprofil",
     tableHeaderSpend: "Monatliche Ausgaben",
     tableHeaderYouEarn: "Du verdienst/Monat",

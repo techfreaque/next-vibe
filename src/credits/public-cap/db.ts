@@ -3,7 +3,16 @@
  * Single-row table tracking the global daily spend cap for non-paying users
  */
 
-import { customType, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  customType,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -34,7 +43,8 @@ const numericNumber = customType<{
  * - lastResetAt: timestamp of last midnight reset (done lazily or by cron)
  *
  * "Free-tier user" = pool where ALL wallets have balance === 0 (no paid credits).
- * Race conditions are intentionally ignored here - minor over-spend is acceptable.
+ * The gate and the spend increment are both atomic single-statement SQL; overshoot is
+ * bounded to the generations already in flight when the cap is crossed.
  */
 export const publicFreeTierDailyCap = pgTable("public_free_tier_daily_cap", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -45,12 +55,55 @@ export const publicFreeTierDailyCap = pgTable("public_free_tier_daily_cap", {
   // Configurable daily limit (updated via POST endpoint)
   capAmount: numericNumber("cap_amount").notNull().default(500),
 
+  // Per-lead / per-IP daily sub-caps (credits) - stop one abuser eating the pool
+  perLeadCap: numericNumber("per_lead_cap").notNull().default(20),
+  perIpCap: numericNumber("per_ip_cap").notNull().default(40),
+
   // When spendToday was last zeroed (midnight server time)
   lastResetAt: timestamp("last_reset_at").defaultNow().notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Per-day free spend by key. kind = "lead" | "ip" (ip keys are hashed).
+ */
+export const publicCapSpenders = pgTable(
+  "public_cap_spenders",
+  {
+    day: text("day").notNull(),
+    kind: text("kind").notNull(),
+    key: text("key").notNull(),
+    spend: numericNumber("spend").notNull().default(0),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.day, t.kind, t.key] }),
+    index("public_cap_spenders_day_spend_idx").on(t.day, t.spend),
+  ],
+);
+
+/**
+ * Recent cap-hit / abuse / threshold events for the admin widget.
+ */
+export const publicCapEvents = pgTable(
+  "public_cap_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // "global-cap" | "lead-cap" | "ip-cap" | "single-request" | "fail-closed" | "threshold-80"
+    kind: text("kind").notNull(),
+    leadId: text("lead_id"),
+    ipHash: text("ip_hash"),
+    model: text("model"),
+    cost: numericNumber("cost").notNull().default(0),
+    spendToday: numericNumber("spend_today").notNull().default(0),
+    capAmount: numericNumber("cap_amount").notNull().default(0),
+    hits: integer("hits").notNull().default(1),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("public_cap_events_created_idx").on(t.createdAt)],
+);
 
 export const selectPublicCapSchema = createSelectSchema(publicFreeTierDailyCap);
 export const insertPublicCapSchema = createInsertSchema(publicFreeTierDailyCap);

@@ -192,6 +192,30 @@ export const translations: typeof enTranslations = {
 
   // Earnings List endpoint
   earnings: {
+    confirm: {
+      post: {
+        title: "Potwierdź zarobki z poleceń",
+        titleShort: "Potwierdź zarobki",
+        description:
+          "Odblokowuje zarobki z poleceń po upływie okresu na zwroty. Działa codziennie.",
+        container: {
+          title: "Potwierdzanie zarobków",
+          description: "Oczekujące zarobki po okresie na zwroty",
+        },
+        response: {
+          confirmedCount: "Potwierdzone",
+          failedCount: "Nieudane",
+        },
+        success: {
+          title: "Zarobki potwierdzone",
+          description: "Dojrzałe zarobki z poleceń są już do wykorzystania",
+        },
+      },
+      task: {
+        description:
+          "Zamienia zarobki z poleceń starsze niż okres na zwroty w kredyty",
+      },
+    },
     list: {
       get: {
         title: "Lista zarobków z poleceń",
@@ -369,7 +393,7 @@ export const translations: typeof enTranslations = {
         "Link polecający: {{directPct}} każdej płatności od tego użytkownika, wiecznie. Twój skill udostępniany przez innych: {{skillBonusPct}} każdej płatności tych użytkowników - dochód z linków, których nigdy nie wrzuciłeś/aś.",
       step3Title: "Otrzymaj płatność",
       step3Body:
-        "Zarobki są natychmiastowe. Użyj ich jako kredytów do czatów lub wypłać w krypto.",
+        "Zarobki odblokowują się {{holdDays}} dni po każdej płatności - to okres na zwroty. Potem użyj ich jako kredytów do czatów lub wypłać w krypto.",
       withdrawTitle: "Wypłać zarobki",
       withdrawDescription: "Wiele sposobów na wykorzystanie zarobków z poleceń",
       useAsCredits: "Użyj jako kredyty czatu",
@@ -383,6 +407,9 @@ export const translations: typeof enTranslations = {
       unlockedOf: "odblokowano z",
       viewHistory: "Zobacz historię",
       historyEmpty: "Twoje wypłaty pojawią się tutaj",
+      pendingTitle: "{{amount}} w oczekiwaniu",
+      pendingNote:
+        "Odblokowanie {{holdDays}} dni po każdej płatności - to okres na zwroty. Zwrócona płatność anuluje swoje zarobki.",
     },
     email: {
       user: {
@@ -420,6 +447,8 @@ export const translations: typeof enTranslations = {
       minimumAmount: "Minimalna kwota wypłaty to {{minPayout}}",
       walletRequired: "Adres portfela wymagany dla wypłat krypto",
       insufficientBalance: "Niewystarczające saldo do wypłaty",
+      conversionFailed:
+        "Zamiana nie powiodła się. Twoje zarobki są nietknięte - spróbuj ponownie za chwilę.",
       notFound: "Nie znaleziono żądania wypłaty",
       invalidStatus: "Nieprawidłowy status żądania wypłaty dla tej operacji",
     },

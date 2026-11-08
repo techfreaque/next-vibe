@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
 
-import { getSessionsForConnection, sessionPool } from "../exec/pool";
+import { getSessionsForConnection } from "../exec/pool";
 import type { CortexTerminalsResponseOutput } from "./definition";
 
 export class CortexTerminalsRepository {
@@ -19,12 +19,12 @@ export class CortexTerminalsRepository {
 
   static async list(
     path: string | undefined,
+    userId: string,
   ): Promise<ResponseType<CortexTerminalsResponseOutput>> {
     const slug = path ? this.parseConnectionSlug(path) : null;
 
-    const sessions = slug
-      ? getSessionsForConnection(slug)
-      : [...sessionPool.values()];
+    // Only the caller's own sessions — never list other users' terminals
+    const sessions = getSessionsForConnection(slug, userId);
 
     const terminals = sessions.map((s) => ({
       terminalId: s.sessionId,

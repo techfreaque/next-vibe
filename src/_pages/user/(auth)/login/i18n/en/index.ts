@@ -1,11 +1,4 @@
 export const translations = {
-  auth: {
-    login: {
-      title: "Sign In",
-      subtitle: "Welcome back to the community",
-      signInButton: "Sign In",
-    },
-  },
   meta: {
     title: "Login - {{appName}}",
     description: "Sign in to your {{appName}} account",

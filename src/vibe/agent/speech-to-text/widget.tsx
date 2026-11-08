@@ -16,6 +16,7 @@ import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mic } from "next-vibe/ui/components/icons/Mic";
 import { MicOff } from "next-vibe/ui/components/icons/MicOff";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { Square } from "next-vibe/ui/components/icons/Square";
 import { Upload } from "next-vibe/ui/components/icons/Upload";
 import type {
@@ -23,6 +24,7 @@ import type {
   InputRefObject,
 } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -44,6 +46,7 @@ import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
+import type { AnyRoleModelSelection } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_ID } from "./constants";
 import type definition from "./definition";
@@ -69,6 +72,9 @@ export function SpeechToTextContainer(): JSX.Element {
   // Field-error messages are endpoint translation keys (schema refine messages)
   const { t: tField } = useWidgetContext();
   const [showModelSelector, setShowModelSelector] = useState(false);
+  const [workingSelection, setWorkingSelection] = useState<
+    AnyRoleModelSelection | undefined
+  >(undefined);
 
   const currentModelId = form?.watch("modelId") ?? DEFAULT_STT_MODEL_ID;
   const modelSelection: SttModelSelection = {
@@ -169,14 +175,18 @@ export function SpeechToTextContainer(): JSX.Element {
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => setShowModelSelector(false)}
+          onClick={() => {
+            setShowModelSelector(false);
+            setWorkingSelection(undefined);
+          }}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <ModelSelector
           allowedRoles={["stt"]}
-          modelSelection={modelSelection}
-          onChange={(sel) => {
+          modelSelection={workingSelection ?? modelSelection}
+          onChange={(sel) => setWorkingSelection(sel ?? undefined)}
+          onSelect={(sel) => {
             if (
               sel !== null &&
               sel.selectionType === ModelSelectionType.MANUAL
@@ -189,6 +199,7 @@ export function SpeechToTextContainer(): JSX.Element {
               }
             }
             setShowModelSelector(false);
+            setWorkingSelection(undefined);
           }}
           locale={locale}
           user={user}
@@ -350,6 +361,20 @@ export function SpeechToTextContainer(): JSX.Element {
                   <Copy className="h-3.5 w-3.5" />
                 )}
               </Button>
+              <ExternalLink
+                href={`data:text/plain;charset=utf-8,${encodeURIComponent(transcribedText)}`}
+                download="transcript.txt"
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  title={t("post.download")}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
+              </ExternalLink>
             </Div>
             <P className="text-sm leading-relaxed">{transcribedText}</P>
 

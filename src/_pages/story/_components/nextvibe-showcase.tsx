@@ -404,7 +404,7 @@ export function NextVibeShowcase({
 
   return (
     <Div className="relative overflow-hidden">
-      <Div className="container relative px-4 md:px-6">
+      <Div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <NextVibeBlock
           label={t("home.nextvibe.frameworkAdmin.label")}
           title={t("home.nextvibe.frameworkAdmin.title")}

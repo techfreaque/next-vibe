@@ -20,7 +20,7 @@ import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
 import type { ChatModelId } from "../../../models";
 import { deductAndEmitCredits } from "./credits";
-import type { DbWriterState } from "./shared";
+import { type DbWriterState, noteThreadGoneWrite } from "./shared";
 import { buildSseMessageRow } from "./sse-row";
 
 /**
@@ -79,25 +79,18 @@ export async function emitToolCall(
     },
   });
 
-  // DB: create tool message immediately.
-  // Guard FK: if parentId was never committed to DB (placeholder insert failed),
-  // use null to avoid a foreign-key violation on chat_messages.parent_id.
+  // DB: create tool message immediately. createToolMessage verifies the parent
+  // row exists in the DB and falls back to the thread's last committed message
+  // when it does not, so the chain stays connected without an FK violation.
+  // (An in-memory "committed this stream" check used to null the parent here,
+  // which orphaned tool messages whose parent came from a compaction message or
+  // an earlier stream run.)
   if (!w.deps.isIncognito) {
-    const safeParentId =
-      parentId !== null && !w.committedMessageIds.has(parentId)
-        ? null
-        : parentId;
-    if (safeParentId !== parentId) {
-      w.deps.logger.warn(
-        "[MessageDbWriter] parentId not committed to DB — inserting tool message with null parent to avoid FK violation",
-        { toolMessageId, threadId, originalParentId: parentId },
-      );
-    }
     const createResult = await MessagesRepository.createToolMessage({
       messageId: toolMessageId,
       threadId,
       toolCall,
-      parentId: safeParentId,
+      parentId,
       userId: params.userId,
       sequenceId,
       model,
@@ -111,10 +104,12 @@ export async function emitToolCall(
         createResult.errorType?.errorCode ===
         ErrorResponseTypes.NOT_FOUND.errorCode
       ) {
-        w.deps.logger.warn(
-          "[MessageDbWriter] Thread deleted mid-stream, dropping tool message create",
-          { threadId, messageId: toolMessageId },
-        );
+        noteThreadGoneWrite(w, "tool message create", {
+          threadId,
+          messageId: toolMessageId,
+          userId: params.userId,
+          toolName: toolCall.toolName,
+        });
       } else {
         w.deps.logger.error("[MessageDbWriter] Failed to create tool message", {
           messageId: toolMessageId,
@@ -123,7 +118,7 @@ export async function emitToolCall(
         });
       }
     } else {
-      w.committedMessageIds.add(toolMessageId);
+      w.landedWrites++;
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, toolMessageId);
@@ -213,10 +208,12 @@ export async function emitToolResult(
       .where(eq(chatThreads.id, threadId))
       .limit(1);
     if (!threadExists) {
-      w.deps.logger.warn(
-        "[MessageDbWriter] Thread deleted mid-stream, dropping tool result write",
-        { threadId, messageId: toolMessageId, toolName },
-      );
+      noteThreadGoneWrite(w, "tool result write", {
+        threadId,
+        messageId: toolMessageId,
+        userId: params.userId,
+        toolName,
+      });
       return;
     }
 
@@ -234,16 +231,12 @@ export async function emitToolResult(
           toolName,
         },
       );
-      // Fallback: create if update failed. Guard FK same as emitToolCall.
-      const safeFallbackParentId =
-        parentId !== null && !w.committedMessageIds.has(parentId)
-          ? null
-          : parentId;
+      // Fallback: create if update failed (parent verified in createToolMessage).
       const fallbackResult = await MessagesRepository.createToolMessage({
         messageId: toolMessageId,
         threadId,
         toolCall,
-        parentId: safeFallbackParentId,
+        parentId,
         userId: params.userId,
         sequenceId,
         model,

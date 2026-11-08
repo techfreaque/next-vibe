@@ -34,6 +34,7 @@ import { UserDetailLevel } from "../../../identity/user/enum";
 import { UserRepository } from "../../../identity/user/repository";
 import { createEndpointLogger } from "../../../logger/server";
 import { resolveTestAdminUser } from "../../../tooling/testing/testing-suite/resolve-test-user";
+import { ChatModelId } from "../models-definitions";
 import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
 
 const PASSWORD = "E2eCreditUser123";
@@ -72,10 +73,13 @@ export async function drainCredits(user: JwtPrivatePayloadType): Promise<void> {
     if (balance.data.total <= 0) {
       return;
     }
-    const spent = await CreditRepository.deductCreditsForFeature(
+    // Model-usage deduction (allowPartial): draining is test setup, not a
+    // generation, so it must not trip the public free-tier cap gate (that
+    // gate guards pre-generation spend; the real cap is left untouched).
+    const spent = await CreditRepository.deductCreditsForModelUsage(
       user,
       balance.data.total,
-      "e2e-drain",
+      ChatModelId.GPT_5_4,
       logger,
       t,
       defaultLocale,
@@ -181,6 +185,54 @@ export async function createE2ECreditUser(
       await db
         .delete(leads)
         .where(or(eq(leads.id, leadId), eq(leads.email, email)));
+    },
+  };
+}
+
+export interface E2EFundedGuest {
+  leadId: string;
+  /** Delete the lead (cascades its wallet, packs and transactions). */
+  remove: () => Promise<void>;
+}
+
+/**
+ * Throwaway anonymous visitor with its own `credits` permanent credits.
+ *
+ * Browser-minted leads on localhost all share one IP, so the middleware links
+ * them into one lead pool (see `linkLeadsByIp`) whose monthly free allowance
+ * is spent after a few guest suites — every later spend-bearing guest test
+ * would 402. This lead is created without an IP, so it is never pooled, and
+ * carries a paid pack so the budget doesn't depend on the free tier.
+ * The anti-abuse pooling for real visitors is untouched.
+ */
+export async function createE2EFundedGuest(
+  tag: string,
+  credits: number,
+): Promise<E2EFundedGuest> {
+  const logger = createEndpointLogger(false, defaultLocale);
+  const nonce = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+  const leadId = await createAnonymousLead(
+    { userAgent: `e2e-guest-${tag}-${nonce}` },
+    defaultLocale,
+    logger,
+  );
+  const { t } = creditsScopedTranslation.scopedT(defaultLocale);
+  const funded = await CreditRepository.addCredits(
+    { leadId },
+    credits,
+    "permanent",
+    logger,
+    t,
+    defaultLocale,
+  );
+  if (!funded.success) {
+    // eslint-disable-next-line restricted/restricted-syntax -- test setup failure
+    throw new Error(`[e2e] funding guest failed: ${JSON.stringify(funded)}`);
+  }
+  return {
+    leadId,
+    remove: async (): Promise<void> => {
+      await db.delete(leads).where(eq(leads.id, leadId));
     },
   };
 }

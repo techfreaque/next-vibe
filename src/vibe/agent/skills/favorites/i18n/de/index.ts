@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
         label: "Skill ansehen",
       },
       signupPrompt: {
-        title: "Charakter-Persönlichkeit anpassen",
+        title: "Skill-Persönlichkeit anpassen",
         description:
-          "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+          "Bearbeite den System-Prompt und das Verhalten des Skills. Melde dich an, um zu beginnen.",
         backButton: "Zurück",
         signupButton: "Konto erstellen",
         loginButton: "Anmelden",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         skillId: {
-          content: "Charakter: {{value}}",
+          content: "Skill: {{value}}",
         },
         customVariantName: {
           content: "Benutzerdefinierter Name: {{value}}",
@@ -168,7 +168,7 @@ export const translations: typeof enTranslations = {
         label: "Skill ansehen",
       },
       useThisSkillButton: {
-        label: "Diesen Charakter verwenden",
+        label: "Dieses Skill verwenden",
       },
       useThisModelButton: {
         label: "Dieses Modell verwenden",
@@ -177,9 +177,9 @@ export const translations: typeof enTranslations = {
         label: "Derzeit aktiv",
       },
       signupPrompt: {
-        title: "Charakter-Persönlichkeit anpassen",
+        title: "Skill-Persönlichkeit anpassen",
         description:
-          "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+          "Bearbeite den System-Prompt und das Verhalten des Skills. Melde dich an, um zu beginnen.",
         backButton: "Zurück",
         signupButton: "Konto erstellen",
         loginButton: "Anmelden",
@@ -196,7 +196,7 @@ export const translations: typeof enTranslations = {
         label: "Favoriten-ID",
       },
       skillId: {
-        label: "Charakter",
+        label: "Skill",
         description:
           'Skill-ID. „skillSlug" für die Standardvariante, „skillSlug__variantId" für eine bestimmte Variante.',
       },
@@ -212,42 +212,42 @@ export const translations: typeof enTranslations = {
       voice: {
         label: "KI-Stimme",
         description: "Wählen Sie die Stimme für Ihren KI-Assistenten",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       sttModel: {
         label: "Sprache-zu-Text-Modell",
         description: "Modell für die Spracherkennung",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       imageVisionModel: {
         label: "Bild-Vision-Modell",
         description: "Modell für die Bildanalyse",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       videoVisionModel: {
         label: "Video-Vision-Modell",
         description: "Modell für die Videoanalyse",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       audioVisionModel: {
         label: "Audio-Vision-Modell",
         description: "Modell für die Audioanalyse",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       imageGenModel: {
         label: "Bildgenerierungsmodell",
         description: "Modell zur Bilderstellung",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       musicGenModel: {
         label: "Musikgenerierungsmodell",
         description: "Modell zur Musikerstellung",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       videoGenModel: {
         label: "Video-Generierungsmodell",
         description: "Modell zur Videoerstellung",
-        placeholder: "Vom Charakter erben",
+        placeholder: "Vom Skill erben",
       },
       mode: {
         label: "Auswahlmodus",
@@ -260,7 +260,7 @@ export const translations: typeof enTranslations = {
       },
       selectionType: {
         label: "Auswahltyp",
-        characterBased: "Basierend auf Charakter",
+        characterBased: "Basierend auf Skill",
         manual: "Bestimmtes Modell",
         filters: "Filterkriterien",
       },
@@ -323,22 +323,22 @@ export const translations: typeof enTranslations = {
       icon: {
         label: "Benutzerdefiniertes Symbol",
         description:
-          "Symbol des Charakters für diesen Favoriten-Slot überschreiben",
+          "Symbol des Skills für diesen Favoriten-Slot überschreiben",
       },
       compactTrigger: {
         label: "Komprimierungs-Schwellenwert (Token)",
         description:
-          "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Charakter oder globaler Standard.",
+          "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Skill oder globaler Standard.",
       },
       availableTools: {
         label: "Erlaubte Tools",
         description:
-          "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
+          "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Skill oder globale Einstellungen.",
       },
       pinnedTools: {
         label: "Angeheftete Tools",
         description:
-          "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Charakter oder globale Einstellungen.",
+          "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Skill oder globale Einstellungen.",
       },
       deniedTools: {
         label: "Gesperrte Tools",
@@ -364,10 +364,10 @@ export const translations: typeof enTranslations = {
           "Maximale Gesamttoken des Speicherinhalts für diesen Slot. Null = Skill oder globaler Standard.",
       },
       changeSkill: {
-        label: "Charakter wechseln",
+        label: "Skill wechseln",
       },
       modifySkill: {
-        label: "Charakter bearbeiten",
+        label: "Skill bearbeiten",
       },
       response: {
         success: {
@@ -505,7 +505,7 @@ export const translations: typeof enTranslations = {
   },
   active: "Aktiv",
   fallbacks: {
-    unknownSkill: "Unbekannter Charakter",
+    unknownSkill: "Unbekanntes Skill",
     unknownModel: "Unbekanntes Modell",
     unknown: "Unbekannt",
     unknownProvider: "unbekannt",
@@ -519,7 +519,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     selectionType: {
-      characterBased: "Basierend auf Charakter",
+      characterBased: "Basierend auf Skill",
       manual: "Spezifisches Modell",
       filters: "Filterkriterien",
     },
@@ -594,38 +594,40 @@ export const translations: typeof enTranslations = {
       edit: "Bearbeiten",
       active: "Aktiv",
       reorder: "Ziehen zum Sortieren",
+      moveUp: "Nach oben",
+      moveDown: "Nach unten",
       showMore: "{{count}} weitere Modelle",
       showLess: "Weniger anzeigen",
       settings: "Chat-Einstellungen",
     },
-    addVariant: "Variante hinzufügen",
+    addVariant: "Weiteres Modell hinzufügen",
     viewSkill: "Details",
-    deleteVariant: "Variante entfernen?",
+    deleteVariant: "Dieses Modell entfernen?",
     deleteVariantAction: "Entfernen",
     deleteGroup: {
-      trigger: "Alle Varianten löschen",
-      confirm: "Alle {{count}} Varianten löschen?",
+      trigger: "Skill entfernen",
+      confirm: "Skill samt {{count}} Modellen entfernen?",
       cancel: "Abbrechen",
-      action: "Alle löschen",
+      action: "Entfernen",
     },
-    emptyState: "Sie haben noch keine Favoriten hinzugefügt",
+    emptyState: "Noch keine Skills. Wählen Sie eines und legen Sie los.",
     tabs: {
-      myFavorites: "Meine Favoriten",
-      browseSkills: "Skills durchsuchen",
+      myFavorites: "Meine Skills",
+      browseSkills: "Skills entdecken",
     },
     sections: {
       companion: "Begleiter",
       skills: "Skills",
-      model: "Direkte Modelle",
+      model: "Reine Modelle",
       background: "Hintergrund-Agenten",
     },
     container: {
-      title: "Ihre Favoriten",
+      title: "Ihre Skills",
       description:
-        "Verwalten Sie Ihre bevorzugten Charakter- und Modellkonfigurationen",
+        "Verwalten Sie Ihre bevorzugten Skill- und Modellkonfigurationen",
     },
     createButton: {
-      label: "Charaktere entdecken",
+      label: "Skills entdecken",
     },
     response: {
       favorite: {
@@ -634,7 +636,7 @@ export const translations: typeof enTranslations = {
           content: "ID: {{value}}",
         },
         skillId: {
-          content: "Charakter: {{value}}",
+          content: "Skill: {{value}}",
         },
         customVariantName: {
           content: "Benutzerdefinierter Name: {{value}}",
@@ -758,7 +760,7 @@ export const translations: typeof enTranslations = {
     description: "Neue Favoriten-Konfiguration erstellen",
     container: {
       title: "Neuer Favorit",
-      description: "Charakterkonfiguration als Favorit speichern",
+      description: "Skill-Konfiguration als Favorit speichern",
     },
     backButton: {
       label: "Abbrechen",
@@ -772,8 +774,8 @@ export const translations: typeof enTranslations = {
       loadingText: "Hinzufügen...",
     },
     skillId: {
-      label: "Charakter",
-      description: "Wählen Sie den Charakter für diesen Favoriten",
+      label: "Skill",
+      description: "Wählen Sie das Skill für diesen Favoriten",
     },
     customVariantName: {
       label: "Variantenname",

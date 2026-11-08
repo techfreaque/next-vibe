@@ -47,6 +47,13 @@ export const translations = {
   },
   widget: {
     delete: "Disconnect",
+    confirmDelete: {
+      title: "Disconnect {{provider}}?",
+      description:
+        "New subscribers stop landing in your list. Contacts already captured stay where they are.",
+      cancel: "Keep connected",
+      proceed: "Disconnect",
+    },
     back: "Back",
     loading: "Loading…",
     pitch: {

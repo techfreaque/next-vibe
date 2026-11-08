@@ -295,6 +295,11 @@ export const translations = {
     },
     weight: { label: "Weight", description: "Load balancing weight" },
     isFailover: { label: "Failover", description: "Use as failover account" },
+    isSystem: {
+      label: "Platform mailbox",
+      description:
+        "Platform-owned ops mailbox. Credentials come from env; excluded from campaigns.",
+    },
     failoverPriority: {
       label: "Failover Priority",
       description: "Failover priority order",
@@ -329,6 +334,7 @@ export const translations = {
       isExactMatch: "Exact Match",
       weight: "Weight",
       isFailover: "Failover",
+      isSystem: "Platform mailbox",
       failoverPriority: "Failover Priority",
       messagesSentTotal: "Messages Sent",
       lastUsedAt: "Last Used",

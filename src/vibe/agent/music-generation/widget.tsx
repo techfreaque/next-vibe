@@ -32,6 +32,7 @@ import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
+import type { AnyRoleModelSelection } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
@@ -77,6 +78,9 @@ export function MusicGenerationContainer({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const [showModelSelector, setShowModelSelector] = useState(false);
+  const [workingSelection, setWorkingSelection] = useState<
+    AnyRoleModelSelection | undefined
+  >(undefined);
   const availability = useProviderAvailability();
 
   const currentModelId = form?.watch("model");
@@ -137,14 +141,18 @@ export function MusicGenerationContainer({
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => setShowModelSelector(false)}
+          onClick={() => {
+            setShowModelSelector(false);
+            setWorkingSelection(undefined);
+          }}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <ModelSelector
           allowedRoles={["audio-gen"]}
-          modelSelection={modelSelection}
-          onChange={(sel) => {
+          modelSelection={workingSelection ?? modelSelection}
+          onChange={(sel) => setWorkingSelection(sel ?? undefined)}
+          onSelect={(sel) => {
             if (
               sel !== null &&
               sel.selectionType === ModelSelectionType.MANUAL
@@ -157,6 +165,7 @@ export function MusicGenerationContainer({
               }
             }
             setShowModelSelector(false);
+            setWorkingSelection(undefined);
           }}
           locale={locale}
           user={user}

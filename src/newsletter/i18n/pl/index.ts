@@ -477,6 +477,11 @@ export const translations: typeof enTranslations = {
       bounced: "Odrzucony",
       complained: "Skarga",
     },
+    creditBonus: {
+      active: "Bonus aktywny",
+      pendingConfirmation: "Potwierdź e-mail, żeby odblokować",
+      claimedElsewhere: "Już odebrany przez inne konto",
+    },
   },
   hooks: {
     errors: {

@@ -3,6 +3,7 @@
  */
 
 "use client";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { isCliPlatform } from "next-vibe/platforms/platforms";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -69,6 +70,7 @@ import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
 import { useTourState } from "../chat/tour-state";
 import { useProviderAvailability } from "../env-availability-store";
+import { getAvailableModelCount } from "../models/all-models";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
@@ -100,6 +102,19 @@ export function SkillsListContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const skillsData = useWidgetValue<typeof definition.GET>();
   const platform = useWidgetPlatform();
+  const availability = useProviderAvailability();
+  // Same availability-aware count the home/pricing pages use - the static
+  // count in the definition includes models with no configured provider.
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const modelDescriptionField = useMemo(
+    () => ({
+      ...children.modelDescription,
+      contentParams: {
+        count: getAvailableModelCount(isAdmin, availability),
+      },
+    }),
+    [children.modelDescription, isAdmin, availability],
+  );
   const onPick = usePickerCallback<{ id: string; name: string }>();
   const isTouch = useTouchDevice();
   const pathname = usePathname();
@@ -520,7 +535,7 @@ export function SkillsListContainer({
               <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <TextWidget field={children.name} fieldName="name" />
                 <TextWidget
-                  field={children.modelDescription}
+                  field={modelDescriptionField}
                   fieldName="modelDescription"
                 />
               </Div>

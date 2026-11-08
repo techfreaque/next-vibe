@@ -129,6 +129,8 @@ export const messengerAccounts = pgTable(
       .notNull()
       .default(MessengerAccountStatus.INACTIVE),
     isDefault: boolean("is_default").default(false),
+    // Platform-owned ops mailbox (IMAP+SMTP). Excluded from campaign selection.
+    isSystem: boolean("is_system").notNull().default(false),
     priority: integer("priority").default(0),
     healthStatus: text("health_status", { enum: MessengerHealthStatusDB }),
     consecutiveFailures: integer("consecutive_failures").default(0),

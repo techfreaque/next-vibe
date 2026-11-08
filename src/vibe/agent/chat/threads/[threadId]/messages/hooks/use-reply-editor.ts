@@ -6,6 +6,7 @@
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { DivRefObject } from "next-vibe/ui/components/div";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
@@ -96,19 +97,21 @@ export function useReplyEditor({
     }
   }, [content, attachments, isLoading, parentMessageId, onReply, logger]);
 
+  const isTouch = useTouchDevice();
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent): void => {
-      // Enter without Shift = submit (reply)
-      if (e.key === "Enter" && !e.shiftKey) {
+      // Enter without Shift = submit (reply). On touch there is no Shift key,
+      // so Enter must insert a newline instead (the send button submits).
+      if (e.key === "Enter" && !e.shiftKey && !isTouch) {
         e.preventDefault();
         void handleReply();
       } else if (e.key === "Escape") {
         e.preventDefault();
         onCancel();
       }
-      // Shift+Enter = new line (default textarea behavior, no need to handle)
+      // Shift+Enter (or Enter on touch) = new line (default textarea behavior)
     },
-    [handleReply, onCancel],
+    [handleReply, isTouch, onCancel],
   );
 
   const handleCancel = useCallback(() => {

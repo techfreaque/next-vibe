@@ -219,7 +219,7 @@ export const translations = {
     },
     defaultTone: {
       label: "Default Skill",
-      description: "Default character for this thread",
+      description: "Default skill for this thread",
     },
     systemPrompt: {
       label: "System Prompt",

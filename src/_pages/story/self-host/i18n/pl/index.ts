@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
       optionB: {
         label: "Opcja B: OpenRouter",
         description:
-          "200+ modeli, płatność za użycie. Klucz na openrouter.ai/keys.",
+          "Wszystkie modele OpenRouter, płatność za użycie. Klucz na openrouter.ai/keys.",
       },
     },
   },
@@ -80,10 +80,58 @@ export const translations: typeof enTranslations = {
     description:
       "Thea może kierować zadania do Claude Code na Twoim komputerze. Przejdź do Admin → Połączenia zdalne w panelu i dodaj URL lokalnej instancji. Pamięci i zadania synchronizują się co 60 sekund - bez przekierowywania portów, bez VPN.",
   },
+  own: {
+    eyebrow: "Twój serwer, twoje zasady",
+    title: "Twój stack. Twój filtr.",
+    subtitle:
+      "Żadnego konta w cudzej firmie. Twój Postgres, twoje klucze, twoje logi. Ty wybierasz modele i decydujesz, ile filtrów stoi między tobą a nimi.",
+    cards: {
+      data: {
+        title: "Dane zostają u ciebie",
+        body: "Wątki, wspomnienia i pliki leżą w twoim Postgresie i na twoim dysku. Nic nie dzwoni do domu.",
+      },
+      filter: {
+        title: "Twój poziom filtrowania",
+        body: "Modele mainstreamowe, otwarte albo bez cenzury. Decydujesz per skill, per wątek, per użytkownik. Bez zespołu od polityk po drodze.",
+      },
+      keys: {
+        title: "Twoje klucze",
+        body: "Podepnij OpenRouter, lokalny model albo Claude Code. Koszty idą do twojego dostawcy, nie przez nas.",
+      },
+    },
+  },
+  env: {
+    title: "Czego potrzeba",
+    intro:
+      "Bun, Docker i garść zmiennych środowiskowych. To cała lista dla prywatnej instancji.",
+    envLabel: "Minimalna konfiguracja",
+    composeLabel: "Produkcja na VPS",
+  },
+  instances: {
+    title: "Trzy instancje, trzy zadania",
+    intro:
+      "Jeden kod działa jako osobne instancje. Ten sam kod, inna baza i rola. Tak sami to uruchamiamy.",
+    atlas: {
+      name: "Atlas",
+      body: "Instancja deweloperska. Hot reload, baza na wyrzut. Tu powstaje kod.",
+    },
+    hermes: {
+      name: "Hermes",
+      body: "Twój codzienny napęd. Lokalny podgląd na własnym Postgresie. W niej na co dzień mieszkasz.",
+    },
+    thea: {
+      name: "Thea",
+      body: "Instancja w chmurze na twoim VPS. Zawsze włączona, odpala twoje crony, przyjmuje zadania od dwóch pozostałych.",
+    },
+    note: "Instancje łączą się ze sobą. Wątki i zadania synchronizują się między laptopem a serwerem.",
+  },
+  fork: {
+    title: "Ten sam framework, inny produkt",
+    body: "next-vibe-headunit to fork na komputer samochodowy. Media, nawigacja, klimatyzacja, Bluetooth i radio to endpointy, a każdy jest też komendą CLI i narzędziem dla AI. Inny produkt, te same trzy pliki.",
+  },
   enterprise: {
     title: "Potrzebujesz pomocy przy konfiguracji?",
     description:
       "Pomagamy przy wdrożeniu, niestandardowych integracjach i bieżącym wsparciu deweloperskim.",
-    cta: "Skontaktuj się",
   },
 };

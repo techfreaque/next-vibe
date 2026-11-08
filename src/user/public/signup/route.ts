@@ -7,6 +7,7 @@ import {
   signupWelcomeEmailTemplate,
 } from "./email";
 import { SignupRepository } from "./repository";
+import { verifyEmailSignupEmailTemplate } from "../verify-email/email";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: signupEndpoints,
@@ -15,6 +16,10 @@ export const { POST, tools } = endpointsHandler({
       {
         template: signupWelcomeEmailTemplate,
         ignoreErrors: false,
+      },
+      {
+        template: verifyEmailSignupEmailTemplate,
+        ignoreErrors: true, // Verification mail failing must never block signup
       },
       {
         template: adminSignupNotificationEmailTemplate,

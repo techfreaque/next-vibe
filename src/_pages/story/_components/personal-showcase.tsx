@@ -578,7 +578,7 @@ export function PersonalShowcase({
 
   return (
     <Div className="relative overflow-hidden">
-      <Div className="container relative px-4 md:px-6">
+      <Div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <PersonalBlock
           label={t("home.personal.theaAdmin.label")}
           title={t("home.personal.theaAdmin.title")}

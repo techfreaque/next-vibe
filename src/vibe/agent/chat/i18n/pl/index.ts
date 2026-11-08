@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     folders: "Foldery",
     files: "Pliki",
     messages: "Wiadomości",
-    characters: "Persony",
+    characters: "Skille",
     memories: "Wspomnienia",
     favorites: "Ulubione",
     credits: "Kredyty",
@@ -45,6 +45,23 @@ export const translations: typeof enTranslations = {
       system: "System",
       tool: "Narzędzie",
       error: "Błąd",
+    },
+    threadModerationStatus: {
+      visible: "Widoczny",
+      underReview: "W weryfikacji",
+      removed: "Usunięty",
+    },
+    threadReportReason: {
+      spam: "Spam",
+      illegal: "Treści nielegalne",
+      abuse: "Nadużycie lub nękanie",
+      csamFlag: "Zagrożenie bezpieczeństwa dzieci",
+      other: "Inne",
+    },
+    threadModerationAction: {
+      dismiss: "Odrzuć zgłoszenia (przywróć)",
+      remove: "Usuń treść",
+      banAuthor: "Usuń i zbanuj autora",
     },
     threadStatus: {
       active: "Aktywny",
@@ -171,7 +188,7 @@ export const translations: typeof enTranslations = {
       subscriptionButton: {
         title: "Kredyty i subskrypcja",
         description:
-          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Bezpłatni użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc.",
+          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, +{{bonusCredits}} z newsletterem.",
       },
       chatInput: {
         title: "Wpisz swoją wiadomość",
@@ -222,8 +239,8 @@ export const translations: typeof enTranslations = {
     modelOnly: "Tylko model",
     editModelSettings: "Edytuj ustawienia modelu",
     editSettings: "Edytuj ustawienia",
-    switchSkill: "Zmień postać",
-    editSkill: "Edytuj postać",
+    switchSkill: "Zmień skill",
+    editSkill: "Edytuj skill",
     delete: "Usuń",
     autoSelectedModel: "FILTROWANE",
     manualSelectedModel: "WYBRANE RĘCZNIE",
@@ -250,7 +267,7 @@ export const translations: typeof enTranslations = {
     saveAsDefault: "Dodaj do ulubionych",
     deleteSetup: "Usuń konfigurację",
     content: "Przeszukaj treść...",
-    characterSetup: "Konfiguracja persony",
+    characterSetup: "Konfiguracja skilla",
     noResults: "Brak wyników",
     add: "Dodaj do ulubionych",
     added: "Dodano",
@@ -259,7 +276,7 @@ export const translations: typeof enTranslations = {
     createCustom: "Utwórz własną",
     customizeSettings: "Dostosuj ustawienia",
     requirements: {
-      characterConflict: "Konflikty wymagań postaci",
+      characterConflict: "Konflikty wymagań skilla",
       tooLow: "zbyt niski",
       tooHigh: "zbyt wysoki",
       min: "min",
@@ -304,14 +321,14 @@ export const translations: typeof enTranslations = {
       deleteMessage: "Usuń wiadomość",
     },
     characterSelector: {
-      placeholder: "Wybierz personę",
-      addNewLabel: "Utwórz własną personę",
+      placeholder: "Wybierz skill",
+      addNewLabel: "Utwórz własny skill",
       grouping: {
         bySource: "Według źródła",
         byCategory: "Według kategorii",
         sourceLabels: {
           builtIn: "Wbudowane",
-          my: "Moje persony",
+          my: "Moje skille",
           community: "Społeczność",
         },
         sourceIcons: {
@@ -321,11 +338,11 @@ export const translations: typeof enTranslations = {
         },
       },
       addDialog: {
-        title: "Utwórz własną personę",
+        title: "Utwórz własny skill",
         fields: {
           name: {
             label: "Nazwa",
-            placeholder: "Wprowadź nazwę persony",
+            placeholder: "Wprowadź nazwę skilla",
           },
           icon: {
             label: "Ikona (emoji)",
@@ -333,11 +350,11 @@ export const translations: typeof enTranslations = {
           },
           description: {
             label: "Opis",
-            placeholder: "Krótki opis persony",
+            placeholder: "Krótki opis skilla",
           },
           systemPrompt: {
             label: "Prompt systemowy",
-            placeholder: "Zdefiniuj, jak zachowuje się postać...",
+            placeholder: "Zdefiniuj, jak zachowuje się skill...",
           },
           category: {
             label: "Kategoria",
@@ -345,7 +362,7 @@ export const translations: typeof enTranslations = {
         },
         createCategory: "Utwórz kategorię",
         cancel: "Anuluj",
-        create: "Utwórz personę",
+        create: "Utwórz skill",
       },
       addCategoryDialog: {
         title: "Utwórz kategorię",

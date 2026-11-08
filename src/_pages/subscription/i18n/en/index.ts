@@ -48,7 +48,8 @@ export const translations = {
       },
       free: {
         title: "Free Monthly Credits",
-        description: "{{count}} free credits per month for everyone",
+        description:
+          "{{guest}} free credits a month as a guest, {{signedIn}} signed in, +{{bonus}} with the newsletter",
       },
       earned: {
         title: "Earned Credits",
@@ -68,11 +69,12 @@ export const translations = {
         permanent: {
           title: "Credit packs",
           description:
-            "{{packPrice}} for {{packCredits}} credits. Never expire. For subscribers who burn through {{subCredits}}.",
+            "{{packPrice}} for {{packCredits}} credits, or {{largePackPrice}} for {{largePackCredits}}. Never expire. No subscription needed.",
         },
         free: {
           title: "Free credits",
-          description: "{{count}} credits to start. No card needed.",
+          description:
+            "{{guest}} a month as a guest. {{signedIn}} with a free account, +{{bonus}} with the newsletter. No card.",
         },
       },
       costs: {
@@ -151,9 +153,8 @@ export const translations = {
       },
       pack: {
         title: "Extra Credit Packs",
-        description:
-          "Additional credits that never expire. Requires active subscription.",
-        badge: "For Subscribers",
+        description: "Pay as you go. No subscription. Credits never expire.",
+        badge: "No Subscription",
         perPack: "/pack",
         quantity: "Quantity",
         total: "{{count}} credits",
@@ -169,8 +170,6 @@ export const translations = {
         totalPrice: "Total: {{price}}",
         pack: "Pack",
         packs: "Packs",
-        requiresSubscription:
-          "Credit packs are for active subscribers who need more than their monthly allowance. Subscribe first.",
       },
     },
     history: {

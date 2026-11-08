@@ -2,16 +2,12 @@ export const translations = {
   nav: {
     help: "Help",
     logout: "Log Out",
-    settings: "My Profile",
+    settings: "My Profile & Settings",
+    profile: "My Profile",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Enable light mode",
     enableDarkMode: "Enable dark mode",
     notifications: "Notifications",
-    welcomeNotification: {
-      title: "Welcome to {{appName}}!",
-      description:
-        "Get started by exploring the AI models and creating your first conversation.",
-    },
     company: "Company",
     about: {
       title: "About Us",
@@ -74,86 +70,6 @@ export const translations = {
     },
   },
   home: {
-    v2: {
-      how: {
-        eyebrow: "How it works",
-        title: "Three choices. Then just ask.",
-        subtitle:
-          "No setup, no prompt tricks. Pick who answers and how filtered they are.",
-        steps: {
-          who: {
-            title: "Pick who you talk to",
-            body: "A companion for everyday talk, or a specialist for code, research, writing. Each one remembers your context.",
-          },
-          filter: {
-            title: "Pick your filter",
-            body: "{{modelCount}} models in three tiers: mainstream, open and uncensored. Switch any time, even mid-chat.",
-          },
-          ask: {
-            title: "Ask anything",
-            body: "It searches the web, reads sources, makes images, video and music. You get the answer, not a lecture.",
-          },
-        },
-      },
-      pricing: {
-        eyebrow: "Pricing",
-        title: "Free to start. Pay for what you use.",
-        subtitle:
-          "Credits, not seats. Cheap models cost a fraction of a credit per message.",
-        free: {
-          name: "Free",
-          note: "forever",
-          p1: "{{freeCredits}} credits every month",
-          p2: "All three filter tiers",
-          p3: "No card to start",
-        },
-        sub: {
-          name: "Subscription",
-          note: "per month",
-          p1: "{{subscriptionCredits}} credits every month",
-          p2: "Top up any time: {{packCredits}} credits for {{packPrice}}",
-          p3: "Every model, every tool",
-        },
-        cta: "See full pricing",
-        footnote: "Cancel any time. Credits you buy as packs never expire.",
-      },
-      more: {
-        eyebrow: "Beyond chat",
-        title: "Run it. Build on it. Earn from it.",
-        subtitle:
-          "The same platform, open source, for people who want more than a chat window.",
-      },
-      faq: {
-        eyebrow: "Questions",
-        title: "What people ask first",
-        items: {
-          uncensored: {
-            q: "Is it really uncensored?",
-            a: "You choose, per chat. Mainstream models follow their makers' rules. Open models filter lightly. Uncensored models don't refuse. Nothing gets filtered behind your back - the tier you pick is the tier you get.",
-          },
-          privacy: {
-            q: "Who can read my chats?",
-            a: "Incognito chats live only in your browser - we don't store them. Private chats are saved to your account and only you can open them. To answer, your message goes to the model provider you picked.",
-          },
-          account: {
-            q: "Do I need an account?",
-            a: "No. Open the app and chat in incognito right away. A free account saves your chats across devices and adds {{freeCredits}} free credits every month.",
-          },
-          cost: {
-            q: "What does it cost?",
-            a: "Free gets you {{freeCredits}} credits a month. The subscription is {{subscriptionPrice}} a month for {{subscriptionCredits}} credits, and you can top up with packs ({{packCredits}} credits for {{packPrice}}). Each message costs credits depending on the model.",
-          },
-          models: {
-            q: "Which models can I use?",
-            a: "{{modelCount}} models from {{providerCount}} providers - the latest Claude, GPT, Gemini, Grok, DeepSeek and Qwen, open-weight models, and dedicated uncensored ones. New releases land fast.",
-          },
-          selfhost: {
-            q: "Can I run it myself?",
-            a: "Yes. The whole platform is open source (MIT + GPL v3). Run it on your own machine with your own keys - or connect it to your account here.",
-          },
-        },
-      },
-    },
     splitHero: {
       seeHow: "See how it works",
       stats: {
@@ -213,10 +129,28 @@ export const translations = {
           },
         },
       },
+      or: "OR",
+      clickToExplore: "Click to explore",
       badge: "Small team · Open source · Built in public",
       header: "AI that doesn't tell you what to think.",
       subheader: "No refusals. No one reads your chats. Your AI - not ours.",
+      chipChat: "Chat",
+      chipSelfHost: "Self-host",
+      chipBuild: "Build",
+      chipEarn: "Earn",
+      introGuide: "Four ways in - pick yours:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "We fix fast. Something off?",
+      introHelpCta: "Tell us",
       card: {
+        chat: {
+          label: "Just chat",
+          desc: "Ask anything - including what ChatGPT refuses. No account needed to try.",
+        },
         personal: {
           label: "Your own AI",
           desc: "Runs on your machine. Tell it what you need - it builds around your life, grows with you.",
@@ -231,16 +165,169 @@ export const translations = {
         },
       },
       unbottled: {
+        badge: "Uncensored · Open · Mainstream",
+        titleLine1: "Uncensored AI.",
+        titleLine2: "Ask anything.",
+        subtitle:
+          "{{modelCount}} models. Three tiers - you pick. Switch per conversation. Get the actual answer, not the approved version.",
+        pill1: "{{modelCount}} models - you pick the filter",
+        pill2: "Generate images, video & music",
+        pill3: "{{skillCount}}+ skills with memory & search",
         cta: "Start chatting",
+        ctaExplore: "Learn More",
       },
       personal: {
+        badge: "Self-hosted AI agent",
+        titleLine1: "You ask.",
+        titleLine2: "It ships.",
+        subtitle:
+          "Every tool Thea builds appears on your dashboard instantly - fully usable UI, CLI command, AI tool, cron job. SSH, email, browser automation. Your machine. Your data.",
+        pill1: "Browser, terminal & SSH built in",
+        pill2: "Runs 24/7 in the background",
+        pill3: "Your keys or {{appName}} account",
         cta: "Self-Host Free",
+        ctaGithub: "Learn More",
       },
       nextvibe: {
+        badge: "Open source · MIT + GPL v3",
+        titleLine1: "Write once.",
+        titleLine2: "Ship everywhere.",
+        subtitle:
+          "One TypeScript definition becomes a custom web UI, CLI command, AI tool, MCP server, mobile screen, cron job - automatically. Same contract. Zero rewrites. Fork it, own it.",
+        pill1: "Powers {{appName}}",
+        pill2: "Zero any / unknown / throw",
+        pill3: "{{platformCount}} platforms per endpoint",
+        ctaGithub: "Star on GitHub",
         ctaDocs: "Framework Docs",
+        ctaExplore: "Learn More",
       },
       referral: {
+        badge: "Skill Economy",
+        titleLine1: "Publish. Refer.",
+        titleLine2: "Earn.",
+        subtitle:
+          "Referral link: 10% of every payment, forever. Your skill as their entry point: +5% - even when others share it.",
         cta: "Start Earning",
+        ctaExplore: "Learn More",
+      },
+      tab: {
+        unbottled: "{{appName}}",
+        unbottledSub: "Consumer AI",
+        unbottledDesc:
+          "{{modelCount}} models, image/video/music generation, persistent memory, live search - no filter you didn't choose",
+        personal: "Self-Host",
+        personalSub: "Your AI Agent",
+        personalDesc:
+          "All models on your hardware - browses, codes, runs terminals 24/7. Your keys or {{appName}} account.",
+        nextvibe: "next-vibe",
+        nextvibeSub: "The Framework",
+        nextvibeDesc:
+          "The GPL v3 + MIT framework behind {{appName}} - one endpoint, every platform, fork and own it",
+        referral: "Earn",
+        referralSub: "Skills & Referrals",
+        referralDesc:
+          "10% recurring on every referral, +5% per skill. Multi-level chain. Up to 20% total per payment.",
+      },
+    },
+    ctaPersonal: {
+      title: "Your agent. Your server. Your data.",
+      subtitle:
+        "SSH, browser, email, code. Always on. Everything Thea builds stays on your machine.",
+      primary: "Self-Host Free",
+      secondary: "View on GitHub",
+    },
+    ctaNextvibe: {
+      title: "One definition. Every platform.",
+      subtitle:
+        "Web UI, CLI, AI tool, MCP server, mobile screen, cron job - automatically. Fork it. Own it.",
+      primary: "Read the docs",
+      secondary: "Star on GitHub",
+    },
+    ctaReferral: {
+      title: "Start earning today.",
+      subtitle:
+        "Share your link. Publish a skill. Earn recurring income from every payment, forever.",
+      primary: "Go to referral dashboard",
+      secondary: "Build a skill",
+    },
+    v2: {
+      how: {
+        eyebrow: "How it works",
+        title: "Three choices. Then just ask.",
+        subtitle:
+          "No setup, no prompt tricks. Pick who answers and how filtered they are.",
+        steps: {
+          who: {
+            title: "Pick who you talk to",
+            body: "A companion for everyday talk, or a specialist for code, research, writing. Each one remembers your context.",
+          },
+          filter: {
+            title: "Pick your filter",
+            body: "{{modelCount}} models in three tiers: mainstream, open and uncensored. Switch any time, even mid-chat.",
+          },
+          ask: {
+            title: "Ask anything",
+            body: "It searches the web, reads sources, makes images, video and music. You get the answer, not a lecture.",
+          },
+        },
+      },
+      pricing: {
+        eyebrow: "Pricing",
+        title: "Free to start. Pay for what you use.",
+        subtitle:
+          "Credits, not seats. Cheap models cost a fraction of a credit per message.",
+        free: {
+          name: "Free",
+          note: "forever",
+          p1: "{{freeCreditsGuest}} credits a month, no signup",
+          p2: "{{freeCreditsSignedIn}} with a free account, +{{freeCreditsNewsletterBonus}} with the newsletter",
+          p3: "All three filter tiers. No card.",
+        },
+        sub: {
+          name: "Subscription",
+          note: "per month",
+          p1: "{{subscriptionCredits}} credits every month",
+          p2: "Top up any time: {{packCredits}} credits for {{packPrice}}",
+          p3: "Every model, every tool",
+        },
+        cta: "See full pricing",
+        footnote: "Cancel any time. Credits you buy as packs never expire.",
+      },
+      more: {
+        eyebrow: "Beyond chat",
+        title: "Run it. Build on it. Earn from it.",
+        subtitle:
+          "The same platform, open source, for people who want more than a chat window.",
+      },
+      faq: {
+        eyebrow: "Questions",
+        title: "What people ask first",
+        items: {
+          uncensored: {
+            q: "Is it really uncensored?",
+            a: "You choose, per chat. Mainstream models follow their makers' rules. Open models filter lightly. Uncensored models don't refuse. Nothing gets filtered behind your back - the tier you pick is the tier you get.",
+          },
+          privacy: {
+            q: "Who can read my chats?",
+            a: "Incognito chats live only in your browser - we don't store them. Private chats are saved to your account and only you can open them. To answer, your message goes to the model provider you picked.",
+          },
+          account: {
+            q: "Do I need an account?",
+            a: "No. Open the app and chat in incognito right away. A free account saves your chats across devices and lifts your free credits from {{freeCreditsGuest}} to {{freeCreditsSignedIn}} a month.",
+          },
+          cost: {
+            q: "What does it cost?",
+            a: "Free gets you {{freeCreditsGuest}} credits a month as a guest, {{freeCreditsSignedIn}} with an account, +{{freeCreditsNewsletterBonus}} with the newsletter. The subscription is {{subscriptionPrice}} a month for {{subscriptionCredits}} credits, and you can top up with packs ({{packCredits}} credits for {{packPrice}}). Each message costs credits depending on the model.",
+          },
+          models: {
+            q: "Which models can I use?",
+            a: "{{modelCount}} models from {{providerCount}} providers - the latest Claude, GPT, Gemini, Grok, DeepSeek and Qwen, open-weight models, and dedicated uncensored ones. New releases land fast.",
+          },
+          selfhost: {
+            q: "Can I run it myself?",
+            a: "Yes. The whole platform is open source (MIT + GPL v3). Run it on your own machine with your own keys - or connect it to your account here.",
+          },
+        },
       },
     },
     problem: {

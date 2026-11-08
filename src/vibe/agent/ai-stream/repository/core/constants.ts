@@ -52,6 +52,12 @@ export enum AbortReason {
   SUPERSEDED = "superseded",
   STREAM_TIMEOUT = "stream_timeout",
   CONTEXT_WINDOW_GUARD = "context_window_guard",
+  /** A credit deduction failed after retry — stop before the next billed step */
+  BILLING_FAILED = "billing_failed",
+  /** A task credit cap (per task / per day / per goal) was reached */
+  BUDGET_EXCEEDED = "budget_exceeded",
+  /** The task watchdog stopped the run (duration, turn or tool-call ceiling) */
+  TASK_WATCHDOG = "task_watchdog",
 }
 
 /**

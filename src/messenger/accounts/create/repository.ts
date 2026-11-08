@@ -98,6 +98,7 @@ export class MessengerAccountCreateRepository {
           isExactMatch: data.isExactMatch,
           weight: data.weight,
           isFailover: data.isFailover,
+          isSystem: data.isSystem,
           failoverPriority: data.failoverPriority,
           // Audit
           createdBy: user.id,

@@ -11,10 +11,10 @@ export const translations = {
   post: {
     title: "Create Favorite",
     titleShort: "Add Favorite",
-    description: "Create a new favorite character configuration",
+    description: "Create a new favorite skill configuration",
     container: {
       title: "New Favorite",
-      description: "Save a character configuration as a favorite",
+      description: "Save a skill configuration as a favorite",
     },
     backButton: {
       label: "Back to Favorites",
@@ -33,7 +33,7 @@ export const translations = {
         'Skill ID in merged format: "skillSlug" for the default variant, "skillSlug__variantId" for a specific variant (e.g. "thea__brilliant"). Run skills to see available IDs.',
     },
     customVariantName: {
-      label: "Variant Name",
+      label: "Label",
       description:
         "Custom name for this variant (leave empty to use skill default)",
     },
@@ -43,55 +43,55 @@ export const translations = {
     },
     chatModel: {
       label: "Chat Model",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     voice: {
       label: "Voice",
       description:
         "TTS voice override for this favorite. null = your global voice setting wins (bridge model: user setting takes priority). Set to give this specific favorite a different voice.",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     sttModel: {
       label: "Speech-to-Text Model",
       description:
         "STT model override. null = your global STT preference wins (bridge model). Set only for specialized transcription needs.",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     imageVisionModel: {
       label: "Image Vision Model",
       description:
         "Image vision LLM override. null = user global preference wins (bridge model).",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     videoVisionModel: {
       label: "Video Vision Model",
       description:
         "Video vision LLM override. null = user global preference wins (bridge model).",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     audioVisionModel: {
       label: "Audio Vision Model",
       description:
         "Audio vision LLM override. null = user global preference wins (bridge model).",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     imageGenModel: {
       label: "Image Generation Model",
       description:
         "Image generator override. null = skill's imageGenModelSelection wins (media gen: skill takes priority). Set to use a different generator than the skill specifies.",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     musicGenModel: {
       label: "Music Generation Model",
       description:
         "Music generator override. null = skill's musicGenModelSelection wins (media gen: skill takes priority).",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     videoGenModel: {
       label: "Video Generation Model",
       description:
         "Video generator override. null = skill's videoGenModelSelection wins (media gen: skill takes priority).",
-      placeholder: "Inherit from skill",
+      placeholder: "Same as skill",
     },
     mode: {
       label: "Selection Mode",
@@ -101,7 +101,7 @@ export const translations = {
       title: "Model Selection",
       label: "Model Selection",
       description:
-        "Override the model for this slot. Use filters or pick a specific model. Pass null to use the character's default model.",
+        "Override the model for this slot. Use filters or pick a specific model. Pass null to use the skill's default model.",
     },
     selectionType: {
       label: "Selection Type",
@@ -175,23 +175,22 @@ export const translations = {
     },
     icon: {
       label: "Custom Icon",
-      description:
-        "Override the character's default icon for this favorite slot",
+      description: "Override the skill's default icon for this favorite slot",
     },
     compactTrigger: {
       label: "Compact Trigger (tokens)",
       description:
-        "Override the token count that triggers conversation compaction. Pass null to fall through to character or global default.",
+        "Override the token count that triggers conversation compaction. Pass null to fall through to skill or global default.",
     },
     availableTools: {
       label: "Allowed Tools",
       description:
-        "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to character or global settings.",
+        "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to skill or global settings.",
     },
     pinnedTools: {
       label: "Pinned Tools",
       description:
-        "Override pinned toolbar tools for this slot. Pass null to fall through to character or global settings.",
+        "Override pinned toolbar tools for this slot. Pass null to fall through to skill or global settings.",
     },
     response: {
       id: {

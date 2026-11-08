@@ -1122,7 +1122,7 @@ export const translations = {
         subscriptionButton: {
           title: "Credits & Subscription",
           description:
-            "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free users get {{freeCredits}} credits/month.",
+            "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, +{{bonusCredits}} with the newsletter.",
         },
         chatInput: {
           title: "Type Your Message",
@@ -1205,7 +1205,7 @@ export const translations = {
       add: "Add to favorites",
       added: "Added",
       addNew: "Add New",
-      searchSkills: "Search characters...",
+      searchSkills: "Search skills...",
       createCustom: "Create Custom",
       customizeSettings: "Customize Settings",
       requirements: {
@@ -1254,8 +1254,8 @@ export const translations = {
         deleteMessage: "Delete message",
       },
       characterSelector: {
-        placeholder: "Select character",
-        addNewLabel: "Create custom character",
+        placeholder: "Select skill",
+        addNewLabel: "Create custom skill",
         grouping: {
           bySource: "By Source",
           byCategory: "By Category",
@@ -1275,7 +1275,7 @@ export const translations = {
           fields: {
             name: {
               label: "Name",
-              placeholder: "Enter character name",
+              placeholder: "Enter skill name",
             },
             icon: {
               label: "Icon (emoji)",
@@ -1283,11 +1283,11 @@ export const translations = {
             },
             description: {
               label: "Description",
-              placeholder: "Brief description of the character",
+              placeholder: "Brief description of the skill",
             },
             systemPrompt: {
               label: "System Prompt",
-              placeholder: "Define how the character behaves...",
+              placeholder: "Define how the skill behaves...",
             },
             category: {
               label: "Category",
@@ -1323,7 +1323,7 @@ export const translations = {
       searchEnabled: "Search enabled",
       searchDisabled: "Search disabled",
       answerAsAI: "Answer as AI model",
-      retry: "Retry with different model/character",
+      retry: "Retry with different model/skill",
       branch: "Branch conversation from here",
       editMessage: "Edit message",
       stopAudio: "Stop audio playback",
@@ -2408,6 +2408,14 @@ export const translations = {
           "OpenAI Whisper - State-of-the-art speech recognition for 99 languages",
         deepgramNova2:
           "Deepgram Nova-2 - Fast and accurate speech-to-text with noise robustness",
+        whisperLargeV3:
+          "Whisper Large V3 - Open-weight OpenAI model, 99 languages, far cheaper than hosted whisper-1.",
+        voxtralMini:
+          "Voxtral Mini Transcribe - Mistral transcription with diarization and segment timestamps, up to 10 minutes.",
+        nemotronAsr:
+          "Nemotron ASR - NVIDIA open multilingual speech recognition, 40 locales, low latency.",
+        gpt4oMiniTranscribe:
+          "GPT-4o Mini Transcribe - Lower word error rate than Whisper, better language detection.",
       },
     },
   },
@@ -2529,6 +2537,29 @@ export const translations = {
           "ElevenLabs Bella - Warm female voice with soft delivery",
         elevenlabsAdam:
           "ElevenLabs Adam - Professional male voice for content creation",
+        kokoroBella:
+          "Kokoro Bella - Open-weight 82M model, warm American female voice. No content filter.",
+        kokoroSarah:
+          "Kokoro Sarah - Open-weight 82M model, clear American female voice. No content filter.",
+        kokoroNicole:
+          "Kokoro Nicole - Open-weight 82M model, soft low-key female voice. No content filter.",
+        kokoroAdam:
+          "Kokoro Adam - Open-weight 82M model, steady American male voice. No content filter.",
+        kokoroMichael:
+          "Kokoro Michael - Open-weight 82M model, confident American male voice. No content filter.",
+        kokoroEmma:
+          "Kokoro Emma - Open-weight 82M model, British female voice. No content filter.",
+        kokoroGeorge:
+          "Kokoro George - Open-weight 82M model, British male voice. No content filter.",
+        inworldAshley:
+          "Inworld Ashley - Fast, low-cost female voice with lively delivery.",
+        inworldCraig: "Inworld Craig - Fast, low-cost British male voice.",
+        xaiEve:
+          "xAI Eve - Expressive female voice with inline emotion controls.",
+        geminiZephyr:
+          "Gemini Zephyr - Bright female voice, 100+ languages, delivery instructions.",
+        geminiPuck:
+          "Gemini Puck - Upbeat male voice, 100+ languages, delivery instructions.",
       },
     },
   },

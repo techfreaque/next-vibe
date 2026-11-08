@@ -17,7 +17,6 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { SocialProviders } from "./enum";
 
 /**
  * Login Options Endpoint Definition
@@ -286,28 +285,9 @@ const { GET } = createEndpoint({
               passwordDescription: "Log in with your email and password",
             },
             social: {
-              enabled: true,
-              socialDescription: "Log in with your social media accounts",
-              providers: [
-                {
-                  name: "Google",
-                  id: SocialProviders.GOOGLE,
-                  enabled: true,
-                  description: "Sign in with your Google account",
-                },
-                {
-                  name: "GitHub",
-                  id: SocialProviders.GITHUB,
-                  enabled: true,
-                  description: "Sign in with your GitHub account",
-                },
-                {
-                  name: "Facebook",
-                  id: SocialProviders.FACEBOOK,
-                  enabled: true,
-                  description: "Sign in with your Facebook account",
-                },
-              ],
+              enabled: false,
+              socialDescription: "Social login is not available yet",
+              providers: [],
             },
           },
           security: {
@@ -327,16 +307,9 @@ const { GET } = createEndpoint({
               passwordDescription: "Log in with your email and password",
             },
             social: {
-              enabled: true,
-              socialDescription: "Log in with your social media accounts",
-              providers: [
-                {
-                  name: "Google",
-                  id: SocialProviders.GOOGLE,
-                  enabled: true,
-                  description: "Sign in with your Google account",
-                },
-              ],
+              enabled: false,
+              socialDescription: "Social login is not available yet",
+              providers: [],
             },
           },
           security: {
@@ -354,20 +327,18 @@ const { GET } = createEndpoint({
           loginMethods: {
             password: {
               enabled: true,
-              passwordDescription:
-                "Log in with your email and password (2FA required)",
+              passwordDescription: "Log in with your email and password",
             },
             social: {
               enabled: false,
-              socialDescription: "Social login disabled for admin accounts",
+              socialDescription: "Social login is not available yet",
               providers: [],
             },
           },
           security: {
-            maxAttempts: 3,
-            requireTwoFactor: true,
-            securityDescription:
-              "Enhanced security: 2FA required, limited attempts",
+            maxAttempts: 5,
+            requireTwoFactor: false,
+            securityDescription: "Standard security requirements",
           },
         },
       },

@@ -89,6 +89,7 @@ export function CreatorProfileWidget(): JSX.Element {
     const palette = buildScopedPaletteStyle(accent, false);
     return {
       "--primary": palette["--primary"],
+      "--primary-surface": palette["--primary"],
       "--primary-foreground": palette["--primary-foreground"],
       "--ring": palette["--ring"],
     };

@@ -163,29 +163,29 @@ export const translations: typeof enTranslations = {
   },
 
   createSkill: {
-    title: "Utwórz własną postać",
+    title: "Utwórz własny skill",
     description:
-      "Zaprojektuj własną postać AI z niestandardową osobowością, wiedzą i zachowaniem.",
+      "Zaprojektuj własny skill AI z niestandardową osobowością, wiedzą i zachowaniem.",
     icon: "Ikona",
     name: "Nazwa",
     namePlaceholder: "np. Recenzent kodu",
     descriptionLabel: "Opis",
-    descriptionPlaceholder: "Krótki opis tego, co robi ta postać",
+    descriptionPlaceholder: "Krótki opis tego, co robi ten skill",
     category: "Kategoria",
     selectCategory: "Wybierz kategorię",
     systemPrompt: "Prompt systemowy",
     systemPromptPlaceholder:
-      "Określ, jak ta postać powinna się zachowywać. Bądź szczegółowy co do jej osobowości, ekspertyzy i sposobu odpowiadania.",
+      "Określ, jak ten skill powinna się zachowywać. Bądź szczegółowy co do jej osobowości, ekspertyzy i sposobu odpowiadania.",
     voice: "Głos",
     voicePlaceholder: "Wybierz głos dla zamiany tekstu na mowę",
-    create: "Utwórz postać",
+    create: "Utwórz skill",
     creating: "Tworzenie...",
     charCount: "{{current}} / {{max}}",
     errors: {
       nameRequired: "Wprowadź nazwę",
       descriptionRequired: "Wprowadź opis",
       systemPromptRequired: "Wprowadź prompt systemowy",
-      createFailed: "Nie udało się utworzyć postaci. Spróbuj ponownie.",
+      createFailed: "Nie udało się utworzyć skilla. Spróbuj ponownie.",
     },
   },
 
@@ -195,15 +195,15 @@ export const translations: typeof enTranslations = {
   },
 
   editSkill: {
-    title: "Edytuj jako własną postać",
+    title: "Edytuj jako własny skill",
     description:
-      "Utwórz własną postać na podstawie tej persony. Możesz zmodyfikować dowolne ustawienia.",
+      "Utwórz własny skill na podstawie tego skilla. Możesz zmodyfikować dowolne ustawienia.",
     loginRequired:
-      "Zaloguj się, aby tworzyć i edytować własne postacie. Własne postacie są zapisywane na Twoim koncie.",
+      "Zaloguj się, aby tworzyć i edytować własne skille. Własne skille są zapisywane na Twoim koncie.",
     name: "Nazwa",
-    namePlaceholder: "Nazwa własnej postaci",
+    namePlaceholder: "Nazwa własnej skilla",
     descriptionLabel: "Opis",
-    descriptionPlaceholder: "Co robi ta postać?",
+    descriptionPlaceholder: "Co robi ten skill?",
     category: "Kategoria",
     icon: "Ikona",
     voice: "Głos",
@@ -211,7 +211,7 @@ export const translations: typeof enTranslations = {
     preferredModel: "Preferowany model",
     preferredModelPlaceholder: "Opcjonalny preferowany model",
     systemPrompt: "Prompt systemowy",
-    systemPromptPlaceholder: "Określ zachowanie postaci...",
+    systemPromptPlaceholder: "Określ zachowanie skilla...",
     save: "Zapisz jako własną",
     saveAsCopy: "Zapisz jako kopię",
     saving: "Tworzenie...",
@@ -427,15 +427,15 @@ export const translations: typeof enTranslations = {
     },
   },
   characterSelector: {
-    placeholder: "Wybierz personę",
-    addNewLabel: "Utwórz niestandardową personę",
+    placeholder: "Wybierz skill",
+    addNewLabel: "Utwórz niestandardowy skill",
     defaultIcon: "✨",
     grouping: {
       bySource: "Według Źródła",
       byCategory: "Według Kategorii",
       sourceLabels: {
         builtIn: "Wbudowane",
-        my: "Moje Persony",
+        my: "Moje skille",
         community: "Społeczność",
       },
       sourceIcons: {
@@ -462,7 +462,7 @@ export const translations: typeof enTranslations = {
       create: "Utwórz",
     },
     addDialog: {
-      title: "Utwórz niestandardową personę",
+      title: "Utwórz niestandardowy skill",
       createCategory: "+ Nowa Kategoria",
       fields: {
         name: {
@@ -475,7 +475,7 @@ export const translations: typeof enTranslations = {
         },
         description: {
           label: "Opis",
-          placeholder: "Krótki opis persony",
+          placeholder: "Krótki opis skilla",
         },
         systemPrompt: {
           label: "Prompt systemowy",
@@ -491,7 +491,7 @@ export const translations: typeof enTranslations = {
         },
       },
       cancel: "Anuluj",
-      create: "Utwórz personę",
+      create: "Utwórz skill",
     },
   },
   searchToggle: {
@@ -514,7 +514,7 @@ export const translations: typeof enTranslations = {
       model: "Model",
     },
     current: "Aktualny",
-    favoriteSkills: "Ulubione persony",
+    favoriteSkills: "Ulubione skille",
     favoriteModels: "Ulubione modele",
     showAll: "Pokaż wszystkie",
     selectModel: "Wybierz model",
@@ -525,15 +525,15 @@ export const translations: typeof enTranslations = {
     noFavorites: "Brak ulubionych. Oznacz je gwiazdką.",
     noModels: "Brak dostępnych modeli",
     filteredBySkill:
-      "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez postać)",
-    selectSkill: "Wybierz postać",
+      "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez skill)",
+    selectSkill: "Wybierz skill",
     allSkills: "Wszystkie",
   },
   selector: {
     noResults: "Nie znaleziono wyników",
     tabs: {
       quick: "Szybki",
-      characters: "Persony",
+      characters: "Skille",
       build: "Utwórz",
       favorites: "Moje ulubione",
       browse: "Przeglądaj skill",
@@ -558,10 +558,10 @@ export const translations: typeof enTranslations = {
     favorites: "Ulubione",
     suggested: "Sugerowane",
     noFavorites: "Brak ulubionych",
-    noFavoritesHint: "Zapisz ulubione postacie dla szybkiego dostępu",
-    browseAllSkills: "Przeglądaj wszystkie postacie...",
+    noFavoritesHint: "Zapisz ulubione skille dla szybkiego dostępu",
+    browseAllSkills: "Przeglądaj wszystkie skille...",
     customSetup: "Niestandardowa konfiguracja...",
-    selectSkill: "Wybierz postać",
+    selectSkill: "Wybierz skill",
     modelCreditDisplay: {
       tokenBased: {
         header: "Koszt za wiadomość",
@@ -611,14 +611,14 @@ export const translations: typeof enTranslations = {
     currentConfig: "Aktualnie rozmawiasz z",
     switchModel: "Zmień model",
     keepsConversation: "(zachowuje rozmowę)",
-    switchSkill: "Zmień postać",
+    switchSkill: "Zmień skill",
     startsNewChat: "(rozpoczyna nowy czat)",
     start: "Start",
     addFav: "Dodaj",
-    searchSkills: "Szukaj postaci...",
-    noSkillsFound: "Nie znaleziono postaci",
+    searchSkills: "Szukaj skilli...",
+    noSkillsFound: "Nie znaleziono skilla",
     createCustom: "Utwórz",
-    skill: "Postać",
+    skill: "Skill",
     savePreset: "Zapisz",
     perMessage: "za wiadomość",
     compatibleModels: "{{count}} kompatybilnych modeli",
@@ -679,21 +679,21 @@ export const translations: typeof enTranslations = {
     yourSetups: "Twoje zestawy",
     setup: "Zestaw",
     delete: "Usuń",
-    editSkill: "Edytuj jako własną postać",
+    editSkill: "Edytuj jako własny skill",
     autoSelectedModel: "Filtrowany:",
     manualSelectedModel: "Wybrany:",
-    skillSelectedModel: "Model postaci:",
+    skillSelectedModel: "Model skilla:",
     selectModelBelow: "Wybierz model poniżej",
     chooseYourPath: "Wybierz swoją ścieżkę",
     twoWaysToChat: "Dwa elastyczne sposoby na rozpoczęcie rozmowy",
     directModels: "Bezpośredni dostęp do modeli",
     directModelsDesc:
       "Skonfiguruj filtry lub wybierz ręcznie spośród {{count}} modeli. Pełna kontrola nad wyborem AI.",
-    skillPresets: "Presety postaci",
+    skillPresets: "Presety skilla",
     characterPresetsDesc:
-      "Wybierz postać poniżej. Każda ma zoptymalizowane ustawienia, które możesz dostosować w dowolnym momencie.",
+      "Wybierz skill poniżej. Każdy ma zoptymalizowane ustawienia, które możesz dostosować w dowolnym momencie.",
     startWithDirectModels: "Rozpocznij z bezpośrednimi modelami",
-    orBrowsePresets: "Lub przeglądaj presety postaci poniżej",
+    orBrowsePresets: "Lub przeglądaj presety skilla poniżej",
     loading: "Ładowanie...",
     noModelsMatch: "Brak pasujących modeli",
     adjustFiltersMessage:
@@ -707,28 +707,28 @@ export const translations: typeof enTranslations = {
     useOnce: "Użyj raz",
     saveAsDefault: "Dodaj do ulubionych",
     deleteSetup: "Usuń konfigurację",
-    skillSetup: "Konfiguracja persony",
+    skillSetup: "Konfiguracja skilla",
     separator: " • ",
     sortBy: "Sortuj według",
     // UX improvements v21
     mySetups: "Moje konfiguracje",
     addNew: "Dodaj nowy",
     noSetupsTitle: "Brak konfiguracji",
-    noSetupsDescription: "Stwórz swoją pierwszą konfigurację postaci AI",
+    noSetupsDescription: "Stwórz swoją pierwszą konfigurację skilla AI",
     getStarted: "Rozpocznij",
     currentModel: "Aktualny model",
     modelSelection: "Wybór modelu",
     autoMode: "Automatyczny wybór",
     manualMode: "Wybór ręczny",
-    skillMode: "Domyślny postaci",
+    skillMode: "Domyślny skill",
     autoModeDescription:
       "Automatycznie wybiera najlepszy model według Twoich preferencji",
     manualModeDescription: "Wybierz dowolny model samodzielnie",
     characterBasedModeDescription:
-      "Używa modelu, do którego ta postać została zaprojektowana",
+      "Używa modelu, do którego ten skill został zaprojektowany",
     customizeSettings: "Dostosuj ustawienia przed dodaniem",
     useNow: "Użyj teraz",
-    browseAll: "Przeglądaj wszystkie postacie",
+    browseAll: "Przeglądaj wszystkie skille",
     add: "Dodaj",
     // v22 UX improvements
     quickSwitch: "Szybka zmiana",
@@ -736,11 +736,11 @@ export const translations: typeof enTranslations = {
     adjustSettings: "Dostosuj ustawienia",
     addAnotherSetup: "Dodaj kolejną konfigurację",
     comingSoon: "Wkrótce dostępne",
-    switchSkillBtn: "Zmień personę",
-    editSkillBtn: "Edytuj personę",
+    switchSkillBtn: "Zmień skill",
+    editSkillBtn: "Edytuj skill",
     // Skill requirements
     requirements: {
-      skillConflict: "Konflikt postaci",
+      skillConflict: "Konflikt skilla",
       max: "Maksimum",
       min: "Minimum",
       tooHigh: "Zbyt wysoki",
@@ -754,15 +754,15 @@ export const translations: typeof enTranslations = {
     },
     // Skill switch modal
     characterSwitchModal: {
-      title: "Zmień personę",
-      description: "Przełącz się na inną personę bez utraty ustawień",
-      searchPlaceholder: "Wyszukaj persony...",
+      title: "Zmień skill",
+      description: "Przełącz się na inny skill bez utraty ustawień",
+      searchPlaceholder: "Wyszukaj skille...",
       noResults: "Nie znaleziono person",
       keepSettings: "Zachowaj obecne ustawienia modelu",
       keepSettingsDesc:
         "Użyj obecnych filtrów inteligencji, ceny i treści z nową personą",
       cancel: "Anuluj",
-      confirm: "Zmień personę",
+      confirm: "Zmień skill",
     },
   },
   onboarding: {
@@ -1358,13 +1358,12 @@ export const translations: typeof enTranslations = {
   linearMessageView: {
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description:
-        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description: "Wybierz model i skill, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
       title: "Odpowiedz jako model AI",
-      description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
+      description: "Wybierz model i skill, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
       inputPlaceholder:
         "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
@@ -1379,13 +1378,12 @@ export const translations: typeof enTranslations = {
     copied: "Skopiowano!",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description:
-        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description: "Wybierz model i skill, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
       title: "Odpowiedz jako model AI",
-      description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
+      description: "Wybierz model i skill, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
       inputPlaceholder:
         "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
@@ -1406,8 +1404,8 @@ export const translations: typeof enTranslations = {
     incognitoDescription:
       "Przechowywane tylko w przeglądarce. Nigdy nie zapisywane na koncie ani synchronizowane.",
     more: "Więcej",
-    selectSkill: "Wybierz postać",
-    noPrompts: "Brak sugestii dla tej postaci",
+    selectSkill: "Wybierz skill",
+    noPrompts: "Brak sugestii dla tego skilla",
     showDetails: "Pokaż szczegóły",
     hideDetails: "Ukryj szczegóły",
     systemPromptLabel: "Prompt systemowy",
@@ -1581,13 +1579,12 @@ export const translations: typeof enTranslations = {
     replies: "odpowiedzi",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description:
-        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description: "Wybierz model i skill, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
       title: "Odpowiedz jako model AI",
-      description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
+      description: "Wybierz model i skill, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
       inputPlaceholder:
         "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
@@ -1647,13 +1644,12 @@ export const translations: typeof enTranslations = {
     },
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description:
-        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description: "Wybierz model i skill, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
       title: "Odpowiedz jako model AI",
-      description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
+      description: "Wybierz model i skill, aby wygenerować odpowiedź AI",
       confirmLabel: "Generuj",
       inputPlaceholder:
         "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
@@ -1797,8 +1793,8 @@ export const translations: typeof enTranslations = {
     characterSelector: {
       title: "Dostosuj zachowanie AI",
       description:
-        "Persony kształtują sposób odpowiedzi AI. Używaj wbudowanych stylów lub twórz własne persony z własnymi instrukcjami i preferowanymi modelami.",
-      tip: "Połącz dowolną personę z dowolnym modelem dla idealnego asystenta.",
+        "Skille kształtują sposób odpowiedzi AI. Używaj wbudowanych stylów lub twórz własne skille z własnymi instrukcjami i preferowanymi modelami.",
+      tip: "Połącz dowolny skill z dowolnym modelem dla idealnego asystenta.",
     },
     modelSelectorFavorites: {
       title: "Oznacz ulubione",
@@ -1821,20 +1817,20 @@ export const translations: typeof enTranslations = {
         "Wyświetl modele pogrupowane według firmy (OpenAI, Anthropic) lub według przypadku użycia (Kodowanie, Bez cenzury, Kreatywność).",
     },
     characterSelectorFavorites: {
-      title: "Oznacz swoje persony",
+      title: "Oznacz swoje skille",
       description: "Zapisz swoje ulubione style rozmowy dla szybkiego dostępu.",
     },
     characterSelectorShowAll: {
-      title: "Przeglądaj wszystkie persony",
+      title: "Przeglądaj wszystkie skille",
       description:
-        "Eksploruj pełną bibliotekę person. Twórz własne persony dostosowane do twojego przepływu pracy.",
+        "Eksploruj pełną bibliotekę skilli. Twórz własne skille dostosowane do twojego przepływu pracy.",
     },
     characterSelectorSearch: {
-      title: "Znajdź persony",
+      title: "Znajdź skille",
       description: "Szukaj według nazwy, kategorii lub opisu.",
     },
     characterSelectorGroup: {
-      title: "Grupuj persony",
+      title: "Grupuj skille",
       description:
         "Wyświetl według źródła (Wbudowane vs. Twoje własne) lub według kategorii (Kreatywność, Techniczne, Professional).",
     },
@@ -1900,7 +1896,7 @@ export const translations: typeof enTranslations = {
     sidebarLogin: {
       title: "Utwórz darmowe konto",
       description:
-        "Odblokuj foldery Prywatny i Współdzielony, synchronizuj na wszystkich urządzeniach, zapisuj ulubione modele i persony. Incognito i Publiczny pozostają dostępne bez konta.",
+        "Odblokuj foldery Prywatny i Współdzielony, synchronizuj na wszystkich urządzeniach, zapisuj ulubione modele i skille. Incognito i Publiczny pozostają dostępne bez konta.",
       tip: "Pozostań anonimowy lub synchronizuj wszystko. Twój wybór.",
     },
     subscriptionButton: {

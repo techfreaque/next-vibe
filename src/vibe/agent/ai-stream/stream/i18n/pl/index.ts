@@ -569,6 +569,12 @@ export const translations: typeof enTranslations = {
   info: {
     streamInterrupted:
       "Generowanie zostało zatrzymane. Częściowa odpowiedź została zapisana.",
+    billingFailed:
+      "Zatrzymano: nie udało się pobrać kredytów za tę odpowiedź. Nic nie przepadło - wyślij wiadomość ponownie za chwilę.",
+    budgetExceeded:
+      "Zatrzymano: to zadanie w tle osiągnęło limit kredytów. Podnieś limit w Limitach budżetu zadań, aby mogło działać dalej.",
+    taskWatchdog:
+      "Zatrzymano: strażnik zadań zakończył to uruchomienie, bo przekroczyło limit czasu, tur lub wywołań narzędzi.",
   },
   headless: {
     errors: {
@@ -599,6 +605,9 @@ export const translations: typeof enTranslations = {
       signIn: "Zaloguj się, by synchronizować",
       start: "Zacznij rozmowę",
       saving: "Konfiguruję...",
+      failed:
+        "Nie udało się zapisać ustawień. Sprawdź połączenie i spróbuj ponownie.",
+      retry: "Spróbuj ponownie",
     },
     usecases: {
       noProviderAvailable:
@@ -651,6 +660,10 @@ export const translations: typeof enTranslations = {
       addCredits: "Doładuj kredyty",
       description: "Saldo jest puste. Doładuj i rozmawiaj dalej.",
     },
+    creditsLoadFailed: {
+      title: "Nie udało się wczytać salda.",
+      retry: "Ponów",
+    },
     insufficientCredits: {
       title: "Za mało kredytów (potrzeba {{cost}}, masz {{balance}})",
       description: "Doładuj kredyty albo wybierz tańszy model.",
@@ -675,6 +688,33 @@ export const translations: typeof enTranslations = {
       uploadFile: "Załącz pliki",
       attachedFiles: "Załączone pliki",
       addMore: "Dodaj więcej",
+    },
+  },
+  outOfCredits: {
+    dismiss: "Zamknij",
+    guest: {
+      title: "Darmowe kredyty się skończyły",
+      description:
+        "Kredyty gościa się wyczerpały. Podaj e-mail albo załóż darmowe konto i pisz dalej.",
+      emailLabel: "E-mail",
+      emailPlaceholder: "ty@przyklad.pl",
+      emailSubmit: "Odbierz +{{bonus}} kredytów",
+      emailSubmitting: "Wysyłanie…",
+      invalidEmail: "Podaj poprawny adres e-mail.",
+      added: "Dodano {{bonus}} kredytów. Pisz dalej.",
+      confirm:
+        "Sprawdź skrzynkę. Potwierdź e-mail, by odblokować +{{bonus}} kredytów.",
+      claimed:
+        "Ten e-mail już odebrał bonus. Załóż konto: {{signedIn}} kredytów miesięcznie za darmo.",
+      or: "lub",
+      signUp: "Załóż konto: {{signedIn}} kredytów/mies. za darmo",
+      haveAccount: "Masz już konto?",
+      logIn: "Zaloguj się",
+    },
+    member: {
+      title: "Skończyły Ci się kredyty",
+      description: "Doładuj kredyty i pisz dalej od tego miejsca.",
+      getCredits: "Doładuj kredyty",
     },
   },
   imageGen: {

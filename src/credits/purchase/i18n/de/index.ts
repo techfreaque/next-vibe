@@ -20,6 +20,11 @@ export const translations: typeof enTranslations = {
       description: "Anzahl der zu kaufenden Credit-Pakete (1-10)",
       placeholder: "Anzahl eingeben (1-10)",
     },
+    productId: {
+      label: "Credit-Paket",
+      description: "Paketgröße zum Kauf wählen",
+      placeholder: "Paket wählen",
+    },
     provider: {
       label: "Zahlungsmethode wählen",
       description: "Wählen Sie, wie Sie für Ihr Credit-Paket bezahlen möchten",
@@ -46,7 +51,8 @@ export const translations: typeof enTranslations = {
     pack: {
       qtyCredits: "{{count}} Credits",
       title: "Credit-Paket",
-      description: "Einmaliges Credit-Paket für KI-Nutzung",
+      description:
+        "Zahlen, was du nutzt. Kein Abo. Karte oder Krypto. Credits laufen nie ab.",
       perPack: "/ Paket",
       features: {
         credits: "{{count}} Credits enthalten",
@@ -54,8 +60,14 @@ export const translations: typeof enTranslations = {
         bestFor: "Ergänzt dein monatliches Kontingent",
       },
       totalSummary: "{{totalCredits}} Credits gesamt · {{totalPrice}} gesamt",
-      requiresSubscription:
-        "Credit-Pakete sind für Abonnenten, die mehr brauchen. Zuerst abonnieren.",
+      noSubscriptionNeeded: "Zahlen, was du nutzt. Kein Abo nötig.",
+      logIn: "Anmelden",
+      signUp: "Registrieren",
+      signInToBuy:
+        "Kostenloses Konto anlegen, um Credits zu kaufen. Karte oder Krypto.",
+      sizeStandard: "Standardpaket",
+      sizeLarge: "Großes Paket",
+      bestRate: "Bester Preis",
     },
     submit: {
       text: "Credit-Paket kaufen",
@@ -111,11 +123,6 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Konflikt",
         description: "Ressourcenkonflikt aufgetreten",
-      },
-      noActiveSubscription: {
-        title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Pakete zu kaufen",
       },
     },
   },

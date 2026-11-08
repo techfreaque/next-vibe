@@ -1,51 +1,11 @@
 export const translations = {
   error: {
     title: "Error",
-    unknown: "An unknown error occurred",
-    tryAgain: "Try Again",
-    boundary: {
-      componentStack: "Component Stack",
-      stackTrace: "Stack Trace",
-      componentStackFull: "Component Stack (full)",
-      errorDetails: "Error Details",
-      name: "Name:",
-      errorMessage: "Message:",
-      cause: "Cause:",
-    },
   },
   themeToggle: {
     enableLightMode: "Enable light mode",
     enableDarkMode: "Enable dark mode",
     lightMode: "Light mode",
     darkMode: "Dark mode",
-  },
-  contact: {
-    subjects: {
-      HELP_SUPPORT: "Help & Support",
-      GENERAL_INQUIRY: "General Inquiry",
-      TECHNICAL_SUPPORT: "Technical Support",
-      ACCOUNT_QUESTION: "Account Question",
-      BILLING_QUESTION: "Billing Question",
-      SALES_INQUIRY: "Sales Inquiry",
-      FEATURE_REQUEST: "Feature Request",
-      BUG_REPORT: "Bug Report",
-      FEEDBACK: "Feedback",
-      COMPLAINT: "Complaint",
-      PARTNERSHIP: "Partnership",
-      OTHER: "Other",
-    },
-    priority: {
-      low: "Low",
-      medium: "Medium",
-      high: "High",
-      urgent: "Urgent",
-    },
-    status: {
-      new: "New",
-      open: "Open",
-      inProgress: "In Progress",
-      resolved: "Resolved",
-      closed: "Closed",
-    },
   },
 };

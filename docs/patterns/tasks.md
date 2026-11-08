@@ -317,6 +317,21 @@ export const sideTaskConfig = {
 
 ---
 
+## Task Watchdog (unattended runs)
+
+Every background task is watched by `src/vibe/tasks/watchdog/`:
+
+- **Thresholds** live in ONE file: `watchdog/config.ts` (max duration, turn / tool-call ceilings, error-loop count, retry backoff, default credit caps).
+- **Retry** is transient-only (provider 5xx, rate limit, network) with capped exponential backoff - `policy.ts` `decideRetry`. Validation, permission, credit failures and timeouts never retry.
+- **Budget caps** (per task run, per day, per goal via a `goal:<name>` tag on the cron task) are rows in `task_budget_caps`, editable at `/tools/task-budget-caps`. Streams started by a task carry `toolExecutionContext.cronTaskId`; every billed step is logged to `task_spend_ledger` and checked right after (`TaskGuard.afterBilledStep`). A breach aborts the stream with `AbortReason.BUDGET_EXCEEDED` / `TASK_WATCHDOG`.
+- **Sweep** (`task-watchdog` cron, every minute) stops runs over their limits, recovers orphaned RUNNING rows and disables tasks that fail the same way N runs in a row.
+- **Incidents** go to `task_incidents` and are logged with `logger.error("[TaskWatchdog] ...")`, which is how they reach the Error Monitor.
+- **Visibility**: `/tools/task-health` (running, failures, incidents, cancel) and the "Task Health" Vibe Sense graph.
+
+Code that executes a task handler in-process registers its `AbortController` with `RunningTaskRegistry` so the watchdog can actually stop it.
+
+---
+
 ## Quality Checks
 
 ### Task Implementation Checklist

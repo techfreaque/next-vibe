@@ -429,7 +429,7 @@ class EndpointGenerator {
       }
 
       // eslint-disable-next-line i18next/no-literal-string
-      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
+      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]|^[0-9]/.test(path);
       const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
       const relPathLine = `    relPath: "${relPath}",`;
       if (relPathLine.length <= 80) {
@@ -457,7 +457,7 @@ class EndpointGenerator {
     );
     const aliasMapEntries = entries
       .map(([alias, fullPath]) => {
-        const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
+        const needsQuotes = /[^a-zA-Z0-9_$]|^[0-9]/.test(alias);
         const key = needsQuotes ? `"${alias}"` : alias;
         const singleLine = `  ${key}: "${fullPath}",`;
         if (singleLine.length > 80) {

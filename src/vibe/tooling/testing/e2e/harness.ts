@@ -24,6 +24,9 @@ import type { Browser, BrowserContext, ConsoleMessage, Page } from "playwright";
 import { chromium } from "playwright";
 import { afterAll, beforeAll, expect, it } from "vitest";
 
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
+import { createE2EFundedGuest } from "../../../agent/ai-stream/testing/e2e-credit-user";
 import { slugify } from "../../../agent/ai-stream/testing/fetch-cache";
 import { seedFixtureThread } from "../../../agent/ai-stream/testing/fixture-seed";
 import { endpointToUrlSegment } from "../../../core/core-utils/path";
@@ -70,6 +73,13 @@ export interface E2ESuiteOptions {
    * replays it. Delete that folder to re-record.
    */
   fixtures?: boolean;
+  /**
+   * Give each test's anonymous visitor its own lead holding this many
+   * permanent credits, instead of the lead the middleware mints. Minted
+   * localhost leads share one IP and are pooled, so the pool's monthly free
+   * allowance runs dry across suites — set this for spend-bearing guest tests.
+   */
+  guestCredits?: number;
 }
 
 export interface E2EFixtures {
@@ -214,6 +224,22 @@ export function useE2E(
             baseURL: baseUrl,
             userAgent: `${userAgent} vibe-e2e/${crypto.randomUUID()}`,
           });
+          const cleanups: Array<() => Promise<void>> = [];
+          if (options.guestCredits !== undefined) {
+            const guest = await createE2EFundedGuest(
+              slug(suite),
+              options.guestCredits,
+            );
+            cleanups.push(guest.remove);
+            await context.addCookies([
+              {
+                name: LEAD_ID_COOKIE_NAME,
+                value: guest.leadId,
+                url: baseUrl,
+                httpOnly: true,
+              },
+            ]);
+          }
           if (options.fixtures) {
             // One scope per test: ordinals replay by position, so a scope
             // shared across tests would shift whenever one is filtered out.
@@ -239,7 +265,6 @@ export function useE2E(
             consoleLog.push(`[${msg.type()}] ${msg.text()}`);
           });
 
-          const cleanups: Array<() => Promise<void>> = [];
           // Endpoint forms signal their own hydration (`[data-hydrated]`, see
           // EndpointForm.root); "load" covers hand-built pages driven via `page`.
           const goto = async (path: string): Promise<void> => {

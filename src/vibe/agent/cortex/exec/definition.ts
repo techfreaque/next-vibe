@@ -34,8 +34,8 @@ export const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["vibe", "agent", "cortex", "exec"],
   aliases: [CORTEX_EXEC_ALIAS] as const,
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
 
   title: "post.title" as const,

@@ -633,7 +633,7 @@ class RouteHandlersGenerator {
       }
 
       // eslint-disable-next-line i18next/no-literal-string
-      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]/.test(path);
+      const hotPathNeedsQuotes = /[^a-zA-Z0-9_$]|^[0-9]/.test(path);
       const hotPathKey = hotPathNeedsQuotes ? `"${path}"` : path;
       const relPathLine = `    relPath: "${relPath}",`;
       if (relPathLine.length <= 80) {

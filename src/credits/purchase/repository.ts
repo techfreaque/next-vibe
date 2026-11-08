@@ -1,6 +1,7 @@
 /**
  * Credit Purchase Repository
- * Handles payment provider checkout session creation for credit packs
+ * Handles payment provider checkout session creation for credit packs.
+ * Packs are pay-as-you-go: no subscription required.
  */
 
 import "server-only";
@@ -22,8 +23,6 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getPaymentProvider } from "../../payment/providers";
-import { ProductIds } from "../../products/repository-client";
-import { SubscriptionStatus } from "../../subscription/enum";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
@@ -78,44 +77,6 @@ export class CreditPurchaseRepository {
 
       const user = userResult.data;
 
-      // Check if user has an active subscription before allowing credit pack purchase
-      const { SubscriptionRepository } =
-        await import("../../subscription/repository");
-      const subscriptionResult = await SubscriptionRepository.getSubscription(
-        userId,
-        logger,
-        locale,
-      );
-
-      if (!subscriptionResult.success) {
-        logger.warn(
-          "Credit pack purchase attempted without active subscription",
-          {
-            userId,
-          },
-        );
-        return fail({
-          message: t("post.errors.noActiveSubscription.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-          cause: subscriptionResult,
-        });
-      }
-
-      const subscription = subscriptionResult.data;
-      if (subscription.status !== SubscriptionStatus.ACTIVE) {
-        logger.warn(
-          "Credit pack purchase attempted with inactive subscription",
-          {
-            userId,
-            subscriptionStatus: subscription.status,
-          },
-        );
-        return fail({
-          message: t("post.errors.noActiveSubscription.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
       const provider = getPaymentProvider(data.provider);
 
       logger.debug("Using payment provider", {
@@ -149,8 +110,16 @@ export class CreditPurchaseRepository {
       // Get product and calculate totals based on quantity
       const { productsRepository } =
         await import("../../products/repository-client");
+      // No subscription required: any authenticated user may buy a pack.
+      const packProductId = data.productId;
+      if (!productsRepository.canPurchase(packProductId)) {
+        return fail({
+          message: t("post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
       const product = productsRepository.getProduct(
-        ProductIds.CREDIT_PACK,
+        packProductId,
         locale,
         "one_time",
       );
@@ -164,7 +133,7 @@ export class CreditPurchaseRepository {
       // Note: We calculate total on our side and send as single line item to Stripe
       logger.debug("About to create checkout session", {
         userId,
-        productId: ProductIds.CREDIT_PACK,
+        productId: packProductId,
         interval: "one_time",
         country,
         customerId: customerResult.data.customerId,
@@ -176,7 +145,7 @@ export class CreditPurchaseRepository {
       const session = await provider.createCheckoutSession(
         {
           userId,
-          productId: ProductIds.CREDIT_PACK,
+          productId: packProductId,
           interval: "one_time",
           country,
           locale,
@@ -185,7 +154,7 @@ export class CreditPurchaseRepository {
           metadata: {
             userId,
             type: "credit_pack",
-            productId: ProductIds.CREDIT_PACK,
+            productId: packProductId,
             quantity: data.quantity.toString(),
             totalAmount: totalAmount.toString(),
             totalCredits: totalCredits.toString(),

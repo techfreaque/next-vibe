@@ -6,7 +6,7 @@ Complete documentation for the NextVibe framework.
 
 - **[Quick Start](guides/quickstart.md)** - Get up and running in 5 minutes
 - **[Main README](../README.md)** - Framework overview, all interfaces, key concepts
-- **[Unbottled.ai Example](examples/unbottled-ai/UNBOTTLED_AI.md)** - Full commercial AI chat platform built with NextVibe
+- **[Unbottled.ai](https://unbottled.ai)** - The flagship: a full commercial AI chat platform (197 models) built with NextVibe
 
 ---
 
@@ -254,7 +254,6 @@ src/
 
 - **[Debugging](guides/debugging.md)** - Debugging techniques
 - **[Stripe Webhooks](guides/stripe-webhooks.md)** - Payment integration
-- **[Remote Connection](guides/remote-connection.md)** - Connect local ↔ cloud instances, tool discovery, memory sync, remote execution modes
 
 ---
 

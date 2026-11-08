@@ -79,7 +79,7 @@ export const translations = {
     response: {
       systemPrompt: { text: "System Prompt" },
       trailingSystemMessage: { text: "Trailing Context" },
-      charCount: { text: "Characters" },
+      charCount: { text: "Skills" },
       tokenEstimate: { text: "~Tokens" },
       cortexDiagnostics: { text: "Cortex Embedding Diagnostics" },
       messageContextLines: { text: "Message Context Lines" },

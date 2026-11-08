@@ -26,7 +26,6 @@ export const translations = {
   different: {
     title: "One-time vs recurring - why it matters",
     p1: "Most referral programs pay you once. {{appName}}'s pays you forever. Here's what that looks like in practice:",
-    tableTitle: "Referral types compared",
     tableHeaderType: "Type",
     tableHeaderYouEarn: "You earn",
     tableHeaderWhen: "When",

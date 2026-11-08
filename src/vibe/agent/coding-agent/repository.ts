@@ -256,6 +256,20 @@ async function runBatch(
     await once(child, "close");
   } catch (err) {
     clearTimeout(timer);
+    // ENOENT = the CLI is simply not installed on this instance (e.g. the
+    // production container ships without claude/opencode). That is a setup
+    // state with a clear answer for the caller, not a crash.
+    const isMissingBinary =
+      err instanceof Error && "code" in err && err.code === "ENOENT";
+    if (isMissingBinary) {
+      logger.warn(`${provider.bin} CLI not installed`, { bin: provider.bin });
+      return fail({
+        message: t("codingAgent.run.post.errors.binaryMissing.title", {
+          bin: provider.bin,
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
     logger.error(`${provider.bin} CLI failed to spawn`, parseError(err));
     return fail({
       message: t("codingAgent.run.post.errors.internal.title"),

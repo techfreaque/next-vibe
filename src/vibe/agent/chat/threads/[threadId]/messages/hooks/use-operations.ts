@@ -92,7 +92,11 @@ export interface MessageOperations {
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   stopGeneration: () => void;
+  /** Infinity while the balance is unknown (load failed) - never a fake 0 */
   creditsTotal: number;
+  /** Balance could not be loaded (server and client) - show retry, not "0" */
+  creditsLoadFailed: boolean;
+  retryCredits: () => void;
 }
 
 /**
@@ -132,11 +136,17 @@ function passesCreditGuard(
   t: AiStreamT,
   creditsTotal: number,
   modelId: ChatModelId,
+  isGuest: boolean,
 ): boolean {
   if (creditsTotal <= 0) {
     toast({
-      title: t("input.noCredits.title"),
-      description: t("input.noCredits.description"),
+      // Guests can't top up — point them at a free account instead
+      title: isGuest
+        ? t("outOfCredits.guest.title")
+        : t("input.noCredits.title"),
+      description: isGuest
+        ? t("outOfCredits.guest.description")
+        : t("input.noCredits.description"),
       variant: "destructive",
       duration: Infinity,
     });
@@ -179,9 +189,18 @@ export function useMessageOperations(
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const { initialCredits } = useChatBootContext();
   const creditsEndpoint = useCredits(user, logger, initialCredits);
-  const creditsTotal = creditsEndpoint?.read?.response?.success
-    ? creditsEndpoint.read.response.data.total
+  const creditsResponse = creditsEndpoint?.read?.response;
+  const creditsTotal = creditsResponse?.success
+    ? creditsResponse.data.total
     : (initialCredits?.total ?? Infinity);
+  const creditsLoadFailed =
+    !initialCredits &&
+    creditsResponse !== undefined &&
+    !creditsResponse.success;
+  const refetchCredits = creditsEndpoint?.refetchCredits;
+  const retryCredits = useCallback((): void => {
+    refetchCredits?.();
+  }, [refetchCredits]);
   const { mutateAsync: deleteMutateAsync } = useApiMutation(
     messageIdDefinitions.DELETE,
     logger,
@@ -231,7 +250,14 @@ export function useMessageOperations(
         toastNoModel(t);
         return { success: false, createdThreadId: null };
       }
-      if (!passesCreditGuard(t, creditsTotal, d.settings.selectedModel)) {
+      if (
+        !passesCreditGuard(
+          t,
+          creditsTotal,
+          d.settings.selectedModel,
+          user.isPublic,
+        )
+      ) {
         return { success: false, createdThreadId: null };
       }
       return sendMessageOp(
@@ -268,7 +294,14 @@ export function useMessageOperations(
         toastNoModel(t);
         return;
       }
-      if (!passesCreditGuard(t, creditsTotal, d.settings.selectedModel)) {
+      if (
+        !passesCreditGuard(
+          t,
+          creditsTotal,
+          d.settings.selectedModel,
+          user.isPublic,
+        )
+      ) {
         return;
       }
       await retryMessageOp(messageId, attachments, {
@@ -499,6 +532,14 @@ export function useMessageOperations(
       }
 
       const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
+      const voteContext = {
+        messageId,
+        threadId: activeThreadId,
+        rootFolderId: currentRootFolderId,
+        role: message.role,
+        isAI: message.isAI,
+        ageMs: Date.now() - new Date(message.createdAt).getTime(),
+      };
 
       try {
         // Use activeThreadId, not message.threadId - see deleteMessage above.
@@ -510,6 +551,7 @@ export function useMessageOperations(
         if (!result.success) {
           logger.error("Message operations: Failed to vote on message", {
             message: result.message,
+            ...voteContext,
           });
           return;
         }
@@ -542,9 +584,13 @@ export function useMessageOperations(
           },
         });
       } catch (error) {
+        // A 404 here means the message is in the client cache but not in the
+        // DB (client-only row, unpersisted stream, mirror id drift) - the
+        // context below says which.
         logger.error(
           "Message operations: Failed to vote on message",
           parseError(error),
+          voteContext,
         );
       }
     },
@@ -585,6 +631,8 @@ export function useMessageOperations(
       voteMessage,
       stopGeneration,
       creditsTotal,
+      creditsLoadFailed,
+      retryCredits,
     }),
     [
       sendMessage,
@@ -595,6 +643,8 @@ export function useMessageOperations(
       voteMessage,
       stopGeneration,
       creditsTotal,
+      creditsLoadFailed,
+      retryCredits,
     ],
   );
 }

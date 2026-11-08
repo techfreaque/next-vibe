@@ -39,7 +39,7 @@ vibe rebuild              # production, zero-downtime update after changes
 Open the app → **Login as Admin** (no password in dev) → the setup wizard walks you through AI provider config and admin credentials.
 
 **Claude Code** _(recommended - no API key)_: `claude login`, then pick any `(claude-code)` model in the model selector.
-**OpenRouter** _(100+ models, pay per use)_: paste your key from [openrouter.ai/keys](https://openrouter.ai/keys).
+**OpenRouter** _(every OpenRouter model, pay per use)_: paste your key from [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ### Deploy
 
@@ -219,7 +219,7 @@ The generated `.md` skill file is machine-readable - Claude Code, Cursor, or any
 
 **Hermes** is the local worker. `vibe remote-connect` links your machine. The pulse syncs memories, capabilities, and tasks every 60 seconds. Thea discovers local tools via `help(instanceId="hermes")`, executes remotely, routes coding tasks to the right machine.
 
-**Capabilities:** 100+ AI models · skill delegation · persistent memories · tool calling (any endpoint) · task scheduling · MCP · any-to-any modality (text · image · audio · video · music)
+**Capabilities:** 197 AI models · skill delegation · persistent memories · tool calling (any endpoint) · task scheduling · MCP · any-to-any modality (text · image · audio · video · music)
 
 ---
 
@@ -260,7 +260,7 @@ Graph builder canvas is live in admin. Backtest replays any strategy over histor
 
 NextVibe is the engine. **[Unbottled.ai](https://unbottled.ai)** is the product. Like WordPress.org vs WordPress.com - fork and deploy your own, or use ours.
 
-Free speech AI. 100+ models. Users choose their own content filtering level.
+Free speech AI. 197 models. Users choose their own content filtering level.
 
 - **AI Chat** - Multi-model, branching message trees, skills, memories, favorites
 - **Payments** - Stripe + NowPayments (crypto), credits, referral program
@@ -291,7 +291,7 @@ Free speech AI. 100+ models. Users choose their own content filtering level.
 | Desktop    | Electron 40                                                                                           |
 | Database   | PostgreSQL + Drizzle ORM                                                                              |
 | Validation | Zod - one schema, all platforms                                                                       |
-| AI         | Claude Code, OpenRouter (100+ models)                                                                 |
+| AI         | Claude Code, OpenRouter                                                                               |
 | MCP        | Model Context Protocol server                                                                         |
 | Quality    | Vibe checker (Oxlint + ESLint + TypeScript)                                                           |
 | Email      | React Email + SMTP/IMAP                                                                               |

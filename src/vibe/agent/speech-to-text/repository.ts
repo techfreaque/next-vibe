@@ -117,6 +117,16 @@ export class SpeechToTextRepository {
           t,
           fetchImpl,
         );
+      case ApiProvider.NANO_GPT:
+        return SpeechToTextRepository.transcribeWithOpenAI(
+          file,
+          modelOption.providerModel,
+          language,
+          logger,
+          t,
+          fetchImpl,
+          "nanoGPT",
+        );
       case ApiProvider.EDEN_AI_STT:
         return SpeechToTextRepository.transcribeWithEdenAI(
           file,
@@ -421,6 +431,7 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
+    target: "openAi" | "nanoGPT" = "openAi",
   ): Promise<
     ResponseType<{
       text: string;
@@ -429,8 +440,20 @@ export class SpeechToTextRepository {
       edenAiCostUsd: number | undefined;
     }>
   > {
-    if (!agentEnv.OPENAI_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiStt;
+    // NanoGPT exposes an OpenAI-compatible /audio/transcriptions endpoint
+    const apiKey =
+      target === "nanoGPT"
+        ? agentEnv.NANO_GPT_API_KEY
+        : agentEnv.OPENAI_API_KEY;
+    const endpoint =
+      target === "nanoGPT"
+        ? "https://api.nano-gpt.com/api/v1/audio/transcriptions"
+        : "https://api.openai.com/v1/audio/transcriptions";
+    if (!apiKey) {
+      const { envKey, url, label } =
+        target === "nanoGPT"
+          ? PROVIDER_SETUP_INSTRUCTIONS.nanoGPT
+          : PROVIDER_SETUP_INSTRUCTIONS.openAiStt;
       logger.error("[STT] OpenAI API key not configured");
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
@@ -457,7 +480,11 @@ export class SpeechToTextRepository {
     formData.append("file", normalizedFile, normalizedFile.name);
     formData.append("model", providerModel);
     formData.append("language", language);
-    formData.append("response_format", "verbose_json");
+    // NanoGPT models differ in supported formats; plain json works for all
+    formData.append(
+      "response_format",
+      target === "nanoGPT" ? "json" : "verbose_json",
+    );
 
     logger.debug("[STT] Calling OpenAI Whisper API", {
       model: providerModel,
@@ -468,18 +495,15 @@ export class SpeechToTextRepository {
       fileSize: file.size,
     });
 
-    const response = await fetchImpl(
-      "https://api.openai.com/v1/audio/transcriptions",
-      {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
-        },
-        body: formData,
-        signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
+    const response = await fetchImpl(endpoint, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${apiKey}`,
       },
-    );
+      body: formData,
+      signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();

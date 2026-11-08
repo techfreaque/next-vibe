@@ -51,6 +51,7 @@ import React, {
   useState,
 } from "react";
 
+import { parseChatUrl } from "@/_pages/chat/lib/url-parser";
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
@@ -61,6 +62,7 @@ import publicFeedDefinition from "../../../chat/public-feed/definition";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
 import { scopedTranslation } from "../../../chat/threads/widget/i18n";
+import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "../../../cortex/widget/cortex-modal";
 import { useProviderAvailability } from "../../../env-availability-store";
@@ -98,8 +100,12 @@ interface CustomWidgetProps {
 // ─── Chat area (messages + input + modals) ────────────────────────────────────
 
 function AiStreamChatArea(): JSX.Element {
-  const { initialMessagesData, initialPathData, initialThreadId } =
-    useChatBootContext();
+  const {
+    initialMessagesData,
+    initialPathData,
+    initialThreadId,
+    initialSettingsData,
+  } = useChatBootContext();
 
   const locale = useWidgetLocale();
   const user = useWidgetUser();
@@ -107,6 +113,11 @@ function AiStreamChatArea(): JSX.Element {
   const widgetPlatform = useWidgetPlatform();
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+  const { settings: chatSettings } = useChatSettings(
+    user,
+    logger,
+    initialSettingsData,
+  );
 
   const threadIdToRender =
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
@@ -230,7 +241,11 @@ function AiStreamChatArea(): JSX.Element {
                   platform={widgetPlatform}
                 />
               ) : (
-                <ChatEmptyState locale={locale} inputHeight={inputHeight} />
+                <ChatEmptyState
+                  locale={locale}
+                  inputHeight={inputHeight}
+                  skillId={chatSettings?.selectedSkill ?? null}
+                />
               )}
             </Div>
           </ErrorBoundary>
@@ -264,9 +279,6 @@ function AiStreamChatArea(): JSX.Element {
 }
 
 // ─── Main Widget ─────────────────────────────────────────────────────────────
-
-const noopUnsubscribe = (): void => undefined;
-const subscribeNever = (): (() => void) => noopUnsubscribe;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
@@ -307,19 +319,27 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   // Guests can only use incognito + the public feed. A link to a thread in a
   // private/shared folder gets a sign-in gate (they followed it on purpose);
   // anything else redirects once to a fresh incognito chat.
+  // Route-driven: the URL decides, never loose store state (the store folder
+  // defaults to a restricted one during normal guest navigation).
+  const routeSegments = pathname.split("/").filter(Boolean);
+  const threadsIdx = routeSegments.indexOf("threads");
+  const routeChat =
+    threadsIdx === -1
+      ? null
+      : parseChatUrl(routeSegments.slice(threadsIdx + 1));
   const isRestrictedFolder =
     !isAuthenticated &&
-    currentRootFolderId !== DefaultFolderId.INCOGNITO &&
-    currentRootFolderId !== DefaultFolderId.PUBLIC;
-  // Thread id is client-only state: gate after hydration so SSR markup matches
-  const hydrated = React.useSyncExternalStore(
-    subscribeNever,
-    () => true,
-    () => false,
-  );
-  const showSignInGate =
-    hydrated && isRestrictedFolder && Boolean(activeThreadId);
-  const shouldRedirect = isRestrictedFolder && !activeThreadId;
+    routeChat !== null &&
+    routeChat.initialRootFolderId !== DefaultFolderId.INCOGNITO &&
+    routeChat.initialRootFolderId !== DefaultFolderId.PUBLIC;
+  const hasRealRouteThread =
+    routeChat !== null &&
+    routeChat.initialThreadId !== null &&
+    routeChat.initialThreadId !== NEW_MESSAGE_ID;
+  // Gate only a genuine link to a thread in a restricted folder.
+  const showSignInGate = isRestrictedFolder && hasRealRouteThread;
+  // A bare restricted folder (or /threads root, or /new there) -> incognito once.
+  const shouldRedirect = isRestrictedFolder && !hasRealRouteThread;
   // useRouter() returns a new object every render - keep it out of the deps,
   // or each render re-fires push() and the navigation never completes.
   const routerRef = useRef(router);
@@ -338,12 +358,12 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
     redirectedRef.current = true;
     logger.info(
       "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
-      { attemptedFolder: currentRootFolderId },
+      { attemptedFolder: routeChat?.initialRootFolderId },
     );
     routerRef.current.push(
       `/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`,
     );
-  }, [shouldRedirect, currentRootFolderId, locale, logger]);
+  }, [shouldRedirect, routeChat?.initialRootFolderId, locale, logger]);
 
   return (
     <>

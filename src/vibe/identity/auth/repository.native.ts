@@ -18,12 +18,17 @@ import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
 import type { UserRoleValue } from "../roles/enum";
+import { UserPermissionRole } from "../roles/enum";
 import type { CompleteUserType } from "../user/types";
 import type { AuthContext } from "./base-auth-handler";
 import type { AuthT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import type { AuthRepositoryType } from "./repository";
-import type { InferUserType, JwtPrivatePayloadType } from "./types";
+import type {
+  InferUserType,
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "./types";
 
 const AUTH_TOKEN_STORAGE_KEY = "@auth/token";
 const AUTH_EXPIRES_AT_STORAGE_KEY = "@auth/expiresAt";
@@ -211,6 +216,26 @@ export class AuthRepository {
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("authenticateUserByEmail is not implemented on native");
+  }
+
+  static anonymousPublicUser(): JwtPayloadType {
+    return {
+      isPublic: true,
+      leadId: "",
+      roles: [UserPermissionRole.PUBLIC],
+    };
+  }
+
+  static authenticateUserById(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("authenticateUserById is not implemented on native");
   }
 }
 

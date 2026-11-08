@@ -25,9 +25,9 @@ export const translations = {
         label: "View Skill",
       },
       signupPrompt: {
-        title: "Customize the character's personality",
+        title: "Customize the skill's personality",
         description:
-          "Edit the character's system prompt and behavior. Sign up to get started.",
+          "Edit the skill's system prompt and behavior. Sign up to get started.",
         backButton: "Back",
         signupButton: "Create Account",
         loginButton: "Log In",
@@ -171,9 +171,9 @@ export const translations = {
         label: "Currently Active",
       },
       signupPrompt: {
-        title: "Customize the character's personality",
+        title: "Customize the skill's personality",
         description:
-          "Edit the character's system prompt and behavior. Sign up to get started.",
+          "Edit the skill's system prompt and behavior. Sign up to get started.",
         backButton: "Back",
         signupButton: "Create Account",
         loginButton: "Log In",
@@ -258,7 +258,7 @@ export const translations = {
         title: "Model Selection",
         label: "Model Selection",
         description:
-          "Override the model for this slot. Use filters or pick a specific model. Pass null to use the character's default model.",
+          "Override the model for this slot. Use filters or pick a specific model. Pass null to use the skill's default model.",
       },
       selectionType: {
         label: "Selection Type",
@@ -325,18 +325,17 @@ export const translations = {
       },
       icon: {
         label: "Custom Icon",
-        description:
-          "Override the character's default icon for this favorite slot",
+        description: "Override the skill's default icon for this favorite slot",
       },
       availableTools: {
         label: "Allowed Tools",
         description:
-          "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to character or global settings.",
+          "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to skill or global settings.",
       },
       pinnedTools: {
         label: "Pinned Tools",
         description:
-          "Override pinned toolbar tools for this slot. Pass null to fall through to character or global settings.",
+          "Override pinned toolbar tools for this slot. Pass null to fall through to skill or global settings.",
       },
       deniedTools: {
         label: "Denied Tools",
@@ -359,7 +358,7 @@ export const translations = {
       compactTrigger: {
         label: "Compact Trigger (tokens)",
         description:
-          "Override the token count that triggers conversation compaction for this slot. Pass null to fall through to character or global default.",
+          "Override the token count that triggers conversation compaction for this slot. Pass null to fall through to skill or global default.",
       },
       memoryLimit: {
         label: "Memory Limit (tokens)",
@@ -559,7 +558,7 @@ export const translations = {
   get: {
     title: "Get Favorites",
     titleShort: "Favorites",
-    description: "Retrieve all your saved favorite character configurations",
+    description: "Retrieve all your saved favorite skill configurations",
     userId: {
       label: "User ID",
       description:
@@ -588,34 +587,36 @@ export const translations = {
       edit: "Edit",
       active: "Active",
       reorder: "Drag to reorder",
+      moveUp: "Move up",
+      moveDown: "Move down",
       showMore: "{{count}} more models",
       showLess: "Show less",
       settings: "Chat settings",
     },
-    addVariant: "Add Variant",
+    addVariant: "Add another model",
     viewSkill: "Details",
-    deleteVariant: "Remove this variant?",
+    deleteVariant: "Remove this model?",
     deleteVariantAction: "Remove",
     deleteGroup: {
-      trigger: "Delete all variants",
-      confirm: "Delete all {{count}} variants?",
+      trigger: "Remove skill",
+      confirm: "Remove this skill and its {{count}} models?",
       cancel: "Cancel",
-      action: "Delete all",
+      action: "Remove",
     },
-    emptyState: "You haven't added any favorites yet",
+    emptyState: "No skills yet. Pick one to start chatting.",
     tabs: {
-      myFavorites: "My Favorites",
+      myFavorites: "My Skills",
       browseSkills: "Browse Skills",
     },
     sections: {
       companion: "Companions",
       skills: "Skills",
-      model: "Direct Models",
+      model: "Plain models",
       background: "Background Agents",
     },
     container: {
-      title: "Your Favorites",
-      description: "Manage your favorite character and model configurations",
+      title: "Your Skills",
+      description: "Manage your favorite skill and model configurations",
     },
     createButton: {
       label: "Explore Skills",
@@ -745,10 +746,10 @@ export const translations = {
   },
   post: {
     title: "Create Favorite",
-    description: "Create a new favorite character configuration",
+    description: "Create a new favorite skill configuration",
     container: {
       title: "New Favorite",
-      description: "Save a character configuration as a favorite",
+      description: "Save a skill configuration as a favorite",
     },
     backButton: {
       label: "Cancel",
@@ -763,7 +764,7 @@ export const translations = {
     },
     skillId: {
       label: "Skill",
-      description: "Select the character for this favorite",
+      description: "Select the skill for this favorite",
     },
     customVariantName: {
       label: "Variant Name",

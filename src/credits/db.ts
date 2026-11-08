@@ -58,7 +58,7 @@ const numericNumber = customType<{
  * Each transaction type has specific metadata requirements
  */
 export interface FreeGrantMetadata {
-  reason: "initial_grant" | "admin_grant" | "monthly_reset";
+  reason: "initial_grant" | "admin_grant" | "monthly_reset" | "allowance_topup";
   freeCreditsRemaining: number;
   totalPoolFreeCredits?: number;
 }
@@ -105,6 +105,10 @@ export interface RefundMetadata {
   reason: string;
   originalTransactionId?: string;
   adminId?: string;
+  /** Clawback: credits this revocation was meant to remove */
+  revokedCredits?: number;
+  /** Clawback: part of revokedCredits already spent — could not be removed (flag for review) */
+  unrecoveredCredits?: number;
 }
 
 export interface TransferMetadata {
@@ -174,7 +178,7 @@ export interface CreditPackMetadata {
  *    - Only authenticated users can purchase credits
  *
  * 2. Lead wallets: ONLY free credits
- *    - freeCreditsRemaining can be 0-20 per wallet
+ *    - freeCreditsRemaining holds the pool's monthly free allowance (see free-allowance.ts)
  *    - balance always 0
  *    - Leads cannot purchase credits
  *
@@ -183,11 +187,12 @@ export interface CreditPackMetadata {
  *    - Lead-to-user: via userLeadLinks table
  *
  * 4. Free Credit Pool:
- *    - Max 20 free credits can be spent per pool per period
+ *    - Monthly cap per pool: guest 20, signed-in 50, +20 with a confirmed newsletter
+ *      (FREE_CREDIT_ALLOWANCE in products, math in credits/free-allowance.ts)
  *    - Enforced at deduction time by tracking spending
  *
  * 5. Credit Deduction Priority:
- *    - Free credits from lead wallets (up to 20 per period)
+ *    - Free credits from lead wallets (up to the pool allowance per period)
  *    - Paid credits from user wallet (expiring first, then permanent)
  */
 export const creditWallets = pgTable(
@@ -204,9 +209,9 @@ export const creditWallets = pgTable(
     // Both user and lead wallets can have paid credits
     balance: numericNumber("balance").notNull().default(0),
 
-    // Free tier tracking (20 credits per month SHARED across linked leads)
+    // Free tier tracking (monthly allowance SHARED across the pool's linked leads)
     // CRITICAL: User wallets MUST have freeCreditsRemaining = 0 (enforced in repository)
-    // CRITICAL: Lead wallets share a pool of max 20 credits across ALL linked leads
+    // CRITICAL: Lead wallets share ONE pool allowance across ALL linked leads
     freeCreditsRemaining: numericNumber("free_credits_remaining")
       .notNull()
       .default(20),

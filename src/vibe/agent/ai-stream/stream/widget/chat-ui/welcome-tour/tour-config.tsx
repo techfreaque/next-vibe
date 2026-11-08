@@ -10,6 +10,7 @@ import { Ul } from "next-vibe/ui/components/ul";
 import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DEFAULT_FOLDER_CONFIGS } from "../../../../../chat/config";
@@ -138,7 +139,6 @@ export const getTourSteps = (
 ): TourStepConfig[] => {
   const appName = t("config.appName");
   const sub = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
-  const free = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
 
   return [
     // Step 1: Welcome
@@ -432,7 +432,8 @@ export const getTourSteps = (
             {t("components.welcomeTour.subscriptionButton.description", {
               credits: String(sub.credits),
               price: formatCurrency(sub.price, sub.currency, locale),
-              freeCredits: String(free.credits),
+              freeCredits: String(FREE_CREDIT_ALLOWANCE.signedIn),
+              bonusCredits: String(FREE_CREDIT_ALLOWANCE.newsletterBonus),
             })}
           </P>
         </Div>

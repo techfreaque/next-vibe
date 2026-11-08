@@ -10,7 +10,7 @@
  *   duration_seconds_720p / duration_seconds_1080p → per-resolution $/s
  *   duration_seconds_with_audio / _without_audio → with/without audio variants
  *   cents_per_video_output_second_480p/720p → in cents (÷100 = $/s)
- *   video_tokens → per-token pricing (emit pricingByResolution=null, rely on usage.cost at runtime)
+ *   video_tokens → per-token pricing, converted to $/s per resolution (24fps, w*h*fps/1024 tokens/s)
  *   text_to_video_duration_seconds_720p etc → use 720p T2V as base
  *
  * Picks the most representative $/s for creditCostPerSecond and emits pricingByResolution
@@ -47,7 +47,19 @@ interface ORVideoModelsResponse {
  * Extract a representative $/s price and per-resolution pricing map from pricing_skus.
  * Returns { baseUsdPerSecond, byResolution } where byResolution may be empty.
  */
-function parsePricingSkus(skus: Record<string, string>): {
+const VIDEO_TOKEN_FPS = 24;
+/** Canonical 16:9 pixel counts per resolution label (lowercase). */
+const VIDEO_TOKEN_PIXELS: Record<string, number> = {
+  "480p": 854 * 480,
+  "720p": 1280 * 720,
+  "1080p": 1920 * 1080,
+  "4k": 3840 * 2160,
+};
+
+function parsePricingSkus(
+  skus: Record<string, string>,
+  supportedResolutions: string[],
+): {
   baseUsdPerSecond: number | null;
   byResolution: Record<string, number>;
 } {
@@ -141,8 +153,34 @@ function parsePricingSkus(skus: Record<string, string>): {
     return { baseUsdPerSecond: base ?? null, byResolution };
   }
 
-  // video_tokens pricing — can't convert to $/s without token counts; return null
-  // The openrouter provider uses usage.cost at runtime for these models.
+  // video_tokens pricing (BytePlus Seedance family) — convert $/token to $/s using
+  // BytePlus' formula: tokens = width * height * fps(24) * seconds / 1024, at the
+  // canonical 16:9 pixel size of each supported resolution. Per-resolution rate
+  // key is video_tokens_<res> (lowercase), falling back to the flat video_tokens.
+  const flatTokenRate = skus.video_tokens ? parseFloat(skus.video_tokens) : 0;
+  if (flatTokenRate > 0 && supportedResolutions.length > 0) {
+    const tokenByRes: Record<string, number> = {};
+    for (const res of supportedResolutions) {
+      const pixels = VIDEO_TOKEN_PIXELS[res.toLowerCase()];
+      if (pixels === undefined) {
+        continue;
+      }
+      const rateRaw = skus[`video_tokens_${res.toLowerCase()}`];
+      const rate = rateRaw ? parseFloat(rateRaw) : flatTokenRate;
+      if (rate > 0) {
+        tokenByRes[res] = (pixels * VIDEO_TOKEN_FPS * rate) / 1024;
+      }
+    }
+    if (Object.keys(tokenByRes).length > 0) {
+      Object.assign(byResolution, tokenByRes);
+      const base =
+        tokenByRes["720p"] ??
+        Object.values(tokenByRes).toSorted((a, b) => a - b)[0] ??
+        null;
+      return { baseUsdPerSecond: base, byResolution };
+    }
+  }
+
   return { baseUsdPerSecond: null, byResolution };
 }
 
@@ -233,6 +271,7 @@ export class OpenRouterVideoPriceFetcher extends PriceFetcher {
         if (apiModel.pricing_skus) {
           const { baseUsdPerSecond, byResolution } = parsePricingSkus(
             apiModel.pricing_skus,
+            apiModel.supported_resolutions ?? [],
           );
 
           if (baseUsdPerSecond !== null && baseUsdPerSecond > 0) {
@@ -246,10 +285,10 @@ export class OpenRouterVideoPriceFetcher extends PriceFetcher {
               providerModel: providerConfig.providerModel,
             });
           } else {
-            // video_tokens pricing — not convertible to $/s; creditCostPerSecond stays 0
-            // Runtime cost comes from usage.cost in the polling response
+            // No convertible price — the video-generation pool hides unpriced providers
+            // (fail-closed), so this model is not sellable until a price exists
             logger.debug(
-              `[OR video] ${providerConfig.providerModel}: video_tokens pricing, no $/s — runtime usage.cost used`,
+              `[OR video] ${providerConfig.providerModel}: no convertible $/s price — provider stays hidden`,
             );
           }
 

@@ -8,9 +8,11 @@ import type { JSX } from "react";
 import CountrySelector from "../../../_components/country-selector";
 import { Logo } from "../../../_components/logo";
 import { ThemeToggle } from "../../../_components/theme-toggle";
+import { AppEntryButton } from "./app-entry-button";
 import { AuthButtons } from "./auth-buttons";
 import { MobileMenuClient } from "./mobile-menu-client";
 import type { NavItemType } from "./nav-constants";
+import { Notifications } from "./notifications";
 import { OverflowNav } from "./overflow-nav";
 import { UserMenu } from "./user-menu";
 
@@ -63,12 +65,17 @@ export function Navbar({
           {!hideUserMenu && (
             <>
               {!user.isPublic ? (
-                <UserMenu
-                  user={user}
-                  userProfile={userProfile}
-                  locale={locale}
-                  hasSubscription={hasSubscription}
-                />
+                <>
+                  <Notifications locale={locale} user={user} />
+                  {/* Returning user: straight into the app, one click */}
+                  <AppEntryButton locale={locale} />
+                  <UserMenu
+                    user={user}
+                    userProfile={userProfile}
+                    locale={locale}
+                    hasSubscription={hasSubscription}
+                  />
+                </>
               ) : (
                 <AuthButtons locale={locale} />
               )}
@@ -76,7 +83,11 @@ export function Navbar({
           )}
 
           {/* Mobile hamburger menu */}
-          <MobileMenuClient locale={locale} navigationItems={navigationItems} />
+          <MobileMenuClient
+            locale={locale}
+            navigationItems={navigationItems}
+            isPublic={user.isPublic}
+          />
         </Div>
       </Div>
     </Div>

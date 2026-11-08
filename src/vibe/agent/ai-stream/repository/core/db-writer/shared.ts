@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CreditsT } from "@/credits/i18n";
 
 import type { ToolExecutionContext } from "../../../../../core/execution-context";
+import type { AbortReason } from "../constants";
 import type { MessagesWsEmit } from "../../../../chat/threads/[threadId]/messages/emitter";
 
 /** Callback for emitting thread-title-updated to sidebar channels. */
@@ -68,14 +69,42 @@ export interface DbWriterState {
   /** Tracks the thread ID of the last assistant message - used for embedding sync */
   lastThreadId: string | null;
   /**
-   * Message IDs that were successfully committed to the DB in this stream.
-   * Used to guard FK references: a TOOL message must not reference a parentId
-   * that never made it into the DB (e.g. a placeholder ASSISTANT whose insert
-   * failed). Checked in emitToolCall — if parentId is absent, null is used instead.
-   * Incognito streams skip DB writes so this set stays empty and parentId is
-   * passed through as-is (no FK constraint in incognito mode).
+   * Count of DB writes this stream dropped because its thread no longer exists
+   * (deleted mid-stream). See noteThreadGoneWrite.
    */
-  readonly committedMessageIds: Set<string>;
+  threadGoneWrites: number;
+  /**
+   * Message rows this stream successfully wrote. Distinguishes "thread was
+   * deleted mid-stream" (earlier writes landed) from "thread never existed /
+   * wrong threadId" (nothing ever landed) when a write hits a missing thread.
+   */
+  landedWrites: number;
+  /**
+   * Aborts the owning stream. Called on the first write that finds the thread
+   * row gone: every later write would be dropped too, so the loop must not keep
+   * calling (and billing) tools. Wired by the stream runner; this is the
+   * guaranteed stop - the thread-delete cancel signal only reaches streams on
+   * the deleting user's own control channel.
+   */
+  onThreadGone: (() => void) | null;
+  /**
+   * Set once a credit deduction failed even after a retry. The turn's output
+   * already reached the user and cannot be taken back, so billing fails
+   * closed by stopping the stream before any further billed step or tool.
+   */
+  billingFailed: boolean;
+  /** Aborts the owning stream on billing failure (wired by the stream runner). */
+  onBillingFailed: (() => void) | null;
+  /**
+   * Aborts the owning stream when the task guard trips (budget cap, turn /
+   * tool-call ceiling). Only set for background-task streams (cronTaskId).
+   */
+  onTaskGuardTripped:
+    | ((
+        reason: AbortReason.BUDGET_EXCEEDED | AbortReason.TASK_WATCHDOG,
+        detail: string,
+      ) => void)
+    | null;
   /**
    * In-flight embed of the just-written assistant message. Fired at content-done
    * (write time), awaited by the next step's cortex refresh so the mid-step
@@ -85,6 +114,84 @@ export interface DbWriterState {
   assistantEmbedPromise: Promise<void> | null;
   /** Stream context (its threadId) — binds the write-time embed to the fixture chain. */
   readonly toolExecutionContext: ToolExecutionContext;
+}
+
+/**
+ * After this many dropped writes the stream is clearly still running against a
+ * deleted thread - the thread delete should have cancelled it.
+ */
+const THREAD_GONE_RUNAWAY_THRESHOLD = 5;
+
+/**
+ * Record a write dropped because the stream's thread row does not exist.
+ *
+ * NOT assumed benign: the symptom is the same for a user deleting the thread
+ * mid-stream and for real bugs (wrong threadId, a write racing thread
+ * creation, a mirror/sync delete, incognito/folder misrouting). Every first
+ * occurrence per stream is a warning carrying the evidence that tells them
+ * apart:
+ *  - `reason`: "write-targets-other-thread" (error) when the write's threadId
+ *    is not the stream's own - a routing bug, never a delete. Otherwise the
+ *    row existed at setup (ensureThread) and vanished since:
+ *    "deleted-mid-stream" when earlier writes of THIS stream landed,
+ *    "deleted-before-first-write" when none had yet.
+ *  - a user/remote delete of a streaming thread logs
+ *    "[thread-delete] Thread deleted while streaming" (same threadId) - that
+ *    line is the confirmation that the deletion was a real user action.
+ * The first drop also stops the stream (onThreadGone). Further drops (writes
+ * already in flight) are counted (debug) and re-surfaced as a warning once the
+ * count shows the stream kept running against the gone thread anyway.
+ */
+export function noteThreadGoneWrite(
+  w: DbWriterState,
+  write: string,
+  meta: {
+    threadId: string;
+    messageId: string;
+    userId?: string;
+    toolName?: string;
+  },
+): void {
+  w.threadGoneWrites++;
+  // Setup verified (ensureThread) the stream's own thread row before the loop
+  // started, so a miss on THAT id means the row vanished afterwards. A miss on
+  // any other id is a routing bug in the caller, never a delete.
+  const streamThreadId = w.toolExecutionContext.threadId;
+  const reason =
+    streamThreadId !== undefined && meta.threadId !== streamThreadId
+      ? "write-targets-other-thread"
+      : w.landedWrites > 0
+        ? "deleted-mid-stream"
+        : "deleted-before-first-write";
+  const evidence = {
+    ...meta,
+    write,
+    reason,
+    streamThreadId: streamThreadId ?? null,
+    landedWritesThisStream: w.landedWrites,
+    droppedWrites: w.threadGoneWrites,
+    lastAssistantMessageId: w.lastAssistantMessageId,
+  };
+  if (w.threadGoneWrites === 1) {
+    (reason === "write-targets-other-thread"
+      ? w.deps.logger.error
+      : w.deps.logger.warn
+    ).bind(w.deps.logger)(
+      "[MessageDbWriter] Thread row missing mid-stream, dropping write - stopping stream",
+      evidence,
+    );
+    w.onThreadGone?.();
+  } else if (w.threadGoneWrites === THREAD_GONE_RUNAWAY_THRESHOLD) {
+    w.deps.logger.warn(
+      "[MessageDbWriter] Stream still writing to a missing thread - it was not cancelled",
+      evidence,
+    );
+  } else {
+    w.deps.logger.debug(
+      "[MessageDbWriter] Thread row missing mid-stream, dropping write",
+      evidence,
+    );
+  }
 }
 
 /**

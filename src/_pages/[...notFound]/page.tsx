@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
 import { scopedTranslation } from "./i18n";
@@ -31,6 +32,8 @@ export async function generateMetadata({
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/not-found.jpg`,
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],
+    generateAlternates: false,
+    additionalMetadata: { robots: { index: false, follow: false } },
   });
 }
 
@@ -46,14 +49,10 @@ export function TanstackPage({ locale }: NotFoundPageData): JSX.Element {
 }
 
 /**
- * Custom 404 Not Found page component for language routes
- * Displayed when a user navigates to a non-existent route within a language
- *
- * @returns JSX Element for the 404 page
+ * Next.js catch-all: unmatched routes must answer HTTP 404 (not 200).
+ * notFound() renders src/_pages/not-found.tsx with a real 404 status.
+ * The TanStack path sets the status in its generated route (TanstackPage).
  */
-export default async function NotFound({
-  params,
-}: NotFoundPageProps): Promise<JSX.Element> {
-  const data = await tanstackLoader({ params });
-  return <TanstackPage {...data} />;
+export default function NotFound(): never {
+  return notFound();
 }

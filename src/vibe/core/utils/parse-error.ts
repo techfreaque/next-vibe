@@ -58,7 +58,11 @@ export function parseError(error: unknown): Error {
     const cause = error.cause;
     if (cause instanceof Error && cause.message) {
       // Append the root cause message so DB constraint errors are visible in logs
-      const combined = new Error(`${error.message} | cause: ${cause.message}`);
+      // Keep the cause object itself so log serialization retains its
+      // code/detail/stack (pg errors, provider status/body).
+      const combined = new Error(`${error.message} | cause: ${cause.message}`, {
+        cause,
+      });
       combined.stack = error.stack;
       combined.name = error.name;
       return combined;

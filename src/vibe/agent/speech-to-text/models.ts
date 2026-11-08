@@ -8,6 +8,7 @@ import {
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
+  isProviderSellable,
   type ModelDefinition,
   type ModelOptionSttBased,
   type ModelProviderConfigSttBased,
@@ -26,6 +27,10 @@ import {
 export enum SttModelId {
   OPENAI_WHISPER = "openai-whisper",
   DEEPGRAM_NOVA_2 = "deepgram-nova-2",
+  WHISPER_LARGE_V3 = "whisper-large-v3",
+  VOXTRAL_MINI_TRANSCRIBE = "voxtral-mini-transcribe",
+  NEMOTRON_ASR = "nemotron-asr",
+  GPT4O_MINI_TRANSCRIBE = "gpt4o-mini-transcribe",
 }
 
 export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
@@ -102,6 +107,114 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
       },
     ],
   },
+  [SttModelId.WHISPER_LARGE_V3]: {
+    name: "Whisper Large V3",
+    by: "openAI",
+    description: "speechToText.models.descriptions.whisperLargeV3",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.WHISPER_LARGE_V3,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "Whisper-Large-V3",
+        creditCostPerSecond: 0.000825, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.000495/min)
+      },
+    ],
+  },
+  [SttModelId.VOXTRAL_MINI_TRANSCRIBE]: {
+    name: "Voxtral Mini Transcribe",
+    by: "mistral",
+    description: "speechToText.models.descriptions.voxtralMini",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.VOXTRAL_MINI_TRANSCRIBE,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "voxtral-mini-transcribe-3-0",
+        creditCostPerSecond: 0.00642, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.00385/min)
+      },
+    ],
+  },
+  [SttModelId.NEMOTRON_ASR]: {
+    name: "Nemotron ASR",
+    by: "nvidia",
+    description: "speechToText.models.descriptions.nemotronAsr",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.NEMOTRON_ASR,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "nvidia/nemotron-asr-multilingual/asr",
+        creditCostPerSecond: 0.02267, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0136/min)
+      },
+    ],
+  },
+  [SttModelId.GPT4O_MINI_TRANSCRIBE]: {
+    name: "GPT-4o Mini Transcribe",
+    by: "openAI",
+    description: "speechToText.models.descriptions.gpt4oMiniTranscribe",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.GPT4O_MINI_TRANSCRIBE,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "gpt-4o-mini-transcribe",
+        creditCostPerSecond: 0.0085, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0051/min)
+      },
+    ],
+  },
 };
 
 export type SttModelOption = ModelOptionSttBased & { id: SttModelId };
@@ -144,7 +257,8 @@ function buildSttModelOptions(): SttModelOption[] {
     for (const provider of sortedProviders) {
       if (
         "creditCostPerSecond" in provider &&
-        !("defaultDurationSeconds" in provider)
+        !("defaultDurationSeconds" in provider) &&
+        isProviderSellable(def, provider)
       ) {
         result.push(
           buildSttOption(

@@ -67,7 +67,7 @@ export function UnbottledCta({
   return (
     <Section className="dark relative overflow-hidden bg-background">
       <Div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_70%_60%_at_50%_100%,hsl(var(--primary)/0.22)_0%,transparent_70%)]" />
-      <Div className="container relative px-4 md:px-6 py-24 md:py-32">
+      <Div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 md:py-32">
         <MotionDiv
           className="max-w-2xl mx-auto text-center"
           initial={false}

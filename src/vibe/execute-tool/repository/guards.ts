@@ -311,6 +311,9 @@ export class ExecuteToolGuards {
       permissions,
     );
     if (permissionBlock !== null) {
+      // Usually the model asking for a tool it is not allowed, but this is
+      // also how a platform-instructed call blocked by a whitelist shows up
+      // (the rename-thread bug) - keep it visible at warn.
       logger.warn("[RouteExecute] execute-tool denied by permission cascade", {
         toolName,
         reason: permissionBlock,

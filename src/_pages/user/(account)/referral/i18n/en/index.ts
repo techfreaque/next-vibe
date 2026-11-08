@@ -7,13 +7,13 @@ export const translations = {
 
   hero: {
     directEarning: "You earn",
-    directLabel: "on every payment",
     directNote: "from people you refer, forever",
     bonusEarning: "As skill creator",
     bonusNote: "when others share your skill, recurring forever",
   },
 
   commissionTable: {
+    youLabel: "You",
     perMonth: "/ mo",
     colLevel: "Who earns",
     colCut: "Cut",
@@ -23,38 +23,14 @@ export const translations = {
     chainTitle: "10 subscribers. What you earn per month.",
     chainSubtitle:
       "Each level is half the one above. Built once at signup - pays forever.",
-    youLabel: "You",
     whoLabel0: "You - whoever referred them directly",
     whoLabel1: "Skill creator (if different) or your referrer",
     whoLabel2: "Their referrer's referrer",
     whoLabel3: "Level 4",
     whoLabel4: "Level 5",
     whoLabel5: "Level 6",
-    colExample: "Example ({{examplePrice}}/mo spend)",
     tableNote:
       "Referral link: {{directPct}} per user. Your skill shared by someone else: {{skillBonusPct}} per user. Both recurring, forever.",
-  },
-
-  commission: {
-    title: "The chain, level by level",
-    subtitle:
-      "Every payment from your referrals flows up the chain. You sit at level 1 - {{directPct}} forever. Each level above earns a cut too.",
-    directTitle: "Direct commission",
-    directAmount: "{{directPct}} always",
-    directDesc:
-      "Every time someone you referred pays, you get {{directPct}}. No exceptions. No expiry.",
-    bonusTitle: "Network earnings",
-    bonusAmount: "Up to {{uplinePct}} more",
-    bonusDesc:
-      "Your referrals refer others - you earn a cut of those too. {{level2Pct}} from level 2, {{level3Pct}} from level 3, halving each level.",
-    totalTitle: "Total potential",
-    totalAmount: "Up to {{totalPct}}",
-    totalDesc: "When your referrals are also referring others",
-    levelsTitle: "Level breakdown",
-    level1: "You refer someone → {{directPct}} of their payments",
-    level2: "They refer someone → {{level2Pct}} of those payments",
-    level3: "Those refer others → {{level3Pct}}",
-    level4: "And so on, up to {{maxUplineLevels}} levels",
   },
 
   // Story scenario section
@@ -103,43 +79,14 @@ export const translations = {
       "Referral link → {{directPct}} per user, forever. Your skill shared by others → {{skillBonusPct}} per user. Two sources, zero extra work.",
     step3Title: "Get paid",
     step3Body:
-      "Credits land instantly. Withdraw to BTC or USDC once you hit {{minPayout}}.",
+      "Earnings unlock {{holdDays}} days after each payment - the refund window. Then spend them as credits or withdraw to BTC/USDC from {{minPayout}}.",
   },
 
   manage: {
-    createSubtitle: "Create codes for specific campaigns or audiences.",
     codesSubtitle: "Copy a link, share it, watch it earn.",
-  },
-  createCode: {
-    title: "Create Referral Code",
-    create: "Create Code",
-    creating: "Creating...",
   },
   myCodes: {
     title: "Your links",
-    loading: "Loading...",
-    error: "Failed to load codes",
-    empty: "No codes yet. Create your first one above ↑",
-    copy: "Copy link",
-    copied: "Copied!",
-    uses: "Uses",
-    signups: "Signups",
-    revenue: "Revenue",
-    earnings: "Earned",
-    inactive: "Inactive",
-  },
-  stats: {
-    loading: "Loading...",
-    error: "Failed to load stats",
-    totalSignups: "Total signups",
-    totalSignupsDesc: "Users who signed up via your referral code",
-    totalRevenue: "Revenue generated",
-    totalRevenueDesc: "Total subscription value from your referrals",
-    totalEarned: "Total earned",
-    totalEarnedDesc: "Your commission across all referrals",
-    availableBalance: "Available balance",
-    availableBalanceDesc:
-      "Spend on AI chats - other credits used first. Earn {{minPayout}} to unlock withdrawal.",
   },
   cta: {
     title: "Create an account to start earning",
@@ -150,7 +97,8 @@ export const translations = {
     pitch1: "{{directPct}} referral commission - recurring, no expiry",
     pitch2:
       "Publish a skill → {{skillBonusPct}} from every user others bring to it",
-    pitch3: "Credits instantly. BTC/USDC withdrawals at {{minPayout}} minimum.",
+    pitch3:
+      "Unlocks {{holdDays}} days after payment. BTC/USDC withdrawals from {{minPayout}}.",
   },
   payout: {
     title: "Withdraw your earnings",

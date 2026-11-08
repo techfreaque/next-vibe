@@ -39,7 +39,7 @@ const { PATCH } = createEndpoint({
   category: "companies",
   subCategory: "Company Management",
   tags: ["tags.companies", "tags.update"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   icon: "building",
 
   fields: customWidgetObject({

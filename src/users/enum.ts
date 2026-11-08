@@ -69,14 +69,11 @@ export const {
   options: UserRoleFilterOptions,
 } = createEnumOptions(scopedTranslation, {
   ALL: "list.enums.userRoleFilter.all",
-  USER: "list.enums.userRoleFilter.user",
   PUBLIC: "list.enums.userRoleFilter.public",
   CUSTOMER: "list.enums.userRoleFilter.customer",
-  MODERATOR: "list.enums.userRoleFilter.moderator",
   PARTNER_ADMIN: "list.enums.userRoleFilter.partnerAdmin",
   PARTNER_EMPLOYEE: "list.enums.userRoleFilter.partnerEmployee",
   ADMIN: "list.enums.userRoleFilter.admin",
-  SUPER_ADMIN: "list.enums.userRoleFilter.superAdmin",
 });
 
 /**

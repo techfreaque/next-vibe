@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
     },
     defaultTone: {
       label: "Standardton",
-      description: "Standard-Charakter/Ton für diesen Thread",
+      description: "Standard-Skill/Ton für diesen Thread",
     },
     systemPrompt: {
       label: "System-Prompt",

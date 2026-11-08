@@ -32,7 +32,6 @@ export const translations = {
     p1: "Every skill you publish has a shareable link. Share it yourself and you earn the standard 10% direct. When another member shares it with their own link, you still earn 5% of every payment from those users, forever.",
     p2: "Here's what most people miss: you earn the 5% as the skill creator even when someone else shares your skill. A user finds your skill in the directory, shares the link with a friend - that friend signs up, you get 5% of their payments. Automatically. The platform tracks skill authorship, not who shared the link. Your skill works for you even when you're not the one promoting it.",
     p3: "Embed your skill link in a GitHub README. Post it in a developer Discord. Every person who signs up through it pays you 10%. Every person someone else brings to your skill pays you 5%. Same skill, two income paths.",
-    p4: "Skills are free to create. No paid subscription required. If you've built a useful AI setup - a code reviewer that knows your stack, a docs writer tuned to your style - share it. The link does the rest.",
   },
   math: {
     title: "The math (actual numbers)",

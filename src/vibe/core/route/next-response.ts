@@ -76,15 +76,25 @@ export function wrapErrorResponse(
   // Build clean error chain
   const { logChain } = buildErrorChain(error);
 
-  // 4xx errors are expected API outcomes (bad input, missing auth, not found).
-  // Only 5xx is an unexpected server failure worth paging on.
+  // 4xx: delivered to the caller - usually expected (bad input, auth, no
+  // credits), but several real client bugs only ever surfaced here (guest UI
+  // calling an account-only endpoint, empty path params, version skew), so
+  // they stay visible at warn. 5xx is an unexpected server failure.
   const errorCode = error.errorType.errorCode;
   const logMeta = {
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
     errorKey: error.errorType.errorKey,
     errorCode,
   };
-  if (errorCode >= 500) {
+  if (
+    error.errorType.errorKey ===
+    ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey
+  ) {
+    // A third party or peer instance failed (provider down, peer offline).
+    // Not our bug, but worth seeing - warn; the cause was logged where the
+    // upstream call failed.
+    logger.warn(`API Error:\n${logChain.join("\n")}`, logMeta);
+  } else if (errorCode >= 500) {
     logger.error(`API Error:\n${logChain.join("\n")}`, logMeta);
   } else {
     logger.warn(`API Error:\n${logChain.join("\n")}`, logMeta);

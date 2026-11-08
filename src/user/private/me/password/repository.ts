@@ -96,8 +96,6 @@ export class PasswordUpdateRepository {
       const userRecord = await db
         .select({
           password: users.password,
-          twoFactorEnabled: users.twoFactorEnabled,
-          twoFactorSecret: users.twoFactorSecret,
         })
         .from(users)
         .where(eq(users.id, userId))
@@ -121,32 +119,8 @@ export class PasswordUpdateRepository {
         });
       }
 
-      if (userRecord.twoFactorEnabled && userRecord.twoFactorSecret) {
-        const twoFactorCode = (passwords as { twoFactorCode?: string })
-          .twoFactorCode;
-
-        if (!twoFactorCode) {
-          return fail({
-            message: t("errors.two_factor_code_required"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
-        }
-
-        const is2FAValid = this.verify2FACode(
-          twoFactorCode,
-          userRecord.twoFactorSecret,
-        );
-        if (!is2FAValid) {
-          return fail({
-            message: t("errors.invalid_two_factor_code"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
-        }
-
-        logger.info("2FA verification successful for password change", {
-          userId,
-        });
-      }
+      // Two-factor auth is not implemented — no TOTP code is checked here (a
+      // placeholder that accepted any 6 digits was removed: fake security).
 
       const setPasswordResponse = await this.setPassword(
         userId,
@@ -176,18 +150,6 @@ export class PasswordUpdateRepository {
         errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
-  }
-
-  /**
-   * Verify 2FA code (placeholder)
-   */
-  private static verify2FACode(code: string, secret: string): boolean {
-    const codeRegex = /^\d{6}$/;
-    if (!codeRegex.test(code)) {
-      return false;
-    }
-    void secret;
-    return true;
   }
 
   /**

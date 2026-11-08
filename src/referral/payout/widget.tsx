@@ -20,6 +20,7 @@ import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Download } from "next-vibe/ui/components/icons/Download";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { History } from "next-vibe/ui/components/icons/History";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Span } from "next-vibe/ui/components/span";
@@ -64,6 +65,8 @@ export function ReferralPayoutContainer(): React.JSX.Element {
   const availableDollars = `$${(available / 100).toFixed(2)}`;
   const minDollars = `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`;
   const hasHistory = (data?.payoutHistory.length ?? 0) > 0;
+  const pending = data?.earnedCreditsPending ?? 0;
+  const pendingDollars = `$${(pending / 100).toFixed(2)}`;
 
   return (
     <Div className="flex flex-col gap-4">
@@ -128,6 +131,24 @@ export function ReferralPayoutContainer(): React.JSX.Element {
                 </Span>
               </Div>
             )}
+
+            {pending > 0 ? (
+              <Div className="flex items-start gap-2.5 rounded-lg border bg-muted/40 px-3.5 py-3">
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <Div>
+                  <Div className="text-sm font-medium tabular-nums text-foreground">
+                    {t("payout.widget.pendingTitle", {
+                      amount: pendingDollars,
+                    })}
+                  </Div>
+                  <Div className="text-xs text-muted-foreground">
+                    {t("payout.widget.pendingNote", {
+                      holdDays: String(REFERRAL_CONFIG.EARNING_HOLD_DAYS),
+                    })}
+                  </Div>
+                </Div>
+              </Div>
+            ) : null}
 
             <Div className="mt-auto flex flex-col gap-3">
               <Button

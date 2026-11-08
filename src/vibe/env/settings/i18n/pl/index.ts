@@ -240,7 +240,7 @@ export const translations: typeof enTranslations = {
         "Opcjonalne - możesz zamiast tego użyć OpenRouter lub innych dostawców.",
       openRouterTitle: "Klucz API OpenRouter",
       openRouterDescription:
-        "Dostęp do 200+ modeli AI. Działa razem z Claude Code lub samodzielnie.",
+        "Dostęp do wszystkich modeli AI z OpenRouter. Działa razem z Claude Code lub samodzielnie.",
       openRouterHint: "Pobierz darmowy klucz API na openrouter.ai/keys",
       unbottledTitle: "Unbottled AI Cloud",
       unbottledDescription:

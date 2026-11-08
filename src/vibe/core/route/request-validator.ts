@@ -21,6 +21,7 @@ import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
 import type { WidgetData } from "../utils/json";
 import { parseError } from "../utils/parse-error";
+import { repairEnumShorthands } from "./enum-shorthand-repair";
 import { ErrorResponseTypes, fail, type ResponseType } from "./response.schema";
 import { validateLocale } from "./validate-locale";
 
@@ -159,10 +160,26 @@ export function validateHandlerRequestData<
     // Normalize: AI/CLI models sometimes send object fields as JSON strings — parse them.
     // Only for agent/CLI platforms: machine-to-machine HTTP calls send properly typed
     // data and must not have their string values auto-parsed.
-    const normalizedRequestData =
-      isAgentPlatform(platform) || isCliPlatform(platform)
-        ? deepParseJsonStrings(context.requestData as WidgetData)
-        : (context.requestData as WidgetData);
+    const isLenientCaller =
+      isAgentPlatform(platform) || isCliPlatform(platform);
+    let normalizedRequestData = isLenientCaller
+      ? deepParseJsonStrings(context.requestData as WidgetData)
+      : (context.requestData as WidgetData);
+    // AI/CLI callers send enum shorthands ("BRAVE" for "enums.provider.BRAVE");
+    // map an unambiguous one to the real value instead of failing the call.
+    if (isLenientCaller) {
+      const enumRepair = repairEnumShorthands(
+        normalizedRequestData,
+        endpoint.requestSchema,
+      );
+      if (enumRepair.repaired.length > 0) {
+        logger.debug("Repaired enum shorthand in request data", {
+          endpoint: context.endpointPath,
+          fields: enumRepair.repaired.join(", "),
+        });
+        normalizedRequestData = enumRepair.data;
+      }
+    }
 
     // Now validate the final merged data
     const requestValidation = validateData(

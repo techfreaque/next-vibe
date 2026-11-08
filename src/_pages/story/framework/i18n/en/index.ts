@@ -51,10 +51,6 @@ export const translations = {
       "Delete the folder. The feature disappears from every platform at once.",
   },
   surfaces: {
-    eyebrow: "Every Platform",
-    title: "One definition. Thirteen platforms.",
-    subtitle:
-      "When you add a feature to next-vibe, it doesn't just become an API endpoint. It runs everywhere at once.",
     items: {
       webApi: {
         label: "Web API",
@@ -150,6 +146,34 @@ export const translations = {
     vibeCheck:
       "vibe check runs Oxlint (Rust), ESLint, and TypeScript type checking in parallel. Zero errors required before ship.",
   },
+  examples: {
+    eyebrow: "Built with next-vibe",
+    title: "From a car dashboard to an AI platform.",
+    subtitle:
+      "Same codebase, any surface. These are real products running on next-vibe - a car PC, online shops, booking sites, and {{appName}} itself. One framework, wildly different products.",
+    items: {
+      headunit: {
+        label: "In-car dashboard",
+        title: "A full car headunit",
+        body: "Navigation, climate, radio, Spotify, Bluetooth calls, and live vehicle diagnostics - plus Android Auto - on a touchscreen car PC. Built as a next-vibe fork.",
+      },
+      shop: {
+        label: "E-commerce",
+        title: "Online shops that sell",
+        body: "Storefront, cart, checkout, inventory, and point of sale from one install. A real shop runs on it today.",
+      },
+      booking: {
+        label: "Bookings",
+        title: "Practitioner & booking sites",
+        body: "Appointments, client records, invoicing, and a public site - the backbone of a practitioner business. Same stack as the shop.",
+      },
+      aiPlatform: {
+        label: "AI platform",
+        title: "{{appName}}",
+        body: "{{modelCount}} models, chat, persistent memory, agents, billing, and MCP - the flagship. This exact codebase, in production.",
+      },
+    },
+  },
   quickstart: {
     eyebrow: "Get started",
     title: "Fork, ask, ship.",
@@ -173,19 +197,46 @@ export const translations = {
       description:
         "Open {{appName}} chat or Claude Code and describe the feature you want. The AI writes all the files - definition, route, widget, i18n - and runs vibe check automatically.",
     },
-    step5: {
-      label: "Ship",
-      description:
-        "vibe rebuild updates production with zero downtime. It checks, rebuilds, and hot-restarts - no manual file editing, no downtime.",
-    },
     docsLink: "Pattern documentation",
     githubLink: "github.com/techfreaque/next-vibe",
+  },
+  oneDef: {
+    eyebrow: "One definition",
+    title: "Write it once. Run it everywhere.",
+    subtitle:
+      "This is a real endpoint from this repo: read the focused window on a Linux desktop. Three files. No glue code. It shows up as a web page, a CLI command, an MCP tool, an AI tool and a cron job.",
+    defTitle: "definition.ts",
+    defBody:
+      "Path, alias, roles, Zod schema, widget, errors, examples. Everything every surface needs, in one place.",
+    routeTitle: "route.ts",
+    routeBody:
+      "Wires the definition to a repository function. That handler is what every surface calls.",
+    surfacesTitle: "What you get without writing more code",
+    cli: {
+      title: "CLI command",
+      body: "The alias becomes a command. Output is rendered by the same widget, laid out for the terminal.",
+    },
+    mcp: {
+      title: "MCP tool",
+      body: "Point any MCP client at vibe mcp. Schemas come straight from the Zod fields.",
+    },
+    ai: {
+      title: "AI-callable tool",
+      body: "Models get a function-calling schema generated from the definition. Roles decide who may call it.",
+    },
+    cron: {
+      title: "Cron job",
+      body: "Same handler, now on a schedule. This is the real task file of our credit-expiry job.",
+    },
+    more: "Plus a web page at /tools/<alias>, a typed REST route and a native screen. The widget renders on every one of them. Delete the endpoint folder and every surface disappears with it.",
+    addTitle: "Add your own in five lines of shell",
+    addBody:
+      "Create the folder, write the three files, regenerate, check. If vibe check says 0 errors, it works everywhere.",
   },
   enterprise: {
     eyebrow: "Enterprise",
     title: "Building something big?",
     description:
       "We help teams with setup, custom integrations, architecture review, and ongoing development support. Same codebase, your deployment.",
-    cta: "Get in touch",
   },
 };

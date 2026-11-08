@@ -4,6 +4,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { viewportToHead } from "next-vibe/platforms/web/frameworks/tanstack-start/page-head";
 import globalsUrl from "next-vibe/ui/globals.css?url";
 
 import { TanstackPage as RootLayout } from "@root-layout/layout";
@@ -11,15 +12,21 @@ import { TanstackPage as RootLayout } from "@root-layout/layout";
 const loadLayout = createServerFn({ method: "GET" })
   .validator((data: { locale: string }) => data)
   .handler(async ({ data }) => {
-    const { tanstackLoader } = await import("@root-layout/layout");
-    return tanstackLoader({
+    // `viewport` is a server-only export (stripped from the client bundle),
+    // so it is resolved here and shipped as head data.
+    const { tanstackLoader, viewport } = await import("@root-layout/layout");
+    const layout = await tanstackLoader({
       params: Promise.resolve({ locale: data.locale as CountryLanguage }),
     });
+    return { layout, viewportMeta: viewportToHead(viewport) };
   });
 
 export const Route = createRootRoute({
   staleTime: 0,
-  head: () => ({
+  // Page-specific title/description/canonical/hreflang/OG/robots come from
+  // each generated page route's head() (resolved from generateMetadata).
+  head: ({ loaderData }) => ({
+    meta: [{ charSet: "utf-8" }, ...(loaderData?.viewportMeta ?? [])],
     links: [
       { rel: "stylesheet", href: globalsUrl },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -31,7 +38,9 @@ export const Route = createRootRoute({
     return loadLayout({ data: { locale } });
   },
   shellComponent: function ShellComponent({ children }) {
-    return <RootLayout {...Route.useLoaderData()}>{children}</RootLayout>;
+    return (
+      <RootLayout {...Route.useLoaderData().layout}>{children}</RootLayout>
+    );
   },
   component: () => <Outlet />,
 });

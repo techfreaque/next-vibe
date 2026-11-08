@@ -254,6 +254,11 @@ const accountResponseFields = {
     label: "response.account.isFailover",
     schema: z.boolean(),
   }),
+  isSystem: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    label: "response.account.isSystem",
+    schema: z.boolean(),
+  }),
   failoverPriority: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     label: "response.account.failoverPriority",
@@ -344,6 +349,7 @@ const { GET } = createEndpoint({
       isExactMatch: accountResponseFields.isExactMatch,
       weight: accountResponseFields.weight,
       isFailover: accountResponseFields.isFailover,
+      isSystem: accountResponseFields.isSystem,
       failoverPriority: accountResponseFields.failoverPriority,
       messagesSentTotal: accountResponseFields.messagesSentTotal,
       lastUsedAt: accountResponseFields.lastUsedAt,
@@ -435,6 +441,7 @@ const { GET } = createEndpoint({
         isExactMatch: false,
         weight: 90,
         isFailover: false,
+        isSystem: false,
         failoverPriority: 0,
         messagesSentTotal: 15000,
         lastUsedAt: "2024-01-07T11:45:00.000Z",
@@ -846,6 +853,14 @@ const { PUT } = createEndpoint({
         columns: 4,
         schema: z.boolean(),
       }),
+      isSystem: requestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.isSystem.label",
+        description: "fields.isSystem.description",
+        columns: 4,
+        schema: z.boolean(),
+      }),
       // mapAccount returns: failoverPriority: number
       failoverPriority: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -946,6 +961,7 @@ const { PUT } = createEndpoint({
         isExactMatch: false,
         weight: 0,
         isFailover: false,
+        isSystem: false,
         failoverPriority: 0,
       },
     },
@@ -988,6 +1004,7 @@ const { PUT } = createEndpoint({
         isExactMatch: false,
         weight: 90,
         isFailover: false,
+        isSystem: false,
         failoverPriority: 0,
         messagesSentTotal: 15000,
         lastUsedAt: "2024-01-07T11:45:00.000Z",

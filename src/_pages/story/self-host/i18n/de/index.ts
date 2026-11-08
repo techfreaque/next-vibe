@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
       optionB: {
         label: "Option B: OpenRouter",
         description:
-          "200+ Modelle, nutzungsbasierte Abrechnung. Key unter openrouter.ai/keys holen.",
+          "Alle OpenRouter-Modelle, nutzungsbasierte Abrechnung. Key unter openrouter.ai/keys holen.",
       },
     },
   },
@@ -80,10 +80,58 @@ export const translations: typeof enTranslations = {
     description:
       "Thea kann Aufgaben an Claude Code auf deinem Entwicklungsrechner weiterleiten. Gehe zu Admin → Remote-Verbindungen im Dashboard und füge deine lokale Instanz-URL hinzu. Erinnerungen und Aufgaben synchronisieren alle 60 Sekunden - kein Port-Forwarding, kein VPN.",
   },
+  own: {
+    eyebrow: "Dein Server, deine Regeln",
+    title: "Dein Stack. Dein Filter.",
+    subtitle:
+      "Kein Konto bei fremden Firmen. Deine Postgres, deine Schlüssel, deine Logs. Du wählst die Modelle und du bestimmst, wie viel Filter zwischen dir und ihnen sitzt.",
+    cards: {
+      data: {
+        title: "Deine Daten bleiben bei dir",
+        body: "Threads, Erinnerungen und Dateien liegen in deiner eigenen Postgres und deinem Speicherpfad. Nichts telefoniert nach Hause.",
+      },
+      filter: {
+        title: "Dein Filterlevel",
+        body: "Mainstream-, offene oder unzensierte Modelle. Du entscheidest pro Skill, pro Thread, pro Nutzer. Kein Policy-Team dazwischen.",
+      },
+      keys: {
+        title: "Deine Schlüssel",
+        body: "Bring OpenRouter, ein lokales Modell oder Claude Code mit. Die Kosten gehen an deinen Anbieter, nicht über unseren.",
+      },
+    },
+  },
+  env: {
+    title: "Was du brauchst",
+    intro:
+      "Bun, Docker und eine Handvoll Umgebungsvariablen. Mehr steht nicht auf der Checkliste für eine private Instanz.",
+    envLabel: "Minimale Konfiguration",
+    composeLabel: "Produktion auf einem VPS",
+  },
+  instances: {
+    title: "Drei Instanzen, drei Aufgaben",
+    intro:
+      "Eine Codebasis läuft als getrennte Instanzen. Gleicher Code, andere Datenbank und Rolle. So betreiben wir selbst.",
+    atlas: {
+      name: "Atlas",
+      body: "Die Dev-Instanz. Hot Reload, Wegwerf-Datenbank. Hier entsteht der Code.",
+    },
+    hermes: {
+      name: "Hermes",
+      body: "Dein Alltagswerkzeug. Lokale Vorschau auf eigener Postgres. In dieser Instanz lebst du.",
+    },
+    thea: {
+      name: "Thea",
+      body: "Die Cloud-Instanz auf deinem VPS. Immer an, führt deine Crons aus, nimmt Aufgaben von den anderen beiden.",
+    },
+    note: "Instanzen sind miteinander verbunden. Threads und Aufgaben synchronisieren zwischen Laptop und Server.",
+  },
+  fork: {
+    title: "Gleiches Framework, anderes Produkt",
+    body: "next-vibe-headunit ist ein Car-PC-Fork. Medien, Navigation, Klima, Bluetooth und Radio sind Endpoints, und jeder ist zugleich CLI-Befehl und KI-Tool. Anderes Produkt, dieselben drei Dateien.",
+  },
   enterprise: {
     title: "Hilfe beim Einrichten gesucht?",
     description:
       "Wir helfen bei Deployment, individuellen Integrationen und laufender Entwicklungsunterstützung.",
-    cta: "Kontakt aufnehmen",
   },
 };

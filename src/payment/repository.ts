@@ -502,6 +502,28 @@ export class PaymentRepository {
         case "checkout.session.expired":
           await this.handleCheckoutSessionExpired(eventData, logger);
           break;
+        case "charge.refunded":
+        case "charge.dispute.created":
+        case "charge.dispute.funds_withdrawn":
+        case "charge.dispute.closed": {
+          // Money left (or came back) — revoke/restore what the payment granted.
+          // On failure the event is NOT marked processed, so the provider
+          // retries; the clawback itself is cumulative + idempotent.
+          const reversal = await this.handleChargeReversal(
+            event.type,
+            eventData,
+            provider,
+            logger,
+          );
+          if (!reversal.success) {
+            return fail({
+              message: t("errors.server.detail", { error: reversal.message }),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              cause: reversal,
+            });
+          }
+          break;
+        }
         default:
           logger.debug("Unhandled webhook event type", {
             eventType: event.type,
@@ -526,6 +548,62 @@ export class PaymentRepository {
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
+  }
+
+  /**
+   * charge.refunded / charge.dispute.* (Stripe) and NOWPayments "refunded".
+   * - refund: revoke the refunded share (amount_refunded / amount, cumulative)
+   * - dispute created / funds withdrawn: revoke everything the payment granted
+   * - dispute closed as won: restore what the dispute revoked
+   */
+  private static async handleChargeReversal(
+    eventType: string,
+    data: WebhookData,
+    provider:
+      | typeof PaymentProvider.STRIPE
+      | typeof PaymentProvider.NOWPAYMENTS,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    const { PaymentClawbackRepository } = await import("./refund/clawback");
+    const isNowPayments = provider === PaymentProvider.NOWPAYMENTS;
+    const base = {
+      paymentIntentId: isNowPayments ? null : (data.payment_intent ?? null),
+      // NOWPayments: data.id is the invoice id = paymentTransactions.providerSessionId
+      providerSessionId: isNowPayments ? data.id : null,
+      customerId: isNowPayments ? null : (data.customer ?? null),
+      chargeCreatedAt: data.created ? new Date(data.created * 1000) : null,
+      sourceRef: data.id,
+    };
+
+    if (eventType === "charge.dispute.closed") {
+      if (data.status !== "won") {
+        logger.info("Dispute closed — credits stay revoked", {
+          disputeId: data.id,
+          status: data.status,
+        });
+        return success();
+      }
+      const restore = await PaymentClawbackRepository.restoreWonDispute(
+        base,
+        data.id,
+        logger,
+      );
+      return restore.success ? success() : restore;
+    }
+
+    const isDispute = eventType.startsWith("charge.dispute.");
+    const reversedFraction =
+      isDispute || isNowPayments
+        ? 1
+        : data.amount && data.amount > 0
+          ? (data.amount_refunded ?? data.amount) / data.amount
+          : 1;
+
+    const result = await PaymentClawbackRepository.reverseCharge(
+      { ...base, kind: isDispute ? "dispute" : "refund", reversedFraction },
+      logger,
+    );
+    return result.success ? success() : result;
   }
 
   private static async handlePaymentSucceeded(
@@ -1035,11 +1113,14 @@ export class PaymentRepository {
         });
       }
 
-      // Update transaction status to SUCCEEDED
+      // Update transaction status to SUCCEEDED. Store the payment intent so a
+      // later charge.refunded / charge.dispute.* can be mapped back to it.
       await db
         .update(paymentTransactions)
         .set({
           status: PaymentStatus.SUCCEEDED,
+          providerPaymentIntentId:
+            data.payment_intent ?? transaction.providerPaymentIntentId,
           updatedAt: new Date(),
         })
         .where(eq(paymentTransactions.id, transaction.id));
@@ -1048,6 +1129,19 @@ export class PaymentRepository {
         transactionId: transaction.id,
         sessionId,
       });
+
+      // Growth funnel: first payment (write-once on the user's journey)
+      if (type === "subscription" || type === "credit_pack") {
+        const { GrowthJourneyRepository } =
+          await import("@/leads/growth/repository");
+        const { FunnelStep, PaidKind } = await import("@/leads/growth/enum");
+        await GrowthJourneyRepository.markStep(
+          { userId: transaction.userId },
+          FunnelStep.PAID,
+          logger,
+          type === "subscription" ? PaidKind.SUBSCRIPTION : PaidKind.PACK,
+        );
+      }
 
       // Apply referral payout using credits (currency-independent)
       // Credits are determined from product type, not payment amount
@@ -1063,6 +1157,12 @@ export class PaymentRepository {
         creditsAmount = subscriptionProduct.credits; // 800
       } else if (type === "credit_pack") {
         // Credit pack: quantity * credits per pack
+        // Credits were fixed at checkout creation (productId * quantity), so
+        // payout matches the grant for both pack sizes.
+        const metaTotalCredits =
+          metadata && typeof metadata === "object" && "totalCredits" in metadata
+            ? Number(metadata.totalCredits) || 0
+            : 0;
         const quantity =
           metadata && typeof metadata === "object" && "quantity" in metadata
             ? Number(metadata.quantity) || 1
@@ -1071,7 +1171,10 @@ export class PaymentRepository {
           ProductIds.CREDIT_PACK,
           userLocale,
         );
-        creditsAmount = quantity * creditPackProduct.credits; // quantity * 500
+        creditsAmount =
+          metaTotalCredits > 0
+            ? metaTotalCredits
+            : quantity * creditPackProduct.credits;
       }
 
       if (creditsAmount > 0) {
@@ -1081,7 +1184,6 @@ export class PaymentRepository {
           transaction.userId,
           creditsAmount,
           logger,
-          creditsT,
           userLocale,
         );
       }

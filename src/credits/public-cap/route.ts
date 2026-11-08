@@ -18,6 +18,9 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>
-      PublicCapRepository.updateCap(data.capAmount, logger, t),
+      PublicCapRepository.updateCap(data.capAmount, logger, t, {
+        perLeadCap: data.perLeadCap,
+        perIpCap: data.perIpCap,
+      }),
   },
 });

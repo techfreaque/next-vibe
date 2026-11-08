@@ -2809,7 +2809,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Was du kostenlos bekommst, für immer:",
           credits:
-            "{{freeCredits}} Credits pro Monat - keine Karte, kein Ablaufdatum",
+            "{{freeCreditsSignedIn}} Gratis-Credits jeden Monat, +{{freeCreditsNewsletterBonus}} mit dem Newsletter - ohne Karte",
           allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
           uncensored:
             "4 unzensierte Modelle, die deine Fragen wirklich beantworten",

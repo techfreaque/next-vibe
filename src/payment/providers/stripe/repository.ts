@@ -202,13 +202,21 @@ export class StripeProvider implements PaymentProvider {
 
       // Determine mode based on interval
       const mode = params.interval === "one_time" ? "payment" : "subscription";
+      // Packs are priced per unit; charge quantity units so the charge matches
+      // the credits granted (metadata.totalCredits = credits * quantity).
+      const lineQuantity =
+        mode === "payment"
+          ? Math.max(1, parseInt(params.metadata.quantity ?? "1", 10) || 1)
+          : 1;
 
       // Create checkout session
       const session = await stripeClient.checkout.sessions.create({
         customer: customerId,
         allowed_payment_method_types: ["card"],
         mode: mode,
-        line_items: [{ price: priceResult.data.priceId, quantity: 1 }],
+        line_items: [
+          { price: priceResult.data.priceId, quantity: lineQuantity },
+        ],
         success_url: params.successUrl,
         cancel_url: params.cancelUrl,
         metadata: {
@@ -240,7 +248,7 @@ export class StripeProvider implements PaymentProvider {
         await db.insert(paymentTransactions).values({
           userId: params.userId,
           providerSessionId: session.id,
-          amount: product.price.toFixed(2),
+          amount: (product.price * lineQuantity).toFixed(2),
           currency: product.currency,
           status: PaymentStatus.PENDING,
           provider: PaymentProviderEnum.STRIPE,
@@ -269,7 +277,7 @@ export class StripeProvider implements PaymentProvider {
           await db.insert(paymentInvoices).values({
             userId: params.userId,
             providerInvoiceId: session.id,
-            amount: product.price.toFixed(2),
+            amount: (product.price * lineQuantity).toFixed(2),
             currency: product.currency,
             status: InvoiceStatus.DRAFT,
             invoiceUrl: session.url || undefined,
@@ -448,6 +456,48 @@ export class StripeProvider implements PaymentProvider {
         typeof eventData.billing_reason === "string"
       ) {
         webhookData.billing_reason = eventData.billing_reason;
+      }
+      // Charge / dispute / checkout-session fields (refund + chargeback clawback)
+      if ("payment_intent" in eventData) {
+        const pi = eventData.payment_intent;
+        if (typeof pi === "string" && pi.length > 0) {
+          webhookData.payment_intent = pi;
+        } else if (
+          typeof pi === "object" &&
+          pi !== null &&
+          "id" in pi &&
+          typeof pi.id === "string"
+        ) {
+          webhookData.payment_intent = pi.id;
+        }
+      }
+      if ("amount" in eventData && typeof eventData.amount === "number") {
+        webhookData.amount = eventData.amount;
+      }
+      if (
+        "amount_refunded" in eventData &&
+        typeof eventData.amount_refunded === "number"
+      ) {
+        webhookData.amount_refunded = eventData.amount_refunded;
+      }
+      if ("charge" in eventData) {
+        const charge = eventData.charge;
+        if (typeof charge === "string" && charge.length > 0) {
+          webhookData.charge = charge;
+        } else if (
+          typeof charge === "object" &&
+          charge !== null &&
+          "id" in charge &&
+          typeof charge.id === "string"
+        ) {
+          webhookData.charge = charge.id;
+        }
+      }
+      if ("created" in eventData && typeof eventData.created === "number") {
+        webhookData.created = eventData.created;
+      }
+      if ("reason" in eventData && typeof eventData.reason === "string") {
+        webhookData.reason = eventData.reason;
       }
       if (
         "parent" in eventData &&

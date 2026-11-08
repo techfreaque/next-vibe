@@ -1296,10 +1296,19 @@ export class SubscriptionRepository {
         .limit(1);
 
       if (!subscription) {
-        logger.error("Subscription not found for invoice payment", {
-          subscriptionId,
-          invoiceId,
-        });
+        // The FIRST invoice (subscription_create) routinely beats
+        // checkout.session.completed - which creates the row and grants the
+        // initial credits itself - so missing here is the expected race.
+        // Any other billing reason means a paid renewal we cannot attribute.
+        const isInitialCheckout = billingReason === "subscription_create";
+        (isInitialCheckout ? logger.warn : logger.error).bind(logger)(
+          "Subscription not found for invoice payment",
+          {
+            subscriptionId,
+            invoiceId,
+            billingReason: billingReason ?? "undefined",
+          },
+        );
         return;
       }
 
@@ -1347,6 +1356,18 @@ export class SubscriptionRepository {
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
+
+      // Growth funnel: first paid renewal = second-month retention (write-once)
+      if (billingReason === "subscription_cycle") {
+        const { GrowthJourneyRepository } =
+          await import("@/leads/growth/repository");
+        const { FunnelStep } = await import("@/leads/growth/enum");
+        await GrowthJourneyRepository.markStep(
+          { userId: subscription.userId },
+          FunnelStep.RETAINED,
+          logger,
+        );
+      }
 
       // Add monthly credits for renewal (skip only the initial checkout payment - handled separately)
       // Use deny-list: skip "subscription_create" which is the first invoice at checkout
@@ -2105,6 +2126,17 @@ export class SubscriptionRepository {
         userId,
         invoiceId: matchedInvoice.providerInvoiceId,
       });
+
+      // Growth funnel: first payment (write-once on the user's journey)
+      const { GrowthJourneyRepository } =
+        await import("@/leads/growth/repository");
+      const { FunnelStep, PaidKind } = await import("@/leads/growth/enum");
+      await GrowthJourneyRepository.markStep(
+        { userId },
+        FunnelStep.PAID,
+        logger,
+        PaidKind.SUBSCRIPTION,
+      );
     } catch (error) {
       logger.error("Failed to process NOWPayments success redirect", {
         error: parseError(error),

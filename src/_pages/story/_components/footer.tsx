@@ -122,7 +122,7 @@ const Footer: React.FC<FooterProps> = ({
               </Li>
               <Li>
                 <Link
-                  href={`/${locale}/tools/models`}
+                  href={`/${locale}/models`}
                   className="hover:text-foreground transition-colors flex items-center gap-2"
                 >
                   <Bot className="h-4 w-4" />

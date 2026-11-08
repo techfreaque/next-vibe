@@ -30,6 +30,7 @@ export const translations: typeof enTranslations = {
       label: "Głos",
       description: "Model głosu do syntezy mowy",
     },
+    download: "Pobierz",
     response: {
       title: "Wynik audio",
       description: "Wygenerowane audio mowy",
@@ -121,6 +122,29 @@ export const translations: typeof enTranslations = {
       elevenlabsJosh: "ElevenLabs Josh",
       elevenlabsBella: "ElevenLabs Bella",
       elevenlabsAdam: "ElevenLabs Adam",
+      kokoroBella:
+        "Kokoro Bella - Otwarty model 82M, ciepły amerykański głos kobiecy. Bez filtra treści.",
+      kokoroSarah:
+        "Kokoro Sarah - Otwarty model 82M, wyraźny amerykański głos kobiecy. Bez filtra treści.",
+      kokoroNicole:
+        "Kokoro Nicole - Otwarty model 82M, miękki, stonowany głos kobiecy. Bez filtra treści.",
+      kokoroAdam:
+        "Kokoro Adam - Otwarty model 82M, spokojny amerykański głos męski. Bez filtra treści.",
+      kokoroMichael:
+        "Kokoro Michael - Otwarty model 82M, pewny siebie amerykański głos męski. Bez filtra treści.",
+      kokoroEmma:
+        "Kokoro Emma - Otwarty model 82M, brytyjski głos kobiecy. Bez filtra treści.",
+      kokoroGeorge:
+        "Kokoro George - Otwarty model 82M, brytyjski głos męski. Bez filtra treści.",
+      inworldAshley:
+        "Inworld Ashley - Szybki, tani głos kobiecy o żywej narracji.",
+      inworldCraig: "Inworld Craig - Szybki, tani brytyjski głos męski.",
+      xaiEve:
+        "xAI Eve - Ekspresyjny głos kobiecy ze sterowaniem emocjami w tekście.",
+      geminiZephyr:
+        "Gemini Zephyr - Jasny głos kobiecy, ponad 100 języków, sterowanie intonacją.",
+      geminiPuck:
+        "Gemini Puck - Energiczny głos męski, ponad 100 języków, sterowanie intonacją.",
     },
     names: modelTranslations.names,
   },

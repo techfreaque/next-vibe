@@ -15,7 +15,10 @@ const endpoint = braveEndpoints.GET;
 const QUERY = "bun runtime";
 
 describe("E2E: Brave search", () => {
-  const e2e = useE2E("vibe/agent/web-search/brave", { fixtures: true });
+  const e2e = useE2E("vibe/agent/web-search/brave", {
+    fixtures: true,
+    guestCredits: 100,
+  });
 
   e2e.it("searches Brave and renders the results", async ({ open, page }) => {
     const form = await open(endpoint);

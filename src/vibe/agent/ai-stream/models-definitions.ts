@@ -128,13 +128,9 @@ export enum ChatModelId {
   CLAUDE_HAIKU_5_5 = "claude-haiku-5.5",
   CLAUDE_FABLE_5_1 = "claude-fable-5.1",
   GPT_6_ASTRA = "gpt-6-astra",
-  GPT_6_ASTRA_PRO = "gpt-6-astra-pro",
   GPT_6_1_SOL = "gpt-6.1-sol",
-  GPT_6_1_SOL_PRO = "gpt-6.1-sol-pro",
   GPT_6_1_TERRA = "gpt-6.1-terra",
-  GPT_6_1_TERRA_PRO = "gpt-6.1-terra-pro",
   GPT_6_LUNA = "gpt-6-luna",
-  GPT_6_LUNA_PRO = "gpt-6-luna-pro",
   GEMINI_4_ARGON = "gemini-4-argon",
   GEMINI_3_8_FLASH = "gemini-3.8-flash",
   GROK_4_7 = "grok-4.7",
@@ -225,7 +221,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ChatModelId.GAB_AI_ARYA]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
     name: "Gab AI Arya",
     by: "gabAI",
     description: "chat.models.descriptions.gabAiArya",
@@ -472,6 +467,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.ANALYSIS],
   },
   [ChatModelId.GLM_5_3_ABLITERATED]: {
+    enabled: false, // merged into the uncensored model as providers; kept only so the id resolves
     // Abliteration.ai's "Abliterated Large V2" — GLM-5.3 with refusals ablated.
     name: "GLM 5.3 Abliterated",
     by: "abliterationAI",
@@ -481,36 +477,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     icon: "si-zendesk",
     inputs: ["text"], // updated: 2026-11-07 from venice-api
     outputs: ["text"], // updated: 2026-11-07 from venice-api
-    providers: [
-      // NanoGPT first: same price, native tool calling (Venice prompt-engineers tools).
-      {
-        id: ChatModelId.GLM_5_3_ABLITERATED,
-        apiProvider: ApiProvider.NANO_GPT,
-        providerModel: "abliteration-ai/abliterated-model-large-v2",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 3, // updated: 2026-11-07 from nano-gpt-api
-        outputTokenCost: 5, // updated: 2026-11-07 from nano-gpt-api
-        cacheReadTokenCost: 0.3, // updated: 2026-11-07 from nano-gpt-api
-      },
-      {
-        id: ChatModelId.GLM_5_3_ABLITERATED,
-        apiProvider: ApiProvider.VENICE_AI,
-        providerModel: "abliteration-abliterated-model-large-v2",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 3, // updated: 2026-11-07 from venice-api
-        outputTokenCost: 5, // updated: 2026-11-07 from venice-api
-        cacheReadTokenCost: 0.3, // updated: 2026-11-07 from venice-api
-      },
-      {
-        id: ChatModelId.GLM_5_3_ABLITERATED,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "glm-5.3-abliterated",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
+    providers: [],
     utilities: [
       ModelUtility.LEGACY,
       ModelUtility.UNCENSORED,
@@ -527,6 +494,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.FAST],
   },
   [ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]: {
+    enabled: false, // merged into the uncensored model as providers; kept only so the id resolves
     // Abliteration.ai's "Abliterated Large Flash" — DeepSeek V4.1 Flash 1017 with refusals ablated.
     name: "DeepSeek V4.1 Flash Abliterated",
     by: "abliterationAI",
@@ -536,35 +504,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     icon: "whale",
     inputs: ["text", "image"], // updated: 2026-11-07 from nano-gpt-api
     outputs: ["text"], // updated: 2026-11-07 from nano-gpt-api
-    providers: [
-      {
-        id: ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-        apiProvider: ApiProvider.NANO_GPT,
-        providerModel: "abliteration-ai/abliterated-model-large-flash",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1, // updated: 2026-11-07 from nano-gpt-api
-        outputTokenCost: 2, // updated: 2026-11-07 from nano-gpt-api
-        cacheReadTokenCost: 0.1, // updated: 2026-11-07 from nano-gpt-api
-      },
-      {
-        id: ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-        apiProvider: ApiProvider.VENICE_AI,
-        providerModel: "abliteration-abliterated-model-large-flash",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1.25, // updated: 2026-11-07 from venice-api
-        outputTokenCost: 2.5, // updated: 2026-11-07 from venice-api
-        cacheReadTokenCost: 0.125, // updated: 2026-11-07 from venice-api
-      },
-      {
-        id: ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "deepseek-v4.1-flash-abliterated",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
+    providers: [],
     utilities: [
       ModelUtility.LEGACY,
       ModelUtility.UNCENSORED,
@@ -642,15 +582,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
       {
         id: ChatModelId.GLM_5_3_UNCENSORED,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "glm-5.3-uncensored",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.925, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-      },
-      {
-        id: ChatModelId.GLM_5_3_UNCENSORED,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "abliteration-ai/abliterated-model-large-v2",
         creditCost: calculateCreditCost,
@@ -666,6 +597,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 3, // updated: 2026-11-07 from venice-api
         outputTokenCost: 5, // updated: 2026-11-07 from venice-api
         cacheReadTokenCost: 0.3, // updated: 2026-11-07 from venice-api
+      },
+      {
+        id: ChatModelId.GLM_5_3_UNCENSORED,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "glm-5.3-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
+        outputTokenCost: 2.925, // updated: 2026-11-07 from unbottled.ai
+        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
       },
     ],
     utilities: [
@@ -3028,7 +2968,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     ],
 
     utilities: [
-      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -4500,7 +4439,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
       },
     ],
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -4967,51 +4906,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
 
-  [ChatModelId.GPT_6_ASTRA_PRO]: {
-    name: "GPT-6 Astra Pro",
-    by: "openAI",
-    description: "chat.models.descriptions.gpt6AstraPro",
-    parameterCount: undefined,
-    contextWindow: 1050000,
-    icon: "si-openai",
-    inputs: ["text", "image"], // updated: 2026-11-07 from openrouter-api
-    outputs: ["text"], // updated: 2026-11-07 from openrouter-api
-    providers: [
-      {
-        id: ChatModelId.GPT_6_ASTRA_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "openai/gpt-6-astra-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 10, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 50, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 1, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 12.5, // updated: 2026-11-07 from openrouter-api
-      },
-      {
-        id: ChatModelId.GPT_6_ASTRA_PRO,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "gpt-6-astra-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 16.25, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
-    utilities: [
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.CREATIVE,
-      ModelUtility.REASONING,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.ROLEPLAY],
-  },
-
   [ChatModelId.GPT_6_1_SOL]: {
     name: "GPT-6.1 Sol",
     by: "openAI",
@@ -5036,51 +4930,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.GPT_6_1_SOL,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-6.1-sol",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
-    utilities: [
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.CREATIVE,
-      ModelUtility.REASONING,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.ROLEPLAY],
-  },
-
-  [ChatModelId.GPT_6_1_SOL_PRO]: {
-    name: "GPT-6.1 Sol Pro",
-    by: "openAI",
-    description: "chat.models.descriptions.gpt61SolPro",
-    parameterCount: undefined,
-    contextWindow: 1050000,
-    icon: "si-openai",
-    inputs: ["text", "image"], // updated: 2026-11-07 from openrouter-api
-    outputs: ["text"], // updated: 2026-11-07 from openrouter-api
-    providers: [
-      {
-        id: ChatModelId.GPT_6_1_SOL_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "openai/gpt-6.1-sol-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 2, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 10, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
-      },
-      {
-        id: ChatModelId.GPT_6_1_SOL_PRO,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "gpt-6.1-sol-pro",
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
         outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
@@ -5146,50 +4995,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
 
-  [ChatModelId.GPT_6_1_TERRA_PRO]: {
-    name: "GPT-6.1 Terra Pro",
-    by: "openAI",
-    description: "chat.models.descriptions.gpt61TerraPro",
-    parameterCount: undefined,
-    contextWindow: 1050000,
-    icon: "si-openai",
-    inputs: ["text", "image"], // updated: 2026-11-07 from openrouter-api
-    outputs: ["text"], // updated: 2026-11-07 from openrouter-api
-    providers: [
-      {
-        id: ChatModelId.GPT_6_1_TERRA_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "openai/gpt-6.1-terra-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 5, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.05, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 1.25, // updated: 2026-11-07 from openrouter-api
-      },
-      {
-        id: ChatModelId.GPT_6_1_TERRA_PRO,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "gpt-6.1-terra-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.065, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
-    utilities: [
-      ModelUtility.SMART,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.REASONING,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.ROLEPLAY],
-  },
-
   [ChatModelId.GPT_6_LUNA]: {
     name: "GPT-6 Luna",
     by: "openAI",
@@ -5224,45 +5029,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.ROLEPLAY],
-  },
-
-  [ChatModelId.GPT_6_LUNA_PRO]: {
-    name: "GPT-6 Luna Pro",
-    by: "openAI",
-    description: "chat.models.descriptions.gpt6LunaPro",
-    parameterCount: undefined,
-    contextWindow: 1050000,
-    icon: "si-openai",
-    inputs: ["text", "image"], // updated: 2026-11-07 from openrouter-api
-    outputs: ["text"], // updated: 2026-11-07 from openrouter-api
-    providers: [
-      {
-        id: ChatModelId.GPT_6_LUNA_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "openai/gpt-6-luna-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 0.13, // updated: 2026-11-07 from openrouter-api
-      },
-      {
-        id: ChatModelId.GPT_6_LUNA_PRO,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "gpt-6-luna-pro",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.1625, // updated: 2026-11-07 from unbottled.ai
-      },
-    ],
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.MAINSTREAM,
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ROLEPLAY],
@@ -5843,15 +5609,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
       {
         id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-        apiProvider: ApiProvider.UNBOTTLED,
-        providerModel: "venice-deepseek-v4.1-flash-uncensored",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 0.429, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.716, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0107, // updated: 2026-11-07 from unbottled.ai
-      },
-      {
-        id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "abliteration-ai/abliterated-model-large-flash",
         creditCost: calculateCreditCost,
@@ -5867,6 +5624,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 1.25, // updated: 2026-11-07 from venice-api
         outputTokenCost: 2.5, // updated: 2026-11-07 from venice-api
         cacheReadTokenCost: 0.125, // updated: 2026-11-07 from venice-api
+      },
+      {
+        id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "venice-deepseek-v4.1-flash-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.429, // updated: 2026-11-07 from unbottled.ai
+        outputTokenCost: 1.716, // updated: 2026-11-07 from unbottled.ai
+        cacheReadTokenCost: 0.0107, // updated: 2026-11-07 from unbottled.ai
       },
     ],
     utilities: [
@@ -5906,21 +5672,22 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GPT_5_1]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_2]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_4]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GPT_5_IMAGE]: ChatModelId.GPT_5_4_IMAGE_2,
   [ChatModelId.GPT_5_5]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_6_SOL]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_1_SOL_PRO,
-  [ChatModelId.GTP_5_PRO]: ChatModelId.GPT_6_ASTRA_PRO,
-  [ChatModelId.GPT_5_2_PRO]: ChatModelId.GPT_6_ASTRA_PRO,
-  [ChatModelId.GPT_5_4_PRO]: ChatModelId.GPT_6_ASTRA_PRO,
-  [ChatModelId.GPT_5_5_PRO]: ChatModelId.GPT_6_ASTRA_PRO,
+  [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GTP_5_PRO]: ChatModelId.GPT_6_ASTRA,
+  [ChatModelId.GPT_5_2_PRO]: ChatModelId.GPT_6_ASTRA,
+  [ChatModelId.GPT_5_4_PRO]: ChatModelId.GPT_6_ASTRA,
+  [ChatModelId.GPT_5_5_PRO]: ChatModelId.GPT_6_ASTRA,
   [ChatModelId.GPT_5_2_CHAT]: ChatModelId.GPT_6_1_TERRA,
   [ChatModelId.GPT_5_3_CHAT]: ChatModelId.GPT_6_1_TERRA,
   [ChatModelId.GPT_5_6_TERRA]: ChatModelId.GPT_6_1_TERRA,
-  [ChatModelId.GPT_5_6_TERRA_PRO]: ChatModelId.GPT_6_1_TERRA_PRO,
+  [ChatModelId.GPT_5_6_TERRA_PRO]: ChatModelId.GPT_6_1_TERRA,
   [ChatModelId.GPT_5_MINI]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_4_MINI]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_6_LUNA]: ChatModelId.GPT_6_LUNA,
-  [ChatModelId.GPT_5_6_LUNA_PRO]: ChatModelId.GPT_6_LUNA_PRO,
+  [ChatModelId.GPT_5_6_LUNA_PRO]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_NANO]: ChatModelId.GPT_5_4_NANO,
   [ChatModelId.GPT_5_CODEX]: ChatModelId.GPT_5_3_CODEX,
   [ChatModelId.GPT_5_1_CODEX]: ChatModelId.GPT_5_3_CODEX,
@@ -5934,6 +5701,9 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GEMINI_2_5_FLASH_LITE]: ChatModelId.GEMINI_3_5_FLASH_LITE,
   [ChatModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]:
     ChatModelId.GEMINI_3_5_FLASH_LITE,
+  [ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]:
+    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+  [ChatModelId.GLM_5_3_ABLITERATED]: ChatModelId.GLM_5_3_UNCENSORED,
   [ChatModelId.GROK_4]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_3]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_20]: ChatModelId.GROK_4_7,
@@ -5963,13 +5733,11 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.CLAUDE_CODE_SONNET]: ChatModelId.CLAUDE_SONNET_5_5,
   [ChatModelId.CLAUDE_CODE_OPUS]: ChatModelId.CLAUDE_OPUS_5_5,
   [ChatModelId.CLAUDE_CODE_FABLE]: ChatModelId.CLAUDE_FABLE_5_1,
-  [ChatModelId.GLM_5_3_ABLITERATED]: ChatModelId.GLM_5_3_UNCENSORED,
-  [ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]:
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   [ChatModelId.GLM_4_7_FLASH_HERETIC]: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
   [ChatModelId.GLM_4_5_AIR]: ChatModelId.GLM_5_3_FLASH,
   [ChatModelId.GLM_5_TURBO]: ChatModelId.GLM_5_3,
-  [ChatModelId.QWEN_2_5_7B]: ChatModelId.QWEN_3_7_FLASH,
+  [ChatModelId.QWEN_2_5_7B]: ChatModelId.QWEN_3_8_FLASH,
+  [ChatModelId.QWEN_3_7_FLASH]: ChatModelId.QWEN_3_8_FLASH,
   [ChatModelId.DEEPSEEK_R1]: ChatModelId.DEEPSEEK_V4_1_FLASH,
   [ChatModelId.MISTRAL_MEDIUM_3_5]: ChatModelId.MISTRAL_LARGE_4,
   [ChatModelId.GPT_5_4_NANO]: ChatModelId.GPT_6_LUNA,

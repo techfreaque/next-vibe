@@ -15,6 +15,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ t }) => DbHealthRepository.check(t),
+    handler: ({ t, logger }) => DbHealthRepository.check(t, logger),
   },
 });

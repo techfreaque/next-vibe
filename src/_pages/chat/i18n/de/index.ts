@@ -162,22 +162,22 @@ export const translations: typeof enTranslations = {
   },
 
   createSkill: {
-    title: "Benutzerdefinierten Charakter erstellen",
+    title: "Benutzerdefiniertes Skill erstellen",
     description:
-      "Gestalte deinen eigenen KI-Charakter mit individueller Persönlichkeit, Expertise und Verhalten.",
+      "Gestalte deinen eigenen KI-Skill mit individueller Persönlichkeit, Expertise und Verhalten.",
     icon: "Icon",
     name: "Name",
     namePlaceholder: "z.B. Code Reviewer",
     descriptionLabel: "Beschreibung",
-    descriptionPlaceholder: "Kurze Beschreibung, was dieser Charakter tut",
+    descriptionPlaceholder: "Kurze Beschreibung, was dieser Skill tut",
     category: "Kategorie",
     selectCategory: "Kategorie auswählen",
     systemPrompt: "System-Prompt",
     systemPromptPlaceholder:
-      "Definiere, wie sich dieser Charakter verhalten soll. Sei spezifisch über seine Persönlichkeit, Expertise und wie er antworten soll.",
+      "Definiere, wie sich dieser Skill verhalten soll. Sei spezifisch über seine Persönlichkeit, Expertise und wie er antworten soll.",
     voice: "Stimme",
     voicePlaceholder: "Wähle eine Stimme für Text-to-Speech",
-    create: "Charakter erstellen",
+    create: "Skill erstellen",
     creating: "Erstelle...",
     charCount: "{{current}} / {{max}}",
     errors: {
@@ -185,7 +185,7 @@ export const translations: typeof enTranslations = {
       descriptionRequired: "Bitte gib eine Beschreibung ein",
       systemPromptRequired: "Bitte gib einen System-Prompt ein",
       createFailed:
-        "Charakter konnte nicht erstellt werden. Bitte versuche es erneut.",
+        "Skill konnte nicht erstellt werden. Bitte versuche es erneut.",
     },
   },
 
@@ -195,15 +195,15 @@ export const translations: typeof enTranslations = {
   },
 
   editSkill: {
-    title: "Als benutzerdefinierten Charakter bearbeiten",
+    title: "Als benutzerdefiniertes Skill bearbeiten",
     description:
-      "Erstelle einen benutzerdefinierten Charakter basierend auf dieser Skill. Du kannst alle Einstellungen ändern.",
+      "Erstelle einen benutzerdefinierten Skill basierend auf dieser Skill. Du kannst alle Einstellungen ändern.",
     loginRequired:
-      "Bitte melde dich an, um benutzerdefinierte Charaktere zu erstellen und zu bearbeiten. Benutzerdefinierte Charaktere werden in deinem Konto gespeichert.",
+      "Bitte melde dich an, um benutzerdefinierte Skills zu erstellen und zu bearbeiten. Benutzerdefinierte Skills werden in deinem Konto gespeichert.",
     name: "Name",
-    namePlaceholder: "Name des benutzerdefinierten Charakters",
+    namePlaceholder: "Name des benutzerdefinierten Skills",
     descriptionLabel: "Beschreibung",
-    descriptionPlaceholder: "Was macht dieser Charakter?",
+    descriptionPlaceholder: "Was macht dieser Skill?",
     category: "Kategorie",
     icon: "Icon",
     voice: "Stimme",
@@ -211,7 +211,7 @@ export const translations: typeof enTranslations = {
     preferredModel: "Bevorzugtes Modell",
     preferredModelPlaceholder: "Optionales bevorzugtes Modell",
     systemPrompt: "System-Prompt",
-    systemPromptPlaceholder: "Definiere das Verhalten des Charakters...",
+    systemPromptPlaceholder: "Definiere das Verhalten des Skills...",
     save: "Als benutzerdefiniert speichern",
     saveAsCopy: "Als Kopie speichern",
     saving: "Erstelle...",
@@ -463,7 +463,7 @@ export const translations: typeof enTranslations = {
       create: "Erstellen",
     },
     addDialog: {
-      title: "Benutzerdefinierte Skill erstellen",
+      title: "Benutzerdefiniertes Skill erstellen",
       createCategory: "+ Neue Kategorie",
       fields: {
         name: {
@@ -682,23 +682,23 @@ export const translations: typeof enTranslations = {
     yourSetups: "Deine Setups",
     setup: "Setup",
     delete: "Löschen",
-    editSkill: "Als benutzerdefinierten Charakter bearbeiten",
-    switchSkillBtn: "Charakter wechseln",
-    editSkillBtn: "Charakter bearbeiten",
+    editSkill: "Als benutzerdefiniertes Skill bearbeiten",
+    switchSkillBtn: "Skill wechseln",
+    editSkillBtn: "Skill bearbeiten",
     autoSelectedModel: "Filterbasiert:",
     manualSelectedModel: "Ausgewählt:",
-    skillSelectedModel: "Charakter-Modell:",
+    skillSelectedModel: "Skill-Modell:",
     selectModelBelow: "Wählen Sie unten ein Modell aus",
     chooseYourPath: "Wählen Sie Ihren Weg",
     twoWaysToChat: "Zwei flexible Möglichkeiten zum Chatten",
     directModels: "Direkter Modell-Zugriff",
     directModelsDesc:
       "Konfigurieren Sie Filter oder wählen Sie manuell aus {{count}} Modellen. Volle Kontrolle über die KI-Auswahl.",
-    skillPresets: "Charakter-Voreinstellungen",
+    skillPresets: "Skill-Voreinstellungen",
     characterPresetsDesc:
-      "Wählen Sie unten einen Charakter. Jeder hat optimierte Einstellungen, die Sie jederzeit anpassen können.",
+      "Wählen Sie unten ein Skill. Jedes hat optimierte Einstellungen, die Sie jederzeit anpassen können.",
     startWithDirectModels: "Mit direkten Modellen starten",
-    orBrowsePresets: "Oder Charakter-Voreinstellungen durchsuchen",
+    orBrowsePresets: "Oder Skill-Voreinstellungen durchsuchen",
     loading: "Laden...",
     noModelsMatch: "Keine Modelle gefunden",
     adjustFiltersMessage:
@@ -712,28 +712,28 @@ export const translations: typeof enTranslations = {
     useOnce: "Einmal verwenden",
     saveAsDefault: "Zu Favoriten hinzufügen",
     deleteSetup: "Setup löschen",
-    skillSetup: "Charakter-Setup",
+    skillSetup: "Skill-Setup",
     separator: " • ",
     sortBy: "Sortieren nach",
     // UX improvements v21
     mySetups: "Meine Setups",
     addNew: "Neu hinzufügen",
     noSetupsTitle: "Noch keine Setups",
-    noSetupsDescription: "Erstelle dein erstes KI-Charakter-Setup",
+    noSetupsDescription: "Erstelle dein erstes KI-Skill-Setup",
     getStarted: "Loslegen",
     currentModel: "Aktuelles Modell",
     modelSelection: "Modellauswahl",
     autoMode: "Automatisch",
     manualMode: "Manuell wählen",
-    skillMode: "Charakter-Standard",
+    skillMode: "Skill-Standard",
     autoModeDescription:
       "Wählt automatisch das beste Modell basierend auf deinen Einstellungen",
     manualModeDescription: "Wähle selbst ein beliebiges Modell aus",
     characterBasedModeDescription:
-      "Nutzt das Modell, für das dieser Charakter entwickelt wurde",
+      "Nutzt das Modell, für das dieser Skill entwickelt wurde",
     customizeSettings: "Einstellungen vor dem Hinzufügen anpassen",
     useNow: "Jetzt verwenden",
-    browseAll: "Alle Charaktere durchsuchen",
+    browseAll: "Alle Skills durchsuchen",
     add: "Hinzufügen",
     // v22 UX improvements
     quickSwitch: "Schnellwechsel",

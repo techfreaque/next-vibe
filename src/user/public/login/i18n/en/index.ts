@@ -198,7 +198,8 @@ export const translations = {
     messages: {
       successMessage: "Login options retrieved successfully",
       passwordAuthDescription: "Log in with your email and password",
-      socialAuthDescription: "Log in with your social media accounts",
+      socialAuthDescription:
+        "Social login is not available yet. Use email and password.",
       continueWithProvider: "Continue with {{provider}}",
       twoFactorRequired: "Enhanced security: 2FA required",
       standardSecurity: "Standard security requirements",
@@ -231,9 +232,27 @@ export const translations = {
         minLength: "Password must be at least 8 characters long",
       },
     },
+    twoFactorCode: {
+      label: "Authentication code",
+      description: "Use the app code or a recovery code.",
+      placeholder: "6-digit code",
+    },
     rememberMe: {
       label: "Keep me logged in",
     },
+  },
+  twoFactorStep: {
+    title: "Two-step check",
+    helper: "Enter the 6-digit code from your authenticator app.",
+    recoveryHelper: "Enter one of your recovery codes. Each works once.",
+    codeLabel: "Authentication code",
+    recoveryLabel: "Recovery code",
+    recoveryPlaceholder: "XXXXX-XXXXX",
+    useRecovery: "Use a recovery code",
+    useApp: "Use the authenticator app",
+    verify: "Verify",
+    verifying: "Verifying...",
+    back: "Back",
   },
   groups: {
     credentials: {
@@ -293,6 +312,7 @@ export const translations = {
       "Your account has been locked. Please contact support.",
     invalid_credentials: "Invalid email or password",
     two_factor_required: "Two-factor authentication required",
+    invalid_two_factor_code: "Invalid authentication code",
     auth_error: "Authentication failed for {{email}}: {{error}}",
     user_not_found: "No user found for {{userId}}",
     session_creation_failed:

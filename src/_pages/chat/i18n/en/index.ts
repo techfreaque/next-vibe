@@ -79,7 +79,7 @@ export const translations = {
     // User Message Actions
     userMessageActions: {
       branch: "Branch conversation from here",
-      retry: "Retry with different model/character",
+      retry: "Retry with different model/skill",
       deleteMessage: "Delete message",
     },
 
@@ -161,17 +161,17 @@ export const translations = {
   createSkill: {
     title: "Create Custom Skill",
     description:
-      "Design your own AI character with custom characterlity, expertise, and behavior.",
+      "Design your own AI skill with custom personality, expertise, and behavior.",
     icon: "Icon",
     name: "Name",
     namePlaceholder: "e.g. Code Reviewer",
     descriptionLabel: "Description",
-    descriptionPlaceholder: "Brief description of what this character does",
+    descriptionPlaceholder: "Brief description of what this skill does",
     category: "Category",
     selectCategory: "Select a category",
     systemPrompt: "System Prompt",
     systemPromptPlaceholder:
-      "Define how this character should behave. Be specific about its characterlity, expertise, and how it should respond.",
+      "Define how this skill should behave. Be specific about its personality, expertise, and how it should respond.",
     voice: "Voice",
     voicePlaceholder: "Select a voice for text-to-speech",
     create: "Create Skill",
@@ -181,7 +181,7 @@ export const translations = {
       nameRequired: "Please enter a name",
       descriptionRequired: "Please enter a description",
       systemPromptRequired: "Please enter a system prompt",
-      createFailed: "Failed to create character. Please try again.",
+      createFailed: "Failed to create skill. Please try again.",
     },
   },
 
@@ -193,13 +193,13 @@ export const translations = {
   editSkill: {
     title: "Edit as Custom Skill",
     description:
-      "Create a custom character based on this character. You can modify any settings.",
+      "Create a custom skill based on this skill. You can modify any settings.",
     loginRequired:
-      "Please log in to create and edit custom characters. Custom characters are saved to your account.",
+      "Please log in to create and edit custom skills. Custom skills are saved to your account.",
     name: "Name",
-    namePlaceholder: "Custom character name",
+    namePlaceholder: "Custom skill name",
     descriptionLabel: "Description",
-    descriptionPlaceholder: "What does this character do?",
+    descriptionPlaceholder: "What does this skill do?",
     category: "Category",
     icon: "Icon",
     voice: "Voice",
@@ -207,7 +207,7 @@ export const translations = {
     preferredModel: "Preferred Model",
     preferredModelPlaceholder: "Optional preferred model",
     systemPrompt: "System Prompt",
-    systemPromptPlaceholder: "Define the character's behavior...",
+    systemPromptPlaceholder: "Define the skill's behavior...",
     save: "Save as Custom",
     saveAsCopy: "Save as Copy",
     saving: "Creating...",
@@ -261,7 +261,7 @@ export const translations = {
     searchEnabled: "Search enabled",
     searchDisabled: "Search disabled",
     answerAsAI: "Answer as AI model",
-    retry: "Retry with different model/character",
+    retry: "Retry with different model/skill",
     branch: "Branch conversation from here",
     editMessage: "Edit message",
     stopAudio: "Stop audio playback",
@@ -471,7 +471,7 @@ export const translations = {
         },
         description: {
           label: "Description",
-          placeholder: "Brief description of the character",
+          placeholder: "Brief description of the skill",
         },
         systemPrompt: {
           label: "System Prompt",
@@ -482,7 +482,7 @@ export const translations = {
         },
         suggestedPrompts: {
           label: "Suggested Prompts (Optional)",
-          description: "Add up to 4 suggested prompts for this character",
+          description: "Add up to 4 suggested prompts for this skill",
           placeholder: "Prompt {{number}}",
         },
       },
@@ -521,7 +521,7 @@ export const translations = {
     noFavorites: "No favorites yet. Star some to add them here.",
     noModels: "No models available",
     filteredBySkill:
-      "Showing {{compatible}} of {{total}} models (filtered by character)",
+      "Showing {{compatible}} of {{total}} models (filtered by skill)",
     selectSkill: "Select Skill",
     allSkills: "All",
   },
@@ -554,8 +554,8 @@ export const translations = {
     favorites: "Favorites",
     suggested: "Suggested",
     noFavorites: "No favorites yet",
-    noFavoritesHint: "Save your go-to characters for quick access",
-    browseAllSkills: "Browse all characters...",
+    noFavoritesHint: "Save your go-to skills for quick access",
+    browseAllSkills: "Browse all skills...",
     customSetup: "Custom setup...",
     selectSkill: "Select Skill",
     modelCreditDisplay: {
@@ -611,9 +611,9 @@ export const translations = {
     startsNewChat: "(starts new chat)",
     start: "Start",
     addFav: "Add",
-    searchSkills: "Search characters...",
-    noSkillsFound: "No characters found",
-    createCustom: "Create custom character",
+    searchSkills: "Search skills...",
+    noSkillsFound: "No skills found",
+    createCustom: "Create custom skill",
     skill: "Skill",
     savePreset: "Save",
     perMessage: "per message",
@@ -675,7 +675,7 @@ export const translations = {
     yourSetups: "Your Setups",
     setup: "Setup",
     delete: "Delete",
-    editSkill: "Edit as custom character",
+    editSkill: "Edit as custom skill",
     switchSkillBtn: "Switch Skill",
     editSkillBtn: "Edit Skill",
     autoSelectedModel: "Filter-based:",
@@ -689,9 +689,9 @@ export const translations = {
       "Configure filters or manually select from {{count}} models. Full control over AI selection.",
     skillPresets: "Skill Presets",
     characterPresetsDesc:
-      "Pick a character below. Each has optimized settings you can customize anytime.",
+      "Pick a skill below. Each has optimized settings you can customize anytime.",
     startWithDirectModels: "Start with Direct Models",
-    orBrowsePresets: "Or browse character presets below",
+    orBrowsePresets: "Or browse skill presets below",
     loading: "Loading...",
     noModelsMatch: "No models match",
     adjustFiltersMessage:
@@ -712,7 +712,7 @@ export const translations = {
     mySetups: "My Setups",
     addNew: "Add new",
     noSetupsTitle: "No setups yet",
-    noSetupsDescription: "Create your first AI character setup to get started",
+    noSetupsDescription: "Create your first AI skill setup to get started",
     getStarted: "Get Started",
     currentModel: "Current model",
     modelSelection: "Model Selection",
@@ -722,11 +722,10 @@ export const translations = {
     autoModeDescription:
       "Automatically picks the best model based on your preferences",
     manualModeDescription: "Choose any model you want",
-    characterBasedModeDescription:
-      "Uses the model this character was designed for",
+    characterBasedModeDescription: "Uses the model this skill was designed for",
     customizeSettings: "Customize settings before adding",
     useNow: "Use Now",
-    browseAll: "Browse all characters",
+    browseAll: "Browse all skills",
     add: "Add",
     // v22 UX improvements
     quickSwitch: "Quick Switch",
@@ -751,13 +750,12 @@ export const translations = {
     // Skill switch modal
     characterSwitchModal: {
       title: "Switch Skill",
-      description:
-        "Switch to a different character without losing your settings",
-      searchPlaceholder: "Search characters...",
-      noResults: "No characters found",
+      description: "Switch to a different skill without losing your settings",
+      searchPlaceholder: "Search skills...",
+      noResults: "No skills found",
       keepSettings: "Keep current model settings",
       keepSettingsDesc:
-        "Use your current intelligence, price, and content filters with the new character",
+        "Use your current intelligence, price, and content filters with the new skill",
       cancel: "Cancel",
       confirm: "Switch Skill",
     },
@@ -955,7 +953,7 @@ export const translations = {
       publicTitle: "Public Forum",
       incognitoTitle: "Incognito Mode",
       privateExplanation:
-        "Private threads are your characterl space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
+        "Private threads are your personal space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
       sharedExplanation:
         "Shared threads allow you to create conversations and share them with others via secure links. Perfect for collaboration and sharing insights with your team or friends.",
       publicExplanation:
@@ -1389,12 +1387,12 @@ export const translations = {
   linearMessageView: {
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and character to regenerate the response",
+      description: "Choose a model and skill to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and character to generate an AI response",
+      description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1411,12 +1409,12 @@ export const translations = {
     copied: "Copied!",
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and character to regenerate the response",
+      description: "Choose a model and skill to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and character to generate an AI response",
+      description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1438,7 +1436,7 @@ export const translations = {
       "Stored only in your browser. Never saved to your account or synced.",
     more: "More",
     selectSkill: "Select a Skill",
-    noPrompts: "No suggested prompts for this character",
+    noPrompts: "No suggested prompts for this skill",
     showDetails: "Show details",
     hideDetails: "Hide details",
     systemPromptLabel: "System Prompt",
@@ -1667,12 +1665,12 @@ export const translations = {
     replies: "replies",
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and character to regenerate the response",
+      description: "Choose a model and skill to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and character to generate an AI response",
+      description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1681,7 +1679,7 @@ export const translations = {
       vote: "Vote",
       upvote: "Upvote",
       downvote: "Downvote",
-      respondToAI: "Respond to this AI message with a different AI character",
+      respondToAI: "Respond to this AI message with a different AI skill",
       loadingAudio: "Loading audio...",
       stopAudio: "Stop audio",
       playAudio: "Play audio",
@@ -1694,7 +1692,7 @@ export const translations = {
       edit: "Edit",
       editMessage: "Edit this message (creates a branch)",
       retry: "Retry",
-      retryWithDifferent: "Retry with different model/character",
+      retryWithDifferent: "Retry with different model/skill",
       answerAsAI: "Answer as AI",
       generateAIResponse: "Generate AI response",
       share: "Share",
@@ -1732,12 +1730,12 @@ export const translations = {
     },
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and character to regenerate the response",
+      description: "Choose a model and skill to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and character to generate an AI response",
+      description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1754,7 +1752,7 @@ export const translations = {
       edit: "Edit",
       editMessage: "Edit this message (creates a branch)",
       retry: "Retry",
-      retryWithDifferent: "Retry with different model/character",
+      retryWithDifferent: "Retry with different model/skill",
       answerAsAI: "Answer as AI",
       generateAIResponse: "Generate AI response",
       insertQuote: "Insert quote character '>'",
@@ -1786,13 +1784,13 @@ export const translations = {
     aiCompanion: {
       title: "Choose Your AI Companion",
       description:
-        "Click here to meet your AI companions. Each has a unique characterlity and the best AI model is automatically selected for them. You can always customize later.",
+        "Click here to meet your AI companions. Each has a unique personality and the best AI model is automatically selected for them. You can always customize later.",
       tip: "👆 Click to open and pick your first companion!",
     },
     modelSelectorFavorites: {
       title: "Star Your Favorites",
       description:
-        "Build your characterl AI toolkit. Star mainstream models for safe queries and uncensored models for unrestricted conversations. Quick access to what matters.",
+        "Build your personal AI toolkit. Star mainstream models for safe queries and uncensored models for unrestricted conversations. Quick access to what matters.",
     },
     modelSelectorShowAll: {
       title: "Expand to See All Models",
@@ -1812,18 +1810,18 @@ export const translations = {
     characterSelector: {
       title: "Customize AI Skilllity",
       description:
-        "Skills control how AI responds. Choose from built-in styles or create custom characters with specific instructions, tone, and preferred models. Make AI work your way.",
-      tip: "Pair any character with any model. Professional tone with uncensored model? Done.",
+        "Skills control how AI responds. Choose from built-in styles or create custom skills with specific instructions, tone, and preferred models. Make AI work your way.",
+      tip: "Pair any skill with any model. Professional tone with uncensored model? Done.",
     },
     characterSelectorFavorites: {
       title: "Star Your Skills",
       description:
-        "Quick access to your go-to conversation styles. Star the characters you use most.",
+        "Quick access to your go-to conversation styles. Star the skills you use most.",
     },
     characterSelectorShowAll: {
       title: "Expand to See All Skills",
       description:
-        "Browse the complete character library. Create unlimited custom characters for different tasks and workflows.",
+        "Browse the complete skill library. Create unlimited custom skills for different tasks and workflows.",
     },
     characterSelectorSearch: {
       title: "Search Skills",
@@ -1873,7 +1871,7 @@ export const translations = {
       name: "Private",
       suffix: "Folder",
       description:
-        "Your characterl AI workspace. Synced across all devices, organized with subfolders. Build long-term projects, save research, access anywhere.",
+        "Your personal AI workspace. Synced across all devices, organized with subfolders. Build long-term projects, save research, access anywhere.",
       authPrompt: "Requires account:",
       login: "Login",
       signUp: "Sign Up",
@@ -1896,7 +1894,7 @@ export const translations = {
     sidebarLogin: {
       title: "Create Free Account",
       description:
-        "Unlock Private and Shared folders, sync across all devices, save favorite models and characters. Incognito and Public stay available without account.",
+        "Unlock Private and Shared folders, sync across all devices, save favorite models and skills. Incognito and Public stay available without account.",
       tip: "Stay anonymous or sync everything. Your choice.",
     },
     subscriptionButton: {
@@ -1938,7 +1936,7 @@ export const translations = {
       unlocked: "Folder Unlocked!",
       privateDescription:
         "Your Private folder is now active. All chats sync across devices and stay organized in subfolders.",
-      privateNote: "Perfect for ongoing projects and characterl research.",
+      privateNote: "Perfect for ongoing projects and personal research.",
       sharedDescription:
         "Shared folder unlocked! Create conversations and share via link with granular permission control.",
       sharedNote: "Ideal for team collaboration and getting expert feedback.",

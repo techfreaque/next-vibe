@@ -12,13 +12,18 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { CallbackMode, CallbackModeDB } from "next-vibe/execute-tool/constants";
+import {
+  CallbackMode,
+  CallbackModeDB,
+  EXECUTE_TOOL_ALIAS,
+} from "next-vibe/execute-tool/constants";
 import { Platform } from "next-vibe/platforms/platforms";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
+import { normalizeExecuteToolArgs } from "./execute-tool-args";
 import { isValidToolResult, sortObjectKeys } from "./helpers";
 import type { StreamLoopState } from "./state";
 
@@ -824,7 +829,8 @@ export async function onToolError(
 
   // Execution failed with a known error - emit it as a tool result so the model can retry
   if (fallbackResult && "error" in fallbackResult) {
-    logger.warn("[AI Stream] Emitting tool error result to model", {
+    // executeFallbackTool already logged the failure at the right level.
+    logger.debug("[AI Stream] Emitting tool error result to model", {
       toolName: part.toolName,
       error: fallbackResult.error,
       toolCallId: part.toolCallId,
@@ -889,7 +895,7 @@ async function executeFallbackTool(
       await import("next-vibe/execute-tool/repository/run-endpoint-by-name");
 
     // Tool-call args are always a JSON object; narrow the loose WidgetData type.
-    const inputArgs: Record<string, WidgetData> =
+    const rawArgs: Record<string, WidgetData> =
       args !== null &&
       args !== undefined &&
       typeof args === "object" &&
@@ -897,6 +903,12 @@ async function executeFallbackTool(
       !(args instanceof Date)
         ? args
         : {};
+    // execute-tool calls that failed SDK validation are usually nested one
+    // level too deep or carry an invented callbackMode - repair, then run.
+    const inputArgs =
+      toolName === EXECUTE_TOOL_ALIAS
+        ? normalizeExecuteToolArgs(rawArgs)
+        : rawArgs;
     const result = await runEndpointByName({
       toolName,
       input: inputArgs,
@@ -909,11 +921,19 @@ async function executeFallbackTool(
     });
 
     if (!result.success) {
-      logger.warn("[AI Stream] Fallback tool execution failed", {
-        toolName,
-        error: result.message,
-        args: JSON.stringify(args ?? {}).slice(0, 500),
-      });
+      // The error goes back to the model as its tool result. Bad input /
+      // denied / not-found are usually the model's mistake, but schema bugs (enum keys,
+      // nested execute-tool args) surfaced here too - keep warn; errorKey splits them.
+      const isServerFailure = result.errorType.errorCode >= 500;
+      (isServerFailure ? logger.error : logger.warn).bind(logger)(
+        "[AI Stream] Fallback tool execution failed",
+        {
+          toolName,
+          error: result.message,
+          errorKey: result.errorType.errorKey,
+          args: JSON.stringify(args ?? {}).slice(0, 500),
+        },
+      );
       // Detail that used to arrive via messageParams is now interpolated into
       // the message itself, so it needs no separate append.
       return { error: result.message };

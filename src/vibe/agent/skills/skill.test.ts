@@ -219,7 +219,7 @@ describe("Skill Creator E2E", () => {
           id: favId,
           userId: testUser.id,
           skillId: "quality-tester",
-          variantId: "kimi",
+          variantId: "budget",
           position: 9997,
         })
         .onConflictDoNothing();

@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
     "tags.onboard" as const,
     "tags.setup" as const,
   ],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     usage: { request: "data&urlPathParams", response: true },

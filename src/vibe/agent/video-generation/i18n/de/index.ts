@@ -111,6 +111,8 @@ export const translations: typeof enTranslations = {
       notConfigured:
         "{{label}} ist nicht konfiguriert. Füge {{envKey}} zu deiner .env-Datei hinzu. Hol dir deinen Schlüssel unter {{url}}",
       providerUnsupported: "{{label}} wird noch nicht unterstützt",
+      modelUnavailable:
+        "Dieses Modell ist vorübergehend nicht verfügbar. Wähle ein anderes.",
       insufficientCredits:
         "Nicht genug Credits. Guthaben: {{balance}}, erforderlich: {{minimum}}",
       balanceCheckFailed: "Kontostand konnte nicht geprüft werden",

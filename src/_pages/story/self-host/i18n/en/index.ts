@@ -60,7 +60,7 @@ export const translations = {
       optionB: {
         label: "Option B: OpenRouter",
         description:
-          "200+ models, pay per use. Get your key at openrouter.ai/keys.",
+          "Every OpenRouter model, pay per use. Get your key at openrouter.ai/keys.",
       },
     },
   },
@@ -78,10 +78,58 @@ export const translations = {
     description:
       "Thea can route tasks to Claude Code on your dev machine. Go to Admin → Remote Connections in the dashboard to add your local instance URL. Memories and tasks sync every 60 seconds - no port forwarding, no VPN.",
   },
+  own: {
+    eyebrow: "Your server, your rules",
+    title: "Own the stack. Own the filter.",
+    subtitle:
+      "No account at someone else's company. Your Postgres, your keys, your logs. You pick the models and you pick how much filtering sits between you and them.",
+    cards: {
+      data: {
+        title: "Your data stays put",
+        body: "Threads, memories and files live in your own Postgres and storage path. Nothing phones home.",
+      },
+      filter: {
+        title: "Your filtering level",
+        body: "Mainstream, open or uncensored models. You decide per skill, per thread, per user. No policy team in the loop.",
+      },
+      keys: {
+        title: "Your keys",
+        body: "Bring OpenRouter, a local model or Claude Code. Spend goes to your provider, not through ours.",
+      },
+    },
+  },
+  env: {
+    title: "What it takes",
+    intro:
+      "Bun, Docker and a handful of env vars. That is the whole checklist for a private instance.",
+    envLabel: "Minimum config",
+    composeLabel: "Production on a VPS",
+  },
+  instances: {
+    title: "Three instances, three jobs",
+    intro:
+      "One codebase runs as separate instances. Same code, different database and role. This is how we run our own.",
+    atlas: {
+      name: "Atlas",
+      body: "The dev instance. Hot reload, throwaway database. Where code gets written.",
+    },
+    hermes: {
+      name: "Hermes",
+      body: "Your daily driver. Local preview on its own Postgres. This is the one you live in.",
+    },
+    thea: {
+      name: "Thea",
+      body: "The cloud instance on your VPS. Always on, runs your crons, takes tasks from the other two.",
+    },
+    note: "Instances connect to each other. Threads and tasks sync between your laptop and your server.",
+  },
+  fork: {
+    title: "Same framework, different product",
+    body: "next-vibe-headunit is a car-PC fork. Media, navigation, climate, Bluetooth and radio are all endpoints, and each one is also a CLI command and an AI tool. Different product, same three files.",
+  },
   enterprise: {
     title: "Need help setting up?",
     description:
       "We can help with deployment, custom integrations, and ongoing development support.",
-    cta: "Get in touch",
   },
 };

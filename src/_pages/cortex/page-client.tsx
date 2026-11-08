@@ -4,11 +4,14 @@ import cortexListDefinitions from "next-vibe/agent/cortex/list/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { LogIn } from "next-vibe/ui/components/icons/LogIn";
+import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
 import { Link } from "next-vibe/ui/components/link";
-import { H1, P } from "next-vibe/ui/components/typography";
+import { H1, H3, P } from "next-vibe/ui/components/typography";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -46,22 +49,54 @@ export function CortexPageClient({
         </Div>
         <P className="text-muted-foreground text-sm mb-8">{t("description")}</P>
 
-        <Div className="rounded-xl border bg-card overflow-hidden shadow-sm">
-          <EndpointsPage
-            endpoint={cortexListDefinitions}
-            locale={locale}
-            user={user}
-            platform={platform}
-            endpointOptions={{
-              read: {
-                queryOptions: {
-                  staleTime: 0,
-                  refetchOnWindowFocus: true,
+        {user.isPublic ? (
+          <Div className="mx-auto flex w-full max-w-md flex-col items-center gap-6 rounded-xl border bg-card p-6 text-center shadow-sm sm:p-8">
+            <Div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Brain className="h-6 w-6" />
+            </Div>
+            <Div className="flex flex-col gap-2">
+              <H3 className="m-0 text-xl font-semibold tracking-tight">
+                {t("signIn.title")}
+              </H3>
+              <P className="m-0 text-sm text-muted-foreground">
+                {t("signIn.description")}
+              </P>
+            </Div>
+            <Div className="flex w-full flex-col gap-2">
+              <Button asChild className="h-11 w-full gap-2">
+                <Link
+                  href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(`/${locale}/cortex`)}`}
+                >
+                  <LogIn className="h-4 w-4" />
+                  {t("signIn.logIn")}
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-11 w-full gap-2">
+                <Link href={`/${locale}/user/signup`}>
+                  <UserPlus className="h-4 w-4" />
+                  {t("signIn.signUp")}
+                </Link>
+              </Button>
+            </Div>
+          </Div>
+        ) : (
+          <Div className="rounded-xl border bg-card overflow-hidden shadow-sm">
+            <EndpointsPage
+              endpoint={cortexListDefinitions}
+              locale={locale}
+              user={user}
+              platform={platform}
+              endpointOptions={{
+                read: {
+                  queryOptions: {
+                    staleTime: 0,
+                    refetchOnWindowFocus: true,
+                  },
                 },
-              },
-            }}
-          />
-        </Div>
+              }}
+            />
+          </Div>
+        )}
       </Div>
     </Div>
   );

@@ -9,6 +9,7 @@ import {
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
+  isProviderSellable,
   type ModelDefinition,
   type ModelOptionAudioBased,
   type ModelProviderConfigAudioBased,
@@ -421,7 +422,10 @@ function buildMusicGenModelOptionsPool(): MusicGenModelOption[] {
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
     for (const provider of sortedProviders) {
-      if (provider.creditCostPerClip !== undefined) {
+      if (
+        provider.creditCostPerClip !== undefined &&
+        isProviderSellable(def, provider)
+      ) {
         pool.push(
           buildMusicGenOption(
             modelId,

@@ -72,6 +72,71 @@ import { type MessagesT, scopedTranslation } from "./i18n";
 const STUB_CREATED_AT = new Date(0);
 
 /**
+ * Evidence for a "parent not found" fallback - the warning alone (requested vs
+ * resolved id) never said WHY the parent was missing. Rare path only.
+ *  - parentInOtherThread: the id exists but belongs to another thread (a
+ *    routing bug - linking across threads would corrupt both chains).
+ *  - threadMessageCount 0: nothing of this thread was ever committed (the
+ *    user message / placeholder write itself failed or was skipped).
+ *  - lastCommitted*: what the message is re-parented onto.
+ */
+async function describeParentMiss(
+  threadId: string,
+  requestedParentId: string,
+): Promise<{
+  parentInOtherThread: string | null;
+  threadMessageCount: number;
+  threadRootFolderId: string | null;
+  threadStreamingState: string | null;
+  threadCreatedAt: string | null;
+  lastCommittedId: string | null;
+  lastCommittedRole: string | null;
+  lastCommittedAt: string | null;
+}> {
+  const [[elsewhere], [countRow], [thread], [lastCommitted]] =
+    await Promise.all([
+      db
+        .select({ threadId: chatMessages.threadId })
+        .from(chatMessages)
+        .where(eq(chatMessages.id, requestedParentId))
+        .limit(1),
+      db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, threadId)),
+      db
+        .select({
+          rootFolderId: chatThreads.rootFolderId,
+          streamingState: chatThreads.streamingState,
+          createdAt: chatThreads.createdAt,
+        })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .limit(1),
+      db
+        .select({
+          id: chatMessages.id,
+          role: chatMessages.role,
+          createdAt: chatMessages.createdAt,
+        })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, threadId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(1),
+    ]);
+  return {
+    parentInOtherThread: elsewhere?.threadId ?? null,
+    threadMessageCount: countRow?.n ?? 0,
+    threadRootFolderId: thread?.rootFolderId ?? null,
+    threadStreamingState: thread?.streamingState ?? null,
+    threadCreatedAt: thread?.createdAt.toISOString() ?? null,
+    lastCommittedId: lastCommitted?.id ?? null,
+    lastCommittedRole: lastCommitted?.role ?? null,
+    lastCommittedAt: lastCommitted?.createdAt.toISOString() ?? null,
+  };
+}
+
+/**
  * Messages Repository Implementation
  */
 export class MessagesRepository {
@@ -301,7 +366,12 @@ export class MessagesRepository {
       const [parent] = await db
         .select({ id: chatMessages.id })
         .from(chatMessages)
-        .where(eq(chatMessages.id, resolvedParentId))
+        .where(
+          and(
+            eq(chatMessages.id, resolvedParentId),
+            eq(chatMessages.threadId, params.threadId),
+          ),
+        )
         .limit(1);
       if (!parent) {
         // Parent wasn't committed - find the actual last message in this thread
@@ -314,6 +384,7 @@ export class MessagesRepository {
         params.logger.warn(
           "createUserMessage: parent not committed (interrupted stream?), using last committed message",
           {
+            ...(await describeParentMiss(params.threadId, resolvedParentId)),
             requestedParentId: resolvedParentId,
             resolvedParentId: lastCommitted?.id ?? null,
             messageId: params.messageId,
@@ -531,7 +602,12 @@ export class MessagesRepository {
       const [parent] = await db
         .select({ id: chatMessages.id })
         .from(chatMessages)
-        .where(eq(chatMessages.id, resolvedParentId))
+        .where(
+          and(
+            eq(chatMessages.id, resolvedParentId),
+            eq(chatMessages.threadId, params.threadId),
+          ),
+        )
         .limit(1);
       if (!parent) {
         const [lastCommitted] = await db
@@ -543,6 +619,7 @@ export class MessagesRepository {
         params.logger.warn(
           "createTextMessage: parent not found, using last committed message",
           {
+            ...(await describeParentMiss(params.threadId, resolvedParentId)),
             requestedParentId: resolvedParentId,
             resolvedParentId: lastCommitted?.id ?? null,
             messageId: params.messageId,
@@ -692,7 +769,12 @@ export class MessagesRepository {
       const [parent] = await db
         .select({ id: chatMessages.id })
         .from(chatMessages)
-        .where(eq(chatMessages.id, resolvedParentId))
+        .where(
+          and(
+            eq(chatMessages.id, resolvedParentId),
+            eq(chatMessages.threadId, params.threadId),
+          ),
+        )
         .limit(1);
       if (!parent) {
         const [lastCommitted] = await db
@@ -704,6 +786,7 @@ export class MessagesRepository {
         params.logger.warn(
           "createToolMessage: parent not found, using last committed message",
           {
+            ...(await describeParentMiss(params.threadId, resolvedParentId)),
             requestedParentId: resolvedParentId,
             resolvedParentId: lastCommitted?.id ?? null,
             messageId: params.messageId,

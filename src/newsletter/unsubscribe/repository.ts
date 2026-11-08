@@ -19,6 +19,8 @@ import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { LifecycleRepository } from "@/leads/lifecycle/repository";
+
 import { db } from "../../vibe/database";
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
@@ -64,6 +66,9 @@ export class NewsletterUnsubscribeRepository {
           },
         );
       }
+
+      // Immediately exit every lifecycle journey for this contact
+      await LifecycleRepository.exitOnUnsubscribe(data.email, logger);
 
       // Handle newsletter subscription
       const [subscription] = await db

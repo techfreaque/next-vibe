@@ -53,10 +53,6 @@ export const translations: typeof enTranslations = {
       "Ordner löschen. Das Feature verschwindet sofort von jeder Plattform.",
   },
   surfaces: {
-    eyebrow: "Every Platform",
-    title: "Eine Definition. Dreizehn Plattformen.",
-    subtitle:
-      "Wenn du ein Feature zu next-vibe hinzufügst, wird es nicht nur ein API-Endpoint. Es läuft überall auf einmal.",
     items: {
       webApi: {
         label: "Web API",
@@ -154,6 +150,34 @@ export const translations: typeof enTranslations = {
     vibeCheck:
       "vibe check führt Oxlint (Rust), ESLint und TypeScript-Typüberprüfung parallel aus. Null Fehler erforderlich vor dem Deployen.",
   },
+  examples: {
+    eyebrow: "Mit next-vibe gebaut",
+    title: "Vom Auto-Cockpit bis zur KI-Plattform.",
+    subtitle:
+      "Eine Codebasis, jede Oberfläche. Das sind echte Produkte auf next-vibe - ein Auto-PC, Online-Shops, Buchungsseiten und {{appName}} selbst. Ein Framework, grundverschiedene Produkte.",
+    items: {
+      headunit: {
+        label: "Auto-Cockpit",
+        title: "Ein komplettes Auto-Headunit",
+        body: "Navigation, Klimasteuerung, Radio, Spotify, Bluetooth-Telefonie und Live-Fahrzeugdiagnose - plus Android Auto - auf einem Touchscreen-Auto-PC. Gebaut als next-vibe-Fork.",
+      },
+      shop: {
+        label: "E-Commerce",
+        title: "Online-Shops, die verkaufen",
+        body: "Shopfront, Warenkorb, Checkout, Lager und Kasse aus einer Installation. Ein echter Shop läuft heute darauf.",
+      },
+      booking: {
+        label: "Buchungen",
+        title: "Praxis- & Buchungsseiten",
+        body: "Termine, Kundenakten, Rechnungen und eine öffentliche Seite - das Rückgrat eines Praxisbetriebs. Gleicher Stack wie der Shop.",
+      },
+      aiPlatform: {
+        label: "KI-Plattform",
+        title: "{{appName}}",
+        body: "{{modelCount}} Modelle, Chat, dauerhaftes Gedächtnis, Agenten, Abrechnung und MCP - das Flaggschiff. Genau diese Codebasis, in Produktion.",
+      },
+    },
+  },
   quickstart: {
     eyebrow: "Loslegen",
     title: "Forken, fragen, deployen.",
@@ -177,19 +201,46 @@ export const translations: typeof enTranslations = {
       description:
         "{{appName}}-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien - Definition, Route, Widget, i18n - und führt vibe check automatisch aus.",
     },
-    step5: {
-      label: "Deployen",
-      description:
-        "vibe rebuild aktualisiert die Produktion mit Zero Downtime. Es prüft, baut neu und startet hot-restart - kein manuelles Bearbeiten, kein Ausfall.",
-    },
     docsLink: "Pattern-Dokumentation",
     githubLink: "github.com/techfreaque/next-vibe",
+  },
+  oneDef: {
+    eyebrow: "Eine Definition",
+    title: "Einmal schreiben. Überall laufen lassen.",
+    subtitle:
+      "Ein echter Endpoint aus diesem Repo: das fokussierte Fenster eines Linux-Desktops auslesen. Drei Dateien. Kein Glue-Code. Er erscheint als Webseite, CLI-Befehl, MCP-Tool, KI-Tool und Cron-Job.",
+    defTitle: "definition.ts",
+    defBody:
+      "Pfad, Alias, Rollen, Zod-Schema, Widget, Fehler, Beispiele. Alles, was jede Oberfläche braucht, an einer Stelle.",
+    routeTitle: "route.ts",
+    routeBody:
+      "Verdrahtet die Definition mit einer Repository-Funktion. Genau diesen Handler ruft jede Oberfläche auf.",
+    surfacesTitle: "Das bekommst du ohne weiteren Code",
+    cli: {
+      title: "CLI-Befehl",
+      body: "Der Alias wird zum Befehl. Das Ergebnis rendert dasselbe Widget, fürs Terminal gesetzt.",
+    },
+    mcp: {
+      title: "MCP-Tool",
+      body: "Zeig jedem MCP-Client auf vibe mcp. Die Schemas kommen direkt aus den Zod-Feldern.",
+    },
+    ai: {
+      title: "KI-aufrufbares Tool",
+      body: "Modelle erhalten ein Function-Calling-Schema, erzeugt aus der Definition. Rollen bestimmen, wer aufrufen darf.",
+    },
+    cron: {
+      title: "Cron-Job",
+      body: "Derselbe Handler, jetzt nach Zeitplan. Das ist die echte Task-Datei unseres Credit-Ablauf-Jobs.",
+    },
+    more: "Dazu: eine Webseite unter /tools/<alias>, eine typisierte REST-Route und ein Native-Screen. Das Widget rendert auf allen. Lösch den Endpoint-Ordner, und jede Oberfläche verschwindet mit.",
+    addTitle: "Eigenen Endpoint in fünf Zeilen Shell",
+    addBody:
+      "Ordner anlegen, drei Dateien schreiben, neu generieren, prüfen. Meldet vibe check 0 Fehler, läuft es überall.",
   },
   enterprise: {
     eyebrow: "Enterprise",
     title: "Baust du etwas Großes?",
     description:
       "Wir helfen Teams bei Setup, individuellen Integrationen, Architektur-Review und laufender Entwicklungsunterstützung. Dieselbe Codebasis, dein Deployment.",
-    cta: "Kontakt aufnehmen",
   },
 };

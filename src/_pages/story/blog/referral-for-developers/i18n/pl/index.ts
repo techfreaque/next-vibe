@@ -34,7 +34,6 @@ export const translations: typeof enTranslations = {
     p1: "Każdy skill, który publikujesz, ma link do udostępnienia. Udostępniasz go sam/a - zarabiasz standardowe 10% bezpośrednio. Gdy inny członek udostępni go własnym linkiem, i tak dostajesz 5% każdej płatności tych użytkowników, na zawsze.",
     p2: "To, czego większość nie zauważa: zarabiasz 5% jako autor skilla nawet gdy ktoś inny udostępnia Twój link. Użytkownik znajduje Twój skill w katalogu, wysyła link znajomemu - znajomy się rejestruje, a Ty dostajesz 5% jego płatności. Automatycznie. Platforma śledzi autorstwo skilla, nie to kto udostępnił link. Twój skill pracuje za Ciebie, nawet gdy aktywnie go nie promujesz.",
     p3: "Wbuduj link do skilla w README na GitHubie. Opublikuj go na deweloperskim Discordzie. Każda osoba, która się przez niego zarejestruje, daje Ci 10%. Każda osoba, którą inni przyprowadzą do Twojego skilla, daje Ci 5%. Jeden skill, dwa źródła dochodu.",
-    p4: "Skille są darmowe do stworzenia. Nie potrzeba płatnej subskrypcji. Jeśli masz użyteczne ustawienie AI - code reviewer znający Twój stack lub pisarz dokumentacji dostrojony do Twojego stylu - udostępnij go. Link zajmie się resztą.",
   },
   math: {
     title: "Matematyka (prawdziwe liczby)",

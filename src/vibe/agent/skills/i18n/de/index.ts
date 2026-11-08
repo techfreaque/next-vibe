@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   id: {
     category: "KI-Werkzeuge",
     tags: {
-      skills: "Charaktere",
+      skills: "Skills",
     },
     voices: {
       MALE: "Männliche Stimme",
@@ -32,25 +32,25 @@ export const translations: typeof enTranslations = {
     },
 
     get: {
-      title: "Charakter abrufen",
-      dynamicTitle: "Charakter: {{name}}",
-      description: "Eine bestimmte Charakter anhand der ID abrufen",
+      title: "Skill abrufen",
+      dynamicTitle: "Skill: {{name}}",
+      description: "Eine bestimmte Skill anhand der ID abrufen",
       container: {
-        title: "Charakter-Details",
-        description: "Details der angeforderten Charakter",
+        title: "Skill-Details",
+        description: "Details der angeforderten Skill",
       },
       backButton: {
-        label: "Zurück zu Charakteren",
+        label: "Zurück zu Skills",
       },
       openFullPage: "Vollseite öffnen",
       editButton: {
-        label: "Charakter bearbeiten",
+        label: "Skill bearbeiten",
       },
       customizeButton: {
-        label: "Charakter anpassen",
+        label: "Skill anpassen",
       },
       deleteButton: {
-        label: "Charakter löschen",
+        label: "Skill löschen",
       },
       addToFavoritesButton: {
         label: "Zu Favoriten hinzufügen",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
       goToChat: "Zum Chat",
       addAnother: "Weitere hinzufügen",
       addAnotherTooltip:
-        "Eine weitere Instanz dieses Charakters zu deiner Sammlung hinzufügen",
+        "Eine weitere Instanz dieses Skills zu deiner Sammlung hinzufügen",
       variants: {
         title: "Varianten",
       },
@@ -82,9 +82,9 @@ export const translations: typeof enTranslations = {
       },
       addVariant: "Variante hinzufügen",
       addVariantHint: "Anderes Modell, Persönlichkeit oder Stil",
-      yourskill: "Dein Charakter",
+      yourskill: "Dein Skill",
       signupPrompt: {
-        title: "Diesen Charakter anpassen",
+        title: "Dieses Skill anpassen",
         description:
           "Erstelle eine personalisierte Version mit deinen eigenen Einstellungen und Vorlieben. Melde dich an, um zu beginnen.",
         backButton: "Zurück",
@@ -92,8 +92,8 @@ export const translations: typeof enTranslations = {
         loginButton: "Anmelden",
       },
       id: {
-        label: "Charakter-ID",
-        description: "Der Slug oder die lesbare ID des Charakters",
+        label: "Skill-ID",
+        description: "Der Slug oder die lesbare ID des Skills",
       },
       models: {
         brain: "Gehirn",
@@ -120,11 +120,11 @@ export const translations: typeof enTranslations = {
       },
       response: {
         skill: {
-          title: "Charakter",
-          id: { content: "Charakter-ID" },
-          name: { content: "Charakter-Name" },
-          description: { content: "Charakter-Beschreibung" },
-          icon: { content: "Charakter-Symbol" },
+          title: "Skill",
+          id: { content: "Skill-ID" },
+          name: { content: "Skill-Name" },
+          description: { content: "Skill-Beschreibung" },
+          icon: { content: "Skill-Symbol" },
           systemPrompt: { content: "System-Prompt" },
           category: { content: "Kategorie" },
           source: { content: "Quelle" },
@@ -163,12 +163,12 @@ export const translations: typeof enTranslations = {
             "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
         },
         notFound: {
-          title: "Charakter nicht gefunden",
-          description: "Die angeforderte Charakter existiert nicht",
+          title: "Skill nicht gefunden",
+          description: "Die angeforderte Skill existiert nicht",
         },
         server: {
           title: "Serverfehler",
-          description: "Beim Abrufen der Charakter ist ein Fehler aufgetreten",
+          description: "Beim Abrufen das Skill ist ein Fehler aufgetreten",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -188,7 +188,7 @@ export const translations: typeof enTranslations = {
       },
       success: {
         title: "Erfolg",
-        description: "Charakter erfolgreich abgerufen",
+        description: "Skill erfolgreich abgerufen",
       },
       share: {
         button: "Teilen & Verdienen",
@@ -241,40 +241,40 @@ export const translations: typeof enTranslations = {
       },
     },
     patch: {
-      title: "Charakter aktualisieren",
+      title: "Skill aktualisieren",
       dynamicTitle: "Bearbeiten: {{name}}",
       container: {
-        title: "Charakter aktualisieren",
-        description: "Eine vorhandene benutzerdefinierte Charakter ändern",
+        title: "Skill aktualisieren",
+        description: "Eine vorhandene benutzerdefinierte Skill ändern",
       },
       backButton: {
-        label: "Zurück zur Charakter",
+        label: "Zurück zu Skills",
       },
       deleteButton: {
-        label: "Charakter löschen",
+        label: "Skill löschen",
       },
       submitButton: {
-        label: "Charakter aktualisieren",
-        loadingText: "Charakter wird aktualisiert...",
+        label: "Skill aktualisieren",
+        loadingText: "Skill wird aktualisiert...",
       },
       actions: {
-        update: "Charakter aktualisieren",
-        updating: "Charakter wird aktualisiert",
+        update: "Skill aktualisieren",
+        updating: "Skill wird aktualisiert",
       },
       response: {
         success: {
-          content: "Charakter erfolgreich aktualisiert",
+          content: "Skill erfolgreich aktualisiert",
         },
       },
       id: {
-        label: "Charakter-ID",
+        label: "Skill-ID",
         description:
-          "Der Slug oder die lesbare ID des zu aktualisierenden Charakters",
+          "Der Slug oder die lesbare ID des zu aktualisierenden Skills",
       },
       name: {
         label: "Name",
-        description: "Der Name der Charakter",
-        placeholder: "Charakternamen eingeben",
+        description: "Der Name das Skill",
+        placeholder: "Skillnamen eingeben",
         validation: {
           minLength: "Name muss mindestens 2 Zeichen lang sein",
           maxLength: "Name muss weniger als 100 Zeichen lang sein",
@@ -282,8 +282,8 @@ export const translations: typeof enTranslations = {
       },
       description: {
         label: "Beschreibung",
-        description: "Eine kurze Beschreibung der Charakter",
-        placeholder: "Zweck und Fähigkeiten des Charakters beschreiben",
+        description: "Eine kurze Beschreibung das Skill",
+        placeholder: "Zweck und Fähigkeiten des Skills beschreiben",
         validation: {
           minLength: "Beschreibung muss mindestens 10 Zeichen lang sein",
           maxLength: "Beschreibung muss weniger als 500 Zeichen lang sein",
@@ -291,12 +291,11 @@ export const translations: typeof enTranslations = {
       },
       icon: {
         label: "Symbol",
-        description: "Ein Emoji-Symbol für die Charakter",
+        description: "Ein Emoji-Symbol für die Skill",
       },
       systemPrompt: {
         label: "System-Prompt",
-        description:
-          "Der System-Prompt, der das Verhalten der Charakter definiert",
+        description: "Der System-Prompt, der das Verhalten das Skill definiert",
         placeholder: "System-Prompt eingeben",
         validation: {
           minLength: "System-Prompt muss mindestens 10 Zeichen lang sein",
@@ -305,11 +304,11 @@ export const translations: typeof enTranslations = {
       },
       category: {
         label: "Kategorie",
-        description: "Die Kategorie, zu der diese Charakter gehört",
+        description: "Die Kategorie, zu der diese Skill gehört",
       },
       tagline: {
         label: "Slogan",
-        description: "Ein kurzer Slogan, der den Charakter beschreibt",
+        description: "Ein kurzer Slogan, der das Skill beschreibt",
         placeholder: "Slogan eingeben",
         validation: {
           minLength: "Slogan muss mindestens 2 Zeichen lang sein",
@@ -319,12 +318,12 @@ export const translations: typeof enTranslations = {
       source: {
         label: "Quelle",
         description:
-          "Die Quelle dieses Charakters (integriert, benutzerdefiniert oder Community)",
+          "Die Quelle dieses Skills (integriert, benutzerdefiniert oder Community)",
       },
       isPublic: {
         label: "Öffentlich machen",
         description:
-          "Aktivieren Sie dies, um Ihren Charakter mit der Community zu teilen. Wenn deaktiviert, bleibt der Charakter privat und nur für Sie sichtbar.",
+          "Aktivieren Sie dies, um Ihr Skill mit der Community zu teilen. Wenn deaktiviert, bleibt das Skill privat und nur für Sie sichtbar.",
       },
       chatModel: {
         label: "Chat-Modell",
@@ -332,7 +331,7 @@ export const translations: typeof enTranslations = {
       },
       voice: {
         label: "Stimme",
-        description: "Text-zu-Sprache-Stimme für diesen Charakter",
+        description: "Text-zu-Sprache-Stimme für dieses Skill",
         placeholder: "Systemstandard",
       },
       sttModel: {
@@ -372,7 +371,7 @@ export const translations: typeof enTranslations = {
       },
       modelSelection: {
         label: "Modellauswahl",
-        description: "Wie das KI-Modell für diesen Charakter ausgewählt wird",
+        description: "Wie das KI-Modell für dieses Skill ausgewählt wird",
       },
       variants: {
         label: "Varianten",
@@ -389,17 +388,17 @@ export const translations: typeof enTranslations = {
       },
       preferredModel: {
         label: "Bevorzugtes Modell",
-        description: "Das bevorzugte KI-Modell für diese Charakter",
+        description: "Das bevorzugte KI-Modell für diese Skill",
       },
       availableTools: {
         label: "Erlaubte Tools",
         description:
-          "Tools für diesen Charakter. Jeder Eintrag benötigt eine toolId. Null = globale Einstellungen.",
+          "Tools für dieses Skill. Jeder Eintrag benötigt eine toolId. Null = globale Einstellungen.",
       },
       pinnedTools: {
         label: "Angeheftete Tools",
         description:
-          "Angeheftete Toolbar-Tools für diesen Charakter. Null = globale Einstellungen.",
+          "Angeheftete Toolbar-Tools für dieses Skill. Null = globale Einstellungen.",
       },
       compactTrigger: {
         label: "Komprimierungs-Schwellenwert (Token)",
@@ -410,7 +409,7 @@ export const translations: typeof enTranslations = {
       errors: {
         validation: {
           title: "Validierungsfehler",
-          description: "Die Charakter-Daten sind ungültig",
+          description: "Die Skill-Daten sind ungültig",
         },
         network: {
           title: "Netzwerkfehler",
@@ -418,23 +417,22 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nicht autorisiert",
-          description:
-            "Sie müssen angemeldet sein, um Charakters zu aktualisieren",
+          description: "Sie müssen angemeldet sein, um Skills zu aktualisieren",
         },
         forbidden: {
           title: "Verboten",
           description:
-            "Sie haben keine Berechtigung, diese Charakter zu aktualisieren",
+            "Sie haben keine Berechtigung, dieses Skill zu aktualisieren",
         },
         notFound: {
-          title: "Charakter nicht gefunden",
+          title: "Skill nicht gefunden",
           description:
-            "Die Charakter, die Sie aktualisieren möchten, existiert nicht",
+            "Die Skill, die Sie aktualisieren möchten, existiert nicht",
         },
         server: {
           title: "Serverfehler",
           description:
-            "Beim Aktualisieren der Charakter ist ein Fehler aufgetreten",
+            "Beim Aktualisieren das Skill ist ein Fehler aufgetreten",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -450,35 +448,34 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Charakter aktualisiert",
+        title: "Skill aktualisiert",
         description:
-          "Ihre benutzerdefinierte Charakter wurde erfolgreich aktualisiert",
+          "Ihre benutzerdefinierte Skill wurde erfolgreich aktualisiert",
       },
     },
     delete: {
-      title: "Charakter löschen",
+      title: "Skill löschen",
       dynamicTitle: "Löschen: {{name}}",
-      description: "Einen benutzerdefinierten Charakter löschen",
+      description: "Einen benutzerdefinierten Skill löschen",
       container: {
-        title: "Charakter löschen",
-        description: "Diesen benutzerdefinierten Charakter dauerhaft entfernen",
+        title: "Skill löschen",
+        description: "Diesen benutzerdefinierten Skill dauerhaft entfernen",
       },
       backButton: {
-        label: "Zurück zur Charakter",
+        label: "Zurück zu Skills",
       },
       actions: {
-        delete: "Charakter löschen",
-        deleting: "Charakter wird gelöscht",
+        delete: "Skill löschen",
+        deleting: "Skill wird gelöscht",
       },
       id: {
-        label: "Charakter-ID",
-        description:
-          "Der Slug oder die lesbare ID des zu löschenden Charakters",
+        label: "Skill-ID",
+        description: "Der Slug oder die lesbare ID des zu löschenden Skills",
       },
       errors: {
         validation: {
           title: "Validierungsfehler",
-          description: "Die Charakter-Daten sind ungültig",
+          description: "Die Skill-Daten sind ungültig",
         },
         network: {
           title: "Netzwerkfehler",
@@ -486,26 +483,24 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nicht autorisiert",
-          description: "Sie sind nicht berechtigt, diesen Charakter zu löschen",
+          description: "Sie sind nicht berechtigt, dieses Skill zu löschen",
         },
         forbidden: {
           title: "Verboten",
-          description:
-            "Sie haben keine Berechtigung, diesen Charakter zu löschen",
+          description: "Sie haben keine Berechtigung, dieses Skill zu löschen",
         },
         notFound: {
-          title: "Charakter nicht gefunden",
-          description:
-            "Der Charakter, den Sie löschen möchten, existiert nicht",
+          title: "Skill nicht gefunden",
+          description: "Der Skill, den Sie löschen möchten, existiert nicht",
         },
         server: {
           title: "Serverfehler",
-          description: "Ein Fehler ist beim Löschen des Charakters aufgetreten",
+          description: "Ein Fehler ist beim Löschen des Skills aufgetreten",
         },
         unknown: {
           title: "Unbekannter Fehler",
           description:
-            "Ein unerwarteter Fehler beim Löschen des Charakters ist aufgetreten",
+            "Ein unerwarteter Fehler beim Löschen des Skills ist aufgetreten",
         },
         unsavedChanges: {
           title: "Nicht gespeicherte Änderungen",
@@ -513,20 +508,19 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Konflikt",
-          description:
-            "Der Charakter wurde von einem anderen Benutzer geändert",
+          description: "Der Skill wurde von einem anderen Benutzer geändert",
         },
       },
       success: {
-        title: "Charakter gelöscht",
-        description: "Der Charakter wurde erfolgreich gelöscht",
-        content: "Charakter erfolgreich gelöscht",
+        title: "Skill gelöscht",
+        description: "Der Skill wurde erfolgreich gelöscht",
+        content: "Skill erfolgreich gelöscht",
       },
     },
   },
   category: "Chat",
   tags: {
-    skills: "Charaktere",
+    skills: "Skills",
   },
   voices: {
     MALE: "Männliche Stimme",
@@ -563,7 +557,7 @@ export const translations: typeof enTranslations = {
       community: "Community",
     },
     ownershipType: {
-      system: "Integrierter Charakter",
+      system: "Integriertes Skill",
       user: "Von dir erstellt",
       public: "Aus der Community",
     },
@@ -576,7 +570,7 @@ export const translations: typeof enTranslations = {
       manual: "Manuell",
     },
     selectionType: {
-      skillBased: "Basierend auf Charakter",
+      skillBased: "Basierend auf Skill",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
     },
@@ -820,7 +814,7 @@ export const translations: typeof enTranslations = {
       shortDesc: "Kreatives Denken und Ideenfindung",
       suggestedPrompts: {
         0: "Schreibe ein Gedicht über den Ozean",
-        1: "Erstelle einen einzigartigen Charakter für eine Geschichte",
+        1: "Erstelle einen einzigartigen Skill für eine Geschichte",
         2: "Entwirf ein Logo-Konzept für ein Startup",
         3: "Brainstorme kreative Marketingkampagnen-Ideen",
       },
@@ -1235,7 +1229,7 @@ export const translations: typeof enTranslations = {
       shortDesc: "Fesselndes Geschichtenerzählen und Narrativen",
       suggestedPrompts: {
         0: "Hilf mir, diese Story-Idee zu entwickeln",
-        1: "Erstelle einen überzeugenden Charakter",
+        1: "Erstelle einen überzeugenden Skill",
         2: "Schreibe eine Eröffnungsszene für...",
         3: "Verbessere diesen Dialog",
       },
@@ -1486,7 +1480,7 @@ export const translations: typeof enTranslations = {
       suggestedPrompts: {
         0: "Schreibe einen dunklen psychologischen Thriller",
         1: "Erstelle eine reife Romanze-Szene",
-        2: "Entwickle einen moralisch komplexen Charakter",
+        2: "Entwickle einen moralisch komplexen Skill",
         3: "Schreibe Horror mit grafischen Elementen",
       },
       variants: {
@@ -1500,10 +1494,10 @@ export const translations: typeof enTranslations = {
       tagline: "Jeder werden",
       shortDesc: "Authentisches Charakter-Rollenspiel und Szenarien",
       suggestedPrompts: {
-        0: "Spiele einen Fantasy-Charakter",
+        0: "Spiele einen Fantasy-Skill",
         1: "Erstelle ein Sci-Fi-Abenteuer-Szenario",
         2: "Verkörpere eine historische Figur",
-        3: "Entwickle eine komplexe Charakterbeziehung",
+        3: "Entwickle eine komplexe Skillbeziehung",
       },
       variants: {
         creative: "Kreativ",
@@ -1671,16 +1665,16 @@ export const translations: typeof enTranslations = {
       },
     },
     skillCreator: {
-      name: "Charakter-Ersteller",
+      name: "Skill-Ersteller",
       description:
-        "Entwirf und erstelle KI-Charaktere mit maßgeschneiderten Persönlichkeiten, System-Prompts, Tools und Modellkonfigurationen. Verwaltet auch Favoriten und Einstellungen.",
+        "Entwirf und erstelle KI-Skills mit maßgeschneiderten Persönlichkeiten, System-Prompts, Tools und Modellkonfigurationen. Verwaltet auch Favoriten und Einstellungen.",
       tagline: "KI-Personas gestalten",
-      shortDesc: "KI-Charaktere erstellen und verwalten",
+      shortDesc: "KI-Skills erstellen und verwalten",
       suggestedPrompts: {
-        0: "Hilf mir einen neuen KI-Charakter für Coding-Unterstützung zu erstellen",
-        1: "Zeige mir alle vorhandenen Charaktere und schlage vor was fehlt",
-        2: "Entwirf einen Charakter für kreatives Schreiben mit einzigartiger Persönlichkeit",
-        3: "Füge einen Charakter zu meinen Favoriten hinzu und konfiguriere meine Chat-Einstellungen",
+        0: "Hilf mir einen neuen KI-Skill für Coding-Unterstützung zu erstellen",
+        1: "Zeige mir alle vorhandenen Skills und schlage vor was fehlt",
+        2: "Entwirf ein Skill für kreatives Schreiben mit einzigartiger Persönlichkeit",
+        3: "Füge ein Skill zu meinen Favoriten hinzu und konfiguriere meine Chat-Einstellungen",
       },
       variants: {
         gemini: "Gemini",
@@ -1729,22 +1723,22 @@ export const translations: typeof enTranslations = {
     },
   },
   get: {
-    title: "Charaktere",
+    title: "Skills",
     titleShort: "Skills",
-    dynamicTitle: "Charaktere ({{count}})",
+    dynamicTitle: "Skills ({{count}})",
     description:
-      "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
+      "Alle verfügbaren Skills abrufen (Standard + benutzerdefiniert)",
     fields: {
       query: {
         label: "Suche (optional)",
         description:
-          "Charaktere nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Groß-/Kleinschreibung-unempfindliche Teilstring-Suche über Name, Tagline, Beschreibung, Kategorie. Leer lassen um alle anzuzeigen.",
+          "Skills nach Stichwort filtern. Leerzeichen-getrennte Wörter sind alle erforderlich. Groß-/Kleinschreibung-unempfindliche Teilstring-Suche über Name, Tagline, Beschreibung, Kategorie. Leer lassen um alle anzuzeigen.",
         placeholder: "z.B. Recherche, Bildgenerator",
       },
       skillId: {
-        label: "Charakter-ID",
+        label: "Skill-ID",
         description:
-          "Vollständige Details für einen bestimmten Charakter abrufen. Gibt System-Prompt, Tools und Modellkonfiguration zurück.",
+          "Vollständige Details für einen bestimmten Skill abrufen. Gibt System-Prompt, Tools und Modellkonfiguration zurück.",
       },
       page: {
         label: "Seite",
@@ -1759,7 +1753,7 @@ export const translations: typeof enTranslations = {
       sourceFilter: {
         label: "Quelle",
         description:
-          "Filtere nach Herkunft: eingebaut, Community oder eigene Charaktere.",
+          "Filtere nach Herkunft: eingebaut, Community oder eigene Skills.",
       },
       targetUserId: {
         label: "Ziel-Benutzer-ID",
@@ -1767,17 +1761,17 @@ export const translations: typeof enTranslations = {
       },
     },
     container: {
-      title: "Charaktere-Liste",
-      description: "Alle verfügbaren Charaktere für den Benutzer",
+      title: "Skills-Liste",
+      description: "Alle verfügbaren Skills für den Benutzer",
     },
     createButton: {
-      label: "Eigenen Charakter Erstellen",
+      label: "Eigenen Skill Erstellen",
     },
     openFullPage: "Vollständige Seite öffnen",
     browser: {
       advancedModelAccess: "Wähle deine KI-Erfahrung",
       configureFiltersText:
-        "Modelle direkt auswählen oder mit vorkonfigurierten Charakteren starten",
+        "Modelle direkt auswählen oder mit vorkonfigurierten Skills starten",
       aiModels: "KI-Modelle",
       configureAiModelsTitle: "Direkte Modellauswahl",
       advancedChooseText:
@@ -1787,15 +1781,15 @@ export const translations: typeof enTranslations = {
       selectButton: {
         label: "Modelle Erkunden",
       },
-      skillPresets: "Fertige Charaktere",
+      skillPresets: "Fertige Skills",
       pickSkillText:
-        "Starte mit professionell abgestimmten Charakteren, die bereits das perfekte Modell nutzen. Jederzeit anpassbar.",
+        "Starte mit professionell abgestimmten Skills, die bereits das perfekte Modell nutzen. Jederzeit anpassbar.",
     },
     signupPrompt: {
-      title: "Erstelle deine eigenen KI-Charaktere",
+      title: "Erstelle deine eigenen KI-Skills",
       description:
-        "Gestalte individuelle Charaktere mit einzigartigen Persönlichkeiten und Verhaltensweisen. Jetzt registrieren.",
-      backButton: "Charaktere Durchsuchen",
+        "Gestalte individuelle Skills mit einzigartigen Persönlichkeiten und Verhaltensweisen. Jetzt registrieren.",
+      backButton: "Skills entdecken",
       signupButton: "Konto Erstellen",
       loginButton: "Anmelden",
     },
@@ -1815,18 +1809,18 @@ export const translations: typeof enTranslations = {
         inUse: "Aktiv",
         goToChat: "Zum Chat",
         useThis: "Diesen verwenden",
-        chooseFavorite: "Favorit wählen",
-        selectFavorite: "Wähle einen Favoriten zum Aktivieren:",
-        addVariant: "Variante hinzufügen",
+        chooseFavorite: "Modell wählen",
+        selectFavorite: "Wähle das Modell für den Chat:",
+        addVariant: "Weiteres Modell hinzufügen",
         view: "Ansehen",
         edit: "Bearbeiten",
         vote: "Bewerten",
         report: "Melden",
-        addMissing: "Alle Varianten zu deinen Favoriten",
+        addMissing: "Alle Modelle zu Meine Skills",
         add: "Hinzufügen",
         added: "Hinzugefügt",
       },
-      showVariants: "Varianten ({{count}})",
+      showVariants: "Modelle ({{count}})",
     },
     section: {
       showMore: "{{count}} weitere anzeigen",
@@ -1836,12 +1830,12 @@ export const translations: typeof enTranslations = {
     response: {
       skills: {
         skill: {
-          title: "Charakter",
-          id: { content: "Charakter-ID" },
-          name: { content: "Charakter-Name" },
-          tagline: { content: "Charakter-Slogan" },
-          description: { content: "Charakter-Beschreibung" },
-          icon: { content: "Charakter-Symbol" },
+          title: "Skill",
+          id: { content: "Skill-ID" },
+          name: { content: "Skill-Name" },
+          tagline: { content: "Skill-Slogan" },
+          description: { content: "Skill-Beschreibung" },
+          icon: { content: "Skill-Symbol" },
           systemPrompt: { content: "System-Prompt" },
           category: { content: "Kategorie" },
           source: { content: "Quelle" },
@@ -1882,7 +1876,7 @@ export const translations: typeof enTranslations = {
       unauthorized: {
         title: "Nicht autorisiert",
         description:
-          "Sie müssen angemeldet sein, um auf benutzerdefinierte Charaktere zuzugreifen",
+          "Sie müssen angemeldet sein, um auf benutzerdefinierte Skills zuzugreifen",
       },
       forbidden: {
         title: "Verboten",
@@ -1895,7 +1889,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Beim Abrufen der Charaktere ist ein Fehler aufgetreten",
+        description: "Beim Abrufen das Skille ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -1912,34 +1906,34 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Erfolg",
-      description: "Charaktere erfolgreich abgerufen",
+      description: "Skills erfolgreich abgerufen",
     },
   },
   post: {
-    title: "Charakter erstellen",
+    title: "Skill erstellen",
     titleShort: "Skill erstellen",
     dynamicTitle: "Erstellen: {{name}}",
-    description: "Einen neuen benutzerdefinierten Charakter erstellen",
+    description: "Einen neuen benutzerdefinierten Skill erstellen",
     form: {
-      title: "Erstellen Sie Ihren benutzerdefinierten Charakter",
+      title: "Erstellen Sie Ihr benutzerdefiniertes Skill",
       description:
-        "Entwerfen Sie einen einzigartigen KI-Charakter mit individuellem Verhalten, Persönlichkeit und Fähigkeiten. Wählen Sie ein bestimmtes Modell oder lassen Sie das System basierend auf Ihren Anforderungen auswählen.",
+        "Entwerfen Sie einen einzigartigen KI-Skill mit individuellem Verhalten, Persönlichkeit und Fähigkeiten. Wählen Sie ein bestimmtes Modell oder lassen Sie das System basierend auf Ihren Anforderungen auswählen.",
     },
     submitButton: {
-      text: "Benutzerdefinierten Charakter erstellen",
-      loadingText: "Charakter wird erstellt...",
+      text: "Benutzerdefiniertes Skill erstellen",
+      loadingText: "Skill wird erstellt...",
     },
     backButton: {
       label: "Zurück",
     },
     container: {
-      title: "Neuen Charakter erstellen",
-      description: "Einen neuen benutzerdefinierten Charakter definieren",
+      title: "Neues Skill erstellen",
+      description: "Einen neuen benutzerdefinierten Skill definieren",
     },
     name: {
       label: "Name",
-      description: "Der Name des Charakters",
-      placeholder: "Charakternamen eingeben",
+      description: "Der Name des Skills",
+      placeholder: "Skillnamen eingeben",
       validation: {
         minLength: "Name muss mindestens 2 Zeichen lang sein",
         maxLength: "Name muss weniger als 100 Zeichen lang sein",
@@ -1947,8 +1941,8 @@ export const translations: typeof enTranslations = {
     },
     skillDescription: {
       label: "Beschreibung",
-      description: "Eine kurze Beschreibung des Charakters",
-      placeholder: "Zweck und Fähigkeiten des Charakters beschreiben",
+      description: "Eine kurze Beschreibung des Skills",
+      placeholder: "Zweck und Fähigkeiten des Skills beschreiben",
       validation: {
         minLength: "Beschreibung muss mindestens 10 Zeichen lang sein",
         maxLength: "Beschreibung muss weniger als 500 Zeichen lang sein",
@@ -1956,12 +1950,11 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Symbol",
-      description: "Ein Emoji-Symbol für den Charakter",
+      description: "Ein Emoji-Symbol für das Skill",
     },
     systemPrompt: {
       label: "System-Prompt",
-      description:
-        "Der System-Prompt, der das Verhalten des Charakters definiert",
+      description: "Der System-Prompt, der das Verhalten des Skills definiert",
       placeholder:
         "Sie sind ein hilfreicher Assistent, der sich spezialisiert auf...",
       validation: {
@@ -1971,11 +1964,11 @@ export const translations: typeof enTranslations = {
     },
     category: {
       label: "Kategorie",
-      description: "Die Kategorie, zu der dieser Charakter gehört",
+      description: "Die Kategorie, zu der dieser Skill gehört",
     },
     tagline: {
       label: "Slogan",
-      description: "Ein kurzer Slogan, der den Charakter beschreibt",
+      description: "Ein kurzer Slogan, der das Skill beschreibt",
       placeholder: "Slogan eingeben",
       validation: {
         minLength: "Slogan muss mindestens 2 Zeichen lang sein",
@@ -1985,26 +1978,26 @@ export const translations: typeof enTranslations = {
     isPublic: {
       label: "Öffentlich machen",
       description:
-        "Aktivieren Sie dies, um Ihren Charakter mit der Community zu teilen. Wenn deaktiviert, bleibt der Charakter privat und nur für Sie sichtbar.",
+        "Aktivieren Sie dies, um Ihr Skill mit der Community zu teilen. Wenn deaktiviert, bleibt das Skill privat und nur für Sie sichtbar.",
     },
     modelSelection: {
       title: "Modellauswahl",
       label: "Modellauswahl",
       description:
-        "Wählen Sie, wie das KI-Modell für diesen Charakter ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
+        "Wählen Sie, wie das KI-Modell für dieses Skill ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
     },
     selectionType: {
       label: "Auswahltyp",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
-      skillBased: "Charakter Spezifisch",
+      skillBased: "Skill-spezifisch",
     },
     preferredModel: {
       label: "Bevorzugtes Modell",
       description:
-        "Wählen Sie ein bestimmtes KI-Modell, das immer mit diesem Charakter verwendet werden soll",
+        "Wählen Sie ein bestimmtes KI-Modell, das immer mit diesem Skill verwendet werden soll",
       helpText:
-        "Die Auswahl eines bestimmten Modells sperrt diesen Charakter auf dieses Modell",
+        "Die Auswahl eines bestimmten Modells sperrt dieses Skill auf dieses Modell",
     },
     intelligence: {
       label: "Intelligenzstufe",
@@ -2035,12 +2028,12 @@ export const translations: typeof enTranslations = {
     },
     minPrice: {
       label: "Mindestpreis",
-      description: "Minimale Kreditkosten pro Nachricht mit diesem Charakter",
+      description: "Minimale Kreditkosten pro Nachricht mit diesem Skill",
     },
     maxPrice: {
       label: "Maximaler Preis",
       description:
-        "Maximale Kreditkosten, die Sie bereit sind, pro Nachricht mit diesem Charakter auszugeben",
+        "Maximale Kreditkosten, die Sie bereit sind, pro Nachricht mit diesem Skill auszugeben",
     },
     contentLevel: {
       label: "Inhaltsebene",
@@ -2074,7 +2067,7 @@ export const translations: typeof enTranslations = {
     manualModelId: {
       label: "Manuelles Modell",
       description:
-        "Spezifisches Modell, das immer mit diesem Charakter verwendet werden soll",
+        "Spezifisches Modell, das immer mit diesem Skill verwendet werden soll",
     },
     variants: {
       label: "Varianten",
@@ -2084,12 +2077,12 @@ export const translations: typeof enTranslations = {
     availableTools: {
       label: "Erlaubte Tools",
       description:
-        "Tools für diesen Charakter. Jeder Eintrag benötigt eine toolId (system_help_GET für IDs). Null = globale Einstellungen.",
+        "Tools für dieses Skill. Jeder Eintrag benötigt eine toolId (system_help_GET für IDs). Null = globale Einstellungen.",
     },
     pinnedTools: {
       label: "Angeheftete Tools",
       description:
-        "Angeheftete Toolbar-Tools für diesen Charakter. Null = globale Einstellungen.",
+        "Angeheftete Toolbar-Tools für dieses Skill. Null = globale Einstellungen.",
     },
     compactTrigger: {
       label: "Komprimierungs-Schwellenwert (Token)",
@@ -2102,7 +2095,7 @@ export const translations: typeof enTranslations = {
     },
     voice: {
       label: "Stimme",
-      description: "Text-zu-Sprache-Stimme für diesen Charakter",
+      description: "Text-zu-Sprache-Stimme für dieses Skill",
       placeholder: "Systemstandard",
     },
     sttModel: {
@@ -2142,16 +2135,16 @@ export const translations: typeof enTranslations = {
     },
     suggestedPrompts: {
       label: "Vorgeschlagene Prompts",
-      description: "Beispiel-Prompts zur Verwendung mit diesem Charakter",
+      description: "Beispiel-Prompts zur Verwendung mit diesem Skill",
       placeholder: "Einen vorgeschlagenen Prompt hinzufügen...",
     },
     response: {
-      id: { content: "Erstellte Charakter-ID" },
+      id: { content: "Erstellte Skill-ID" },
     },
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description: "Die Charakter-Daten sind ungültig",
+        description: "Die Skill-Daten sind ungültig",
       },
       network: {
         title: "Netzwerkfehler",
@@ -2159,11 +2152,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie müssen angemeldet sein, um Charaktere zu erstellen",
+        description: "Sie müssen angemeldet sein, um Skills zu erstellen",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, Charaktere zu erstellen",
+        description: "Sie haben keine Berechtigung, Skills zu erstellen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -2171,7 +2164,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Beim Erstellen des Charakters ist ein Fehler aufgetreten",
+        description: "Beim Erstellen des Skills ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -2183,25 +2176,24 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Ein Charakter mit diesem Namen existiert bereits",
+        description: "Ein Skill mit diesem Namen existiert bereits",
       },
     },
     success: {
-      title: "Charakter erstellt",
-      description:
-        "Ihr benutzerdefinierter Charakter wurde erfolgreich erstellt",
+      title: "Skill erstellt",
+      description: "Ihr benutzerdefinierter Skill wurde erfolgreich erstellt",
     },
   },
   onboarding: {
     success: {
       title: "{{companion}} ist bereit zu chatten!",
       subtitle:
-        "Jetzt kannst du Spezialisten für bestimmte Aufgaben auswählen - oder überspringen und sie jederzeit später hinzufügen",
+        "Jetzt kannst du Skills für bestimmte Aufgaben auswählen - oder überspringen und sie jederzeit später hinzufügen",
     },
     bottom: {
       title: "Bereit loszuchatten?",
       description:
-        "Du kannst jederzeit zurückkommen und weitere Spezialisten hinzufügen, wann immer du sie brauchst",
+        "Du kannst jederzeit zurückkommen und weitere Skills hinzufügen, wann immer du sie brauchst",
       button: "Jetzt Chatten",
     },
   },

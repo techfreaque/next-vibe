@@ -323,7 +323,8 @@ export class ThreadsRepository {
         );
 
         if (!hasPermission) {
-          logger.error(
+          // Correct denial returned as FORBIDDEN - warn, not error.
+          logger.warn(
             "User does not have permission to create threads in root folder",
             {
               userId,
@@ -376,9 +377,13 @@ export class ThreadsRepository {
       });
 
       if (!hasPermission) {
-        logger.error("User does not have permission to create thread", {
+        // Correct denial returned as FORBIDDEN - warn, not error. (The
+        // composer gates on canCreateThread; a hit here means it was bypassed
+        // or the folder permissions had not loaded yet.)
+        logger.warn("User does not have permission to create thread", {
           userId,
           leadId,
+          isPublic: user.isPublic,
           rootFolderId,
           subFolderId,
         });
@@ -819,6 +824,7 @@ export class ThreadsRepository {
           name: "Public",
           icon: null,
           color: null,
+          instructions: null,
           parentId: null, // This is the key - null means root level
           expanded: true,
           sortOrder: 0,
@@ -850,6 +856,7 @@ export class ThreadsRepository {
               : "Remote",
           icon: null,
           color: null,
+          instructions: null,
           parentId: null,
           expanded: true,
           sortOrder: 0,

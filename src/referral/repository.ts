@@ -5,8 +5,11 @@
 
 import "server-only";
 
-import { and, desc, eq, sql } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { and, desc, eq, inArray, lte, ne, sql } from "drizzle-orm";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -18,8 +21,12 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
+import { CreditPackType, CreditTransactionType } from "@/credits/enum";
 import type { CreditsT } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { NotificationType } from "@/notifications/enum";
+import { NotificationsRepository } from "@/notifications/repository";
 
 import type {
   CodesListGetResponseOutput,
@@ -48,6 +55,12 @@ import {
 import type { ReferralT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import type { StatsGetResponseOutput } from "./stats/definition";
+import { withTransaction } from "../vibe/database/utils/repository-helpers";
+
+/** Placeholder until a lock's release resolver is assigned */
+function noop(): void {
+  return undefined;
+}
 
 /**
  * Internal result type for referral code validation
@@ -106,7 +119,7 @@ export class ReferralRepository {
 
       if (existingCode) {
         return fail({
-          message: t("errors.conflict.title"),
+          message: t("errors.code_exists"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -581,19 +594,31 @@ export class ReferralRepository {
           total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) * ${revenueMultiplier}, 0)::int`,
         })
         .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId));
+        .where(
+          and(
+            eq(referralEarnings.earnerUserId, userId),
+            ne(referralEarnings.status, ReferralEarningStatus.CANCELED),
+          ),
+        );
 
       const totalRevenueCredits = revenueResult?.total || 0;
 
-      // Calculate total earned credits (sum of all earnings)
+      // Total earned = pending + confirmed (refunded/charged-back = canceled, excluded)
       const [earningsResult] = await db
         .select({
           total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
+          confirmed: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) FILTER (WHERE ${referralEarnings.status} = ${ReferralEarningStatus.CONFIRMED}), 0)::int`,
         })
         .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId));
+        .where(
+          and(
+            eq(referralEarnings.earnerUserId, userId),
+            ne(referralEarnings.status, ReferralEarningStatus.CANCELED),
+          ),
+        );
 
       const totalEarnedCredits = earningsResult?.total || 0;
+      const confirmedEarnedCredits = earningsResult?.confirmed || 0;
 
       // Calculate total paid out (from completed payout requests)
       const [payoutResult] = await db
@@ -610,8 +635,11 @@ export class ReferralRepository {
 
       const totalPaidOutCredits = payoutResult?.total || 0;
 
-      // Available = earned - paid out
-      const availableCredits = totalEarnedCredits - totalPaidOutCredits;
+      // Available = confirmed (past the refund window) - paid out
+      const availableCredits = Math.max(
+        0,
+        confirmedEarnedCredits - totalPaidOutCredits,
+      );
 
       return success({
         totalSignupsTitle: "stats.fields.totalSignups",
@@ -707,7 +735,6 @@ export class ReferralRepository {
     userId: string,
     creditsAmount: number,
     logger: EndpointLogger,
-    creditsT: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
@@ -731,18 +758,11 @@ export class ReferralRepository {
         chain,
       );
 
-      // Get source user email for transaction metadata
-      const [sourceUser] = await db
-        .select({ email: users.email })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-
-      // Insert earnings records and add earned credits
+      // Earnings start PENDING: nothing is spendable or payable until the
+      // refund window (REFERRAL_CONFIG.EARNING_HOLD_DAYS) has passed without a
+      // refund/dispute. confirmMaturedEarnings() grants the credits afterwards.
       for (const share of shares) {
-        // Insert referral earnings record (audit trail)
-        // Note: amountCents here represents earned credits (1:1 mapping)
-        const [insertedEarning] = await db
+        await db
           .insert(referralEarnings)
           .values({
             earnerUserId: share.earnerUserId,
@@ -750,27 +770,11 @@ export class ReferralRepository {
             transactionId,
             level: share.level,
             amountCents: share.amountCents, // Credits earned (1 credit = 1 cent value)
+            baseCredits: creditsAmount,
             currency: "CREDITS", // Currency-independent, stored as credits
-            status: ReferralEarningStatus.CONFIRMED,
+            status: ReferralEarningStatus.PENDING,
           })
-          .onConflictDoNothing() // Idempotency: ignore if already exists
-          .returning();
-
-        // Add earned credits to user's wallet (only if earning was inserted)
-        if (insertedEarning) {
-          const commissionPercent = (share.amountCents / creditsAmount) * 100;
-          await CreditRepository.addEarnedCredits(
-            share.earnerUserId,
-            share.amountCents, // Credits earned
-            userId,
-            transactionId,
-            commissionPercent,
-            creditsAmount, // Original credits purchased
-            logger,
-            creditsT,
-            sourceUser?.email,
-          );
-        }
+          .onConflictDoNothing(); // Idempotency: one earning per tx/earner/level
       }
 
       logger.debug("Referral payout applied successfully", {
@@ -787,6 +791,353 @@ export class ReferralRepository {
         message: t("errors.serverError.detail", {
           error: parseError(error).message,
         }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Confirm earnings whose refund window has passed: PENDING → CONFIRMED and
+   * grant the earned credits, atomically per earning (row-locked, so a refund
+   * reversal racing the cron either cancels it first or claws back after).
+   * Called by the referral-earnings-confirm cron.
+   */
+  static async confirmMaturedEarnings(
+    logger: EndpointLogger,
+    creditsT: CreditsT,
+    now: Date = new Date(),
+  ): Promise<ResponseType<{ confirmedCount: number; failedCount: number }>> {
+    const cutoff = new Date(
+      now.getTime() - REFERRAL_CONFIG.EARNING_HOLD_DAYS * 24 * 60 * 60 * 1000,
+    );
+    try {
+      const matured = await db
+        .select({
+          id: referralEarnings.id,
+          earnerUserId: referralEarnings.earnerUserId,
+        })
+        .from(referralEarnings)
+        .where(
+          and(
+            eq(referralEarnings.status, ReferralEarningStatus.PENDING),
+            lte(referralEarnings.createdAt, cutoff),
+          ),
+        )
+        .orderBy(referralEarnings.createdAt)
+        .limit(500);
+
+      let confirmedCount = 0;
+      let failedCount = 0;
+
+      for (const earning of matured) {
+        // Ensures the earner's wallet row exists (getOrCreateUserWallet side effect)
+        const walletReady = await CreditRepository.getEarnedCreditsBalance(
+          earning.earnerUserId,
+          logger,
+          creditsT,
+        );
+        if (!walletReady.success) {
+          failedCount++;
+          logger.error("Referral earning confirm: earner wallet unavailable", {
+            earningId: earning.id,
+            earnerUserId: earning.earnerUserId,
+          });
+          continue;
+        }
+
+        try {
+          const confirmed = await withTransaction(logger, async (tx) => {
+            const [locked] = await tx
+              .select()
+              .from(referralEarnings)
+              .where(eq(referralEarnings.id, earning.id))
+              .for("update")
+              .limit(1);
+            if (
+              !locked ||
+              locked.status !== ReferralEarningStatus.PENDING ||
+              locked.createdAt > cutoff
+            ) {
+              return null;
+            }
+
+            const [wallet] = await tx
+              .select()
+              .from(creditWallets)
+              .where(eq(creditWallets.userId, locked.earnerUserId))
+              .for("update")
+              .limit(1);
+            if (!wallet) {
+              return null;
+            }
+
+            const [sourceUser] = await tx
+              .select({ email: users.email })
+              .from(users)
+              .where(eq(users.id, locked.sourceUserId))
+              .limit(1);
+
+            const base = locked.baseCredits ?? 0;
+            if (locked.amountCents > 0) {
+              const [newPack] = await tx
+                .insert(creditPacks)
+                .values({
+                  walletId: wallet.id,
+                  originalAmount: locked.amountCents,
+                  remaining: locked.amountCents,
+                  type: CreditPackType.EARNED,
+                  expiresAt: null,
+                  source: "referral_earning",
+                  metadata: {
+                    sourceUserId: locked.sourceUserId,
+                    transactionId: locked.transactionId,
+                  },
+                })
+                .returning({ id: creditPacks.id });
+
+              const [updated] = await tx
+                .update(creditWallets)
+                .set({
+                  balance: sql`${creditWallets.balance} + ${locked.amountCents}`,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditWallets.id, wallet.id))
+                .returning({ balance: creditWallets.balance });
+
+              await tx.insert(creditTransactions).values({
+                walletId: wallet.id,
+                amount: locked.amountCents,
+                balanceAfter: updated.balance,
+                type: CreditTransactionType.REFERRAL_EARNING,
+                packId: newPack.id,
+                freePeriodId: wallet.freePeriodId,
+                metadata: {
+                  sourceUserId: locked.sourceUserId,
+                  sourceUserEmail: sourceUser?.email,
+                  transactionId: locked.transactionId,
+                  commissionPercent:
+                    base > 0 ? (locked.amountCents / base) * 100 : 0,
+                  originalAmountCents: base,
+                },
+              });
+            }
+
+            await tx
+              .update(referralEarnings)
+              .set({ status: ReferralEarningStatus.CONFIRMED })
+              .where(eq(referralEarnings.id, locked.id));
+            return { amountCents: locked.amountCents };
+          });
+          if (confirmed) {
+            confirmedCount++;
+            if (confirmed.amountCents > 0) {
+              await NotificationsRepository.notify(
+                {
+                  userId: earning.earnerUserId,
+                  type: NotificationType.EARNING,
+                  params: { amount: confirmed.amountCents },
+                  link: "/user/referral",
+                  dedupeKey: `earning:${earning.id}`,
+                  metadata: {
+                    earningId: earning.id,
+                    amountCents: confirmed.amountCents,
+                  },
+                },
+                logger,
+              );
+            }
+          }
+        } catch (error) {
+          failedCount++;
+          logger.error("Referral earning confirm failed", parseError(error), {
+            earningId: earning.id,
+            earnerUserId: earning.earnerUserId,
+          });
+        }
+      }
+
+      if (confirmedCount > 0 || failedCount > 0) {
+        logger.info("Referral earnings confirmed", {
+          confirmedCount,
+          failedCount,
+          cutoff: cutoff.toISOString(),
+        });
+      }
+      return success({ confirmedCount, failedCount });
+    } catch (error) {
+      logger.error("Failed to confirm matured referral earnings", {
+        error: parseError(error),
+      });
+      return fail({
+        message: creditsT("errors.addEarnedCreditsFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Reverse all referral earnings of a refunded / charged-back payment.
+   * PENDING → CANCELED (never granted). CONFIRMED → CANCELED and the earned
+   * credits are clawed back from the earner's EARNED packs — never below
+   * zero; any part already spent or paid out is recorded as unrecovered on
+   * the REFUND transaction and logged at error level for manual review.
+   * Idempotent: only PENDING/CONFIRMED rows are touched.
+   */
+  static async reverseEarningsForTransaction(
+    transactionId: string,
+    reason: "refund" | "dispute",
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      canceledPending: number;
+      reversedConfirmed: number;
+      unrecoveredCredits: number;
+    }>
+  > {
+    try {
+      const earnings = await db
+        .select({ id: referralEarnings.id })
+        .from(referralEarnings)
+        .where(
+          and(
+            eq(referralEarnings.transactionId, transactionId),
+            inArray(referralEarnings.status, [
+              ReferralEarningStatus.PENDING,
+              ReferralEarningStatus.CONFIRMED,
+            ]),
+          ),
+        );
+
+      let canceledPending = 0;
+      let reversedConfirmed = 0;
+      let unrecoveredCredits = 0;
+
+      for (const { id } of earnings) {
+        const outcome = await withTransaction(logger, async (tx) => {
+          const [locked] = await tx
+            .select()
+            .from(referralEarnings)
+            .where(eq(referralEarnings.id, id))
+            .for("update")
+            .limit(1);
+          if (!locked || locked.status === ReferralEarningStatus.CANCELED) {
+            return { kind: "noop" as const, unrecovered: 0 };
+          }
+
+          const wasConfirmed =
+            locked.status === ReferralEarningStatus.CONFIRMED;
+          await tx
+            .update(referralEarnings)
+            .set({ status: ReferralEarningStatus.CANCELED })
+            .where(eq(referralEarnings.id, locked.id));
+
+          if (!wasConfirmed || locked.amountCents <= 0) {
+            return { kind: "pending" as const, unrecovered: 0 };
+          }
+
+          const [wallet] = await tx
+            .select()
+            .from(creditWallets)
+            .where(eq(creditWallets.userId, locked.earnerUserId))
+            .for("update")
+            .limit(1);
+          if (!wallet) {
+            return {
+              kind: "confirmed" as const,
+              unrecovered: locked.amountCents,
+            };
+          }
+
+          const earnedPacks = await tx
+            .select()
+            .from(creditPacks)
+            .where(
+              and(
+                eq(creditPacks.walletId, wallet.id),
+                eq(creditPacks.type, CreditPackType.EARNED),
+              ),
+            )
+            .orderBy(desc(creditPacks.createdAt))
+            .for("update");
+
+          let toRecover = locked.amountCents;
+          for (const pack of earnedPacks) {
+            if (toRecover <= 0) {
+              break;
+            }
+            const take = Math.min(pack.remaining, toRecover);
+            if (take <= 0) {
+              continue;
+            }
+            await tx
+              .update(creditPacks)
+              .set({ remaining: pack.remaining - take, updatedAt: new Date() })
+              .where(eq(creditPacks.id, pack.id));
+            toRecover -= take;
+          }
+          const recovered = locked.amountCents - toRecover;
+
+          const [updated] = await tx
+            .update(creditWallets)
+            .set({
+              balance: sql`GREATEST(0, ${creditWallets.balance} - ${recovered})`,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditWallets.id, wallet.id))
+            .returning({ balance: creditWallets.balance });
+
+          await tx.insert(creditTransactions).values({
+            walletId: wallet.id,
+            amount: -recovered,
+            balanceAfter: updated?.balance ?? 0,
+            type: CreditTransactionType.REFUND,
+            freePeriodId: wallet.freePeriodId,
+            metadata: {
+              reason: `referral_${reason}_reversal`,
+              originalTransactionId: locked.id,
+              revokedCredits: locked.amountCents,
+              unrecoveredCredits: toRecover,
+            },
+          });
+          return { kind: "confirmed" as const, unrecovered: toRecover };
+        });
+
+        if (outcome.kind === "pending") {
+          canceledPending++;
+        } else if (outcome.kind === "confirmed") {
+          reversedConfirmed++;
+          unrecoveredCredits += outcome.unrecovered;
+        }
+      }
+
+      if (unrecoveredCredits > 0) {
+        logger.error(
+          "Referral reversal: earned credits already spent/paid out — unrecovered, review manually",
+          { transactionId, reason, unrecoveredCredits },
+        );
+      }
+      if (canceledPending > 0 || reversedConfirmed > 0) {
+        logger.info("Referral earnings reversed", {
+          transactionId,
+          reason,
+          canceledPending,
+          reversedConfirmed,
+          unrecoveredCredits,
+        });
+      }
+      return success({
+        canceledPending,
+        reversedConfirmed,
+        unrecoveredCredits,
+      });
+    } catch (error) {
+      logger.error("Failed to reverse referral earnings", parseError(error), {
+        transactionId,
+        reason,
+      });
+      const { t } = scopedTranslation.scopedT(defaultLocale);
+      return fail({
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -943,6 +1294,8 @@ export class ReferralRepository {
         total: number;
         available: number;
         locked: number;
+        /** In the refund window — not spendable, not payable yet */
+        pending: number;
       };
       payoutHistory: Array<{
         id: string;
@@ -967,6 +1320,18 @@ export class ReferralRepository {
         return balanceResult;
       }
 
+      const [pendingResult] = await db
+        .select({
+          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
+        })
+        .from(referralEarnings)
+        .where(
+          and(
+            eq(referralEarnings.earnerUserId, userId),
+            eq(referralEarnings.status, ReferralEarningStatus.PENDING),
+          ),
+        );
+
       // Get payout history
       const history = await db
         .select()
@@ -976,7 +1341,10 @@ export class ReferralRepository {
         .limit(50);
 
       return success({
-        earnedCredits: balanceResult.data,
+        earnedCredits: {
+          ...balanceResult.data,
+          pending: Number(pendingResult?.total ?? 0),
+        },
         payoutHistory: history.map((p) => ({
           id: p.id,
           amountCents: p.amountCents,
@@ -1001,7 +1369,62 @@ export class ReferralRepository {
   /**
    * Request a payout (BTC/USDC)
    */
+  /** Per-user in-process payout queue (see withUserPayoutLock) */
+  private static readonly payoutLocks = new Map<string, Promise<void>>();
+
+  /**
+   * Run payout work for one user strictly one-at-a-time in this process.
+   * Defense in depth on top of the wallet row lock: on Postgres the
+   * SELECT … FOR UPDATE alone serializes requests across instances, but the
+   * embedded PGlite backend shares ONE session between connections, where
+   * row locks cannot block concurrent transactions.
+   */
+  private static async withUserPayoutLock<T>(
+    userId: string,
+    fn: () => Promise<T>,
+  ): Promise<T> {
+    const previous =
+      ReferralRepository.payoutLocks.get(userId) ?? Promise.resolve();
+    let release: () => void = noop;
+    const current = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const tail = previous.then(() => current);
+    ReferralRepository.payoutLocks.set(userId, tail);
+    await previous;
+    try {
+      return await fn();
+    } finally {
+      release();
+      if (ReferralRepository.payoutLocks.get(userId) === tail) {
+        ReferralRepository.payoutLocks.delete(userId);
+      }
+    }
+  }
+
   static async requestPayout(
+    userId: string,
+    amountCents: number,
+    currency: typeof PayoutCurrencyValue,
+    walletAddress: string | null,
+    logger: EndpointLogger,
+    creditsT: CreditsT,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<PayoutRequestResult>> {
+    return ReferralRepository.withUserPayoutLock(userId, () =>
+      ReferralRepository.requestPayoutLocked(
+        userId,
+        amountCents,
+        currency,
+        walletAddress,
+        logger,
+        creditsT,
+        locale,
+      ),
+    );
+  }
+
+  private static async requestPayoutLocked(
     userId: string,
     amountCents: number,
     currency: typeof PayoutCurrencyValue,
@@ -1030,45 +1453,91 @@ export class ReferralRepository {
         });
       }
 
-      // Get earned balance
-      const balanceResult = await CreditRepository.getEarnedCreditsBalance(
-        userId,
-        logger,
-        creditsT,
-      );
-      if (!balanceResult.success) {
-        return balanceResult;
-      }
+      // Balance check + insert under the wallet row lock: concurrent requests
+      // serialize here, so the second sees the first as locked and cannot
+      // double-spend. Only CONFIRMED earnings ever exist as EARNED packs, so
+      // pending (refund-window) earnings are never payable.
+      const created = await withTransaction(logger, async (tx) => {
+        const [wallet] = await tx
+          .select({ id: creditWallets.id })
+          .from(creditWallets)
+          .where(eq(creditWallets.userId, userId))
+          .for("update")
+          .limit(1);
+        if (!wallet) {
+          return null;
+        }
 
-      // Check sufficient available balance
-      if (balanceResult.data.available < amountCents) {
+        const earnedPacks = await tx
+          .select({ remaining: creditPacks.remaining })
+          .from(creditPacks)
+          .where(
+            and(
+              eq(creditPacks.walletId, wallet.id),
+              eq(creditPacks.type, CreditPackType.EARNED),
+            ),
+          );
+        const earnedTotal = earnedPacks.reduce(
+          (sum, pack) => sum + pack.remaining,
+          0,
+        );
+
+        const openPayouts = await tx
+          .select({ amountCents: payoutRequests.amountCents })
+          .from(payoutRequests)
+          .where(
+            and(
+              eq(payoutRequests.userId, userId),
+              inArray(payoutRequests.status, [
+                PayoutStatus.PENDING,
+                PayoutStatus.APPROVED,
+                PayoutStatus.PROCESSING,
+              ]),
+            ),
+          );
+        const locked = openPayouts.reduce((sum, p) => sum + p.amountCents, 0);
+
+        if (earnedTotal - locked < amountCents) {
+          return null;
+        }
+
+        const [inserted] = await tx
+          .insert(payoutRequests)
+          .values({
+            userId,
+            amountCents,
+            currency,
+            status: PayoutStatus.PENDING,
+            walletAddress,
+          })
+          .returning();
+        return inserted;
+      });
+
+      if (!created) {
         return fail({
           message: t("payout.errors.insufficientBalance"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
-
-      // Create payout request
-      const [request] = await db
-        .insert(payoutRequests)
-        .values({
-          userId,
-          amountCents,
-          currency,
-          status: PayoutStatus.PENDING,
-          walletAddress,
-        })
-        .returning();
+      const request = created;
 
       // If converting to credits, process immediately
       if (currency === PayoutCurrency.CREDITS) {
-        await ReferralRepository.processCreditsConversion(
+        const conversion = await ReferralRepository.processCreditsConversion(
           request.id,
           userId,
           amountCents,
           logger,
           creditsT,
         );
+        if (!conversion.success) {
+          return fail({
+            message: t("payout.errors.conversionFailed"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            cause: conversion,
+          });
+        }
       }
 
       logger.info("Payout request created", {
@@ -1097,7 +1566,18 @@ export class ReferralRepository {
     amountCents: number,
     logger: EndpointLogger,
     creditsT: CreditsT,
-  ): Promise<void> {
+  ): Promise<ResponseType<void>> {
+    const markFailed = async (adminNotes: string): Promise<void> => {
+      await db
+        .update(payoutRequests)
+        .set({
+          status: PayoutStatus.FAILED,
+          adminNotes,
+          updatedAt: new Date(),
+        })
+        .where(eq(payoutRequests.id, requestId));
+    };
+
     // Deduct from earned credits
     const deductResult = await CreditRepository.deductEarnedCredits(
       userId,
@@ -1109,26 +1589,52 @@ export class ReferralRepository {
     );
 
     if (!deductResult.success) {
-      // Mark request as failed
-      await db
-        .update(payoutRequests)
-        .set({
-          status: PayoutStatus.FAILED,
-          adminNotes: "Failed to deduct earned credits",
-          updatedAt: new Date(),
-        })
-        .where(eq(payoutRequests.id, requestId));
-      return;
+      await markFailed("Failed to deduct earned credits");
+      return deductResult;
     }
 
     // Add to permanent credits
-    await CreditRepository.addUserCredits(
+    const addResult = await CreditRepository.addUserCredits(
       userId,
       amountCents,
       "permanent",
       logger,
       creditsT,
     );
+
+    if (!addResult.success) {
+      // Earned credits are already gone — put them back so the user loses
+      // nothing, and never mark the conversion completed.
+      const restoreResult = await CreditRepository.addEarnedCredits(
+        userId,
+        amountCents,
+        userId,
+        requestId,
+        0,
+        amountCents,
+        logger,
+        creditsT,
+      );
+      if (!restoreResult.success) {
+        logger.error(
+          "Credits conversion failed AND earned credits could not be restored — manual fix required",
+          { requestId, userId, amountCents },
+        );
+        await markFailed(
+          `Conversion failed; ${amountCents} earned credits deducted but NOT restored — restore manually`,
+        );
+      } else {
+        logger.error("Credits conversion failed — earned credits restored", {
+          requestId,
+          userId,
+          amountCents,
+        });
+        await markFailed(
+          "Failed to add permanent credits; earned credits restored",
+        );
+      }
+      return addResult;
+    }
 
     // Mark request as completed
     await db
@@ -1145,6 +1651,7 @@ export class ReferralRepository {
       userId,
       amountCents,
     });
+    return success();
   }
 
   /**

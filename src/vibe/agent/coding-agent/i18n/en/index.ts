@@ -75,6 +75,12 @@ export const translations = {
             description:
               "Coding agent process failed to start or crashed unexpectedly",
           },
+          binaryMissing: {
+            title:
+              "{{bin}} is not installed on this instance - install it or pick another coding agent",
+            description:
+              "The coding agent CLI binary was not found on this server's PATH",
+          },
           internalExitCode: {
             title: "Execution Failed (exit {{exitCode}})",
             description:

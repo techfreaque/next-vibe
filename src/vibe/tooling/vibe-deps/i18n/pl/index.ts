@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
     importers: "Importerzy",
     needsMove: "Do przeniesienia",
     unusedSymbols: "Nieużywane symbole",
+    unusedI18n: "Nieużywane klucze i18n",
     crossDomain: "Międzydomenowe",
     pageViolations: "Naruszenia Stron",
   },
@@ -125,6 +126,14 @@ export const translations: typeof enTranslations = {
       colPath: "plik",
       emptyState: "Brak nieużywanej powierzchni publicznej w zakresie.",
       wholeFile: "(cały plik — brak importerów)",
+    },
+    unusedI18n: {
+      title: "Nieużywane klucze i18n",
+      description:
+        "Klucze z tłumaczeń en, do których nie odwołuje się żaden plik źródłowy. Prefiksy szablonów jak t(`a.b.<x>`) chronią swoje poddrzewo. Usuwaj razem z en, de i pl.",
+      colKey: "klucz",
+      colPath: "plik",
+      emptyState: "Każdy klucz tłumaczenia w zakresie jest używany.",
     },
     pageViolations: {
       title: "Naruszenia Architektury Strony",

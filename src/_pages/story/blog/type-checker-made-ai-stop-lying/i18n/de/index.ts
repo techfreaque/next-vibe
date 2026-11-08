@@ -42,8 +42,6 @@ export const translations: typeof enTranslations = {
       "Eine als `any` typisierte Variable sagt dem Compiler: Hör hier auf zu prüfen. Nicht nur für diese Variable - für alles, was sie berührt. Der Fehler taucht nicht beim `any` auf. Er taucht drei Dateien weiter auf, wenn ein zusammenhangsloses Refactoring eine Annahme bricht, die nie durchgesetzt wurde.",
     zeroErrors:
       "Null TypeScript-Fehler heißt gar nichts, wenn du 47 ungeprüfte `any`-Stellen hast.",
-    zeroErrorsDescription:
-      "Du hast keine typsichere Codebase. Du hast eine Codebase, bei der der Compiler an 47 Stellen aufgegeben hat und du es als bestanden gewertet hast.",
     doubleAssertion:
       "`as unknown as Whatever` ist noch schlimmer. Das ist eine doppelte Typbehauptung. Du sagst dem Compiler: Ich weiß, dass das falsch ist, und behaupte mich trotzdem durch. Das ist der Lieblings-Fluchtweg der KI.",
     bannedTitle: "Die verbotenen Muster in dieser Codebase:",
@@ -51,17 +49,14 @@ export const translations: typeof enTranslations = {
       "Keine Warnungen. Fehler. Die Prüfung schlägt fehl. Claude Code muss die Grundursache beheben oder kann nicht ausliefern.",
     psychologyNote:
       "Der Grund, warum das Fehler und keine Warnungen sind, ist genauso psychologisch wie technisch. KI-Modelle behandeln Warnungen als optional. Fehler schließen die Schleife.",
-    infectionDiagramTitle: "Das `any`-Infektionsdiagramm",
     infectionDiagramSubtitle:
       "Ein `any`-Typ breitet sich durch den Graph aus und korrumpiert die nachgelagerte Typinferenz",
-    infectionUnsafe: "unsicher",
     counterZeroErrors: "TypeScript-Fehler",
     counterAnyUsages: "`any`-Stellen",
   },
   checker: {
     title: "@next-vibe/checker",
     subtitle: "Ein Befehl. Drei Tools. Keine Fluchtwege.",
-    mcpIntegrationTitle: "MCP-Integration",
     commandDescription:
       "Das ist der Befehl. Ein einziger. Er führt drei Tools parallel aus und gibt dir eine einheitliche Fehlerliste.",
     oxlintDescription:
@@ -70,22 +65,16 @@ export const translations: typeof enTranslations = {
       "Das, was Oxlint noch nicht kann: React Hooks Lint, React Compiler-Regeln, Import-Sortierung.",
     tsDescription:
       "Vollständige Typprüfung. Nicht nur die Datei, die du gerade bearbeitest - den gesamten Graph.",
-    parallelNote:
-      "Alle drei laufen parallel. Du bekommst eine einheitliche Fehlerliste. Fixen, bis es sauber ist.",
     timingNote:
       "Bei dieser Codebase - 4.400 Dateien - dauert das vollständige TypeScript etwa 12 Sekunden. Oxlint unter einer Sekunde. ESLint ein paar Sekunden. Parallel sind es insgesamt 12.",
     mcpNote:
       "Es gibt außerdem einen `vibe-check mcp`-Befehl, der einen MCP-Server mit einem `check`-Tool startet. Die KI führt keinen Shell-Befehl aus - sie ruft ein Tool auf, das strukturierte Fehlerdaten zurückgibt. Paginierung eingebaut. Filterung nach Pfad.",
-    architectureTitle: "Die Checker-Architektur",
-    architectureSubtitle:
-      "Drei Tools laufen parallel, eine einheitliche Fehlerliste",
     parallel: "parallel",
     unifiedErrors: "Einheitliche Fehlerliste",
     unifiedErrorsDescription: "Eine Ausgabe. Fixen, bis es sauber ist.",
   },
   plugins: {
     title: "Eigene Plugins",
-    subtitle: "Der Linter als Dokumentation",
     linterIsDocumentation:
       "Der Linter ist die Dokumentation. Und er wird durchgesetzt.",
     jsxPluginTitle: "jsx-capitalization Plugin",
@@ -105,8 +94,6 @@ export const translations: typeof enTranslations = {
     objectBanDescription:
       "`object` ist fast immer falsch. Entweder kennst du die Form - dann schreib das Interface - oder du meinst `Record<string, SomeType>`. Rohes `object` ist ein Zeichen dafür, dass die KI aufgegeben hat.",
     bannedPatternsTitle: "Verbotene Muster",
-    bannedPatternsSubtitle:
-      "Jedes verbotene Muster wird beim Prüfen erkannt. Die Fehlermeldung sagt der KI genau, was stattdessen zu tun ist.",
     bannedLabel: "VERBOTEN",
     correctLabel: "KORREKT",
   },
@@ -118,14 +105,10 @@ export const translations: typeof enTranslations = {
     round1Description:
       'Frag Claude Code: "Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben - nimm einfach irgendeinen Typ, der funktioniert."',
     round1Result: "Claude Code schreibt die einfache Lösung:",
-    round1Error:
-      "2 Fehler gefunden. Beide `any`. Claude Code sieht das über das MCP-Tool.",
     round2Title: "Runde 2 - KI versucht `unknown`",
     round2Description:
       "Schau, was es als Nächstes macht. Das ist der entscheidende Teil. Es versucht den nächsten Fluchtweg:",
     round2Result: "Den Trick kennt der Checker.",
-    round2Error:
-      "3 Fehler. `unknown` ist genauso verboten. Die Fehlermeldung sagt Claude Code genau, was stattdessen zu tun ist: die vorhandene typisierte Schnittstelle finden.",
     round3Title: "Runde 3 - KI findet den echten Typ",
     round3Description:
       "Jetzt macht Claude Code das, was es gleich hätte tun sollen. Es schaut nach, wie vorhandene API-Antworten in dieser Codebase typisiert sind. Es findet `ResponseType<T>`.",
@@ -133,8 +116,6 @@ export const translations: typeof enTranslations = {
       "Null Fehler. Und die Funktion ist jetzt tatsächlich korrekt.",
     round3Insight:
       "Der Checker hat den Code nicht geschrieben. Aber er hat die Abkürzung zweimal verhindert, bis Claude Code sich mit dem eigentlichen Problem auseinandersetzen musste.",
-    errorTitle: "Prüfungsausgabe",
-    passTitle: "Prüfung bestanden",
   },
   endpoint: {
     title: "Die Endpoint-Verbindung",
@@ -155,23 +136,11 @@ export const translations: typeof enTranslations = {
       "Wenn es ein Schema gibt, gibt es nichts zu synchronisieren.",
     typecheckedNote:
       "Und weil der TypeScript-Checker auch darüber läuft: Wenn du das Schema so änderst, dass der abgeleitete Typ downstream bricht, bekommst du einen Compiler-Fehler. Das KI-Tool-Schema ist typgeprüft. Die CLI-Flags sind typgeprüft. Der React-Hook ist typgeprüft.",
-    statsTitle: "Diese Codebase in Zahlen",
     stat245: "245 Endpoints",
     stat0any: "Null `any`",
     stat0unknown: "Null `unknown`-Casts",
     stat0tsExpect: "Null `@ts-expect-error`",
     statNote: "Nicht per Konvention. Durch den Checker.",
-    diagramTitle: "Ein Zod-Schema - vier Verbraucher",
-    diagramSubtitle:
-      "Schema einmal ändern - alles aktualisiert sich automatisch",
-    diagramSource: "definition.ts (Zod-Schema)",
-    diagramWebApi: "Web-API-Validierung",
-    diagramHookTypes: "React-Hook-Typen",
-    diagramCliFlags: "CLI-Flags",
-    diagramAiSchema: "KI-Tool-Schema",
-    diagramSameSchema: "selbes Schema",
-    diagramInferred: "abgeleitet vom Schema",
-    diagramGenerated: "generiert vom Schema",
   },
   install: {
     title: "@next-vibe/checker installieren",

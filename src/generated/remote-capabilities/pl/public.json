@@ -976,6 +976,92 @@
     "credits": 0
   },
   {
+    "toolName": "newsletter-confirm",
+    "title": "Potwierdź e-mail newslettera",
+    "titleShort": "Potwierdź e-mail",
+    "description": "Potwierdź adres newslettera kodem z maila powitalnego. Odblokowuje miesięczny bonus darmowych kredytów.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "token": {
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string"
+          },
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Kod potwierdzenia",
+          "description": "Kod z linku w Twoim mailu powitalnym",
+          "placeholder": "Wklej kod z maila",
+          "columns": 12,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "confirmed": {
+          "type": "text",
+          "label": "Potwierdzono",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "email": {
+          "type": "text",
+          "label": "E-mail",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bonusCredits": {
+          "type": "text",
+          "label": "Bonusowe kredyty miesięcznie",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "newsletter",
+    "tags": ["Newsletter"],
+    "aliases": ["newsletter-confirm"],
+    "credits": 0
+  },
+  {
     "toolName": "newsletter-status",
     "title": "Status newslettera",
     "titleShort": "Status newslettera",
@@ -1288,6 +1374,65 @@
               }
             },
             "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "creditBonus": {
+          "type": "badge",
+          "label": "Bonus darmowych kredytów",
+          "enumOptions": [
+            {
+              "value": "enum.creditBonus.active",
+              "label": "enum.creditBonus.active"
+            },
+            {
+              "value": "enum.creditBonus.pendingConfirmation",
+              "label": "enum.creditBonus.pendingConfirmation"
+            },
+            {
+              "value": "enum.creditBonus.claimedElsewhere",
+              "label": "enum.creditBonus.claimedElsewhere"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "ACTIVE": "enum.creditBonus.active",
+                "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
+                "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "ACTIVE": "enum.creditBonus.active",
+              "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
+              "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+            },
+            "options": [
+              "enum.creditBonus.active",
+              "enum.creditBonus.pendingConfirmation",
+              "enum.creditBonus.claimedElsewhere"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bonusCredits": {
+          "type": "text",
+          "label": "Bonusowe kredyty miesięcznie",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
           },
           "usage": {
             "response": true
@@ -4339,13 +4484,9 @@
                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                           "GPT_6_ASTRA": "gpt-6-astra",
-                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                           "GPT_6_LUNA": "gpt-6-luna",
-                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                           "GEMINI_4_ARGON": "gemini-4-argon",
                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                           "GROK_4_7": "grok-4.7",
@@ -4474,13 +4615,9 @@
                         "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                         "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                         "GPT_6_ASTRA": "gpt-6-astra",
-                        "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                         "GPT_6_1_SOL": "gpt-6.1-sol",
-                        "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                         "GPT_6_1_TERRA": "gpt-6.1-terra",
-                        "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                         "GPT_6_LUNA": "gpt-6-luna",
-                        "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                         "GEMINI_4_ARGON": "gemini-4-argon",
                         "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                         "GROK_4_7": "grok-4.7",
@@ -4607,13 +4744,9 @@
                         "claude-haiku-5.5",
                         "claude-fable-5.1",
                         "gpt-6-astra",
-                        "gpt-6-astra-pro",
                         "gpt-6.1-sol",
-                        "gpt-6.1-sol-pro",
                         "gpt-6.1-terra",
-                        "gpt-6.1-terra-pro",
                         "gpt-6-luna",
-                        "gpt-6-luna-pro",
                         "gemini-4-argon",
                         "gemini-3.8-flash",
                         "grok-4.7",
@@ -7453,13 +7586,9 @@
                               "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                               "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                               "GPT_6_ASTRA": "gpt-6-astra",
-                              "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                               "GPT_6_1_SOL": "gpt-6.1-sol",
-                              "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                               "GPT_6_1_TERRA": "gpt-6.1-terra",
-                              "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                               "GPT_6_LUNA": "gpt-6-luna",
-                              "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                               "GEMINI_4_ARGON": "gemini-4-argon",
                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                               "GROK_4_7": "grok-4.7",
@@ -7588,13 +7717,9 @@
                             "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                             "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                             "GPT_6_ASTRA": "gpt-6-astra",
-                            "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                             "GPT_6_1_SOL": "gpt-6.1-sol",
-                            "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                             "GPT_6_1_TERRA": "gpt-6.1-terra",
-                            "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                             "GPT_6_LUNA": "gpt-6-luna",
-                            "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                             "GEMINI_4_ARGON": "gemini-4-argon",
                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                             "GROK_4_7": "grok-4.7",
@@ -7721,13 +7846,9 @@
                             "claude-haiku-5.5",
                             "claude-fable-5.1",
                             "gpt-6-astra",
-                            "gpt-6-astra-pro",
                             "gpt-6.1-sol",
-                            "gpt-6.1-sol-pro",
                             "gpt-6.1-terra",
-                            "gpt-6.1-terra-pro",
                             "gpt-6-luna",
-                            "gpt-6-luna-pro",
                             "gemini-4-argon",
                             "gemini-3.8-flash",
                             "grok-4.7",
@@ -8603,32 +8724,16 @@
               "label": "models.names.GPT_6_ASTRA"
             },
             {
-              "value": "gpt-6-astra-pro",
-              "label": "models.names.GPT_6_ASTRA_PRO"
-            },
-            {
               "value": "gpt-6.1-sol",
               "label": "models.names.GPT_6_1_SOL"
-            },
-            {
-              "value": "gpt-6.1-sol-pro",
-              "label": "models.names.GPT_6_1_SOL_PRO"
             },
             {
               "value": "gpt-6.1-terra",
               "label": "models.names.GPT_6_1_TERRA"
             },
             {
-              "value": "gpt-6.1-terra-pro",
-              "label": "models.names.GPT_6_1_TERRA_PRO"
-            },
-            {
               "value": "gpt-6-luna",
               "label": "models.names.GPT_6_LUNA"
-            },
-            {
-              "value": "gpt-6-luna-pro",
-              "label": "models.names.GPT_6_LUNA_PRO"
             },
             {
               "value": "gemini-4-argon",
@@ -8806,13 +8911,9 @@
                     "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                     "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                     "GPT_6_ASTRA": "gpt-6-astra",
-                    "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                     "GPT_6_1_SOL": "gpt-6.1-sol",
-                    "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                     "GPT_6_1_TERRA": "gpt-6.1-terra",
-                    "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                     "GPT_6_LUNA": "gpt-6-luna",
-                    "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                     "GEMINI_4_ARGON": "gemini-4-argon",
                     "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                     "GROK_4_7": "grok-4.7",
@@ -8941,13 +9042,9 @@
                   "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                   "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                   "GPT_6_ASTRA": "gpt-6-astra",
-                  "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                   "GPT_6_1_SOL": "gpt-6.1-sol",
-                  "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                   "GPT_6_1_TERRA": "gpt-6.1-terra",
-                  "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                   "GPT_6_LUNA": "gpt-6-luna",
-                  "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                   "GEMINI_4_ARGON": "gemini-4-argon",
                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                   "GROK_4_7": "grok-4.7",
@@ -9074,13 +9171,9 @@
                   "claude-haiku-5.5",
                   "claude-fable-5.1",
                   "gpt-6-astra",
-                  "gpt-6-astra-pro",
                   "gpt-6.1-sol",
-                  "gpt-6.1-sol-pro",
                   "gpt-6.1-terra",
-                  "gpt-6.1-terra-pro",
                   "gpt-6-luna",
-                  "gpt-6-luna-pro",
                   "gemini-4-argon",
                   "gemini-3.8-flash",
                   "grok-4.7",
@@ -20139,13 +20232,9 @@
                         "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                         "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                         "GPT_6_ASTRA": "gpt-6-astra",
-                        "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                         "GPT_6_1_SOL": "gpt-6.1-sol",
-                        "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                         "GPT_6_1_TERRA": "gpt-6.1-terra",
-                        "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                         "GPT_6_LUNA": "gpt-6-luna",
-                        "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                         "GEMINI_4_ARGON": "gemini-4-argon",
                         "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                         "GROK_4_7": "grok-4.7",
@@ -20274,13 +20363,9 @@
                       "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                       "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                       "GPT_6_ASTRA": "gpt-6-astra",
-                      "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                       "GPT_6_1_SOL": "gpt-6.1-sol",
-                      "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                       "GPT_6_1_TERRA": "gpt-6.1-terra",
-                      "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                       "GPT_6_LUNA": "gpt-6-luna",
-                      "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                       "GEMINI_4_ARGON": "gemini-4-argon",
                       "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                       "GROK_4_7": "grok-4.7",
@@ -20407,13 +20492,9 @@
                       "claude-haiku-5.5",
                       "claude-fable-5.1",
                       "gpt-6-astra",
-                      "gpt-6-astra-pro",
                       "gpt-6.1-sol",
-                      "gpt-6.1-sol-pro",
                       "gpt-6.1-terra",
-                      "gpt-6.1-terra-pro",
                       "gpt-6-luna",
-                      "gpt-6-luna-pro",
                       "gemini-4-argon",
                       "gemini-3.8-flash",
                       "grok-4.7",
@@ -20445,7 +20526,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Domyślny ton",
-          "description": "Domyślna postać/ton dla tego wątku",
+          "description": "Domyślny skill/ton dla tego wątku",
           "columns": 6,
           "schema": {
             "def": {
@@ -23139,13 +23220,9 @@
                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                           "GPT_6_ASTRA": "gpt-6-astra",
-                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                           "GPT_6_LUNA": "gpt-6-luna",
-                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                           "GEMINI_4_ARGON": "gemini-4-argon",
                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                           "GROK_4_7": "grok-4.7",
@@ -23274,13 +23351,9 @@
                         "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                         "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                         "GPT_6_ASTRA": "gpt-6-astra",
-                        "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                         "GPT_6_1_SOL": "gpt-6.1-sol",
-                        "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                         "GPT_6_1_TERRA": "gpt-6.1-terra",
-                        "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                         "GPT_6_LUNA": "gpt-6-luna",
-                        "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                         "GEMINI_4_ARGON": "gemini-4-argon",
                         "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                         "GROK_4_7": "grok-4.7",
@@ -23407,13 +23480,9 @@
                         "claude-haiku-5.5",
                         "claude-fable-5.1",
                         "gpt-6-astra",
-                        "gpt-6-astra-pro",
                         "gpt-6.1-sol",
-                        "gpt-6.1-sol-pro",
                         "gpt-6.1-terra",
-                        "gpt-6.1-terra-pro",
                         "gpt-6-luna",
-                        "gpt-6-luna-pro",
                         "gemini-4-argon",
                         "gemini-3.8-flash",
                         "grok-4.7",
@@ -24339,13 +24408,9 @@
                     "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                     "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                     "GPT_6_ASTRA": "gpt-6-astra",
-                    "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                     "GPT_6_1_SOL": "gpt-6.1-sol",
-                    "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                     "GPT_6_1_TERRA": "gpt-6.1-terra",
-                    "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                     "GPT_6_LUNA": "gpt-6-luna",
-                    "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                     "GEMINI_4_ARGON": "gemini-4-argon",
                     "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                     "GROK_4_7": "grok-4.7",
@@ -24474,13 +24539,9 @@
                   "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                   "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                   "GPT_6_ASTRA": "gpt-6-astra",
-                  "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                   "GPT_6_1_SOL": "gpt-6.1-sol",
-                  "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                   "GPT_6_1_TERRA": "gpt-6.1-terra",
-                  "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                   "GPT_6_LUNA": "gpt-6-luna",
-                  "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                   "GEMINI_4_ARGON": "gemini-4-argon",
                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                   "GROK_4_7": "grok-4.7",
@@ -24607,13 +24668,9 @@
                   "claude-haiku-5.5",
                   "claude-fable-5.1",
                   "gpt-6-astra",
-                  "gpt-6-astra-pro",
                   "gpt-6.1-sol",
-                  "gpt-6.1-sol-pro",
                   "gpt-6.1-terra",
-                  "gpt-6.1-terra-pro",
                   "gpt-6-luna",
-                  "gpt-6-luna-pro",
                   "gemini-4-argon",
                   "gemini-3.8-flash",
                   "grok-4.7",
@@ -24642,7 +24699,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Postać",
-          "description": "Postać/persona AI dla wiadomości",
+          "description": "Skill/persona AI dla wiadomości",
           "schema": {
             "def": {
               "type": "optional",
@@ -25339,13 +25396,9 @@
                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                           "GPT_6_ASTRA": "gpt-6-astra",
-                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                           "GPT_6_LUNA": "gpt-6-luna",
-                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                           "GEMINI_4_ARGON": "gemini-4-argon",
                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                           "GROK_4_7": "grok-4.7",
@@ -25474,13 +25527,9 @@
                         "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                         "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                         "GPT_6_ASTRA": "gpt-6-astra",
-                        "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                         "GPT_6_1_SOL": "gpt-6.1-sol",
-                        "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                         "GPT_6_1_TERRA": "gpt-6.1-terra",
-                        "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                         "GPT_6_LUNA": "gpt-6-luna",
-                        "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                         "GEMINI_4_ARGON": "gemini-4-argon",
                         "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                         "GROK_4_7": "grok-4.7",
@@ -25607,13 +25656,9 @@
                         "claude-haiku-5.5",
                         "claude-fable-5.1",
                         "gpt-6-astra",
-                        "gpt-6-astra-pro",
                         "gpt-6.1-sol",
-                        "gpt-6.1-sol-pro",
                         "gpt-6.1-terra",
-                        "gpt-6.1-terra-pro",
                         "gpt-6-luna",
-                        "gpt-6-luna-pro",
                         "gemini-4-argon",
                         "gemini-3.8-flash",
                         "grok-4.7",
@@ -26192,6 +26237,245 @@
     "instanceId": "local",
     "category": "ai",
     "tags": ["Wiadomości"],
+    "credits": 0
+  },
+  {
+    "toolName": "thread-report",
+    "title": "Zgłoś treść",
+    "titleShort": "Zgłoś",
+    "description": "Zgłoś publiczny post lub udostępniony wątek. Wystarczająco dużo zgłoszeń ukrywa go do czasu weryfikacji przez admina.",
+    "fields": {
+      "usage": {
+        "request": "data&urlPathParams",
+        "response": true
+      },
+      "children": {
+        "threadId": {
+          "type": "form_field",
+          "fieldType": "entity_picker",
+          "labelField": "title",
+          "label": "Zgłoś treść",
+          "description": "Zgłoś publiczny post lub udostępniony wątek. Wystarczająco dużo zgłoszeń ukrywa go do czasu weryfikacji przez admina.",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "reason": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Powód",
+          "description": "Co jest nie tak z tą treścią?",
+          "options": [
+            {
+              "value": "enums.threadReportReason.spam",
+              "label": "post.reasons.spam"
+            },
+            {
+              "value": "enums.threadReportReason.illegal",
+              "label": "post.reasons.illegal"
+            },
+            {
+              "value": "enums.threadReportReason.abuse",
+              "label": "post.reasons.abuse"
+            },
+            {
+              "value": "enums.threadReportReason.csamFlag",
+              "label": "post.reasons.csamFlag"
+            },
+            {
+              "value": "enums.threadReportReason.other",
+              "label": "post.reasons.other"
+            }
+          ],
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "enums.threadReportReason.spam": "enums.threadReportReason.spam",
+                "enums.threadReportReason.illegal": "enums.threadReportReason.illegal",
+                "enums.threadReportReason.abuse": "enums.threadReportReason.abuse",
+                "enums.threadReportReason.csamFlag": "enums.threadReportReason.csamFlag",
+                "enums.threadReportReason.other": "enums.threadReportReason.other"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "enums.threadReportReason.spam": "enums.threadReportReason.spam",
+              "enums.threadReportReason.illegal": "enums.threadReportReason.illegal",
+              "enums.threadReportReason.abuse": "enums.threadReportReason.abuse",
+              "enums.threadReportReason.csamFlag": "enums.threadReportReason.csamFlag",
+              "enums.threadReportReason.other": "enums.threadReportReason.other"
+            },
+            "options": [
+              "enums.threadReportReason.spam",
+              "enums.threadReportReason.illegal",
+              "enums.threadReportReason.abuse",
+              "enums.threadReportReason.csamFlag",
+              "enums.threadReportReason.other"
+            ]
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "note": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Szczegóły",
+          "description": "Opcjonalnie. Dodaj kontekst dla weryfikującego.",
+          "placeholder": "Co powinien wiedzieć weryfikujący?",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "messageId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "ID wiadomości",
+          "description": "Konkretna zgłaszana wiadomość (opcjonalnie)",
+          "hidden": true,
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "reported": {
+          "type": "text",
+          "label": "Zgłoszono",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "reportCount": {
+          "type": "text",
+          "label": "Liczba zgłoszeń",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "hidden": {
+          "type": "text",
+          "label": "Ukryte",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data&urlPathParams"
+          },
+          "type": "navigate_button",
+          "label": "Wstecz",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data&urlPathParams"
+          },
+          "type": "submit_button",
+          "text": "post.button.submit",
+          "loadingText": "post.button.loading",
+          "icon": "alert-triangle",
+          "variant": "destructive",
+          "size": "default",
+          "className": "ml-auto"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Moderacja"],
+    "aliases": ["thread-report"],
     "credits": 0
   },
   {
@@ -29934,10 +30218,1313 @@
     "credits": 0
   },
   {
+    "toolName": "refusal-index-leaderboard",
+    "title": "Ranking Indeksu odmów",
+    "titleShort": "Indeks odmów",
+    "description": "Jak często każdy model AI odpowiada, łagodzi albo odmawia - z najnowszego tygodniowego przebiegu.",
+    "fields": {
+      "type": "container",
+      "layoutType": "stacked",
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "hasData": {
+          "type": "badge",
+          "label": "Ma dane",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "runId": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "uuid",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "runFinishedAt": {
+          "type": "text",
+          "label": "Przebieg zakończony",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "datetime",
+                        "check": "string_format",
+                        "offset": false,
+                        "local": false,
+                        "precision": null,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "modelCount": {
+          "type": "text",
+          "label": "Modele",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "questionCount": {
+          "type": "text",
+          "label": "Pytania",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgeModelId": {
+          "type": "text",
+          "label": "ID modelu-sędziego",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgeModelName": {
+          "type": "text",
+          "label": "Model-sędzia",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgePromptVersion": {
+          "type": "text",
+          "label": "Wersja promptu sędziego",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "overall": {
+          "type": "container",
+          "layoutType": "grid",
+          "columns": 12,
+          "title": "Ogółem",
+          "usage": {
+            "response": true
+          },
+          "children": {
+            "judged": {
+              "type": "text",
+              "label": "Ocenione odpowiedzi",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "answeredPct": {
+              "type": "text",
+              "label": "Odpowiedział %",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "hedgedPct": {
+              "type": "text",
+              "label": "Złagodził %",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "refusedPct": {
+              "type": "text",
+              "label": "Odmówił %",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            }
+          },
+          "schemaType": "object"
+        },
+        "categories": {
+          "type": "container",
+          "child": {
+            "type": "text",
+            "schema": {
+              "def": {
+                "type": "string"
+              },
+              "type": "string"
+            },
+            "usage": {
+              "response": true
+            },
+            "schemaType": "primitive"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        },
+        "models": {
+          "type": "container",
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "modelId": {
+                "type": "text",
+                "label": "ID modelu",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "name": {
+                "type": "text",
+                "label": "Nazwa",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "tier": {
+                "type": "badge",
+                "label": "Poziom",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "judged": {
+                "type": "text",
+                "label": "Ocenione odpowiedzi",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "answeredPct": {
+                "type": "text",
+                "label": "Odpowiedział %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "hedgedPct": {
+                "type": "text",
+                "label": "Złagodził %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "refusedPct": {
+                "type": "text",
+                "label": "Odmówił %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "trend": {
+                "type": "text",
+                "label": "Trend odmów (punkty)",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "categoryBreakdown": {
+                "type": "container",
+                "child": {
+                  "type": "container",
+                  "layoutType": "stacked",
+                  "noCard": true,
+                  "usage": {
+                    "response": true
+                  },
+                  "children": {
+                    "category": {
+                      "type": "badge",
+                      "label": "Kategoria",
+                      "schema": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "usage": {
+                        "response": true
+                      },
+                      "schemaType": "primitive"
+                    },
+                    "judged": {
+                      "type": "text",
+                      "label": "Ocenione odpowiedzi",
+                      "schema": {
+                        "def": {
+                          "type": "number",
+                          "checks": [
+                            {
+                              "def": {
+                                "type": "number",
+                                "check": "number_format",
+                                "abort": false,
+                                "format": "safeint"
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            {}
+                          ]
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "usage": {
+                        "response": true
+                      },
+                      "schemaType": "primitive"
+                    },
+                    "answeredPct": {
+                      "type": "text",
+                      "label": "Odpowiedział %",
+                      "schema": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "usage": {
+                        "response": true
+                      },
+                      "schemaType": "primitive"
+                    },
+                    "hedgedPct": {
+                      "type": "text",
+                      "label": "Złagodził %",
+                      "schema": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "usage": {
+                        "response": true
+                      },
+                      "schemaType": "primitive"
+                    },
+                    "refusedPct": {
+                      "type": "text",
+                      "label": "Odmówił %",
+                      "schema": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "usage": {
+                        "response": true
+                      },
+                      "schemaType": "primitive"
+                    }
+                  },
+                  "schemaType": "object"
+                },
+                "schemaType": "array",
+                "usage": {
+                  "response": true
+                }
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Indeks odmów"],
+    "aliases": ["refusal-index-leaderboard"],
+    "credits": 0
+  },
+  {
+    "toolName": "vibe_agent_refusal-index_model_modelId_GET",
+    "title": "Wskaźniki odmów modelu",
+    "titleShort": "Wskaźniki modelu",
+    "description": "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu z najnowszego przebiegu, plus zatwierdzone próbki odpowiedzi.",
+    "fields": {
+      "type": "container",
+      "layoutType": "stacked",
+      "usage": {
+        "request": "urlPathParams",
+        "response": true
+      },
+      "children": {
+        "modelId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Model",
+          "description": "ID modelu lub slug z URL",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "hasData": {
+          "type": "badge",
+          "label": "Ma dane",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "runId": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "uuid",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "runFinishedAt": {
+          "type": "text",
+          "label": "Przebieg zakończony",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "datetime",
+                        "check": "string_format",
+                        "offset": false,
+                        "local": false,
+                        "precision": null,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "modelCount": {
+          "type": "text",
+          "label": "Modele",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "questionCount": {
+          "type": "text",
+          "label": "Pytania",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgeModelId": {
+          "type": "text",
+          "label": "ID modelu-sędziego",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgeModelName": {
+          "type": "text",
+          "label": "Model-sędzia",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judgePromptVersion": {
+          "type": "text",
+          "label": "Wersja promptu sędziego",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "name": {
+          "type": "text",
+          "label": "Nazwa",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "tier": {
+          "type": "badge",
+          "label": "Poziom",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "judged": {
+          "type": "text",
+          "label": "Ocenione odpowiedzi",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "answeredPct": {
+          "type": "text",
+          "label": "Odpowiedział %",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "hedgedPct": {
+          "type": "text",
+          "label": "Złagodził %",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "refusedPct": {
+          "type": "text",
+          "label": "Odmówił %",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "trend": {
+          "type": "text",
+          "label": "Trend odmów (punkty)",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "rank": {
+          "type": "text",
+          "label": "Miejsce (1 = najmniej odmów)",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "rankedModels": {
+          "type": "text",
+          "label": "Modele w rankingu",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "categoryBreakdown": {
+          "type": "container",
+          "child": {
+            "type": "container",
+            "layoutType": "stacked",
+            "noCard": true,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "category": {
+                "type": "badge",
+                "label": "Kategoria",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "judged": {
+                "type": "text",
+                "label": "Ocenione odpowiedzi",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "answeredPct": {
+                "type": "text",
+                "label": "Odpowiedział %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "hedgedPct": {
+                "type": "text",
+                "label": "Złagodził %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "refusedPct": {
+                "type": "text",
+                "label": "Odmówił %",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        },
+        "samples": {
+          "type": "container",
+          "child": {
+            "type": "container",
+            "layoutType": "stacked",
+            "noCard": true,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "id": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "string",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "string",
+                          "format": "uuid",
+                          "check": "string_format",
+                          "abort": false,
+                          "pattern": {}
+                        },
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "category": {
+                "type": "badge",
+                "label": "Kategoria",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionEn": {
+                "type": "text",
+                "label": "Pytanie",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionDe": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionPl": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "verdict": {
+                "type": "badge",
+                "label": "Werdykt",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.verdict.answered": "enums.verdict.answered",
+                      "enums.verdict.hedged": "enums.verdict.hedged",
+                      "enums.verdict.refused": "enums.verdict.refused",
+                      "enums.verdict.error": "enums.verdict.error"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.verdict.answered": "enums.verdict.answered",
+                    "enums.verdict.hedged": "enums.verdict.hedged",
+                    "enums.verdict.refused": "enums.verdict.refused",
+                    "enums.verdict.error": "enums.verdict.error"
+                  },
+                  "options": [
+                    "enums.verdict.answered",
+                    "enums.verdict.hedged",
+                    "enums.verdict.refused",
+                    "enums.verdict.error"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "answerExcerpt": {
+                "type": "text",
+                "label": "Odpowiedź",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "judgeReason": {
+                "type": "text",
+                "label": "Uzasadnienie sędziego",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Indeks odmów"],
+    "credits": 0
+  },
+  {
     "toolName": "skill-get",
-    "title": "Pobierz postacię",
+    "title": "Pobierz skill",
     "titleShort": "Szczegóły skilla",
-    "description": "Pobierz konkretną postacię według ID",
+    "description": "Pobierz konkretną skill według ID",
     "fields": {
       "usage": {
         "request": "urlPathParams",
@@ -29947,7 +31534,7 @@
         "id": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID postaci",
+          "label": "ID skilla",
           "hidden": true,
           "schema": {
             "def": {
@@ -30593,13 +32180,9 @@
                                       "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                       "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                       "GPT_6_ASTRA": "gpt-6-astra",
-                                      "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                       "GPT_6_1_SOL": "gpt-6.1-sol",
-                                      "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                       "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                      "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                       "GPT_6_LUNA": "gpt-6-luna",
-                                      "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                       "GEMINI_4_ARGON": "gemini-4-argon",
                                       "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                       "GROK_4_7": "grok-4.7",
@@ -30728,13 +32311,9 @@
                                     "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                     "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                     "GPT_6_ASTRA": "gpt-6-astra",
-                                    "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                     "GPT_6_1_SOL": "gpt-6.1-sol",
-                                    "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                     "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                    "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                     "GPT_6_LUNA": "gpt-6-luna",
-                                    "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                     "GEMINI_4_ARGON": "gemini-4-argon",
                                     "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                     "GROK_4_7": "grok-4.7",
@@ -30861,13 +32440,9 @@
                                     "claude-haiku-5.5",
                                     "claude-fable-5.1",
                                     "gpt-6-astra",
-                                    "gpt-6-astra-pro",
                                     "gpt-6.1-sol",
-                                    "gpt-6.1-sol-pro",
                                     "gpt-6.1-terra",
-                                    "gpt-6.1-terra-pro",
                                     "gpt-6-luna",
-                                    "gpt-6-luna-pro",
                                     "gemini-4-argon",
                                     "gemini-3.8-flash",
                                     "grok-4.7",
@@ -31650,13 +33225,9 @@
                                     "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                     "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                     "GPT_6_ASTRA": "gpt-6-astra",
-                                    "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                     "GPT_6_1_SOL": "gpt-6.1-sol",
-                                    "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                     "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                    "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                     "GPT_6_LUNA": "gpt-6-luna",
-                                    "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                     "GEMINI_4_ARGON": "gemini-4-argon",
                                     "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                     "GROK_4_7": "grok-4.7",
@@ -31785,13 +33356,9 @@
                                   "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                   "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                   "GPT_6_ASTRA": "gpt-6-astra",
-                                  "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                   "GPT_6_1_SOL": "gpt-6.1-sol",
-                                  "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                   "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                  "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                   "GPT_6_LUNA": "gpt-6-luna",
-                                  "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                   "GEMINI_4_ARGON": "gemini-4-argon",
                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                   "GROK_4_7": "grok-4.7",
@@ -31918,13 +33485,9 @@
                                   "claude-haiku-5.5",
                                   "claude-fable-5.1",
                                   "gpt-6-astra",
-                                  "gpt-6-astra-pro",
                                   "gpt-6.1-sol",
-                                  "gpt-6.1-sol-pro",
                                   "gpt-6.1-terra",
-                                  "gpt-6.1-terra-pro",
                                   "gpt-6-luna",
-                                  "gpt-6-luna-pro",
                                   "gemini-4-argon",
                                   "gemini-3.8-flash",
                                   "grok-4.7",
@@ -37108,7 +38671,19 @@
                                               "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                               "ELEVENLABS_JOSH": "elevenlabs-josh",
                                               "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                              "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                              "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                              "KOKORO_BELLA": "kokoro-bella",
+                                              "KOKORO_SARAH": "kokoro-sarah",
+                                              "KOKORO_NICOLE": "kokoro-nicole",
+                                              "KOKORO_ADAM": "kokoro-adam",
+                                              "KOKORO_MICHAEL": "kokoro-michael",
+                                              "KOKORO_EMMA": "kokoro-emma",
+                                              "KOKORO_GEORGE": "kokoro-george",
+                                              "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                              "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                              "XAI_EVE": "xai-eve",
+                                              "GEMINI_ZEPHYR": "gemini-zephyr",
+                                              "GEMINI_PUCK": "gemini-puck"
                                             }
                                           },
                                           "type": "enum",
@@ -37122,7 +38697,19 @@
                                             "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                             "ELEVENLABS_JOSH": "elevenlabs-josh",
                                             "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                            "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                            "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                            "KOKORO_BELLA": "kokoro-bella",
+                                            "KOKORO_SARAH": "kokoro-sarah",
+                                            "KOKORO_NICOLE": "kokoro-nicole",
+                                            "KOKORO_ADAM": "kokoro-adam",
+                                            "KOKORO_MICHAEL": "kokoro-michael",
+                                            "KOKORO_EMMA": "kokoro-emma",
+                                            "KOKORO_GEORGE": "kokoro-george",
+                                            "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                            "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                            "XAI_EVE": "xai-eve",
+                                            "GEMINI_ZEPHYR": "gemini-zephyr",
+                                            "GEMINI_PUCK": "gemini-puck"
                                           },
                                           "options": [
                                             "openai-alloy",
@@ -37134,7 +38721,19 @@
                                             "elevenlabs-rachel",
                                             "elevenlabs-josh",
                                             "elevenlabs-bella",
-                                            "elevenlabs-adam"
+                                            "elevenlabs-adam",
+                                            "kokoro-bella",
+                                            "kokoro-sarah",
+                                            "kokoro-nicole",
+                                            "kokoro-adam",
+                                            "kokoro-michael",
+                                            "kokoro-emma",
+                                            "kokoro-george",
+                                            "inworld-mini-ashley",
+                                            "inworld-mini-craig",
+                                            "xai-eve",
+                                            "gemini-zephyr",
+                                            "gemini-puck"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -37806,7 +39405,19 @@
                                             "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                             "ELEVENLABS_JOSH": "elevenlabs-josh",
                                             "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                            "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                            "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                            "KOKORO_BELLA": "kokoro-bella",
+                                            "KOKORO_SARAH": "kokoro-sarah",
+                                            "KOKORO_NICOLE": "kokoro-nicole",
+                                            "KOKORO_ADAM": "kokoro-adam",
+                                            "KOKORO_MICHAEL": "kokoro-michael",
+                                            "KOKORO_EMMA": "kokoro-emma",
+                                            "KOKORO_GEORGE": "kokoro-george",
+                                            "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                            "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                            "XAI_EVE": "xai-eve",
+                                            "GEMINI_ZEPHYR": "gemini-zephyr",
+                                            "GEMINI_PUCK": "gemini-puck"
                                           }
                                         },
                                         "type": "enum",
@@ -37820,7 +39431,19 @@
                                           "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                           "ELEVENLABS_JOSH": "elevenlabs-josh",
                                           "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                          "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                          "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                          "KOKORO_BELLA": "kokoro-bella",
+                                          "KOKORO_SARAH": "kokoro-sarah",
+                                          "KOKORO_NICOLE": "kokoro-nicole",
+                                          "KOKORO_ADAM": "kokoro-adam",
+                                          "KOKORO_MICHAEL": "kokoro-michael",
+                                          "KOKORO_EMMA": "kokoro-emma",
+                                          "KOKORO_GEORGE": "kokoro-george",
+                                          "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                          "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                          "XAI_EVE": "xai-eve",
+                                          "GEMINI_ZEPHYR": "gemini-zephyr",
+                                          "GEMINI_PUCK": "gemini-puck"
                                         },
                                         "options": [
                                           "openai-alloy",
@@ -37832,7 +39455,19 @@
                                           "elevenlabs-rachel",
                                           "elevenlabs-josh",
                                           "elevenlabs-bella",
-                                          "elevenlabs-adam"
+                                          "elevenlabs-adam",
+                                          "kokoro-bella",
+                                          "kokoro-sarah",
+                                          "kokoro-nicole",
+                                          "kokoro-adam",
+                                          "kokoro-michael",
+                                          "kokoro-emma",
+                                          "kokoro-george",
+                                          "inworld-mini-ashley",
+                                          "inworld-mini-craig",
+                                          "xai-eve",
+                                          "gemini-zephyr",
+                                          "gemini-puck"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -38508,17 +40143,29 @@
                                             "type": "enum",
                                             "entries": {
                                               "OPENAI_WHISPER": "openai-whisper",
-                                              "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                              "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                              "WHISPER_LARGE_V3": "whisper-large-v3",
+                                              "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                              "NEMOTRON_ASR": "nemotron-asr",
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                             }
                                           },
                                           "type": "enum",
                                           "enum": {
                                             "OPENAI_WHISPER": "openai-whisper",
-                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                            "WHISPER_LARGE_V3": "whisper-large-v3",
+                                            "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                            "NEMOTRON_ASR": "nemotron-asr",
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                           },
                                           "options": [
                                             "openai-whisper",
-                                            "deepgram-nova-2"
+                                            "deepgram-nova-2",
+                                            "whisper-large-v3",
+                                            "voxtral-mini-transcribe",
+                                            "nemotron-asr",
+                                            "gpt4o-mini-transcribe"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -39182,17 +40829,29 @@
                                           "type": "enum",
                                           "entries": {
                                             "OPENAI_WHISPER": "openai-whisper",
-                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                            "WHISPER_LARGE_V3": "whisper-large-v3",
+                                            "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                            "NEMOTRON_ASR": "nemotron-asr",
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                           }
                                         },
                                         "type": "enum",
                                         "enum": {
                                           "OPENAI_WHISPER": "openai-whisper",
-                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                          "WHISPER_LARGE_V3": "whisper-large-v3",
+                                          "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                          "NEMOTRON_ASR": "nemotron-asr",
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                         },
                                         "options": [
                                           "openai-whisper",
-                                          "deepgram-nova-2"
+                                          "deepgram-nova-2",
+                                          "whisper-large-v3",
+                                          "voxtral-mini-transcribe",
+                                          "nemotron-asr",
+                                          "gpt4o-mini-transcribe"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -39906,7 +41565,6 @@
                                               "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                               "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                               "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                              "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                               "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                               "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                               "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -39942,13 +41600,9 @@
                                               "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                               "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                               "GPT_6_ASTRA": "gpt-6-astra",
-                                              "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                               "GPT_6_1_SOL": "gpt-6.1-sol",
-                                              "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                               "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                              "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                               "GPT_6_LUNA": "gpt-6-luna",
-                                              "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "GROK_4_7": "grok-4.7",
@@ -40005,7 +41659,6 @@
                                             "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                             "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                             "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                            "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                             "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                             "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                             "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -40041,13 +41694,9 @@
                                             "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                             "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                             "GPT_6_ASTRA": "gpt-6-astra",
-                                            "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                             "GPT_6_1_SOL": "gpt-6.1-sol",
-                                            "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                             "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                            "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                             "GPT_6_LUNA": "gpt-6-luna",
-                                            "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                             "GEMINI_4_ARGON": "gemini-4-argon",
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                             "GROK_4_7": "grok-4.7",
@@ -40102,7 +41751,6 @@
                                             "venice-uncensored-roleplay",
                                             "gemma-4-uncensored",
                                             "qwen-3.6-plus-uncensored",
-                                            "deepseek-v4.1-flash-abliterated",
                                             "mimo-v2.6-flash-abliterated",
                                             "glm-5.3-flash-uncensored",
                                             "gemini-3.1-flash-image-preview",
@@ -40138,13 +41786,9 @@
                                             "claude-haiku-5.5",
                                             "claude-fable-5.1",
                                             "gpt-6-astra",
-                                            "gpt-6-astra-pro",
                                             "gpt-6.1-sol",
-                                            "gpt-6.1-sol-pro",
                                             "gpt-6.1-terra",
-                                            "gpt-6.1-terra-pro",
                                             "gpt-6-luna",
-                                            "gpt-6-luna-pro",
                                             "gemini-4-argon",
                                             "gemini-3.8-flash",
                                             "grok-4.7",
@@ -40859,7 +42503,6 @@
                                             "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                             "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                             "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                            "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                             "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                             "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                             "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -40895,13 +42538,9 @@
                                             "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                             "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                             "GPT_6_ASTRA": "gpt-6-astra",
-                                            "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                             "GPT_6_1_SOL": "gpt-6.1-sol",
-                                            "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                             "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                            "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                             "GPT_6_LUNA": "gpt-6-luna",
-                                            "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                             "GEMINI_4_ARGON": "gemini-4-argon",
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                             "GROK_4_7": "grok-4.7",
@@ -40958,7 +42597,6 @@
                                           "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                           "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                           "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                          "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                           "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                           "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                           "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -40994,13 +42632,9 @@
                                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                           "GPT_6_ASTRA": "gpt-6-astra",
-                                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                           "GPT_6_LUNA": "gpt-6-luna",
-                                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                           "GEMINI_4_ARGON": "gemini-4-argon",
                                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                           "GROK_4_7": "grok-4.7",
@@ -41055,7 +42689,6 @@
                                           "venice-uncensored-roleplay",
                                           "gemma-4-uncensored",
                                           "qwen-3.6-plus-uncensored",
-                                          "deepseek-v4.1-flash-abliterated",
                                           "mimo-v2.6-flash-abliterated",
                                           "glm-5.3-flash-uncensored",
                                           "gemini-3.1-flash-image-preview",
@@ -41091,13 +42724,9 @@
                                           "claude-haiku-5.5",
                                           "claude-fable-5.1",
                                           "gpt-6-astra",
-                                          "gpt-6-astra-pro",
                                           "gpt-6.1-sol",
-                                          "gpt-6.1-sol-pro",
                                           "gpt-6.1-terra",
-                                          "gpt-6.1-terra-pro",
                                           "gpt-6-luna",
-                                          "gpt-6-luna-pro",
                                           "gemini-4-argon",
                                           "gemini-3.8-flash",
                                           "grok-4.7",
@@ -44871,13 +46500,9 @@
                                     "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                     "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                     "GPT_6_ASTRA": "gpt-6-astra",
-                                    "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                     "GPT_6_1_SOL": "gpt-6.1-sol",
-                                    "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                     "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                    "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                     "GPT_6_LUNA": "gpt-6-luna",
-                                    "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                     "GEMINI_4_ARGON": "gemini-4-argon",
                                     "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                     "GROK_4_7": "grok-4.7",
@@ -45006,13 +46631,9 @@
                                   "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                   "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                   "GPT_6_ASTRA": "gpt-6-astra",
-                                  "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                   "GPT_6_1_SOL": "gpt-6.1-sol",
-                                  "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                   "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                  "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                   "GPT_6_LUNA": "gpt-6-luna",
-                                  "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                   "GEMINI_4_ARGON": "gemini-4-argon",
                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                   "GROK_4_7": "grok-4.7",
@@ -45139,13 +46760,9 @@
                                   "claude-haiku-5.5",
                                   "claude-fable-5.1",
                                   "gpt-6-astra",
-                                  "gpt-6-astra-pro",
                                   "gpt-6.1-sol",
-                                  "gpt-6.1-sol-pro",
                                   "gpt-6.1-terra",
-                                  "gpt-6.1-terra-pro",
                                   "gpt-6-luna",
-                                  "gpt-6-luna-pro",
                                   "gemini-4-argon",
                                   "gemini-3.8-flash",
                                   "grok-4.7",
@@ -45928,13 +47545,9 @@
                                   "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                   "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                   "GPT_6_ASTRA": "gpt-6-astra",
-                                  "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                   "GPT_6_1_SOL": "gpt-6.1-sol",
-                                  "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                   "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                  "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                   "GPT_6_LUNA": "gpt-6-luna",
-                                  "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                   "GEMINI_4_ARGON": "gemini-4-argon",
                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                   "GROK_4_7": "grok-4.7",
@@ -46063,13 +47676,9 @@
                                 "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                 "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                 "GPT_6_ASTRA": "gpt-6-astra",
-                                "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                 "GPT_6_1_SOL": "gpt-6.1-sol",
-                                "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                 "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                 "GPT_6_LUNA": "gpt-6-luna",
-                                "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                 "GROK_4_7": "grok-4.7",
@@ -46196,13 +47805,9 @@
                                 "claude-haiku-5.5",
                                 "claude-fable-5.1",
                                 "gpt-6-astra",
-                                "gpt-6-astra-pro",
                                 "gpt-6.1-sol",
-                                "gpt-6.1-sol-pro",
                                 "gpt-6.1-terra",
-                                "gpt-6.1-terra-pro",
                                 "gpt-6-luna",
-                                "gpt-6-luna-pro",
                                 "gemini-4-argon",
                                 "gemini-3.8-flash",
                                 "grok-4.7",
@@ -51380,7 +52985,19 @@
                                             "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                             "ELEVENLABS_JOSH": "elevenlabs-josh",
                                             "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                            "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                            "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                            "KOKORO_BELLA": "kokoro-bella",
+                                            "KOKORO_SARAH": "kokoro-sarah",
+                                            "KOKORO_NICOLE": "kokoro-nicole",
+                                            "KOKORO_ADAM": "kokoro-adam",
+                                            "KOKORO_MICHAEL": "kokoro-michael",
+                                            "KOKORO_EMMA": "kokoro-emma",
+                                            "KOKORO_GEORGE": "kokoro-george",
+                                            "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                            "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                            "XAI_EVE": "xai-eve",
+                                            "GEMINI_ZEPHYR": "gemini-zephyr",
+                                            "GEMINI_PUCK": "gemini-puck"
                                           }
                                         },
                                         "type": "enum",
@@ -51394,7 +53011,19 @@
                                           "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                           "ELEVENLABS_JOSH": "elevenlabs-josh",
                                           "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                          "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                          "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                          "KOKORO_BELLA": "kokoro-bella",
+                                          "KOKORO_SARAH": "kokoro-sarah",
+                                          "KOKORO_NICOLE": "kokoro-nicole",
+                                          "KOKORO_ADAM": "kokoro-adam",
+                                          "KOKORO_MICHAEL": "kokoro-michael",
+                                          "KOKORO_EMMA": "kokoro-emma",
+                                          "KOKORO_GEORGE": "kokoro-george",
+                                          "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                          "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                          "XAI_EVE": "xai-eve",
+                                          "GEMINI_ZEPHYR": "gemini-zephyr",
+                                          "GEMINI_PUCK": "gemini-puck"
                                         },
                                         "options": [
                                           "openai-alloy",
@@ -51406,7 +53035,19 @@
                                           "elevenlabs-rachel",
                                           "elevenlabs-josh",
                                           "elevenlabs-bella",
-                                          "elevenlabs-adam"
+                                          "elevenlabs-adam",
+                                          "kokoro-bella",
+                                          "kokoro-sarah",
+                                          "kokoro-nicole",
+                                          "kokoro-adam",
+                                          "kokoro-michael",
+                                          "kokoro-emma",
+                                          "kokoro-george",
+                                          "inworld-mini-ashley",
+                                          "inworld-mini-craig",
+                                          "xai-eve",
+                                          "gemini-zephyr",
+                                          "gemini-puck"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -52076,7 +53717,19 @@
                                           "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                           "ELEVENLABS_JOSH": "elevenlabs-josh",
                                           "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                          "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                          "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                          "KOKORO_BELLA": "kokoro-bella",
+                                          "KOKORO_SARAH": "kokoro-sarah",
+                                          "KOKORO_NICOLE": "kokoro-nicole",
+                                          "KOKORO_ADAM": "kokoro-adam",
+                                          "KOKORO_MICHAEL": "kokoro-michael",
+                                          "KOKORO_EMMA": "kokoro-emma",
+                                          "KOKORO_GEORGE": "kokoro-george",
+                                          "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                          "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                          "XAI_EVE": "xai-eve",
+                                          "GEMINI_ZEPHYR": "gemini-zephyr",
+                                          "GEMINI_PUCK": "gemini-puck"
                                         }
                                       },
                                       "type": "enum",
@@ -52090,7 +53743,19 @@
                                         "ELEVENLABS_RACHEL": "elevenlabs-rachel",
                                         "ELEVENLABS_JOSH": "elevenlabs-josh",
                                         "ELEVENLABS_BELLA": "elevenlabs-bella",
-                                        "ELEVENLABS_ADAM": "elevenlabs-adam"
+                                        "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                        "KOKORO_BELLA": "kokoro-bella",
+                                        "KOKORO_SARAH": "kokoro-sarah",
+                                        "KOKORO_NICOLE": "kokoro-nicole",
+                                        "KOKORO_ADAM": "kokoro-adam",
+                                        "KOKORO_MICHAEL": "kokoro-michael",
+                                        "KOKORO_EMMA": "kokoro-emma",
+                                        "KOKORO_GEORGE": "kokoro-george",
+                                        "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
+                                        "INWORLD_MINI_CRAIG": "inworld-mini-craig",
+                                        "XAI_EVE": "xai-eve",
+                                        "GEMINI_ZEPHYR": "gemini-zephyr",
+                                        "GEMINI_PUCK": "gemini-puck"
                                       },
                                       "options": [
                                         "openai-alloy",
@@ -52102,7 +53767,19 @@
                                         "elevenlabs-rachel",
                                         "elevenlabs-josh",
                                         "elevenlabs-bella",
-                                        "elevenlabs-adam"
+                                        "elevenlabs-adam",
+                                        "kokoro-bella",
+                                        "kokoro-sarah",
+                                        "kokoro-nicole",
+                                        "kokoro-adam",
+                                        "kokoro-michael",
+                                        "kokoro-emma",
+                                        "kokoro-george",
+                                        "inworld-mini-ashley",
+                                        "inworld-mini-craig",
+                                        "xai-eve",
+                                        "gemini-zephyr",
+                                        "gemini-puck"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -52778,17 +54455,29 @@
                                           "type": "enum",
                                           "entries": {
                                             "OPENAI_WHISPER": "openai-whisper",
-                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                            "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                            "WHISPER_LARGE_V3": "whisper-large-v3",
+                                            "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                            "NEMOTRON_ASR": "nemotron-asr",
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                           }
                                         },
                                         "type": "enum",
                                         "enum": {
                                           "OPENAI_WHISPER": "openai-whisper",
-                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                          "WHISPER_LARGE_V3": "whisper-large-v3",
+                                          "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                          "NEMOTRON_ASR": "nemotron-asr",
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                         },
                                         "options": [
                                           "openai-whisper",
-                                          "deepgram-nova-2"
+                                          "deepgram-nova-2",
+                                          "whisper-large-v3",
+                                          "voxtral-mini-transcribe",
+                                          "nemotron-asr",
+                                          "gpt4o-mini-transcribe"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -53450,17 +55139,29 @@
                                         "type": "enum",
                                         "entries": {
                                           "OPENAI_WHISPER": "openai-whisper",
-                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                          "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                          "WHISPER_LARGE_V3": "whisper-large-v3",
+                                          "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                          "NEMOTRON_ASR": "nemotron-asr",
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                         }
                                       },
                                       "type": "enum",
                                       "enum": {
                                         "OPENAI_WHISPER": "openai-whisper",
-                                        "DEEPGRAM_NOVA_2": "deepgram-nova-2"
+                                        "DEEPGRAM_NOVA_2": "deepgram-nova-2",
+                                        "WHISPER_LARGE_V3": "whisper-large-v3",
+                                        "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
+                                        "NEMOTRON_ASR": "nemotron-asr",
+                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
                                       },
                                       "options": [
                                         "openai-whisper",
-                                        "deepgram-nova-2"
+                                        "deepgram-nova-2",
+                                        "whisper-large-v3",
+                                        "voxtral-mini-transcribe",
+                                        "nemotron-asr",
+                                        "gpt4o-mini-transcribe"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -54174,7 +55875,6 @@
                                             "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                             "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                             "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                            "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                             "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                             "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                             "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -54210,13 +55910,9 @@
                                             "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                             "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                             "GPT_6_ASTRA": "gpt-6-astra",
-                                            "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                             "GPT_6_1_SOL": "gpt-6.1-sol",
-                                            "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                             "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                            "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                             "GPT_6_LUNA": "gpt-6-luna",
-                                            "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                             "GEMINI_4_ARGON": "gemini-4-argon",
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                             "GROK_4_7": "grok-4.7",
@@ -54273,7 +55969,6 @@
                                           "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                           "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                           "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                          "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                           "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                           "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                           "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -54309,13 +56004,9 @@
                                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                           "GPT_6_ASTRA": "gpt-6-astra",
-                                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                           "GPT_6_LUNA": "gpt-6-luna",
-                                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                           "GEMINI_4_ARGON": "gemini-4-argon",
                                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                           "GROK_4_7": "grok-4.7",
@@ -54370,7 +56061,6 @@
                                           "venice-uncensored-roleplay",
                                           "gemma-4-uncensored",
                                           "qwen-3.6-plus-uncensored",
-                                          "deepseek-v4.1-flash-abliterated",
                                           "mimo-v2.6-flash-abliterated",
                                           "glm-5.3-flash-uncensored",
                                           "gemini-3.1-flash-image-preview",
@@ -54406,13 +56096,9 @@
                                           "claude-haiku-5.5",
                                           "claude-fable-5.1",
                                           "gpt-6-astra",
-                                          "gpt-6-astra-pro",
                                           "gpt-6.1-sol",
-                                          "gpt-6.1-sol-pro",
                                           "gpt-6.1-terra",
-                                          "gpt-6.1-terra-pro",
                                           "gpt-6-luna",
-                                          "gpt-6-luna-pro",
                                           "gemini-4-argon",
                                           "gemini-3.8-flash",
                                           "grok-4.7",
@@ -55125,7 +56811,6 @@
                                           "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                           "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                           "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                          "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                           "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                           "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                           "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -55161,13 +56846,9 @@
                                           "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                           "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                           "GPT_6_ASTRA": "gpt-6-astra",
-                                          "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                           "GPT_6_1_SOL": "gpt-6.1-sol",
-                                          "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                           "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                          "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                           "GPT_6_LUNA": "gpt-6-luna",
-                                          "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                           "GEMINI_4_ARGON": "gemini-4-argon",
                                           "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                           "GROK_4_7": "grok-4.7",
@@ -55224,7 +56905,6 @@
                                         "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
                                         "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
                                         "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                                        "DEEPSEEK_V4_1_FLASH_ABLITERATED": "deepseek-v4.1-flash-abliterated",
                                         "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
                                         "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
                                         "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
@@ -55260,13 +56940,9 @@
                                         "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                         "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                         "GPT_6_ASTRA": "gpt-6-astra",
-                                        "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                         "GPT_6_1_SOL": "gpt-6.1-sol",
-                                        "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                         "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                        "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                         "GPT_6_LUNA": "gpt-6-luna",
-                                        "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                         "GEMINI_4_ARGON": "gemini-4-argon",
                                         "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                         "GROK_4_7": "grok-4.7",
@@ -55321,7 +56997,6 @@
                                         "venice-uncensored-roleplay",
                                         "gemma-4-uncensored",
                                         "qwen-3.6-plus-uncensored",
-                                        "deepseek-v4.1-flash-abliterated",
                                         "mimo-v2.6-flash-abliterated",
                                         "glm-5.3-flash-uncensored",
                                         "gemini-3.1-flash-image-preview",
@@ -55357,13 +57032,9 @@
                                         "claude-haiku-5.5",
                                         "claude-fable-5.1",
                                         "gpt-6-astra",
-                                        "gpt-6-astra-pro",
                                         "gpt-6.1-sol",
-                                        "gpt-6.1-sol-pro",
                                         "gpt-6.1-terra",
-                                        "gpt-6.1-terra-pro",
                                         "gpt-6-luna",
-                                        "gpt-6-luna-pro",
                                         "gemini-4-argon",
                                         "gemini-3.8-flash",
                                         "grok-4.7",
@@ -59250,7 +60921,7 @@
             "request": "urlPathParams"
           },
           "type": "navigate_button",
-          "label": "Powrót do postaci",
+          "label": "Powrót do skilli",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -59264,15 +60935,15 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Postacie"],
+    "tags": ["Skille"],
     "aliases": ["skill-get"],
     "credits": 0
   },
   {
     "toolName": "skills",
-    "title": "Postacie",
-    "titleShort": "Umiejętności",
-    "description": "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
+    "title": "Skille",
+    "titleShort": "Skille",
+    "description": "Pobierz wszystkie dostępne skille (domyślne + niestandardowe)",
     "fields": {
       "usage": {
         "request": "data",
@@ -59320,7 +60991,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Szukaj (opcjonalne)",
-          "description": "Filtruj postacie po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukiwanie podciągów bez rozróżniania wielkości liter po nazwie, tagline, opisie, kategorii. Pozostaw puste aby wyświetlić wszystkie.",
+          "description": "Filtruj skille po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukiwanie podciągów bez rozróżniania wielkości liter po nazwie, tagline, opisie, kategorii. Pozostaw puste aby wyświetlić wszystkie.",
           "placeholder": "np. badania, generowanie obrazów",
           "columns": 8,
           "schema": {
@@ -59427,8 +61098,8 @@
         "skillId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID postaci",
-          "description": "Pobierz pełne szczegóły dla konkretnej postaci. Zwraca prompt systemowy, narzędzia i konfigurację modelu.",
+          "label": "ID skilla",
+          "description": "Pobierz pełne szczegóły dla konkretnej skilla. Zwraca prompt systemowy, narzędzia i konfigurację modelu.",
           "columns": 4,
           "schema": {
             "def": {
@@ -59526,7 +61197,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Źródło",
-          "description": "Filtruj po źródle: wbudowane, społeczność lub twoje własne postacie.",
+          "description": "Filtruj po źródle: wbudowane, społeczność lub twoje własne skille.",
           "columns": 4,
           "schema": {
             "def": {
@@ -59592,7 +61263,7 @@
           "type": "text",
           "size": "xs",
           "variant": "muted",
-          "label": "Wybierz modele bezpośrednio lub zacznij od gotowych postaci",
+          "label": "Wybierz modele bezpośrednio lub zacznij od gotowych skilli",
           "className": "text-muted-foreground pb-4",
           "usage": {
             "response": true
@@ -59629,7 +61300,7 @@
           "variant": "muted",
           "label": "Wybierz spośród {{count}} modeli z precyzyjną kontrolą inteligencji, szybkości i kosztów",
           "contentParams": {
-            "count": 213
+            "count": 223
           },
           "usage": {
             "response": true
@@ -59659,7 +61330,7 @@
           "schemaType": "widget",
           "type": "text",
           "size": "base",
-          "label": "Gotowe postacie",
+          "label": "Gotowe skille",
           "emphasis": "bold",
           "inline": true,
           "usage": {
@@ -59671,7 +61342,7 @@
           "type": "text",
           "size": "xs",
           "variant": "muted",
-          "label": "Zacznij od ekspercko dostrojonych postaci z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
+          "label": "Zacznij od ekspercko dostrojonych skilli z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
           "className": "text-muted-foreground pb-4",
           "usage": {
             "response": true
@@ -60130,13 +61801,9 @@
                                 "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                                 "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                                 "GPT_6_ASTRA": "gpt-6-astra",
-                                "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                                 "GPT_6_1_SOL": "gpt-6.1-sol",
-                                "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                                 "GPT_6_1_TERRA": "gpt-6.1-terra",
-                                "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                                 "GPT_6_LUNA": "gpt-6-luna",
-                                "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                 "GROK_4_7": "grok-4.7",
@@ -60265,13 +61932,9 @@
                               "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
                               "CLAUDE_FABLE_5_1": "claude-fable-5.1",
                               "GPT_6_ASTRA": "gpt-6-astra",
-                              "GPT_6_ASTRA_PRO": "gpt-6-astra-pro",
                               "GPT_6_1_SOL": "gpt-6.1-sol",
-                              "GPT_6_1_SOL_PRO": "gpt-6.1-sol-pro",
                               "GPT_6_1_TERRA": "gpt-6.1-terra",
-                              "GPT_6_1_TERRA_PRO": "gpt-6.1-terra-pro",
                               "GPT_6_LUNA": "gpt-6-luna",
-                              "GPT_6_LUNA_PRO": "gpt-6-luna-pro",
                               "GEMINI_4_ARGON": "gemini-4-argon",
                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                               "GROK_4_7": "grok-4.7",
@@ -60398,13 +62061,9 @@
                               "claude-haiku-5.5",
                               "claude-fable-5.1",
                               "gpt-6-astra",
-                              "gpt-6-astra-pro",
                               "gpt-6.1-sol",
-                              "gpt-6.1-sol-pro",
                               "gpt-6.1-terra",
-                              "gpt-6.1-terra-pro",
                               "gpt-6-luna",
-                              "gpt-6-luna-pro",
                               "gemini-4-argon",
                               "gemini-3.8-flash",
                               "grok-4.7",
@@ -60703,7 +62362,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "ai",
-    "tags": ["Postacie"],
+    "tags": ["Skille"],
     "aliases": ["skills"],
     "credits": 0
   },

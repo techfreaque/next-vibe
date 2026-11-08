@@ -97,6 +97,16 @@ export const category: CategoryDefinition = {
         "pl-PL": "Statystyki kampanii",
       },
     },
+    growth: {
+      icon: "trending-up",
+      order: 8,
+      label: {
+        "en-US": "Growth",
+        "en-GLOBAL": "Growth",
+        "de-DE": "Wachstum",
+        "pl-PL": "Wzrost",
+      },
+    },
     leadMagnetIntegrations: {
       icon: "plug",
       order: 7,

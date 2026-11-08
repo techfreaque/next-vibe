@@ -693,7 +693,7 @@ export const translations: typeof enTranslations = {
     headless: {
       errors: {
         missingModelOrSkill:
-          "Modell oder Charakter erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
+          "Modell oder Skill erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
         favoriteNotFound:
           "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
       },
@@ -711,15 +711,15 @@ export const translations: typeof enTranslations = {
           favoriteId: {
             title: "Favoriten-ID",
             description:
-              "UUID eines gespeicherten Favoriten zum Laden von Modell und Charakter.",
+              "UUID eines gespeicherten Favoriten zum Laden von Modell und Skill.",
           },
           modelId: {
             title: "Modell-ID",
             description: "KI-Modell für den fortgesetzten Schritt.",
           },
           skillId: {
-            title: "Charakter-ID",
-            description: "Charakter/Persona für den fortgesetzten Schritt.",
+            title: "Skill-ID",
+            description: "Skill/Persona für den fortgesetzten Schritt.",
           },
           callbackMode: {
             title: "Callback-Modus",
@@ -949,7 +949,7 @@ export const translations: typeof enTranslations = {
       folders: "Ordner",
       files: "Dateien",
       messages: "Nachrichten",
-      characters: "Charaktere",
+      characters: "Skills",
       memories: "Erinnerungen",
       favorites: "Favoriten",
       credits: "Credits",
@@ -1113,7 +1113,7 @@ export const translations: typeof enTranslations = {
         subscriptionButton: {
           title: "Credits & Abonnement",
           description:
-            "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Nutzer erhalten {{freeCredits}} Credits/Monat.",
+            "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, +{{bonusCredits}} mit dem Newsletter.",
         },
         chatInput: {
           title: "Ihre Nachricht eingeben",
@@ -1165,8 +1165,8 @@ export const translations: typeof enTranslations = {
       modelOnly: "Nur Modell",
       editModelSettings: "Modelleinstellungen bearbeiten",
       editSettings: "Einstellungen bearbeiten",
-      switchSkill: "Charakter wechseln",
-      editSkill: "Charakter bearbeiten",
+      switchSkill: "Skill wechseln",
+      editSkill: "Skill bearbeiten",
       delete: "Löschen",
       autoSelectedModel: "FILTERBASIERT",
       manualSelectedModel: "MANUELL AUSGEWÄHLT",
@@ -1193,16 +1193,16 @@ export const translations: typeof enTranslations = {
       saveAsDefault: "Zu Favoriten hinzufügen",
       deleteSetup: "Setup löschen",
       content: "Inhalte durchsuchen...",
-      characterSetup: "Charakter-Setup",
+      characterSetup: "Skill-Setup",
       noResults: "Keine Ergebnisse",
       add: "Zu Favoriten hinzufügen",
       added: "Hinzugefügt",
       addNew: "Neu hinzufügen",
-      searchSkills: "Charaktere suchen...",
+      searchSkills: "Skills suchen...",
       createCustom: "Benutzerdefiniert erstellen",
       customizeSettings: "Einstellungen anpassen",
       requirements: {
-        characterConflict: "Charakter-Anforderungskonflikte",
+        characterConflict: "Skill-Anforderungskonflikte",
         tooLow: "zu niedrig",
         tooHigh: "zu hoch",
         min: "min",
@@ -1247,14 +1247,14 @@ export const translations: typeof enTranslations = {
         deleteMessage: "Nachricht löschen",
       },
       characterSelector: {
-        placeholder: "Charakter auswählen",
-        addNewLabel: "Benutzerdefinierte Charakter erstellen",
+        placeholder: "Skill auswählen",
+        addNewLabel: "Benutzerdefiniertes Skill erstellen",
         grouping: {
           bySource: "Nach Quelle",
           byCategory: "Nach Kategorie",
           sourceLabels: {
             builtIn: "Integriert",
-            my: "Meine Charakters",
+            my: "Meine Skills",
             community: "Community",
           },
           sourceIcons: {
@@ -1264,11 +1264,11 @@ export const translations: typeof enTranslations = {
           },
         },
         addDialog: {
-          title: "Benutzerdefinierte Charakter erstellen",
+          title: "Benutzerdefiniertes Skill erstellen",
           fields: {
             name: {
               label: "Name",
-              placeholder: "Charakter-Name eingeben",
+              placeholder: "Skill-Name eingeben",
             },
             icon: {
               label: "Symbol (Emoji)",
@@ -1276,11 +1276,11 @@ export const translations: typeof enTranslations = {
             },
             description: {
               label: "Beschreibung",
-              placeholder: "Kurze Beschreibung der Charakter",
+              placeholder: "Kurze Beschreibung das Skill",
             },
             systemPrompt: {
               label: "System-Prompt",
-              placeholder: "Definieren Sie, wie sich die Charakter verhält...",
+              placeholder: "Definieren Sie, wie sich die Skill verhält...",
             },
             category: {
               label: "Kategorie",
@@ -1288,7 +1288,7 @@ export const translations: typeof enTranslations = {
           },
           createCategory: "Kategorie erstellen",
           cancel: "Abbrechen",
-          create: "Charakter erstellen",
+          create: "Skill erstellen",
         },
         addCategoryDialog: {
           title: "Kategorie erstellen",
@@ -1316,7 +1316,7 @@ export const translations: typeof enTranslations = {
       searchEnabled: "Suche aktiviert",
       searchDisabled: "Suche deaktiviert",
       answerAsAI: "Als KI-Modell antworten",
-      retry: "Mit anderem Modell/Charakter wiederholen",
+      retry: "Mit anderem Modell/Skill wiederholen",
       branch: "Konversation von hier abzweigen",
       editMessage: "Nachricht bearbeiten",
       stopAudio: "Audio-Wiedergabe stoppen",
@@ -2410,6 +2410,14 @@ export const translations: typeof enTranslations = {
       descriptions: {
         openaiWhisper: "OpenAI Whisper",
         deepgramNova2: "Deepgram Nova-2",
+        whisperLargeV3:
+          "Whisper Large V3 - Open-Weight-Modell von OpenAI, 99 Sprachen, deutlich günstiger als gehostetes whisper-1.",
+        voxtralMini:
+          "Voxtral Mini Transcribe - Mistral-Transkription mit Sprechertrennung und Segment-Zeitstempeln, bis zu 10 Minuten.",
+        nemotronAsr:
+          "Nemotron ASR - offene mehrsprachige Spracherkennung von NVIDIA, 40 Sprachvarianten, geringe Latenz.",
+        gpt4oMiniTranscribe:
+          "GPT-4o Mini Transcribe - Niedrigere Wortfehlerrate als Whisper, bessere Spracherkennung.",
       },
     },
   },
@@ -2528,6 +2536,30 @@ export const translations: typeof enTranslations = {
         elevenlabsJosh: "ElevenLabs Josh",
         elevenlabsBella: "ElevenLabs Bella",
         elevenlabsAdam: "ElevenLabs Adam",
+        kokoroBella:
+          "Kokoro Bella - Open-Weight-Modell, warme amerikanische Frauenstimme. Kein Inhaltsfilter.",
+        kokoroSarah:
+          "Kokoro Sarah - Open-Weight-Modell, klare amerikanische Frauenstimme. Kein Inhaltsfilter.",
+        kokoroNicole:
+          "Kokoro Nicole - Open-Weight-Modell, weiche, zurückhaltende Frauenstimme. Kein Inhaltsfilter.",
+        kokoroAdam:
+          "Kokoro Adam - Open-Weight-Modell, ruhige amerikanische Männerstimme. Kein Inhaltsfilter.",
+        kokoroMichael:
+          "Kokoro Michael - Open-Weight-Modell, selbstbewusste amerikanische Männerstimme. Kein Inhaltsfilter.",
+        kokoroEmma:
+          "Kokoro Emma - Open-Weight-Modell, britische Frauenstimme. Kein Inhaltsfilter.",
+        kokoroGeorge:
+          "Kokoro George - Open-Weight-Modell, britische Männerstimme. Kein Inhaltsfilter.",
+        inworldAshley:
+          "Inworld Ashley - Schnelle, günstige Frauenstimme mit lebendigem Vortrag.",
+        inworldCraig:
+          "Inworld Craig - Schnelle, günstige britische Männerstimme.",
+        xaiEve:
+          "xAI Eve - Ausdrucksstarke Frauenstimme mit Emotionssteuerung im Text.",
+        geminiZephyr:
+          "Gemini Zephyr - Helle Frauenstimme, über 100 Sprachen, steuerbarer Vortrag.",
+        geminiPuck:
+          "Gemini Puck - Lebhafte Männerstimme, über 100 Sprachen, steuerbarer Vortrag.",
       },
     },
   },

@@ -47,7 +47,7 @@ export const { GET } = createEndpoint({
   icon: "server",
   category: "ssh",
   subCategory: "Connections",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({
@@ -184,7 +184,7 @@ export const { PATCH } = createEndpoint({
   icon: "server",
   category: "ssh",
   subCategory: "Connections",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({
@@ -351,7 +351,7 @@ export const { DELETE } = createEndpoint({
   icon: "server",
   category: "ssh",
   subCategory: "Connections",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   tags: ["category" as const],
 
   fields: customWidgetObject({

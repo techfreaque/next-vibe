@@ -40,6 +40,10 @@ export const translations: typeof enTranslations = {
     hideVideoDescription: "Ukryj opis wideo",
   },
   errorCode: "Kod błędu",
+  errorActions: {
+    retry: "Ponów",
+    tryAnotherModel: "Wybierz inny model",
+  },
   streamInterrupted: {
     label: "Generowanie zatrzymane",
     hint: "Częściowa odpowiedź zapisana. Wyślij nową wiadomość, aby kontynuować.",
@@ -223,7 +227,7 @@ export const translations: typeof enTranslations = {
     },
     skill: {
       label: "Postać",
-      description: "Postać/persona AI dla wiadomości",
+      description: "Skill/persona AI dla wiadomości",
     },
     metadata: {
       label: "Metadane",

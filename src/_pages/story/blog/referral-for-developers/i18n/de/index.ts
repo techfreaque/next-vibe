@@ -35,7 +35,6 @@ export const translations: typeof enTranslations = {
     p1: "Jedes Skill, das du veröffentlichst, hat einen teilbaren Link. Teilst du ihn selbst, verdienst du die üblichen 10 % direkt. Teilt ein anderes Mitglied ihn mit seinem eigenen Link, bekommst du trotzdem 5 % jeder Zahlung dieser Nutzer, für immer.",
     p2: "Was die meisten übersehen: Du verdienst die 5 % als Skill-Autor auch dann, wenn jemand anderes deinen Skill teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis, schickt den Link an einen Freund - der meldet sich an, und du bekommst 5 % seiner Zahlungen. Automatisch. Die Plattform trackt die Skill-Autorenschaft, nicht wer den Link verbreitet hat. Dein Skill arbeitet für dich, auch wenn du gerade nicht aktiv promtest.",
     p3: "Bettet deinen Skill-Link in ein GitHub README ein. Post ihn in einem Entwickler-Discord. Jede Person, die sich darüber anmeldet, bringt dir 10 %. Jede Person, die andere zu deinem Skill bringen, bringt dir 5 %. Ein Skill, zwei Einnahmequellen.",
-    p4: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Wenn du ein nützliches KI-Setup gebaut hast - ein Code-Reviewer, der deinen Stack kennt, oder ein Docs-Writer auf deinen Stil abgestimmt - teil es. Der Link erledigt den Rest.",
   },
   math: {
     title: "Die Rechnung (echte Zahlen)",

@@ -2147,8 +2147,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           await assertNoPendingTasks(threadId);
 
           const afterWait = await getBalance(testUser);
-          // T5b only: await-task + AI response (~0.3cr). Image gen was charged in T5.
-          await assertDeductedLocal(testUser, beforeWait, afterWait, 0.1, 10);
+          // T5b only: await-task + AI response (a few hundredths at 0.01cr billing
+          // granularity on the budget model). Image gen was charged in T5.
+          await assertDeductedLocal(testUser, beforeWait, afterWait, 0.01, 10);
         },
         effectiveTestTimeout,
       );
@@ -5702,7 +5703,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
       );
 
       fit(
-        "C3: insufficient credits - returns 403 when balance is zero",
+        "C3: insufficient credits - returns 402 when balance is zero",
         async () => {
           const wallets = await db.execute<{
             id: string;
@@ -5739,10 +5740,10 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             if (result.success) {
               // oxlint-disable-next-line restricted-syntax
               throw new Error(
-                "C3: expected stream to fail with 403 but it succeeded",
+                "C3: expected stream to fail with 402 but it succeeded",
               );
             }
-            expect(result.errorType?.errorCode).toBe(403);
+            expect(result.errorType?.errorCode).toBe(402);
             expect(result.message).toContain("nsufficient");
           } finally {
             for (const w of saved) {

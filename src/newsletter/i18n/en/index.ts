@@ -468,6 +468,11 @@ export const translations = {
       bounced: "Bounced",
       complained: "Complained",
     },
+    creditBonus: {
+      active: "Bonus active",
+      pendingConfirmation: "Confirm your email to unlock",
+      claimedElsewhere: "Already claimed by another account",
+    },
   },
   hooks: {
     errors: {

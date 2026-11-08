@@ -17,6 +17,7 @@ export const translations = {
     importers: "Importers",
     needsMove: "Needs Move",
     unusedSymbols: "Unused Symbols",
+    unusedI18n: "Unused i18n Keys",
     crossDomain: "Cross-Domain",
     pageViolations: "Page Violations",
   },
@@ -122,6 +123,14 @@ export const translations = {
       colPath: "file",
       emptyState: "No unused public surface found in scope.",
       wholeFile: "(whole file — no importers)",
+    },
+    unusedI18n: {
+      title: "Unused i18n Keys",
+      description:
+        "Keys in scoped en translations that no source file references. Template prefixes like t(`a.b.<x>`) protect their subtree. Delete from en, de and pl together.",
+      colKey: "key",
+      colPath: "file",
+      emptyState: "Every translation key in scope is referenced.",
     },
     pageViolations: {
       title: "Page Architecture Violations",

@@ -13,6 +13,7 @@ import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  failInline,
   isContentResponse,
   isFileResponse,
   isStreamingResponse,
@@ -48,6 +49,10 @@ import type {
   PulseHealth,
 } from "./db";
 import { pulseExecutions, pulseHealth } from "./db";
+import { TaskGuard } from "../watchdog/guard";
+import { decideRetry, type RetryDecision } from "../watchdog/policy";
+import { RunningTaskRegistry } from "../watchdog/registry";
+import { TaskIncidentType } from "../watchdog/enum";
 import { resolveTaskDisplayName } from "./i18n-utils";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
@@ -334,6 +339,7 @@ export class PulseHealthRepository {
               .update(cronTasksTable)
               .set({
                 lastExecutionStatus: CronTaskStatus.RUNNING,
+                runStartedAt: new Date(),
                 ...(dbTask.runOnce ? { enabled: false } : {}),
                 updatedAt: new Date(),
               })
@@ -444,18 +450,13 @@ export class PulseHealthRepository {
               let finalDurationMs = 0;
               let didLogHistory = false;
 
-              for (let attempt = 0; attempt <= maxRetries; attempt++) {
-                if (attempt > 0) {
-                  logger.debug(
-                    `Pulse: retrying task "${dbTask.displayName}" (attempt ${attempt + 1}/${maxRetries + 1}) after ${retryDelayMs}ms`,
-                  );
-                  await new Promise<void>((resolve) => {
-                    setTimeout(resolve, retryDelayMs);
-                  });
-                }
-
+              for (let attempt = 0; ; attempt++) {
                 const attemptStart = Date.now();
                 const taskAbortController = new AbortController();
+                // The watchdog / an admin cancels a run through this entry.
+                RunningTaskRegistry.register(dbTask.id, taskAbortController);
+                let timedOut = false;
+                let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
                 let typedResult: ResponseType<
                   Record<string, string | number | boolean>
                 >;
@@ -493,6 +494,8 @@ export class PulseHealthRepository {
                         isRevival: undefined,
                         waitingForRemoteResult: undefined,
                         voiceEnabled: false,
+                        // Spend / turn / budget accounting is keyed on this
+                        cronTaskId: dbTask.id,
                         abortSignal: taskAbortController.signal,
                         callerCallbackMode: undefined,
                         escalateToTask: undefined,
@@ -500,10 +503,13 @@ export class PulseHealthRepository {
                       },
                     }),
                     new Promise<never>((...[, reject]) => {
-                      setTimeout(
-                        () => reject(new Error("TASK_TIMEOUT")),
-                        timeoutMs,
-                      );
+                      timeoutHandle = setTimeout(() => {
+                        // Abort the run itself: rejecting alone leaves the
+                        // handler (an AI loop) running and billing forever.
+                        timedOut = true;
+                        taskAbortController.abort(new Error("TASK_TIMEOUT"));
+                        reject(new Error("TASK_TIMEOUT"));
+                      }, timeoutMs);
                     }),
                   ]);
 
@@ -518,17 +524,33 @@ export class PulseHealthRepository {
                         })
                       : result;
                 } catch (err) {
-                  const isTimeout =
-                    err instanceof Error && err.message === "TASK_TIMEOUT";
                   typedResult = fail({
-                    message: isTimeout
-                      ? tTask("errors.repositoryInternalError")
-                      : tTask("errors.repositoryInternalError"),
+                    message: tTask("errors.repositoryInternalError"),
                     errorType: ErrorResponseTypes.INTERNAL_ERROR,
                   });
-                  finalStatus = isTimeout
-                    ? CronTaskStatus.TIMEOUT
-                    : CronTaskStatus.FAILED;
+                  finalStatus =
+                    timedOut ||
+                    (err instanceof Error && err.message === "TASK_TIMEOUT")
+                      ? CronTaskStatus.TIMEOUT
+                      : CronTaskStatus.FAILED;
+                } finally {
+                  if (timeoutHandle !== undefined) {
+                    clearTimeout(timeoutHandle);
+                  }
+                }
+
+                // Cancelled by the watchdog / an admin: finish as CANCELLED and
+                // never retry - the run was stopped on purpose.
+                const cancelReason = RunningTaskRegistry.unregister(
+                  dbTask.id,
+                  taskAbortController,
+                );
+                if (cancelReason !== null) {
+                  typedResult = failInline({
+                    message: cancelReason,
+                    errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                  });
+                  finalStatus = CronTaskStatus.CANCELLED;
                 }
 
                 const attemptDuration = Date.now() - attemptStart;
@@ -537,7 +559,9 @@ export class PulseHealthRepository {
                     ? CronTaskStatus.COMPLETED
                     : finalStatus === CronTaskStatus.TIMEOUT
                       ? CronTaskStatus.TIMEOUT
-                      : CronTaskStatus.FAILED;
+                      : finalStatus === CronTaskStatus.CANCELLED
+                        ? CronTaskStatus.CANCELLED
+                        : CronTaskStatus.FAILED;
 
                 // History throttle: skip logging successful runs when within historyInterval
                 const shouldLogHistory =
@@ -596,17 +620,66 @@ export class PulseHealthRepository {
                 // so there are no `{{param}}` placeholders left to substitute.
                 const logMessage = finalMessage;
 
-                if (attempt < maxRetries) {
+                // Retry only TRANSIENT failures (provider 5xx / rate limit /
+                // network), with capped exponential backoff. Validation,
+                // permission and credit failures, timeouts and watchdog
+                // cancels fail immediately.
+                const decision: RetryDecision =
+                  cancelReason !== null
+                    ? { retry: false, exhausted: false }
+                    : decideRetry({
+                        attempt,
+                        taskMaxRetries: maxRetries,
+                        baseDelayMs: retryDelayMs,
+                        failure: {
+                          errorKey: typedResult.errorType.errorKey,
+                          message: logMessage ?? "",
+                          timedOut: finalStatus === CronTaskStatus.TIMEOUT,
+                        },
+                      });
+
+                if (decision.retry) {
                   logger.warn(
-                    `Pulse: task "${resolvedTaskName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
-                    { message: logMessage },
+                    `Pulse: task "${resolvedTaskName}" failed transiently (attempt ${attempt + 1}), retrying in ${decision.delayMs}ms`,
+                    { message: logMessage, taskId: dbTask.id },
                   );
-                } else {
-                  logger.error(
-                    `Pulse: task "${resolvedTaskName}" failed after ${maxRetries + 1} attempt(s)`,
-                    { message: logMessage },
+                  await new Promise<void>((resolve) => {
+                    setTimeout(resolve, decision.delayMs);
+                  });
+                  continue;
+                }
+
+                logger.error(
+                  `Pulse: task "${resolvedTaskName}" failed after ${attempt + 1} attempt(s)`,
+                  { message: logMessage, taskId: dbTask.id },
+                );
+                if (
+                  cancelReason === null &&
+                  finalStatus === CronTaskStatus.TIMEOUT
+                ) {
+                  await TaskGuard.recordIncident(
+                    {
+                      taskId: dbTask.id,
+                      taskName: resolvedTaskName,
+                      type: TaskIncidentType.TIMEOUT,
+                      reason: `Run exceeded its ${timeoutMs}ms timeout and was aborted`,
+                      metadata: { timeoutMs, attempt: attempt + 1 },
+                    },
+                    logger,
+                  );
+                } else if (cancelReason === null && decision.exhausted) {
+                  await TaskGuard.recordIncident(
+                    {
+                      taskId: dbTask.id,
+                      taskName: resolvedTaskName,
+                      type: TaskIncidentType.TRANSIENT_RETRY_EXHAUSTED,
+                      reason: `Transient failure persisted through ${attempt + 1} attempts: ${logMessage ?? ""}`,
+                      metadata: { attempts: attempt + 1 },
+                    },
+                    logger,
                   );
                 }
+                break;
               }
 
               if (taskSucceeded) {
@@ -627,6 +700,7 @@ export class PulseHealthRepository {
                   lastExecutedAt: startedAt,
                   lastExecutionStatus: finalStatus,
                   lastExecutionDuration: finalDurationMs,
+                  runStartedAt: null,
                   executionCount: sql`${cronTasksTable.executionCount} + 1`,
                   consecutiveFailures: newConsecutiveFailures,
                   ...(taskSucceeded
@@ -679,6 +753,7 @@ export class PulseHealthRepository {
                 .update(cronTasksTable)
                 .set({
                   lastExecutionStatus: CronTaskStatus.FAILED,
+                  runStartedAt: null,
                   executionCount: sql`${cronTasksTable.executionCount} + 1`,
                   errorCount: sql`${cronTasksTable.errorCount} + 1`,
                   consecutiveFailures: catchConsecutiveFailures,

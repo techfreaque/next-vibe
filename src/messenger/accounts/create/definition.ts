@@ -467,6 +467,15 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      isSystem: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.isSystem.label",
+        description: "fields.isSystem.description",
+        columns: 4,
+        schema: z.boolean().default(false),
+      }),
+
       failoverPriority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,

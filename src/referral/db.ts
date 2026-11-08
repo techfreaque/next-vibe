@@ -106,6 +106,8 @@ export const referralEarnings = pgTable(
       .references(() => paymentTransactions.id, { onDelete: "cascade" }),
     level: integer("level").notNull(),
     amountCents: integer("amount_cents").notNull(),
+    /** Credits of the source purchase the commission was computed from (null on legacy rows) */
+    baseCredits: integer("base_credits"),
     currency: text("currency").notNull(),
     status: text("status", { enum: ReferralEarningStatusDB })
       .notNull()

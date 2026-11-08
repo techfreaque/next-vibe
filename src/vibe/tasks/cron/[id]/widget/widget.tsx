@@ -859,10 +859,14 @@ export function CronTaskDetailContainer({
               />
             </InfoRow>
             <InfoRow label={t("widget.createdAt")}>
-              <Div>{formatDate(task.createdAt.toISOString(), neverLabel)}</Div>
+              <Div>
+                {formatDate(new Date(task.createdAt).toISOString(), neverLabel)}
+              </Div>
             </InfoRow>
             <InfoRow label={t("widget.updatedAt")}>
-              <Div>{formatDate(task.updatedAt.toISOString(), neverLabel)}</Div>
+              <Div>
+                {formatDate(new Date(task.updatedAt).toISOString(), neverLabel)}
+              </Div>
             </InfoRow>
           </Div>
         </Div>

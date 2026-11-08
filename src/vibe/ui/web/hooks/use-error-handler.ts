@@ -28,12 +28,21 @@ export default function useErrorHandler(
   const logger = useLogger();
 
   useEffect(() => {
+    const htmlClasses = document.documentElement.classList;
     logger.error(`Application error: ${error.message || "unknown"}`, {
       message: error.message,
       name: error.name,
       digest: error.digest,
       stack: error.stack?.slice(0, 500),
       locale,
+      // Browser + page context: "x is not a function" is usually an old
+      // engine, and removeChild/insertBefore NotFoundErrors are almost always
+      // a page translator (Google Translate tags <html>) rewriting React's DOM.
+      userAgent: navigator.userAgent,
+      path: window.location.pathname,
+      pageTranslated:
+        htmlClasses.contains("translated-ltr") ||
+        htmlClasses.contains("translated-rtl"),
     });
     // Call custom error handler if provided
     if (onError) {

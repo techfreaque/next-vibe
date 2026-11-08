@@ -29,6 +29,7 @@ export const translations = {
       description:
         "Voice model id. Use list-models (modelType=audio) to browse available voices and their ids.",
     },
+    download: "Download",
     response: {
       title: "Audio Result",
       description: "The generated speech audio",
@@ -127,6 +128,28 @@ export const translations = {
         "ElevenLabs Bella - Warm female voice with soft delivery",
       elevenlabsAdam:
         "ElevenLabs Adam - Professional male voice for content creation",
+      kokoroBella:
+        "Kokoro Bella - Open-weight 82M model, warm American female voice. No content filter.",
+      kokoroSarah:
+        "Kokoro Sarah - Open-weight 82M model, clear American female voice. No content filter.",
+      kokoroNicole:
+        "Kokoro Nicole - Open-weight 82M model, soft low-key female voice. No content filter.",
+      kokoroAdam:
+        "Kokoro Adam - Open-weight 82M model, steady American male voice. No content filter.",
+      kokoroMichael:
+        "Kokoro Michael - Open-weight 82M model, confident American male voice. No content filter.",
+      kokoroEmma:
+        "Kokoro Emma - Open-weight 82M model, British female voice. No content filter.",
+      kokoroGeorge:
+        "Kokoro George - Open-weight 82M model, British male voice. No content filter.",
+      inworldAshley:
+        "Inworld Ashley - Fast, low-cost female voice with lively delivery.",
+      inworldCraig: "Inworld Craig - Fast, low-cost British male voice.",
+      xaiEve: "xAI Eve - Expressive female voice with inline emotion controls.",
+      geminiZephyr:
+        "Gemini Zephyr - Bright female voice, 100+ languages, delivery instructions.",
+      geminiPuck:
+        "Gemini Puck - Upbeat male voice, 100+ languages, delivery instructions.",
     },
     names: modelTranslations.names,
   },

@@ -16,6 +16,7 @@ import { type PgliteDatabase } from "drizzle-orm/pglite";
 import { Pool } from "pg";
 
 import { parseError } from "../core/utils/parse-error";
+import { resolveEffectiveDatabaseUrl } from "./effective-url";
 import { databaseEnv } from "./env";
 
 /**
@@ -47,7 +48,9 @@ import { databaseEnv } from "./env";
  *   - `isPglite` stays true so feature-flag compat helpers still work.
  */
 
-const DATABASE_URL = process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL;
+const DATABASE_URL = resolveEffectiveDatabaseUrl(
+  process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL,
+);
 
 export const isPglite = DATABASE_URL.startsWith("file:");
 

@@ -15,17 +15,9 @@ import {
   success,
 } from "../../core/route/response.schema";
 import type { TasksT } from "../../tasks/i18n";
+import type { EndpointLogger } from "../../logger/types";
 import { rawPool } from "..";
-
-/** Thresholds tuned for a 16 GB server */
-const THRESHOLDS = {
-  memWarnPct: 75,
-  memCriticalPct: 90,
-  diskWarnPct: 80,
-  diskCriticalPct: 95,
-  dbWarnMs: 500,
-  dbCriticalMs: 2000,
-} as const;
+import { DB_HEALTH_THRESHOLDS as THRESHOLDS } from "./constants";
 
 /** Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms. */
 export function readProcMeminfo(): {
@@ -70,7 +62,13 @@ function readDiskUsedPct(): number | null {
 }
 
 export class DbHealthRepository {
-  static async check(t: TasksT): Promise<
+  static async check(
+    t: TasksT,
+    logger?: EndpointLogger,
+    probe: () => Promise<void> = async () => {
+      await rawPool.query("SELECT 1");
+    },
+  ): Promise<
     ResponseType<{
       healthy: boolean;
       status: "ok" | "warning" | "critical";
@@ -88,7 +86,18 @@ export class DbHealthRepository {
 
     // --- DB check ---
     const dbStart = Date.now();
-    await rawPool.query("SELECT 1");
+    try {
+      await probe();
+    } catch (error) {
+      // Unreachable DB is a genuine failure (distinct from merely slow).
+      return fail({
+        message: t("dbHealth.post.errors.systemAlert", {
+          status: "critical",
+          warnings: `DB unreachable: ${error instanceof Error ? error.message : String(error)}`,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
     const dbResponseMs = Date.now() - dbStart;
 
     if (dbResponseMs >= THRESHOLDS.dbCriticalMs) {
@@ -143,7 +152,7 @@ export class DbHealthRepository {
     const uptimeHours = Math.round(process.uptime() / 3600);
 
     const result = {
-      healthy: status === "ok",
+      healthy: status !== "critical",
       status,
       dbResponseMs,
       memoryUsedPct,
@@ -154,7 +163,9 @@ export class DbHealthRepository {
       warnings,
     };
 
-    if (status !== "ok") {
+    // Only "critical" fails the task. "warning" (slow-but-alive DB, high
+    // memory/disk) is a degraded-but-healthy result: success with warnings.
+    if (status === "critical") {
       return fail({
         message: t("dbHealth.post.errors.systemAlert", {
           status,
@@ -162,6 +173,10 @@ export class DbHealthRepository {
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+
+    if (warnings.length > 0) {
+      logger?.warn(`[DbHealth] ${status}: ${warnings.join("; ")}`);
     }
 
     return success(result);

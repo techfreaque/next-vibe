@@ -17,6 +17,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { Database } from "next-vibe/ui/components/icons/Database";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Input } from "next-vibe/ui/components/input";
 import { MotionDiv } from "next-vibe/ui/components/motion";
 import { Span } from "next-vibe/ui/components/span";
 import { H3 } from "next-vibe/ui/components/typography";
@@ -48,6 +49,8 @@ export function PublicCapContainer(): JSX.Element {
   const remainingToday = cap?.remainingToday ?? 0;
   const percentUsed = cap?.percentUsed ?? 0;
   const capExceeded = cap?.capExceeded ?? false;
+  const topSpenders = cap?.topSpenders ?? [];
+  const recentEvents = cap?.recentEvents ?? [];
 
   return (
     <MotionDiv
@@ -133,6 +136,57 @@ export function PublicCapContainer(): JSX.Element {
               </Div>
             ))}
           </Div>
+
+          <Div className="flex flex-col gap-2">
+            <Span className="text-sm font-medium">
+              {t("get.topSpenders.content")} ({t("get.perLeadCap.content")}:{" "}
+              {cap?.perLeadCap ?? 0}, {t("get.perIpCap.content")}:{" "}
+              {cap?.perIpCap ?? 0})
+            </Span>
+            {topSpenders.length === 0 ? (
+              <Span className="text-xs text-muted-foreground">
+                {t("get.noData")}
+              </Span>
+            ) : (
+              topSpenders.map((s) => (
+                <Div
+                  key={`${s.kind}:${s.key}`}
+                  className="flex justify-between text-xs"
+                >
+                  <Span className="text-muted-foreground font-mono">
+                    {s.kind}:{s.key}
+                  </Span>
+                  <Span className="font-semibold tabular-nums">
+                    {s.spend.toFixed(2)}
+                  </Span>
+                </Div>
+              ))
+            )}
+          </Div>
+
+          <Div className="flex flex-col gap-2">
+            <Span className="text-sm font-medium">
+              {t("get.recentEvents.content")}
+            </Span>
+            {recentEvents.length === 0 ? (
+              <Span className="text-xs text-muted-foreground">
+                {t("get.noData")}
+              </Span>
+            ) : (
+              recentEvents.map((e) => (
+                <Div
+                  key={`${e.kind}:${String(e.createdAt)}:${e.leadId}:${e.ipHash}`}
+                  className="flex justify-between gap-2 text-xs"
+                >
+                  <Span className="font-semibold">{e.kind}</Span>
+                  <Span className="text-muted-foreground font-mono truncate">
+                    {e.leadId || e.ipHash} {e.model}
+                  </Span>
+                  <Span className="tabular-nums">{e.cost.toFixed(2)}</Span>
+                </Div>
+              ))
+            )}
+          </Div>
         </CardContent>
       </Card>
     </MotionDiv>
@@ -201,6 +255,26 @@ export function PublicCapUpdateContainer(): JSX.Element {
               <Plus className="h-5 w-5" />
             </Button>
           </Div>
+        </Div>
+
+        <Div className="grid grid-cols-2 gap-3">
+          {(["perLeadCap", "perIpCap"] as const).map((name) => (
+            <Div key={name} className="flex flex-col gap-1">
+              <Span className="text-sm font-medium text-muted-foreground">
+                {t(`post.${name}.label`)}
+              </Span>
+              <Input
+                type="number"
+                min={1}
+                placeholder={t(`post.${name}.placeholder`)}
+                onChangeText={(v) =>
+                  form.setValue(name, v === "" ? undefined : Number(v), {
+                    shouldValidate: true,
+                  })
+                }
+              />
+            </Div>
+          ))}
         </Div>
 
         <Button type="button" className="w-full" size="lg" onClick={onSubmit}>

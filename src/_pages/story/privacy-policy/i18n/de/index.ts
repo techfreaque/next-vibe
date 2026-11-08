@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Datenschutzrichtlinie",
-  lastUpdated: "Zuletzt aktualisiert: Januar 2025",
+  lastUpdated: "Zuletzt aktualisiert: November 2026",
   introduction:
     "Bei {{appName}} nehmen wir Ihre Privatsphäre ernst. Diese Datenschutzrichtlinie erklärt, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen.",
   sections: {
@@ -98,15 +98,17 @@ export const translations: typeof enTranslations = {
         access: "Recht auf Zugang zu Ihren personenbezogenen Daten",
         correction:
           "Recht auf Berichtigung ungenauer oder unvollständiger Daten",
-        deletion: "Recht auf Löschung Ihrer Daten (Recht auf Vergessenwerden)",
+        deletion:
+          "Recht auf Löschung: Löschen Sie Ihr Konto in den Einstellungen, Ihre personenbezogenen Daten werden entfernt",
         objection: "Recht auf Widerspruch gegen die Verarbeitung Ihrer Daten",
-        portability: "Recht auf Datenportabilität und -übertragung",
+        portability:
+          "Recht auf Datenportabilität: Exportieren Sie alle Ihre Daten als JSON in den Einstellungen",
       },
     },
     cookies: {
       title: "Cookies und Tracking",
       description:
-        "Wir verwenden Cookies und ähnliche Tracking-Technologien, um Ihre Erfahrung zu verbessern.",
+        "Keine Tracker von Drittanbietern, keine Werbepixel, kein Fingerprinting. Ein eigenes Cookie erkennt Ihren Browser bei uns wieder. Um zu sehen, welche Kanäle Menschen bringen, die bleiben, speichern wir, wie Sie zum ersten Mal und zuletzt über einen markierten Link zu uns kamen: die Kampagnen-Tags des Links (utm_source, utm_medium, utm_campaign, utm_content, utm_term), die Domain der verweisenden Website (nie die vollständige Adresse), die Einstiegsseite (ohne Query-String) und einen etwaigen Empfehlungscode. Dazu halten wir fest, wann Sie zuerst gechattet, sich registriert, den Newsletter bestätigt, bezahlt und verlängert haben. Mit der Registrierung wird das Ihrem Konto zugeordnet. Wir nutzen es nur aggregiert zur Bewertung von Marketingkanälen, verkaufen oder teilen es nie und löschen es mit Ihrem Konto.",
     },
     thirdPartySites: {
       title: "Websites Dritter",
@@ -126,7 +128,7 @@ export const translations: typeof enTranslations = {
     gdpr: {
       title: "DSGVO-Konformität",
       description:
-        "Für Nutzer in der Europäischen Union halten wir alle DSGVO-Anforderungen ein.",
+        "Für Nutzer in der Europäischen Union achten wir Ihre DSGVO-Rechte. Exportieren Sie Ihre Daten jederzeit in den Einstellungen. Wenn Sie Ihr Konto löschen, werden Profil, Chats, Erinnerungen, Adressen, Newsletter-Anmeldung und Kontaktdaten gelöscht, und personenbezogene Angaben in verknüpften Besucherdatensätzen entfernt. Anonyme Gesamtstatistiken und das Credit-Journal (nicht mehr mit Ihnen verknüpft) bleiben erhalten. Für alles, was die Einstellungen nicht abdecken, kontaktieren Sie uns.",
     },
     ccpa: {
       title: "CCPA-Konformität",

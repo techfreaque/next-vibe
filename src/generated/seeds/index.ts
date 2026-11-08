@@ -58,6 +58,8 @@ export async function getSeedModule(
       return (await import("../../vibe/tasks/pulse/seeds")) as EnvironmentSeeds;
     case "tasks":
       return (await import("../../vibe/tasks/seeds")) as EnvironmentSeeds;
+    case "watchdog":
+      return (await import("../../vibe/tasks/watchdog/seeds")) as EnvironmentSeeds;
     default:
       return null;
   }
@@ -89,6 +91,7 @@ export function getAllSeedModuleNames(): string[] {
     "dataflow",
     "pulse",
     "tasks",
+    "watchdog",
   ];
 }
 

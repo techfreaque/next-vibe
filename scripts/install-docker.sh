@@ -4,8 +4,13 @@ set -e
 compose() { docker compose -f docker-compose.prod.yml "$@" 2>/dev/null; }
 COMPOSE=compose
 
-git fetch origin
-git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+# DESTRUCTIVE: this is a DEPLOY/UPDATE script for a dedicated deploy box. It
+# force-syncs the checkout to origin, DISCARDING any uncommitted local changes.
+# Do NOT run it on a working tree you have edits in. Set NO_GIT_RESET=1 to skip.
+if [ "${NO_GIT_RESET:-0}" != "1" ]; then
+  git fetch origin
+  git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+fi
 
 # Build postgres image first (includes plv8 + pgvector via Dockerfile.postgres)
 $COMPOSE build postgres
@@ -81,6 +86,9 @@ done
 
 echo "Deployment successful - new app is responding."
 echo "Cleaning up docker resources..."
+# Remove unused images / build cache to reclaim disk after the swap.
 docker system prune -a -f
-docker volume prune -a -f
+# Only dangling (anonymous, unreferenced) volumes - NEVER `-a`, which would also
+# target named volumes like the Postgres data volume. The DB volume survives.
+docker volume prune -f
 

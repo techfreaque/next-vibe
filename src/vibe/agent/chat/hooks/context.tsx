@@ -36,7 +36,8 @@ export interface RootFolderPermissions {
  * Server-origin boot values - stable after mount
  */
 export interface ChatBootValue {
-  initialCredits: CreditsGetResponseOutput;
+  /** undefined = server-side balance load failed; the client fetches it. */
+  initialCredits: CreditsGetResponseOutput | undefined;
   rootFolderPermissions: RootFolderPermissions;
   /** Initial folders data fetched server-side - used as initialData for the sidebar */
   initialFoldersData: FolderListResponseOutput | null;
@@ -81,7 +82,7 @@ interface ChatBootProviderProps {
   currentRootFolderId: DefaultFolderId;
   /** Current subfolder ID from URL (null if none) */
   currentSubFolderId: string | null;
-  initialCredits: CreditsGetResponseOutput;
+  initialCredits: CreditsGetResponseOutput | undefined;
   rootFolderPermissions: RootFolderPermissions;
   /** Initial data fetched server-side to avoid client-side refetch on mount */
   initialFoldersData: FolderListResponseOutput | null;

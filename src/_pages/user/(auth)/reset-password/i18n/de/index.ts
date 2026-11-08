@@ -16,25 +16,6 @@ export const translations: typeof enTranslations = {
   },
   auth: {
     resetPassword: {
-      title: "Passwort zurücksetzen",
-      subtitle:
-        "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Reset-Link",
-      sendResetLink: "Reset-Link senden",
-      backToLogin: "Zurück zur Anmeldung",
-      emailSent: "E-Mail gesendet!",
-      successTitle: "Überprüfen Sie Ihre E-Mail",
-      successMessage:
-        "Wir haben Ihnen einen Link zum Zurücksetzen des Passworts gesendet. Bitte überprüfen Sie Ihren Posteingang.",
-      requestNewLink: "Neuen Link anfordern",
-      createNewPasswordTitle: "Neues Passwort erstellen",
-      createNewPasswordSubtitle: "Geben Sie unten Ihr neues Passwort ein",
-      resetPasswordButton: "Passwort zurücksetzen",
-      emailLabel: "E-Mail-Adresse",
-      emailPlaceholder: "Geben Sie Ihre E-Mail ein",
-      newPasswordLabel: "Neues Passwort",
-      newPasswordPlaceholder: "Geben Sie Ihr neues Passwort ein",
-      confirmPasswordLabel: "Passwort bestätigen",
-      confirmPasswordPlaceholder: "Bestätigen Sie Ihr neues Passwort",
       errors: {
         loadingError:
           "Fehler beim Laden des Formulars zum Zurücksetzen des Passworts",

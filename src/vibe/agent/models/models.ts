@@ -855,11 +855,11 @@ export function calculateCreditCost(
   const credits =
     (totalCostPerMessage / DOLLARS_PER_CREDIT) *
     (1 + STANDARD_MARKUP_PERCENTAGE);
-  // Round UP to the 0.1-credit billing granularity: rounding to nearest let
-  // every turn under 0.05 credits round down to 0 — deducted nothing, wrote no
-  // ledger transaction, i.e. free usage. Zero stays zero (no tokens, no charge).
+  // Round UP to the 0.01-credit billing granularity: rounding to nearest let
+  // tiny turns round down to 0 — deducted nothing, wrote no ledger
+  // transaction, i.e. free usage. Zero stays zero (no tokens, no charge).
   // The 1e-9 epsilon keeps float noise on an exact boundary (0.2 computed as
-  // 0.20000000000000004) from ceiling up a full tenth.
+  // 0.20000000000000004) from ceiling up a full hundredth.
   const rounded = Math.ceil(credits * 100 - 1e-9) / 100;
   return rounded % 1 === 0 ? Math.round(rounded) : rounded;
 }
@@ -961,6 +961,26 @@ export function getProviderPrice(p: ModelProviderConfig): number {
   return 0;
 }
 
+/**
+ * Fail-closed sellability guard for generation (image/video/music/tts/stt)
+ * providers: a provider whose resolved per-unit price is 0 (or missing) must
+ * never be offered, otherwise a pricing gap means free generation.
+ * Function-priced providers (token-based creditCost) are priced at runtime.
+ * Genuinely free models opt in explicitly via enabledWithoutPrice.
+ */
+export function isProviderSellable(
+  def: Pick<ModelDefinition, "enabledWithoutPrice">,
+  p: ModelProviderConfig,
+): boolean {
+  if (def.enabledWithoutPrice) {
+    return true;
+  }
+  if ("creditCost" in p && typeof p.creditCost === "function") {
+    return true;
+  }
+  return getProviderPrice(p) > 0;
+}
+
 // Cross-domain aggregates (getModelDisplayName, getAvailableModelCount, etc.)
 // live in ./all-models.ts to break the circular dependency with domain models files.
 
@@ -994,6 +1014,34 @@ export function meetsRangeConstraint<T>(
     return false;
   }
   return true;
+}
+
+/**
+ * True when the model satisfies the intelligence / content / price ranges of a
+ * FILTERS selection. Single source of truth: used by the backend resolver
+ * (filterRoleModels) and by the model selector's visible list.
+ */
+export function modelMeetsFilterRanges(
+  model: CreditCostInput,
+  ranges: {
+    intelligenceRange?: { min?: string; max?: string };
+    contentRange?: { min?: string; max?: string };
+    priceRange?: { min?: string; max?: string };
+  },
+): boolean {
+  return (
+    meetsRangeConstraint(
+      model.intelligence,
+      ranges.intelligenceRange,
+      IntelligenceLevelDB,
+    ) &&
+    meetsRangeConstraint(model.content, ranges.contentRange, ContentLevelDB) &&
+    meetsRangeConstraint(
+      getModelPriceLevel(getModelPrice(model)),
+      ranges.priceRange,
+      PriceLevelDB,
+    )
+  );
 }
 
 /**
@@ -1060,16 +1108,7 @@ export function filterRoleModels<
     if (!isModelProviderAvailable(m, availability)) {
       return false;
     }
-    const modelPrice = getModelPriceLevel(getModelPrice(m));
-    return (
-      meetsRangeConstraint(
-        m.intelligence,
-        selection.intelligenceRange,
-        IntelligenceLevelDB,
-      ) &&
-      meetsRangeConstraint(m.content, selection.contentRange, ContentLevelDB) &&
-      meetsRangeConstraint(modelPrice, selection.priceRange, PriceLevelDB)
-    );
+    return modelMeetsFilterRanges(m, selection);
   });
   const deduped = deduplicateCheapestPerModel(
     preferCurrentModels(filtered),

@@ -139,6 +139,7 @@ export const translations = {
     },
   },
   post: {
+    download: "Download",
     title: "Speech to Text",
     titleShort: "Speech to Text",
     dynamicTitle: "Transcript: {{text}}",
@@ -250,6 +251,14 @@ export const translations = {
         "OpenAI Whisper - State-of-the-art speech recognition for 99 languages",
       deepgramNova2:
         "Deepgram Nova-2 - Fast and accurate speech-to-text with noise robustness",
+      whisperLargeV3:
+        "Whisper Large V3 - Open-weight OpenAI model, 99 languages, far cheaper than hosted whisper-1.",
+      voxtralMini:
+        "Voxtral Mini Transcribe - Mistral transcription with diarization and segment timestamps, up to 10 minutes.",
+      nemotronAsr:
+        "Nemotron ASR - NVIDIA open multilingual speech recognition, 40 locales, low latency.",
+      gpt4oMiniTranscribe:
+        "GPT-4o Mini Transcribe - Lower word error rate than Whisper, better language detection.",
     },
   },
 };

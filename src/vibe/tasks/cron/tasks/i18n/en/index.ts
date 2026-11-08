@@ -285,6 +285,9 @@ export const translations = {
       taskInput: {
         label: "Task Input",
         description: "JSON input data for the task",
+        placeholder: '{ "dryRun": false }',
+        invalidJson: "Not valid JSON. Check quotes, commas and brackets.",
+        notObject: 'Task input must be a JSON object, like { "key": "value" }.',
       },
       runOnce: {
         label: "Run Once",
@@ -459,6 +462,22 @@ export const translations = {
       noMatches: "No tasks match your filters",
       noMatchesDesc: "Try adjusting your search or filter criteria",
       clearFilters: "Clear Filters",
+    },
+    create: {
+      created: "Task created",
+      route: "Route",
+      schedule: "Schedule",
+      nextRun: "Next run",
+      notScheduled: "Not scheduled",
+      owner: "Owner",
+      ownerSystem: "System",
+      ownerYou: "You",
+      ownerUser: "User {{id}}",
+      enabled: "Enabled",
+      disabled: "Disabled",
+      taskInput: "Task input",
+      noInput: "No input - the route runs with its defaults.",
+      openTask: "Open task",
     },
   },
 };

@@ -9,13 +9,13 @@ export const translations: typeof enTranslations = {
 
   hero: {
     directEarning: "Zarabiasz",
-    directLabel: "od każdej płatności",
     directNote: "od osób, które polecasz, wiecznie",
     bonusEarning: "Jako twórca skilla",
     bonusNote: "gdy inni udostępniają Twój skill, na zawsze",
   },
 
   commissionTable: {
+    youLabel: "Ty",
     perMonth: "/ mies.",
     colLevel: "Kto zarabia",
     colCut: "Udział",
@@ -25,38 +25,14 @@ export const translations: typeof enTranslations = {
     chainTitle: "10 subskrybentów. Co zarabiasz miesięcznie.",
     chainSubtitle:
       "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji - płaci wiecznie.",
-    youLabel: "Ty",
     whoLabel0: "Ty - ktokolwiek polecił ich bezpośrednio",
     whoLabel1: "Twórca skilla (jeśli inny) lub Twój polecający",
     whoLabel2: "Polecający ich polecającego",
     whoLabel3: "Poziom 4",
     whoLabel4: "Poziom 5",
     whoLabel5: "Poziom 6",
-    colExample: "Przykład (wydatki {{examplePrice}}/mies.)",
     tableNote:
       "Link polecający: {{directPct}} od użytkownika. Twój skill udostępniony przez innych: {{skillBonusPct}} od użytkownika. Oba cyklicznie, na zawsze.",
-  },
-
-  commission: {
-    title: "Łańcuch, poziom po poziomie",
-    subtitle:
-      "Każda płatność Twoich poleceń przepływa w górę łańcucha. Ty siedzisz na poziomie 1 - {{directPct}} na zawsze. Każdy poziom wyżej też zarabia.",
-    directTitle: "Bezpośrednia prowizja",
-    directAmount: "Zawsze {{directPct}}",
-    directDesc:
-      "Za każdym razem gdy ktoś przez Ciebie polecony płaci, dostajesz {{directPct}}. Bez wyjątków. Bez daty ważności.",
-    bonusTitle: "Zarobki z sieci",
-    bonusAmount: "Do {{uplinePct}} więcej",
-    bonusDesc:
-      "Twoje polecenia polecają innych - zarabiasz też z tych płatności. {{level2Pct}} z poziomu 2, {{level3Pct}} z poziomu 3, połowa z każdym poziomem.",
-    totalTitle: "Łączny potencjał",
-    totalAmount: "Do {{totalPct}}",
-    totalDesc: "Gdy Twoje polecenia też polecają innych",
-    levelsTitle: "Podział na poziomy",
-    level1: "Polecasz kogoś → {{directPct}} jego płatności",
-    level2: "On poleca kogoś → {{level2Pct}} tych płatności",
-    level3: "Ci polecają innych → {{level3Pct}}",
-    level4: "I tak dalej, do {{maxUplineLevels}} poziomów",
   },
 
   story: {
@@ -106,43 +82,14 @@ export const translations: typeof enTranslations = {
       "Link polecający → {{directPct}} na użytkownika, wiecznie. Twój skill udostępniany przez innych → {{skillBonusPct}} na użytkownika. Dwa źródła, zero dodatkowej pracy.",
     step3Title: "Odbierz wypłatę",
     step3Body:
-      "Kredyty są natychmiast. Wypłać w BTC lub USDC po osiągnięciu {{minPayout}}.",
+      "Zarobki odblokowują się {{holdDays}} dni po każdej płatności - to okres na zwroty. Potem wydaj je jako kredyty albo wypłać w BTC/USDC od {{minPayout}}.",
   },
 
   manage: {
-    createSubtitle: "Twórz kody dla konkretnych kampanii lub odbiorców.",
     codesSubtitle: "Skopiuj link, udostępnij, zarabiaj.",
-  },
-  createCode: {
-    title: "Utwórz kod polecający",
-    create: "Utwórz kod",
-    creating: "Tworzenie...",
   },
   myCodes: {
     title: "Twoje linki",
-    loading: "Ładowanie...",
-    error: "Nie udało się załadować kodów",
-    empty: "Brak kodów. Utwórz swój pierwszy powyżej ↑",
-    copy: "Kopiuj link",
-    copied: "Skopiowano!",
-    uses: "Użycia",
-    signups: "Rejestracje",
-    revenue: "Przychód",
-    earnings: "Zarobione",
-    inactive: "Nieaktywny",
-  },
-  stats: {
-    loading: "Ładowanie...",
-    error: "Nie udało się załadować statystyk",
-    totalSignups: "Łączne rejestracje",
-    totalSignupsDesc: "Użytkownicy, którzy zarejestrowali się przez Twój kod",
-    totalRevenue: "Wygenerowany przychód",
-    totalRevenueDesc: "Całkowita wartość subskrypcji z Twoich poleceń",
-    totalEarned: "Łącznie zarobione",
-    totalEarnedDesc: "Twoje prowizje ze wszystkich poleceń",
-    availableBalance: "Dostępne saldo",
-    availableBalanceDesc:
-      "Na czaty AI - inne kredyty używane najpierw. Zarobić {{minPayout}}, by odblokować wypłatę.",
   },
   cta: {
     title: "Utwórz konto i zacznij zarabiać",
@@ -154,7 +101,8 @@ export const translations: typeof enTranslations = {
       "{{directPct}} prowizji polecającej - cyklicznie, bez daty ważności",
     pitch2:
       "Opublikuj skill → {{skillBonusPct}} od każdego, kogo inni do niego przyprowadzą",
-    pitch3: "Kredyty natychmiast. BTC/USDC od minimum {{minPayout}}.",
+    pitch3:
+      "Odblokowanie {{holdDays}} dni po płatności. BTC/USDC od {{minPayout}}.",
   },
   payout: {
     title: "Wypłać zarobki",

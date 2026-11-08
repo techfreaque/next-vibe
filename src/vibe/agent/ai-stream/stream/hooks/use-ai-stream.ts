@@ -11,7 +11,10 @@
  * on messagesDefinition.GET), NOT from this hook.
  */
 
-import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  isErrorResponseType,
+  parseError,
+} from "next-vibe/core/utils/parse-error";
 import { preWarmChannel } from "next-vibe/realtime/client/client";
 import { buildWsChannel } from "next-vibe/realtime/core/channel";
 import { toast } from "next-vibe/ui/hooks/use-toast";
@@ -26,12 +29,16 @@ import { z } from "zod";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
-import { addErrorMessageToChat } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
+import {
+  addErrorMessageToChat,
+  discardOptimisticTurn,
+} from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
 import cancelEndpoints from "../../cancel/definition";
 import { serializeError } from "../../repository/errors/error-utils";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
 import { scopedTranslation } from "../i18n";
+import { isOutOfCreditsErrorCode } from "../widget/out-of-credits-card";
 import { getAudioQueue } from "./audio-queue";
 import { useAIStreamStore } from "./store";
 
@@ -146,7 +153,22 @@ export function useAIStream(): UseAIStreamReturn {
         // Distinct name from the non-success branch below: this is a thrown
         // exception (network drop, timeout, abort) with no server response at
         // all, not a server-returned failure - keep them separately traceable.
-        logger.error("[client] Stream request network error", {
+        // Browser-level connectivity loss ("Load failed" on Safari, "Failed
+        // to fetch" on Chrome, Firefox's NetworkError) is most likely the
+        // user's network (a server outage looks the same) - warn. Anything
+        // else (timeout, malformed response) stays an error.
+        const isBrowserNetworkLoss =
+          /load failed|failed to fetch|networkerror|network connection was lost/i.test(
+            failMessage,
+          );
+        // Credit refusal (402) is an expected outcome, shown as a card below.
+        const isCreditRefusal =
+          isErrorResponseType(err) &&
+          isOutOfCreditsErrorCode(err.errorType.errorCode);
+        (isBrowserNetworkLoss || isCreditRefusal
+          ? logger.warn
+          : logger.error
+        ).bind(logger)("Stream request network error", {
           message: failMessage,
           errorType: Reflect.get(parsedErr, "errorType"),
           operation: data.operation,
@@ -155,6 +177,16 @@ export function useAIStream(): UseAIStreamReturn {
         });
 
         const activeThreadId = data.threadId;
+        // Credit refusal (402): the composer shows a sign-up / top-up card
+        // (visible on new and existing threads alike) - no error bubble, no
+        // destructive toast.
+        if (isCreditRefusal) {
+          if (activeThreadId) {
+            discardOptimisticTurn(activeThreadId, data.rootFolderId, logger);
+          }
+          useAIStreamStore.getState().setCreditRefusal(true);
+          return false;
+        }
         if (activeThreadId) {
           addErrorMessageToChat(
             activeThreadId,
@@ -185,15 +217,28 @@ export function useAIStream(): UseAIStreamReturn {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
         const resultMessage = result.message;
-        logger.error("[client] Stream request failed", {
-          message: resultMessage,
-          errorType: result.errorType?.errorCode,
-          operation: data.operation,
-          model: data.model,
-          threadId: data.threadId,
-        });
+        // 4xx (no credits, forbidden folder) is shown to the user - warn;
+        // a server failure is an error.
+        const isServerFailure = (result.errorType?.errorCode ?? 500) >= 500;
+        (isServerFailure ? logger.error : logger.warn).bind(logger)(
+          "Stream request failed",
+          {
+            message: resultMessage,
+            errorType: result.errorType?.errorCode,
+            operation: data.operation,
+            model: data.model,
+            threadId: data.threadId,
+          },
+        );
 
         const activeThreadId = data.threadId;
+        if (isOutOfCreditsErrorCode(result.errorType?.errorCode)) {
+          if (activeThreadId) {
+            discardOptimisticTurn(activeThreadId, data.rootFolderId, logger);
+          }
+          useAIStreamStore.getState().setCreditRefusal(true);
+          return false;
+        }
         if (activeThreadId) {
           addErrorMessageToChat(
             activeThreadId,
@@ -218,6 +263,7 @@ export function useAIStream(): UseAIStreamReturn {
 
       // POST returned successfully - stream is now running on the server.
       // WS events will drive all UI updates. stream-finished will clean up.
+      useAIStreamStore.getState().setCreditRefusal(false);
       logger.debug("Stream triggered successfully (fire-and-forget)", {
         threadId,
       });
@@ -246,12 +292,18 @@ export function useAIStream(): UseAIStreamReturn {
 
       // Safety timeout: if stream-finished doesn't arrive within 15s, force-clear
       // the aborting state so the stop button doesn't stay stuck indefinitely.
+      // What the server answered decides where the stuck stream-finished got
+      // lost: "pending" = the cancel POST itself hung, "cancelled" = the
+      // stream was signalled but never emitted stream-finished, "idle" = the
+      // server saw no live stream (the finish event was lost on the WS).
+      let cancelOutcome: "pending" | "cancelled" | "idle" = "pending";
       const safetyTimeout = setTimeout(() => {
         if (useAIStreamStore.getState().isAborting(threadId)) {
           logger.warn(
             "Cancel safety timeout fired - force-clearing aborting state",
             {
               threadId,
+              cancelOutcome,
             },
           );
           storeClearThread(threadId);
@@ -274,6 +326,7 @@ export function useAIStream(): UseAIStreamReturn {
         });
 
         if (result.success) {
+          cancelOutcome = result.data.cancelled ? "cancelled" : "idle";
           logger.info("Cancel endpoint called successfully", { threadId });
         } else {
           logger.error("Cancel endpoint returned error", {

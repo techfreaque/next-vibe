@@ -145,8 +145,9 @@ export const translations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Send me product updates",
-      description: "New models and features. Rarely. No spam.",
+      label: "+20 free credits every month",
+      description:
+        "Subscribe to the newsletter and get 20 bonus credits a month, plus first word on new models and features. No spam, leave anytime.",
     },
     acceptTerms: {
       label: "I accept the terms",
@@ -167,6 +168,10 @@ export const translations = {
       labelPrefilled: "Referral code",
       descriptionPrefilled:
         "Your friend gets rewarded when you create your account.",
+      validation: {
+        invalid:
+          "That referral code doesn't exist or is no longer active. Fix it or clear the field.",
+      },
     },
     supportedSkillId: {
       label: "Support a Creator",
@@ -225,6 +230,8 @@ export const translations = {
       title: "Unsaved Changes",
       description: "You have unsaved changes",
     },
+    autoLoginFailed:
+      "Account created, but we couldn't sign you in. Log in with your new password.",
     internal: {
       title: "Signup failed for {{email}}: {{error}}",
       description: "An internal error occurred",
@@ -423,7 +430,8 @@ export const translations = {
     },
     free: {
       title: "What you get for free, forever:",
-      credits: "{{freeCredits}} credits per month - no card, no expiry",
+      credits:
+        "{{freeCreditsSignedIn}} free credits every month, +{{freeCreditsNewsletterBonus}} with the newsletter - no card",
       allModels: "Access to all {{modelCount}} AI models",
       uncensored: "4 uncensored models that actually answer your questions",
       chatModes: "Private, Incognito, Shared, and Public chat modes",

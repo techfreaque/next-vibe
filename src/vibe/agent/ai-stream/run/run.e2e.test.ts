@@ -144,7 +144,7 @@ describe("E2E: ai-run", () => {
     });
     expect(call.response.success).toBe(false);
     if (call.response.success) return;
-    expect(call.status, JSON.stringify([call.response, call.requestBody])).toBe(403);
+    expect(call.status, JSON.stringify([call.response, call.requestBody])).toBe(402);
     // The refusal is shown to the customer, not swallowed
     await page
       .getByRole("alert")

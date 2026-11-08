@@ -11,6 +11,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
+  failInline,
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
@@ -77,7 +78,7 @@ import {
   shouldTriggerCompacting,
   truncateToContextWindow,
 } from "./context/token-budget";
-import { AbortReason } from "./core/constants";
+import { AbortReason, StreamAbortError } from "./core/constants";
 import { resolveModelSkill } from "./core/modality-resolver";
 import {
   clearStreamingState,
@@ -422,6 +423,23 @@ export class AiStreamRepository {
     // The calling companion's skill (for companion-soul inheritance) rides the
     // stream context of the invoking turn.
     const callerSkillId = toolExecutionContext.skillId;
+
+    // Background-task preflight: a run that starts over its budget cap (or
+    // inside an already-tripped task) never opens a stream.
+    if (toolExecutionContext.cronTaskId) {
+      const { TaskGuard } = await import("next-vibe/tasks/watchdog/guard");
+      const verdict = await TaskGuard.check(
+        toolExecutionContext.cronTaskId,
+        logger,
+      );
+      if (!verdict.ok) {
+        return failInline({
+          message: verdict.reason,
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
+      }
+    }
+
     try {
       const rootFolderId = data.rootFolderId ?? DefaultFolderId.BACKGROUND;
 
@@ -793,6 +811,29 @@ export class AiStreamRepository {
     const { userId, leadId, ipAddress } =
       AiStreamRepository.extractUserIdentifiers(user, request, awaitResult);
 
+    // Growth funnel: a person's first sent chat message (write-once per journey).
+    // Agent-driven turns (sub-agents, revival, relay, headless, awaited) are not people.
+    if (
+      data.operation === "send" &&
+      data.role === ChatMessageRole.USER &&
+      !awaitResult &&
+      !isRevival &&
+      !relayReceiver &&
+      !headlessIntake &&
+      !subAgentDepth
+    ) {
+      void (async (): Promise<void> => {
+        const { GrowthJourneyRepository } =
+          await import("@/leads/growth/repository");
+        const { FunnelStep } = await import("@/leads/growth/enum");
+        await GrowthJourneyRepository.markStep(
+          { userId: userId ?? null, leadId: leadId ?? null },
+          FunnelStep.CHAT,
+          logger,
+        );
+      })();
+    }
+
     // Notify the caller of the thread ID before any work starts (ai-run emits
     // a partial tool result so the parent UI can render the sub-thread live).
     if (onThreadCreated) {
@@ -980,7 +1021,8 @@ export class AiStreamRepository {
     });
 
     if (!setupResult.success) {
-      // Auth/billing failures (4xx) are expected user-facing outcomes.
+      // Auth/billing failures (4xx) are expected user-facing outcomes - the
+      // client gets the error event; warn keeps them visible.
       const errorCode = setupResult.errorType?.errorCode ?? 500;
       const logFn = errorCode >= 500 ? logger.error : logger.warn;
       logFn("[AiStream] Setup failed", {
@@ -1195,6 +1237,37 @@ export class AiStreamRepository {
         // (normal completion). A cancel signal auto-settles the subscription; this
         // covers the no-cancel path so the bus handler is never left dangling.
         ctx.onCleanup(cancelStreamControlSub);
+
+        // The thread row vanished mid-stream (deleted by a moderator/admin
+        // while another user streams, by a sync/mirror delete): every further
+        // write would be dropped, so stop the loop instead of calling and
+        // billing tools into the void. The thread-delete cancel signal only
+        // reaches the deleting user's own channel - this covers everyone.
+        ctx.dbWriter.onThreadGone = (): void => {
+          if (!streamAbortController.signal.aborted) {
+            streamAbortController.abort(
+              new StreamAbortError(AbortReason.USER_CANCELLED),
+            );
+          }
+        };
+
+        // A credit deduction failed even after retry: billing fails closed —
+        // stop before the next billed step/tool instead of running free.
+        ctx.dbWriter.onBillingFailed = (): void => {
+          if (!streamAbortController.signal.aborted) {
+            streamAbortController.abort(
+              new StreamAbortError(AbortReason.BILLING_FAILED),
+            );
+          }
+        };
+
+        // Background-task guard (budget cap / turn or tool-call ceiling): stop
+        // before the next billed step, same shape as the billing fail-closed.
+        ctx.dbWriter.onTaskGuardTripped = (reason): void => {
+          if (!streamAbortController.signal.aborted) {
+            streamAbortController.abort(new StreamAbortError(reason));
+          }
+        };
 
         // Wire toolExecutionContext.pendingToolMessages into ToolExecutionContext so
         // tools-loader can inject the correct currentToolMessageId per toolCallId

@@ -82,6 +82,7 @@ const { POST } = createEndpoint({
           { value: "importers", label: "mode.importers" },
           { value: "needs-move", label: "mode.needsMove" },
           { value: "unused-symbols", label: "mode.unusedSymbols" },
+          { value: "unused-i18n", label: "mode.unusedI18n" },
           { value: "cross-domain", label: "mode.crossDomain" },
           { value: "page-violations", label: "mode.pageViolations" },
         ],
@@ -97,6 +98,7 @@ const { POST } = createEndpoint({
             "importers",
             "needs-move",
             "unused-symbols",
+            "unused-i18n",
             "cross-domain",
             "page-violations",
           ])
@@ -145,6 +147,7 @@ const { POST } = createEndpoint({
           "importers",
           "needs-move",
           "unused-symbols",
+          "unused-i18n",
           "cross-domain",
           "page-violations",
         ]),
@@ -421,6 +424,10 @@ const { POST } = createEndpoint({
       },
       sharedCandidates: {
         mode: "shared-candidates" as const,
+      },
+      unusedI18n: {
+        mode: "unused-i18n" as const,
+        focus: "src/_pages",
       },
     },
     responses: {

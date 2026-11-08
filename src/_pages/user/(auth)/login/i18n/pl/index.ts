@@ -1,13 +1,6 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  auth: {
-    login: {
-      title: "Zaloguj się",
-      subtitle: "Powrót do społeczności",
-      signInButton: "Zaloguj się",
-    },
-  },
   meta: {
     title: "Logowanie - {{appName}}",
     description: "Zaloguj się do swojego konta {{appName}}",

@@ -34,6 +34,13 @@ interface AIStreamState {
    */
   incognitoStreams: Set<string>;
 
+  /**
+   * The last send was refused for lack of credits (402). The composer swaps
+   * in a sign-up / top-up card until dismissed or the next send succeeds.
+   */
+  creditRefusal: boolean;
+  setCreditRefusal: (value: boolean) => void;
+
   isAborting: (threadId: string) => boolean;
   setAborting: (threadId: string, value: boolean) => void;
   /** Clear aborting state for a thread (called by stream-finished event) */
@@ -52,6 +59,12 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   abortingThreads: new Set<string>(),
   pendingThreads: new Set<string>(),
   incognitoStreams: new Set<string>(),
+  creditRefusal: false,
+
+  setCreditRefusal: (value: boolean): void =>
+    set((state) =>
+      state.creditRefusal === value ? state : { creditRefusal: value },
+    ),
 
   isAborting: (threadId: string): boolean =>
     get().abortingThreads.has(threadId),
@@ -114,5 +127,6 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       abortingThreads: new Set<string>(),
       pendingThreads: new Set<string>(),
       incognitoStreams: new Set<string>(),
+      creditRefusal: false,
     }),
 }));

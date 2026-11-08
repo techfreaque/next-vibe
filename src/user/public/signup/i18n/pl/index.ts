@@ -156,8 +156,9 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Chcę dostawać nowości",
-      description: "Nowe modele i funkcje. Rzadko. Bez spamu.",
+      label: "+20 darmowych kredytów co miesiąc",
+      description:
+        "Zapisz się do newslettera i odbieraj 20 bonusowych kredytów miesięcznie - a do tego nowe modele i funkcje jako pierwszy. Bez spamu, zrezygnujesz, kiedy chcesz.",
     },
 
     referralCode: {
@@ -167,6 +168,10 @@ export const translations: typeof enTranslations = {
       labelPrefilled: "Kod polecający",
       descriptionPrefilled:
         "Twoj znajomy dostanie nagrodę, gdy założysz konto.",
+      validation: {
+        invalid:
+          "Ten kod polecający nie istnieje lub jest już nieaktywny. Popraw go albo wyczyść pole.",
+      },
     },
     supportedSkillId: {
       label: "Wesprzyj twórcę",
@@ -229,6 +234,8 @@ export const translations: typeof enTranslations = {
       title: "Niezapisane Zmiany",
       description: "Masz niezapisane zmiany",
     },
+    autoLoginFailed:
+      "Konto założone, ale nie udało się cię zalogować. Zaloguj się nowym hasłem.",
     internal: {
       title: "Rejestracja dla {{email}} nie powiodła się: {{error}}",
       description: "Wystąpił błąd wewnętrzny",
@@ -429,7 +436,7 @@ export const translations: typeof enTranslations = {
     free: {
       title: "Co dostajesz za darmo, na zawsze:",
       credits:
-        "{{freeCredits}} creditów miesięcznie - bez karty, bez daty wygaśnięcia",
+        "{{freeCreditsSignedIn}} darmowych kredytów co miesiąc, +{{freeCreditsNewsletterBonus}} z newsletterem - bez karty",
       allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
       uncensored:
         "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",

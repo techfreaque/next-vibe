@@ -16,7 +16,10 @@ const endpoint = fetchUrlEndpoints.GET;
 const PAGE_URL = "https://example.com/";
 
 describe("E2E: fetch URL content", () => {
-  const e2e = useE2E("vibe/agent/fetch-url-content", { fixtures: true });
+  const e2e = useE2E("vibe/agent/fetch-url-content", {
+    fixtures: true,
+    guestCredits: 100,
+  });
 
   e2e.it(
     "fetches a page and renders it as markdown",

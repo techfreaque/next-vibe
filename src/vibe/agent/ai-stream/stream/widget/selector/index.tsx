@@ -115,20 +115,28 @@ export function Selector({
 
           {/* Who + which brain - truncates, never disappears */}
           <Span
-            className="flex min-w-0 items-baseline gap-1.5"
+            className="flex min-w-0 items-center gap-2"
             suppressHydrationWarning
           >
             {!isModelOnly && isClient && currentSkill?.name ? (
               <>
-                <Span className="truncate font-medium">
+                <Span className="truncate font-medium leading-5">
                   {currentSkill.name}
                 </Span>
-                <Span className="min-w-0 truncate text-xs text-muted-foreground">
-                  {currentModel?.name}
+                <Span className="flex min-w-0 items-center gap-1.5 text-xs leading-5 text-muted-foreground">
+                  {currentModel?.icon ? (
+                    <Icon
+                      icon={currentModel.icon}
+                      className="h-3.5 w-3.5 shrink-0 opacity-80"
+                    />
+                  ) : null}
+                  <Span className="truncate">{currentModel?.name}</Span>
                 </Span>
               </>
             ) : (
-              <Span className="truncate font-medium">{currentModel?.name}</Span>
+              <Span className="truncate font-medium leading-5">
+                {currentModel?.name}
+              </Span>
             )}
           </Span>
 

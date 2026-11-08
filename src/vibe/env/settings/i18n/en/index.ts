@@ -237,7 +237,7 @@ export const translations = {
         "Optional - you can use OpenRouter or other providers instead.",
       openRouterTitle: "OpenRouter API Key",
       openRouterDescription:
-        "Access 200+ AI models (GPT-4, Claude, Llama, and more). Works alongside Claude Code or on its own.",
+        "Access every OpenRouter AI model (GPT-4, Claude, Llama, and more). Works alongside Claude Code or on its own.",
       openRouterHint:
         "Get your free API key at openrouter.ai/keys - no credit card required for free models.",
       unbottledTitle: "Unbottled AI Cloud",

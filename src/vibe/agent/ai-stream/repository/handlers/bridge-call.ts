@@ -234,6 +234,26 @@ async function runBridgeCall(params: {
           });
           return null;
         }
+        // A provider moderation block (Gemini PROHIBITED_CONTENT / SAFETY,
+        // content-filter refusals) is deterministic - retrying the same
+        // payload only bills a second refusal. It is the provider's policy,
+        // not a failure of ours: warn (no retry), fall through to the placeholder.
+        const isModerationBlock =
+          /PROHIBITED_CONTENT|\bSAFETY\b|blocked the request|content.?filter|content.?policy/i.test(
+            parsedAttemptErr.message,
+          );
+        if (isModerationBlock) {
+          logger.warn(
+            `[GapFill] ${errorLabel} bridge refused by provider moderation`,
+            {
+              error: parsedAttemptErr.message,
+              modality,
+              bridgeType,
+              modelId,
+            },
+          );
+          return bridgeFail(parsedAttemptErr.message);
+        }
         if (attempt === 1) {
           logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
             error: parsedAttemptErr.message,
@@ -244,9 +264,10 @@ async function runBridgeCall(params: {
           return bridgeFail(parsedAttemptErr.message);
         }
         logger.warn(
-          `[GapFill] ${errorLabel} bridge attempt timed out - retrying once`,
+          `[GapFill] ${errorLabel} bridge attempt failed - retrying once`,
           {
             modality,
+            modelId,
             error: parsedAttemptErr.message,
             errorStack: parsedAttemptErr.stack,
           },

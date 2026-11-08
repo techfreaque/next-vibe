@@ -271,6 +271,12 @@ export interface ToolExecutionContext {
    */
   abortSignal: AbortSignal;
   /**
+   * Background task (cron_tasks.id) this stream runs on behalf of. Set by the
+   * pulse and by async-tool goroutines; absent for interactive chat. The task
+   * budget guard and watchdog key spend / turn / tool-call counts on it.
+   */
+  cronTaskId?: string;
+  /**
    * The AI SDK toolCallId for the current tool call being executed.
    * Set by tools-loader execute() wrapper from options.toolCallId before calling execute().
    * Used by execute-tool to look up the correct toolMessageId for parallel tool calls.

@@ -2717,7 +2717,8 @@ export const translations = {
         },
         free: {
           title: "What you get for free, forever:",
-          credits: "{{freeCredits}} credits per month - no card, no expiry",
+          credits:
+            "{{freeCreditsSignedIn}} free credits every month, +{{freeCreditsNewsletterBonus}} with the newsletter - no card",
           allModels: "Access to all {{modelCount}} AI models",
           uncensored: "4 uncensored models that actually answer your questions",
           chatModes: "Private, Incognito, Shared, and Public chat modes",

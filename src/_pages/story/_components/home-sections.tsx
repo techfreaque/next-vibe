@@ -143,7 +143,7 @@ export function PricingTeaser({
       note: t("home.v2.pricing.free.note", pricing),
       points: [
         t("home.v2.pricing.free.p1", pricing),
-        t("home.v2.pricing.free.p2"),
+        t("home.v2.pricing.free.p2", pricing),
         t("home.v2.pricing.free.p3"),
       ],
       highlight: false,
@@ -164,7 +164,7 @@ export function PricingTeaser({
 
   return (
     <Section className="border-y border-border bg-muted/40">
-      <Div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 md:py-24">
+      <Div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 md:py-24">
         <SectionHeader
           eyebrow={t("home.v2.pricing.eyebrow")}
           title={t("home.v2.pricing.title")}
@@ -324,26 +324,28 @@ export function HomeFaq({
   };
 
   return (
-    <Section className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 md:py-24">
-      <SectionHeader
-        eyebrow={t("home.v2.faq.eyebrow")}
-        title={t("home.v2.faq.title")}
-      />
-      <Div className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
-        {FAQ_IDS.map((id) => (
-          <Details
-            key={id}
-            className="group px-5 [&_summary::-webkit-details-marker]:hidden"
-          >
-            <Summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-base font-medium">
-              {t(`home.v2.faq.items.${id}.q`)}
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
-            </Summary>
-            <P className="pb-5 text-sm leading-relaxed text-muted-foreground">
-              {t(`home.v2.faq.items.${id}.a`, params)}
-            </P>
-          </Details>
-        ))}
+    <Section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 md:py-24">
+      <Div className="mx-auto w-full max-w-3xl">
+        <SectionHeader
+          eyebrow={t("home.v2.faq.eyebrow")}
+          title={t("home.v2.faq.title")}
+        />
+        <Div className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+          {FAQ_IDS.map((id) => (
+            <Details
+              key={id}
+              className="group px-5 [&_summary::-webkit-details-marker]:hidden"
+            >
+              <Summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-base font-medium">
+                {t(`home.v2.faq.items.${id}.q`)}
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+              </Summary>
+              <P className="pb-5 text-sm leading-relaxed text-muted-foreground">
+                {t(`home.v2.faq.items.${id}.a`, params)}
+              </P>
+            </Details>
+          ))}
+        </Div>
       </Div>
     </Section>
   );

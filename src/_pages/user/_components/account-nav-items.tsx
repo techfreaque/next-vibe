@@ -19,7 +19,7 @@ export const accountNavItems: NavItemType[] = [
   },
   {
     icon: <Settings className="h-4 w-4" />,
-    title: "nav.settings",
+    title: "nav.profile",
     href: "/user/settings",
   },
   {

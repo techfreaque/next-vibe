@@ -569,15 +569,14 @@ export const translations: typeof enTranslations = {
         models: "Dostęp do wszystkich {{modelCount}} modeli AI",
         nolimits: "Brak dziennych limitów - używaj creditów kiedy chcesz",
         uncensored: "Niecenzurowane modele bez filtrów treści",
-        packs:
-          "Kupuj dodatkowe pakiety creditów, które nigdy nie wygasają (tylko dla subskrybentów)",
+        packs: "Kupuj dodatkowe pakiety creditów, które nigdy nie wygasają",
         cancel: "Anuluj w dowolnym momencie, bez pytań",
       },
       cta: "Zacznij rozmawiać",
       packs: {
         title: "Potrzebujesz więcej creditów?",
         description:
-          "Kupuj pakiety creditów w dowolnym momencie - {{packPrice}} za {{packCredits}} creditów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem. Dostępne tylko dla subskrybentów.",
+          "Kupuj pakiety creditów w dowolnym momencie, z subskrypcją lub bez - {{packPrice}} za {{packCredits}} creditów albo {{largePackPrice}} za {{largePackCredits}}. Nigdy nie wygasają i sumują się z miesięcznym przydziałem.",
         cta: "Kup pakiet creditów",
       },
       manage: "Zarządzaj lub anuluj subskrypcję w dowolnym momencie w",

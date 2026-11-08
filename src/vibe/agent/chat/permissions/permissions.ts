@@ -38,6 +38,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
+import { ThreadModerationStatus } from "../enum";
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -565,6 +566,12 @@ export async function canViewThread(
   // Admin can always view
   if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
+  }
+
+  // Auto-hidden (under review) or removed by moderation: only the owner and
+  // admins (handled above) may still open it
+  if (thread.moderationStatus !== ThreadModerationStatus.VISIBLE) {
+    return false;
   }
 
   // Build folder map for inheritance

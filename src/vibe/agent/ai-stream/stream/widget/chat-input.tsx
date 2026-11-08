@@ -19,6 +19,7 @@ import { Kbd } from "next-vibe/ui/components/kbd";
 import { Span } from "next-vibe/ui/components/span";
 import type { TextareaKeyboardEvent } from "next-vibe/ui/components/textarea";
 import { Textarea } from "next-vibe/ui/components/textarea";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   Tooltip,
   TooltipContent,
@@ -124,6 +125,7 @@ export function WidgetChatInput({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { t } = aiStreamScopedTranslation.scopedT(locale);
   const isInactive = disabled || isSubmitting;
+  const isTouch = useTouchDevice();
 
   // Bridge: react to favorite selection → sync model/skill to form
   const { settings } = useChatSettings(user, logger);
@@ -158,17 +160,19 @@ export function WidgetChatInput({
     onSkillChange,
   ]);
 
-  // Keyboard: Enter to submit, Shift+Enter for newline
+  // Keyboard: on desktop Enter submits, Shift+Enter makes a newline.
+  // On touch devices there is no Shift key, so Enter must insert a newline
+  // (the send button submits) - otherwise multi-line messages are impossible.
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent): void => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === "Enter" && !e.shiftKey && !isTouch) {
         e.preventDefault();
         if (content.trim() && !isInactive) {
           onSubmit();
         }
       }
     },
-    [content, isInactive, onSubmit],
+    [content, isInactive, isTouch, onSubmit],
   );
 
   const currentModel = getChatModelById(modelId);
@@ -209,21 +213,25 @@ export function WidgetChatInput({
               <Div className="text-sm text-muted-foreground/70 pt-2">
                 {t("input.placeholder")}
               </Div>
-              <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
-                <Span>
-                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("input.keyboardShortcuts.enter")}
-                  </Kbd>{" "}
-                  {t("input.keyboardShortcuts.toSend")}
-                </Span>
-                <Span className="opacity-30">{"/"}</Span>
-                <Span>
-                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("input.keyboardShortcuts.shiftEnter")}
-                  </Kbd>{" "}
-                  {t("input.keyboardShortcuts.forNewLine")}
-                </Span>
-              </Div>
+              {/* Enter/Shift+Enter hints only apply with a physical keyboard;
+                  on touch Enter inserts a newline and the send button submits. */}
+              {!isTouch && (
+                <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
+                  <Span>
+                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                      {t("input.keyboardShortcuts.enter")}
+                    </Kbd>{" "}
+                    {t("input.keyboardShortcuts.toSend")}
+                  </Span>
+                  <Span className="opacity-30">{"/"}</Span>
+                  <Span>
+                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                      {t("input.keyboardShortcuts.shiftEnter")}
+                    </Kbd>{" "}
+                    {t("input.keyboardShortcuts.forNewLine")}
+                  </Span>
+                </Div>
+              )}
             </Div>
           )}
         </Div>

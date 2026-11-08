@@ -101,6 +101,11 @@ export const translations: typeof enTranslations = {
         description:
           "Sie haben keine Berechtigung, diese Teilen-Links anzuzeigen",
       },
+      removed: {
+        title: "Entfernt oder in Prüfung",
+        description:
+          "Dieser geteilte Thread wurde gemeldet und ist nicht mehr verfügbar.",
+      },
       notFound: {
         title: "Nicht gefunden",
         description: "Thread oder Teilen-Link nicht gefunden",

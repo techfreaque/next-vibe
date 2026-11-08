@@ -40,6 +40,7 @@ import {
 import { emails } from "../../../messages/db";
 import { MessageStatus, MessageType } from "../../../messages/enum";
 import { EmailSecurityType } from "../enum";
+import { buildListUnsubscribeHeaders } from "../list-unsubscribe";
 import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpClientT } from "./i18n";
 
@@ -128,6 +129,8 @@ export class SmtpRepository {
     eq(messengerAccounts.channel, MessageChannel.EMAIL),
     eq(messengerAccounts.provider, MessengerProvider.SMTP),
     eq(messengerAccounts.status, MessengerAccountStatus.ACTIVE),
+    // The platform ops mailbox never takes part in campaign/failover selection
+    eq(messengerAccounts.isSystem, false),
   ] as const;
 
   private static toSmtpShape(row: MessengerAccount): SmtpAccountShape {
@@ -553,6 +556,27 @@ export class SmtpRepository {
   }
 
   /**
+   * Build an uncached transport from explicit connection params (no DB row).
+   * Same nodemailer options as the account transports. Used by the platform
+   * system mailbox, whose credentials come from env at runtime.
+   */
+  static createTransportFromParams(params: {
+    host: string;
+    port: number;
+    secure: boolean;
+    username: string;
+    password: string;
+  }): Transporter<SMTPTransport.SentMessageInfo> {
+    return createTransport({
+      host: params.host,
+      port: params.port,
+      secure: params.secure,
+      auth: { user: params.username, pass: params.password },
+      connectionTimeout: 30000,
+    });
+  }
+
+  /**
    * Create or get cached SMTP transport
    */
   private static async getTransport(
@@ -778,11 +802,10 @@ export class SmtpRepository {
 
       const transport = transportResult.data;
 
-      const headers: Record<string, string> = {};
-      if (params.unsubscribeUrl) {
-        headers["List-Unsubscribe"] = `<${params.unsubscribeUrl}>`;
-        headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
-      }
+      const headers = buildListUnsubscribeHeaders(
+        params.to,
+        params.unsubscribeUrl,
+      );
 
       const resolvedSenderName = account.fromName ?? params.senderName;
       const result = await transport.sendMail({

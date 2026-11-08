@@ -177,15 +177,23 @@ export async function complete(
   ]);
 
   if (finishReason === "error") {
-    logger.error("[AI Stream] Provider returned finishReason=error", {
-      model,
-      threadId,
-      totalTokens: finalTotalTokens,
-      warnings: JSON.stringify(streamWarnings ?? []),
-      messageCount: messages.length,
-      messageRoles: messages.map((m) => m.role).join(","),
-      lastMessageRole: messages[messages.length - 1]?.role,
-    });
+    // The provider's error part (if any) was already logged where it arrived,
+    // classified transient (warn) vs real (error). Only a finishReason=error
+    // with NO error part is unexplained - that one stays an error.
+    const providerErrorText = state.p.ctx.lastProviderErrorText;
+    (providerErrorText === null ? logger.error : logger.warn).bind(logger)(
+      "[AI Stream] Provider returned finishReason=error",
+      {
+        model,
+        threadId,
+        providerError: providerErrorText,
+        totalTokens: finalTotalTokens,
+        warnings: JSON.stringify(streamWarnings ?? []),
+        messageCount: messages.length,
+        messageRoles: messages.map((m) => m.role).join(","),
+        lastMessageRole: messages[messages.length - 1]?.role,
+      },
+    );
   }
 
   if (finishReason === "content-filter") {

@@ -290,6 +290,11 @@ export const translations = {
       label: "Failover",
       description: "Use as failover account",
     },
+    isSystem: {
+      label: "Platform mailbox",
+      description:
+        "Platform-owned ops mailbox. Credentials come from env; excluded from campaigns.",
+    },
     failoverPriority: {
       label: "Failover Priority",
       description: "Failover priority order",

@@ -14,6 +14,8 @@ import {
 } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
+import { shouldUseColors } from "next-vibe/logger/colors";
+import { formatSinceStart } from "next-vibe/logger/uptime";
 import { serverFileLog } from "next-vibe/logger/file";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 
@@ -21,27 +23,34 @@ import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget"
 const C = {
   reset: "\u001B[0m",
   bold: "\u001B[1m",
-  gray: "\u001B[90m",
+  dim: "\u001B[2m",
+  white: "\u001B[97m",
+  // Timestamp white matches semantic.highlight used by every other log line.
+  timeWhite: "\u001B[37m",
   green: "\u001B[32m",
   yellow: "\u001B[33m",
   red: "\u001B[31m",
-  cyan: "\u001B[96m",
+  cyan: "\u001B[36m",
+  // HTTP request lines share the web-server colour (semantic.webServer === semantic.nextjs, brightCyan).
+  blue: "\u001B[96m",
 } as const;
 
-function statusColor(status: number): string {
-  if (status < 300) {
-    return C.green;
-  }
-  if (status < 400) {
-    return C.yellow;
-  }
-  return C.red;
+function formatMs(ms: number): string {
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
 }
 
-function formatMs(ms: number): string {
-  const useColors = Boolean(process.stdout?.isTTY) && !process.env.NO_COLOR;
-  const s = ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
-  return useColors ? `${C.gray}${s}${C.reset}` : s;
+/** Status colour by class: 2xx green, 3xx cyan, 4xx yellow, 5xx red. */
+function statusColor(status: number): string {
+  if (status >= 500) {
+    return C.red;
+  }
+  if (status >= 400) {
+    return C.yellow;
+  }
+  if (status >= 300) {
+    return C.cyan;
+  }
+  return C.green;
 }
 
 function logRequest(
@@ -51,17 +60,21 @@ function logRequest(
   totalMs: number,
   appMs: number,
 ): void {
-  const useColors = Boolean(process.stdout?.isTTY) && !process.env.NO_COLOR;
-  const ts = `[${process.uptime().toFixed(3)}s]`;
-  const sc = statusColor(status);
-  const statusStr = useColors
-    ? `${sc}${String(status)}${C.reset}`
-    : String(status);
-  const methodStr = useColors ? `${C.bold}${method}${C.reset}` : method;
-  const pathStr = useColors ? `${C.cyan}${path}${C.reset}` : path;
-  const line = `${ts} ${methodStr} ${pathStr} ${statusStr} in ${formatMs(totalMs)} (app: ${formatMs(appMs)})`;
-  process.stdout.write(`${line}\n`);
-  void serverFileLog(line);
+  const useColors = shouldUseColors();
+  const ts = `[${formatSinceStart()}]`;
+  const total = formatMs(totalMs);
+  const app = `(app: ${formatMs(appMs)})`;
+  const statusStr = String(status);
+  const plain = `${ts} ${method} ${path} ${statusStr} in ${total} ${app}`;
+  if (useColors) {
+    // [time] white · method+path web cyan · status by class · "in" + (app) dim · total bold white
+    process.stdout.write(
+      `${C.timeWhite}${ts}${C.reset} ${C.blue}${method} ${path}${C.reset} ${statusColor(status)}${statusStr}${C.reset} ${C.dim}in${C.reset} ${C.white}${C.bold}${total}${C.reset} ${C.dim}${app}${C.reset}\n`,
+    );
+  } else {
+    process.stdout.write(`${plain}\n`);
+  }
+  void serverFileLog(plain);
 }
 
 /**

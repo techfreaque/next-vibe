@@ -13,6 +13,7 @@ import type {
 } from "../../../core/route/response.schema";
 import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
 import type { WidgetData } from "../../../core/utils/json";
+import { parseError } from "../../../core/utils/parse-error";
 import type { AiT } from "../../../platforms/ai/i18n";
 import type { RouteExecuteResponseOutput } from "../../definition";
 import executeDefinition from "../../definition";
@@ -129,9 +130,15 @@ export async function callToolDirect(params: {
         (await resp.json()) as ResponseType<RouteExecuteResponseOutput>;
       return body;
     } catch (err) {
+      // Bare "fetch failed" says nothing - parseError appends the cause
+      // (ECONNREFUSED / ENOTFOUND / socket reset / timeout) and the peer origin
+      // tells WHICH instance was unreachable.
       logger.warn("[RouteExecute] callToolDirect network error", {
         toolName,
-        error: err instanceof Error ? err.message : String(err),
+        peer: remoteUrl,
+        attempt,
+        timedOut: err instanceof Error && err.name === "TimeoutError",
+        error: parseError(err).message,
       });
       return fail({
         message: t("executeTool.post.errors.network.title"),

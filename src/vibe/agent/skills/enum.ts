@@ -157,6 +157,8 @@ interface TierDisplayConfig<T extends string = string> {
   label: ModelsTranslationKey;
   icon: IconKey;
   description?: ModelsTranslationKey;
+  /** One-line explanation for newcomers (shown where users pick the tier) */
+  help?: ModelsTranslationKey;
 }
 
 export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
@@ -209,18 +211,21 @@ export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelValue>[] = [
     label: "tiers.content.mainstream",
     icon: "home",
     description: "tiers.content.mainstreamDesc",
+    help: "tiers.content.mainstreamHelp",
   },
   {
     value: ContentLevel.OPEN,
     label: "tiers.content.open",
     icon: "log-out",
     description: "tiers.content.openDesc",
+    help: "tiers.content.openHelp",
   },
   {
     value: ContentLevel.UNCENSORED,
     label: "tiers.content.uncensored",
     icon: "shield-off",
     description: "tiers.content.uncensoredDesc",
+    help: "tiers.content.uncensoredHelp",
   },
 ];
 

@@ -5,9 +5,12 @@ import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as vibeScopedTranslation } from "next-vibe/core/i18n/shared";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { StopCircle } from "next-vibe/ui/components/icons/StopCircle";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Span } from "next-vibe/ui/components/span";
@@ -27,10 +30,16 @@ import type { ContactRequest } from "@/contact/definition";
 import { useUser } from "@/user/private/me/hooks";
 
 import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
+import {
+  isOutOfCreditsErrorCode,
+  OutOfCreditsCard,
+} from "../../../../../ai-stream/stream/widget/out-of-credits-card";
 import type { ChatMessage } from "../../../../db";
+import { useTourState } from "../../../../tour-state";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
+import { useErrorRetry } from "./error-retry-context";
 import { MessageActionButton } from "./message-action-button";
 
 interface ErrorMessageBubbleProps {
@@ -61,6 +70,10 @@ export function ErrorMessageBubble({
     useState<CreateApiEndpointAny | null>(null);
   const [contactPrefill, setContactPrefill] =
     useState<Partial<ContactRequest> | null>(null);
+  const retryMessage = useErrorRetry();
+  const setModelSelectorOpen = useTourState(
+    (state) => state.setModelSelectorOpen,
+  );
 
   // User-cancelled streams get a compact "stopped" indicator, not an error bubble
   if (message.errorType === StreamErrorType.STREAM_INTERRUPTED) {
@@ -146,6 +159,30 @@ export function ErrorMessageBubble({
   } catch {
     displayContent = message.content ?? "";
   }
+
+  // Credit refusals (402) are not faults: offer the way forward instead of an error
+  if (isOutOfCreditsErrorCode(errorData?.errorType?.errorCode)) {
+    return (
+      <Div className={cn("flex items-start gap-3", group)}>
+        <OutOfCreditsCard locale={locale} isGuest={user.isPublic} />
+      </Div>
+    );
+  }
+
+  // The turn that failed: nearest user message up the parent chain. Retry
+  // re-sends it through the same op as the user-message retry button.
+  const failedUserMessageId = findParentUserMessageId(message, messages);
+  const canRetry = retryMessage !== null && failedUserMessageId !== null;
+
+  const handleRetry = (): void => {
+    if (retryMessage && failedUserMessageId) {
+      void retryMessage(failedUserMessageId, undefined);
+    }
+  };
+
+  const handleTryAnotherModel = (): void => {
+    setModelSelectorOpen(true);
+  };
 
   const handleDelete = (): void => {
     void (async (): Promise<void> => {
@@ -251,6 +288,32 @@ export function ErrorMessageBubble({
             </Div>
           </Div>
 
+          {/* The way forward: retry the turn or switch models */}
+          {canRetry && (
+            <Div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 gap-1.5"
+                onClick={handleRetry}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                {ts("errorActions.retry")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-8 gap-1.5"
+                onClick={handleTryAnotherModel}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {ts("errorActions.tryAnotherModel")}
+              </Button>
+            </Div>
+          )}
+
           {/* Error feedback section */}
           <Div className="mt-3 pt-2 border-t border-destructive/10">
             {!contactEndpoint ? (
@@ -307,6 +370,29 @@ export function ErrorMessageBubble({
       </Div>
     </Div>
   );
+}
+
+function findParentUserMessageId(
+  message: ChatMessage,
+  messages: ChatMessage[] | undefined,
+): string | null {
+  if (!messages) {
+    return null;
+  }
+  const byId = new Map(messages.map((m) => [m.id, m]));
+  let parentId = message.parentId;
+  // Bounded walk: a malformed parent cycle must not hang the render
+  for (let hops = 0; parentId && hops < 50; hops++) {
+    const parent = byId.get(parentId);
+    if (!parent) {
+      return null;
+    }
+    if (parent.role === "user") {
+      return parent.id;
+    }
+    parentId = parent.parentId;
+  }
+  return null;
 }
 
 function translateErrorRecursive(

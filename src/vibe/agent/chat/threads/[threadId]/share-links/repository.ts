@@ -16,6 +16,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatThreads, threadShareLinks } from "../../../db";
+import { ThreadModerationStatus } from "../../../enum";
 import type {
   ShareLinkCreateRequestOutput,
   ShareLinkCreateResponseOutput,
@@ -409,6 +410,19 @@ export class ShareLinksRepository {
         });
         return fail({
           message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
+      // Reported past the threshold or removed by moderation: the link goes dark
+      if (thread.moderationStatus !== ThreadModerationStatus.VISIBLE) {
+        logger.warn("Share link accessed for moderated thread", {
+          shareLinkId: shareLink.id,
+          threadId: thread.id,
+          moderationStatus: thread.moderationStatus,
+        });
+        return fail({
+          message: t("get.errors.removed.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }

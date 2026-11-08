@@ -13,10 +13,10 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Utwórz ulubiony",
     titleShort: "Dodaj ulubiony",
-    description: "Utwórz nową ulubioną konfigurację postaci",
+    description: "Utwórz nową ulubioną konfigurację skilla",
     container: {
       title: "Nowy ulubiony",
-      description: "Zapisz konfigurację postaci jako ulubioną",
+      description: "Zapisz konfigurację skilla jako ulubioną",
     },
     backButton: {
       label: "Wróć do ulubionych",
@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       loadingText: "Stosowanie...",
     },
     skillId: {
-      label: "Postać",
+      label: "Skill",
       description:
         'ID umiejętności w połączonym formacie: „skillSlug" dla domyślnego wariantu, „skillSlug__variantId" dla konkretnego (np. „thea__brilliant"). Wywołaj listę umiejętności, by zobaczyć dostępne ID.',
     },
@@ -44,47 +44,47 @@ export const translations: typeof enTranslations = {
     },
     chatModel: {
       label: "Model czatu",
-      placeholder: "Odziedzicz z umiejętności",
+      placeholder: "Jak w skillu",
     },
     voice: {
       label: "Głos",
       description: "Preferencje głosu text-to-speech",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model do rozpoznawania mowy",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     imageVisionModel: {
       label: "Model wizji obrazu",
       description: "Model używany do analizy obrazów",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     videoVisionModel: {
       label: "Model wizji wideo",
       description: "Model używany do analizy wideo",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     audioVisionModel: {
       label: "Model wizji audio",
       description: "Model używany do analizy audio",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     imageGenModel: {
       label: "Model generowania obrazów",
       description: "Model do generowania obrazów",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     musicGenModel: {
       label: "Model generowania muzyki",
       description: "Model do generowania muzyki",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     videoGenModel: {
       label: "Model generowania wideo",
       description: "Model do generowania wideo",
-      placeholder: "Dziedzicz ze skilla",
+      placeholder: "Jak w skillu",
     },
     mode: {
       label: "Tryb wyboru",
@@ -98,7 +98,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Typ wyboru",
-      characterBased: "W oparciu o postać",
+      characterBased: "W oparciu o skill",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -168,22 +168,22 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Niestandardowa ikona",
-      description: "Zastąp domyślną ikonę postaci dla tego slotu ulubionych",
+      description: "Zastąp domyślną ikonę skilla dla tego slotu ulubionych",
     },
     compactTrigger: {
       label: "Próg kompresji (tokeny)",
       description:
-        "Liczba tokenów wyzwalająca kompresję rozmowy. Null = postać lub domyślna globalna.",
+        "Liczba tokenów wyzwalająca kompresję rozmowy. Null = skill lub domyślna globalna.",
     },
     availableTools: {
       label: "Dozwolone narzędzia",
       description:
-        "Narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
+        "Narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = skill lub ustawienia globalne.",
     },
     pinnedTools: {
       label: "Przypięte narzędzia",
       description:
-        "Przypięte narzędzia paska narzędzi. Null = postać lub ustawienia globalne.",
+        "Przypięte narzędzia paska narzędzi. Null = skill lub ustawienia globalne.",
     },
     response: {
       id: {
@@ -234,10 +234,10 @@ export const translations: typeof enTranslations = {
       description: "Ulubiony utworzony pomyślnie",
     },
     changeSkill: {
-      label: "Zmień postać",
+      label: "Zmień skill",
     },
     modifySkill: {
-      label: "Modyfikuj postać",
+      label: "Modyfikuj skill",
     },
     character: {
       name: "Nazwa",

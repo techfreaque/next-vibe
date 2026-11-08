@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
   category: "companies",
   subCategory: "Company Members",
   tags: ["tags.companies", "tags.members", "tags.invite"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   icon: "user-plus",
 
   fields: customWidgetObject({

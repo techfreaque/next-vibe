@@ -484,7 +484,13 @@ export async function buildMessageContext(
     });
   }
 
-  if (params.operation === "answer-as-ai") {
+  // Answer-as-AI on a USER message with no extra instructions: the model simply
+  // answers it, exactly like a normal turn. The "respond to the previous AI
+  // message" prompt only makes sense when the parent is an AI message.
+  // (Independent bug fix - not tied to any feature.)
+  const answersUserMessageDirectly =
+    history.at(-1)?.role === ChatMessageRole.USER && !params.content.trim();
+  if (params.operation === "answer-as-ai" && !answersUserMessageDirectly) {
     const { CONTINUE_CONVERSATION_PROMPT } =
       await import("../../system-prompt/builder");
     const systemContent = params.content.trim()

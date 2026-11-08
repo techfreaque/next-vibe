@@ -1,6 +1,10 @@
-# Allow all crawlers
+# Public site is crawlable; private app areas and APIs are not.
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /*/api/
+Disallow: /*/threads/
+Disallow: /*/tools/
+Disallow: /*/user/
 
-# Sitemap location
 Sitemap: https://unbottled.ai/sitemap.xml

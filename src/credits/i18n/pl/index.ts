@@ -221,8 +221,12 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Zobacz plany",
       freePlanHint:
-        "{{count}} darmowych kredytów miesięcznie. Z subskrypcją {{subCredits}} i pakiety doładowań.",
+        "{{count}} darmowych kredytów miesięcznie, +{{bonus}} z newsletterem. Z subskrypcją {{subCredits}}, albo po prostu kup pakiet. Subskrypcja niepotrzebna.",
       freePlan: "Korzystasz z planu darmowego",
+      guestPlan: "Saldo gościa",
+      signUp: "Załóż darmowe konto",
+      loadFailed: "Saldo się nie wczytało.",
+      retry: "Ponów",
       title: "Twoje kredyty",
       adminTitle: "Limit wydatków",
       description: "Jedno saldo na wszystkie modele ({{modelCount}}).",
@@ -242,9 +246,11 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Darmowe kredyty",
-        description: "{{count}} darmowych kredytów odnawiane co miesiąc",
+        description: "{{count}} za darmo co miesiąc, +{{bonus}} z newsletterem",
+        descriptionGuest:
+          "{{guest}} za darmo co miesiąc. Z kontem {{signedIn}}.",
         adminDescription:
-          "{{count}} darmowych kredytów na pulę/miesiąc (wspólne dla urządzeń)",
+          "Darmowy limit na pulę/miesiąc (wspólny dla urządzeń): {{guest}} gość, {{signedIn}} zalogowany, +{{bonus}} newsletter",
       },
       earned: {
         title: "Zarobione kredyty",

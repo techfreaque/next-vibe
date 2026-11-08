@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -21,6 +21,7 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { paymentTransactions } from "../../db";
+import { PaymentClawbackRepository } from "../../refund/clawback";
 import { InvoiceStatus } from "../../enum";
 import type {
   PaymentInvoiceRequestOutput,
@@ -337,15 +338,12 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         amount: data.amount,
       });
 
+      // Admin-only endpoint (payment/refund allowedRoles = ADMIN): look the
+      // transaction up by id alone — it belongs to the customer, not the admin.
       const [transaction] = await db
         .select()
         .from(paymentTransactions)
-        .where(
-          and(
-            eq(paymentTransactions.id, data.transactionId),
-            eq(paymentTransactions.userId, userId),
-          ),
-        )
+        .where(eq(paymentTransactions.id, data.transactionId))
         .limit(1);
 
       if (!transaction) {
@@ -361,8 +359,23 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      const paymentIntentId =
-        transaction.providerPaymentIntentId || transaction.providerSessionId;
+      // Legacy rows only stored the checkout session id — resolve its intent.
+      let paymentIntentId = transaction.providerPaymentIntentId;
+      if (!paymentIntentId && transaction.providerSessionId) {
+        const session = await stripeClient.checkout.sessions.retrieve(
+          transaction.providerSessionId,
+        );
+        paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : (session.payment_intent?.id ?? null);
+        if (paymentIntentId) {
+          await db
+            .update(paymentTransactions)
+            .set({ providerPaymentIntentId: paymentIntentId })
+            .where(eq(paymentTransactions.id, transaction.id));
+        }
+      }
       if (!paymentIntentId) {
         logger.error("payment.refund.error.noPaymentIntent", {
           transactionId: data.transactionId,
@@ -377,15 +390,45 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         payment_intent: paymentIntentId,
         amount: data.amount ? Math.round(data.amount * 100) : undefined,
         reason:
-          (data.reason as
-            | "duplicate"
-            | "fraudulent"
-            | "requested_by_customer") || "requested_by_customer",
+          data.reason === "duplicate" || data.reason === "fraudulent"
+            ? data.reason
+            : "requested_by_customer",
         metadata: {
-          userId,
+          userId: transaction.userId,
+          adminId: userId,
           transactionId: data.transactionId,
         },
       });
+
+      // Claw back right away (the charge.refunded webhook does the same and is
+      // idempotent against this — cumulative fraction, never double-revoked).
+      const chargeId =
+        typeof refund.charge === "string" ? refund.charge : refund.charge?.id;
+      if (chargeId) {
+        const charge = await stripeClient.charges.retrieve(chargeId);
+        const clawback = await PaymentClawbackRepository.reverseCharge(
+          {
+            kind: "refund",
+            paymentIntentId,
+            providerSessionId: transaction.providerSessionId,
+            customerId:
+              typeof charge.customer === "string"
+                ? charge.customer
+                : (charge.customer?.id ?? null),
+            chargeCreatedAt: new Date(charge.created * 1000),
+            reversedFraction:
+              charge.amount > 0 ? charge.amount_refunded / charge.amount : 1,
+            sourceRef: refund.id,
+          },
+          logger,
+        );
+        if (!clawback.success) {
+          logger.error(
+            "Refund issued but credit clawback failed — webhook retry will reapply",
+            { refundId: refund.id, transactionId: data.transactionId },
+          );
+        }
+      }
 
       logger.debug("Refund created successfully", {
         refundId: refund.id,
@@ -398,7 +441,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         message: tRefund("success.created"),
         refund: {
           id: refund.id,
-          userId,
+          userId: transaction.userId,
           transactionId: data.transactionId,
           stripeRefundId: refund.id,
           amount: (refund.amount || 0) / 100,

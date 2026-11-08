@@ -43,6 +43,11 @@ import {
   Step,
   StepList,
 } from "../_shared/marketing";
+import {
+  INSTANCE_COMPOSE,
+  INSTANCE_ENV,
+  INSTANCE_MODEL,
+} from "../_shared/surface-snippets";
 import { scopedTranslation } from "./i18n";
 
 export interface SelfHostPageData {
@@ -94,13 +99,14 @@ cd next-vibe
 bun install`;
 
 const DEV_SH = "vibe dev";
+const ENV_FILENAME = ".env";
 
 const OPTION_A_SH = `# Claude Code - no API key needed
 # Requires Claude subscription + Claude Code CLI
 claude login   # sign in once
 # Then select any claude-code-* model in the model picker`;
 
-const OPTION_B_SH = `# OpenRouter - 200+ models, pay per use
+const OPTION_B_SH = `# OpenRouter - every model, pay per use
 # Paste your key in Settings → API Keys
 # Get yours at openrouter.ai/keys`;
 
@@ -189,6 +195,24 @@ export function TanstackPage({
       />
 
       <PersonalShowcase locale={locale} />
+
+      <PageSection
+        label={t("own.eyebrow")}
+        title={t("own.title")}
+        intro={t("own.subtitle")}
+      >
+        <FeatureGrid columns={3}>
+          <FeatureCard icon={Database} title={t("own.cards.data.title")}>
+            {t("own.cards.data.body")}
+          </FeatureCard>
+          <FeatureCard icon={Lock} title={t("own.cards.filter.title")}>
+            {t("own.cards.filter.body")}
+          </FeatureCard>
+          <FeatureCard icon={Cpu} title={t("own.cards.keys.title")}>
+            {t("own.cards.keys.body")}
+          </FeatureCard>
+        </FeatureGrid>
+      </PageSection>
 
       <PageSection title={t("includes.title")}>
         <FeatureGrid columns={4}>
@@ -290,8 +314,46 @@ export function TanstackPage({
         </Callout>
       </PageSection>
 
+      <PageSection tone="muted" title={t("env.title")} intro={t("env.intro")}>
+        <Div className="grid gap-6 lg:grid-cols-2">
+          <Div className="flex min-w-0 flex-col gap-2">
+            <P className="text-sm font-semibold">{t("env.envLabel")}</P>
+            <Shell code={INSTANCE_ENV} filename={ENV_FILENAME} />
+          </Div>
+          <Div className="flex min-w-0 flex-col gap-2">
+            <P className="text-sm font-semibold">{t("env.composeLabel")}</P>
+            <Shell code={INSTANCE_COMPOSE} />
+          </Div>
+        </Div>
+      </PageSection>
+
+      <PageSection title={t("instances.title")} intro={t("instances.intro")}>
+        <FeatureGrid columns={3}>
+          <FeatureCard icon={Terminal} title={t("instances.atlas.name")}>
+            {t("instances.atlas.body")}
+          </FeatureCard>
+          <FeatureCard icon={Activity} title={t("instances.hermes.name")}>
+            {t("instances.hermes.body")}
+          </FeatureCard>
+          <FeatureCard icon={Server} title={t("instances.thea.name")}>
+            {t("instances.thea.body")}
+          </FeatureCard>
+        </FeatureGrid>
+        <Div className="mt-6">
+          <Shell code={INSTANCE_MODEL} />
+        </Div>
+        <Callout icon={RefreshCw} tone="neutral" className="mt-6">
+          {t("instances.note")}
+        </Callout>
+      </PageSection>
+
+      <PageSection tone="muted" title={t("fork.title")} narrow>
+        <P className="text-base leading-relaxed text-muted-foreground md:text-lg">
+          {t("fork.body")}
+        </P>
+      </PageSection>
+
       <PageSection
-        tone="muted"
         title={t("enterprise.title")}
         intro={t("enterprise.description")}
         centeredHeader

@@ -412,11 +412,15 @@ export const translations: typeof enTranslations = {
         title: "Ungespeicherte Änderungen",
         description: "Es gibt ungespeicherte Änderungen",
       },
+      billingCancelFailed:
+        "Wir konnten Ihr Abo nicht kündigen, deshalb wurde Ihr Konto NICHT gelöscht - sonst würden Sie weiter belastet. Versuchen Sie es erneut oder kündigen Sie zuerst unter Abo.",
       internal: {
         title: "Interner Fehler",
         description: "Interner Serverfehler aufgetreten",
         detail:
           "Konto konnte nicht gelöscht werden: {{error}} (Benutzer {{userId}})",
+        retry:
+          "Konto konnte nicht gelöscht werden. Versuchen Sie es erneut - klappt es weiterhin nicht, kontaktieren Sie den Support.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -444,12 +448,23 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    loadState: {
+      loading: "Wird geladen...",
+      profileFailed: "Profil konnte nicht geladen werden.",
+      creditsFailed: "Guthaben nicht geladen. Tippen zum Wiederholen.",
+      retry: "Erneut laden",
+    },
     save: "Profil speichern",
     saving: "Wird gespeichert...",
     editProfile: "Profil bearbeiten",
     changePhoto: "Foto ändern",
     cancelEdit: "Abbrechen",
     memberSince: "Mitglied seit",
+    stats: {
+      plan: "Tarif",
+      credits: "Guthaben",
+      member: "Dabei seit",
+    },
     profileCard: {
       title: "Creator-Profil",
       description: "Deine öffentliche Identität auf der Plattform",
@@ -484,6 +499,26 @@ export const translations: typeof enTranslations = {
       showLess: "Weniger anzeigen",
       hubSubtitle: "{{count}} veröffentlicht",
     },
+    appearance: {
+      title: "Darstellung",
+      sectionHint: "Aussehen und Sprache der App.",
+      theme: "Design",
+      themeHint: "Hell oder dunkel. Gilt überall.",
+      light: "Hell",
+      dark: "Dunkel",
+      language: "Sprache",
+      languageHint: "Sprache der Oberfläche und Inhalte.",
+    },
+    chatPrefs: {
+      title: "Chat",
+      sectionHint: "Steuere, wie der Assistent arbeitet.",
+      searchProvider: "Websuche",
+      searchProviderHint: "Welche Suchmaschine deine Suchen beantwortet.",
+      automation: "Hintergrund-Automatik",
+      automationHint: "Die KI arbeitet, während du weg bist.",
+      on: "An",
+      off: "Aus",
+    },
     nav: {
       logoutHint: "Auf diesem Gerät abmelden",
       logout: "Abmelden",
@@ -491,6 +526,13 @@ export const translations: typeof enTranslations = {
     },
     sections: {
       account: "Konto",
+      accountHint: "Tarif, Abrechnung, Sicherheit und deine Daten.",
+      billingHint: "Tarif, Guthaben und gespeicherte Adressen.",
+      security: "Sicherheit",
+      securityHint: "Halte dein Konto dicht.",
+      data: "Daten & Privatsphäre",
+      dataHint: "Deine Daten, deine Entscheidung.",
+      creatorHint: "Reichweite und Einnahmen ausbauen.",
       basics: "Basisdaten",
       basicsHint: "Name, Login-E-Mail und Updates.",
       subscription: "Abonnement",
@@ -511,7 +553,22 @@ export const translations: typeof enTranslations = {
       password: "Passwort",
       passwordHint: "Passwort ändern",
       sessions: "Aktive Sitzungen",
+      emailVerification: "E-Mail-Bestätigung",
+      emailVerifiedHint: "Deine Adresse ist bestätigt",
+      emailUnverifiedHint:
+        "Bestätige deine Adresse. Tippen, um den Link erneut zu senden",
+      verified: "Bestätigt",
+      unverified: "Unbestätigt",
+      twoFactor: "Zwei-Faktor-Authentifizierung",
+      twoFactorHint: "Beim Login einen App-Code verlangen",
+      on: "An",
+      off: "Aus",
       sessionsHint: "Alle Geräte sehen und abmelden",
+      apiKeys: "API-Schlüssel",
+      apiKeysHint: "{{modelCount}} Modelle aus dem eigenen Code nutzen",
+      exportData: "Meine Daten exportieren",
+      exportDataHint:
+        "Lade eine Kopie aller Daten herunter, die wir über dich speichern",
       creator: "Creator",
       referral: "Empfehlungsprogramm",
       referralHint: "Verdiene an jeder Zahlung, die du bringst",

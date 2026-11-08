@@ -10,15 +10,23 @@ import "server-only";
 
 import { eq, or, sql } from "drizzle-orm";
 
-import type { CountryLanguage } from "../../core/i18n/core/config";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
 import type { ResponseType } from "../../core/route/response.schema";
-import { success } from "../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Lead Auth Repository
@@ -95,8 +103,17 @@ export class LeadAuthRepository {
       logger.debug("Linked lead to user", { leadId, userId });
       return success();
     } catch (error) {
-      logger.error("Failed to link lead to user", parseError(error).message);
-      return success(); // Don't fail the operation
+      // Report the failure: an unlinked lead means its wallet (pre-signup
+      // credits) never joins the user's pool. Callers decide whether to block.
+      logger.error("Failed to link lead to user", parseError(error).message, {
+        leadId,
+        userId,
+      });
+      const { t } = scopedTranslation.scopedT(defaultLocale);
+      return fail({
+        message: t("errors.linkFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

@@ -18,6 +18,11 @@ export const translations = {
       description: "Number of credit packs to purchase (1-10)",
       placeholder: "Enter quantity (1-10)",
     },
+    productId: {
+      label: "Credit pack",
+      description: "Pick the pack size to buy",
+      placeholder: "Select pack",
+    },
     provider: {
       label: "Choose Payment Method",
       description: "Select how you want to pay for your credit pack",
@@ -44,15 +49,21 @@ export const translations = {
     pack: {
       qtyCredits: "{{count}} credits",
       title: "Credit Pack",
-      description: "One-time credit pack for AI usage",
+      description:
+        "Pay as you go. No subscription. Card or crypto. Credits never expire.",
       perPack: "/ pack",
       features: {
         credits: "{{count}} credits included",
         expiry: "Credits never expire",
         bestFor: "Stack on top of your monthly credits",
       },
-      requiresSubscription:
-        "Credit packs are for subscribers who need more. Subscribe first to unlock them.",
+      noSubscriptionNeeded: "Pay as you go. No subscription needed.",
+      logIn: "Log in",
+      signUp: "Sign up",
+      signInToBuy: "Create a free account to buy credits. Card or crypto.",
+      sizeStandard: "Standard pack",
+      sizeLarge: "Large pack",
+      bestRate: "Best rate",
       totalSummary: "{{totalCredits}} credits total · {{totalPrice}} total",
     },
     submit: {
@@ -109,11 +120,6 @@ export const translations = {
       conflict: {
         title: "Conflict",
         description: "Resource conflict occurred",
-      },
-      noActiveSubscription: {
-        title: "Active Subscription Required",
-        description:
-          "You must have an active subscription to purchase credit packs",
       },
     },
   },

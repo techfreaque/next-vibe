@@ -31,12 +31,11 @@ import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { ExternalLink } from "next-vibe/ui/components/link";
+import { ExternalLink, Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetForm,
-  useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
@@ -48,14 +47,17 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
-import { ProductIds, productsRepository } from "@/products/repository-client";
-import { SubscriptionStatus } from "@/subscription/enum";
-import { useSubscription } from "@/subscription/hooks";
+import {
+  CREDIT_PACK_PRODUCT_IDS,
+  ProductIds,
+  productsRepository,
+} from "@/products/repository-client";
 
 import type definition from "./definition";
 
 const MIN_QTY = 1;
-const MIN_QTY_CRYPTO = 5;
+// Crypto minimum is ~$25 of credits (5 standard packs); the large pack clears it alone.
+const MIN_CRYPTO_CREDITS = 2500;
 
 /**
  * Props for custom widget
@@ -84,21 +86,20 @@ export function CreditsPurchaseContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const value = useWidgetValue<typeof definition.POST>();
   const { locale } = useTranslation();
-  const logger = useWidgetLogger();
   const user = useWidgetUser();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const children = field.children;
 
   const products = productsRepository.getProducts(locale);
-  const packProduct = products[ProductIds.CREDIT_PACK];
+  const selectedProductId =
+    form.watch("productId") === ProductIds.CREDIT_PACK_LARGE
+      ? ProductIds.CREDIT_PACK_LARGE
+      : ProductIds.CREDIT_PACK;
+  const packProduct = products[selectedProductId];
   const packPrice = packProduct.price;
   const packCredits = packProduct.credits;
-
-  const subscriptionEndpoint = useSubscription(logger, user);
-  const currentSubscription = subscriptionEndpoint.read?.data;
-  const hasActiveSubscription =
-    currentSubscription?.status === SubscriptionStatus.ACTIVE;
+  const isAuthenticated = !user.isPublic;
 
   const quantity = form.watch("quantity") ?? 1;
   const totalPrice = packPrice * quantity;
@@ -115,7 +116,8 @@ export function CreditsPurchaseContainer({
     setIsProviderModalOpen(true);
   }
 
-  const isCryptoDisabled = quantity < MIN_QTY_CRYPTO;
+  const isCryptoDisabled = totalCredits < MIN_CRYPTO_CREDITS;
+  const minCryptoPacks = Math.ceil(MIN_CRYPTO_CREDITS / packCredits);
 
   function handleProviderSelect(provider: typeof PaymentProviderValue): void {
     setIsProviderModalOpen(false);
@@ -177,7 +179,7 @@ export function CreditsPurchaseContainer({
               <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
                 <Info className="h-4 w-4 mt-0.5 shrink-0" />
                 {t("post.provider.cryptoMinimumDisabled", {
-                  min: MIN_QTY_CRYPTO,
+                  min: minCryptoPacks,
                 })}
               </Div>
             )}
@@ -221,8 +223,44 @@ export function CreditsPurchaseContainer({
             </Div>
           </Div>
 
-          {/* Purchase Form - Only for active subscribers */}
-          {hasActiveSubscription ? (
+          {/* Pack size */}
+          <Div className="grid grid-cols-2 gap-2">
+            {CREDIT_PACK_PRODUCT_IDS.map((id) => (
+              <Button
+                key={id}
+                type="button"
+                variant={selectedProductId === id ? "default" : "outline"}
+                className="h-auto flex-col items-start gap-0.5 p-3 text-left"
+                onClick={() => form.setValue("productId", id)}
+              >
+                <Span className="text-sm font-semibold">
+                  {id === ProductIds.CREDIT_PACK
+                    ? t("post.pack.sizeStandard")
+                    : t("post.pack.sizeLarge")}
+                </Span>
+                <Span className="text-xs opacity-80">
+                  {formatPrice(
+                    products[id].price,
+                    locale,
+                    products[id].currency,
+                  )}
+                </Span>
+                <Span className="text-xs opacity-80">
+                  {t("post.pack.features.credits", {
+                    count: products[id].credits,
+                  })}
+                </Span>
+                {id === ProductIds.CREDIT_PACK_LARGE && (
+                  <Span className="text-xs font-medium text-success">
+                    {t("post.pack.bestRate")}
+                  </Span>
+                )}
+              </Button>
+            ))}
+          </Div>
+
+          {/* Purchase Form - any signed-in user, no subscription needed */}
+          {isAuthenticated ? (
             <Div className="flex flex-col gap-4">
               <FormAlertWidget field={{}} />
 
@@ -310,10 +348,22 @@ export function CreditsPurchaseContainer({
               )}
             </Div>
           ) : (
-            <Div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/30">
-              <Div className="text-sm text-warning">
+            <Div className="flex flex-col gap-3">
+              <Div className="text-sm text-muted-foreground">
                 <Info className="h-4 w-4 inline mr-2" />
-                {t("post.pack.requiresSubscription")}
+                {t("post.pack.signInToBuy")}
+              </Div>
+              <Div className="flex flex-col gap-2 sm:flex-row">
+                <Button variant="outline" asChild className="flex-1">
+                  <Link href={`/${locale}/user/login`}>
+                    {t("post.pack.logIn")}
+                  </Link>
+                </Button>
+                <Button asChild className="flex-1">
+                  <Link href={`/${locale}/user/signup`}>
+                    {t("post.pack.signUp")}
+                  </Link>
+                </Button>
               </Div>
             </Div>
           )}

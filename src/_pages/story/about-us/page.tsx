@@ -51,7 +51,7 @@ export const generateMetadata = async ({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   return metadataGenerator(locale, {
-    path: "about-us",
+    path: "story/about-us",
     title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", { appName }),

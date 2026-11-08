@@ -32,6 +32,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "../ai-stream/models";
 import { FOLDER_DENIED_TOOL_IDS } from "../chat/config";
+import { THREAD_RENAME_ALIAS } from "../chat/threads/rename/constants";
 import type { ToolConfigItem } from "../chat/settings/definition";
 import type { AgentEnvAvailability } from "../env-availability";
 import { DEFAULT_SKILLS } from "./config";
@@ -39,6 +40,12 @@ import { NO_SKILL_ID } from "./constants";
 import type { FavoriteConfig } from "./favorites/db";
 import type { CustomSkillConfig, SkillFavoriteContext } from "./resolver";
 import { resolveSkillFavoriteContext } from "./resolver";
+
+/**
+ * Tools the platform's own system prompt tells the model to call (not the
+ * user's tool choice) - always callable through an availableTools restriction.
+ */
+const HOUSEKEEPING_TOOL_IDS: readonly string[] = [THREAD_RENAME_ALIAS];
 
 /** A normalized tool config entry (requiresConfirmation always boolean). */
 type NormalizedTools = Array<{
@@ -221,6 +228,18 @@ export async function resolveAgentContext(
     // requiresConfirmation flags the list carries. `null` (no restriction at any
     // level) still means "all allowed for the role".
     availableTools = unionTools(cascadeBase, pinnedBase);
+    // System housekeeping the platform itself instructs the model to call every
+    // turn (thread-rename fragment). A restricted skill/favorite list must not
+    // turn that instruction into a denied call - it stays callable unless a
+    // deny explicitly blocks it.
+    for (const toolId of HOUSEKEEPING_TOOL_IDS) {
+      if (
+        !deniedToolIds.has(toolId) &&
+        !availableTools.some((tool) => tool.toolId === toolId)
+      ) {
+        availableTools.push({ toolId, requiresConfirmation: false });
+      }
+    }
   }
 
   const promptAppend = ctx.favorite?.promptAppend ?? null;

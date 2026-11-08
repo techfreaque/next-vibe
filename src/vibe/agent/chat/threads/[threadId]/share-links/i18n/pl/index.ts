@@ -101,6 +101,11 @@ export const translations: typeof enTranslations = {
         title: "Zabronione",
         description: "Nie masz uprawnień do wyświetlenia tych linków",
       },
+      removed: {
+        title: "Usunięty lub w weryfikacji",
+        description:
+          "Ten udostępniony wątek został zgłoszony i nie jest już dostępny.",
+      },
       notFound: {
         title: "Nie znaleziono",
         description: "Wątek lub link udostępniania nie został znaleziony",

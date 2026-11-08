@@ -14,24 +14,6 @@ export const translations = {
   },
   auth: {
     resetPassword: {
-      title: "Reset Your Password",
-      subtitle: "Enter your email address and we'll send you a reset link",
-      sendResetLink: "Send Reset Link",
-      backToLogin: "Back to Login",
-      emailSent: "Email Sent!",
-      successTitle: "Check Your Email",
-      successMessage:
-        "We've sent you a password reset link. Please check your inbox.",
-      requestNewLink: "Request New Link",
-      createNewPasswordTitle: "Create New Password",
-      createNewPasswordSubtitle: "Enter your new password below",
-      resetPasswordButton: "Reset Password",
-      emailLabel: "Email Address",
-      emailPlaceholder: "Enter your email",
-      newPasswordLabel: "New Password",
-      newPasswordPlaceholder: "Enter your new password",
-      confirmPasswordLabel: "Confirm Password",
-      confirmPasswordPlaceholder: "Confirm your new password",
       errors: {
         loadingError: "Failed to load reset password form",
       },

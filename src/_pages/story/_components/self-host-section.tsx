@@ -33,7 +33,7 @@ export function SelfHostSection({
 
   return (
     <Div className="bg-muted/30">
-      <Div className="container px-4 md:px-6 py-24 md:py-32">
+      <Div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-24 md:py-32">
         <MotionDiv
           initial={false}
           animate={{ opacity: 1, y: 0 }}

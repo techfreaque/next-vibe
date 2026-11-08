@@ -224,8 +224,12 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Pläne ansehen",
       freePlanHint:
-        "{{count}} Gratis-Credits pro Monat. Mit Abo {{subCredits}} plus Aufladepakete.",
+        "{{count}} Gratis-Credits pro Monat, +{{bonus}} mit dem Newsletter. Mit Abo {{subCredits}}, oder kauf einfach ein Paket. Kein Abo nötig.",
       freePlan: "Du nutzt den Gratis-Plan",
+      guestPlan: "Gast-Guthaben",
+      signUp: "Kostenlos registrieren",
+      loadFailed: "Guthaben nicht geladen.",
+      retry: "Erneut laden",
       title: "Deine Credits",
       adminTitle: "Ausgabenlimit",
       description: "Ein Guthaben für alle {{modelCount}} Modelle.",
@@ -245,9 +249,12 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Kostenlose Credits",
-        description: "{{count}} kostenlose Credits monatlich aufgefrischt",
+        description:
+          "{{count}} gratis jeden Monat, +{{bonus}} mit dem Newsletter",
+        descriptionGuest:
+          "{{guest}} gratis jeden Monat. Mit Konto {{signedIn}}.",
         adminDescription:
-          "{{count}} kostenlose Credits pro Pool/Monat (geteilt über Geräte)",
+          "Gratis-Limit pro Pool/Monat (geteilt über Geräte): {{guest}} Gast, {{signedIn}} angemeldet, +{{bonus}} Newsletter",
       },
       earned: {
         title: "Verdiente Credits",

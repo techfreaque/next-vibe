@@ -32,7 +32,7 @@ export async function tanstackLoader({
   const logger = createEndpointLogger(false, locale);
 
   const user = await AuthRepository.getAuthMinimalUser(
-    [UserRole.CUSTOMER, UserRole.ADMIN],
+    [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   );

@@ -590,6 +590,31 @@ function buildUnusedSymbolLines(
   return lines;
 }
 
+function buildUnusedI18nLines(
+  entries: Entry[],
+  isMcp: boolean,
+  t: TFn,
+): string[] {
+  if (entries.length === 0) {
+    return [t("response.unusedI18n.emptyState")];
+  }
+  const lines: string[] = [];
+  if (!isMcp) {
+    lines.push(
+      `${pad(t("response.unusedI18n.colKey"), 44)}  ${t("response.unusedI18n.colPath")}`,
+    );
+    lines.push(`${"─".repeat(44)}  ${"─".repeat(40)}`);
+  }
+  for (const e of entries) {
+    lines.push(
+      isMcp
+        ? `${e.symbol ?? ""} ${shortPath(e.path)}`
+        : `${pad(e.symbol ?? "", 44)}  ${shortPath(e.path)}`,
+    );
+  }
+  return lines;
+}
+
 // ── Main widget ─────────────────────────────────────────────
 
 export function VibeDepsWidget(): React.JSX.Element {
@@ -620,6 +645,7 @@ export function VibeDepsWidget(): React.JSX.Element {
   const isImporters = view === "importers";
   const isNeedsMove = view === "needs-move";
   const isUnusedSymbols = view === "unused-symbols";
+  const isUnusedI18n = view === "unused-i18n";
   const isCrossDomain = view === "cross-domain";
   const isPageViolations = view === "page-violations";
 
@@ -647,7 +673,11 @@ export function VibeDepsWidget(): React.JSX.Element {
     const lines: string[] = [];
 
     // Header line — boundary modes lead with the violation summary.
-    if (isBoundary || isLayers) {
+    if (isUnusedI18n) {
+      lines.push(
+        `${String(totalFiles)} en files  ${String(unusedCount)} unused keys`,
+      );
+    } else if (isBoundary || isLayers) {
       lines.push(
         `out:${String(violations.outOfPackage)} cross:${String(violations.crossPackage)} reverse:${String(violations.reverseDirection)}  (${String(totalFiles)} files)`,
       );
@@ -672,6 +702,8 @@ export function VibeDepsWidget(): React.JSX.Element {
       lines.push(...buildNeedsMoveLines(entries, isMcp, t));
     } else if (isUnusedSymbols) {
       lines.push(...buildUnusedSymbolLines(entries, isMcp, t));
+    } else if (isUnusedI18n) {
+      lines.push(...buildUnusedI18nLines(entries, isMcp, t));
     } else if (isCrossDomain) {
       lines.push(...buildCrossDomainLines(entries, isMcp, t));
     } else if (isPageViolations) {
@@ -720,11 +752,13 @@ export function VibeDepsWidget(): React.JSX.Element {
             ? t("response.needsMove.title")
             : isUnusedSymbols
               ? t("response.unusedSymbols.title")
-              : isCrossDomain
-                ? t("response.crossDomain.title")
-                : isPageViolations
-                  ? t("response.pageViolations.title")
-                  : t("title");
+              : isUnusedI18n
+                ? t("response.unusedI18n.title")
+                : isCrossDomain
+                  ? t("response.crossDomain.title")
+                  : isPageViolations
+                    ? t("response.pageViolations.title")
+                    : t("title");
 
   return (
     <Div className="flex flex-col gap-6">

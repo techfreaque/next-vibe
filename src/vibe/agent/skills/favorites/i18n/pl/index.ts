@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
         label: "Zobacz skill",
       },
       signupPrompt: {
-        title: "Dostosuj osobowość postaci",
+        title: "Dostosuj osobowość skilla",
         description:
-          "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+          "Edytuj prompt systemowy i zachowanie skilla. Zarejestruj się, aby rozpocząć.",
         backButton: "Wstecz",
         signupButton: "Utwórz konto",
         loginButton: "Zaloguj się",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         skillId: {
-          content: "Postać: {{value}}",
+          content: "Skill: {{value}}",
         },
         customVariantName: {
           content: "Nazwa niestandardowa: {{value}}",
@@ -164,7 +164,7 @@ export const translations: typeof enTranslations = {
         label: "Zobacz skill",
       },
       useThisSkillButton: {
-        label: "Użyj tej postaci",
+        label: "Użyj tego skilla",
       },
       useThisModelButton: {
         label: "Użyj tego modelu",
@@ -173,9 +173,9 @@ export const translations: typeof enTranslations = {
         label: "Obecnie aktywne",
       },
       signupPrompt: {
-        title: "Dostosuj osobowość postaci",
+        title: "Dostosuj osobowość skilla",
         description:
-          "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+          "Edytuj prompt systemowy i zachowanie skilla. Zarejestruj się, aby rozpocząć.",
         backButton: "Wstecz",
         signupButton: "Utwórz konto",
         loginButton: "Zaloguj się",
@@ -192,7 +192,7 @@ export const translations: typeof enTranslations = {
         label: "ID ulubionego",
       },
       skillId: {
-        label: "Postać",
+        label: "Skill",
         description:
           'ID umiejętności. „skillSlug" dla domyślnego wariantu, „skillSlug__variantId" dla konkretnego wariantu.',
       },
@@ -208,42 +208,42 @@ export const translations: typeof enTranslations = {
       voice: {
         label: "Głos AI",
         description: "Wybierz głos dla swojego asystenta AI",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       sttModel: {
         label: "Model mowy na tekst",
         description: "Model używany do rozpoznawania mowy",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       imageVisionModel: {
         label: "Model wizji obrazu",
         description: "Model używany do analizy obrazów",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       videoVisionModel: {
         label: "Model wizji wideo",
         description: "Model używany do analizy wideo",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       audioVisionModel: {
         label: "Model wizji audio",
         description: "Model używany do analizy audio",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       imageGenModel: {
         label: "Model generowania obrazów",
         description: "Model do generowania obrazów",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       musicGenModel: {
         label: "Model generowania muzyki",
         description: "Model do generowania muzyki",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       videoGenModel: {
         label: "Model generowania wideo",
         description: "Model do generowania wideo",
-        placeholder: "Dziedzicz z postaci",
+        placeholder: "Dziedzicz ze skilla",
       },
       mode: {
         label: "Tryb wyboru",
@@ -256,7 +256,7 @@ export const translations: typeof enTranslations = {
       },
       selectionType: {
         label: "Typ wyboru",
-        characterBased: "Na podstawie postaci",
+        characterBased: "Na podstawie skilla",
         manual: "Konkretny model",
         filters: "Kryteria filtrowania",
       },
@@ -318,22 +318,22 @@ export const translations: typeof enTranslations = {
       },
       icon: {
         label: "Niestandardowa ikona",
-        description: "Zastąp domyślną ikonę postaci dla tego slotu ulubionych",
+        description: "Zastąp domyślną ikonę skilla dla tego slotu ulubionych",
       },
       compactTrigger: {
         label: "Próg kompresji (tokeny)",
         description:
-          "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = postać lub domyślna globalna.",
+          "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = skill lub domyślna globalna.",
       },
       availableTools: {
         label: "Dozwolone narzędzia",
         description:
-          "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
+          "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = skill lub ustawienia globalne.",
       },
       pinnedTools: {
         label: "Przypięte narzędzia",
         description:
-          "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = postać lub ustawienia globalne.",
+          "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = skill lub ustawienia globalne.",
       },
       deniedTools: {
         label: "Zablokowane narzędzia",
@@ -358,10 +358,10 @@ export const translations: typeof enTranslations = {
           "Maksymalna łączna liczba tokenów treści pamięci dla tego slotu. Null = skill lub domyślna globalna.",
       },
       changeSkill: {
-        label: "Zmień postać",
+        label: "Zmień skill",
       },
       modifySkill: {
-        label: "Modyfikuj postać",
+        label: "Modyfikuj skill",
       },
       response: {
         success: {
@@ -490,7 +490,7 @@ export const translations: typeof enTranslations = {
   },
   active: "Aktywny",
   fallbacks: {
-    unknownSkill: "Nieznana postać",
+    unknownSkill: "Nieznany skill",
     unknownModel: "Nieznany model",
     unknown: "Nieznany",
     unknownProvider: "nieznany",
@@ -504,7 +504,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     selectionType: {
-      characterBased: "Na podstawie postaci",
+      characterBased: "Na podstawie skilla",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -550,7 +550,7 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Pobierz ulubione",
     titleShort: "Ulubione",
-    description: "Pobierz wszystkie zapisane ulubione konfiguracje postaci",
+    description: "Pobierz wszystkie zapisane ulubione konfiguracje skilla",
     userId: {
       label: "ID użytkownika",
       description:
@@ -580,37 +580,39 @@ export const translations: typeof enTranslations = {
       edit: "Edytuj",
       active: "Aktywny",
       reorder: "Przeciągnij, by zmienić kolejność",
+      moveUp: "Przenieś wyżej",
+      moveDown: "Przenieś niżej",
       showMore: "Więcej modeli: {{count}}",
       showLess: "Pokaż mniej",
       settings: "Ustawienia czatu",
     },
-    addVariant: "Dodaj wariant",
+    addVariant: "Dodaj kolejny model",
     viewSkill: "Szczegóły",
-    deleteVariant: "Usunąć ten wariant?",
+    deleteVariant: "Usunąć ten model?",
     deleteVariantAction: "Usuń",
     deleteGroup: {
-      trigger: "Usuń wszystkie warianty",
-      confirm: "Usunąć wszystkie {{count}} warianty?",
+      trigger: "Usuń skill",
+      confirm: "Usunąć ten skill i jego modele ({{count}})?",
       cancel: "Anuluj",
-      action: "Usuń wszystkie",
+      action: "Usuń",
     },
-    emptyState: "Nie dodałeś jeszcze żadnych ulubionych",
+    emptyState: "Nie masz jeszcze skilli. Wybierz jeden i zacznij rozmowę.",
     tabs: {
-      myFavorites: "Moje ulubione",
-      browseSkills: "Przeglądaj umiejętności",
+      myFavorites: "Moje skille",
+      browseSkills: "Przeglądaj skille",
     },
     sections: {
       companion: "Towarzysze",
-      skills: "Umiejętności",
-      model: "Bezpośrednie modele",
+      skills: "Skille",
+      model: "Same modele",
       background: "Agenci w tle",
     },
     container: {
-      title: "Twoje ulubione",
-      description: "Zarządzaj ulubionymi konfiguracjami postaci i modeli",
+      title: "Twoje skille",
+      description: "Zarządzaj ulubionymi konfiguracjami skilla i modeli",
     },
     createButton: {
-      label: "Odkryj postacie",
+      label: "Odkryj skille",
     },
     response: {
       favorite: {
@@ -619,7 +621,7 @@ export const translations: typeof enTranslations = {
           content: "ID: {{value}}",
         },
         skillId: {
-          content: "Postać: {{value}}",
+          content: "Skill: {{value}}",
         },
         customVariantName: {
           content: "Nazwa niestandardowa: {{value}}",
@@ -737,10 +739,10 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz ulubiony",
-    description: "Utwórz nową ulubioną konfigurację postaci",
+    description: "Utwórz nową ulubioną konfigurację skilla",
     container: {
       title: "Nowy ulubiony",
-      description: "Zapisz konfigurację postaci jako ulubioną",
+      description: "Zapisz konfigurację skilla jako ulubioną",
     },
     backButton: {
       label: "Anuluj",
@@ -754,8 +756,8 @@ export const translations: typeof enTranslations = {
       loadingText: "Dodawanie...",
     },
     skillId: {
-      label: "Postać",
-      description: "Wybierz postać dla tego ulubionego",
+      label: "Skill",
+      description: "Wybierz skill dla tego ulubionego",
     },
     customVariantName: {
       label: "Nazwa wariantu",

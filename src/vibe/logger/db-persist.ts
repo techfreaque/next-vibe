@@ -17,6 +17,7 @@ import {
   MAX_STACK_LENGTH,
   type NewErrorLog,
 } from "./error-monitor/db";
+import { serializeLogValue } from "./serialize";
 import { type ErrorLogLevel, type LoggerMetadata } from "./types";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
@@ -161,11 +162,14 @@ export function persistErrorLog(
         allMeta,
       );
 
+      // jsonb would store nested Errors as `{}` - keep message/stack/cause.
+      const serializedMeta = allMeta.map(serializeLogValue);
+
       const row: NewErrorLog = {
         message: truncatedMessage,
         errorType,
         stackTrace: extractStack(error) ?? null,
-        metadata: allMeta,
+        metadata: serializedMeta,
         fingerprint,
         occurrences: 1,
         resolved: false,
@@ -181,7 +185,7 @@ export function persistErrorLog(
           set: {
             occurrences: sql`${errorLogs.occurrences} + 1`,
             stackTrace: row.stackTrace,
-            metadata: allMeta,
+            metadata: serializedMeta,
             resolved: false,
             createdAt: sql`now()`,
           },

@@ -1,6 +1,6 @@
 /**
  * Credits Purchase API Route Definition
- * Defines endpoint for purchasing credit packs via Stripe
+ * Defines endpoint for purchasing credit packs (Stripe or crypto). No subscription required.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -26,6 +26,10 @@ import {
   PaymentProviderDB,
   PaymentProviderOptions,
 } from "../../payment/enum";
+import {
+  CREDIT_PACK_PRODUCT_IDS,
+  ProductIds,
+} from "../../products/repository-client";
 import { scopedTranslation } from "./i18n";
 
 const CreditsPurchaseContainer = lazyWidget(() =>
@@ -64,6 +68,15 @@ const { POST } = createEndpoint({
         label: "post.quantity.label" as const,
         description: "post.quantity.description" as const,
         placeholder: "post.quantity.placeholder" as const,
+      }),
+
+      productId: requestField(scopedTranslation, {
+        schema: z.enum(CREDIT_PACK_PRODUCT_IDS).default(ProductIds.CREDIT_PACK),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.productId.label" as const,
+        description: "post.productId.description" as const,
+        placeholder: "post.productId.placeholder" as const,
       }),
 
       provider: requestField(scopedTranslation, {
@@ -167,6 +180,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         quantity: 2,
+        productId: ProductIds.CREDIT_PACK,
         provider: PaymentProvider.STRIPE,
       },
     },

@@ -130,6 +130,42 @@ export const translations: typeof enTranslations = {
       description: "Zostałeś wypisany z naszego newslettera",
     },
   },
+  oneClick: {
+    tag: "Wypisanie jednym kliknięciem",
+    post: {
+      title: "Wypisanie jednym kliknięciem",
+      titleShort: "Wypisz",
+      description:
+        "Wypisanie przez podpisany link one-click z nagłówka e-maila (RFC 8058)",
+      container: {
+        title: "Wypisanie jednym kliknięciem",
+        description:
+          "Wywoływane przez dostawców poczty. Podpisany token autoryzuje wypisanie.",
+      },
+      token: {
+        label: "Token",
+        description: "Podpisany token wypisania z e-maila",
+      },
+      errors: {
+        invalidToken: {
+          title: "Nieprawidłowy link",
+          description: "Ten link do wypisania jest nieprawidłowy.",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wypisanie nie powiodło się. Spróbuj ponownie.",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowy format tokenu",
+        },
+      },
+      success: {
+        title: "Wypisano",
+        description: "Nie ma Cię już na liście.",
+      },
+    },
+  },
   sync: {
     failed: "Synchronizacja wypisania z newslettera nie powiodła się",
     error: "Błąd synchronizacji wypisania z newslettera",

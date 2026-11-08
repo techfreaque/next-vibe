@@ -10,6 +10,11 @@ export const translations: typeof enTranslations = {
       industryInsights: "Brancheneinblicke",
       events: "Veranstaltungen",
     },
+    creditBonus: {
+      active: "Bonus aktiv",
+      pendingConfirmation: "E-Mail bestätigen zum Freischalten",
+      claimedElsewhere: "Bereits von einem anderen Konto beansprucht",
+    },
   },
   tags: {
     newsletter: "Newsletter",
@@ -46,6 +51,8 @@ export const translations: typeof enTranslations = {
     leadId: "Lead-Kennung",
     subscriptionId: "Abonnement-ID",
     userId: "Benutzer-ID",
+    creditBonus: "Gratis-Credit-Bonus",
+    bonusCredits: "Bonus-Credits pro Monat",
     alreadySubscribed:
       "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
   },
@@ -193,6 +200,11 @@ export const translations: typeof enTranslations = {
         "Wir senden dir alle paar Wochen Updates - nie Spam, immer wertvoller Inhalt.",
       unsubscribe_text: "Möchtest du diese E-Mails nicht mehr erhalten?",
       unsubscribe_link: "Abmelden",
+      confirm_title:
+        "Noch ein Klick: +{{bonusCredits}} Gratis-Credits jeden Monat",
+      confirm_text:
+        "Bestätige diese Adresse und dein Konto erhält jeden Monat {{bonusCredits}} zusätzliche Gratis-Credits – solange du angemeldet bleibst.",
+      confirm_button: "Bestätigen und +{{bonusCredits}} Credits freischalten",
     },
     admin_notification: {
       title: "Neues Newsletter-Abonnement",

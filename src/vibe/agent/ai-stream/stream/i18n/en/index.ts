@@ -231,7 +231,7 @@ export const translations = {
     title: "AI Stream Chat",
     titleShort: "AI Chat",
     description:
-      "Stream AI-powered chat responses using 100+ models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
+      "Stream AI-powered chat responses using any chat model (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
     form: {
       title: "AI Chat Configuration",
       description: "Configure AI chat parameters and messages",
@@ -540,6 +540,12 @@ export const translations = {
   info: {
     streamInterrupted:
       "Generation was stopped. Partial response has been saved.",
+    billingFailed:
+      "Stopped: we couldn't charge credits for this reply. Nothing was lost - send your message again in a moment.",
+    budgetExceeded:
+      "Stopped: this background task reached its credit cap. Raise the cap in Task Budget Caps to let it continue.",
+    taskWatchdog:
+      "Stopped: the task watchdog ended this run because it exceeded its time, turn or tool-call limit.",
   },
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
@@ -607,6 +613,8 @@ export const translations = {
       signIn: "Sign in to sync",
       start: "Start chatting",
       saving: "Setting up...",
+      failed: "Couldn't save your setup. Check your connection and try again.",
+      retry: "Try again",
     },
     usecases: {
       noProviderAvailable:
@@ -659,6 +667,10 @@ export const translations = {
       addCredits: "Add credits",
       description: "Your balance is empty. Top up to keep chatting.",
     },
+    creditsLoadFailed: {
+      title: "Couldn't load your balance.",
+      retry: "Retry",
+    },
     insufficientCredits: {
       title: "Not enough credits (need {{cost}}, have {{balance}})",
       description: "Top up or pick a cheaper model.",
@@ -683,6 +695,33 @@ export const translations = {
       uploadFile: "Attach files",
       attachedFiles: "Attached Files",
       addMore: "Add More",
+    },
+  },
+  outOfCredits: {
+    dismiss: "Dismiss",
+    guest: {
+      title: "Out of free credits",
+      description:
+        "Guest credits are used up. Add your email or sign up free to keep chatting.",
+      emailLabel: "Email",
+      emailPlaceholder: "you@example.com",
+      emailSubmit: "Get {{bonus}} more credits",
+      emailSubmitting: "Sending...",
+      invalidEmail: "Enter a valid email address.",
+      added: "{{bonus}} credits added. Keep chatting.",
+      confirm:
+        "Check your inbox. Confirm your email to unlock +{{bonus}} credits.",
+      claimed:
+        "That email already claimed its bonus. Sign up instead: {{signedIn}} credits/month free.",
+      or: "or",
+      signUp: "Sign up: {{signedIn}} credits/month free",
+      haveAccount: "Already have an account?",
+      logIn: "Log in",
+    },
+    member: {
+      title: "You're out of credits",
+      description: "Top up and keep chatting right where you left off.",
+      getCredits: "Get credits",
     },
   },
   imageGen: {

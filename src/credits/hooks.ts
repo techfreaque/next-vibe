@@ -31,8 +31,9 @@ export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
 export function useCredits(
   user: JwtPayloadType,
   logger: EndpointLogger,
-  // Pass null when credits should not be fetched (e.g., unauthenticated users)
-  initialData: CreditsGetResponseOutput | null,
+  // null: don't fetch (e.g. unauthenticated). undefined: fetch with no seed -
+  // the server-side load failed, so never seed a fake zero balance.
+  initialData: CreditsGetResponseOutput | null | undefined,
 ): UseCreditsReturn | null {
   // Determine if hook is enabled
   const isEnabled = initialData !== null;

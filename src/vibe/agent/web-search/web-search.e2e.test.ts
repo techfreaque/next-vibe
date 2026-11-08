@@ -16,7 +16,10 @@ const endpoint = webSearchEndpoints.GET;
 const QUERY = "bun runtime";
 
 describe("E2E: web search", () => {
-  const e2e = useE2E("vibe/agent/web-search", { fixtures: true });
+  const e2e = useE2E("vibe/agent/web-search", {
+    fixtures: true,
+    guestCredits: 100,
+  });
 
   e2e.it(
     "searches with Brave and renders the results",

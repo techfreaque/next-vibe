@@ -66,11 +66,22 @@ function buildUrl<TEndpoint extends CreateApiEndpointAny>(
         ? segment.slice(1, -1)
         : segment.slice(1);
       const paramValue = pathParams?.[paramName as keyof typeof pathParams];
-      if (paramValue === undefined) {
+      // An empty/null id must fail here: `/skills/` silently resolves to the
+      // LIST route, whose response then fails the by-id schema with a
+      // confusing "icon/name/tagline: expected string" validation error.
+      if (
+        paramValue === undefined ||
+        paramValue === null ||
+        String(paramValue) === ""
+      ) {
         logger.error("callApi: Missing URL path parameter", {
           paramName,
           endpoint: endpoint.path.join("/"),
           availableParams: pathParams ? Object.keys(pathParams) : [],
+          receivedValue:
+            paramValue === undefined ? "undefined" : JSON.stringify(paramValue),
+          // Which widget fired the call - the bug is always in the caller.
+          callerStack: new Error().stack?.slice(0, 800),
         });
         return { url, missingParam: paramName };
       }

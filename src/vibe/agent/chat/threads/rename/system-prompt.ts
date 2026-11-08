@@ -3,8 +3,10 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 
 import type { SystemPromptFragment } from "../../../ai-stream/system-prompt/types";
+import { FOLDER_DENIED_TOOL_IDS } from "../../config";
 import { chatThreads } from "../../db";
 import { THREAD_RENAME_ALIAS } from "./constants";
 import { getIncognitoRename } from "./incognito-title-cache";
@@ -73,7 +75,18 @@ export const threadRenameFragment: SystemPromptFragment = {
     const renameToolName = params.relayCallerInstanceId
       ? `${params.relayCallerInstanceId}__${THREAD_RENAME_ALIAS}`
       : THREAD_RENAME_ALIAS;
-    const callShape = `execute-tool(toolName="${renameToolName}", input={ title: "≤8 words covering the whole conversation, no quotes", description: "2-6 sentences summarizing the full thread — what was discussed, decided, or built" }, callbackMode: "endLoop")`;
+    const renameInput = `{ title: "≤8 words covering the whole conversation, no quotes", description: "2-6 sentences summarizing the full thread — what was discussed, decided, or built" }`;
+    // Folders that deny execute-tool (incognito, public) must call rename-thread
+    // DIRECTLY - routing it through execute-tool there was always rejected
+    // ("execute-tool denied by permission cascade"), so those threads never got
+    // a title. A direct call has no callbackMode (that is an execute-tool arg).
+    const executeToolDenied =
+      FOLDER_DENIED_TOOL_IDS[params.rootFolderId]?.includes(
+        EXECUTE_TOOL_ALIAS,
+      ) ?? false;
+    const callShape = executeToolDenied
+      ? `${renameToolName}(${renameInput})`
+      : `execute-tool(toolName="${renameToolName}", input=${renameInput}, callbackMode: "endLoop")`;
     // Housekeeping — NEVER pre-empts the user's actual work and NEVER ends the turn
     // BEFORE the work is done. It rides in the SAME parallel batch as real tool calls.
     // callbackMode:"endLoop" is correct HERE because rename is always a final side-action
@@ -82,7 +95,7 @@ export const threadRenameFragment: SystemPromptFragment = {
     // nobody reads. GUARD: the rideRule below makes clear it must not fire before the
     // user's request is fully done — that blocks the T1 rename+endLoop hijack pattern
     // where the model uses rename to short-circuit real work.
-    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn.`;
+    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done${executeToolDenied ? "" : ", then let endLoop close the turn"}.`;
 
     if (isNew) {
       // Urgent + unconditional, but SUBORDINATE to the user's task: fire the rename

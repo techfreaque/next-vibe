@@ -1,8 +1,21 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import { LocaleSelectorContent } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
+import chatSettingsDef from "next-vibe/agent/chat/settings/definition";
+import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
 import skillsDef from "next-vibe/agent/skills/definition";
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
+import {
+  SearchProvider,
+  SearchProviderOptions,
+} from "next-vibe/agent/web-search/enum";
+import { scopedTranslation as searchScopedTranslation } from "next-vibe/agent/web-search/i18n";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import { Platform } from "next-vibe/platforms/platforms";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
 import {
   Avatar,
@@ -15,6 +28,8 @@ import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Brain } from "next-vibe/ui/components/icons/Brain";
+import { Download } from "next-vibe/ui/components/icons/Download";
+import { Key } from "next-vibe/ui/components/icons/Key";
 import { Camera } from "next-vibe/ui/components/icons/Camera";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
@@ -23,32 +38,49 @@ import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Instagram } from "next-vibe/ui/components/icons/Instagram";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { LogOut } from "next-vibe/ui/components/icons/LogOut";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
+import { Moon } from "next-vibe/ui/components/icons/Moon";
 import { Music } from "next-vibe/ui/components/icons/Music";
+import { Palette } from "next-vibe/ui/components/icons/Palette";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Sun } from "next-vibe/ui/components/icons/Sun";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Twitter } from "next-vibe/ui/components/icons/Twitter";
 import { Youtube } from "next-vibe/ui/components/icons/Youtube";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
+import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -85,6 +117,10 @@ import { scopedTranslation as subscriptionScopedTranslation } from "@/subscripti
 import logoutDef from "@/user/private/logout/definition";
 import addressesDef from "@/user/private/me/addresses/definition";
 import passwordDef from "@/user/private/me/password/definition";
+import exportDef from "@/user/private/me/export/definition";
+import twoFactorDef from "@/user/private/me/two-factor/definition";
+import verifyEmailDef from "@/user/public/verify-email/definition";
+import apiKeysDef from "@/api-keys/definition";
 import sessionsDef from "@/user/private/sessions/definition";
 
 import avatarDef from "./avatar/definition";
@@ -114,9 +150,9 @@ function HubRow({
       type="button"
       variant="ghost"
       onClick={onClick}
-      className="flex h-auto min-h-14 w-full items-center justify-start gap-3 rounded-none px-4 py-3 text-left hover:bg-muted/60"
+      className="group flex h-auto min-h-14 w-full items-center justify-start gap-3.5 rounded-none px-4 py-3 text-left transition-colors hover:bg-muted/50"
     >
-      <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+      <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/70 text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
         {icon}
       </Span>
       <Div className="min-w-0 flex-1">
@@ -130,28 +166,326 @@ function HubRow({
         )}
       </Div>
       {badge && <Div className="shrink-0">{badge}</Div>}
-      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/60" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
     </Button>
   );
 }
 
-/** Titled group of HubRows inside one bordered card. */
+/** Rows wrapped in one bordered, rounded card. */
+function HubCard({ children }: { children: ReactNode }): JSX.Element {
+  return (
+    <Div className="flex flex-col divide-y divide-border/70 overflow-hidden rounded-2xl border bg-card shadow-sm">
+      {children}
+    </Div>
+  );
+}
+
+/** Titled group of HubRows inside one bordered card, with an optional hint. */
 function HubSection({
   title,
+  subtitle,
   children,
 }: {
   title: string;
+  subtitle?: string;
   children: ReactNode;
 }): JSX.Element {
   return (
-    <Div className="flex flex-col gap-2">
-      <H3 className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {title}
-      </H3>
-      <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
-        {children}
+    <Div className="flex flex-col gap-2.5">
+      <Div className="flex flex-col gap-0.5 px-1">
+        <H3 className="m-0 border-0 p-0 text-[13px] font-semibold tracking-tight text-foreground">
+          {title}
+        </H3>
+        {subtitle && (
+          <Span className="text-xs leading-snug text-muted-foreground">
+            {subtitle}
+          </Span>
+        )}
+      </Div>
+      <HubCard>{children}</HubCard>
+    </Div>
+  );
+}
+
+/** A cluster caption rendered inside a HubCard to separate groups of rows.
+ *  A plain label (not a heading), so it never competes with the section's own
+ *  heading in the a11y tree. */
+function RowLabel({
+  label,
+  hint,
+}: {
+  label: string;
+  hint?: string;
+}): JSX.Element {
+  return (
+    <Div className="flex items-baseline gap-2 bg-muted/25 px-4 py-2">
+      <Span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </Span>
+      {hint && (
+        <Span className="truncate text-[11px] text-muted-foreground/70">
+          {hint}
+        </Span>
+      )}
+    </Div>
+  );
+}
+
+/**
+ * One settings row with an inline control on the right instead of a navigation
+ * chevron. Matches HubRow's geometry (same icon tile, title, hint) so a mixed
+ * list of tappable rows and inline controls reads as one coherent group.
+ */
+function HubControlRow({
+  icon,
+  title,
+  subtitle,
+  control,
+}: {
+  icon: ReactNode;
+  title: string;
+  subtitle?: string;
+  control: ReactNode;
+}): JSX.Element {
+  return (
+    <Div className="flex min-h-14 w-full items-center justify-start gap-3.5 px-4 py-3 text-left">
+      <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/70 text-muted-foreground">
+        {icon}
+      </Span>
+      <Div className="min-w-0 flex-1">
+        <Span className="block truncate text-sm font-medium text-foreground">
+          {title}
+        </Span>
+        {subtitle && (
+          <Span className="mt-0.5 block whitespace-normal text-xs font-normal leading-snug text-muted-foreground">
+            {subtitle}
+          </Span>
+        )}
+      </Div>
+      <Div className="shrink-0">{control}</Div>
+    </Div>
+  );
+}
+
+/** A compact at-a-glance stat in the identity header strip. */
+function StatTile({
+  icon,
+  label,
+  value,
+  badge,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  badge?: ReactNode;
+}): JSX.Element {
+  return (
+    <Div className="flex min-w-0 flex-1 flex-col gap-1 rounded-xl border bg-background/60 px-3.5 py-3">
+      <Span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <Span className="text-muted-foreground/70">{icon}</Span>
+        {label}
+      </Span>
+      <Div className="flex min-w-0 items-center gap-2">
+        <Span className="truncate text-sm font-semibold text-foreground">
+          {value}
+        </Span>
+        {badge}
       </Div>
     </Div>
+  );
+}
+
+/** Platforms that render real UI — theme/locale controls are meaningless on
+ *  headless surfaces (CLI, AI, MCP, cron). */
+function isVisualPlatform(platform: Platform): boolean {
+  return (
+    platform !== Platform.CLI &&
+    platform !== Platform.CLI_PACKAGE &&
+    platform !== Platform.AI &&
+    platform !== Platform.MCP &&
+    platform !== Platform.REMOTE_SKILL &&
+    platform !== Platform.CRON
+  );
+}
+
+/**
+ * Two-option theme switch. Reuses the exact same theme state as the top-bar and
+ * nav toggles (useThemeToggle → next-themes), so flipping it here updates every
+ * other theme control instantly and vice-versa. Theme is light/dark only by
+ * platform design (enableSystem=false), so onToggleTheme flips between the two.
+ */
+function ThemeSegmented(): JSX.Element {
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation<typeof meDefinition.POST>();
+  const { theme, onToggleTheme, isMounted } = useThemeToggle();
+  const options = [
+    {
+      key: "light" as const,
+      icon: <Sun className="h-3.5 w-3.5" />,
+      label: t("widget.appearance.light"),
+    },
+    {
+      key: "dark" as const,
+      icon: <Moon className="h-3.5 w-3.5" />,
+      label: t("widget.appearance.dark"),
+    },
+  ];
+  return (
+    <Div
+      className="inline-flex rounded-lg border bg-muted/40 p-0.5"
+      suppressHydrationWarning
+    >
+      {options.map((opt) => {
+        const active = isMounted && theme === opt.key;
+        return (
+          <Button
+            key={`${opt.key}-${locale}`}
+            type="button"
+            variant="ghost"
+            size="sm"
+            suppressHydrationWarning
+            onClick={(): void => {
+              if (theme !== opt.key) {
+                onToggleTheme();
+              }
+            }}
+            className={cn(
+              "h-8 gap-1.5 rounded-md px-3 text-xs font-medium transition-colors",
+              active
+                ? "bg-card text-foreground shadow-sm hover:bg-card"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+            aria-pressed={active}
+          >
+            {opt.icon}
+            {opt.label}
+          </Button>
+        );
+      })}
+    </Div>
+  );
+}
+
+/**
+ * Appearance group: theme + language. Web-only — scoped into its own component
+ * so the theme/locale hooks never run on headless platforms. Language reuses the
+ * shared LocaleSelectorContent (the same control the top-bar opens), so it
+ * switches locale through the exact same mechanism.
+ */
+function AppearanceSection(): JSX.Element {
+  const t = useWidgetTranslation<typeof meDefinition.POST>();
+  const { currentCountry } = useTranslation();
+  const [langOpen, setLangOpen] = useState(false);
+
+  return (
+    <>
+      <HubSection
+        title={t("widget.appearance.title")}
+        subtitle={t("widget.appearance.sectionHint")}
+      >
+        <HubControlRow
+          icon={<Palette className="h-4 w-4" />}
+          title={t("widget.appearance.theme")}
+          subtitle={t("widget.appearance.themeHint")}
+          control={<ThemeSegmented />}
+        />
+        <HubRow
+          icon={<Globe className="h-4 w-4" />}
+          title={t("widget.appearance.language")}
+          subtitle={t("widget.appearance.languageHint")}
+          badge={
+            <Span className="text-lg leading-none">{currentCountry.flag}</Span>
+          }
+          onClick={(): void => {
+            setLangOpen(true);
+          }}
+        />
+      </HubSection>
+      <Dialog open={langOpen} onOpenChange={setLangOpen}>
+        <DialogContent className="max-w-md">
+          <LocaleSelectorContent />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/**
+ * Chat preferences group: web-search provider (inline, instant) + a row into the
+ * full background-automation panel. Both read/write through useChatSettings — the
+ * same DB-backed endpoint the in-chat settings use — so the two stay in sync.
+ */
+function ChatPrefsSection(): JSX.Element {
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation<typeof meDefinition.POST>();
+  const { t: tSearch } = searchScopedTranslation.scopedT(locale);
+  const { push: navigate } = useWidgetNavigation();
+  const { settings, updateSettings } = useChatSettings(user, logger);
+
+  const handleSearchProvider = useCallback(
+    (value: string): void => {
+      const opt = SearchProviderOptions.find((o) => o.value === value);
+      if (opt) {
+        void updateSettings({ searchProvider: opt.value });
+      }
+    },
+    [updateSettings],
+  );
+
+  const automationOn =
+    (settings?.dreamerEnabled ?? false) ||
+    (settings?.autopilotEnabled ?? false);
+
+  return (
+    <HubSection
+      title={t("widget.chatPrefs.title")}
+      subtitle={t("widget.chatPrefs.sectionHint")}
+    >
+      <HubControlRow
+        icon={<Search className="h-4 w-4" />}
+        title={t("widget.chatPrefs.searchProvider")}
+        subtitle={t("widget.chatPrefs.searchProviderHint")}
+        control={
+          <Select
+            value={settings?.searchProvider ?? SearchProvider.AUTO}
+            onValueChange={handleSearchProvider}
+          >
+            <SelectTrigger className="h-8 w-36 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SearchProviderOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {tSearch(opt.label)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        }
+      />
+      {!user.isPublic && (
+        <HubRow
+          icon={<Sparkles className="h-4 w-4" />}
+          title={t("widget.chatPrefs.automation")}
+          subtitle={t("widget.chatPrefs.automationHint")}
+          badge={
+            <StatusPill
+              status={
+                automationOn
+                  ? t("widget.chatPrefs.on")
+                  : t("widget.chatPrefs.off")
+              }
+              variant={automationOn ? "success" : "warning"}
+            />
+          }
+          onClick={(): void => {
+            navigate(chatSettingsDef.GET, {});
+          }}
+        />
+      )}
+    </HubSection>
   );
 }
 
@@ -480,12 +814,17 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const availability = useProviderAvailability();
   const t = useWidgetTranslation<typeof meDefinition.POST>();
   const roleT = userRoleScopedTranslation.scopedT(locale).t;
   const subscriptionT = subscriptionScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof meDefinition.POST>();
   const onSubmit = useWidgetOnSubmit();
-  const { user: profileRaw, refetch } = useUser(user, logger);
+  const {
+    user: profileRaw,
+    refetch,
+    error: profileError,
+  } = useUser(user, logger);
   const profile = profileRaw && !profileRaw.isPublic ? profileRaw : undefined;
 
   const [editing, setEditing] = useState(false);
@@ -525,6 +864,8 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
 
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const router = useRouter();
+  const platform = useWidgetPlatform();
+  const showVisualSettings = isVisualPlatform(platform);
 
   const handleLogout = useCallback((): void => {
     navigate(logoutDef.POST, {});
@@ -568,13 +909,19 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         }
       : null;
 
-  const { data: creditsResponse } = useApiQuery({
+  const {
+    data: creditsResponse,
+    isError: creditsError,
+    refetch: refetchCredits,
+  } = useApiQuery({
     endpoint: creditsDef.GET,
     logger,
     user,
     options: { enabled: !user.isPublic },
   });
   const credits = creditsResponse ?? null;
+  // A failed load is an error with a retry - never a blank or a fake value
+  const profileLoadFailed = !profile && profileError !== undefined;
 
   // Server avatar wins whenever it changes (adjust state during render)
   const profileAvatarUrl = profile?.avatarUrl;
@@ -656,10 +1003,10 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
             websiteUrl: profile.websiteUrl,
           }
         : {
-            publicName: PENDING_VALUE,
+            publicName: profileLoadFailed ? "" : PENDING_VALUE,
             avatarUrl: null,
           },
-    [profile, liveAvatarUrl, displayName],
+    [profile, liveAvatarUrl, displayName, profileLoadFailed],
   );
 
   // Resolved slug for public profile links (null if no profile loaded yet)
@@ -675,8 +1022,25 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
 
   const iconClass = "h-4 w-4";
 
+  // ── At-a-glance header stats ──
+  const planLabel = subscription?.plan
+    ? subscriptionT(subscription.plan)
+    : t("widget.sections.noSubscription");
+  const planActive = subscription?.status === SubscriptionStatus.ACTIVE;
+  const creditsLabel = credits
+    ? credits.total.toLocaleString(locale)
+    : creditsError
+      ? t("widget.loadState.creditsFailed")
+      : PENDING_VALUE;
+  const memberSinceLabel = profile?.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString(locale, {
+        year: "numeric",
+        month: "short",
+      })
+    : PENDING_VALUE;
+
   return (
-    <WidgetShell scroll className="gap-6 pb-8">
+    <WidgetShell scroll className="gap-7 pb-10">
       {/* ── BACK (only when pushed from another screen) ── */}
       {canGoBack && (
         <Button
@@ -693,63 +1057,119 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         </Button>
       )}
 
-      {/* ── PROFILE CARD ── */}
-      <Div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      {/* ── IDENTITY HERO ── */}
+      <Div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <Form form={form} onSubmit={onSubmit}>
-          <Div className="flex flex-col gap-5 p-5 sm:p-6">
-            <Div className="flex items-start gap-4">
-              <AvatarUploadButton
-                avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
-                initials={initials}
-                label={t("widget.changePhoto")}
-                onUploaded={handleAvatarUploaded}
-              />
-              <Div className="flex min-w-0 flex-1 flex-col gap-1 pt-1">
-                <Div className="flex flex-wrap items-center gap-2">
-                  <H2 className="m-0 truncate border-0 p-0 text-xl font-semibold tracking-tight text-foreground">
-                    {displayName || PENDING_VALUE}
-                  </H2>
-                  {profile?.userRoles?.map((r) => (
-                    <Badge
-                      key={r.id}
-                      variant="secondary"
-                      className="px-2 py-0 text-[11px] font-medium"
-                    >
-                      {roleT(r.role)}
-                    </Badge>
-                  ))}
+          {/* Decorative accent band. */}
+          <Div className="h-16 bg-gradient-to-r from-primary/25 via-primary/10 to-transparent sm:h-20" />
+          <Div className="flex flex-col gap-5 px-5 pb-5 sm:px-6 sm:pb-6">
+            {profileLoadFailed && (
+              <Div className="-mt-2 flex items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm">
+                <Span className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  {t("widget.loadState.profileFailed")}
+                </Span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={(): void => {
+                    void refetch();
+                  }}
+                >
+                  {t("widget.loadState.retry")}
+                </Button>
+              </Div>
+            )}
+            <Div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <Div className="flex min-w-0 items-end gap-4">
+                <Div className="-mt-9 shrink-0 sm:-mt-12">
+                  <AvatarUploadButton
+                    avatarUrl={liveAvatarUrl ?? profile?.avatarUrl}
+                    initials={initials}
+                    label={t("widget.changePhoto")}
+                    onUploaded={handleAvatarUploaded}
+                  />
                 </Div>
-                <Div className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
-                  <Mail className="h-3.5 w-3.5 shrink-0" />
-                  <Span className="truncate">{profile?.email}</Span>
+                <Div className="flex min-w-0 flex-col gap-1 pb-0.5">
+                  <Div className="flex flex-wrap items-center gap-2">
+                    <H2 className="m-0 truncate border-0 p-0 text-xl font-semibold tracking-tight text-foreground">
+                      {displayName ||
+                        (profileLoadFailed
+                          ? t("widget.loadState.profileFailed")
+                          : PENDING_VALUE)}
+                    </H2>
+                    {profile?.userRoles?.map((r) => (
+                      <Badge
+                        key={r.id}
+                        variant="secondary"
+                        className="px-2 py-0 text-[11px] font-medium"
+                      >
+                        {roleT(r.role)}
+                      </Badge>
+                    ))}
+                  </Div>
+                  <Div className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+                    <Mail className="h-3.5 w-3.5 shrink-0" />
+                    <Span className="truncate">{profile?.email}</Span>
+                  </Div>
                 </Div>
               </Div>
+
+              {!editing && (
+                <Div className="flex shrink-0 flex-col-reverse gap-2 sm:flex-row sm:items-center">
+                  {profileHref && (
+                    <Link
+                      href={profileHref}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input px-3.5 text-sm font-medium text-foreground no-underline transition-colors hover:bg-accent sm:h-10"
+                    >
+                      <ExternalLink className={iconClass} />
+                      {t("widget.viewPublicProfile")}
+                    </Link>
+                  )}
+                  <Button
+                    type="button"
+                    className="h-11 gap-2 sm:h-10"
+                    onClick={handleStartEdit}
+                  >
+                    <Pencil className={iconClass} />
+                    {t("widget.editProfile")}
+                  </Button>
+                </Div>
+              )}
             </Div>
+            {/* identity row end */}
+
+            {!editing && (
+              <Div className="flex gap-2.5">
+                <StatTile
+                  icon={<CreditCard className="h-3.5 w-3.5" />}
+                  label={t("widget.stats.plan")}
+                  value={planLabel}
+                  badge={
+                    subscription?.status ? (
+                      <StatusPill
+                        status={subscriptionT(subscription.status)}
+                        variant={planActive ? "success" : "warning"}
+                      />
+                    ) : undefined
+                  }
+                />
+                <StatTile
+                  icon={<Zap className="h-3.5 w-3.5" />}
+                  label={t("widget.stats.credits")}
+                  value={creditsLabel}
+                />
+                <StatTile
+                  icon={<Sparkles className="h-3.5 w-3.5" />}
+                  label={t("widget.stats.member")}
+                  value={memberSinceLabel}
+                />
+              </Div>
+            )}
 
             {!editing && profile?.bio && <ProfileBio bio={profile.bio} />}
             {!editing && <ProfileSocialPills profile={profileData} />}
-
-            {!editing && (
-              <Div className="flex flex-col gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  className="h-11 gap-2 sm:h-10"
-                  onClick={handleStartEdit}
-                >
-                  <Pencil className={iconClass} />
-                  {t("widget.editProfile")}
-                </Button>
-                {profileHref && (
-                  <Link
-                    href={profileHref}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input px-4 text-sm font-medium text-foreground no-underline transition-colors hover:bg-accent sm:h-10"
-                  >
-                    <ExternalLink className={iconClass} />
-                    {t("widget.viewPublicProfile")}
-                  </Link>
-                )}
-              </Div>
-            )}
           </Div>
 
           <FormAlertWidget field={emptyField} />
@@ -858,108 +1278,209 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         </Form>
       </Div>
 
-      {/* ── SKILLS ── */}
-      {mySkills.length > 0 && (
-        <HubSection title={t("widget.skills.title")}>
-          <HubRow
-            icon={<Brain className={iconClass} />}
-            title={`${t("widget.skills.title")} (${mySkills.length.toString()})`}
-            subtitle={t("widget.skills.hubSubtitle", {
-              count: mySkills.length,
-            })}
-            onClick={(): void => {
-              navigate(skillsDef.GET, {});
-            }}
-          />
-        </HubSection>
+      {/* ── SKILLS + PREFERENCES (web/native surfaces only) ── */}
+      {(mySkills.length > 0 || showVisualSettings) && (
+        <Div className="grid gap-5 @2xl:grid-cols-2">
+          {mySkills.length > 0 && (
+            <HubSection
+              title={t("widget.skills.title")}
+              subtitle={t("widget.skills.hubSubtitle", {
+                count: mySkills.length,
+              })}
+            >
+              <HubRow
+                icon={<Brain className={iconClass} />}
+                title={`${t("widget.skills.title")} (${mySkills.length.toString()})`}
+                subtitle={t("widget.skills.hubSubtitle", {
+                  count: mySkills.length,
+                })}
+                onClick={(): void => {
+                  navigate(skillsDef.GET, {});
+                }}
+              />
+            </HubSection>
+          )}
+          {showVisualSettings && <AppearanceSection />}
+          {showVisualSettings && <ChatPrefsSection />}
+        </Div>
       )}
 
       {/* ── ACCOUNT ── */}
-      <HubSection title={t("widget.sections.account")}>
-        <HubRow
-          icon={<CreditCard className={iconClass} />}
-          title={
-            subscription?.plan
-              ? subscriptionT(subscription.plan)
-              : t("widget.sections.noSubscription")
-          }
-          subtitle={
-            subscription?.currentPeriodEnd
-              ? new Date(subscription.currentPeriodEnd).toLocaleDateString(
-                  locale,
-                )
-              : t("widget.sections.subscriptionHint")
-          }
-          badge={
-            subscription?.status ? (
+      <Div className="flex flex-col gap-2.5">
+        <Div className="flex flex-col gap-0.5 px-1">
+          <H3 className="m-0 border-0 p-0 text-[13px] font-semibold tracking-tight text-foreground">
+            {t("widget.sections.account")}
+          </H3>
+          <Span className="text-xs leading-snug text-muted-foreground">
+            {t("widget.sections.accountHint")}
+          </Span>
+        </Div>
+        <HubCard>
+          <RowLabel
+            label={t("widget.sections.billing")}
+            hint={t("widget.sections.billingHint")}
+          />
+          <HubRow
+            icon={<CreditCard className={iconClass} />}
+            title={
+              subscription?.plan
+                ? subscriptionT(subscription.plan)
+                : t("widget.sections.noSubscription")
+            }
+            subtitle={
+              subscription?.currentPeriodEnd
+                ? new Date(subscription.currentPeriodEnd).toLocaleDateString(
+                    locale,
+                  )
+                : t("widget.sections.subscriptionHint")
+            }
+            badge={
+              subscription?.status ? (
+                <StatusPill
+                  status={subscriptionT(subscription.status)}
+                  variant={
+                    subscription.status === SubscriptionStatus.ACTIVE
+                      ? "success"
+                      : "warning"
+                  }
+                />
+              ) : (
+                <Badge className="px-2 py-0.5 text-[11px]">
+                  {t("widget.sections.upgrade")}
+                </Badge>
+              )
+            }
+            onClick={(): void => {
+              router.push(
+                subscription
+                  ? `/${locale}/subscription/overview`
+                  : `/${locale}/subscription/buy`,
+              );
+            }}
+          />
+          <HubRow
+            icon={<Zap className={iconClass} />}
+            title={t("widget.sections.credits")}
+            subtitle={
+              credits
+                ? `${credits.total.toLocaleString(locale)} ${t("widget.sections.creditsAvailable")}`
+                : creditsError
+                  ? t("widget.loadState.creditsFailed")
+                  : t("widget.loadState.loading")
+            }
+            onClick={(): void => {
+              if (!credits && creditsError) {
+                void refetchCredits();
+                return;
+              }
+              router.push(`/${locale}/subscription/overview`);
+            }}
+          />
+          <HubRow
+            icon={<Building className={iconClass} />}
+            title={t("widget.sections.addresses")}
+            subtitle={
+              addresses.length > 0
+                ? t("widget.sections.addressCount", { count: addresses.length })
+                : t("widget.sections.noAddresses")
+            }
+            onClick={handleAddAddress}
+          />
+
+          <RowLabel
+            label={t("widget.sections.security")}
+            hint={t("widget.sections.securityHint")}
+          />
+          <HubRow
+            icon={<Lock className={iconClass} />}
+            title={t("widget.sections.password")}
+            subtitle={t("widget.sections.passwordHint")}
+            onClick={(): void => {
+              navigate(passwordDef.POST, {});
+            }}
+          />
+          <HubRow
+            icon={<Mail className={iconClass} />}
+            title={t("widget.sections.emailVerification")}
+            subtitle={
+              profile?.emailVerified
+                ? t("widget.sections.emailVerifiedHint")
+                : t("widget.sections.emailUnverifiedHint")
+            }
+            badge={
               <StatusPill
-                status={subscriptionT(subscription.status)}
-                variant={
-                  subscription.status === SubscriptionStatus.ACTIVE
-                    ? "success"
-                    : "warning"
+                status={
+                  profile?.emailVerified
+                    ? t("widget.sections.verified")
+                    : t("widget.sections.unverified")
                 }
+                variant={profile?.emailVerified ? "success" : "warning"}
               />
-            ) : (
-              <Badge className="px-2 py-0.5 text-[11px]">
-                {t("widget.sections.upgrade")}
-              </Badge>
-            )
-          }
-          onClick={(): void => {
-            router.push(
-              subscription
-                ? `/${locale}/subscription/overview`
-                : `/${locale}/subscription/buy`,
-            );
-          }}
-        />
+            }
+            onClick={(): void => {
+              navigate(verifyEmailDef.POST, {});
+            }}
+          />
+          <HubRow
+            icon={<Shield className={iconClass} />}
+            title={t("widget.sections.twoFactor")}
+            subtitle={t("widget.sections.twoFactorHint")}
+            badge={
+              <StatusPill
+                status={
+                  profile?.requireTwoFactor
+                    ? t("widget.sections.on")
+                    : t("widget.sections.off")
+                }
+                variant={profile?.requireTwoFactor ? "success" : "warning"}
+              />
+            }
+            onClick={(): void => {
+              navigate(twoFactorDef.POST, {});
+            }}
+          />
+          <HubRow
+            icon={<Monitor className={iconClass} />}
+            title={t("widget.sections.sessions")}
+            subtitle={t("widget.sections.sessionsHint")}
+            onClick={(): void => {
+              navigate(sessionsDef.GET, {});
+            }}
+          />
 
-        <HubRow
-          icon={<Zap className={iconClass} />}
-          title={t("widget.sections.credits")}
-          subtitle={
-            credits
-              ? `${credits.total.toLocaleString(locale)} ${t("widget.sections.creditsAvailable")}`
-              : PENDING_VALUE
-          }
-          onClick={(): void => {
-            router.push(`/${locale}/subscription/overview`);
-          }}
-        />
-
-        <HubRow
-          icon={<Building className={iconClass} />}
-          title={t("widget.sections.addresses")}
-          subtitle={
-            addresses.length > 0
-              ? t("widget.sections.addressCount", { count: addresses.length })
-              : t("widget.sections.noAddresses")
-          }
-          onClick={handleAddAddress}
-        />
-
-        <HubRow
-          icon={<Lock className={iconClass} />}
-          title={t("widget.sections.password")}
-          subtitle={t("widget.sections.passwordHint")}
-          onClick={(): void => {
-            navigate(passwordDef.POST, {});
-          }}
-        />
-
-        <HubRow
-          icon={<Monitor className={iconClass} />}
-          title={t("widget.sections.sessions")}
-          subtitle={t("widget.sections.sessionsHint")}
-          onClick={(): void => {
-            navigate(sessionsDef.GET, {});
-          }}
-        />
-      </HubSection>
+          <RowLabel
+            label={t("widget.sections.data")}
+            hint={t("widget.sections.dataHint")}
+          />
+          <HubRow
+            icon={<Key className={iconClass} />}
+            title={t("widget.sections.apiKeys")}
+            subtitle={t("widget.sections.apiKeysHint", {
+              modelCount: getAvailableChatModelCount(
+                !user.isPublic && user.roles.includes(UserRole.ADMIN),
+                availability,
+              ),
+            })}
+            onClick={(): void => {
+              navigate(apiKeysDef.GET, {});
+            }}
+          />
+          <HubRow
+            icon={<Download className={iconClass} />}
+            title={t("widget.sections.exportData")}
+            subtitle={t("widget.sections.exportDataHint")}
+            onClick={(): void => {
+              navigate(exportDef.GET, {});
+            }}
+          />
+        </HubCard>
+      </Div>
 
       {/* ── CREATOR ── */}
-      <HubSection title={t("widget.sections.creator")}>
+      <HubSection
+        title={t("widget.sections.creator")}
+        subtitle={t("widget.sections.creatorHint")}
+      >
         <HubRow
           icon={<Mail className={iconClass} />}
           title={t("widget.emailCard.title")}
@@ -968,7 +1489,6 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
             navigate(configDef.GET, {});
           }}
         />
-
         <HubRow
           icon={<TrendingUp className={iconClass} />}
           title={t("widget.sections.referral")}
@@ -980,28 +1500,33 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
       </HubSection>
 
       {/* ── SIGN OUT ── */}
-      <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+      <HubCard>
         <HubRow
           icon={<LogOut className={iconClass} />}
           title={t("widget.nav.logout")}
           subtitle={t("widget.nav.logoutHint")}
           onClick={handleLogout}
         />
-      </Div>
+      </HubCard>
 
       {/* ── DANGER ZONE ── */}
-      <Div className="flex flex-col gap-2">
-        <H3 className="px-1 text-xs font-semibold uppercase tracking-wider text-destructive">
+      <Div className="flex flex-col gap-2.5">
+        <H3 className="m-0 border-0 px-1 pb-0 pt-0 text-[13px] font-semibold tracking-tight text-destructive">
           {t("widget.deleteAccount.dangerZone")}
         </H3>
-        <Div className="flex flex-col gap-4 rounded-xl border border-destructive/30 bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <Div className="flex flex-col gap-0.5">
-            <Span className="text-sm font-medium text-foreground">
-              {t("widget.deleteAccount.button")}
+        <Div className="flex flex-col gap-4 rounded-2xl border border-destructive/30 bg-destructive/[0.03] p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <Div className="flex items-start gap-3">
+            <Span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive sm:flex">
+              <AlertTriangle className="h-4 w-4" />
             </Span>
-            <Span className="text-xs leading-snug text-muted-foreground">
-              {t("widget.deleteAccount.dangerDescription")}
-            </Span>
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm font-medium text-foreground">
+                {t("widget.deleteAccount.button")}
+              </Span>
+              <Span className="text-xs leading-snug text-muted-foreground">
+                {t("widget.deleteAccount.dangerDescription")}
+              </Span>
+            </Div>
           </Div>
           <Button
             type="button"

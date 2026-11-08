@@ -201,7 +201,8 @@ export const translations: typeof enTranslations = {
     messages: {
       successMessage: "Opcje logowania pobrane pomyślnie",
       passwordAuthDescription: "Zaloguj się za pomocą adresu e-mail i hasła",
-      socialAuthDescription: "Zaloguj się za pomocą kont społecznościowych",
+      socialAuthDescription:
+        "Logowanie przez media społecznościowe jeszcze nie działa. Użyj e-maila i hasła.",
       continueWithProvider: "Kontynuuj z {{provider}}",
       twoFactorRequired: "Zwiększone bezpieczeństwo: wymagane 2FA",
       standardSecurity: "Standardowe wymagania bezpieczeństwa",
@@ -235,9 +236,28 @@ export const translations: typeof enTranslations = {
         minLength: "Hasło musi mieć co najmniej 8 znaków",
       },
     },
+    twoFactorCode: {
+      label: "Kod uwierzytelniający",
+      description: "Użyj kodu z aplikacji lub kodu odzyskiwania.",
+      placeholder: "6-cyfrowy kod",
+    },
     rememberMe: {
       label: "Zapamiętaj mnie",
     },
+  },
+  twoFactorStep: {
+    title: "Drugi krok",
+    helper: "Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej.",
+    recoveryHelper:
+      "Wpisz jeden ze swoich kodów odzyskiwania. Każdy działa raz.",
+    codeLabel: "Kod uwierzytelniający",
+    recoveryLabel: "Kod odzyskiwania",
+    recoveryPlaceholder: "XXXXX-XXXXX",
+    useRecovery: "Użyj kodu odzyskiwania",
+    useApp: "Użyj aplikacji uwierzytelniającej",
+    verify: "Zweryfikuj",
+    verifying: "Weryfikuję...",
+    back: "Wstecz",
   },
   groups: {
     credentials: {
@@ -297,6 +317,7 @@ export const translations: typeof enTranslations = {
       "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną.",
     invalid_credentials: "Nieprawidłowy e-mail lub hasło",
     two_factor_required: "Wymagana dwuskładnikowa autoryzacja",
+    invalid_two_factor_code: "Nieprawidłowy kod uwierzytelniający",
     auth_error: "Logowanie dla {{email}} nie powiodło się: {{error}}",
     user_not_found: "Nie znaleziono użytkownika {{userId}}",
     session_creation_failed:

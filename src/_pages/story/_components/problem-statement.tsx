@@ -18,9 +18,9 @@ export function ProblemStatement({
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
-    <Div className="container relative px-4 md:px-6 py-24 md:py-32">
+    <Div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 md:py-32">
       <MotionDiv
-        className="mx-auto max-w-3xl"
+        className="max-w-3xl"
         initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}

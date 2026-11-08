@@ -36,6 +36,7 @@ import { CLI_BYPASS_USER_ID } from "../../platforms/cli/auth/cli-bypass-user";
 import { Platform } from "../../platforms/platforms";
 import { cronTaskExecutions, cronTasks } from "../../tasks/cron/db";
 import type { CronTaskStatusDB } from "../../tasks/enum";
+import { RunningTaskRegistry } from "../../tasks/watchdog/registry";
 import {
   CronTaskPriority,
   CronTaskStatus,
@@ -192,6 +193,8 @@ export class LocalExecutionAsync {
         onEscalatedTaskCancel: undefined,
         cancelPendingStreamTimer: undefined,
         abortSignal: goroutineAbortController.signal,
+        // Budget guard + watchdog attribute every billed step to this task.
+        cronTaskId: taskId,
         escalateToTask: wrappedEscalateToTask,
         // Per-dispatch identity/hook — must NOT leak into tools this goroutine
         // itself dispatches (a nested async dispatch would reuse the callId as
@@ -204,6 +207,9 @@ export class LocalExecutionAsync {
       let finalStatus: (typeof CronTaskStatusDB)[number] =
         CronTaskStatus.FAILED;
       let errorMessage: string | null = null;
+
+      // The task watchdog / an admin cancels a runaway goroutine through this.
+      RunningTaskRegistry.register(taskId, goroutineAbortController);
 
       try {
         const executed = await LocalExecutionAsync.executeInGoroutine({
@@ -252,6 +258,17 @@ export class LocalExecutionAsync {
           error: errorMessage,
         });
       } finally {
+        const cancelReason = RunningTaskRegistry.unregister(
+          taskId,
+          goroutineAbortController,
+        );
+        if (cancelReason !== null) {
+          // Stopped on purpose: report it as the failure it is so the parked
+          // revival / await-task waiter still gets a terminal result.
+          finalStatus = CronTaskStatus.FAILED;
+          errorMessage = cancelReason;
+          finalResult = TaskCompletion.failedOutputFromMessage(cancelReason);
+        }
         if (selfEscalated) {
           logger.debug(
             "[RouteExecute] Tool self-escalated - skipping completion handling",
@@ -906,6 +923,7 @@ export class LocalExecutionAsync {
         enabled: false,
         runOnce: true,
         lastExecutionStatus: CronTaskStatus.RUNNING,
+        runStartedAt: new Date(),
         taskInput: input ?? {},
         outputMode: TaskOutputMode.STORE_ONLY,
         notificationTargets: [],
@@ -917,6 +935,7 @@ export class LocalExecutionAsync {
         set: {
           routeId: toolName,
           lastExecutionStatus: CronTaskStatus.RUNNING,
+          runStartedAt: new Date(),
           enabled: false,
           taskInput: input ?? {},
           userId,

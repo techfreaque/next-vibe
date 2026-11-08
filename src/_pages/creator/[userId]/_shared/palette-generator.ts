@@ -226,6 +226,8 @@ export function buildScopedPaletteStyle(
   for (const key of CSS_VAR_KEYS) {
     style[`--${key}`] = mode[key];
   }
+  // Button fills follow the generated primary (globals.css --primary-surface)
+  style["--primary-surface"] = mode.primary;
   // Sidebar vars to match
   style["--sidebar-primary"] = mode.primary;
   style["--sidebar-primary-foreground"] = mode["primary-foreground"];

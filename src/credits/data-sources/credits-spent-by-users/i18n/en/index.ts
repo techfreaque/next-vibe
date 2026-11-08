@@ -1,10 +1,10 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Spent by Users",
-    title: "Credits Spent by Users",
+    titleShort: "Users: All Spend",
+    title: "All Spend by Users (paid + free)",
     description:
-      "Sum of usage transactions from user wallets per resolution bucket",
+      "Credits spent by signed-in user wallets, paid and free combined. NOT the cap axis - see Free-Tier Spend.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },
@@ -13,7 +13,7 @@ export const translations = {
         description: "Extra bars before range start",
       },
       result: {
-        label: "Credits Spent by Users",
+        label: "All Spend by Users",
         description: "Output time series",
       },
       meta: { label: "Meta", description: "Node execution metadata" },

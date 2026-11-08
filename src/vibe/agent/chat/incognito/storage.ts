@@ -10,7 +10,11 @@ import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { storage } from "next-vibe/ui/lib/storage";
 
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import { ThreadStatus, ThreadStreamingState } from "../enum";
+import {
+  ThreadModerationStatus,
+  ThreadStatus,
+  ThreadStreamingState,
+} from "../enum";
 
 /**
  * Storage keys
@@ -359,6 +363,8 @@ export async function createIncognitoThread(
     rolesModerate: null,
     rolesAdmin: null,
     published: false,
+    moderationStatus: ThreadModerationStatus.VISIBLE,
+    reportCount: 0,
     streamingState: ThreadStreamingState.IDLE,
     // Incognito threads never claim a streaming run (viewer-local, no revival).
     streamingRunId: null,

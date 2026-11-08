@@ -31,6 +31,7 @@ export const translations: typeof enTranslations = {
       label: "Stimme",
       description: "Stimmmodell für Sprachsynthese",
     },
+    download: "Herunterladen",
     response: {
       title: "Audio-Ergebnis",
       description: "Die generierte Sprachaudio",
@@ -126,6 +127,30 @@ export const translations: typeof enTranslations = {
       elevenlabsJosh: "ElevenLabs Josh",
       elevenlabsBella: "ElevenLabs Bella",
       elevenlabsAdam: "ElevenLabs Adam",
+      kokoroBella:
+        "Kokoro Bella - Open-Weight-Modell, warme amerikanische Frauenstimme. Kein Inhaltsfilter.",
+      kokoroSarah:
+        "Kokoro Sarah - Open-Weight-Modell, klare amerikanische Frauenstimme. Kein Inhaltsfilter.",
+      kokoroNicole:
+        "Kokoro Nicole - Open-Weight-Modell, weiche, zurückhaltende Frauenstimme. Kein Inhaltsfilter.",
+      kokoroAdam:
+        "Kokoro Adam - Open-Weight-Modell, ruhige amerikanische Männerstimme. Kein Inhaltsfilter.",
+      kokoroMichael:
+        "Kokoro Michael - Open-Weight-Modell, selbstbewusste amerikanische Männerstimme. Kein Inhaltsfilter.",
+      kokoroEmma:
+        "Kokoro Emma - Open-Weight-Modell, britische Frauenstimme. Kein Inhaltsfilter.",
+      kokoroGeorge:
+        "Kokoro George - Open-Weight-Modell, britische Männerstimme. Kein Inhaltsfilter.",
+      inworldAshley:
+        "Inworld Ashley - Schnelle, günstige Frauenstimme mit lebendigem Vortrag.",
+      inworldCraig:
+        "Inworld Craig - Schnelle, günstige britische Männerstimme.",
+      xaiEve:
+        "xAI Eve - Ausdrucksstarke Frauenstimme mit Emotionssteuerung im Text.",
+      geminiZephyr:
+        "Gemini Zephyr - Helle Frauenstimme, über 100 Sprachen, steuerbarer Vortrag.",
+      geminiPuck:
+        "Gemini Puck - Lebhafte Männerstimme, über 100 Sprachen, steuerbarer Vortrag.",
     },
     names: modelTranslations.names,
   },

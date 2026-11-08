@@ -186,6 +186,33 @@ export function getCachedMessages(
 }
 
 /**
+ * Undo an optimistic send that the server refused before it started (e.g. a
+ * 402 credit refusal shown outside the thread): drops optimistic placeholders
+ * and the unsent user message at the leaf, inserting nothing.
+ */
+export function discardOptimisticTurn(
+  threadId: string,
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): void {
+  const msgs = getCachedMessages(threadId, rootFolderId, logger);
+  const leafMsg = [...msgs].toSorted(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )[0];
+  for (const m of msgs) {
+    if (m.metadata?.isOptimistic) {
+      removeMessage(threadId, rootFolderId, logger, m.id);
+    }
+  }
+  if (
+    leafMsg?.role === ChatMessageRole.USER &&
+    !leafMsg.metadata?.isOptimistic
+  ) {
+    removeMessage(threadId, rootFolderId, logger, leafMsg.id);
+  }
+}
+
+/**
  * Insert an error message at the current branch leaf.
  * De-dupes: if the leaf is already an ERROR message, patches it in place.
  * Reverts optimistic user message and removes optimistic assistant placeholders.

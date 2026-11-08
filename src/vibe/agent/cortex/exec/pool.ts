@@ -23,6 +23,8 @@ interface SessionMeta {
   connectionSlug: string;
   /** UUID from sshConnections or synthetic ID for remote connections */
   connectionId: string;
+  /** User who opened the session — sessions are never shared across users */
+  ownerUserId: string;
   /** Optional user-provided label for this terminal */
   name: string;
   /** Timestamp of last command execution */
@@ -96,25 +98,54 @@ export function drainSessionPool(): void {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Get all active sessions for a given connection slug */
-export function getSessionsForConnection(slug: string): SessionEntry[] {
+/** Get all active sessions owned by a user (optionally for one connection slug) */
+export function getSessionsForConnection(
+  slug: string | null,
+  ownerUserId: string,
+): SessionEntry[] {
   const result: SessionEntry[] = [];
   for (const session of sessionPool.values()) {
-    if (session.connectionSlug === slug) {
+    if (
+      session.ownerUserId === ownerUserId &&
+      (slug === null || session.connectionSlug === slug)
+    ) {
       result.push(session);
     }
   }
   return result;
 }
 
-/** Find the default (first) session for a connection, if any */
-export function getDefaultSession(slug: string): SessionEntry | undefined {
+/** Find the default (first) session for a user's connection, if any */
+export function getDefaultSession(
+  connectionId: string,
+  ownerUserId: string,
+): SessionEntry | undefined {
   for (const session of sessionPool.values()) {
-    if (session.connectionSlug === slug) {
+    if (
+      session.connectionId === connectionId &&
+      session.ownerUserId === ownerUserId
+    ) {
       return session;
     }
   }
   return undefined;
+}
+
+/** Get a session by id only if it belongs to the user + connection */
+export function getOwnedSession(
+  sessionId: string,
+  connectionId: string,
+  ownerUserId: string,
+): SessionEntry | undefined {
+  const session = sessionPool.get(sessionId);
+  if (
+    !session ||
+    session.ownerUserId !== ownerUserId ||
+    session.connectionId !== connectionId
+  ) {
+    return undefined;
+  }
+  return session;
 }
 
 /** Update the tracked CWD for a session */

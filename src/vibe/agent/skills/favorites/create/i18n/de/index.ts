@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     description: "Neue Favoriten-Konfiguration erstellen",
     container: {
       title: "Neuer Favorit",
-      description: "Charakterkonfiguration als Favorit speichern",
+      description: "Skill-Konfiguration als Favorit speichern",
     },
     backButton: {
       label: "Zurück zu Favoriten",
@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       loadingText: "Anwenden...",
     },
     skillId: {
-      label: "Charakter",
+      label: "Skill",
       description:
         'Skill-ID im kombinierten Format: „skillSlug" für die Standardvariante, „skillSlug__variantId" für eine bestimmte Variante (z.B. „thea__brilliant"). Skill-Liste abfragen, um verfügbare IDs zu sehen.',
     },
@@ -45,47 +45,47 @@ export const translations: typeof enTranslations = {
     },
     chatModel: {
       label: "Chat-Modell",
-      placeholder: "Von Fertigkeit übernehmen",
+      placeholder: "Wie beim Skill",
     },
     voice: {
       label: "Stimme",
       description: "Text-to-Speech-Stimmpräferenz",
-      placeholder: "Von Skill erben",
+      placeholder: "Wie beim Skill",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell zur Spracherkennung",
-      placeholder: "Vom Skill erben",
+      placeholder: "Wie beim Skill",
     },
     imageVisionModel: {
       label: "Bild-Vision-Modell",
       description: "Modell für die Bildanalyse",
-      placeholder: "Vom Skill erben",
+      placeholder: "Wie beim Skill",
     },
     videoVisionModel: {
       label: "Video-Vision-Modell",
       description: "Modell für die Videoanalyse",
-      placeholder: "Vom Skill erben",
+      placeholder: "Wie beim Skill",
     },
     audioVisionModel: {
       label: "Audio-Vision-Modell",
       description: "Modell für die Audioanalyse",
-      placeholder: "Vom Skill erben",
+      placeholder: "Wie beim Skill",
     },
     imageGenModel: {
       label: "Bildgenerierungsmodell",
       description: "Modell zur Bilderstellung",
-      placeholder: "Von Skill erben",
+      placeholder: "Wie beim Skill",
     },
     musicGenModel: {
       label: "Musikgenerierungsmodell",
       description: "Modell zur Musikerstellung",
-      placeholder: "Von Skill erben",
+      placeholder: "Wie beim Skill",
     },
     videoGenModel: {
       label: "Video-Generierungsmodell",
       description: "Modell zur Videoerstellung",
-      placeholder: "Von Skill erben",
+      placeholder: "Wie beim Skill",
     },
     mode: {
       label: "Auswahlmodus",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Auswahltyp",
-      characterBased: "Basierend auf Charakter",
+      characterBased: "Basierend auf Skill",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
     },
@@ -169,23 +169,22 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Benutzerdefiniertes Symbol",
-      description:
-        "Symbol des Charakters für diesen Favoriten-Slot überschreiben",
+      description: "Symbol des Skills für diesen Favoriten-Slot überschreiben",
     },
     compactTrigger: {
       label: "Komprimierungs-Schwellenwert (Token)",
       description:
-        "Token-Anzahl für automatische Gesprächskomprimierung. Null = Charakter oder globaler Standard.",
+        "Token-Anzahl für automatische Gesprächskomprimierung. Null = Skill oder globaler Standard.",
     },
     availableTools: {
       label: "Erlaubte Tools",
       description:
-        "Tools für diesen Slot. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
+        "Tools für diesen Slot. Jeder Eintrag benötigt eine toolId. Null = Skill oder globale Einstellungen.",
     },
     pinnedTools: {
       label: "Angeheftete Tools",
       description:
-        "Angeheftete Toolbar-Tools für diesen Slot. Null = Charakter oder globale Einstellungen.",
+        "Angeheftete Toolbar-Tools für diesen Slot. Null = Skill oder globale Einstellungen.",
     },
     response: {
       id: {
@@ -238,10 +237,10 @@ export const translations: typeof enTranslations = {
       description: "Favorit erfolgreich erstellt",
     },
     changeSkill: {
-      label: "Charakter ändern",
+      label: "Skill ändern",
     },
     modifySkill: {
-      label: "Charakter bearbeiten",
+      label: "Skill bearbeiten",
     },
     character: {
       name: "Name",

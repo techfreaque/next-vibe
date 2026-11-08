@@ -15,6 +15,7 @@ import type { SubscriptionPlanValue } from "@/subscription/enum";
 import { SubscriptionPlan } from "@/subscription/enum";
 
 import type { PaymentInterval } from "../payment/providers/types";
+import { FREE_CREDIT_ALLOWANCE } from "./constants";
 import type { ProductsTranslationKey } from "./i18n";
 
 /**
@@ -214,7 +215,17 @@ export enum ProductIds {
   FREE_TIER = "free_tier",
   SUBSCRIPTION = "subscription",
   CREDIT_PACK = "credit_pack",
+  CREDIT_PACK_LARGE = "credit_pack_large",
 }
+
+/**
+ * Credit pack products a user can buy (one-time, no subscription required).
+ * Ordered small to large.
+ */
+export const CREDIT_PACK_PRODUCT_IDS = [
+  ProductIds.CREDIT_PACK,
+  ProductIds.CREDIT_PACK_LARGE,
+] as const;
 
 /**
  * Internal product definitions with pricing for all countries
@@ -229,7 +240,7 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
       US: { price: 0, currency: "USD" as const },
       GLOBAL: { price: 0, currency: "USD" as const },
     },
-    credits: 20,
+    credits: FREE_CREDIT_ALLOWANCE.guest,
     isSubscription: true,
     allowedIntervals: ["month" as const],
     status: "active" as const,
@@ -270,6 +281,27 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
       GLOBAL: { price: 5, currency: "USD" as const },
     },
     credits: 500,
+    isSubscription: false,
+    allowedIntervals: ["one_time" as const],
+    status: "active" as const,
+  },
+  // Bigger pack, better rate: $20 / 2500 credits ($0.008 per credit vs $0.01).
+  credit_pack_large: {
+    name: "creditPackLarge.name",
+    description: "creditPackLarge.description",
+    priceByCountry: {
+      DE: { price: 20, currency: "EUR" as const },
+      PL: { price: 160, currency: "PLN" as const },
+      US: { price: 20, currency: "USD" as const },
+      GLOBAL: { price: 20, currency: "USD" as const },
+    },
+    oneTimePriceByCountry: {
+      DE: { price: 20, currency: "EUR" as const },
+      PL: { price: 160, currency: "PLN" as const },
+      US: { price: 20, currency: "USD" as const },
+      GLOBAL: { price: 20, currency: "USD" as const },
+    },
+    credits: 2500,
     isSubscription: false,
     allowedIntervals: ["one_time" as const],
     status: "active" as const,
@@ -378,7 +410,16 @@ export class ProductsRepositoryImpl implements ProductsRepository {
         ProductIds.SUBSCRIPTION,
         locale,
       ),
-      [ProductIds.CREDIT_PACK]: this.getProduct(ProductIds.CREDIT_PACK, locale),
+      [ProductIds.CREDIT_PACK]: this.getProduct(
+        ProductIds.CREDIT_PACK,
+        locale,
+        "one_time",
+      ),
+      [ProductIds.CREDIT_PACK_LARGE]: this.getProduct(
+        ProductIds.CREDIT_PACK_LARGE,
+        locale,
+        "one_time",
+      ),
     };
   }
 
@@ -420,7 +461,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   /**
    * Get a summary of all products in a single sentence
    * Single source of truth for product summary text
-   * Example: "We offer Free (20 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
+   * Example: "We offer Free (20-70 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
    */
   getProductsSummary(
     locale: CountryLanguage,
@@ -431,6 +472,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const freeTier = productDefinitions[ProductIds.FREE_TIER];
     const subscription = productDefinitions[ProductIds.SUBSCRIPTION];
     const creditPack = productDefinitions[ProductIds.CREDIT_PACK];
+    const largePack = productDefinitions[ProductIds.CREDIT_PACK_LARGE];
 
     const subPrice = subscription.priceByCountry[country].price;
     const subCurrency = subscription.priceByCountry[country].currency;
@@ -441,6 +483,10 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const packPrice = packPriceData.price;
     const packCurrency = packPriceData.currency;
 
+    const largePackPriceData = (
+      largePack.oneTimePriceByCountry ?? largePack.priceByCountry
+    )[country];
+
     const subCurrencySymbol =
       subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
     const packCurrencySymbol =
@@ -448,9 +494,14 @@ export class ProductsRepositoryImpl implements ProductsRepository {
 
     return t("summary", {
       freeCredits: freeTier.credits,
+      freeCreditsSignedIn: FREE_CREDIT_ALLOWANCE.signedIn,
+      freeCreditsNewsletterBonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       packCurrency: packCurrencySymbol,
       packPrice: packPrice,
       packCredits: creditPack.credits,
+      largePackPrice: largePackPriceData.price,
+      largePackCredits: largePack.credits,
+      subCredits: subscription.credits,
       subCurrency: subCurrencySymbol,
       subPrice: subPrice,
     });
@@ -478,21 +529,36 @@ export function getPricingParams(
   const sub = productDefinitions[ProductIds.SUBSCRIPTION];
   const pack = productDefinitions[ProductIds.CREDIT_PACK];
 
+  const largePack = productDefinitions[ProductIds.CREDIT_PACK_LARGE];
   const subPriceData = sub.priceByCountry[country];
   // Packs are one-time purchases: checkout charges oneTimePriceByCountry
   const packPriceData = (pack.oneTimePriceByCountry ?? pack.priceByCountry)[
     country
   ];
 
+  const largePackPriceData = (
+    largePack.oneTimePriceByCountry ?? largePack.priceByCountry
+  )[country];
   const subSymbol = currencySymbol(subPriceData.currency);
   const packSymbol = currencySymbol(packPriceData.currency);
 
   return {
     freeCredits: String(free.credits),
+    freeCreditsGuest: String(FREE_CREDIT_ALLOWANCE.guest),
+    freeCreditsSignedIn: String(FREE_CREDIT_ALLOWANCE.signedIn),
+    freeCreditsNewsletterBonus: String(FREE_CREDIT_ALLOWANCE.newsletterBonus),
+    freeCreditsGuestNewsletter: String(
+      FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.newsletterBonus,
+    ),
+    freeCreditsMax: String(
+      FREE_CREDIT_ALLOWANCE.signedIn + FREE_CREDIT_ALLOWANCE.newsletterBonus,
+    ),
     subscriptionCredits: String(sub.credits),
     packCredits: String(pack.credits),
     subscriptionPrice: `${subSymbol}${subPriceData.price}`,
     packPrice: `${packSymbol}${packPriceData.price}`,
+    largePackCredits: String(largePack.credits),
+    largePackPrice: `${currencySymbol(largePackPriceData.currency)}${largePackPriceData.price}`,
   };
 }
 

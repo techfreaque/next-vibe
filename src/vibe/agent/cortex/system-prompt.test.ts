@@ -66,6 +66,7 @@ function makeData(
     taskCount: 0,
     languageName: undefined,
     localeRoots: DEFAULT_LOCALE_ROOTS,
+    machineAccess: false,
     ...partial,
   };
 }
@@ -518,3 +519,18 @@ describe("cortexFragment.build - structure and content", () => {
     expect(out).toContain("/documents/ (working files)");
   });
 });
+
+describe("machine access line", () => {
+  it("never advertises /ssh or cortex-exec without machine access", () => {
+    const out = buildFragment({ machineAccess: false });
+    expect(out).not.toContain("/ssh/");
+    expect(out).not.toContain("SSH/Machines");
+  });
+
+  it("documents /ssh + exec for admins", () => {
+    const out = buildFragment({ machineAccess: true });
+    expect(out).toContain("/ssh/");
+    expect(out).toContain("SSH/Machines");
+  });
+});
+

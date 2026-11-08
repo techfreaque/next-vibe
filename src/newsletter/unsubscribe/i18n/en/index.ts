@@ -129,6 +129,42 @@ export const translations = {
       description: "You have been unsubscribed from our newsletter",
     },
   },
+  oneClick: {
+    tag: "One-Click Unsubscribe",
+    post: {
+      title: "One-Click Unsubscribe",
+      titleShort: "Unsubscribe",
+      description:
+        "Unsubscribe via the signed one-click link in an email header (RFC 8058)",
+      container: {
+        title: "One-Click Unsubscribe",
+        description:
+          "Called by mailbox providers. The signed token authorizes the unsubscribe.",
+      },
+      token: {
+        label: "Token",
+        description: "Signed unsubscribe token from the email",
+      },
+      errors: {
+        invalidToken: {
+          title: "Invalid link",
+          description: "This unsubscribe link is invalid.",
+        },
+        server: {
+          title: "Server Error",
+          description: "Unsubscribe failed. Try again.",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid token format",
+        },
+      },
+      success: {
+        title: "Unsubscribed",
+        description: "You are off the list.",
+      },
+    },
+  },
   sync: {
     failed: "Newsletter unsubscribe sync failed",
     error: "Newsletter unsubscribe sync error",

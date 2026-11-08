@@ -1,6 +1,7 @@
 "use client";
 
 import aiStreamDefinition from "next-vibe/agent/ai-stream/stream/definition";
+import { useQueryPrefill } from "next-vibe/agent/ai-stream/stream/hooks/use-query-prefill";
 import { ChatBootProvider } from "next-vibe/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -29,6 +30,17 @@ export function ThreadsPageClient({
   initialFolderContentsData,
   initialSubFolderContentsData,
 }: ThreadsPathPageData & { user: JwtPayloadType }): JSX.Element {
+  // ?q=<text>&model=<id> pre-fill the composer / pick the model once
+  // (model pages, shared prompt links)
+  useQueryPrefill({
+    activeThreadId: initialThreadId,
+    rootFolderId: initialRootFolderId,
+    subFolderId: initialSubFolderId,
+    user,
+    locale,
+    initialSettings: initialSettingsData,
+  });
+
   return (
     <ChatNavigationProvider
       activeThreadId={initialThreadId}

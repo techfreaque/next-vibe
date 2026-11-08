@@ -41,7 +41,11 @@ import {
 import { syncUploadEmbedding } from "./db-writer/embedding-sync";
 import * as mediaWrites from "./db-writer/media";
 import * as notificationWrites from "./db-writer/notifications";
-import type { EmitThreadTitleFn, WriterDeps } from "./db-writer/shared";
+import type {
+  DbWriterState,
+  EmitThreadTitleFn,
+  WriterDeps,
+} from "./db-writer/shared";
 import * as textWrites from "./db-writer/text";
 import { ThrottleEngine } from "./db-writer/throttle-engine";
 import * as toolWrites from "./db-writer/tools";
@@ -64,8 +68,18 @@ export class MessageDbWriter {
   /** In-flight embed of the just-written assistant message (fired at content-done,
    *  awaited by the next step's cortex refresh). See DbWriterState. */
   assistantEmbedPromise: Promise<void> | null = null;
-  /** Message IDs successfully committed to DB — guards FK references in emitToolCall. */
-  readonly committedMessageIds: Set<string> = new Set();
+  /** DB writes dropped because the thread was deleted mid-stream. */
+  threadGoneWrites = 0;
+  /** Message rows this stream wrote successfully (see DbWriterState). */
+  landedWrites = 0;
+  /** Stops the owning stream once its thread row is gone (see DbWriterState). */
+  onThreadGone: (() => void) | null = null;
+  /** A deduction failed after retry (see DbWriterState). */
+  billingFailed = false;
+  /** Stops the owning stream on billing failure (see DbWriterState). */
+  onBillingFailed: (() => void) | null = null;
+  /** Stops the owning stream when the task guard trips (see DbWriterState). */
+  onTaskGuardTripped: DbWriterState["onTaskGuardTripped"] = null;
   /** Stream context of the owning stream (its threadId) - binds embedding-sync
    *  API calls so they record/replay. Passed at construction. */
   toolExecutionContext: ToolExecutionContext;

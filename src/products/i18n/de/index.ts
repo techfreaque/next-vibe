@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits, erfordert Abonnement) an.",
+    "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat als Gast, {{freeCreditsSignedIn}} angemeldet, +{{freeCreditsNewsletterBonus}} mit Newsletter), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits oder {{packCurrency}}{{largePackPrice}} für {{largePackCredits}}), die jeder ohne Abonnement kaufen kann, an.",
 
   // Free tier product
   free: {
@@ -44,11 +44,27 @@ export const translations: typeof enTranslations = {
   // Credit pack product
   creditPack: {
     name: "Credit-Paket",
-    description: "Zusätzliche Credits für Abonnenten - laufen nie ab",
+    description: "Zahlen, was du nutzt. Kein Abo. Credits laufen nie ab.",
     longDescription:
-      "Kaufen Sie zusätzliche Credit-Pakete, wenn Sie mehr als Ihre monatlichen {{subCredits}} Credits benötigen. Erfordert aktives Abonnement.",
+      "Kaufen Sie Credits, wenn Sie sie brauchen. Kein Abonnement nötig. Pakete lassen sich zu einem Plan addieren oder allein nutzen.",
     features: {
       credits: "{{packCredits}} Credits pro Paket",
+      allModels: "Alle {{modelCount}} KI-Modelle enthalten",
+      allFeatures: "Alle Funktionen enthalten",
+      multiple: "Mehrere Pakete kaufen",
+      permanent: "Credits laufen nie ab",
+    },
+  },
+
+  // Großes Credit-Paket
+  creditPackLarge: {
+    name: "Großes Credit-Paket",
+    description:
+      "{{largePackCredits}} Credits zum besseren Preis. Kein Abo. Laufen nie ab.",
+    longDescription:
+      "Das Vorratspaket. {{largePackCredits}} Credits zu einem niedrigeren Preis pro Credit. Kein Abonnement nötig.",
+    features: {
+      credits: "{{largePackCredits}} Credits pro Paket",
       allModels: "Alle {{modelCount}} KI-Modelle enthalten",
       allFeatures: "Alle Funktionen enthalten",
       multiple: "Mehrere Pakete kaufen",

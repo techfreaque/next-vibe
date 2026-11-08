@@ -22,6 +22,7 @@ import { CREDITS_BALANCE_TOTAL_ALIAS } from "./data-sources/credits-balance-tota
 import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
 import { CREDITS_EXPIRED_ALIAS } from "./data-sources/credits-expired/constants";
 import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
+import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-spend/constants";
 import { CREDITS_FREE_POOL_UTILIZATION_ALIAS } from "./data-sources/credits-free-pool-utilization/constants";
 import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
@@ -267,40 +268,47 @@ const creditRevenueHealthConfig: GraphConfig = {
 
 const creditTierUsageConfig: GraphConfig = {
   nodes: {
-    spent_by_users: {
+    all_spend_users: {
       endpointPath: CREDITS_SPENT_BY_USERS_ALIAS,
       pane: 0,
       color: BLUE,
     },
-    spent_by_leads: {
+    all_spend_leads: {
       endpointPath: CREDITS_SPENT_BY_LEADS_ALIAS,
       pane: 0,
       color: ORANGE,
     },
-    spent_total: {
+    all_spend_total: {
       endpointPath: CREDITS_SPENT_TOTAL_ALIAS,
       pane: 0,
       color: GREEN,
     },
-    free_grants: {
+    free_grants_issued: {
       endpointPath: CREDITS_FREE_GRANTS_ALIAS,
       pane: 0,
       color: CYAN,
     },
-    free_pool_utilization: {
-      endpointPath: CREDITS_FREE_POOL_UTILIZATION_ALIAS,
+    // Pane 1 = free-tier only (same axis as the public daily cap, local-midnight days)
+    free_tier_spend_cap_axis: {
+      endpointPath: CREDITS_FREE_TIER_SPEND_ALIAS,
       pane: 1,
+      color: RED,
+    },
+    // Pane 2 = free allowance used month-to-date (0..1)
+    free_allowance_used_mtd: {
+      endpointPath: CREDITS_FREE_POOL_UTILIZATION_ALIAS,
+      pane: 2,
       color: AMBER,
     },
 
     user_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
+      pane: 3,
       color: BLUE,
     },
     lead_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
+      pane: 3,
       color: ORANGE,
     },
 
@@ -337,28 +345,29 @@ const creditTierUsageConfig: GraphConfig = {
   },
 
   edges: [
-    { from: "spent_by_users", to: "user_share", toHandle: "a" },
-    { from: "spent_total", to: "user_share", toHandle: "b" },
-    { from: "spent_by_leads", to: "lead_share", toHandle: "a" },
-    { from: "spent_total", to: "lead_share", toHandle: "b" },
+    { from: "all_spend_users", to: "user_share", toHandle: "a" },
+    { from: "all_spend_total", to: "user_share", toHandle: "b" },
+    { from: "all_spend_leads", to: "lead_share", toHandle: "a" },
+    { from: "all_spend_total", to: "lead_share", toHandle: "b" },
     { from: "lead_share", to: "eval_lead_dominance" },
-    { from: "free_pool_utilization", to: "eval_pool_exhaustion" },
+    { from: "free_allowance_used_mtd", to: "eval_pool_exhaustion" },
     { from: "user_share", to: "eval_user_spend_drop" },
     { from: "eval_pool_exhaustion", to: "action_notify_pool_exhaustion" },
   ],
 
   positions: {
-    spent_by_users: { x: 0, y: 0 },
-    spent_by_leads: { x: 0, y: 120 },
-    spent_total: { x: 0, y: 240 },
-    free_grants: { x: 0, y: 360 },
-    free_pool_utilization: { x: 0, y: 480 },
+    all_spend_users: { x: 0, y: 0 },
+    all_spend_leads: { x: 0, y: 120 },
+    all_spend_total: { x: 0, y: 240 },
+    free_grants_issued: { x: 0, y: 360 },
+    free_tier_spend_cap_axis: { x: 0, y: 480 },
+    free_allowance_used_mtd: { x: 0, y: 600 },
     user_share: { x: 300, y: 0 },
     lead_share: { x: 300, y: 120 },
     eval_lead_dominance: { x: 600, y: 120 },
-    eval_pool_exhaustion: { x: 600, y: 480 },
+    eval_pool_exhaustion: { x: 600, y: 600 },
     eval_user_spend_drop: { x: 600, y: 0 },
-    action_notify_pool_exhaustion: { x: 900, y: 480 },
+    action_notify_pool_exhaustion: { x: 900, y: 600 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
@@ -650,7 +659,7 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "credit-tier-usage",
     name: "Free vs Paid Usage",
     description:
-      "Compares free lead vs paid user credit consumption. Tracks free pool utilization. Alerts on free-tier saturation and user disengagement.",
+      "Pane 0: ALL spend (paid + free) split leads / users / total. Pane 1: free-tier spend only - mirrors the public cap's Spent Today (server-local midnight days). Pane 2: free allowance used month-to-date (consumed / granted, 0-1). Pane 3: user vs lead share of all spend. Alerts on free-tier saturation and user disengagement.",
     config: creditTierUsageConfig,
   },
   {

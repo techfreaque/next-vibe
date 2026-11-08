@@ -42,7 +42,7 @@ contact/
 
 ### The Products
 
-**[unbottled.ai](https://unbottled.ai)** - the hosted platform. Zero setup. 100+ models across chat, image, video, music and voice - 50+ of them chat models from Anthropic, OpenAI, Google, xAI, DeepSeek, Moonshot, Mistral, Meta and more. Every model carries a content level - **mainstream**, **open** or **uncensored** - and the user picks. Nobody filters for them. Agent loop, skills, persistent memory, scheduled tasks, web search, media generation. No terminal access - safe for general users.
+**[unbottled.ai](https://unbottled.ai)** - the hosted platform. Zero setup. 197 models across chat, image, video, music and voice - 113 of them chat models from Anthropic, OpenAI, Google, xAI, DeepSeek, Moonshot, Mistral, Meta and more. Every model carries a content level - **mainstream**, **open** or **uncensored** - and the user picks. Nobody filters for them. Agent loop, skills, persistent memory, scheduled tasks, web search, media generation. No terminal access - safe for general users.
 
 **next-vibe self-hosted** - the full power-user platform. Everything above, plus terminal, SSH, browser automation, desktop control and a coding agent that hands real code changes to Claude Code or OpenCode - headless, or live in a terminal window. Bring your own API keys. No Docker required: it runs on embedded Postgres. Role-based tool permissions decide exactly what each user and skill can touch.
 

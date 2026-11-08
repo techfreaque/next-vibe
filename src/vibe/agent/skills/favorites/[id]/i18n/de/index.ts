@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
       label: "Skill ansehen",
     },
     signupPrompt: {
-      title: "Charakter-Persönlichkeit anpassen",
+      title: "Skill-Persönlichkeit anpassen",
       description:
-        "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+        "Bearbeite den System-Prompt und das Verhalten des Skills. Melde dich an, um zu beginnen.",
       backButton: "Zurück",
       signupButton: "Konto erstellen",
       loginButton: "Anmelden",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       skillId: {
-        content: "Charakter: {{value}}",
+        content: "Skill: {{value}}",
       },
       customVariantName: {
         content: "Benutzerdefinierter Name: {{value}}",
@@ -157,7 +157,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Favorit bearbeiten",
     description: "Bestehende Favoriten-Konfiguration aktualisieren",
     container: {
-      title: "Favorit bearbeiten",
+      title: "Skill-Setup bearbeiten",
     },
     backButton: {
       label: "Zurück zum Favoriten",
@@ -172,7 +172,7 @@ export const translations: typeof enTranslations = {
       label: "Melden",
     },
     useThisSkillButton: {
-      label: "Diesen Charakter verwenden",
+      label: "Dieses Skill verwenden",
     },
     useThisModelButton: {
       label: "Dieses Modell verwenden",
@@ -181,9 +181,9 @@ export const translations: typeof enTranslations = {
       label: "Derzeit aktiv",
     },
     signupPrompt: {
-      title: "Charakter-Persönlichkeit anpassen",
+      title: "Skill-Persönlichkeit anpassen",
       description:
-        "Bearbeite den System-Prompt und das Verhalten des Charakters. Melde dich an, um zu beginnen.",
+        "Bearbeite den System-Prompt und das Verhalten des Skills. Melde dich an, um zu beginnen.",
       backButton: "Zurück",
       signupButton: "Konto erstellen",
       loginButton: "Anmelden",
@@ -200,58 +200,58 @@ export const translations: typeof enTranslations = {
       label: "Favoriten-ID",
     },
     skillId: {
-      label: "Charakter",
+      label: "Skill",
       description:
         'Skill-ID. „skillSlug" für die Standardvariante, „skillSlug__variantId" für eine bestimmte Variante.',
     },
     customVariantName: {
-      label: "Variantenname",
+      label: "Bezeichnung",
       description:
         "Eigener Name für diese Variante (leer lassen für Skill-Standard)",
     },
     chatModel: {
       label: "Chat-Modell",
-      placeholder: "Von Fertigkeit übernehmen",
+      placeholder: "Wie beim Skill",
     },
     voice: {
       label: "KI-Stimme",
       description: "Wählen Sie die Stimme für Ihren KI-Assistenten",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     sttModel: {
       label: "Sprache-zu-Text-Modell",
       description: "Modell für die Spracherkennung",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     imageVisionModel: {
       label: "Bild-Vision-Modell",
       description: "Modell für die Bildanalyse",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     videoVisionModel: {
       label: "Video-Vision-Modell",
       description: "Modell für die Videoanalyse",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     audioVisionModel: {
       label: "Audio-Vision-Modell",
       description: "Modell für die Audioanalyse",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     imageGenModel: {
       label: "Bildgenerierungsmodell",
       description: "Modell zur Bilderstellung",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     musicGenModel: {
       label: "Musikgenerierungsmodell",
       description: "Modell zur Musikerstellung",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     videoGenModel: {
       label: "Video-Generierungsmodell",
       description: "Modell zur Videoerstellung",
-      placeholder: "Vom Charakter erben",
+      placeholder: "Wie beim Skill",
     },
     mode: {
       label: "Auswahlmodus",
@@ -264,7 +264,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Auswahltyp",
-      characterBased: "Basierend auf Charakter",
+      characterBased: "Basierend auf Skill",
       manual: "Bestimmtes Modell",
       filters: "Filterkriterien",
     },
@@ -326,23 +326,22 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Benutzerdefiniertes Symbol",
-      description:
-        "Symbol des Charakters für diesen Favoriten-Slot überschreiben",
+      description: "Symbol des Skills für diesen Favoriten-Slot überschreiben",
     },
     compactTrigger: {
       label: "Komprimierungs-Schwellenwert (Token)",
       description:
-        "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Charakter oder globaler Standard.",
+        "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Skill oder globaler Standard.",
     },
     availableTools: {
       label: "Erlaubte Tools",
       description:
-        "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
+        "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Skill oder globale Einstellungen.",
     },
     pinnedTools: {
       label: "Angeheftete Tools",
       description:
-        "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Charakter oder globale Einstellungen.",
+        "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Skill oder globale Einstellungen.",
     },
     deniedTools: {
       label: "Gesperrte Tools",
@@ -367,10 +366,10 @@ export const translations: typeof enTranslations = {
         "Maximale Gesamttoken des Speicherinhalts für diesen Slot. Null = Skill oder globaler Standard.",
     },
     changeSkill: {
-      label: "Charakter wechseln",
+      label: "Skill wechseln",
     },
     modifySkill: {
-      label: "Charakter bearbeiten",
+      label: "Skill bearbeiten",
     },
     response: {
       success: {

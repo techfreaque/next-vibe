@@ -51,7 +51,8 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Darmowe miesięczne kredyty",
-        description: "{{count}} darmowych kredytów miesięcznie dla wszystkich",
+        description:
+          "{{guest}} darmowych kredytów miesięcznie jako gość, {{signedIn}} po zalogowaniu, +{{bonus}} z newsletterem",
       },
       earned: {
         title: "Zarobione kredyty",
@@ -71,11 +72,12 @@ export const translations: typeof enTranslations = {
         permanent: {
           title: "Pakiety kredytów",
           description:
-            "{{packPrice}} za {{packCredits}} kredytów. Nie wygasają. Dla subskrybentów, którym {{subCredits}} to za mało.",
+            "{{packPrice}} za {{packCredits}} kredytów albo {{largePackPrice}} za {{largePackCredits}}. Nie wygasają. Bez subskrypcji.",
         },
         free: {
           title: "Darmowe kredyty",
-          description: "{{count}} kredytów na start. Bez karty.",
+          description:
+            "{{guest}} miesięcznie jako gość. {{signedIn}} z darmowym kontem, +{{bonus}} z newsletterem. Bez karty.",
         },
       },
       costs: {
@@ -158,8 +160,8 @@ export const translations: typeof enTranslations = {
       pack: {
         title: "Pakiety kredytów",
         description:
-          "Dodatkowe kredyty dla zaawansowanych użytkowników (wymaga aktywnej subskrypcji)",
-        badge: "Dla zaawansowanych",
+          "Płacisz za to, co zużyjesz. Bez subskrypcji. Kredyty nie wygasają.",
+        badge: "Bez subskrypcji",
         perPack: "/pakiet",
         quantity: "Ilość",
         total: "{{count}} kredyty",
@@ -176,8 +178,6 @@ export const translations: typeof enTranslations = {
         totalPrice: "Razem: {{price}}",
         pack: "Pakiet",
         packs: "Pakiety",
-        requiresSubscription:
-          "Pakiety kredytów są dla subskrybentów, którym skończyły się miesięczne kredyty. Najpierw wykup subskrypcję.",
       },
     },
     history: {

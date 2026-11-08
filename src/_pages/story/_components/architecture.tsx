@@ -1000,7 +1000,7 @@ export function Architecture({ locale }: ArchitectureProps): JSX.Element {
     <Div className="relative overflow-hidden bg-muted/20">
       <Div className="absolute inset-0 bg-linear-to-b from-background via-transparent to-background pointer-events-none" />
 
-      <Div className="container relative px-4 md:px-6 py-24 md:py-32">
+      <Div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-24 md:py-32">
         {/* Header */}
         <MotionDiv
           className="text-center mb-14"

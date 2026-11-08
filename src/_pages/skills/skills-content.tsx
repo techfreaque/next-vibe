@@ -1,6 +1,8 @@
 "use client";
 
-import skillsDefinitions from "next-vibe/agent/skills/definition";
+import skillsDefinitions, {
+  type SkillListResponseOutput,
+} from "next-vibe/agent/skills/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -11,12 +13,14 @@ interface SkillsContentProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
+  initialData: SkillListResponseOutput | undefined;
 }
 
 export default function SkillsContent({
   locale,
   user,
   platform,
+  initialData,
 }: SkillsContentProps): JSX.Element {
   return (
     <EndpointsPage
@@ -26,6 +30,7 @@ export default function SkillsContent({
       platform={platform}
       endpointOptions={{
         read: {
+          initialData,
           queryOptions: {
             staleTime: 60 * 1000,
             refetchOnWindowFocus: false,

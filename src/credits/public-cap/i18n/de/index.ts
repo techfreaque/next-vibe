@@ -32,6 +32,11 @@ export const translations: typeof enTranslations = {
     capExceeded: {
       content: "Limit überschritten",
     },
+    perLeadCap: { content: "Limit pro Lead" },
+    perIpCap: { content: "Limit pro IP" },
+    topSpenders: { content: "Größte Gratis-Nutzer heute" },
+    recentEvents: { content: "Letzte Limit-Ereignisse" },
+    noData: "Heute noch nichts.",
     success: {
       title: "Limit-Status abgerufen",
       description: "Status des Gratis-Tageslimits erfolgreich abgerufen",
@@ -85,6 +90,18 @@ export const translations: typeof enTranslations = {
         "Maximale Credits, die nicht zahlende Nutzer täglich gemeinsam ausgeben können",
       placeholder: "z.B. 500",
     },
+    perLeadCap: {
+      label: "Tageslimit pro Lead (Credits)",
+      description:
+        "Maximale Gratis-Credits, die ein Gast pro Tag verbrauchen darf",
+      placeholder: "z.B. 20",
+    },
+    perIpCap: {
+      label: "Tageslimit pro IP (Credits)",
+      description:
+        "Maximale Gratis-Credits, die eine IP pro Tag verbrauchen darf",
+      placeholder: "z.B. 40",
+    },
     message: {
       content: "Ergebnis",
     },
@@ -135,6 +152,10 @@ export const translations: typeof enTranslations = {
     capUpdated: "Tageslimit auf {{capAmount}} Credits gesetzt",
     capExceeded:
       "Tägliches Gratis-Limit erreicht. Bitte registrieren Sie sich oder versuchen Sie es morgen erneut.",
+    leadCapExceeded:
+      "Dein Gratis-Limit für heute ist erreicht. Registriere dich oder gib deine E-Mail an – dann gibt es mehr Credits.",
+    capUnavailable:
+      "Das Gratis-Kontingent ist gerade nicht verfügbar. Registriere dich, um weiterzumachen.",
     getCapFailed: "Gratis-Limit-Konfiguration konnte nicht abgerufen werden",
     updateCapFailed: "Gratis-Limit konnte nicht aktualisiert werden",
     incrementFailed: "Gratis-Ausgaben konnten nicht erfasst werden",

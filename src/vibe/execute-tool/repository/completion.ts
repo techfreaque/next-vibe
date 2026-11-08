@@ -18,6 +18,9 @@ import "server-only";
 import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 
+import { NotificationType } from "@/notifications/enum";
+import { NotificationsRepository } from "@/notifications/repository";
+
 import type { ChatModelId } from "../../agent/ai-stream/models";
 import type { ToolCall } from "../../agent/chat/db";
 import { chatMessages, chatThreads } from "../../agent/chat/db";
@@ -304,6 +307,49 @@ export class TaskCompletion {
       emitTaskQueue("task-updated", { responseData: taskPayload });
     }
 
+    // 2a'. Persist a notification for the owner so finished background work
+    //    surfaces in the bell even if they are offline. WAIT/APPROVE are skipped:
+    //    the user is live in the stream that is waiting on this result.
+    if (
+      callbackMode !== CallbackMode.WAIT &&
+      callbackMode !== CallbackMode.APPROVE
+    ) {
+      try {
+        const [taskRow] = await db
+          .select({ displayName: cronTasks.displayName })
+          .from(cronTasks)
+          .where(eq(cronTasks.id, taskId))
+          .limit(1);
+        await NotificationsRepository.notify(
+          {
+            userId: ownerUser.id,
+            type:
+              toolStatus === "completed"
+                ? NotificationType.TASK_COMPLETE
+                : NotificationType.TASK_FAILED,
+            params: { name: taskRow?.displayName },
+            link:
+              threadId && threadRow
+                ? `/threads/${threadRow.rootFolderId}/${threadId}`
+                : null,
+            dedupeKey: `task:${taskId}`,
+            metadata: {
+              taskId,
+              threadId: threadId ?? null,
+              status: toolStatus,
+            },
+          },
+          logger,
+        );
+      } catch (notifyErr) {
+        logger.warn("[TaskCompletion] Failed to create notification", {
+          taskId,
+          error:
+            notifyErr instanceof Error ? notifyErr.message : String(notifyErr),
+        });
+      }
+    }
+
     // 2b. No-revival modes (endLoop, detach): the task is done and no AI
     //    continuation follows — reconcile the thread state. A stream that died
     //    into 'waiting' on this task returns to 'idle' unless OTHER work is
@@ -331,7 +377,9 @@ export class TaskCompletion {
           .where(eq(chatThreads.id, threadId))
           .limit(1);
         if (currentThread?.streamingState === ThreadStreamingState.STREAMING) {
-          logger.warn(
+          // The designed outcome for a fast detach (the live stream owns the
+          // state and clears it itself) - info, not a warning.
+          logger.info(
             "[TaskCompletion] no-revival completion - stream still active, skipping clearStreamingState",
             { threadId, taskId, callbackMode },
           );

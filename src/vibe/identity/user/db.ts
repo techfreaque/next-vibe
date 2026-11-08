@@ -66,7 +66,10 @@ export const users = pgTable("users", {
 
   // Two-Factor Authentication
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  /** AES-256-GCM encrypted TOTP secret (iv:tag:ciphertext). Pending until twoFactorEnabled. */
   twoFactorSecret: text("two_factor_secret"),
+  /** JSON array of SHA-256 hashes of unused recovery codes. */
+  twoFactorRecoveryCodes: text("two_factor_recovery_codes"),
 
   // Audit fields
   createdBy: uuid("created_by"),

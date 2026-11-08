@@ -19,6 +19,11 @@ import {
   browserEnvSchema,
 } from "../../browser/env";
 import {
+  financeEnv,
+  financeEnvExamples,
+  financeEnvSchema,
+} from "../../finance/env";
+import {
   googleSheetsEnv,
   googleSheetsEnvExamples,
   googleSheetsEnvSchema,
@@ -38,6 +43,11 @@ import {
   imapClientEnvExamples,
   imapClientEnvSchema,
 } from "../../messenger/providers/email/imap-client/env";
+import {
+  systemMailboxEnv,
+  systemMailboxEnvExamples,
+  systemMailboxEnvSchema,
+} from "../../messenger/system-mailbox/env";
 import {
   paymentEnv,
   paymentEnvExamples,
@@ -148,6 +158,11 @@ export const envModules: Record<
     schema: browserEnvSchema,
     examples: browserEnvExamples,
   },
+  finance: {
+    env: financeEnv,
+    schema: financeEnvSchema,
+    examples: financeEnvExamples,
+  },
   googleSheets: {
     env: googleSheetsEnv,
     schema: googleSheetsEnvSchema,
@@ -167,6 +182,11 @@ export const envModules: Record<
     env: imapClientEnv,
     schema: imapClientEnvSchema,
     examples: imapClientEnvExamples,
+  },
+  systemMailbox: {
+    env: systemMailboxEnv,
+    schema: systemMailboxEnvSchema,
+    examples: systemMailboxEnvExamples,
   },
   payment: {
     env: paymentEnv,
@@ -236,10 +256,12 @@ export const envModules: Record<
 
 // Combined schema using merge
 export const envSchema = browserEnvSchema
+  .merge(financeEnvSchema)
   .merge(googleSheetsEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)
+  .merge(systemMailboxEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(sshEnvSchema)

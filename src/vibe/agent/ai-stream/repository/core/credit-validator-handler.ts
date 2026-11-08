@@ -9,6 +9,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { CreditRepository } from "@/credits/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { creditValidator } from "@/credits/validator";
 
@@ -114,7 +115,25 @@ export class CreditValidatorHandler {
           cost: modelCost.toString(),
           balance: validationResult.data.balance.toString(),
         }),
-        errorType: ErrorResponseTypes.FORBIDDEN,
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      });
+    }
+
+    // Public free-tier daily cap: hard gate BEFORE generation. PAYMENT_REQUIRED
+    // routes into the same out-of-credits conversion card as an empty wallet.
+    const capGate = await CreditRepository.gateFreeTierCap(
+      user,
+      ipAddress,
+      modelCost,
+      modelInfo.id,
+      logger,
+      creditsT,
+      locale,
+    );
+    if (!capGate.success) {
+      return fail({
+        message: capGate.message,
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
     }
 

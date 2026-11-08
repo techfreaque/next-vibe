@@ -68,6 +68,7 @@ export class MessengerAccountEditRepository {
       isExactMatch: account.isExactMatch ?? false,
       weight: account.weight ?? 0,
       isFailover: account.isFailover ?? false,
+      isSystem: account.isSystem,
       failoverPriority: account.failoverPriority ?? 0,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
@@ -283,6 +284,9 @@ export class MessengerAccountEditRepository {
       }
       if (data.isFailover !== undefined) {
         updateValues.isFailover = data.isFailover;
+      }
+      if (data.isSystem !== undefined) {
+        updateValues.isSystem = data.isSystem;
       }
       if (data.failoverPriority !== undefined) {
         updateValues.failoverPriority = data.failoverPriority;

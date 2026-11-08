@@ -28,7 +28,6 @@ export const translations = {
     floorTitle: "ARPU grows as the platform grows",
     floorBody:
       "Every time {{appName}} adds models, capabilities, or generation modalities, existing subscribers spend more. Referrals you made six months ago are worth more today than when you made them - without any extra work from you.",
-    tableTitle: "What you earn per referral per month",
     tableHeaderProfile: "User profile",
     tableHeaderSpend: "Monthly spend",
     tableHeaderYouEarn: "You earn/mo",

@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   return metadataGenerator(locale, {
-    path: "contact",
+    path: "help",
     title: t("meta.contact.title", { appName }),
     description: t("meta.contact.description", { appName }),
     category: t("meta.contact.category"),

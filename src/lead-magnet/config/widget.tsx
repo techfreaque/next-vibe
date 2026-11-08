@@ -1,6 +1,16 @@
 "use client";
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe/ui/components/alert-dialog";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
@@ -113,6 +123,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
 
   // null = no explicit user selection yet, fall through to currentProvider
   const [override, setOverride] = useState<ProviderKey | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const selectedProvider = override ?? currentProvider ?? "";
   const activeProvider = override ?? currentProvider;
@@ -127,6 +138,7 @@ export function LeadMagnetConfigContainer(): JSX.Element {
   );
 
   const handleDelete = useCallback((): void => {
+    setConfirmOpen(false);
     void (async (): Promise<void> => {
       const [configDef, { apiClient }] = await Promise.all([
         import("./definition"),
@@ -191,10 +203,39 @@ export function LeadMagnetConfigContainer(): JSX.Element {
               aria-label={t("widget.delete")}
               title={t("widget.delete")}
               className="h-11 w-11 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={handleDelete}
+              onClick={(): void => {
+                setConfirmOpen(true);
+              }}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
+            <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("widget.confirmDelete.title", {
+                      provider:
+                        providerOptions.find((p) => p.value === config.provider)
+                          ?.label ?? config.provider,
+                    })}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("widget.confirmDelete.description")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {t("widget.confirmDelete.cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {t("widget.confirmDelete.proceed")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </Div>
         ) : (
           <>

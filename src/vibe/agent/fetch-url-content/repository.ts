@@ -46,7 +46,65 @@ interface ScrappeyResponse {
 }
 type FetchResult<T> =
   | { ok: true; data: T }
-  | { ok: false; error: string; isTimeout?: boolean };
+  | {
+      ok: false;
+      error: string;
+      isTimeout?: boolean;
+      /** The caller's input was unfetchable (bad URL, scraper answered 4xx). */
+      isCallerError?: boolean;
+    };
+
+/**
+ * Loopback / private-network hosts. The fetch runs on a REMOTE scraper, so
+ * these can never resolve to anything the caller means (models try to fetch
+ * the app's own `http://localhost:3000/api/...` routes).
+ */
+function isPrivateHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local") ||
+    host === "0.0.0.0" ||
+    host === "::" ||
+    host === "::1"
+  ) {
+    return true;
+  }
+  // IPv6 unique-local (fc00::/7), link-local (fe80::/10), IPv4-mapped (::ffff:)
+  if (host.includes(":")) {
+    if (/^f[cd][0-9a-f]{0,2}:/.test(host) || /^fe[89ab][0-9a-f]?:/.test(host)) {
+      return true;
+    }
+    const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(host);
+    if (mapped?.[1]) {
+      return isPrivateHost(mapped[1]);
+    }
+    // WHATWG URL normalizes ::ffff:127.0.0.1 to ::ffff:7f00:1
+    const mappedHex = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(host);
+    if (mappedHex?.[1] && mappedHex[2]) {
+      const hi = Number.parseInt(mappedHex[1], 16);
+      const lo = Number.parseInt(mappedHex[2], 16);
+      return isPrivateHost(`${hi >> 8}.${hi & 0xff}.${lo >> 8}.${lo & 0xff}`);
+    }
+    return false;
+  }
+  const octets = host.split(".").map(Number);
+  if (octets.length !== 4 || octets.some((o) => !Number.isInteger(o))) {
+    return false;
+  }
+  const a = octets[0] ?? -1;
+  const b = octets[1] ?? -1;
+  return (
+    a === 127 ||
+    a === 10 ||
+    (a === 192 && b === 168) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 169 && b === 254) ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    a === 0
+  );
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -300,7 +358,12 @@ class FetchUrlService {
         return {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
-          error: `Scrappey API error: ${response.statusText}`,
+          error: `Scrappey API error: ${response.status} ${response.statusText}`,
+          // Scrappey's status is about OUR API call, not the target page (a
+          // page 404 comes back as 200 + solution.statusCode). Only a rejected
+          // URL (400/422) is the caller's; 401/402/403/429 mean our key,
+          // balance or quota broke - those must stay errors.
+          isCallerError: response.status === 400 || response.status === 422,
         };
       }
 
@@ -377,13 +440,29 @@ class FetchUrlService {
     try {
       const urlObj = new URL(url);
       if (!["http:", "https:"].includes(urlObj.protocol)) {
-        return { ok: false, error: "Only HTTP and HTTPS URLs are allowed" };
+        return {
+          ok: false,
+          error: "Only HTTP and HTTPS URLs are allowed",
+          isCallerError: true,
+        };
+      }
+      if (isPrivateHost(urlObj.hostname)) {
+        return {
+          ok: false,
+          // eslint-disable-next-line i18next/no-literal-string
+          error: `${urlObj.hostname} is a local/private address - the page is fetched from the public internet, so only public URLs work`,
+          isCallerError: true,
+        };
       }
       return { ok: true, data: undefined };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-      return { ok: false, error: `Invalid URL format: ${errorMessage}` };
+      return {
+        ok: false,
+        error: `Invalid URL format: ${errorMessage}`,
+        isCallerError: true,
+      };
     }
   }
 }
@@ -437,12 +516,26 @@ export class FetchUrlContentRepository {
     );
 
     if (!result.ok) {
-      const logFn = result.isTimeout ? logger.warn : logger.error;
-      logFn("Fetch URL error", {
-        error: result.error,
-        isTimeout: result.isTimeout ?? false,
-        url,
-      });
+      // A slow site timing out or an unfetchable URL is the normal life of a
+      // scraper - warn with the reason. The scraper itself failing (5xx,
+      // no content, conversion error) is an error.
+      const isExpected = result.isTimeout === true || result.isCallerError;
+      (isExpected ? logger.warn : logger.error).bind(logger)(
+        "Fetch URL error",
+        {
+          error: result.error,
+          isTimeout: result.isTimeout ?? false,
+          isCallerError: result.isCallerError ?? false,
+          url,
+        },
+      );
+
+      if (result.isCallerError) {
+        return fail({
+          message: t("get.errors.internal.detail", { message: result.error }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
 
       if (result.isTimeout) {
         return fail({

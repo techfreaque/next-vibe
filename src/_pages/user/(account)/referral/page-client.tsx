@@ -297,7 +297,7 @@ export function ReferralPageClient({
 
   return (
     <Div className="w-full bg-background">
-      <Div className="mx-auto flex max-w-4xl flex-col gap-12 px-4 py-8 sm:py-12 md:px-6">
+      <Div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-8 sm:py-12 sm:px-6">
         {hero}
 
         {howItWorks}

@@ -47,6 +47,7 @@ import { ArchiveRestore } from "next-vibe/ui/components/icons/ArchiveRestore";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Edit } from "next-vibe/ui/components/icons/Edit";
+import { FolderOpen } from "next-vibe/ui/components/icons/FolderOpen";
 import { FolderInput } from "next-vibe/ui/components/icons/FolderInput";
 import { FolderPlus } from "next-vibe/ui/components/icons/FolderPlus";
 import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePlus";
@@ -91,6 +92,7 @@ import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/defi
 import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
 import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/folder-permissions-dialog";
+import { FolderProjectDialog } from "../../folders/[rootFolderId]/widget/folder-project-dialog";
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -380,7 +382,7 @@ function ThreadRow({
     <>
       <Div
         className={cn(
-          "relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer",
+          "relative flex items-center gap-2 px-2 py-1.5 rounded-md min-h-9 cursor-pointer",
           chatTransitions.colors,
           isActive
             ? cn(chatColors.sidebar.active, "shadow-sm")
@@ -1128,6 +1130,7 @@ function FolderRow({
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const [newSubfolderDialogOpen, setNewSubfolderDialogOpen] = useState(false);
 
   // isExpanded: true when active folder is this folder OR any descendant of it
@@ -1519,6 +1522,18 @@ function FolderRow({
                       <DropdownMenuItem
                         onSelect={() => {
                           setDropdownOpen(false);
+                          setProjectDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <FolderOpen className="h-4 w-4 mr-2" />
+                        {t("widget.folderList.projectSettings")}
+                      </DropdownMenuItem>
+                    )}
+                    {!isDefault && item.canManage && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setDropdownOpen(false);
                           setRenameDialogOpen(true);
                         }}
                         className="cursor-pointer"
@@ -1694,6 +1709,16 @@ function FolderRow({
           />
         </DialogContent>
       </Dialog>
+
+      <FolderProjectDialog
+        user={user}
+        open={projectDialogOpen}
+        onOpenChange={setProjectDialogOpen}
+        folderId={item.id}
+        folderName={folderDisplayName}
+        locale={locale}
+        logger={logger}
+      />
 
       <FolderPermissionsDialog
         user={user}

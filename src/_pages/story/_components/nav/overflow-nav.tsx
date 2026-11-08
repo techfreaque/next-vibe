@@ -266,9 +266,12 @@ export function OverflowNav({
   const overflowItems = navigationItems.slice(visibleCount);
 
   return (
+    // flex-wrap + one fixed-height row: before hydration measures (SSR, slow
+    // fonts) an item that doesn't fit wraps onto the hidden second row
+    // instead of being cut in half at the container edge.
     <Div
       ref={containerRef}
-      className="flex items-center gap-1 overflow-hidden w-full"
+      className="flex h-10 w-full flex-wrap content-start items-center gap-x-1 overflow-hidden"
     >
       {navigationItems.map((item, i) => (
         <Div

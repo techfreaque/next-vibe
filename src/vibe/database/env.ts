@@ -2,9 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
-import { cliArgs, isPreviewMode } from "@/vibe/env/detect";
-
 import { defineEnv } from "../env/define-env";
+import { resolveEffectiveDatabaseUrl } from "./effective-url";
 
 export const {
   env: databaseEnv,
@@ -18,24 +17,22 @@ export const {
           ? v
           : (process.env["DATABASE_URL"] ??
             "postgres://postgres:postgres@localhost:5432/postgres");
-      if (
-        !isPreviewMode ||
-        cliArgs.includes("--skip-db-setup") ||
-        raw.startsWith("file:")
-      ) {
-        return raw;
+      const effective = resolveEffectiveDatabaseUrl(raw);
+      if (effective !== raw) {
+        // Keep child processes / raw process.env readers on the same DB.
+        process.env["DATABASE_URL"] = effective;
       }
-      try {
-        const previewDbPort = process.env["PREVIEW_DB_PORT"] ?? "5433";
-        const parsed = new URL(raw);
-        parsed.port = previewDbPort;
-        return parsed.toString();
-      } catch {
-        return raw;
-      }
+      return effective;
     }, z.string().url().default("postgres://postgres:postgres@localhost:5432/postgres")),
     example: "postgres://postgres:postgres@localhost:5432/postgres",
     comment: "Database connection URL",
+    sensitive: true,
+  },
+  HERMES_DATABASE_URL: {
+    schema: z.string().optional(),
+    example: "postgres://postgres:postgres@localhost:5433/hermes",
+    comment:
+      "Hermes (--hermes / --preview) database URL. Overrides DATABASE_URL in Hermes mode so Hermes never shares Atlas's PGlite. Unset: Hermes docker Postgres on PREVIEW_DB_PORT (docker-compose.preview.yml). Set to a file: URL (e.g. file:./data.hermes.db) for an isolated PGlite without Docker.",
     sensitive: true,
   },
   PREVIEW_DB_PORT: {
@@ -59,7 +56,7 @@ export const {
  * for. Same source as database/client's isPglite, without opening the client.
  */
 export function usesPglite(): boolean {
-  return (process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL).startsWith(
-    "file:",
-  );
+  return resolveEffectiveDatabaseUrl(
+    process.env["DATABASE_URL"] ?? databaseEnv.DATABASE_URL,
+  ).startsWith("file:");
 }

@@ -15,6 +15,7 @@ import {
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
+import type { WidgetData } from "../../../core/utils/json";
 import { UserRole } from "../../../identity/roles/enum";
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
@@ -53,6 +54,46 @@ const CronTasksContainer = lazyWidget(() =>
     default: m.CronTasksContainer,
   })),
 );
+
+const CronTaskCreateContainer = lazyWidget(() =>
+  import("./create-widget").then((m) => ({
+    default: m.CronTaskCreateContainer,
+  })),
+);
+
+/**
+ * Task input accepts the object itself (AI/MCP/typed callers) or a JSON
+ * string (web textarea, CLI). Both normalize to the same record.
+ */
+const taskInputRequestSchema = z
+  .union([z.string(), taskInputSchema])
+  .transform((value, ctx) => {
+    if (typeof value !== "string") {
+      return value;
+    }
+    if (!value.trim()) {
+      return {};
+    }
+    let parsedJson: WidgetData;
+    try {
+      parsedJson = JSON.parse(value);
+    } catch {
+      ctx.addIssue({
+        code: "custom",
+        message: "post.fields.taskInput.invalidJson",
+      });
+      return z.NEVER;
+    }
+    const parsed = taskInputSchema.safeParse(parsedJson);
+    if (!parsed.success) {
+      ctx.addIssue({
+        code: "custom",
+        message: "post.fields.taskInput.notObject",
+      });
+      return z.NEVER;
+    }
+    return parsed.data;
+  });
 
 /**
  * GET /cron/tasks - List cron tasks
@@ -512,13 +553,9 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
   ],
   tags: ["tags.cron" as const, "tags.scheduling" as const],
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title",
-    description: "post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: CronTaskCreateContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // Request fields
       id: requestField(scopedTranslation, {
@@ -638,8 +675,9 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXTAREA,
         label: "post.fields.taskInput.label",
         description: "post.fields.taskInput.description",
+        placeholder: "post.fields.taskInput.placeholder",
         columns: 12,
-        schema: taskInputSchema.optional(),
+        schema: taskInputRequestSchema.optional(),
       }),
       runOnce: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

@@ -4,16 +4,12 @@ export const translations: typeof enTranslations = {
   nav: {
     help: "Hilfe",
     logout: "Abmelden",
-    settings: "Mein Profil",
+    settings: "Mein Profil & Einstellungen",
+    profile: "Mein Profil",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Hellen Modus aktivieren",
     enableDarkMode: "Dunklen Modus aktivieren",
     notifications: "Benachrichtigungen",
-    welcomeNotification: {
-      title: "Willkommen bei {{appName}}!",
-      description:
-        "Starten Sie damit, die KI-Modelle zu erkunden und Ihr erstes Gespräch zu erstellen.",
-    },
     company: "Unternehmen",
     about: {
       title: "Über uns",
@@ -75,86 +71,6 @@ export const translations: typeof enTranslations = {
     },
   },
   home: {
-    v2: {
-      how: {
-        eyebrow: "So funktioniert's",
-        title: "Drei Entscheidungen. Dann einfach fragen.",
-        subtitle:
-          "Kein Setup, keine Prompt-Tricks. Du wählst, wer antwortet - und wie gefiltert.",
-        steps: {
-          who: {
-            title: "Wähle dein Gegenüber",
-            body: "Ein Begleiter für den Alltag oder ein Spezialist für Code, Recherche, Texte. Jeder kennt deinen Kontext.",
-          },
-          filter: {
-            title: "Wähle deinen Filter",
-            body: "{{modelCount}} Modelle in drei Stufen: Mainstream, offen und unzensiert. Jederzeit wechselbar, auch mitten im Chat.",
-          },
-          ask: {
-            title: "Frag, was du willst",
-            body: "Sucht im Web, liest Quellen, erstellt Bilder, Videos und Musik. Du bekommst Antworten, keine Belehrungen.",
-          },
-        },
-      },
-      pricing: {
-        eyebrow: "Preise",
-        title: "Kostenlos starten. Zahlen nach Nutzung.",
-        subtitle:
-          "Credits statt Lizenzen. Günstige Modelle kosten einen Bruchteil eines Credits pro Nachricht.",
-        free: {
-          name: "Kostenlos",
-          note: "für immer",
-          p1: "{{freeCredits}} Credits jeden Monat",
-          p2: "Alle drei Filterstufen",
-          p3: "Keine Karte nötig",
-        },
-        sub: {
-          name: "Abo",
-          note: "pro Monat",
-          p1: "{{subscriptionCredits}} Credits jeden Monat",
-          p2: "Jederzeit aufladen: {{packCredits}} Credits für {{packPrice}}",
-          p3: "Alle Modelle, alle Tools",
-        },
-        cta: "Alle Preise ansehen",
-        footnote: "Jederzeit kündbar. Gekaufte Credit-Pakete verfallen nie.",
-      },
-      more: {
-        eyebrow: "Mehr als Chat",
-        title: "Selbst betreiben. Darauf bauen. Damit verdienen.",
-        subtitle:
-          "Dieselbe Plattform, Open Source - für alle, denen ein Chatfenster nicht reicht.",
-      },
-      faq: {
-        eyebrow: "Fragen",
-        title: "Was zuerst gefragt wird",
-        items: {
-          uncensored: {
-            q: "Ist das wirklich unzensiert?",
-            a: "Du entscheidest - pro Chat. Mainstream-Modelle folgen den Regeln ihrer Hersteller. Offene Modelle filtern leicht. Unzensierte Modelle verweigern nicht. Nichts wird heimlich gefiltert: Die Stufe, die du wählst, ist die, die du bekommst.",
-          },
-          privacy: {
-            q: "Wer kann meine Chats lesen?",
-            a: "Inkognito-Chats existieren nur in deinem Browser - wir speichern sie nicht. Private Chats liegen in deinem Konto und nur du kannst sie öffnen. Für die Antwort geht deine Nachricht an den Modellanbieter, den du gewählt hast.",
-          },
-          account: {
-            q: "Brauche ich ein Konto?",
-            a: "Nein. App öffnen und sofort im Inkognito-Modus chatten. Ein kostenloses Konto synchronisiert deine Chats über Geräte hinweg und bringt {{freeCredits}} Gratis-Credits pro Monat.",
-          },
-          cost: {
-            q: "Was kostet das?",
-            a: "Kostenlos bekommst du {{freeCredits}} Credits im Monat. Das Abo kostet {{subscriptionPrice}} im Monat für {{subscriptionCredits}} Credits, aufladen geht mit Paketen ({{packCredits}} Credits für {{packPrice}}). Jede Nachricht kostet je nach Modell Credits.",
-          },
-          models: {
-            q: "Welche Modelle gibt es?",
-            a: "{{modelCount}} Modelle von {{providerCount}} Anbietern - die neuesten von Claude, GPT, Gemini, Grok, DeepSeek und Qwen, Open-Weight-Modelle und eigens unzensierte. Neue Releases sind schnell da.",
-          },
-          selfhost: {
-            q: "Kann ich das selbst betreiben?",
-            a: "Ja. Die komplette Plattform ist Open Source (MIT + GPL v3). Auf deinem eigenen Rechner mit eigenen Keys - oder verbunden mit deinem Konto hier.",
-          },
-        },
-      },
-    },
     splitHero: {
       seeHow: "So funktioniert's",
       stats: {
@@ -214,11 +130,29 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      or: "ODER",
+      clickToExplore: "Entdecken",
       badge: "Kleines Team · Open Source · Offen entwickelt",
       header: "KI, die dir nicht vorschreibt, was du denken sollst.",
       subheader:
         "Keine Verweigerungen. Niemand liest deine Chats. Deine KI - nicht unsere.",
+      chipChat: "Chatten",
+      chipSelfHost: "Selbst hosten",
+      chipBuild: "Aufbauen",
+      chipEarn: "Verdienen",
+      introGuide: "Vier Wege - such dir deinen aus:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "Wir fixen schnell. Etwas stimmt nicht?",
+      introHelpCta: "Sag's uns",
       card: {
+        chat: {
+          label: "Einfach chatten",
+          desc: "Frag alles - auch was ChatGPT ablehnt. Kein Account nötig.",
+        },
         personal: {
           label: "Deine eigene KI",
           desc: "Läuft auf deinem Rechner. Sag ihr, was du brauchst - sie passt sich deinem Leben an.",
@@ -233,16 +167,169 @@ export const translations: typeof enTranslations = {
         },
       },
       unbottled: {
+        badge: "Unzensiert · Offen · Mainstream",
+        titleLine1: "Unzensierte KI.",
+        titleLine2: "Frag alles.",
+        subtitle:
+          "{{modelCount}} Modelle. Drei Stufen - du entscheidest. Pro Gespräch wechselbar. Die echte Antwort, nicht die genehmigte Version.",
+        pill1: "{{modelCount}} Modelle - du wählst den Filter",
+        pill2: "Bilder, Video & Musik generieren",
+        pill3: "{{skillCount}}+ Skills mit Gedächtnis & Suche",
         cta: "Jetzt chatten",
+        ctaExplore: "Mehr erfahren",
       },
       personal: {
+        badge: "Eigener KI-Agent",
+        titleLine1: "Du fragst.",
+        titleLine2: "Es liefert.",
+        subtitle:
+          "Jedes Tool, das Thea baut, landet sofort auf deinem Dashboard - vollständige UI, CLI, KI-Tool, Cron-Job. SSH, E-Mail, Browser-Automatisierung. Deine Maschine. Deine Daten.",
+        pill1: "Browser, Terminal & SSH eingebaut",
+        pill2: "Läuft 24/7 im Hintergrund",
+        pill3: "Eigene Keys oder {{appName}}-Konto",
         cta: "Jetzt selbst hosten",
+        ctaGithub: "Mehr erfahren",
       },
       nextvibe: {
+        badge: "Open Source · MIT + GPL v3",
+        titleLine1: "Einmal schreiben.",
+        titleLine2: "Überall deployen.",
+        subtitle:
+          "Eine TypeScript-Definition wird automatisch zur maßgeschneiderten Web-UI, CLI-Befehl, KI-Tool, MCP-Server, Mobile-Screen und Cron-Job. Gleicher Vertrag. Kein Umschreiben. Fork es, mach es zu deinem.",
+        pill1: "Treibt {{appName}} an",
+        pill2: "Zero any / unknown / throw",
+        pill3: "{{platformCount}} Plattformen pro Endpoint",
+        ctaGithub: "GitHub Star geben",
         ctaDocs: "Framework entdecken",
+        ctaExplore: "Mehr erfahren",
       },
       referral: {
+        badge: "Skill-Ökonomie",
+        titleLine1: "Veröffentlichen. Empfehlen.",
+        titleLine2: "Verdienen.",
+        subtitle:
+          "Empfehlungslink: 10% jeder Zahlung, dauerhaft. Dein Skill als Einstiegspunkt: +5% - auch wenn andere ihn teilen.",
         cta: "Jetzt verdienen",
+        ctaExplore: "Mehr erfahren",
+      },
+      tab: {
+        unbottled: "{{appName}}",
+        unbottledSub: "Consumer-KI",
+        unbottledDesc:
+          "{{modelCount}} Modelle, Bild/Video/Musik-Generierung, persistentes Gedächtnis, Live-Suche - kein Filter den du nicht gewählt hast",
+        personal: "Selbst hosten",
+        personalSub: "Dein KI-Agent",
+        personalDesc:
+          "Alle Modelle auf deiner Hardware - surft, codet, bedient Terminals 24/7. Eigene Keys oder {{appName}}-Konto.",
+        nextvibe: "next-vibe",
+        nextvibeSub: "Das Framework",
+        nextvibeDesc:
+          "Das MIT-lizenzierte Framework hinter {{appName}} - ein Endpoint, alle Plattformen, fork und besitz es",
+        referral: "Verdienen",
+        referralSub: "Skills & Empfehlungen",
+        referralDesc:
+          "10% wiederkehrend pro Empfehlung, +5% pro Skill. Mehrstufige Kette. Bis zu 20% gesamt pro Zahlung.",
+      },
+    },
+    ctaPersonal: {
+      title: "Dein Agent. Dein Server. Deine Daten.",
+      subtitle:
+        "SSH, Browser, E-Mail, Code. Immer aktiv. Alles, was Thea baut, bleibt auf deiner Maschine.",
+      primary: "Kostenlos selbst hosten",
+      secondary: "Auf GitHub ansehen",
+    },
+    ctaNextvibe: {
+      title: "Eine Definition. Jede Plattform.",
+      subtitle:
+        "Web-UI, CLI, KI-Tool, MCP-Server, mobiler Bildschirm, Cron-Job - automatisch. Fork it. Own it.",
+      primary: "Dokumentation lesen",
+      secondary: "Auf GitHub starten",
+    },
+    ctaReferral: {
+      title: "Fang heute an zu verdienen.",
+      subtitle:
+        "Teile deinen Link. Veröffentliche ein Skill. Verdiene bei jeder Zahlung, für immer.",
+      primary: "Zum Empfehlungs-Dashboard",
+      secondary: "Skill erstellen",
+    },
+    v2: {
+      how: {
+        eyebrow: "So funktioniert's",
+        title: "Drei Entscheidungen. Dann einfach fragen.",
+        subtitle:
+          "Kein Setup, keine Prompt-Tricks. Du wählst, wer antwortet - und wie gefiltert.",
+        steps: {
+          who: {
+            title: "Wähle dein Gegenüber",
+            body: "Ein Begleiter für den Alltag oder ein Spezialist für Code, Recherche, Texte. Jeder kennt deinen Kontext.",
+          },
+          filter: {
+            title: "Wähle deinen Filter",
+            body: "{{modelCount}} Modelle in drei Stufen: Mainstream, offen und unzensiert. Jederzeit wechselbar, auch mitten im Chat.",
+          },
+          ask: {
+            title: "Frag, was du willst",
+            body: "Sucht im Web, liest Quellen, erstellt Bilder, Videos und Musik. Du bekommst Antworten, keine Belehrungen.",
+          },
+        },
+      },
+      pricing: {
+        eyebrow: "Preise",
+        title: "Kostenlos starten. Zahlen nach Nutzung.",
+        subtitle:
+          "Credits statt Lizenzen. Günstige Modelle kosten einen Bruchteil eines Credits pro Nachricht.",
+        free: {
+          name: "Kostenlos",
+          note: "für immer",
+          p1: "{{freeCreditsGuest}} Credits pro Monat, ohne Anmeldung",
+          p2: "{{freeCreditsSignedIn}} mit kostenlosem Konto, +{{freeCreditsNewsletterBonus}} mit dem Newsletter",
+          p3: "Alle drei Filterstufen. Keine Karte.",
+        },
+        sub: {
+          name: "Abo",
+          note: "pro Monat",
+          p1: "{{subscriptionCredits}} Credits jeden Monat",
+          p2: "Jederzeit aufladen: {{packCredits}} Credits für {{packPrice}}",
+          p3: "Alle Modelle, alle Tools",
+        },
+        cta: "Alle Preise ansehen",
+        footnote: "Jederzeit kündbar. Gekaufte Credit-Pakete verfallen nie.",
+      },
+      more: {
+        eyebrow: "Mehr als Chat",
+        title: "Selbst betreiben. Darauf bauen. Damit verdienen.",
+        subtitle:
+          "Dieselbe Plattform, Open Source - für alle, denen ein Chatfenster nicht reicht.",
+      },
+      faq: {
+        eyebrow: "Fragen",
+        title: "Was zuerst gefragt wird",
+        items: {
+          uncensored: {
+            q: "Ist das wirklich unzensiert?",
+            a: "Du entscheidest - pro Chat. Mainstream-Modelle folgen den Regeln ihrer Hersteller. Offene Modelle filtern leicht. Unzensierte Modelle verweigern nicht. Nichts wird heimlich gefiltert: Die Stufe, die du wählst, ist die, die du bekommst.",
+          },
+          privacy: {
+            q: "Wer kann meine Chats lesen?",
+            a: "Inkognito-Chats existieren nur in deinem Browser - wir speichern sie nicht. Private Chats liegen in deinem Konto und nur du kannst sie öffnen. Für die Antwort geht deine Nachricht an den Modellanbieter, den du gewählt hast.",
+          },
+          account: {
+            q: "Brauche ich ein Konto?",
+            a: "Nein. App öffnen und sofort im Inkognito-Modus chatten. Ein kostenloses Konto synchronisiert deine Chats über Geräte hinweg und hebt deine Gratis-Credits von {{freeCreditsGuest}} auf {{freeCreditsSignedIn}} pro Monat.",
+          },
+          cost: {
+            q: "Was kostet das?",
+            a: "Kostenlos bekommst du {{freeCreditsGuest}} Credits im Monat als Gast, {{freeCreditsSignedIn}} mit Konto, +{{freeCreditsNewsletterBonus}} mit dem Newsletter. Das Abo kostet {{subscriptionPrice}} im Monat für {{subscriptionCredits}} Credits, aufladen geht mit Paketen ({{packCredits}} Credits für {{packPrice}}). Jede Nachricht kostet je nach Modell Credits.",
+          },
+          models: {
+            q: "Welche Modelle gibt es?",
+            a: "{{modelCount}} Modelle von {{providerCount}} Anbietern - die neuesten von Claude, GPT, Gemini, Grok, DeepSeek und Qwen, Open-Weight-Modelle und eigens unzensierte. Neue Releases sind schnell da.",
+          },
+          selfhost: {
+            q: "Kann ich das selbst betreiben?",
+            a: "Ja. Die komplette Plattform ist Open Source (MIT + GPL v3). Auf deinem eigenen Rechner mit eigenen Keys - oder verbunden mit deinem Konto hier.",
+          },
+        },
       },
     },
     problem: {

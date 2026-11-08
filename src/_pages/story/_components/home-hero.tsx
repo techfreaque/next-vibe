@@ -1,10 +1,6 @@
 "use client";
 
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import {
-  getDraftKey,
-  saveDraft,
-} from "next-vibe/agent/ai-stream/stream/hooks/use-input-autosave";
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
@@ -15,21 +11,16 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Form } from "next-vibe/ui/components/form/form";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
-import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
-import { Send } from "next-vibe/ui/components/icons/Send";
 import { ShieldOff } from "next-vibe/ui/components/icons/ShieldOff";
 import { ShieldPlus } from "next-vibe/ui/components/icons/ShieldPlus";
-import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { Section } from "next-vibe/ui/components/section";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -76,7 +67,7 @@ export function HomeHero({
         <Div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,hsl(var(--primary)/0.14),transparent_70%)]" />
         <Div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.5)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.5)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
 
-        <Div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 md:pb-24 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        <Div className="relative mx-auto grid w-full max-w-6xl items-center gap-5 px-4 pb-16 pt-14 sm:px-6 md:pb-24 md:pt-20 lg:grid-cols-[1.1fr_1fr]">
           {/* Copy */}
           <Div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <Span className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
@@ -174,29 +165,17 @@ function HeroPreview({
   modelCountsByTier: ModelCountsByContentLevel;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const router = useRouter();
   const logger = useLogger();
   const [prompt, setPrompt] = useState<PromptKey>("influence");
   const [view, setView] = useState<View>("uncensored");
-  const [draft, setDraft] = useState("");
 
   const question = t(`home.splitHero.preview.prompts.${prompt}.question`);
   const shownTiers =
     view === "compare" ? TIERS : TIERS.filter((tier) => tier.key === view);
 
-  const askForReal = async (): Promise<void> => {
-    const text = draft.trim() || question;
-    await saveDraft(
-      getDraftKey(null, DefaultFolderId.INCOGNITO, null),
-      text,
-      logger,
-    );
-    router.push(`/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`);
-  };
-
   return (
     <Div
-      className="relative mx-auto w-full max-w-md lg:max-w-none"
+      className="relative mx-auto w-full max-w-lg lg:max-w-none"
       data-testid="hero-preview"
     >
       <Div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-primary/10 blur-2xl" />
@@ -207,17 +186,13 @@ function HeroPreview({
             <Span className="text-xs font-semibold text-foreground">
               {t("home.splitHero.preview.pickQuestion")}
             </Span>
-            <Span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Lock className="h-3 w-3" />
-              {t("home.splitHero.preview.private")}
-            </Span>
           </Div>
-          <Div className="flex flex-wrap gap-1.5">
+          <Div className="flex flex-wrap gap-1">
             {PROMPTS.map((key) => (
               <Button
                 key={key}
                 type="button"
-                size="sm"
+                size="xs"
                 variant={prompt === key ? "default" : "outline"}
                 aria-pressed={prompt === key}
                 className="h-8 rounded-full px-3 text-xs"
@@ -319,13 +294,6 @@ function HeroPreview({
                   key={seq}
                   className="duration-300 animate-in fade-in-0 slide-in-from-bottom-1"
                 >
-                  <Span className="inline-flex items-center gap-1.5 px-1 text-[11px] font-medium text-muted-foreground">
-                    <Span
-                      className={cn("h-1.5 w-1.5 rounded-full", tier.dot)}
-                    />
-                    <tier.Icon className="h-3 w-3" />
-                    {t(`home.capabilities.models.demo.${tier.key}Tab`)}
-                  </Span>
                   <GroupedAssistantMessage
                     group={{
                       primary: answer,
@@ -353,35 +321,6 @@ function HeroPreview({
             })}
           </Div>
         </MockChatProvider>
-
-        {/* Composer: real input, opens a private chat with the question typed in */}
-        <Div className="border-t border-border p-3">
-          <Form
-            onSubmit={askForReal}
-            className="flex items-center gap-2 rounded-xl border border-border bg-background py-1.5 pl-3 pr-1.5 focus-within:ring-2 focus-within:ring-ring/40"
-          >
-            <Input
-              type="text"
-              name="hero-prompt"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder={question}
-              aria-label={t("home.splitHero.preview.composer")}
-              className="h-9 flex-1 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
-            />
-            <Button
-              type="submit"
-              size="sm"
-              className="h-9 shrink-0 gap-1.5 rounded-lg px-3"
-            >
-              {t("home.splitHero.preview.askForReal")}
-              <Send className="h-3.5 w-3.5" />
-            </Button>
-          </Form>
-          <P className="mt-2 text-center text-[11px] text-muted-foreground">
-            {t("home.splitHero.preview.composerHint")}
-          </P>
-        </Div>
       </Div>
     </Div>
   );

@@ -18,7 +18,7 @@ export const translations = {
   onThisPage: "On this page",
   printButton: "Print",
   title: "Privacy Policy",
-  lastUpdated: "Last updated: January 2025",
+  lastUpdated: "Last updated: November 2026",
   introduction:
     "At {{appName}}, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our uncensored AI chat platform.",
   sections: {
@@ -96,15 +96,16 @@ export const translations = {
         access: "Right to access your personal data",
         correction: "Right to correct inaccurate or incomplete data",
         deletion:
-          "Right to request deletion of your data (right to be forgotten)",
+          "Right to deletion: delete your account from Settings and your personal data is erased",
         objection: "Right to object to processing of your data",
-        portability: "Right to data portability and transfer",
+        portability:
+          "Right to data portability: export all your data as JSON from Settings",
       },
     },
     cookies: {
       title: "Cookies and Tracking",
       description:
-        "We use cookies and similar tracking technologies to improve your experience and analyze usage patterns.",
+        "No third-party trackers, no ad pixels, no fingerprinting. One first-party cookie identifies your browser to us. To learn which channels bring people who stay, we record how you first arrived and how you most recently arrived through a tagged link: the campaign tags in the link (utm_source, utm_medium, utm_campaign, utm_content, utm_term), the referring website's domain (never the full address), the page you landed on (without its query string) and any referral code. We then note when you first chatted, signed up, confirmed the newsletter, paid and renewed. This is linked to your account when you sign up, used only in aggregate to judge marketing channels, never sold or shared, and deleted with your account.",
     },
     thirdPartySites: {
       title: "Third-Party Websites",
@@ -124,7 +125,7 @@ export const translations = {
     gdpr: {
       title: "GDPR Compliance",
       description:
-        "For users in the European Union, we comply with all GDPR requirements and respect your data protection rights.",
+        "For users in the European Union, we respect your GDPR rights. Export your data any time from Settings. When you delete your account, your profile, chats, memories, addresses, newsletter subscription and contact details are erased, and personal details on linked visitor records are removed. Anonymous aggregate statistics and the credit ledger (no longer linked to you) are kept. Contact us for anything Settings does not cover.",
     },
     ccpa: {
       title: "CCPA Compliance",

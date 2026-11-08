@@ -20,7 +20,6 @@ import {
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
-import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
@@ -62,14 +61,19 @@ import { scopedTranslation as publicCapScopedTranslation } from "@/credits/publi
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
-import { ProductIds, productsRepository } from "@/products/platform-products";
+import {
+  CREDIT_PACK_PRODUCT_IDS,
+  ProductIds,
+  productsRepository,
+} from "@/products/platform-products";
 
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import { useSubscription } from "../hooks";
 import type definition from "./definition";
 
 const MIN_QTY = 1;
-const MIN_QTY_CRYPTO = 5;
+// Crypto minimum is ~$25 of credits (5 standard packs); the large pack clears it alone.
+const MIN_CRYPTO_CREDITS = 2500;
 
 function formatPrice(price: number, locale: string, currency: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(
@@ -120,7 +124,10 @@ export function SubscriptionCreateContainer(): JSX.Element {
     "year",
   );
   const yearlySubscriptionPrice = yearlyProduct.price;
-  const packProduct = products[ProductIds.CREDIT_PACK];
+  const [packProductId, setPackProductId] = useState<
+    (typeof CREDIT_PACK_PRODUCT_IDS)[number]
+  >(ProductIds.CREDIT_PACK);
+  const packProduct = products[packProductId];
   const packPrice = packProduct.price;
   const packCredits = packProduct.credits;
 
@@ -238,9 +245,10 @@ export function SubscriptionCreateContainer(): JSX.Element {
     packResponse?.success === true ? packResponse.data : undefined;
   const packIsSubmitting = purchaseEndpoint.create?.isSubmitting ?? false;
   const packQty = packForm?.watch("quantity") ?? 1;
-  const isCryptoPackDisabled = packQty < MIN_QTY_CRYPTO;
   const totalPrice = packPrice * packQty;
   const totalCredits = packCredits * packQty;
+  const isCryptoPackDisabled = totalCredits < MIN_CRYPTO_CREDITS;
+  const minCryptoPacks = Math.ceil(MIN_CRYPTO_CREDITS / packCredits);
 
   function setPackQty(next: number): void {
     packForm?.setValue("quantity", Math.max(MIN_QTY, next), {
@@ -256,6 +264,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
     provider: typeof PaymentProviderValue,
   ): void => {
     setIsPackProviderModalOpen(false);
+    packForm?.setValue("productId", packProductId);
     packForm?.setValue("provider", provider);
     void packSubmit?.();
   };
@@ -380,7 +389,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
               <Div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
                 <Info className="h-4 w-4 mt-0.5 shrink-0" />
                 {tPurchase("post.provider.cryptoMinimumDisabled", {
-                  min: MIN_QTY_CRYPTO,
+                  min: minCryptoPacks,
                 })}
               </Div>
             )}
@@ -751,6 +760,40 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 {tPurchase("post.pack.perPack")}
               </Div>
             </Div>
+            <Div className="grid grid-cols-2 gap-2">
+              {CREDIT_PACK_PRODUCT_IDS.map((id) => (
+                <Button
+                  key={id}
+                  type="button"
+                  variant={packProductId === id ? "default" : "outline"}
+                  className="h-auto flex-col items-start gap-0.5 p-3 text-left"
+                  onClick={() => setPackProductId(id)}
+                >
+                  <Span className="text-sm font-semibold">
+                    {id === ProductIds.CREDIT_PACK
+                      ? tPurchase("post.pack.sizeStandard")
+                      : tPurchase("post.pack.sizeLarge")}
+                  </Span>
+                  <Span className="text-xs opacity-80">
+                    {formatPrice(
+                      products[id].price,
+                      locale,
+                      products[id].currency,
+                    )}
+                  </Span>
+                  <Span className="text-xs opacity-80">
+                    {tPurchase("post.pack.features.credits", {
+                      count: products[id].credits,
+                    })}
+                  </Span>
+                  {id === ProductIds.CREDIT_PACK_LARGE && (
+                    <Span className="text-xs font-medium text-success">
+                      {tPurchase("post.pack.bestRate")}
+                    </Span>
+                  )}
+                </Button>
+              ))}
+            </Div>
             <Div className="flex flex-col gap-3 text-sm">
               <Div className="flex items-center gap-2.5">
                 <Sparkles className="h-4 w-4 shrink-0 text-primary" />
@@ -769,7 +812,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 <Span>{tPurchase("post.pack.features.bestFor")}</Span>
               </Div>
             </Div>
-            {hasActiveSubscription ? (
+            {isAuthenticated ? (
               <Div className="flex flex-col gap-4">
                 <FormAlertWidget field={{}} />
                 <Div className="flex flex-col gap-2">
@@ -849,10 +892,21 @@ export function SubscriptionCreateContainer(): JSX.Element {
                 )}
               </Div>
             ) : (
-              <Div className="mt-auto flex items-start gap-2.5 rounded-lg border bg-muted/50 px-3.5 py-3">
-                <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+              <Div className="mt-auto flex flex-col gap-3">
                 <Div className="text-sm text-muted-foreground">
-                  {tPurchase("post.pack.requiresSubscription")}
+                  {tPurchase("post.pack.signInToBuy")}
+                </Div>
+                <Div className="flex flex-col gap-2 sm:flex-row">
+                  <Button variant="outline" asChild className="h-11 flex-1">
+                    <Link href={`/${locale}/user/login`}>
+                      {tPurchase("post.pack.logIn")}
+                    </Link>
+                  </Button>
+                  <Button asChild className="h-11 flex-1">
+                    <Link href={`/${locale}/user/signup`}>
+                      {tPurchase("post.pack.signUp")}
+                    </Link>
+                  </Button>
                 </Div>
               </Div>
             )}

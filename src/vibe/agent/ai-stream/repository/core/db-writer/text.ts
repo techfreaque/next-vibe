@@ -12,7 +12,7 @@ import type { MessageMetadata } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
 import type { ChatModelId } from "../../../models";
-import type { DbWriterState } from "./shared";
+import { type DbWriterState, noteThreadGoneWrite } from "./shared";
 import { buildSseMessageRow } from "./sse-row";
 
 /** Emit a single CONTENT_DELTA SSE event. */
@@ -103,10 +103,11 @@ export async function emitMessageCreated(
       if (
         result.errorType?.errorCode === ErrorResponseTypes.NOT_FOUND.errorCode
       ) {
-        w.deps.logger.warn(
-          "[MessageDbWriter] Thread deleted mid-stream, dropping ASSISTANT message create",
-          { messageId, threadId },
-        );
+        noteThreadGoneWrite(w, "ASSISTANT message create", {
+          messageId,
+          threadId,
+          userId: params.userId,
+        });
       } else {
         // Data loss, not a mere warning: the assistant's reply never lands in
         // the DB and the client never learns why - createTextMessage already
@@ -123,7 +124,7 @@ export async function emitMessageCreated(
         );
       }
     } else {
-      w.committedMessageIds.add(messageId);
+      w.landedWrites++;
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, messageId);
@@ -353,14 +354,15 @@ export async function emitPlaceholderAssistantMessage(
       if (
         result.errorType?.errorCode === ErrorResponseTypes.NOT_FOUND.errorCode
       ) {
-        w.deps.logger.warn(
-          "[MessageDbWriter] Thread deleted mid-stream, dropping placeholder ASSISTANT message",
-          { messageId, threadId },
-        );
+        noteThreadGoneWrite(w, "placeholder ASSISTANT message", {
+          messageId,
+          threadId,
+          userId: params.userId,
+        });
       } else {
         // Data loss, not a mere warning - see emitMessageCreated above.
-        // NOT adding to committedMessageIds — tool children must not use this
-        // failed placeholder as parent (they will fall back to null instead).
+        // Tool children referencing this failed placeholder fall back to the
+        // last committed message inside createToolMessage.
         w.deps.logger.error(
           "[MessageDbWriter] Failed to create placeholder ASSISTANT message - reply not persisted",
           {
@@ -373,7 +375,7 @@ export async function emitPlaceholderAssistantMessage(
         );
       }
     } else {
-      w.committedMessageIds.add(messageId);
+      w.landedWrites++;
     }
     // Roll any queued messages forward to this new frontier
     w.engine.advanceQueuedMessages(threadId, messageId);

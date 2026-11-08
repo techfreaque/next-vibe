@@ -114,7 +114,10 @@ export function useVoiceRecording({
 
   const onError = useCallback(
     (err: string) => {
-      logger.error("Voice input error", { error: err });
+      // Every STT failure shown to the user (incl. "recording too short",
+      // which the hook does not log itself). Genuine failures are ALSO logged
+      // at error with full context inside the STT hook.
+      logger.warn("Voice input error", { error: err });
     },
     [logger],
   );

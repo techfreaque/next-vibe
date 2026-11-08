@@ -302,6 +302,11 @@ export const translations: typeof enTranslations = {
       label: "Failover",
       description: "Als Failover-Konto verwenden",
     },
+    isSystem: {
+      label: "Plattform-Postfach",
+      description:
+        "Postfach der Plattform für den Betrieb. Zugangsdaten kommen aus der Umgebung; von Kampagnen ausgeschlossen.",
+    },
     failoverPriority: {
       label: "Failover-Priorität",
       description: "Failover-Priorität",
@@ -336,6 +341,7 @@ export const translations: typeof enTranslations = {
       isExactMatch: "Genaue Übereinstimmung",
       weight: "Gewichtung",
       isFailover: "Failover",
+      isSystem: "Plattform-Postfach",
       failoverPriority: "Failover-Priorität",
       messagesSentTotal: "Gesendete Nachrichten",
       lastUsedAt: "Zuletzt verwendet",

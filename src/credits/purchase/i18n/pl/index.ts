@@ -19,6 +19,11 @@ export const translations: typeof enTranslations = {
       description: "Liczba pakietów kredytów do zakupu (1-10)",
       placeholder: "Wprowadź ilość (1-10)",
     },
+    productId: {
+      label: "Pakiet kredytów",
+      description: "Wybierz rozmiar pakietu",
+      placeholder: "Wybierz pakiet",
+    },
     provider: {
       label: "Wybierz metodę płatności",
       description: "Wybierz sposób płatności za pakiet kredytów",
@@ -45,7 +50,8 @@ export const translations: typeof enTranslations = {
     pack: {
       qtyCredits: "{{count}} kredytów",
       title: "Pakiet kredytów",
-      description: "Jednorazowy pakiet kredytów do użycia AI",
+      description:
+        "Płacisz za to, co zużyjesz. Bez subskrypcji. Karta lub krypto. Kredyty nie wygasają.",
       perPack: "/ pakiet",
       features: {
         credits: "{{count}} kredytów w zestawie",
@@ -54,8 +60,13 @@ export const translations: typeof enTranslations = {
       },
       totalSummary:
         "{{totalCredits}} kredytów łącznie · {{totalPrice}} łącznie",
-      requiresSubscription:
-        "Pakiety kredytów są dla subskrybentów potrzebujących więcej. Najpierw wykup subskrypcję.",
+      noSubscriptionNeeded: "Płacisz za to, co zużyjesz. Bez subskrypcji.",
+      logIn: "Zaloguj się",
+      signUp: "Załóż konto",
+      signInToBuy: "Załóż darmowe konto, żeby kupić kredyty. Karta lub krypto.",
+      sizeStandard: "Pakiet standardowy",
+      sizeLarge: "Duży pakiet",
+      bestRate: "Najlepsza cena",
     },
     submit: {
       text: "Kup pakiet kredytów",
@@ -111,11 +122,6 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Konflikt",
         description: "Wystąpił konflikt zasobów",
-      },
-      noActiveSubscription: {
-        title: "Wymagana aktywna subskrypcja",
-        description:
-          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
     },
   },

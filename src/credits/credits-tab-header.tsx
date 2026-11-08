@@ -29,6 +29,7 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/repository-client";
 import { useSubscription } from "@/subscription/hooks";
 
@@ -77,7 +78,8 @@ export function CreditsTabHeader({
         queryOptions: {
           staleTime: 10_000,
           refetchOnWindowFocus: true,
-          enabled: isAuthenticated,
+          // Guests have a real (lead-scoped) free balance too - a disabled
+          // query left them on an endless skeleton.
         },
       },
     },
@@ -86,15 +88,23 @@ export function CreditsTabHeader({
   );
 
   const data = endpoint.read?.data;
+  // Loading, failed and loaded are three different screens - a failed load
+  // gets an error + retry, never a skeleton that never resolves or a fake 0.
+  const readFailed = !data && endpoint.read?.response?.success === false;
+  const retryRead = (): void => {
+    void endpoint.read?.refetch();
+  };
 
   const subProduct = productsRepository.getProduct(
     ProductIds.SUBSCRIPTION,
     locale,
   );
-  const freeProduct = productsRepository.getProduct(
-    ProductIds.FREE_TIER,
-    locale,
-  );
+  // Monthly free allowance by tier (guest / signed-in / +newsletter)
+  const freeTiers = {
+    guest: FREE_CREDIT_ALLOWANCE.guest,
+    signedIn: FREE_CREDIT_ALLOWANCE.signedIn,
+    bonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+  };
 
   const totalFormatted = data ? formatCredits(data.total) : "—";
   const totalLabel = data
@@ -174,6 +184,20 @@ export function CreditsTabHeader({
           <Span className="shrink-0 text-2xl font-semibold tabular-nums tracking-tight text-primary sm:text-3xl">
             {totalLabel}
           </Span>
+        ) : readFailed ? (
+          <Div className="flex shrink-0 items-center gap-2 text-sm">
+            <Span className="text-destructive">
+              {t("get.balance.loadFailed")}
+            </Span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={retryRead}
+            >
+              {t("get.balance.retry")}
+            </Button>
+          </Div>
         ) : (
           <Skeleton className="h-9 w-32 shrink-0 rounded-md" />
         )}
@@ -212,12 +236,13 @@ export function CreditsTabHeader({
               value={formatCredits(data.free)}
               description={
                 isAdmin
-                  ? t("get.balance.free.adminDescription", {
-                      count: freeProduct.credits,
-                    })
-                  : t("get.balance.free.description", {
-                      count: freeProduct.credits,
-                    })
+                  ? t("get.balance.free.adminDescription", freeTiers)
+                  : isAuthenticated
+                    ? t("get.balance.free.description", {
+                        count: freeTiers.signedIn,
+                        bonus: freeTiers.bonus,
+                      })
+                    : t("get.balance.free.descriptionGuest", freeTiers)
               }
               icon={<Zap className="h-4 w-4" />}
               variant="info"
@@ -232,7 +257,7 @@ export function CreditsTabHeader({
               />
             </Link>
           </Div>
-        ) : (
+        ) : readFailed ? null : (
           <Div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-24 rounded-lg" />
@@ -253,6 +278,28 @@ export function CreditsTabHeader({
         </Div>
       )}
 
+      {/* Guests: what they get now and the free step up */}
+      {!isAuthenticated && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm font-semibold">
+                {t("get.balance.guestPlan")}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {t("get.balance.free.descriptionGuest", freeTiers)}
+              </Span>
+            </Div>
+            <Link
+              href={`/${locale}/user/signup`}
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90 sm:h-10"
+            >
+              {t("get.balance.signUp")}
+            </Link>
+          </Div>
+        </Div>
+      )}
+
       {/* No plan yet: what they're on and the one step up */}
       {isAuthenticated &&
         !isAdmin &&
@@ -266,7 +313,8 @@ export function CreditsTabHeader({
                 </Span>
                 <Span className="text-sm text-muted-foreground">
                   {t("get.balance.freePlanHint", {
-                    count: freeProduct.credits,
+                    count: freeTiers.signedIn,
+                    bonus: freeTiers.bonus,
                     subCredits: subProduct.credits,
                   })}
                 </Span>

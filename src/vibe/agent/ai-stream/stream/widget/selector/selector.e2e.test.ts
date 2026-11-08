@@ -111,12 +111,11 @@ describe("E2E: chat selector + empty state", () => {
       await page.waitForTimeout(1500);
       expect(await page.locator("#react-joyride-portal").count()).toBe(0);
 
-      const starter = page.locator('[data-starter="explain"]');
+      const starter = page.locator('[data-starter="0"]');
+      const starterText = (await starter.innerText()).trim();
       await starter.click();
       const composer = page.locator('textarea[name="prompt"]').first();
-      expect(await composer.inputValue()).toBe(
-        tThreads("widget.suggestedPrompts.starters.explain.prompt"),
-      );
+      expect(await composer.inputValue()).toBe(starterText);
 
       // The tour is still one click away
       await page

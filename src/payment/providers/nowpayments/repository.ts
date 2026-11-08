@@ -553,7 +553,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       // Return standardized webhook event
       return success<WebhookEvent>({
-        id: payload.payment_id,
+        // One IPN per status change shares the same payment_id — key the
+        // idempotency row on id+status, or a later "refunded" (or "finished"
+        // after "waiting") would be skipped as already processed.
+        id: `${payload.payment_id}_${payload.payment_status}`,
         type: eventType,
         data: {
           id: payload.invoice_id || payload.payment_id,

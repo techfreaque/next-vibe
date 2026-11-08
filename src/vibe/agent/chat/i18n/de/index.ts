@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     folders: "Ordner",
     files: "Dateien",
     messages: "Nachrichten",
-    characters: "Charaktere",
+    characters: "Skills",
     memories: "Erinnerungen",
     favorites: "Favoriten",
     credits: "Credits",
@@ -45,6 +45,23 @@ export const translations: typeof enTranslations = {
       system: "System",
       tool: "Werkzeug",
       error: "Fehler",
+    },
+    threadModerationStatus: {
+      visible: "Sichtbar",
+      underReview: "In Prüfung",
+      removed: "Entfernt",
+    },
+    threadReportReason: {
+      spam: "Spam",
+      illegal: "Illegale Inhalte",
+      abuse: "Missbrauch oder Belästigung",
+      csamFlag: "Kinderschutz-Verdacht",
+      other: "Sonstiges",
+    },
+    threadModerationAction: {
+      dismiss: "Meldungen verwerfen (wiederherstellen)",
+      remove: "Inhalt entfernen",
+      banAuthor: "Entfernen und Autor sperren",
     },
     threadStatus: {
       active: "Aktiv",
@@ -171,7 +188,7 @@ export const translations: typeof enTranslations = {
       subscriptionButton: {
         title: "Credits & Abonnement",
         description:
-          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Nutzer erhalten {{freeCredits}} Credits/Monat.",
+          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, +{{bonusCredits}} mit dem Newsletter.",
       },
       chatInput: {
         title: "Ihre Nachricht eingeben",
@@ -223,8 +240,8 @@ export const translations: typeof enTranslations = {
     modelOnly: "Nur Modell",
     editModelSettings: "Modelleinstellungen bearbeiten",
     editSettings: "Einstellungen bearbeiten",
-    switchSkill: "Charakter wechseln",
-    editSkill: "Charakter bearbeiten",
+    switchSkill: "Skill wechseln",
+    editSkill: "Skill bearbeiten",
     delete: "Löschen",
     autoSelectedModel: "FILTERBASIERT",
     manualSelectedModel: "MANUELL AUSGEWÄHLT",
@@ -251,16 +268,16 @@ export const translations: typeof enTranslations = {
     saveAsDefault: "Zu Favoriten hinzufügen",
     deleteSetup: "Setup löschen",
     content: "Inhalte durchsuchen...",
-    characterSetup: "Charakter-Setup",
+    characterSetup: "Skill-Setup",
     noResults: "Keine Ergebnisse",
     add: "Zu Favoriten hinzufügen",
     added: "Hinzugefügt",
     addNew: "Neu hinzufügen",
-    searchSkills: "Charaktere suchen...",
+    searchSkills: "Skills suchen...",
     createCustom: "Benutzerdefiniert erstellen",
     customizeSettings: "Einstellungen anpassen",
     requirements: {
-      characterConflict: "Charakter-Anforderungskonflikte",
+      characterConflict: "Skill-Anforderungskonflikte",
       tooLow: "zu niedrig",
       tooHigh: "zu hoch",
       min: "min",
@@ -305,14 +322,14 @@ export const translations: typeof enTranslations = {
       deleteMessage: "Nachricht löschen",
     },
     characterSelector: {
-      placeholder: "Charakter auswählen",
-      addNewLabel: "Benutzerdefinierte Charakter erstellen",
+      placeholder: "Skill auswählen",
+      addNewLabel: "Benutzerdefiniertes Skill erstellen",
       grouping: {
         bySource: "Nach Quelle",
         byCategory: "Nach Kategorie",
         sourceLabels: {
           builtIn: "Integriert",
-          my: "Meine Charakters",
+          my: "Meine Skills",
           community: "Community",
         },
         sourceIcons: {
@@ -322,11 +339,11 @@ export const translations: typeof enTranslations = {
         },
       },
       addDialog: {
-        title: "Benutzerdefinierte Charakter erstellen",
+        title: "Benutzerdefiniertes Skill erstellen",
         fields: {
           name: {
             label: "Name",
-            placeholder: "Charakter-Name eingeben",
+            placeholder: "Skill-Name eingeben",
           },
           icon: {
             label: "Symbol (Emoji)",
@@ -334,11 +351,11 @@ export const translations: typeof enTranslations = {
           },
           description: {
             label: "Beschreibung",
-            placeholder: "Kurze Beschreibung der Charakter",
+            placeholder: "Kurze Beschreibung das Skill",
           },
           systemPrompt: {
             label: "System-Prompt",
-            placeholder: "Definieren Sie, wie sich die Charakter verhält...",
+            placeholder: "Definieren Sie, wie sich die Skill verhält...",
           },
           category: {
             label: "Kategorie",
@@ -346,7 +363,7 @@ export const translations: typeof enTranslations = {
         },
         createCategory: "Kategorie erstellen",
         cancel: "Abbrechen",
-        create: "Charakter erstellen",
+        create: "Skill erstellen",
       },
       addCategoryDialog: {
         title: "Kategorie erstellen",
@@ -374,7 +391,7 @@ export const translations: typeof enTranslations = {
     searchEnabled: "Suche aktiviert",
     searchDisabled: "Suche deaktiviert",
     answerAsAI: "Als KI-Modell antworten",
-    retry: "Mit anderem Modell/Charakter wiederholen",
+    retry: "Mit anderem Modell/Skill wiederholen",
     branch: "Konversation von hier abzweigen",
     editMessage: "Nachricht bearbeiten",
     stopAudio: "Audio-Wiedergabe stoppen",

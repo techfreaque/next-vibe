@@ -130,6 +130,42 @@ export const translations: typeof enTranslations = {
       description: "Sie wurden vom Newsletter abgemeldet",
     },
   },
+  oneClick: {
+    tag: "One-Click-Abmeldung",
+    post: {
+      title: "One-Click-Abmeldung",
+      titleShort: "Abmelden",
+      description:
+        "Abmeldung über den signierten One-Click-Link im E-Mail-Header (RFC 8058)",
+      container: {
+        title: "One-Click-Abmeldung",
+        description:
+          "Wird von Mailanbietern aufgerufen. Das signierte Token autorisiert die Abmeldung.",
+      },
+      token: {
+        label: "Token",
+        description: "Signiertes Abmelde-Token aus der E-Mail",
+      },
+      errors: {
+        invalidToken: {
+          title: "Ungültiger Link",
+          description: "Dieser Abmeldelink ist ungültig.",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Abmeldung fehlgeschlagen. Versuch es erneut.",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültiges Token-Format",
+        },
+      },
+      success: {
+        title: "Abgemeldet",
+        description: "Du bist raus aus dem Verteiler.",
+      },
+    },
+  },
   sync: {
     failed: "Newsletter-Abmeldung Synchronisation fehlgeschlagen",
     error: "Newsletter-Abmeldung Synchronisation Fehler",

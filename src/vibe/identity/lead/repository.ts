@@ -1239,20 +1239,34 @@ export class LeadsRepository {
               .limit(1);
 
             if (duplicateLead && duplicateLead.id !== existingLead.id) {
-              return fail({
-                message: t("leadsErrors.leads.post.error.duplicate.title"),
-                errorType: ErrorResponseTypes.CONFLICT,
-              });
+              // The email already belongs to another lead (newsletter,
+              // campaign import, earlier visit). Failing here used to leave the
+              // visitor's lead unlinked from the new account ("Lead conversion
+              // failed"). Convert the visitor's lead below WITHOUT taking the
+              // email. The email-owning lead is deliberately NOT linked to the
+              // user: a user-lead link pools that lead's credit wallet (and
+              // lead-owned data) into the account, and signup does not prove
+              // ownership of the email - linking here would let anyone sign up
+              // with someone else's newsletter email and inherit their guest
+              // credits. Merge it only after the email is verified.
+              logger.info(
+                "Email already owned by another lead - converting visitor lead without it (email lead not linked)",
+                {
+                  leadId,
+                  emailLeadId: duplicateLead.id,
+                  userId: options.userId,
+                },
+              );
+            } else {
+              updateData.email = options.email.toLowerCase().trim();
+              updateData.status = getWebsiteUserStatus(existingLead.status);
+              updateData.metadata = {
+                ...existingLead.metadata,
+                anonymous: false,
+                convertedAt: new Date().toISOString(),
+                originalEmail: existingLead.email,
+              };
             }
-
-            updateData.email = options.email.toLowerCase().trim();
-            updateData.status = getWebsiteUserStatus(existingLead.status);
-            updateData.metadata = {
-              ...existingLead.metadata,
-              anonymous: false,
-              convertedAt: new Date().toISOString(),
-              originalEmail: existingLead.email,
-            };
           }
 
           // Handle additional data updates

@@ -142,6 +142,7 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
+    download: "Pobierz",
     title: "Mowa na tekst",
     titleShort: "Mowa na tekst",
     dynamicTitle: "Transkrypt: {{text}}",
@@ -252,6 +253,14 @@ export const translations: typeof enTranslations = {
     descriptions: {
       openaiWhisper: "OpenAI Whisper",
       deepgramNova2: "Deepgram Nova-2",
+      whisperLargeV3:
+        "Whisper Large V3 - Otwarty model OpenAI, 99 języków, znacznie tańszy niż whisper-1.",
+      voxtralMini:
+        "Voxtral Mini Transcribe - transkrypcja Mistral z rozdzielaniem mówców i znacznikami czasu, do 10 minut.",
+      nemotronAsr:
+        "Nemotron ASR - otwarte wielojęzyczne rozpoznawanie mowy NVIDIA, 40 wariantów językowych, niskie opóźnienie.",
+      gpt4oMiniTranscribe:
+        "GPT-4o Mini Transcribe - niższy współczynnik błędów niż Whisper, lepsze wykrywanie języka.",
     },
   },
 };

@@ -4,16 +4,12 @@ export const translations: typeof enTranslations = {
   nav: {
     help: "Pomoc",
     logout: "Wyloguj",
-    settings: "Mój profil",
+    settings: "Mój profil i ustawienia",
+    profile: "Mój profil",
     leadMagnet: "Lead Magnet",
     enableLightMode: "Włącz tryb jasny",
     enableDarkMode: "Włącz tryb ciemny",
     notifications: "Powiadomienia",
-    welcomeNotification: {
-      title: "Witamy w {{appName}}!",
-      description:
-        "Zacznij od eksplorowania modeli AI i tworzenia swojej pierwszej rozmowy.",
-    },
     company: "Firma",
     about: {
       title: "O nas",
@@ -75,87 +71,6 @@ export const translations: typeof enTranslations = {
     },
   },
   home: {
-    v2: {
-      how: {
-        eyebrow: "Jak to działa",
-        title: "Trzy wybory. Potem po prostu pytaj.",
-        subtitle:
-          "Bez konfiguracji, bez sztuczek z promptami. Wybierasz, kto odpowiada i jak bardzo filtruje.",
-        steps: {
-          who: {
-            title: "Wybierz rozmówcę",
-            body: "Towarzysz do codziennych rozmów albo specjalista od kodu, researchu, pisania. Każdy pamięta Twój kontekst.",
-          },
-          filter: {
-            title: "Wybierz filtr",
-            body: "Modele: {{modelCount}}, w trzech poziomach: mainstream, otwarte i bez cenzury. Zmieniasz w każdej chwili, nawet w trakcie czatu.",
-          },
-          ask: {
-            title: "Pytaj o wszystko",
-            body: "Szuka w sieci, czyta źródła, tworzy obrazy, wideo i muzykę. Dostajesz odpowiedź, nie wykład.",
-          },
-        },
-      },
-      pricing: {
-        eyebrow: "Cennik",
-        title: "Zacznij za darmo. Płać za to, czego używasz.",
-        subtitle:
-          "Kredyty zamiast licencji. Tanie modele kosztują ułamek kredytu za wiadomość.",
-        free: {
-          name: "Darmowy",
-          note: "na zawsze",
-          p1: "{{freeCredits}} kredytów co miesiąc",
-          p2: "Wszystkie trzy poziomy filtra",
-          p3: "Bez karty na start",
-        },
-        sub: {
-          name: "Subskrypcja",
-          note: "miesięcznie",
-          p1: "{{subscriptionCredits}} kredytów co miesiąc",
-          p2: "Doładowanie w każdej chwili: {{packCredits}} kredytów za {{packPrice}}",
-          p3: "Każdy model, każde narzędzie",
-        },
-        cta: "Zobacz pełny cennik",
-        footnote:
-          "Rezygnujesz kiedy chcesz. Kupione pakiety kredytów nigdy nie wygasają.",
-      },
-      more: {
-        eyebrow: "Więcej niż czat",
-        title: "Uruchom u siebie. Buduj na tym. Zarabiaj.",
-        subtitle:
-          "Ta sama platforma, open source - dla tych, którym okno czatu nie wystarcza.",
-      },
-      faq: {
-        eyebrow: "Pytania",
-        title: "O co pytacie najpierw",
-        items: {
-          uncensored: {
-            q: "Czy to naprawdę bez cenzury?",
-            a: "Ty decydujesz, w każdym czacie osobno. Modele mainstream trzymają się zasad swoich twórców. Otwarte filtrują lekko. Modele bez cenzury nie odmawiają. Nic nie jest filtrowane za Twoimi plecami - dostajesz dokładnie ten poziom, który wybierzesz.",
-          },
-          privacy: {
-            q: "Kto może czytać moje czaty?",
-            a: "Czaty incognito istnieją tylko w Twojej przeglądarce - nie przechowujemy ich. Prywatne czaty są zapisane na Twoim koncie i tylko Ty możesz je otworzyć. Żeby odpowiedzieć, wiadomość trafia do wybranego dostawcy modelu.",
-          },
-          account: {
-            q: "Czy potrzebuję konta?",
-            a: "Nie. Otwórz aplikację i od razu czatuj w trybie incognito. Darmowe konto synchronizuje czaty między urządzeniami i daje {{freeCredits}} darmowych kredytów co miesiąc.",
-          },
-          cost: {
-            q: "Ile to kosztuje?",
-            a: "Za darmo dostajesz {{freeCredits}} kredytów miesięcznie. Subskrypcja to {{subscriptionPrice}} miesięcznie za {{subscriptionCredits}} kredytów, a doładujesz pakietami ({{packCredits}} kredytów za {{packPrice}}). Każda wiadomość kosztuje kredyty zależnie od modelu.",
-          },
-          models: {
-            q: "Z jakich modeli mogę korzystać?",
-            a: "Modele: {{modelCount}}, od dostawców: {{providerCount}} - najnowsze Claude, GPT, Gemini, Grok, DeepSeek i Qwen, modele open-weight i dedykowane modele bez cenzury. Nowości pojawiają się szybko.",
-          },
-          selfhost: {
-            q: "Czy mogę to uruchomić u siebie?",
-            a: "Tak. Cała platforma jest open source (MIT + GPL v3). Uruchom ją na własnym komputerze z własnymi kluczami - albo połącz z kontem tutaj.",
-          },
-        },
-      },
-    },
     splitHero: {
       seeHow: "Zobacz, jak to działa",
       stats: {
@@ -215,11 +130,29 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      or: "LUB",
+      clickToExplore: "Odkryj",
       badge: "Mały zespół · Open source · Rozwijamy otwarcie",
       header: "AI, które nie mówi ci, co masz myśleć.",
       subheader:
         "Żadnych odmów. Nikt nie czyta twoich rozmów. Twoja AI - nie nasza.",
+      chipChat: "Czat",
+      chipSelfHost: "Własny serwer",
+      chipBuild: "Buduj",
+      chipEarn: "Zarabiaj",
+      introGuide: "Cztery drogi - wybierz swoją:",
+      introOption1: "",
+      introOption2: "",
+      introOption3: "",
+      introOption4: "",
+      introBody: "",
+      introHelp: "Naprawiamy szybko. Coś nie gra?",
+      introHelpCta: "Napisz do nas",
       card: {
+        chat: {
+          label: "Po prostu pogadaj",
+          desc: "Pytaj o wszystko - łącznie z tym, czego ChatGPT odmawia. Bez rejestracji.",
+        },
         personal: {
           label: "Twoja własna AI",
           desc: "Działa na twoim sprzęcie. Mówisz jej czego potrzebujesz - dostosowuje się do twojego życia.",
@@ -234,16 +167,170 @@ export const translations: typeof enTranslations = {
         },
       },
       unbottled: {
+        badge: "Bez cenzury · Otwarty · Mainstream",
+        titleLine1: "AI bez cenzury.",
+        titleLine2: "Zapytaj o wszystko.",
+        subtitle:
+          "{{modelCount}} modeli. Trzy poziomy - Ty wybierasz. Zmieniaj w każdej rozmowie. Prawdziwa odpowiedź, nie zatwierdzona wersja.",
+        pill1: "{{modelCount}} modeli - Ty wybierasz filtr",
+        pill2: "Generuj obrazy, wideo i muzykę",
+        pill3: "{{skillCount}}+ skillów z pamięcią i wyszukiwarką",
         cta: "Zacznij rozmawiać",
+        ctaExplore: "Dowiedz się więcej",
       },
       personal: {
+        badge: "Twój własny agent AI",
+        titleLine1: "Pytasz.",
+        titleLine2: "Dostarcza.",
+        subtitle:
+          "Każde narzędzie, które Thea zbuduje, trafia od razu na Twój dashboard - gotowy interfejs, CLI, narzędzie AI, cron job. SSH, e-mail, automatyzacja przeglądarki. Twoja maszyna. Twoje dane.",
+        pill1: "Przeglądarka, terminal i SSH w zestawie",
+        pill2: "Działa 24/7 w tle",
+        pill3: "Własne klucze lub konto {{appName}}",
         cta: "Hostuj za darmo",
+        ctaGithub: "Dowiedz się więcej",
       },
       nextvibe: {
+        badge: "Open Source · MIT + GPL v3",
+        titleLine1: "Piszesz raz.",
+        titleLine2: "Działa wszędzie.",
+        subtitle:
+          "Jedna definicja TypeScript staje się automatycznie dedykowanym interfejsem web, poleceniem CLI, narzędziem AI, serwerem MCP, ekranem mobilnym i cron jobem. Ten sam kontrakt. Zero przepisywania. Sforkuj i rozwijaj po swojemu.",
+        pill1: "Napędza {{appName}}",
+        pill2: "Zero any / unknown / throw",
+        pill3: "{{platformCount}} platform na endpoint",
+        ctaGithub: "Dodaj gwiazdkę na GitHub",
         ctaDocs: "Odkryj framework",
+        ctaExplore: "Dowiedz się więcej",
       },
       referral: {
+        badge: "Skill Economy",
+        titleLine1: "Publikuj. Polecaj.",
+        titleLine2: "Zarabiaj.",
+        subtitle:
+          "Link polecający: 10% z każdej płatności, na zawsze. Twój skill jako strona wejścia: +5% - nawet gdy inni go udostępniają.",
         cta: "Zacznij zarabiać",
+        ctaExplore: "Dowiedz się więcej",
+      },
+      tab: {
+        unbottled: "{{appName}}",
+        unbottledSub: "AI dla użytkowników",
+        unbottledDesc:
+          "{{modelCount}} modeli, generowanie obrazów/wideo/muzyki, trwała pamięć, wyszukiwanie na żywo - żaden filtr, którego nie wybrałeś",
+        personal: "Własny hosting",
+        personalSub: "Twój Agent AI",
+        personalDesc:
+          "Wszystkie modele na Twoim sprzęcie - przegląda, koduje, terminale 24/7. Własne klucze lub konto {{appName}}.",
+        nextvibe: "next-vibe",
+        nextvibeSub: "Framework",
+        nextvibeDesc:
+          "Framework MIT za {{appName}} - jeden endpoint, każda platforma, sforkuj i posiadaj",
+        referral: "Zarabiaj",
+        referralSub: "Skille i rekomendacje",
+        referralDesc:
+          "10% cyklicznie z każdego polecenia, +5% za skill. Wielopoziomowy łańcuch. Do 20% łącznie z każdej płatności.",
+      },
+    },
+    ctaPersonal: {
+      title: "Twój agent. Twój serwer. Twoje dane.",
+      subtitle:
+        "SSH, przeglądarka, e-mail, kod. Zawsze aktywny. Wszystko, co zbuduje Thea, zostaje na Twoim serwerze.",
+      primary: "Hostuj za darmo",
+      secondary: "Zobacz na GitHub",
+    },
+    ctaNextvibe: {
+      title: "Jedna definicja. Każda platforma.",
+      subtitle:
+        "Web UI, CLI, narzędzie AI, serwer MCP, ekran mobilny, cron job - automatycznie. Sforkuj. Posiadaj.",
+      primary: "Czytaj dokumentację",
+      secondary: "Star na GitHub",
+    },
+    ctaReferral: {
+      title: "Zacznij zarabiać już dziś.",
+      subtitle:
+        "Udostępnij link. Opublikuj skill. Zarabiaj od każdej płatności, na zawsze.",
+      primary: "Przejdź do panelu poleceń",
+      secondary: "Zbuduj skill",
+    },
+    v2: {
+      how: {
+        eyebrow: "Jak to działa",
+        title: "Trzy wybory. Potem po prostu pytaj.",
+        subtitle:
+          "Bez konfiguracji, bez sztuczek z promptami. Wybierasz, kto odpowiada i jak bardzo filtruje.",
+        steps: {
+          who: {
+            title: "Wybierz rozmówcę",
+            body: "Towarzysz do codziennych rozmów albo specjalista od kodu, researchu, pisania. Każdy pamięta Twój kontekst.",
+          },
+          filter: {
+            title: "Wybierz filtr",
+            body: "Modele: {{modelCount}}, w trzech poziomach: mainstream, otwarte i bez cenzury. Zmieniasz w każdej chwili, nawet w trakcie czatu.",
+          },
+          ask: {
+            title: "Pytaj o wszystko",
+            body: "Szuka w sieci, czyta źródła, tworzy obrazy, wideo i muzykę. Dostajesz odpowiedź, nie wykład.",
+          },
+        },
+      },
+      pricing: {
+        eyebrow: "Cennik",
+        title: "Zacznij za darmo. Płać za to, czego używasz.",
+        subtitle:
+          "Kredyty zamiast licencji. Tanie modele kosztują ułamek kredytu za wiadomość.",
+        free: {
+          name: "Darmowy",
+          note: "na zawsze",
+          p1: "{{freeCreditsGuest}} kredytów miesięcznie, bez rejestracji",
+          p2: "{{freeCreditsSignedIn}} z darmowym kontem, +{{freeCreditsNewsletterBonus}} z newsletterem",
+          p3: "Wszystkie trzy poziomy filtra. Bez karty.",
+        },
+        sub: {
+          name: "Subskrypcja",
+          note: "miesięcznie",
+          p1: "{{subscriptionCredits}} kredytów co miesiąc",
+          p2: "Doładowanie w każdej chwili: {{packCredits}} kredytów za {{packPrice}}",
+          p3: "Każdy model, każde narzędzie",
+        },
+        cta: "Zobacz pełny cennik",
+        footnote:
+          "Rezygnujesz kiedy chcesz. Kupione pakiety kredytów nigdy nie wygasają.",
+      },
+      more: {
+        eyebrow: "Więcej niż czat",
+        title: "Uruchom u siebie. Buduj na tym. Zarabiaj.",
+        subtitle:
+          "Ta sama platforma, open source - dla tych, którym okno czatu nie wystarcza.",
+      },
+      faq: {
+        eyebrow: "Pytania",
+        title: "O co pytacie najpierw",
+        items: {
+          uncensored: {
+            q: "Czy to naprawdę bez cenzury?",
+            a: "Ty decydujesz, w każdym czacie osobno. Modele mainstream trzymają się zasad swoich twórców. Otwarte filtrują lekko. Modele bez cenzury nie odmawiają. Nic nie jest filtrowane za Twoimi plecami - dostajesz dokładnie ten poziom, który wybierzesz.",
+          },
+          privacy: {
+            q: "Kto może czytać moje czaty?",
+            a: "Czaty incognito istnieją tylko w Twojej przeglądarce - nie przechowujemy ich. Prywatne czaty są zapisane na Twoim koncie i tylko Ty możesz je otworzyć. Żeby odpowiedzieć, wiadomość trafia do wybranego dostawcy modelu.",
+          },
+          account: {
+            q: "Czy potrzebuję konta?",
+            a: "Nie. Otwórz aplikację i od razu czatuj w trybie incognito. Darmowe konto synchronizuje czaty między urządzeniami i podnosi Twoje darmowe kredyty z {{freeCreditsGuest}} do {{freeCreditsSignedIn}} miesięcznie.",
+          },
+          cost: {
+            q: "Ile to kosztuje?",
+            a: "Za darmo dostajesz {{freeCreditsGuest}} kredytów miesięcznie jako gość, {{freeCreditsSignedIn}} z kontem, +{{freeCreditsNewsletterBonus}} z newsletterem. Subskrypcja to {{subscriptionPrice}} miesięcznie za {{subscriptionCredits}} kredytów, a doładujesz pakietami ({{packCredits}} kredytów za {{packPrice}}). Każda wiadomość kosztuje kredyty zależnie od modelu.",
+          },
+          models: {
+            q: "Z jakich modeli mogę korzystać?",
+            a: "Modele: {{modelCount}}, od dostawców: {{providerCount}} - najnowsze Claude, GPT, Gemini, Grok, DeepSeek i Qwen, modele open-weight i dedykowane modele bez cenzury. Nowości pojawiają się szybko.",
+          },
+          selfhost: {
+            q: "Czy mogę to uruchomić u siebie?",
+            a: "Tak. Cała platforma jest open source (MIT + GPL v3). Uruchom ją na własnym komputerze z własnymi kluczami - albo połącz z kontem tutaj.",
+          },
+        },
       },
     },
     problem: {
@@ -738,7 +825,7 @@ export const translations: typeof enTranslations = {
       featuresReferral: "Dochód z poleceń",
       subscription: "Subskrypcja",
       aiModels: "Modele AI",
-      characters: "Persony",
+      characters: "Skille",
     },
     product: {
       title: "Produkt",

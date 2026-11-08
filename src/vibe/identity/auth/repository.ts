@@ -80,6 +80,50 @@ export class AuthRepository {
   }
 
   /**
+   * Anonymous public payload with NO lead (empty id). Used where a request
+   * must not mint a lead (API-key surface: bad key = 401, never a new lead).
+   */
+  static anonymousPublicUser(): JwtPayloadType {
+    return {
+      isPublic: true,
+      leadId: "",
+      roles: [UserPermissionRole.PUBLIC],
+    };
+  }
+
+  /**
+   * Build the private payload for a user id (fresh roles + primary lead).
+   * Caller has already proven identity (e.g. a verified API key).
+   */
+  static async authenticateUserById(
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    const leadId = await AuthRepository.getLeadIdForUser(
+      userId,
+      locale,
+      logger,
+    );
+    if (!leadId) {
+      const { t } = scopedTranslation.scopedT(locale);
+      return fail({
+        message: t("errors.session_retrieval_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    const userRolesResponse = await UserRolesRepository.findByUserId(
+      userId,
+      logger,
+      locale,
+    );
+    const roles = userRolesResponse.success
+      ? userRolesResponse.data.map((r) => r.role)
+      : [UserPermissionRole.CUSTOMER];
+    return success({ isPublic: false, id: userId, leadId, roles });
+  }
+
+  /**
    * Helper to create private user payload
    * Note: This is a helper for creating payload structure - roles should be fetched from DB
    */
@@ -827,6 +871,20 @@ export class AuthRepository {
       if (context.jwtPayload) {
         logger.debug("Using provided JWT payload");
         return success(context.jwtPayload);
+      }
+
+      // API-key surface (/api/<locale>/v1/*): keys authenticate here and
+      // nowhere else. Resolved before JWT/cookie handling.
+      if (context.request) {
+        const { ApiKeyAuth } = await import("@/api-keys/auth");
+        const keyAuth = await ApiKeyAuth.authenticateRequest(
+          context.request,
+          context.locale,
+          logger,
+        );
+        if (keyAuth) {
+          return keyAuth;
+        }
       }
 
       // Extract leadId from Bearer suffix before getStoredAuthToken strips it.

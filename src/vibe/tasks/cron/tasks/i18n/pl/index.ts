@@ -289,6 +289,11 @@ export const translations: typeof enTranslations = {
       taskInput: {
         label: "Dane wejściowe zadania",
         description: "Dane wejściowe JSON dla zadania",
+        placeholder: '{ "dryRun": false }',
+        invalidJson:
+          "To nie jest poprawny JSON. Sprawdź cudzysłowy, przecinki i nawiasy.",
+        notObject:
+          'Dane wejściowe muszą być obiektem JSON, np. { "key": "value" }.',
       },
       runOnce: {
         label: "Uruchom raz",
@@ -464,6 +469,22 @@ export const translations: typeof enTranslations = {
       noMatches: "Żadne zadania nie pasują do filtrów",
       noMatchesDesc: "Spróbuj dostosować kryteria wyszukiwania lub filtrowania",
       clearFilters: "Wyczyść filtry",
+    },
+    create: {
+      created: "Zadanie utworzone",
+      route: "Trasa",
+      schedule: "Harmonogram",
+      nextRun: "Następne uruchomienie",
+      notScheduled: "Nie zaplanowano",
+      owner: "Właściciel",
+      ownerSystem: "System",
+      ownerYou: "Ty",
+      ownerUser: "Użytkownik {{id}}",
+      enabled: "Aktywne",
+      disabled: "Wyłączone",
+      taskInput: "Dane wejściowe",
+      noInput: "Brak danych - trasa działa z ustawieniami domyślnymi.",
+      openTask: "Otwórz zadanie",
     },
   },
 };

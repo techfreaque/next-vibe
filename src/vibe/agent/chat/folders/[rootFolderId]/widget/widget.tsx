@@ -359,7 +359,7 @@ export function FoldersListContainer(): React.JSX.Element {
   // Trigger cortex search when debounced query changes or on mount with persisted query
   const searchSubmittedRef = useRef("");
   useEffect(() => {
-    if (!debouncedQuery || !searchEndpoint?.read) {
+    if (!isAuthenticated || !debouncedQuery || !searchEndpoint?.read) {
       searchSubmittedRef.current = "";
       return;
     }
@@ -373,7 +373,7 @@ export function FoldersListContainer(): React.JSX.Element {
     form.setValue("path", `/threads/${activeRootFolderId}`);
     form.setValue("maxResults", 20);
     searchEndpoint.read.submitForm();
-  }, [debouncedQuery, activeRootFolderId, searchEndpoint]);
+  }, [debouncedQuery, activeRootFolderId, searchEndpoint, isAuthenticated]);
 
   // Extract thread IDs from cortex search results
   const searchResponse = searchEndpoint?.read?.response;
@@ -393,7 +393,7 @@ export function FoldersListContainer(): React.JSX.Element {
   }, [searchResponse]);
 
   // Show loading while debouncing OR while API is fetching
-  const isSearchActive = searchQuery.trim().length > 0;
+  const isSearchActive = isAuthenticated && searchQuery.trim().length > 0;
   const isDebouncePending =
     isSearchActive && searchQuery.trim() !== debouncedQuery;
   const isSearching =
@@ -503,35 +503,39 @@ export function FoldersListContainer(): React.JSX.Element {
         )}
       </Div>
 
-      <Div className="px-3 pb-3 flex flex-row gap-2 border-b border-border">
-        <Div className="relative flex-1 flex flex-row">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-          <Input
-            ref={searchInputRef}
-            type="text"
-            placeholder={t("widget.common.searchPlaceholder")}
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (e.target.value.trim().length === 0) {
-                setDebouncedQuery("");
-              }
-            }}
-            className={cn(
-              "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
-              isSearchActive && "pr-8",
+      {/* Thread search is cortex vector search - account-scoped. Guests have
+          no cortex (the call was always 403), so the box is not offered. */}
+      {isAuthenticated && (
+        <Div className="px-3 pb-3 flex flex-row gap-2 border-b border-border">
+          <Div className="relative flex-1 flex flex-row">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <Input
+              ref={searchInputRef}
+              type="text"
+              placeholder={t("widget.common.searchPlaceholder")}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (e.target.value.trim().length === 0) {
+                  setDebouncedQuery("");
+                }
+              }}
+              className={cn(
+                "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
+                isSearchActive && "pr-8",
+              )}
+            />
+            {isSearchActive && (
+              <Div
+                onClick={handleClearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 hover:bg-primary/10"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </Div>
             )}
-          />
-          {isSearchActive && (
-            <Div
-              onClick={handleClearSearch}
-              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 hover:bg-primary/10"
-            >
-              <X className="h-3.5 w-3.5 text-muted-foreground" />
-            </Div>
-          )}
+          </Div>
         </Div>
-      </Div>
+      )}
 
       <Div className="flex-1 overflow-hidden px-0">
         <ScrollArea className="h-full">

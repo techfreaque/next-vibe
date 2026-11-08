@@ -220,3 +220,100 @@ export function getAvailableModelCountsByContentLevel(
 
   return counts;
 }
+
+/**
+ * Honest, user-facing chat-model count: only the chat models a user can
+ * actually pick in a thread (excludes image/video/music/TTS/STT model
+ * definitions, which inflate {@link getAvailableModelCount}).
+ */
+export function getAvailableChatModelCount(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): number {
+  return Object.values(chatModelDefinitions).filter((def) => {
+    const visibleProviders = isAdmin
+      ? def.providers
+      : def.providers.filter((p) => !p.adminOnly);
+    if (visibleProviders.length === 0) {
+      return false;
+    }
+    if (isAdmin) {
+      return true;
+    }
+    return visibleProviders.some((p) => {
+      const option = chatModelOptions.find((m) => m.id === p.id);
+      return option ? isModelProviderAvailable(option, availability) : false;
+    });
+  }).length;
+}
+
+/**
+ * Number of distinct labs/providers that publish at least one available chat
+ * model (honest "across N labs" figure, not the full multi-modal provider set).
+ */
+export function getAvailableChatProviderCount(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): number {
+  const providerIds = new Set<string>();
+  for (const def of Object.values(chatModelDefinitions)) {
+    const visibleProviders = isAdmin
+      ? def.providers
+      : def.providers.filter((p) => !p.adminOnly);
+    if (visibleProviders.length === 0) {
+      continue;
+    }
+    const available =
+      isAdmin ||
+      visibleProviders.some((p) => {
+        const option = chatModelOptions.find((m) => m.id === p.id);
+        return option ? isModelProviderAvailable(option, availability) : false;
+      });
+    if (available) {
+      providerIds.add(def.by);
+    }
+  }
+  return providerIds.size;
+}
+
+/**
+ * Per-tier counts restricted to pickable chat models (honest tier breakdown).
+ */
+export function getAvailableChatModelCountsByContentLevel(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): ModelCountsByContentLevel {
+  const counts: ModelCountsByContentLevel = {
+    mainstream: 0,
+    open: 0,
+    uncensored: 0,
+  };
+
+  for (const def of Object.values(chatModelDefinitions)) {
+    const visibleProviders = isAdmin
+      ? def.providers
+      : def.providers.filter((p) => !p.adminOnly);
+    if (visibleProviders.length === 0) {
+      continue;
+    }
+    if (
+      !isAdmin &&
+      !visibleProviders.some((p) => {
+        const option = chatModelOptions.find((m) => m.id === p.id);
+        return option ? isModelProviderAvailable(option, availability) : false;
+      })
+    ) {
+      continue;
+    }
+
+    if (def.content === ContentLevel.MAINSTREAM) {
+      counts.mainstream++;
+    } else if (def.content === ContentLevel.OPEN) {
+      counts.open++;
+    } else if (def.content === ContentLevel.UNCENSORED) {
+      counts.uncensored++;
+    }
+  }
+
+  return counts;
+}

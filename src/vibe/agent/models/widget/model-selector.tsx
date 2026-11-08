@@ -43,6 +43,7 @@ import { useMemo, useState } from "react";
 import {
   ChatModelId,
   chatModelOptions,
+  chatModelOptionsPool,
   filterChatModels,
   getBestChatModel,
 } from "../../ai-stream/models";
@@ -110,6 +111,7 @@ import {
   deduplicateCheapestPerModel,
   getModelPrice,
   isModelProviderAvailable,
+  modelMeetsFilterRanges,
   modelProviders,
   type ModelType,
 } from "../models";
@@ -445,6 +447,7 @@ export function ModelCard({
             variant="badge"
             badgeVariant={selected ? "outline" : "secondary"}
             className="text-[10px] h-5"
+            moneyClassName="hidden sm:inline"
             locale={locale}
           />
         )}
@@ -469,6 +472,161 @@ export function ModelCard({
         <P>{setupRequired}</P>
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+export function ContentTierHelp({
+  t,
+  className,
+}: {
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  className?: string;
+}): JSX.Element {
+  return (
+    <Div
+      className={cn(
+        "flex flex-col gap-1 rounded-md bg-muted/40 px-2.5 py-2",
+        className,
+      )}
+    >
+      {CONTENT_DISPLAY.map((tier) => (
+        <Div key={tier.value} className="flex items-start gap-2 text-[11px]">
+          <Icon
+            icon={tier.icon}
+            className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground"
+          />
+          <Span className="leading-snug text-muted-foreground">
+            <Span className="font-semibold text-foreground">
+              {t(tier.label)}
+            </Span>
+            {tier.help ? ` - ${t(tier.help)}` : null}
+          </Span>
+        </Div>
+      ))}
+    </Div>
+  );
+}
+
+/**
+ * Admin view: one row per model name. Each distinct model id under that name
+ * (e.g. the OpenRouter id and the Claude Code id of the same model) becomes a
+ * provider chip. Entries for the same id collapse - runtime routes an id to its
+ * cheapest available provider, so they are not separately selectable.
+ */
+interface AdminModelGroup {
+  key: string;
+  /** Distinct ids, first (cheapest) entry per id, in list order */
+  options: AnyModelOptionWithVision[];
+  /** Every provider entry per id, for the chip tooltip */
+  providersById: Map<string, AnyModelOptionWithVision[]>;
+}
+
+function groupModelsForAdmin(
+  models: AnyModelOptionWithVision[],
+): AdminModelGroup[] {
+  const groups = new Map<string, AdminModelGroup>();
+  for (const model of models) {
+    const group = groups.get(model.name) ?? {
+      key: model.name,
+      options: [],
+      providersById: new Map<string, AnyModelOptionWithVision[]>(),
+    };
+    const entries = group.providersById.get(model.id);
+    if (entries) {
+      entries.push(model);
+    } else {
+      group.providersById.set(model.id, [model]);
+      group.options.push(model);
+    }
+    groups.set(model.name, group);
+  }
+  return [...groups.values()];
+}
+
+function ProviderChips({
+  group,
+  selectedId,
+  onSelect,
+  disabled,
+  availability,
+  locale,
+  t,
+}: {
+  group: AdminModelGroup;
+  selectedId: AnyModelId | undefined;
+  onSelect: (id: AnyModelId) => void;
+  disabled: boolean;
+  availability: AgentEnvAvailability;
+  locale: CountryLanguage;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+}): JSX.Element {
+  return (
+    <Div
+      className="flex flex-wrap items-center gap-1 pl-[46px]"
+      title={t("selector.providerSwitcher")}
+    >
+      {group.options.map((option) => {
+        // Every provider serving this id (chat has a full pool; other roles
+        // fall back to the entries the list already holds)
+        const pooled = chatModelOptionsPool.filter((e) => e.id === option.id);
+        const entries: AnyModelOptionWithVision[] =
+          pooled.length > 0
+            ? pooled
+            : (group.providersById.get(option.id) ?? [option]);
+        const routed =
+          entries.find((e) => isProviderAvailable(e, availability)) ??
+          entries[0] ??
+          option;
+        const unavailable = !isProviderAvailable(routed, availability);
+        const isSelected = selectedId === option.id;
+        // Ids of one model often share providers (Claude Code serves both the
+        // regular and the Claude Code id), so label with the id's provider set.
+        const names = [
+          ...new Set(
+            entries.map((e) => apiProviderDisplayNames[e.apiProvider]),
+          ),
+        ];
+        const label =
+          names.length > 2
+            ? `${names.slice(0, 2).join(" / ")} +${names.length - 2}`
+            : names.join(" / ");
+        const tooltip = entries
+          .map((e) => {
+            const setup = getSetupRequiredMessage(e, locale, availability);
+            return `${apiProviderDisplayNames[e.apiProvider]}: ${t("selector.creditsExact", { cost: getModelPrice(e) })}${setup ? ` - ${setup}` : ""}`;
+          })
+          .join("\n");
+        return (
+          <Button
+            key={`${option.id}:${routed.apiProvider}`}
+            type="button"
+            variant={isSelected ? "default" : "outline"}
+            size="sm"
+            title={tooltip}
+            aria-pressed={isSelected}
+            disabled={disabled || unavailable}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(option.id);
+            }}
+            className={cn(
+              "h-6 gap-1 rounded-full px-2 text-[10px] font-medium",
+              unavailable && "border-dashed",
+            )}
+          >
+            {label}
+            <ModelCreditDisplay
+              modelId={option.id}
+              variant="text"
+              interactive={false}
+              showMoney={false}
+              className="tabular-nums opacity-80"
+              locale={locale}
+            />
+          </Button>
+        );
+      })}
+    </Div>
   );
 }
 
@@ -1480,12 +1638,22 @@ export function ModelSelector({
         typeFilter(m) &&
         roleFilter(m) &&
         !filteredIds.has(m.id) &&
-        !isProviderAvailable(m, availability),
+        !isProviderAvailable(m, availability) &&
+        // Env-unavailable extras must honor the same slider ranges, otherwise
+        // they bleed into the list regardless of the intelligence/content/price filter.
+        modelMeetsFilterRanges(m, {
+          intelligenceRange,
+          contentRange,
+          priceRange,
+        }),
     );
     return [...filteredModels, ...adminExtras];
   }, [
     showUnfilteredModels,
     filteredModels,
+    intelligenceRange,
+    contentRange,
+    priceRange,
     isAdmin,
     allowedRoles,
     modelTypeTab,
@@ -1682,6 +1850,93 @@ export function ModelSelector({
     availability,
   ]);
 
+  /**
+   * Model rows. Users get one row per model (already deduplicated upstream).
+   * Admins see every provider: rows collapse per model name with a provider
+   * chip per distinct id, so the list stays as long as the user's.
+   */
+  const renderModelRows = (
+    models: AnyModelOptionWithVision[],
+    alwaysDimmed: boolean,
+  ): JSX.Element[] => {
+    const isDimmed = (model: AnyModelOptionWithVision): boolean =>
+      alwaysDimmed ||
+      (showUnfilteredModels &&
+        !filteredModels.some(
+          (m: AnyModelOptionWithVision) => m.id === model.id,
+        ));
+    if (!isAdmin) {
+      return models.map((model) => (
+        <ModelCard
+          key={`${model.id}:${model.apiProvider}`}
+          model={model}
+          isBest={!alwaysDimmed && model.id === bestFilteredModel?.id}
+          selected={
+            mode === ModelSelectionType.MANUAL && manualModelId === model.id
+          }
+          onClick={() => handleModelSelect(model.id)}
+          dimmed={isDimmed(model)}
+          disabled={readOnly}
+          setupRequired={getSetupRequiredMessage(model, locale, availability)}
+          providerSuffix={
+            duplicateModelNames.has(model.name)
+              ? apiProviderDisplayNames[model.apiProvider]
+              : null
+          }
+          t={t}
+          locale={locale}
+        />
+      ));
+    }
+    return groupModelsForAdmin(models).map((group) => {
+      const selectedOption =
+        mode === ModelSelectionType.MANUAL
+          ? group.options.find((o) => o.id === manualModelId)
+          : undefined;
+      const representative =
+        selectedOption ??
+        group.options.find((o) => o.id === bestFilteredModel?.id) ??
+        group.options.find((o) => isProviderAvailable(o, availability)) ??
+        group.options[0];
+      if (!representative) {
+        return <Div key={group.key} />;
+      }
+      return (
+        <Div key={group.key} className="flex flex-col gap-1">
+          <ModelCard
+            model={representative}
+            isBest={
+              !alwaysDimmed &&
+              group.options.some((o) => o.id === bestFilteredModel?.id)
+            }
+            selected={selectedOption !== undefined}
+            onClick={() => handleModelSelect(representative.id)}
+            dimmed={isDimmed(representative)}
+            disabled={readOnly}
+            setupRequired={getSetupRequiredMessage(
+              representative,
+              locale,
+              availability,
+            )}
+            t={t}
+            locale={locale}
+          />
+          {group.options.length > 1 && (
+            <ProviderChips
+              group={group}
+              selectedId={selectedOption?.id}
+              onSelect={handleModelSelect}
+              disabled={readOnly}
+              availability={availability}
+              locale={locale}
+              t={t}
+            />
+          )}
+        </Div>
+      );
+    });
+  };
+
   const activeFilterChips = buildFilterChips({
     intelligenceIndices,
     contentIndices,
@@ -1810,6 +2065,7 @@ export function ModelSelector({
               variant="badge"
               badgeVariant="secondary"
               className="text-[10px] h-5 shrink-0 bg-background/60"
+              moneyClassName="hidden sm:inline"
               locale={locale}
             />
           </Div>
@@ -1912,11 +2168,11 @@ export function ModelSelector({
                   />
                   <RangeSlider
                     options={CONTENT_DISPLAY.map((opt) => ({
-                      ...opt,
+                      value: opt.value,
+                      icon: opt.icon,
                       label: t(opt.label),
-                      description: opt.description
-                        ? t(opt.description)
-                        : undefined,
+                      // The legend below explains each tier in a full line
+                      description: undefined,
                     }))}
                     minIndex={contentIndices.min}
                     maxIndex={contentIndices.max}
@@ -1925,6 +2181,7 @@ export function ModelSelector({
                     maxLabel={t("ranges.contentRange.maxLabel")}
                     disabled={readOnly}
                   />
+                  <ContentTierHelp t={t} className="-mt-1" />
                   <RangeSlider
                     options={PRICE_DISPLAY.map((opt) => ({
                       ...opt,
@@ -2081,13 +2338,23 @@ export function ModelSelector({
                 ([groupLabel, groupModels]) => {
                   const models = groupModels;
 
-                  // Separate legacy and non-legacy models
+                  // Separate legacy and non-legacy models. Admin rows group by
+                  // name, so a legacy provider alias (e.g. a Claude Code id)
+                  // stays a chip on its live sibling's row instead of hiding.
+                  const liveNames = new Set(
+                    models
+                      .filter((m) => !m.utilities.includes(ModelUtility.LEGACY))
+                      .map((m) => m.name),
+                  );
+                  const isHiddenLegacy = (
+                    model: AnyModelOptionWithVision,
+                  ): boolean =>
+                    model.utilities.includes(ModelUtility.LEGACY) &&
+                    (!isAdmin || !liveNames.has(model.name));
                   const nonLegacyModels = models.filter(
-                    (model) => !model.utilities.includes(ModelUtility.LEGACY),
+                    (model) => !isHiddenLegacy(model),
                   );
-                  const legacyModels = models.filter((model) =>
-                    model.utilities.includes(ModelUtility.LEGACY),
-                  );
+                  const legacyModels = models.filter(isHiddenLegacy);
 
                   const showingLegacy = showLegacyByGroup[groupLabel] ?? false;
                   const visibleModels = showingLegacy
@@ -2115,41 +2382,7 @@ export function ModelSelector({
                         </Span>
                       </Div>
                       <Div className="flex flex-col gap-2">
-                        {visibleModels.map((model) => {
-                          const isOutsideFilter =
-                            showUnfilteredModels &&
-                            !filteredModels.some(
-                              (m: AnyModelOptionWithVision) =>
-                                m.id === model.id,
-                            );
-                          const setupRequired = getSetupRequiredMessage(
-                            model,
-                            locale,
-                            availability,
-                          );
-                          return (
-                            <ModelCard
-                              key={`${model.id}:${model.apiProvider}`}
-                              model={model}
-                              isBest={model.id === bestFilteredModel?.id}
-                              selected={
-                                mode === ModelSelectionType.MANUAL &&
-                                manualModelId === model.id
-                              }
-                              onClick={() => handleModelSelect(model.id)}
-                              dimmed={isOutsideFilter}
-                              disabled={readOnly}
-                              setupRequired={setupRequired}
-                              providerSuffix={
-                                duplicateModelNames.has(model.name)
-                                  ? apiProviderDisplayNames[model.apiProvider]
-                                  : null
-                              }
-                              t={t}
-                              locale={locale}
-                            />
-                          );
-                        })}
+                        {renderModelRows(visibleModels, false)}
 
                         {/* Show Legacy Models Button */}
                         {legacyModels.length > 0 && !showingLegacy && (
@@ -2187,35 +2420,7 @@ export function ModelSelector({
                 </Span>
               </Div>
               <Div className="flex flex-col gap-2">
-                {searchExtraModels.map((model) => {
-                  const setupRequired = getSetupRequiredMessage(
-                    model,
-                    locale,
-                    availability,
-                  );
-                  return (
-                    <ModelCard
-                      key={`${model.id}:${model.apiProvider}`}
-                      model={model}
-                      isBest={false}
-                      selected={
-                        mode === ModelSelectionType.MANUAL &&
-                        manualModelId === model.id
-                      }
-                      onClick={() => handleModelSelect(model.id)}
-                      dimmed={true}
-                      disabled={readOnly}
-                      setupRequired={setupRequired}
-                      providerSuffix={
-                        duplicateModelNames.has(model.name)
-                          ? apiProviderDisplayNames[model.apiProvider]
-                          : null
-                      }
-                      t={t}
-                      locale={locale}
-                    />
-                  );
-                })}
+                {renderModelRows(searchExtraModels, true)}
               </Div>
             </Div>
           )}

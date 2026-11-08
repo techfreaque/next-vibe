@@ -35,8 +35,8 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["vibe", "agent", "cortex", "terminals"],
   aliases: [CORTEX_TERMINALS_ALIAS] as const,
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-  defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
+  defaultAiPinned: [UserRole.ADMIN] as const,
   cli: { firstCliArgKey: "path" },
 
   title: "get.title" as const,

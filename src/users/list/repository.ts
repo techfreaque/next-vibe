@@ -12,6 +12,7 @@ import {
   eq,
   exists,
   ilike,
+  inArray,
   notExists,
   or,
   type SQL,
@@ -28,7 +29,11 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { users } from "next-vibe/identity/user/db";
+import {
+  UserPermissionRole,
+  type UserRoleDB,
+} from "next-vibe/identity/roles/enum";
+import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
@@ -43,6 +48,7 @@ import {
   SortOrder,
   SubscriptionPresenceFilter,
   ThreadsFilter,
+  UserRoleFilter,
   UserSortField,
   UserStatusFilter,
 } from "../enum";
@@ -73,13 +79,52 @@ export class UserListRepository {
   }
 
   /**
-   * Convert role filter to database conditions
-   * Note: Role filtering is disabled due to complex enum type mapping
+   * Map a role filter value to the stored permission role (null = no constraint)
    */
-  private static convertRoleFilter(): SQL | null {
-    // Role filtering disabled for now due to enum type complexity
-    // TODO: Implement proper role filtering with correct type mapping
-    return null;
+  private static roleFilterToDbRole(
+    role: string,
+  ): (typeof UserRoleDB)[number] | null {
+    switch (role) {
+      case UserRoleFilter.PUBLIC:
+        return UserPermissionRole.PUBLIC;
+      case UserRoleFilter.CUSTOMER:
+        return UserPermissionRole.CUSTOMER;
+      case UserRoleFilter.PARTNER_ADMIN:
+        return UserPermissionRole.PARTNER_ADMIN;
+      case UserRoleFilter.PARTNER_EMPLOYEE:
+        return UserPermissionRole.PARTNER_EMPLOYEE;
+      case UserRoleFilter.ADMIN:
+        return UserPermissionRole.ADMIN;
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Convert role filter to database conditions - user must hold ANY selected role
+   */
+  private static convertRoleFilter(roles: string[] | undefined): SQL | null {
+    if (!roles || roles.includes(UserRoleFilter.ALL)) {
+      return null;
+    }
+    const dbRoles: (typeof UserRoleDB)[number][] = [];
+    for (const role of roles) {
+      const dbRole = UserListRepository.roleFilterToDbRole(role);
+      if (dbRole) {
+        dbRoles.push(dbRole);
+      }
+    }
+    if (dbRoles.length === 0) {
+      return null;
+    }
+    return exists(
+      db
+        .select({ one: sql`1` })
+        .from(userRoles)
+        .where(
+          and(eq(userRoles.userId, users.id), inArray(userRoles.role, dbRoles)),
+        ),
+    );
   }
 
   /**
@@ -381,15 +426,26 @@ export class UserListRepository {
       const conditions: SQL[] = [];
 
       // Status filter
-      const statusCondition = UserListRepository.convertStatusFilter(
-        requestData.searchFilters?.status?.[0],
-      );
+      // Status filter - multi-select, user matches ANY selected status
+      const statusConditions: SQL[] = [];
+      const statuses = requestData.searchFilters?.status ?? [];
+      for (const status of statuses.includes(UserStatusFilter.ALL)
+        ? []
+        : statuses) {
+        const statusCondition = UserListRepository.convertStatusFilter(status);
+        if (statusCondition) {
+          statusConditions.push(statusCondition);
+        }
+      }
+      const statusCondition = or(...statusConditions);
       if (statusCondition) {
         conditions.push(statusCondition);
       }
 
       // Role filter
-      const roleCondition = UserListRepository.convertRoleFilter();
+      const roleCondition = UserListRepository.convertRoleFilter(
+        requestData.searchFilters?.role,
+      );
       if (roleCondition) {
         conditions.push(roleCondition);
       }

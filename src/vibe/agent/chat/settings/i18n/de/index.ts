@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       label: "Ausgewähltes Modell",
     },
     selectedSkill: {
-      label: "Ausgewählter Charakter",
+      label: "Ausgewählter Skill",
     },
     activeFavoriteId: {
       label: "Aktiver Favorit",

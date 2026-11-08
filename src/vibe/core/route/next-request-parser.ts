@@ -449,6 +449,17 @@ export async function parseRequestBody(
       return parseFormData(formData);
     }
 
+    // Handle application/x-www-form-urlencoded (e.g. RFC 8058 one-click
+    // unsubscribe POST: `List-Unsubscribe=One-Click`)
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      const params = new URLSearchParams(await request.text());
+      const fields: Record<string, string> = {};
+      for (const [key, value] of params.entries()) {
+        fields[key] = value;
+      }
+      return fields;
+    }
+
     // Handle JSON
     const bodyText = await request.text();
 

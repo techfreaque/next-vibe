@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Zainwestuj w {{appName}}",
     description:
-      "Bilety od 5 000 $. Otwartoźródłowa platforma AI na next-vibe - ponad 100 modeli, działa produkcyjnie, a filtr ustawia użytkownik.",
+      "Bilety od 5 000 $. Otwartoźródłowa platforma AI na next-vibe - {{modelCount}} modeli, działa produkcyjnie, a filtr ustawia użytkownik.",
     category: "Inwestuj",
     imageAlt: "Zainwestuj w {{appName}}",
     keywords:

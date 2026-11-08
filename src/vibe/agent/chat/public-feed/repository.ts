@@ -22,7 +22,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatFolder } from "../db";
 import { chatFolders, chatMessages, chatThreads } from "../db";
-import { ThreadStatus } from "../enum";
+import { ThreadModerationStatus, ThreadStatus } from "../enum";
 import { canViewThread } from "../permissions/permissions";
 import type {
   PublicFeedGetRequestOutput,
@@ -81,6 +81,8 @@ export class PublicFeedRepository {
       const baseCondition = and(
         eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC),
         ne(chatThreads.status, ThreadStatus.DELETED),
+        // Reported past the threshold (under review) or removed: never listed
+        eq(chatThreads.moderationStatus, ThreadModerationStatus.VISIBLE),
         searchCondition,
         risingCondition,
       );

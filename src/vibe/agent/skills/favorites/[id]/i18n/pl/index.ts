@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
       label: "Zobacz skill",
     },
     signupPrompt: {
-      title: "Dostosuj osobowość postaci",
+      title: "Dostosuj osobowość skilla",
       description:
-        "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+        "Edytuj prompt systemowy i zachowanie skilla. Zarejestruj się, aby rozpocząć.",
       backButton: "Wstecz",
       signupButton: "Utwórz konto",
       loginButton: "Zaloguj się",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       skillId: {
-        content: "Postać: {{value}}",
+        content: "Skill: {{value}}",
       },
       customVariantName: {
         content: "Nazwa niestandardowa: {{value}}",
@@ -153,7 +153,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Edytuj ulubiony",
     description: "Aktualizuj istniejącą ulubioną konfigurację",
     container: {
-      title: "Edytuj ulubiony",
+      title: "Edytuj ustawienia skilla",
     },
     backButton: {
       label: "Wróć do ulubionego",
@@ -168,7 +168,7 @@ export const translations: typeof enTranslations = {
       label: "Zgłoś",
     },
     useThisSkillButton: {
-      label: "Użyj tej postaci",
+      label: "Użyj tego skilla",
     },
     useThisModelButton: {
       label: "Użyj tego modelu",
@@ -177,9 +177,9 @@ export const translations: typeof enTranslations = {
       label: "Obecnie aktywne",
     },
     signupPrompt: {
-      title: "Dostosuj osobowość postaci",
+      title: "Dostosuj osobowość skilla",
       description:
-        "Edytuj prompt systemowy i zachowanie postaci. Zarejestruj się, aby rozpocząć.",
+        "Edytuj prompt systemowy i zachowanie skilla. Zarejestruj się, aby rozpocząć.",
       backButton: "Wstecz",
       signupButton: "Utwórz konto",
       loginButton: "Zaloguj się",
@@ -196,58 +196,58 @@ export const translations: typeof enTranslations = {
       label: "ID ulubionego",
     },
     skillId: {
-      label: "Postać",
+      label: "Skill",
       description:
         'ID umiejętności. „skillSlug" dla domyślnego wariantu, „skillSlug__variantId" dla konkretnego wariantu.',
     },
     customVariantName: {
-      label: "Nazwa wariantu",
+      label: "Etykieta",
       description:
         "Własna nazwa dla tego wariantu (pozostaw puste, aby użyć domyślnej)",
     },
     chatModel: {
       label: "Model czatu",
-      placeholder: "Odziedzicz z umiejętności",
+      placeholder: "Jak w skillu",
     },
     voice: {
       label: "Głos AI",
       description: "Wybierz głos dla swojego asystenta AI",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     sttModel: {
       label: "Model mowy na tekst",
       description: "Model używany do rozpoznawania mowy",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     imageVisionModel: {
       label: "Model wizji obrazu",
       description: "Model używany do analizy obrazów",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     videoVisionModel: {
       label: "Model wizji wideo",
       description: "Model używany do analizy wideo",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     audioVisionModel: {
       label: "Model wizji audio",
       description: "Model używany do analizy audio",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     imageGenModel: {
       label: "Model generowania obrazów",
       description: "Model do generowania obrazów",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     musicGenModel: {
       label: "Model generowania muzyki",
       description: "Model do generowania muzyki",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     videoGenModel: {
       label: "Model generowania wideo",
       description: "Model do generowania wideo",
-      placeholder: "Dziedzicz z postaci",
+      placeholder: "Jak w skillu",
     },
     mode: {
       label: "Tryb wyboru",
@@ -260,7 +260,7 @@ export const translations: typeof enTranslations = {
     },
     selectionType: {
       label: "Typ wyboru",
-      characterBased: "Na podstawie postaci",
+      characterBased: "Na podstawie skilla",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
@@ -322,22 +322,22 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Niestandardowa ikona",
-      description: "Zastąp domyślną ikonę postaci dla tego slotu ulubionych",
+      description: "Zastąp domyślną ikonę skilla dla tego slotu ulubionych",
     },
     compactTrigger: {
       label: "Próg kompresji (tokeny)",
       description:
-        "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = postać lub domyślna globalna.",
+        "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = skill lub domyślna globalna.",
     },
     availableTools: {
       label: "Dozwolone narzędzia",
       description:
-        "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
+        "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = skill lub ustawienia globalne.",
     },
     pinnedTools: {
       label: "Przypięte narzędzia",
       description:
-        "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = postać lub ustawienia globalne.",
+        "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = skill lub ustawienia globalne.",
     },
     deniedTools: {
       label: "Zablokowane narzędzia",
@@ -362,10 +362,10 @@ export const translations: typeof enTranslations = {
         "Maksymalna łączna liczba tokenów treści pamięci dla tego slotu. Null = skill lub domyślna globalna.",
     },
     changeSkill: {
-      label: "Zmień postać",
+      label: "Zmień skill",
     },
     modifySkill: {
-      label: "Modyfikuj postać",
+      label: "Modyfikuj skill",
     },
     response: {
       success: {

@@ -368,6 +368,36 @@ export class ThreadByIdRepository {
 
       logger.debug("Thread deleted successfully", { threadId });
 
+      // A stream still running on this thread must stop: every later write
+      // would be dropped, yet the loop kept calling (and billing) tools - one
+      // deleted thread kept a stream looping tools for six minutes. Deliver a
+      // cancel on the thread's control channel (reaches the stream in whatever
+      // process runs it). Fire-and-forget: no live stream means no reactor.
+      if (existingThread.streamingState !== ThreadStreamingState.IDLE) {
+        // Confirmation record for the stream's "[MessageDbWriter] Thread row
+        // missing" warnings: THIS was a real delete action (user or relayed),
+        // not a wrong id / sync bug.
+        logger.warn("[thread-delete] Thread deleted while streaming", {
+          threadId,
+          deletedBy: user.isPublic ? null : user.id,
+          ownerUserId: existingThread.userId,
+          streamingState: existingThread.streamingState,
+          relayed,
+        });
+        void (async (): Promise<void> => {
+          try {
+            const { StreamControl } =
+              await import("../../../ai-stream/repository/core/stream-control");
+            StreamControl.deliver(threadId, "cancel", user, logger);
+          } catch (cancelError) {
+            logger.warn("[thread-delete] stream cancel delivery failed", {
+              threadId,
+              error: parseError(cancelError).message,
+            });
+          }
+        })();
+      }
+
       // Clean up materialized cortex index rows for this thread so search never
       // surfaces orphaned embeddings. /threads and /uploads paths embed the
       // threadId; /searches and /gens embed the per-message id.

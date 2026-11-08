@@ -78,6 +78,12 @@ export const translations: typeof enTranslations = {
             description:
               "Coding-Agent-Prozess konnte nicht gestartet werden oder ist abgestürzt",
           },
+          binaryMissing: {
+            title:
+              "{{bin}} ist auf dieser Instanz nicht installiert - installieren oder anderen Coding-Agent wählen",
+            description:
+              "Die CLI des Coding-Agents liegt nicht im PATH dieses Servers",
+          },
           internalExitCode: {
             title: "Ausführung fehlgeschlagen (exit {{exitCode}})",
             description:

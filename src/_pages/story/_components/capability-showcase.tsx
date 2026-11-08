@@ -31,6 +31,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import { DeferredVisual } from "./deferred-visual";
 import { mkAssistantMsg, mkDemoToolMsg, mkUserMsg } from "./demo-messages";
 import { scopedTranslation } from "./i18n";
 import { MockChatProvider } from "./mock-chat-provider";
@@ -54,6 +55,8 @@ interface CapabilityBlockProps {
   title: string;
   description: string;
   visual: ReactNode;
+  /** Height reserved for the visual until it mounts (see DeferredVisual). */
+  visualPlaceholderClassName: string;
   reversed: boolean;
   delay: number;
   id?: string;
@@ -65,11 +68,18 @@ function CapabilityBlock({
   title,
   description,
   visual,
+  visualPlaceholderClassName,
   reversed,
   delay,
   id,
   stacked = false,
 }: CapabilityBlockProps): JSX.Element {
+  const deferredVisual = (
+    <DeferredVisual placeholderClassName={visualPlaceholderClassName}>
+      {visual}
+    </DeferredVisual>
+  );
+
   if (stacked) {
     return (
       <Div id={id} className="py-16 md:py-24">
@@ -90,7 +100,7 @@ function CapabilityBlock({
               {description}
             </P>
           </Div>
-          <Div>{visual}</Div>
+          <Div>{deferredVisual}</Div>
         </MotionDiv>
       </Div>
     );
@@ -115,7 +125,9 @@ function CapabilityBlock({
             {description}
           </P>
         </Div>
-        <Div className={reversed ? "md:[direction:ltr]" : ""}>{visual}</Div>
+        <Div className={reversed ? "md:[direction:ltr]" : ""}>
+          {deferredVisual}
+        </Div>
       </MotionDiv>
     </Div>
   );
@@ -1083,7 +1095,7 @@ export function CapabilityShowcase({
 
   return (
     <Div className="relative overflow-hidden">
-      <Div className="container relative px-4 md:px-6">
+      <Div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <CapabilityBlock
           label={t("home.capabilities.models.label")}
           title={t("home.capabilities.models.title", interpolation)}
@@ -1094,6 +1106,7 @@ export function CapabilityShowcase({
               modelCountsByTier={modelCountsByTier}
             />
           }
+          visualPlaceholderClassName="min-h-[820px] md:min-h-[460px]"
           reversed={false}
           delay={0}
           stacked={true}
@@ -1104,6 +1117,7 @@ export function CapabilityShowcase({
           title={t("home.capabilities.memory.title")}
           description={t("home.capabilities.memory.description")}
           visual={<MemoryVisual locale={locale} />}
+          visualPlaceholderClassName="min-h-[560px] md:min-h-[520px]"
           reversed={true}
           delay={0}
         />
@@ -1113,6 +1127,7 @@ export function CapabilityShowcase({
           title={t("home.capabilities.search.title")}
           description={t("home.capabilities.search.description")}
           visual={<SearchVisual locale={locale} />}
+          visualPlaceholderClassName="min-h-[560px]"
           reversed={false}
           delay={0}
         />
@@ -1123,6 +1138,7 @@ export function CapabilityShowcase({
           title={t("home.capabilities.privacy.title")}
           description={t("home.capabilities.privacy.description")}
           visual={<PrivacyVisual locale={locale} />}
+          visualPlaceholderClassName="min-h-[340px]"
           reversed={true}
           delay={0}
         />

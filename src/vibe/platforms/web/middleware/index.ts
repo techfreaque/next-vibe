@@ -15,12 +15,14 @@ import {
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { Environment } from "../../../env/env-util";
+import { createEndpointLogger } from "../../../logger/server";
 import {
   checkLeadId,
   createLeadId,
   getLeadIdFromRequest,
   isLeadIdValid,
   LeadIdCheckResult,
+  recordAttributionTouch,
   redeemExchangeToken,
   updateLeadLocale,
   UUID_REGEX,
@@ -28,7 +30,11 @@ import {
 import { VIBE_FRAME_MOUNT_API_PATH } from "../../vibe-frame/mount/constants";
 import type { LanguageMiddlewareOptions } from "./language/index";
 import { detectLocale } from "./language/index";
-import { extractLocaleFromPath, shouldSkipPath } from "./utils";
+import {
+  extractLocaleFromPath,
+  shouldSkipPath,
+  V1_API_PATH_REGEX,
+} from "./utils";
 
 /**
  * Add CORS headers to API responses so cross-origin clients (e.g. a local
@@ -270,6 +276,25 @@ export async function middleware(
         return mountResp;
       }
 
+      // RFC 8058 one-click unsubscribe: the mailbox provider POSTs with no
+      // cookies and no browser session. The signed token in the path is the
+      // only credential - never demand a lead identity here.
+      if (path.includes("/newsletter/unsubscribe/oneclick/")) {
+        const oneClickResp = NextResponseClass.next();
+        addCorsHeaders(request, oneClickResp, path);
+        return oneClickResp;
+      }
+
+      // OpenAI-compatible API (/api/<locale>/v1/*): server-to-server callers
+      // with no cookies. The API key in the Authorization header is the only
+      // credential (resolved in the handler, answered with OpenAI-shaped
+      // errors) - never demand a lead identity here.
+      if (V1_API_PATH_REGEX.test(path)) {
+        const v1Resp = NextResponseClass.next();
+        addCorsHeaders(request, v1Resp, path);
+        return v1Resp;
+      }
+
       // The public login endpoint must work without a pre-existing lead_id
       // (cross-origin remote-connect clients have no cookie). Create one on
       // the fly and pass through - do NOT redirect (that would drop the body).
@@ -344,6 +369,19 @@ export async function middleware(
     const leadIdResp = await createLeadId(request, locale);
     addCorsHeaders(request, leadIdResp, path);
     return leadIdResp;
+  }
+
+  // Valid leadId - a later visit carrying UTMs / ref moves the last touch
+  if (/[?&](?:utm_|ref=)/.test(request.nextUrl.search)) {
+    const touchLeadId = getLeadIdFromRequest(request);
+    if (touchLeadId) {
+      recordAttributionTouch(
+        request,
+        touchLeadId,
+        false,
+        createEndpointLogger(false, locale),
+      );
+    }
   }
 
   // Valid leadId - sync lead locale if it changed

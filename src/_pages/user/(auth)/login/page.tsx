@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   return metadataGenerator(locale, {
-    path: "login",
+    path: "user/login",
     title: t("meta.title", { appName }),
     description: t("meta.description", { appName }),
     category: t("meta.category"),
@@ -119,7 +119,6 @@ export async function tanstackLoader({
   // Get login options
   const loginOptionsResponse = await LoginRepository.getLoginOptions(
     logger,
-    locale,
     loginT,
   );
   if (!loginOptionsResponse.success) {

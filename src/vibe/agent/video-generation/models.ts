@@ -9,6 +9,7 @@ import {
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
+  isProviderSellable,
   type ModelDefinition,
   type ModelOptionVideoBased,
   type ModelProviderConfigVideoBased,
@@ -276,7 +277,8 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance/seedance-1-5-pro",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from openrouter-api
+        creditCostPerSecond: 5.184, // updated: 2026-11-08 from openrouter.ai video_tokens (24fps, 720p)
+        pricingByResolution: { "480p": 2.306, "720p": 5.184, "1080p": 11.664 }, // updated: 2026-11-08 from openrouter.ai video_tokens
         allowedPassthroughParameters: ["watermark", "req_key"], // updated: 2026-07-10 from openrouter.ai
         supportedSizes: [
           "480x480",
@@ -331,7 +333,8 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerSecond: 6.739, // updated: 2026-11-08 from unbottled.ai
+        pricingByResolution: { "480p": 2.998, "720p": 6.739, "1080p": 15.163 }, // updated: 2026-11-08 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 12,
@@ -1556,7 +1559,6 @@ export const videoGenModelDefinitions: Record<
   },
 
   [VideoGenModelId.SEEDANCE_2]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Seedance 2.0",
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance2",
@@ -1570,7 +1572,13 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance/seedance-2.0",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from openrouter-api
+        creditCostPerSecond: 15.12, // updated: 2026-11-08 from openrouter.ai video_tokens (24fps, 720p)
+        pricingByResolution: {
+          "480p": 6.725,
+          "720p": 15.12,
+          "1080p": 37.422,
+          "4K": 77.76,
+        }, // updated: 2026-11-08 from openrouter.ai video_tokens
         allowedPassthroughParameters: ["watermark", "req_key"], // updated: 2026-07-10 from openrouter.ai
         supportedSizes: [
           "480x480",
@@ -1633,7 +1641,13 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-2",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerSecond: 19.656, // updated: 2026-11-08 from unbottled.ai
+        pricingByResolution: {
+          "480p": 8.743,
+          "720p": 19.656,
+          "1080p": 48.649,
+          "4K": 101.088,
+        }, // updated: 2026-11-08 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 15,
@@ -1671,7 +1685,6 @@ export const videoGenModelDefinitions: Record<
   },
 
   [VideoGenModelId.SEEDANCE_2_FAST]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Seedance 2.0 Fast",
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance2Fast",
@@ -1685,7 +1698,8 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2_FAST,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance/seedance-2.0-fast",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from openrouter-api
+        creditCostPerSecond: 9.072, // updated: 2026-11-08 from openrouter.ai video_tokens (24fps, 720p)
+        pricingByResolution: { "480p": 4.035, "720p": 9.072 }, // updated: 2026-11-08 from openrouter.ai video_tokens
         allowedPassthroughParameters: ["watermark", "req_key"], // updated: 2026-07-10 from openrouter.ai
         supportedSizes: [
           "480x480",
@@ -1736,7 +1750,8 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-2-fast",
-        creditCostPerSecond: 0, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerSecond: 11.794, // updated: 2026-11-08 from unbottled.ai
+        pricingByResolution: { "480p": 5.246, "720p": 11.794 }, // updated: 2026-11-08 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 15,
@@ -2233,7 +2248,8 @@ function buildVideoGenModelOptionsPool(): VideoGenModelOption[] {
     for (const provider of sortedProviders) {
       if (
         provider.creditCostPerSecond !== undefined &&
-        provider.defaultDurationSeconds !== undefined
+        provider.defaultDurationSeconds !== undefined &&
+        isProviderSellable(def, provider)
       ) {
         pool.push(
           buildVideoGenOption(

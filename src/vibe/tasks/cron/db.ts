@@ -94,6 +94,11 @@ export const cronTasks = pgTable("cron_tasks", {
     enum: CronTaskStatusDB,
   }),
   lastExecutionDuration: integer("last_execution_duration"),
+  /**
+   * When the CURRENT run claimed the task (set with status=running, cleared on
+   * completion). The task watchdog measures wall-clock age from this.
+   */
+  runStartedAt: timestamp("run_started_at"),
   nextExecutionAt: timestamp("next_execution_at"),
 
   // History logging throttle

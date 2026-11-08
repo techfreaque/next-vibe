@@ -91,6 +91,20 @@ const { POST } = createEndpoint({
           }),
       }),
 
+      twoFactorCode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.twoFactorCode.label",
+        description: "fields.twoFactorCode.description",
+        placeholder: "fields.twoFactorCode.placeholder",
+        columns: 12,
+        order: 3.5,
+        theme: {
+          style: "none",
+        },
+        schema: z.string().max(32).optional(),
+      }),
+
       rememberMe: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,

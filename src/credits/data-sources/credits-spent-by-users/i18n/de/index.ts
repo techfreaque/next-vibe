@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Nutzer-Ausgaben",
-    title: "Von Nutzern ausgegebene Credits",
+    titleShort: "Nutzer: Gesamtausgaben",
+    title: "Gesamtausgaben der Nutzer (bezahlt + gratis)",
     description:
-      "Summe der Nutzungstransaktionen aus Nutzer-Wallets pro Auflösungs-Bucket",
+      "Credits, die Nutzer-Wallets ausgegeben haben, bezahlt und gratis zusammen. Nicht die Cap-Achse - siehe Gratis-Ausgaben.",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
         description: "Extra Balken vor Bereichsstart",
       },
       result: {
-        label: "Von Nutzern ausgegebene Credits",
+        label: "Gesamtausgaben der Nutzer",
         description: "Ausgabe-Zeitreihe",
       },
       meta: { label: "Meta", description: "Knotenausführungsmetadaten" },

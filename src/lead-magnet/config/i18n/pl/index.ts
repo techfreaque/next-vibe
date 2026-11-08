@@ -45,6 +45,13 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     delete: "Odłącz",
+    confirmDelete: {
+      title: "Odłączyć {{provider}}?",
+      description:
+        "Nowi subskrybenci przestaną trafiać na Twoją listę. Zebrane już kontakty zostaną tam, gdzie są.",
+      cancel: "Zostaw połączenie",
+      proceed: "Odłącz",
+    },
     back: "Wstecz",
     loading: "Ładowanie…",
     pitch: {

@@ -11,7 +11,6 @@ import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 
 import { scopedTranslation as loginScopedTranslation } from "../i18n";
 import loginOptionsEndpoints from "./definition";
-import { SocialProviders } from "./enum";
 
 const endpoint = loginOptionsEndpoints.GET;
 
@@ -35,17 +34,22 @@ describe("E2E: login options", () => {
     const { response } = result.response.data;
     expect(response.forUser).toBe(identityEnv.VIBE_ADMIN_USER_EMAIL);
     expect(response.loginMethods.password.enabled).toBe(true);
-    // Provider names reach the customer translated, never as raw keys
-    const google = response.loginMethods.social.providers.find(
-      (p) => p.id === SocialProviders.GOOGLE,
-    );
-    expect(google?.name).toBe(loginT("enums.socialProviders.google"));
+    // No user OAuth exists — no provider may be advertised
+    expect(response.loginMethods.social.enabled).toBe(false);
+    expect(response.loginMethods.social.providers).toEqual([]);
 
     // The response renders on the page, not just over the wire
     await form.root.getByText(response.message).first().waitFor();
-    await form.root.getByText(google?.name ?? "").first().waitFor();
-    // Provider ids are internal — only the translated name is shown, once
-    expect(await form.root.getByText(google?.name ?? "", { exact: true }).count()).toBe(1);
+    // No fake social buttons reach the customer
+    for (const key of [
+      "enums.socialProviders.google",
+      "enums.socialProviders.github",
+      "enums.socialProviders.facebook",
+    ] as const) {
+      expect(
+        await form.root.getByText(loginT(key), { exact: true }).count(),
+      ).toBe(0);
+    }
   });
 
   e2e.it("answers an unknown email like a known one (no account probing)", async ({ open, uniqueEmail }) => {

@@ -565,14 +565,14 @@ export const translations = {
         models: "Access to all {{modelCount}} AI models",
         nolimits: "No daily limits - use all credits whenever you want",
         uncensored: "Uncensored models with no content filters",
-        packs: "Buy extra credit packs that never expire (subscribers only)",
+        packs: "Buy extra credit packs that never expire",
         cancel: "Cancel anytime, no questions asked",
       },
       cta: "Start Chatting Now",
       packs: {
         title: "Need more credits?",
         description:
-          "Buy credit packs anytime - {{packPrice}} for {{packCredits}} credits. They never expire and stack on top of your monthly allowance. Only available to subscribers.",
+          "Buy credit packs anytime, subscription or not - {{packPrice}} for {{packCredits}} credits, or {{largePackPrice}} for {{largePackCredits}}. They never expire and stack on top of any monthly allowance.",
         cta: "Buy Credit Pack",
       },
       manage: "Manage or cancel your subscription anytime in",

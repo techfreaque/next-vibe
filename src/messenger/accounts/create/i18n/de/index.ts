@@ -270,6 +270,11 @@ export const translations: typeof enTranslations = {
       label: "Failover",
       description: "Als Failover-Konto verwenden",
     },
+    isSystem: {
+      label: "Plattform-Postfach",
+      description:
+        "Postfach der Plattform für den Betrieb. Zugangsdaten kommen aus der Umgebung; von Kampagnen ausgeschlossen.",
+    },
     failoverPriority: {
       label: "Failover-Priorität",
       description: "Failover-Prioritätsreihenfolge",

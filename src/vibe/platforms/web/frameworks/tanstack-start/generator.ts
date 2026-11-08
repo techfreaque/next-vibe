@@ -49,6 +49,10 @@ const posixDirname = path.posix.dirname;
 
 const WRAPPER_IMPORT = "../nextjs-compat-wrapper";
 
+/** Next `Metadata` → TanStack `head()` resolver used by every page route. */
+const PAGE_HEAD_IMPORT =
+  "next-vibe/platforms/web/frameworks/tanstack-start/page-head";
+
 interface GenerationResult {
   created: string[];
   skipped: string[];
@@ -171,6 +175,30 @@ function hasSearchParamsInLoader(filePath: string): boolean {
   return /\btanstackLoader\b[\s\S]{0,300}searchParams/.test(
     fileContent(filePath),
   );
+}
+
+function hasGenerateMetadataExport(filePath: string): boolean {
+  if (!existsSync(filePath)) {
+    return false;
+  }
+  return /\bexport\s+(?:const\s+generateMetadata\b|(?:async\s+)?function\s+generateMetadata\b)/.test(
+    fileContent(filePath),
+  );
+}
+
+/**
+ * Import paths of every layout from the root down to (and including) `dir`
+ * that exports `generateMetadata` — the Next metadata chain for a page.
+ */
+function metadataLayoutChain(dir: string, sourceDir: string): string[] {
+  const segments = dir === "." ? [] : dir.split("/");
+  const dirs = ["."];
+  for (let i = 1; i <= segments.length; i++) {
+    dirs.push(segments.slice(0, i).join("/"));
+  }
+  return dirs
+    .filter((d) => hasGenerateMetadataExport(join(sourceDir, d, "layout.tsx")))
+    .map((d) => buildPaths(d, sourceDir, "layout").importPath);
 }
 
 function hasHttpExports(filePath: string): boolean {
@@ -619,6 +647,8 @@ function emitPageFile(
   result: GenerationResult,
 ): void {
   const catchAllName = getCatchAllParamName(dir);
+  // The `[...notFound]` catch-all is the 404 page: respond with HTTP 404.
+  const isNotFoundCatchAll = catchAllName === "notFound";
   let { flatName, routePath, importPath } = buildPaths(dir, sourceDir, "page");
   if (catchAllName) {
     flatName = flatName
@@ -631,10 +661,15 @@ function emitPageFile(
   const outPath = join(routesDir(), `${flatName}.tsx`);
   const srcRelative = relative(projectRoot(), srcFile).replaceAll("\\", "/");
   const hasSearch = hasSearchParamsInLoader(srcFile);
+  const pageHasMetadata = hasGenerateMetadataExport(srcFile);
+  const layoutChain = metadataLayoutChain(dir, sourceDir);
   const lines = [
     `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
     `import { createFileRoute } from "@tanstack/react-router";`,
     `import { createServerFn } from "@tanstack/react-start";`,
+    ...(isNotFoundCatchAll
+      ? [`import { setResponseStatus } from "@tanstack/react-start/server";`]
+      : []),
   ];
   // Type imports: alphabetical by source ("next-vibe/..." before "react")
   if (catchAllName) {
@@ -642,64 +677,80 @@ function emitPageFile(
       `import type { CountryLanguage } from "${getRelativeImportPath(I18N_CONFIG_MODULE, outPath)}";`,
     );
   }
-  lines.push(`import type { JSX } from "react";`);
+  lines.push(
+    `import { resolvePageHead } from "${PAGE_HEAD_IMPORT}";`,
+    `import type { JSX } from "react";`,
+  );
   lines.push(
     ``,
     `import { TanstackPage as Page } from "${importPath}";`,
     ``,
     `import { runPageLoader, toNextParams } from "${WRAPPER_IMPORT}";`,
   );
-  if (catchAllName) {
-    const inputType = hasSearch
-      ? "{ params: Record<string, string>; search: Record<string, string> }"
-      : "Record<string, string>";
-    const paramsExpr = hasSearch ? "data.params" : "data";
-    lines.push(
-      ``,
-      `const loadData = createServerFn({ method: "GET" })`,
-      ...fmtInputValidator(inputType),
-      `  .handler(async ({ data }) =>`,
-      `    runPageLoader(async () => {`,
-      fmtAwaitImport(importPath, `      `),
-      `      const p = toNextParams(${paramsExpr});`,
-      `      return tanstackLoader({`,
-      `        params: Promise.resolve({`,
-      `          ...p,`,
-      `          ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
-      `        } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
-      ...(hasSearch
-        ? [`        searchParams: Promise.resolve(data.search),`]
-        : []),
-      `      });`,
-      `    }),`,
-      `  );`,
-    );
-  } else {
-    const inputType = hasSearch
-      ? "{ params: Record<string, string>; search: Record<string, string> }"
-      : "Record<string, string>";
-    lines.push(
-      ``,
-      `const loadData = createServerFn({ method: "GET" })`,
-      ...fmtInputValidator(inputType),
-      `  .handler(async ({ data }) =>`,
-      `    runPageLoader(async () => {`,
-      fmtAwaitImport(importPath, `      `),
-    );
-    if (hasSearch) {
-      lines.push(
-        `      return tanstackLoader({`,
-        `        params: Promise.resolve(toNextParams(data.params)),`,
-        `        searchParams: Promise.resolve(data.search),`,
-        `      });`,
+
+  const inputType = hasSearch
+    ? "{ params: Record<string, string>; search: Record<string, string> }"
+    : "Record<string, string>";
+  const rawParamsExpr = hasSearch ? "data.params" : "data";
+  // Next-style props passed to tanstackLoader AND every generateMetadata in
+  // the chain. Emitted inline per call so toNextParams<T> infers each
+  // callee's own params type. Like Next, layouts never get searchParams.
+  const propsLines = (indent: string, withSearch = hasSearch): string[] => {
+    const out: string[] = [];
+    if (catchAllName) {
+      out.push(
+        `${indent}params: Promise.resolve({`,
+        `${indent}  ...toNextParams(${rawParamsExpr}),`,
+        `${indent}  ${catchAllName}: (${rawParamsExpr}["_splat"] ?? "").split("/").filter(Boolean),`,
+        `${indent}} as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
       );
     } else {
-      lines.push(
-        `      return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`,
+      out.push(
+        `${indent}params: Promise.resolve(toNextParams(${rawParamsExpr})),`,
       );
     }
-    lines.push(`    }),`, `  );`);
-  }
+    if (withSearch) {
+      out.push(`${indent}searchParams: Promise.resolve(data.search),`);
+    }
+    return out;
+  };
+
+  const metadataModules = [
+    ...Array.from(layoutChain.keys(), (i) => ({
+      name: `layout${i}`,
+      isPage: false,
+    })),
+    ...(pageHasMetadata ? [{ name: "page", isPage: true }] : []),
+  ];
+
+  lines.push(
+    ``,
+    `const loadData = createServerFn({ method: "GET" })`,
+    ...fmtInputValidator(inputType),
+    `  .handler(async ({ data }) =>`,
+    `    runPageLoader(async () => {`,
+    ...(isNotFoundCatchAll ? [`      setResponseStatus(404);`] : []),
+    `      const page = await import("${importPath}");`,
+    ...layoutChain.map(
+      (p, i) => `      const layout${i} = await import("${p}");`,
+    ),
+    `      const [pageData, head] = await Promise.all([`,
+    `        page.tanstackLoader({`,
+    ...propsLines(`          `),
+    `        }),`,
+    `        resolvePageHead([`,
+    ...metadataModules.flatMap((m) => [
+      `          () =>`,
+      `            ${m.name}.generateMetadata({`,
+      ...propsLines(`              `, m.isPage && hasSearch),
+      `            }),`,
+    ]),
+    `        ]),`,
+    `      ]);`,
+    `      return { page: pageData, head };`,
+    `    }),`,
+    `  );`,
+  );
 
   // Route body lines at zero indent; fmtRouteBlock adds the appropriate indent
   const bodyIndent = routeBodyIndent(routePath);
@@ -712,13 +763,14 @@ function emitPageFile(
           ...fmtSearchLoader(bodyIndent),
         ]
       : [...fmtParamsLoader(bodyIndent)]),
+    `head: ({ loaderData }) => loaderData?.head ?? {},`,
     `component: PageComponent,`,
   ];
 
   lines.push(
     ``,
     `function PageComponent(): JSX.Element {`,
-    `  return <Page {...Route.useLoaderData()} />;`,
+    `  return <Page {...Route.useLoaderData().page} />;`,
     `}`,
     ``,
     fmtRouteBlock(routePath, routeBodyLines),
@@ -749,6 +801,45 @@ function emitApiFile(
   ].join("\n");
   if (writeIfNotCustom(outPath, content)) {
     result.created.push(relative(projectRoot(), outPath).replaceAll("\\", "/"));
+  }
+}
+
+/**
+ * Root routes: `src/_pages/_root/<public file>/root-route.ts` (e.g.
+ * `sitemap.xml`) is served at `/<public file>`, outside `$locale`. Dots in
+ * the file name are escaped as `[.]` so the router treats them literally.
+ * Stale shells are removed by pruneStaleGeneratedFiles.
+ */
+const ROOT_ROUTE_FILE = "root-route.ts";
+
+function emitRootRouteFiles(ui: string, result: GenerationResult): void {
+  const rootDir = join(ui, "_root");
+  if (!existsSync(rootDir)) {
+    return;
+  }
+  for (const name of readdirSync(rootDir)) {
+    const srcFile = join(rootDir, name, ROOT_ROUTE_FILE);
+    if (!existsSync(srcFile)) {
+      continue;
+    }
+    const outPath = join(routesDir(), `${name.replaceAll(".", "[.]")}.ts`);
+    const srcRelative = relative(projectRoot(), srcFile).replaceAll("\\", "/");
+    const importPath = `@/${srcRelative.replace(/^src\//, "").replace(/\.ts$/, "")}`;
+    const content = [
+      `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
+      `import { createFileRoute } from "@tanstack/react-router";`,
+      ``,
+      `import { wrapNextApiRoute } from "${WRAPPER_IMPORT}";`,
+      ``,
+      fmtRouteBlock(`/${name}`, fmtServerHandlers(importPath)),
+      ``,
+    ].join("\n");
+    const rel = relative(projectRoot(), outPath).replaceAll("\\", "/");
+    if (writeIfNotCustom(outPath, content)) {
+      result.created.push(rel);
+    } else {
+      result.skipped.push(rel);
+    }
   }
 }
 
@@ -836,6 +927,9 @@ export const generator: GeneratorDefinition = {
         ...findFilesByName(pagesDir, "layout.tsx").map(
           (r: { fullPath: string }) => r.fullPath,
         ),
+        ...findFilesByName(pagesDir, ROOT_ROUTE_FILE).map(
+          (r: { fullPath: string }) => r.fullPath,
+        ),
       ].toSorted();
     }
     return [
@@ -846,6 +940,9 @@ export const generator: GeneratorDefinition = {
         (r: { fullPath: string }) => r.fullPath,
       ),
       ...findFilesByName(pagesDir, "layout.tsx").map(
+        (r: { fullPath: string }) => r.fullPath,
+      ),
+      ...findFilesByName(pagesDir, ROOT_ROUTE_FILE).map(
         (r: { fullPath: string }) => r.fullPath,
       ),
     ].toSorted();
@@ -933,6 +1030,7 @@ export const generator: GeneratorDefinition = {
     }
 
     emitRootRedirect(result);
+    emitRootRouteFiles(ui, result);
     pruneStaleGeneratedFiles(routes);
     // The live TanStack dev server (vibe dev) runs its OWN in-process
     // route-tree generator (configResolved at boot, watchChange on every

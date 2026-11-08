@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Polityka prywatności",
-  lastUpdated: "Ostatnia aktualizacja: styczeń 2025",
+  lastUpdated: "Ostatnia aktualizacja: listopad 2026",
   introduction:
     "W {{appName}} poważnie traktujemy Twoją prywatność. Ta polityka prywatności wyjaśnia, jak zbieramy, używamy i chronimy Twoje dane osobowe.",
   sections: {
@@ -97,15 +97,16 @@ export const translations: typeof enTranslations = {
         correction:
           "Prawo do poprawienia nieprawidłowych lub niekompletnych danych",
         deletion:
-          "Prawo do żądania usunięcia danych (prawo do bycia zapomnianym)",
+          "Prawo do usunięcia: usuń konto w ustawieniach, a Twoje dane osobowe zostaną skasowane",
         objection: "Prawo sprzeciwu wobec przetwarzania Twoich danych",
-        portability: "Prawo do przenoszenia danych",
+        portability:
+          "Prawo do przenoszenia danych: wyeksportuj wszystkie dane jako JSON w ustawieniach",
       },
     },
     cookies: {
       title: "Pliki cookie i śledzenie",
       description:
-        "Używamy plików cookie i podobnych technologii śledzenia w celu poprawy Twojego doświadczenia.",
+        "Żadnych trackerów firm trzecich, żadnych pikseli reklamowych, żadnego fingerprintingu. Jeden własny plik cookie pozwala nam rozpoznać Twoją przeglądarkę. Żeby wiedzieć, które kanały przyprowadzają ludzi, którzy zostają, zapisujemy, jak trafiłeś do nas pierwszy raz i ostatnio przez oznaczony link: tagi kampanii z linku (utm_source, utm_medium, utm_campaign, utm_content, utm_term), domenę strony odsyłającej (nigdy pełny adres), stronę wejścia (bez parametrów zapytania) i ewentualny kod polecający. Notujemy też, kiedy pierwszy raz napisałeś na czacie, założyłeś konto, potwierdziłeś newsletter, zapłaciłeś i odnowiłeś. Po rejestracji wiążemy to z Twoim kontem. Używamy tego wyłącznie zbiorczo do oceny kanałów marketingowych, nigdy nie sprzedajemy ani nie udostępniamy i usuwamy razem z kontem.",
     },
     thirdPartySites: {
       title: "Strony trzecie",
@@ -125,7 +126,7 @@ export const translations: typeof enTranslations = {
     gdpr: {
       title: "Zgodność z RODO",
       description:
-        "Dla użytkowników z Unii Europejskiej przestrzegamy wszystkich wymogów RODO.",
+        "Dla użytkowników z Unii Europejskiej szanujemy Twoje prawa wynikające z RODO. Eksportuj dane w dowolnej chwili w ustawieniach. Po usunięciu konta kasujemy profil, czaty, wspomnienia, adresy, zapis do newslettera i dane kontaktowe, a dane osobowe w powiązanych rekordach odwiedzających są usuwane. Zachowujemy anonimowe statystyki zbiorcze oraz rejestr kredytów (niepowiązany już z Tobą). W sprawach, których ustawienia nie obejmują, skontaktuj się z nami.",
     },
     ccpa: {
       title: "Zgodność z CCPA",

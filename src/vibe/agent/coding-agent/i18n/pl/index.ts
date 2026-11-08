@@ -78,6 +78,12 @@ export const translations: typeof enTranslations = {
             description:
               "Proces agenta kodowania nie mógł zostać uruchomiony lub uległ awarii",
           },
+          binaryMissing: {
+            title:
+              "{{bin}} nie jest zainstalowany na tej instancji - zainstaluj go albo wybierz innego agenta",
+            description:
+              "Nie znaleziono CLI agenta kodowania w PATH tego serwera",
+          },
           internalExitCode: {
             title: "Wykonanie nie powiodło się (exit {{exitCode}})",
             description:

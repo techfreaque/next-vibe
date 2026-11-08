@@ -44,6 +44,23 @@ export const translations = {
       tool: "Tool",
       error: "Error",
     },
+    threadModerationStatus: {
+      visible: "Visible",
+      underReview: "Under review",
+      removed: "Removed",
+    },
+    threadReportReason: {
+      spam: "Spam",
+      illegal: "Illegal content",
+      abuse: "Abuse or harassment",
+      csamFlag: "Child safety concern",
+      other: "Other",
+    },
+    threadModerationAction: {
+      dismiss: "Dismiss reports (restore)",
+      remove: "Remove content",
+      banAuthor: "Remove and ban author",
+    },
     threadStatus: {
       active: "Active",
       archived: "Archived",
@@ -168,7 +185,7 @@ export const translations = {
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free users get {{freeCredits}} credits/month.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, +{{bonusCredits}} with the newsletter.",
       },
       chatInput: {
         title: "Type Your Message",
@@ -251,7 +268,7 @@ export const translations = {
     add: "Add to favorites",
     added: "Added",
     addNew: "Add New",
-    searchSkills: "Search characters...",
+    searchSkills: "Search skills...",
     createCustom: "Create Custom",
     customizeSettings: "Customize Settings",
     requirements: {
@@ -300,8 +317,8 @@ export const translations = {
       deleteMessage: "Delete message",
     },
     characterSelector: {
-      placeholder: "Select character",
-      addNewLabel: "Create custom character",
+      placeholder: "Select skill",
+      addNewLabel: "Create custom skill",
       grouping: {
         bySource: "By Source",
         byCategory: "By Category",
@@ -321,7 +338,7 @@ export const translations = {
         fields: {
           name: {
             label: "Name",
-            placeholder: "Enter character name",
+            placeholder: "Enter skill name",
           },
           icon: {
             label: "Icon (emoji)",
@@ -329,11 +346,11 @@ export const translations = {
           },
           description: {
             label: "Description",
-            placeholder: "Brief description of the character",
+            placeholder: "Brief description of the skill",
           },
           systemPrompt: {
             label: "System Prompt",
-            placeholder: "Define how the character behaves...",
+            placeholder: "Define how the skill behaves...",
           },
           category: {
             label: "Category",
@@ -369,7 +386,7 @@ export const translations = {
     searchEnabled: "Search enabled",
     searchDisabled: "Search disabled",
     answerAsAI: "Answer as AI model",
-    retry: "Retry with different model/character",
+    retry: "Retry with different model/skill",
     branch: "Branch conversation from here",
     editMessage: "Edit message",
     stopAudio: "Stop audio playback",

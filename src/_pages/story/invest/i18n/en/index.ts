@@ -16,7 +16,7 @@ export const translations = {
   meta: {
     title: "Invest in {{appName}}",
     description:
-      "Tickets from $5,000. Back the open-source AI platform built on next-vibe - 100+ models, in production, and the user sets the filter.",
+      "Tickets from $5,000. Back the open-source AI platform built on next-vibe - {{modelCount}} models, in production, and the user sets the filter.",
     category: "Invest",
     imageAlt: "Invest in {{appName}}",
     keywords:

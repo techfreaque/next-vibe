@@ -28,7 +28,6 @@ export const translations: typeof enTranslations = {
   different: {
     title: "Jednorazowe vs. cykliczne - dlaczego to ma znaczenie",
     p1: "Większość programów polecających płaci raz. {{appName}} płaci wiecznie. Tak wygląda to w praktyce:",
-    tableTitle: "Porównanie typów poleceń",
     tableHeaderType: "Typ",
     tableHeaderYouEarn: "Zarabiasz",
     tableHeaderWhen: "Kiedy",

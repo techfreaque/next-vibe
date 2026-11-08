@@ -69,6 +69,9 @@ interface ThreadsPathPageProps {
   }>;
   searchParams: Promise<{
     message?: string;
+    /** Composer prefill + model (see use-query-prefill) - kept across redirects. */
+    q?: string;
+    model?: string;
   }>;
 }
 
@@ -76,7 +79,8 @@ export interface ThreadsPathPageData {
   locale: CountryLanguage;
   user: JwtPayloadType | null;
   platform: Platform;
-  creditsToUse: CreditsGetResponseOutput;
+  /** undefined = balance load failed server-side (client retries; never a fake 0) */
+  creditsToUse: CreditsGetResponseOutput | undefined;
   initialRootFolderId: DefaultFolderId;
   initialSubFolderId: string | null;
   initialThreadId: string | null;
@@ -116,10 +120,35 @@ export async function tanstackLoader({
 
   // Determine root folder early so we can redirect unauthenticated users
   // away from private/incognito folders before doing any DB work
-  const { initialRootFolderId: earlyRootFolderId } = parseChatUrl(path);
+  const {
+    initialRootFolderId: earlyRootFolderId,
+    initialThreadId: earlyThreadId,
+  } = parseChatUrl(path);
+  // A guest following a link to a real thread gets the sign-in gate (rendered
+  // by the chat widget); only bare/new private routes redirect to incognito.
+  const earlyHasRealThread =
+    earlyThreadId !== null && earlyThreadId !== NEW_MESSAGE_ID;
 
-  if (user?.isPublic && earlyRootFolderId === DefaultFolderId.PRIVATE) {
-    redirect(`/${locale}/threads/incognito`);
+  // Redirects must not drop a ?q= composer prefill
+  const prefillParams = new URLSearchParams();
+  if (resolvedSearchParams.q) {
+    prefillParams.set("q", resolvedSearchParams.q);
+  }
+  if (resolvedSearchParams.model) {
+    prefillParams.set("model", resolvedSearchParams.model);
+  }
+  const prefillQuery =
+    prefillParams.size > 0 ? `?${prefillParams.toString()}` : "";
+  const incognitoTarget = prefillQuery
+    ? `/${locale}/threads/incognito/${NEW_MESSAGE_ID}${prefillQuery}`
+    : `/${locale}/threads/incognito`;
+
+  if (
+    user?.isPublic &&
+    earlyRootFolderId === DefaultFolderId.PRIVATE &&
+    !earlyHasRealThread
+  ) {
+    redirect(incognitoTarget);
   }
 
   if (!user) {
@@ -158,7 +187,7 @@ export async function tanstackLoader({
     user.isPublic &&
     earlyRootFolderId !== DefaultFolderId.INCOGNITO
   ) {
-    redirect(`/${locale}/threads/incognito`);
+    redirect(incognitoTarget);
   }
 
   // Fetch credit balance for all users (both authenticated and public)
@@ -215,16 +244,9 @@ export async function tanstackLoader({
     }
   }
 
-  // Provide default credits if null (e.g., for unauthenticated users or error cases)
-  const creditsToUse = initialCredits ?? {
-    total: 0,
-    expiring: 0,
-    permanent: 0,
-    earned: 0,
-    free: 0,
-    expiresAt: null,
-    capacity: 20,
-  };
+  // A failed load stays unknown (undefined) - seeding zeros here made the
+  // composer claim "No credits left" whenever GET credits errored.
+  const creditsToUse = initialCredits ?? undefined;
 
   // Compute root folder permissions server-side
   // This is stateless and based on user role + folder config
@@ -255,7 +277,9 @@ export async function tanstackLoader({
     !initialThreadId &&
     !initialSubFolderId
   ) {
-    redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
+    redirect(
+      `/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}${prefillQuery}`,
+    );
   }
 
   // Prefetch initial sidebar + thread data server-side to avoid client-side fetch on mount.

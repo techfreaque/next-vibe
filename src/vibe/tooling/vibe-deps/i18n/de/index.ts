@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
     importers: "Importeure",
     needsMove: "Zu verschieben",
     unusedSymbols: "Ungenutzte Symbole",
+    unusedI18n: "Ungenutzte i18n-Keys",
     crossDomain: "Domänenübergreifend",
     pageViolations: "Seitenverstöße",
   },
@@ -124,6 +125,14 @@ export const translations: typeof enTranslations = {
       colPath: "Datei",
       emptyState: "Keine ungenutzte öffentliche Oberfläche im Umfang.",
       wholeFile: "(ganze Datei — keine Importeure)",
+    },
+    unusedI18n: {
+      title: "Ungenutzte i18n-Keys",
+      description:
+        "Keys aus den scoped en-Übersetzungen, die keine Quelldatei referenziert. Template-Präfixe wie t(`a.b.<x>`) schützen ihren Teilbaum. In en, de und pl gemeinsam löschen.",
+      colKey: "Key",
+      colPath: "Datei",
+      emptyState: "Jeder Übersetzungs-Key im Umfang wird referenziert.",
     },
     pageViolations: {
       title: "Seitenarchitektur-Verstöße",

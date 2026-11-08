@@ -265,6 +265,11 @@ export const translations: typeof enTranslations = {
     },
     weight: { label: "Waga", description: "Waga do równoważenia obciążenia" },
     isFailover: { label: "Failover", description: "Użyj jako konto failover" },
+    isSystem: {
+      label: "Skrzynka platformy",
+      description:
+        "Skrzynka operacyjna platformy. Dane dostępowe z env; wyłączona z kampanii.",
+    },
     failoverPriority: {
       label: "Priorytet failover",
       description: "Kolejność priorytetu failover",

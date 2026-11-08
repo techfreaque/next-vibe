@@ -8,6 +8,11 @@ export const translations = {
       industryInsights: "Industry Insights",
       events: "Events",
     },
+    creditBonus: {
+      active: "Bonus active",
+      pendingConfirmation: "Confirm your email to unlock",
+      claimedElsewhere: "Already claimed by another account",
+    },
   },
   tags: {
     newsletter: "Newsletter",
@@ -43,6 +48,8 @@ export const translations = {
     leadId: "Lead Identifier",
     subscriptionId: "Subscription ID",
     userId: "User ID",
+    creditBonus: "Free-credit bonus",
+    bonusCredits: "Bonus credits per month",
     alreadySubscribed:
       "This email address is already subscribed to our newsletter",
   },
@@ -182,6 +189,11 @@ export const translations = {
         "We'll send you updates every few weeks - never spam, always valuable content.",
       unsubscribe_text: "Don't want to receive these emails?",
       unsubscribe_link: "Unsubscribe",
+      confirm_title:
+        "One click left: +{{bonusCredits}} free credits every month",
+      confirm_text:
+        "Confirm this address and your account gets {{bonusCredits}} extra free credits, every month, for as long as you stay subscribed.",
+      confirm_button: "Confirm and unlock +{{bonusCredits}} credits",
     },
     admin_notification: {
       title: "New Newsletter Subscription",

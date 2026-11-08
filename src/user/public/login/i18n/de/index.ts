@@ -202,7 +202,8 @@ export const translations: typeof enTranslations = {
       successMessage: "Login-Optionen erfolgreich abgerufen",
       passwordAuthDescription:
         "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an",
-      socialAuthDescription: "Melden Sie sich mit Ihren Social-Media-Konten an",
+      socialAuthDescription:
+        "Social Login ist noch nicht verfügbar. Melden Sie sich mit E-Mail und Passwort an.",
       continueWithProvider: "Weiter mit {{provider}}",
       twoFactorRequired: "Erhöhte Sicherheit: 2FA erforderlich",
       standardSecurity: "Standard-Sicherheitsanforderungen",
@@ -236,9 +237,28 @@ export const translations: typeof enTranslations = {
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
       },
     },
+    twoFactorCode: {
+      label: "Authentifizierungscode",
+      description: "App-Code oder Wiederherstellungscode verwenden.",
+      placeholder: "6-stelliger Code",
+    },
     rememberMe: {
       label: "Angemeldet bleiben",
     },
+  },
+  twoFactorStep: {
+    title: "Zweiter Schritt",
+    helper: "Gib den 6-stelligen Code aus deiner Authenticator-App ein.",
+    recoveryHelper:
+      "Gib einen deiner Wiederherstellungscodes ein. Jeder gilt nur einmal.",
+    codeLabel: "Authentifizierungscode",
+    recoveryLabel: "Wiederherstellungscode",
+    recoveryPlaceholder: "XXXXX-XXXXX",
+    useRecovery: "Wiederherstellungscode verwenden",
+    useApp: "Authenticator-App verwenden",
+    verify: "Bestätigen",
+    verifying: "Prüfe...",
+    back: "Zurück",
   },
   groups: {
     credentials: {
@@ -298,6 +318,7 @@ export const translations: typeof enTranslations = {
       "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
     invalid_credentials: "Ungültige E-Mail oder Passwort",
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
+    invalid_two_factor_code: "Ungültiger Authentifizierungscode",
     auth_error: "Anmeldung für {{email}} fehlgeschlagen: {{error}}",
     user_not_found: "Kein Benutzer zu {{userId}} gefunden",
     session_creation_failed:

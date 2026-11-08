@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
   category: "companies",
   subCategory: "Company Members",
   tags: ["tags.companies", "tags.members", "tags.list"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   icon: "users",
 
   fields: customWidgetObject({

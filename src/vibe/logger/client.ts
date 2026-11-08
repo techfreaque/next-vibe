@@ -7,6 +7,7 @@
 import type { CountryLanguage } from "../core/i18n/core/config";
 import { UserPermissionRole } from "../identity/roles/enum";
 import { createLogger } from "./create-logger";
+import { serializeLogValue } from "./serialize";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 /** Coerce any LoggerMetadata value to a schema-safe primitive */
@@ -28,7 +29,7 @@ function toPrimitive(v: LoggerMetadata): string | number | boolean | null {
     return v.toISOString();
   }
   try {
-    return JSON.stringify(v);
+    return JSON.stringify(serializeLogValue(v));
   } catch {
     return String(v);
   }

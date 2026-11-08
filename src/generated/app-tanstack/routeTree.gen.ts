@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LocaleIndexRouteImport } from './routes/$locale.index'
 import { Route as LocaleSplatRouteImport } from './routes/$locale.$'
 import { Route as LocaleHelpRouteImport } from './routes/$locale.help'
+import { Route as LocaleModelsRouteImport } from './routes/$locale.models'
 import { Route as LocaleStoryRouteImport } from './routes/$locale.story'
 import { Route as LocaleSubscriptionRouteImport } from './routes/$locale.subscription'
 import { Route as LocaleThreadsRouteImport } from './routes/$locale.threads'
@@ -20,6 +22,7 @@ import { Route as LocaleCortexIndexRouteImport } from './routes/$locale.cortex.i
 import { Route as LocaleDesignTestIndexRouteImport } from './routes/$locale.design-test.index'
 import { Route as LocaleFrameSplatRouteImport } from './routes/$locale.frame.$'
 import { Route as LocaleHelpIndexRouteImport } from './routes/$locale.help.index'
+import { Route as LocaleModelsIndexRouteImport } from './routes/$locale.models.index'
 import { Route as LocaleSkillsIndexRouteImport } from './routes/$locale.skills.index'
 import { Route as LocaleStoryIndexRouteImport } from './routes/$locale.story.index'
 import { Route as LocaleSubscriptionIndexRouteImport } from './routes/$locale.subscription.index'
@@ -31,6 +34,7 @@ import { Route as LocaleTrackIndexRouteImport } from './routes/$locale.track.ind
 import { Route as LocaleUserAccountRouteImport } from './routes/$locale.user._account'
 import { Route as LocaleUserAuthRouteImport } from './routes/$locale.user._auth'
 import { Route as ApiLocaleNotFoundRouteImport } from './routes/api.$locale.$notFound'
+import { Route as ApiLocaleApiKeysRouteImport } from './routes/api.$locale.api-keys'
 import { Route as ApiLocaleContactRouteImport } from './routes/api.$locale.contact'
 import { Route as ApiLocaleCreditsRouteImport } from './routes/api.$locale.credits'
 import { Route as ApiLocaleManifestRouteImport } from './routes/api.$locale.manifest'
@@ -39,6 +43,7 @@ import { Route as ApiLocaleReferralRouteImport } from './routes/api.$locale.refe
 import { Route as ApiLocaleSubscriptionRouteImport } from './routes/api.$locale.subscription'
 import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.creator.$userId.index'
 import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$locale.invoice.$invoiceId.index'
+import { Route as LocaleModelsModelIdIndexRouteImport } from './routes/$locale.models.$modelId.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
 import { Route as LocaleSkillSkillIdIndexRouteImport } from './routes/$locale.skill.$skillId.index'
 import { Route as LocaleStoryAboutUsIndexRouteImport } from './routes/$locale.story.about-us.index'
@@ -51,6 +56,7 @@ import { Route as LocaleStoryImprintIndexRouteImport } from './routes/$locale.st
 import { Route as LocaleStoryInvestIndexRouteImport } from './routes/$locale.story.invest.index'
 import { Route as LocaleStoryNewsletterIndexRouteImport } from './routes/$locale.story.newsletter.index'
 import { Route as LocaleStoryPrivacyPolicyIndexRouteImport } from './routes/$locale.story.privacy-policy.index'
+import { Route as LocaleStoryRefusalIndexIndexRouteImport } from './routes/$locale.story.refusal-index.index'
 import { Route as LocaleStorySelfHostIndexRouteImport } from './routes/$locale.story.self-host.index'
 import { Route as LocaleStoryTermsOfServiceIndexRouteImport } from './routes/$locale.story.terms-of-service.index'
 import { Route as LocaleSubscriptionBuyIndexRouteImport } from './routes/$locale.subscription.buy.index'
@@ -58,6 +64,7 @@ import { Route as LocaleSubscriptionHistoryIndexRouteImport } from './routes/$lo
 import { Route as LocaleSubscriptionOverviewIndexRouteImport } from './routes/$locale.subscription.overview.index'
 import { Route as LocaleSubscriptionRemoteIndexRouteImport } from './routes/$locale.subscription.remote.index'
 import { Route as LocaleUserAuthSignupRouteImport } from './routes/$locale.user._auth.signup'
+import { Route as ApiLocaleApiKeysIdRouteImport } from './routes/api.$locale.api-keys.$id'
 import { Route as ApiLocaleBrowserClickRouteImport } from './routes/api.$locale.browser.click'
 import { Route as ApiLocaleBrowserClosePageRouteImport } from './routes/api.$locale.browser.close-page'
 import { Route as ApiLocaleBrowserDragRouteImport } from './routes/api.$locale.browser.drag'
@@ -105,6 +112,9 @@ import { Route as ApiLocaleDesktopPressKeyRouteImport } from './routes/api.$loca
 import { Route as ApiLocaleDesktopScrollRouteImport } from './routes/api.$locale.desktop.scroll'
 import { Route as ApiLocaleDesktopTakeScreenshotRouteImport } from './routes/api.$locale.desktop.take-screenshot'
 import { Route as ApiLocaleDesktopTypeTextRouteImport } from './routes/api.$locale.desktop.type-text'
+import { Route as ApiLocaleFinanceIngestRouteImport } from './routes/api.$locale.finance.ingest'
+import { Route as ApiLocaleFinanceStatusRouteImport } from './routes/api.$locale.finance.status'
+import { Route as ApiLocaleFinanceThresholdsRouteImport } from './routes/api.$locale.finance.thresholds'
 import { Route as ApiLocaleInventoryDashboardRouteImport } from './routes/api.$locale.inventory.dashboard'
 import { Route as ApiLocaleLeadMagnetCaptureRouteImport } from './routes/api.$locale.lead-magnet.capture'
 import { Route as ApiLocaleLeadMagnetCapturesRouteImport } from './routes/api.$locale.lead-magnet.captures'
@@ -122,9 +132,13 @@ import { Route as ApiLocaleLeadsSkillRouteImport } from './routes/api.$locale.le
 import { Route as ApiLocaleLeadsStatsRouteImport } from './routes/api.$locale.leads.stats'
 import { Route as ApiLocaleLeadsTrackingRouteImport } from './routes/api.$locale.leads.tracking'
 import { Route as ApiLocaleMessengerSendRouteImport } from './routes/api.$locale.messenger.send'
+import { Route as ApiLocaleNewsletterConfirmRouteImport } from './routes/api.$locale.newsletter.confirm'
 import { Route as ApiLocaleNewsletterStatusRouteImport } from './routes/api.$locale.newsletter.status'
 import { Route as ApiLocaleNewsletterSubscribeRouteImport } from './routes/api.$locale.newsletter.subscribe'
 import { Route as ApiLocaleNewsletterUnsubscribeRouteImport } from './routes/api.$locale.newsletter.unsubscribe'
+import { Route as ApiLocaleNotificationsListRouteImport } from './routes/api.$locale.notifications.list'
+import { Route as ApiLocaleNotificationsReadRouteImport } from './routes/api.$locale.notifications.read'
+import { Route as ApiLocaleNotificationsUnreadCountRouteImport } from './routes/api.$locale.notifications.unread-count'
 import { Route as ApiLocalePaymentCheckoutRouteImport } from './routes/api.$locale.payment.checkout'
 import { Route as ApiLocalePaymentDashboardRouteImport } from './routes/api.$locale.payment.dashboard'
 import { Route as ApiLocalePaymentInvoiceRouteImport } from './routes/api.$locale.payment.invoice'
@@ -145,6 +159,7 @@ import { Route as ApiLocaleUsersCreateRouteImport } from './routes/api.$locale.u
 import { Route as ApiLocaleUsersListRouteImport } from './routes/api.$locale.users.list'
 import { Route as ApiLocaleUsersStatsRouteImport } from './routes/api.$locale.users.stats'
 import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.users.view'
+import { Route as ApiLocaleV1ModelsRouteImport } from './routes/api.$locale.v1.models'
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
@@ -171,6 +186,7 @@ import { Route as LocaleUserAuthResetPasswordIndexRouteImport } from './routes/$
 import { Route as LocaleUserAuthSignupIndexRouteImport } from './routes/$locale.user._auth.signup.index'
 import { Route as ApiLocaleAnalyticsEvaluatorsAndRouteImport } from './routes/api.$locale.analytics.evaluators.and'
 import { Route as ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport } from './routes/api.$locale.analytics.evaluators.crossover'
+import { Route as ApiLocaleAnalyticsEvaluatorsDropRouteImport } from './routes/api.$locale.analytics.evaluators.drop'
 import { Route as ApiLocaleAnalyticsEvaluatorsNotRouteImport } from './routes/api.$locale.analytics.evaluators.not'
 import { Route as ApiLocaleAnalyticsEvaluatorsOrRouteImport } from './routes/api.$locale.analytics.evaluators.or'
 import { Route as ApiLocaleAnalyticsEvaluatorsScriptRouteImport } from './routes/api.$locale.analytics.evaluators.script'
@@ -211,6 +227,7 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsEarnedRouteImport } from './
 import { Route as ApiLocaleCreditsDataSourcesCreditsExpiredRouteImport } from './routes/api.$locale.credits.data-sources.credits-expired'
 import { Route as ApiLocaleCreditsDataSourcesCreditsFreeGrantsRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-grants'
 import { Route as ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-pool-utilization'
+import { Route as ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-tier-spend'
 import { Route as ApiLocaleCreditsDataSourcesCreditsPacksCreatedRouteImport } from './routes/api.$locale.credits.data-sources.credits-packs-created'
 import { Route as ApiLocaleCreditsDataSourcesCreditsPurchasedRouteImport } from './routes/api.$locale.credits.data-sources.credits-purchased'
 import { Route as ApiLocaleCreditsDataSourcesCreditsRefundedRouteImport } from './routes/api.$locale.credits.data-sources.credits-refunded'
@@ -222,6 +239,7 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsTransactionsCountRouteImport
 import { Route as ApiLocaleCreditsDataSourcesCreditsTransferVolumeRouteImport } from './routes/api.$locale.credits.data-sources.credits-transfer-volume'
 import { Route as ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRouteImport } from './routes/api.$locale.credits.data-sources.credits-usage-with-feature'
 import { Route as ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-wallets-total'
+import { Route as ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport } from './routes/api.$locale.finance.data-sources.finance-series'
 import { Route as ApiLocaleInventoryStockAdjustRouteImport } from './routes/api.$locale.inventory.stock.adjust'
 import { Route as ApiLocaleInventoryStockIssueRouteImport } from './routes/api.$locale.inventory.stock.issue'
 import { Route as ApiLocaleInventoryStockListRouteImport } from './routes/api.$locale.inventory.stock.list'
@@ -272,8 +290,14 @@ import { Route as ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRouteImport
 import { Route as ApiLocaleLeadsDataSourcesLeadsUnsubscribedRouteImport } from './routes/api.$locale.leads.data-sources.leads-unsubscribed'
 import { Route as ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRouteImport } from './routes/api.$locale.leads.data-sources.leads-website-users'
 import { Route as ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRouteImport } from './routes/api.$locale.leads.data-sources.leads-website-visits'
+import { Route as ApiLocaleLeadsGrowthLinksRouteImport } from './routes/api.$locale.leads.growth.links'
+import { Route as ApiLocaleLeadsGrowthSpendRouteImport } from './routes/api.$locale.leads.growth.spend'
 import { Route as ApiLocaleLeadsImportProcessRouteImport } from './routes/api.$locale.leads.import.process'
 import { Route as ApiLocaleLeadsImportStatusRouteImport } from './routes/api.$locale.leads.import.status'
+import { Route as ApiLocaleLeadsLifecycleBackfillRouteImport } from './routes/api.$locale.leads.lifecycle.backfill'
+import { Route as ApiLocaleLeadsLifecycleOverviewRouteImport } from './routes/api.$locale.leads.lifecycle.overview'
+import { Route as ApiLocaleLeadsLifecycleRunRouteImport } from './routes/api.$locale.leads.lifecycle.run'
+import { Route as ApiLocaleLeadsLifecycleSettingsRouteImport } from './routes/api.$locale.leads.lifecycle.settings'
 import { Route as ApiLocaleLeadsTrackingPixelRouteImport } from './routes/api.$locale.leads.tracking.pixel'
 import { Route as ApiLocaleMessengerAccountsCreateRouteImport } from './routes/api.$locale.messenger.accounts.create'
 import { Route as ApiLocaleMessengerAccountsListRouteImport } from './routes/api.$locale.messenger.accounts.list'
@@ -292,6 +316,10 @@ import { Route as ApiLocaleMessengerMessagesListRouteImport } from './routes/api
 import { Route as ApiLocaleMessengerMessagesStatsRouteImport } from './routes/api.$locale.messenger.messages.stats'
 import { Route as ApiLocaleMessengerPreviewRenderRouteImport } from './routes/api.$locale.messenger.preview.render'
 import { Route as ApiLocaleMessengerPreviewSendTestRouteImport } from './routes/api.$locale.messenger.preview.send-test'
+import { Route as ApiLocaleMessengerSystemMailboxInboxRouteImport } from './routes/api.$locale.messenger.system-mailbox.inbox'
+import { Route as ApiLocaleMessengerSystemMailboxMessageRouteImport } from './routes/api.$locale.messenger.system-mailbox.message'
+import { Route as ApiLocaleMessengerSystemMailboxReportRouteImport } from './routes/api.$locale.messenger.system-mailbox.report'
+import { Route as ApiLocaleMessengerSystemMailboxSendRouteImport } from './routes/api.$locale.messenger.system-mailbox.send'
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-campaigns-sent'
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-events-total'
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-subscriptions-new'
@@ -334,6 +362,7 @@ import { Route as ApiLocaleReferralDataSourcesReferralsEarningsVolumeRouteImport
 import { Route as ApiLocaleReferralDataSourcesReferralsLeadClicksRouteImport } from './routes/api.$locale.referral.data-sources.referrals-lead-clicks'
 import { Route as ApiLocaleReferralDataSourcesReferralsPayoutsRouteImport } from './routes/api.$locale.referral.data-sources.referrals-payouts'
 import { Route as ApiLocaleReferralDataSourcesReferralsSignupsRouteImport } from './routes/api.$locale.referral.data-sources.referrals-signups'
+import { Route as ApiLocaleReferralEarningsConfirmRouteImport } from './routes/api.$locale.referral.earnings.confirm'
 import { Route as ApiLocaleReferralEarningsListRouteImport } from './routes/api.$locale.referral.earnings.list'
 import { Route as ApiLocaleReferralLeadCurrentRouteImport } from './routes/api.$locale.referral.lead.current'
 import { Route as ApiLocaleSshConnectionsIdRouteImport } from './routes/api.$locale.ssh.connections.$id'
@@ -365,7 +394,9 @@ import { Route as ApiLocaleUserPrivateMeRouteImport } from './routes/api.$locale
 import { Route as ApiLocaleUserPrivateSessionsRouteImport } from './routes/api.$locale.user.private.sessions'
 import { Route as ApiLocaleUserPublicLoginRouteImport } from './routes/api.$locale.user.public.login'
 import { Route as ApiLocaleUserPublicSignupRouteImport } from './routes/api.$locale.user.public.signup'
+import { Route as ApiLocaleUserPublicVerifyEmailRouteImport } from './routes/api.$locale.user.public.verify-email'
 import { Route as ApiLocaleUsersUserIdRouteImport } from './routes/api.$locale.users.user.$id'
+import { Route as ApiLocaleV1ChatCompletionsRouteImport } from './routes/api.$locale.v1.chat.completions'
 import { Route as ApiLocaleVibeAgentCodingAgentRouteImport } from './routes/api.$locale.vibe.agent.coding-agent'
 import { Route as ApiLocaleVibeAgentDescribeImageRouteImport } from './routes/api.$locale.vibe.agent.describe-image'
 import { Route as ApiLocaleVibeAgentDescribeVideoRouteImport } from './routes/api.$locale.vibe.agent.describe-video'
@@ -393,8 +424,11 @@ import { Route as ApiLocaleVibeRemoteConnectionConnectReverseRouteImport } from 
 import { Route as ApiLocaleVibeRemoteConnectionListRouteImport } from './routes/api.$locale.vibe.remote-connection.list'
 import { Route as ApiLocaleVibeRemoteConnectionSyncRouteImport } from './routes/api.$locale.vibe.remote-connection.sync'
 import { Route as ApiLocaleVibeTasksExecuteRouteImport } from './routes/api.$locale.vibe.tasks.execute'
+import { Route as LocaleModelsCompareABIndexRouteImport } from './routes/$locale.models.compare.$a.$b.index'
+import { Route as LocaleStoryNewsletterConfirmTokenIndexRouteImport } from './routes/$locale.story.newsletter.confirm.$token.index'
 import { Route as LocaleStoryNewsletterUnsubscribeEmailIndexRouteImport } from './routes/$locale.story.newsletter.unsubscribe.$email.index'
 import { Route as LocaleUserAuthResetPasswordTokenIndexRouteImport } from './routes/$locale.user._auth.reset-password.$token.index'
+import { Route as LocaleUserAuthVerifyEmailTokenIndexRouteImport } from './routes/$locale.user._auth.verify-email.$token.index'
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdDeactivateRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.deactivate'
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdGetRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.get'
 import { Route as ApiLocaleChartOfAccountsAccountAccountIdUpdateRouteImport } from './routes/api.$locale.chart-of-accounts.account.$accountId.update'
@@ -412,8 +446,11 @@ import { Route as ApiLocaleInventoryWarehouseWarehouseIdGetRouteImport } from '.
 import { Route as ApiLocaleInventoryWarehouseWarehouseIdUpdateRouteImport } from './routes/api.$locale.inventory.warehouse.$warehouseId.update'
 import { Route as ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRouteImport } from './routes/api.$locale.lead-magnet.providers.google-sheets.sheets-list'
 import { Route as ApiLocaleLeadsCampaignsEmailsTestMailRouteImport } from './routes/api.$locale.leads.campaigns.emails.test-mail'
+import { Route as ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport } from './routes/api.$locale.leads.growth.data-sources.channel-spend'
+import { Route as ApiLocaleLeadsGrowthDataSourcesFunnelStepRouteImport } from './routes/api.$locale.leads.growth.data-sources.funnel-step'
 import { Route as ApiLocaleLeadsImportJobsJobIdRouteImport } from './routes/api.$locale.leads.import.jobs.$jobId'
 import { Route as ApiLocaleMessengerAccountsEditIdRouteImport } from './routes/api.$locale.messenger.accounts.edit.$id'
+import { Route as ApiLocaleNewsletterUnsubscribeOneclickTokenRouteImport } from './routes/api.$locale.newsletter.unsubscribe.oneclick.$token'
 import { Route as ApiLocalePaymentBillBillIdApproveRouteImport } from './routes/api.$locale.payment.bill.$billId.approve'
 import { Route as ApiLocalePaymentBillBillIdGetRouteImport } from './routes/api.$locale.payment.bill.$billId.get'
 import { Route as ApiLocalePaymentBillBillIdPayRouteImport } from './routes/api.$locale.payment.bill.$billId.pay'
@@ -466,7 +503,9 @@ import { Route as ApiLocaleTaxRateRateIdDeleteRouteImport } from './routes/api.$
 import { Route as ApiLocaleTaxRateRateIdUpdateRouteImport } from './routes/api.$locale.tax.rate.$rateId.update'
 import { Route as ApiLocaleUserPrivateMeAddressesRouteImport } from './routes/api.$locale.user.private.me.addresses'
 import { Route as ApiLocaleUserPrivateMeAvatarRouteImport } from './routes/api.$locale.user.private.me.avatar'
+import { Route as ApiLocaleUserPrivateMeExportRouteImport } from './routes/api.$locale.user.private.me.export'
 import { Route as ApiLocaleUserPrivateMePasswordRouteImport } from './routes/api.$locale.user.private.me.password'
+import { Route as ApiLocaleUserPrivateMeTwoFactorRouteImport } from './routes/api.$locale.user.private.me.two-factor'
 import { Route as ApiLocaleUserPrivateSessionsIdRouteImport } from './routes/api.$locale.user.private.sessions.$id'
 import { Route as ApiLocaleUserPublicCreatorUserIdRouteImport } from './routes/api.$locale.user.public.creator.$userId'
 import { Route as ApiLocaleUserPublicLoginOptionsRouteImport } from './routes/api.$locale.user.public.login.options'
@@ -477,6 +516,7 @@ import { Route as ApiLocaleUsersUserIdRolesRouteImport } from './routes/api.$loc
 import { Route as ApiLocaleVibeAgentAiStreamCancelRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.cancel'
 import { Route as ApiLocaleVibeAgentAiStreamRunRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.run'
 import { Route as ApiLocaleVibeAgentAiStreamStreamRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.stream'
+import { Route as ApiLocaleVibeAgentChatModerationRouteImport } from './routes/api.$locale.vibe.agent.chat.moderation'
 import { Route as ApiLocaleVibeAgentChatPublicFeedRouteImport } from './routes/api.$locale.vibe.agent.chat.public-feed'
 import { Route as ApiLocaleVibeAgentChatSettingsRouteImport } from './routes/api.$locale.vibe.agent.chat.settings'
 import { Route as ApiLocaleVibeAgentChatThreadsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads'
@@ -493,6 +533,10 @@ import { Route as ApiLocaleVibeAgentCortexTreeRouteImport } from './routes/api.$
 import { Route as ApiLocaleVibeAgentCortexWriteRouteImport } from './routes/api.$locale.vibe.agent.cortex.write'
 import { Route as ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content.cleanup'
 import { Route as ApiLocaleVibeAgentModelsListRouteImport } from './routes/api.$locale.vibe.agent.models.list'
+import { Route as ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.leaderboard'
+import { Route as ApiLocaleVibeAgentRefusalIndexQuestionsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.questions'
+import { Route as ApiLocaleVibeAgentRefusalIndexRunsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.runs'
+import { Route as ApiLocaleVibeAgentRefusalIndexSamplesRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.samples'
 import { Route as ApiLocaleVibeAgentSkillsIdRouteImport } from './routes/api.$locale.vibe.agent.skills.$id'
 import { Route as ApiLocaleVibeAgentSkillsCreateRouteImport } from './routes/api.$locale.vibe.agent.skills.create'
 import { Route as ApiLocaleVibeAgentSkillsFavoritesRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites'
@@ -525,6 +569,10 @@ import { Route as ApiLocaleVibeTasksDataSourcesCronExecutionsTotalRouteImport } 
 import { Route as ApiLocaleVibeTasksPulseExecuteRouteImport } from './routes/api.$locale.vibe.tasks.pulse.execute'
 import { Route as ApiLocaleVibeTasksPulseHistoryRouteImport } from './routes/api.$locale.vibe.tasks.pulse.history'
 import { Route as ApiLocaleVibeTasksPulseStatusRouteImport } from './routes/api.$locale.vibe.tasks.pulse.status'
+import { Route as ApiLocaleVibeTasksWatchdogBudgetCapsRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.budget-caps'
+import { Route as ApiLocaleVibeTasksWatchdogCancelRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.cancel'
+import { Route as ApiLocaleVibeTasksWatchdogHealthRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.health'
+import { Route as ApiLocaleVibeTasksWatchdogSweepRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.sweep'
 import { Route as ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRouteImport } from './routes/api.$locale.companies.$companyId.members.$memberId.remove'
 import { Route as ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRouteImport } from './routes/api.$locale.companies.$companyId.members.$memberId.update-role'
 import { Route as ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRouteImport } from './routes/api.$locale.lead-magnet.providers.google-sheets.oauth.callback'
@@ -560,6 +608,10 @@ import { Route as ApiLocaleVibeAgentChatThreadsRenameRouteImport } from './route
 import { Route as ApiLocaleVibeAgentChatThreadsSearchMessagesRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.search-messages'
 import { Route as ApiLocaleVibeAgentChatThreadsSearchThreadsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.search-threads'
 import { Route as ApiLocaleVibeAgentCortexEmbeddingsBackfillRouteImport } from './routes/api.$locale.vibe.agent.cortex.embeddings.backfill'
+import { Route as ApiLocaleVibeAgentRefusalIndexModelModelIdRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.model.$modelId'
+import { Route as ApiLocaleVibeAgentRefusalIndexQuestionsIdRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.questions.$id'
+import { Route as ApiLocaleVibeAgentRefusalIndexRunsIdRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.runs.$id'
+import { Route as ApiLocaleVibeAgentRefusalIndexRunsStartRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.runs.start'
 import { Route as ApiLocaleVibeAgentSkillsIdPublishRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.publish'
 import { Route as ApiLocaleVibeAgentSkillsIdReportRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.report'
 import { Route as ApiLocaleVibeAgentSkillsIdVoteRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.vote'
@@ -578,11 +630,13 @@ import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
 import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-total'
 import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-warnings'
 import { Route as ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.$characterSkill'
+import { Route as ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.data-sources.task-health'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.create'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.root-permissions'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.permissions'
+import { Route as ApiLocaleVibeAgentChatThreadsThreadIdReportRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.report'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.share-links'
 import { Route as ApiLocaleVibePlatformsAiSkillsAGENTMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.AGENT.md'
 import { Route as ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.PUBLIC_USER_AI_RUN.md'
@@ -591,17 +645,25 @@ import { Route as ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_AI_RUNMdRouteI
 import { Route as ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.USER_WITH_ACCOUNT_SKILL.md'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.move'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.permissions'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.project'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.rename'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.update'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.$messageId'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.path'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.search'
 import { Route as ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.files.$threadId.$filename'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.project.files'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId.messages.$messageId.vote'
+import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId.project.files.$fileId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleIndexRoute = LocaleIndexRouteImport.update({
@@ -617,6 +679,11 @@ const LocaleSplatRoute = LocaleSplatRouteImport.update({
 const LocaleHelpRoute = LocaleHelpRouteImport.update({
   id: '/$locale/help',
   path: '/$locale/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocaleModelsRoute = LocaleModelsRouteImport.update({
+  id: '/$locale/models',
+  path: '/$locale/models',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleStoryRoute = LocaleStoryRouteImport.update({
@@ -653,6 +720,11 @@ const LocaleHelpIndexRoute = LocaleHelpIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LocaleHelpRoute,
+} as any)
+const LocaleModelsIndexRoute = LocaleModelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LocaleModelsRoute,
 } as any)
 const LocaleSkillsIndexRoute = LocaleSkillsIndexRouteImport.update({
   id: '/$locale/skills/',
@@ -709,6 +781,11 @@ const ApiLocaleNotFoundRoute = ApiLocaleNotFoundRouteImport.update({
   path: '/api/$locale/$notFound',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleApiKeysRoute = ApiLocaleApiKeysRouteImport.update({
+  id: '/api/$locale/api-keys',
+  path: '/api/$locale/api-keys',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleContactRoute = ApiLocaleContactRouteImport.update({
   id: '/api/$locale/contact',
   path: '/api/$locale/contact',
@@ -750,6 +827,12 @@ const LocaleInvoiceInvoiceIdIndexRoute =
     id: '/$locale/invoice/$invoiceId/',
     path: '/$locale/invoice/$invoiceId/',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const LocaleModelsModelIdIndexRoute =
+  LocaleModelsModelIdIndexRouteImport.update({
+    id: '/$modelId/',
+    path: '/$modelId/',
+    getParentRoute: () => LocaleModelsRoute,
   } as any)
 const LocaleSharedTokenIndexRoute = LocaleSharedTokenIndexRouteImport.update({
   id: '/$locale/shared/$token/',
@@ -815,6 +898,12 @@ const LocaleStoryPrivacyPolicyIndexRoute =
     path: '/privacy-policy/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryRefusalIndexIndexRoute =
+  LocaleStoryRefusalIndexIndexRouteImport.update({
+    id: '/refusal-index/',
+    path: '/refusal-index/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStorySelfHostIndexRoute =
   LocaleStorySelfHostIndexRouteImport.update({
     id: '/self-host/',
@@ -855,6 +944,11 @@ const LocaleUserAuthSignupRoute = LocaleUserAuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => LocaleUserAuthRoute,
+} as any)
+const ApiLocaleApiKeysIdRoute = ApiLocaleApiKeysIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiLocaleApiKeysRoute,
 } as any)
 const ApiLocaleBrowserClickRoute = ApiLocaleBrowserClickRouteImport.update({
   id: '/api/$locale/browser/click',
@@ -1126,6 +1220,22 @@ const ApiLocaleDesktopTypeTextRoute =
     path: '/api/$locale/desktop/type-text',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleFinanceIngestRoute = ApiLocaleFinanceIngestRouteImport.update({
+  id: '/api/$locale/finance/ingest',
+  path: '/api/$locale/finance/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleFinanceStatusRoute = ApiLocaleFinanceStatusRouteImport.update({
+  id: '/api/$locale/finance/status',
+  path: '/api/$locale/finance/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleFinanceThresholdsRoute =
+  ApiLocaleFinanceThresholdsRouteImport.update({
+    id: '/api/$locale/finance/thresholds',
+    path: '/api/$locale/finance/thresholds',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleInventoryDashboardRoute =
   ApiLocaleInventoryDashboardRouteImport.update({
     id: '/api/$locale/inventory/dashboard',
@@ -1216,6 +1326,12 @@ const ApiLocaleMessengerSendRoute = ApiLocaleMessengerSendRouteImport.update({
   path: '/api/$locale/messenger/send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleNewsletterConfirmRoute =
+  ApiLocaleNewsletterConfirmRouteImport.update({
+    id: '/api/$locale/newsletter/confirm',
+    path: '/api/$locale/newsletter/confirm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleNewsletterStatusRoute =
   ApiLocaleNewsletterStatusRouteImport.update({
     id: '/api/$locale/newsletter/status',
@@ -1232,6 +1348,24 @@ const ApiLocaleNewsletterUnsubscribeRoute =
   ApiLocaleNewsletterUnsubscribeRouteImport.update({
     id: '/api/$locale/newsletter/unsubscribe',
     path: '/api/$locale/newsletter/unsubscribe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleNotificationsListRoute =
+  ApiLocaleNotificationsListRouteImport.update({
+    id: '/api/$locale/notifications/list',
+    path: '/api/$locale/notifications/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleNotificationsReadRoute =
+  ApiLocaleNotificationsReadRouteImport.update({
+    id: '/api/$locale/notifications/read',
+    path: '/api/$locale/notifications/read',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleNotificationsUnreadCountRoute =
+  ApiLocaleNotificationsUnreadCountRouteImport.update({
+    id: '/api/$locale/notifications/unread-count',
+    path: '/api/$locale/notifications/unread-count',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocalePaymentCheckoutRoute =
@@ -1341,6 +1475,11 @@ const ApiLocaleUsersStatsRoute = ApiLocaleUsersStatsRouteImport.update({
 const ApiLocaleUsersViewRoute = ApiLocaleUsersViewRouteImport.update({
   id: '/api/$locale/users/view',
   path: '/api/$locale/users/view',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleV1ModelsRoute = ApiLocaleV1ModelsRouteImport.update({
+  id: '/api/$locale/v1/models',
+  path: '/api/$locale/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLocaleVibeExecuteToolRoute =
@@ -1496,6 +1635,12 @@ const ApiLocaleAnalyticsEvaluatorsCrossoverRoute =
   ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport.update({
     id: '/api/$locale/analytics/evaluators/crossover',
     path: '/api/$locale/analytics/evaluators/crossover',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleAnalyticsEvaluatorsDropRoute =
+  ApiLocaleAnalyticsEvaluatorsDropRouteImport.update({
+    id: '/api/$locale/analytics/evaluators/drop',
+    path: '/api/$locale/analytics/evaluators/drop',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleAnalyticsEvaluatorsNotRoute =
@@ -1738,6 +1883,12 @@ const ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute =
     path: '/data-sources/credits-free-pool-utilization',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
+const ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute =
+  ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRouteImport.update({
+    id: '/data-sources/credits-free-tier-spend',
+    path: '/data-sources/credits-free-tier-spend',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
 const ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute =
   ApiLocaleCreditsDataSourcesCreditsPacksCreatedRouteImport.update({
     id: '/data-sources/credits-packs-created',
@@ -1803,6 +1954,12 @@ const ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute =
     id: '/data-sources/credits-wallets-total',
     path: '/data-sources/credits-wallets-total',
     getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
+const ApiLocaleFinanceDataSourcesFinanceSeriesRoute =
+  ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport.update({
+    id: '/api/$locale/finance/data-sources/finance-series',
+    path: '/api/$locale/finance/data-sources/finance-series',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleInventoryStockAdjustRoute =
   ApiLocaleInventoryStockAdjustRouteImport.update({
@@ -2104,6 +2261,18 @@ const ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute =
     path: '/api/$locale/leads/data-sources/leads-website-visits',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleLeadsGrowthLinksRoute =
+  ApiLocaleLeadsGrowthLinksRouteImport.update({
+    id: '/api/$locale/leads/growth/links',
+    path: '/api/$locale/leads/growth/links',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsGrowthSpendRoute =
+  ApiLocaleLeadsGrowthSpendRouteImport.update({
+    id: '/api/$locale/leads/growth/spend',
+    path: '/api/$locale/leads/growth/spend',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleLeadsImportProcessRoute =
   ApiLocaleLeadsImportProcessRouteImport.update({
     id: '/process',
@@ -2115,6 +2284,30 @@ const ApiLocaleLeadsImportStatusRoute =
     id: '/status',
     path: '/status',
     getParentRoute: () => ApiLocaleLeadsImportRoute,
+  } as any)
+const ApiLocaleLeadsLifecycleBackfillRoute =
+  ApiLocaleLeadsLifecycleBackfillRouteImport.update({
+    id: '/api/$locale/leads/lifecycle/backfill',
+    path: '/api/$locale/leads/lifecycle/backfill',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsLifecycleOverviewRoute =
+  ApiLocaleLeadsLifecycleOverviewRouteImport.update({
+    id: '/api/$locale/leads/lifecycle/overview',
+    path: '/api/$locale/leads/lifecycle/overview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsLifecycleRunRoute =
+  ApiLocaleLeadsLifecycleRunRouteImport.update({
+    id: '/api/$locale/leads/lifecycle/run',
+    path: '/api/$locale/leads/lifecycle/run',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsLifecycleSettingsRoute =
+  ApiLocaleLeadsLifecycleSettingsRouteImport.update({
+    id: '/api/$locale/leads/lifecycle/settings',
+    path: '/api/$locale/leads/lifecycle/settings',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleLeadsTrackingPixelRoute =
   ApiLocaleLeadsTrackingPixelRouteImport.update({
@@ -2222,6 +2415,30 @@ const ApiLocaleMessengerPreviewSendTestRoute =
   ApiLocaleMessengerPreviewSendTestRouteImport.update({
     id: '/api/$locale/messenger/preview/send-test',
     path: '/api/$locale/messenger/preview/send-test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleMessengerSystemMailboxInboxRoute =
+  ApiLocaleMessengerSystemMailboxInboxRouteImport.update({
+    id: '/api/$locale/messenger/system-mailbox/inbox',
+    path: '/api/$locale/messenger/system-mailbox/inbox',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleMessengerSystemMailboxMessageRoute =
+  ApiLocaleMessengerSystemMailboxMessageRouteImport.update({
+    id: '/api/$locale/messenger/system-mailbox/message',
+    path: '/api/$locale/messenger/system-mailbox/message',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleMessengerSystemMailboxReportRoute =
+  ApiLocaleMessengerSystemMailboxReportRouteImport.update({
+    id: '/api/$locale/messenger/system-mailbox/report',
+    path: '/api/$locale/messenger/system-mailbox/report',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleMessengerSystemMailboxSendRoute =
+  ApiLocaleMessengerSystemMailboxSendRouteImport.update({
+    id: '/api/$locale/messenger/system-mailbox/send',
+    path: '/api/$locale/messenger/system-mailbox/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute =
@@ -2473,6 +2690,12 @@ const ApiLocaleReferralDataSourcesReferralsSignupsRoute =
     path: '/data-sources/referrals-signups',
     getParentRoute: () => ApiLocaleReferralRoute,
   } as any)
+const ApiLocaleReferralEarningsConfirmRoute =
+  ApiLocaleReferralEarningsConfirmRouteImport.update({
+    id: '/earnings/confirm',
+    path: '/earnings/confirm',
+    getParentRoute: () => ApiLocaleReferralRoute,
+  } as any)
 const ApiLocaleReferralEarningsListRoute =
   ApiLocaleReferralEarningsListRouteImport.update({
     id: '/earnings/list',
@@ -2656,11 +2879,23 @@ const ApiLocaleUserPublicSignupRoute =
     path: '/api/$locale/user/public/signup',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleUserPublicVerifyEmailRoute =
+  ApiLocaleUserPublicVerifyEmailRouteImport.update({
+    id: '/api/$locale/user/public/verify-email',
+    path: '/api/$locale/user/public/verify-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleUsersUserIdRoute = ApiLocaleUsersUserIdRouteImport.update({
   id: '/api/$locale/users/user/$id',
   path: '/api/$locale/users/user/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleV1ChatCompletionsRoute =
+  ApiLocaleV1ChatCompletionsRouteImport.update({
+    id: '/api/$locale/v1/chat/completions',
+    path: '/api/$locale/v1/chat/completions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentCodingAgentRoute =
   ApiLocaleVibeAgentCodingAgentRouteImport.update({
     id: '/api/$locale/vibe/agent/coding-agent',
@@ -2823,6 +3058,18 @@ const ApiLocaleVibeTasksExecuteRoute =
     path: '/api/$locale/vibe/tasks/execute',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LocaleModelsCompareABIndexRoute =
+  LocaleModelsCompareABIndexRouteImport.update({
+    id: '/compare/$a/$b/',
+    path: '/compare/$a/$b/',
+    getParentRoute: () => LocaleModelsRoute,
+  } as any)
+const LocaleStoryNewsletterConfirmTokenIndexRoute =
+  LocaleStoryNewsletterConfirmTokenIndexRouteImport.update({
+    id: '/newsletter/confirm/$token/',
+    path: '/newsletter/confirm/$token/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryNewsletterUnsubscribeEmailIndexRoute =
   LocaleStoryNewsletterUnsubscribeEmailIndexRouteImport.update({
     id: '/newsletter/unsubscribe/$email/',
@@ -2833,6 +3080,12 @@ const LocaleUserAuthResetPasswordTokenIndexRoute =
   LocaleUserAuthResetPasswordTokenIndexRouteImport.update({
     id: '/reset-password/$token/',
     path: '/reset-password/$token/',
+    getParentRoute: () => LocaleUserAuthRoute,
+  } as any)
+const LocaleUserAuthVerifyEmailTokenIndexRoute =
+  LocaleUserAuthVerifyEmailTokenIndexRouteImport.update({
+    id: '/verify-email/$token/',
+    path: '/verify-email/$token/',
     getParentRoute: () => LocaleUserAuthRoute,
   } as any)
 const ApiLocaleChartOfAccountsAccountAccountIdDeactivateRoute =
@@ -2937,6 +3190,18 @@ const ApiLocaleLeadsCampaignsEmailsTestMailRoute =
     path: '/api/$locale/leads/campaigns/emails/test-mail',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute =
+  ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport.update({
+    id: '/api/$locale/leads/growth/data-sources/channel-spend',
+    path: '/api/$locale/leads/growth/data-sources/channel-spend',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute =
+  ApiLocaleLeadsGrowthDataSourcesFunnelStepRouteImport.update({
+    id: '/api/$locale/leads/growth/data-sources/funnel-step',
+    path: '/api/$locale/leads/growth/data-sources/funnel-step',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleLeadsImportJobsJobIdRoute =
   ApiLocaleLeadsImportJobsJobIdRouteImport.update({
     id: '/jobs/$jobId',
@@ -2948,6 +3213,12 @@ const ApiLocaleMessengerAccountsEditIdRoute =
     id: '/api/$locale/messenger/accounts/edit/$id',
     path: '/api/$locale/messenger/accounts/edit/$id',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleNewsletterUnsubscribeOneclickTokenRoute =
+  ApiLocaleNewsletterUnsubscribeOneclickTokenRouteImport.update({
+    id: '/oneclick/$token',
+    path: '/oneclick/$token',
+    getParentRoute: () => ApiLocaleNewsletterUnsubscribeRoute,
   } as any)
 const ApiLocalePaymentBillBillIdApproveRoute =
   ApiLocalePaymentBillBillIdApproveRouteImport.update({
@@ -3261,10 +3532,22 @@ const ApiLocaleUserPrivateMeAvatarRoute =
     path: '/avatar',
     getParentRoute: () => ApiLocaleUserPrivateMeRoute,
   } as any)
+const ApiLocaleUserPrivateMeExportRoute =
+  ApiLocaleUserPrivateMeExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => ApiLocaleUserPrivateMeRoute,
+  } as any)
 const ApiLocaleUserPrivateMePasswordRoute =
   ApiLocaleUserPrivateMePasswordRouteImport.update({
     id: '/password',
     path: '/password',
+    getParentRoute: () => ApiLocaleUserPrivateMeRoute,
+  } as any)
+const ApiLocaleUserPrivateMeTwoFactorRoute =
+  ApiLocaleUserPrivateMeTwoFactorRouteImport.update({
+    id: '/two-factor',
+    path: '/two-factor',
     getParentRoute: () => ApiLocaleUserPrivateMeRoute,
   } as any)
 const ApiLocaleUserPrivateSessionsIdRoute =
@@ -3325,6 +3608,12 @@ const ApiLocaleVibeAgentAiStreamStreamRoute =
   ApiLocaleVibeAgentAiStreamStreamRouteImport.update({
     id: '/api/$locale/vibe/agent/ai-stream/stream',
     path: '/api/$locale/vibe/agent/ai-stream/stream',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentChatModerationRoute =
+  ApiLocaleVibeAgentChatModerationRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/moderation',
+    path: '/api/$locale/vibe/agent/chat/moderation',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleVibeAgentChatPublicFeedRoute =
@@ -3421,6 +3710,30 @@ const ApiLocaleVibeAgentModelsListRoute =
   ApiLocaleVibeAgentModelsListRouteImport.update({
     id: '/api/$locale/vibe/agent/models/list',
     path: '/api/$locale/vibe/agent/models/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexLeaderboardRoute =
+  ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport.update({
+    id: '/api/$locale/vibe/agent/refusal-index/leaderboard',
+    path: '/api/$locale/vibe/agent/refusal-index/leaderboard',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexQuestionsRoute =
+  ApiLocaleVibeAgentRefusalIndexQuestionsRouteImport.update({
+    id: '/api/$locale/vibe/agent/refusal-index/questions',
+    path: '/api/$locale/vibe/agent/refusal-index/questions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexRunsRoute =
+  ApiLocaleVibeAgentRefusalIndexRunsRouteImport.update({
+    id: '/api/$locale/vibe/agent/refusal-index/runs',
+    path: '/api/$locale/vibe/agent/refusal-index/runs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexSamplesRoute =
+  ApiLocaleVibeAgentRefusalIndexSamplesRouteImport.update({
+    id: '/api/$locale/vibe/agent/refusal-index/samples',
+    path: '/api/$locale/vibe/agent/refusal-index/samples',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleVibeAgentSkillsIdRoute =
@@ -3613,6 +3926,30 @@ const ApiLocaleVibeTasksPulseStatusRoute =
   ApiLocaleVibeTasksPulseStatusRouteImport.update({
     id: '/api/$locale/vibe/tasks/pulse/status',
     path: '/api/$locale/vibe/tasks/pulse/status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksWatchdogBudgetCapsRoute =
+  ApiLocaleVibeTasksWatchdogBudgetCapsRouteImport.update({
+    id: '/api/$locale/vibe/tasks/watchdog/budget-caps',
+    path: '/api/$locale/vibe/tasks/watchdog/budget-caps',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksWatchdogCancelRoute =
+  ApiLocaleVibeTasksWatchdogCancelRouteImport.update({
+    id: '/api/$locale/vibe/tasks/watchdog/cancel',
+    path: '/api/$locale/vibe/tasks/watchdog/cancel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksWatchdogHealthRoute =
+  ApiLocaleVibeTasksWatchdogHealthRouteImport.update({
+    id: '/api/$locale/vibe/tasks/watchdog/health',
+    path: '/api/$locale/vibe/tasks/watchdog/health',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeTasksWatchdogSweepRoute =
+  ApiLocaleVibeTasksWatchdogSweepRouteImport.update({
+    id: '/api/$locale/vibe/tasks/watchdog/sweep',
+    path: '/api/$locale/vibe/tasks/watchdog/sweep',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute =
@@ -3827,6 +4164,30 @@ const ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute =
     path: '/api/$locale/vibe/agent/cortex/embeddings/backfill',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentRefusalIndexModelModelIdRoute =
+  ApiLocaleVibeAgentRefusalIndexModelModelIdRouteImport.update({
+    id: '/api/$locale/vibe/agent/refusal-index/model/$modelId',
+    path: '/api/$locale/vibe/agent/refusal-index/model/$modelId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute =
+  ApiLocaleVibeAgentRefusalIndexQuestionsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiLocaleVibeAgentRefusalIndexQuestionsRoute,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexRunsIdRoute =
+  ApiLocaleVibeAgentRefusalIndexRunsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiLocaleVibeAgentRefusalIndexRunsRoute,
+  } as any)
+const ApiLocaleVibeAgentRefusalIndexRunsStartRoute =
+  ApiLocaleVibeAgentRefusalIndexRunsStartRouteImport.update({
+    id: '/start',
+    path: '/start',
+    getParentRoute: () => ApiLocaleVibeAgentRefusalIndexRunsRoute,
+  } as any)
 const ApiLocaleVibeAgentSkillsIdPublishRoute =
   ApiLocaleVibeAgentSkillsIdPublishRouteImport.update({
     id: '/publish',
@@ -3937,6 +4298,12 @@ const ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute =
     path: '/api/$locale/vibe/platforms/ai/skills/$characterSkill',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute =
+  ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport.update({
+    id: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health',
+    path: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute =
   ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport.update({
     id: '/create',
@@ -3965,6 +4332,12 @@ const ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute =
   ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport.update({
     id: '/permissions',
     path: '/permissions',
+    getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdRoute,
+  } as any)
+const ApiLocaleVibeAgentChatThreadsThreadIdReportRoute =
+  ApiLocaleVibeAgentChatThreadsThreadIdReportRouteImport.update({
+    id: '/report',
+    path: '/report',
     getParentRoute: () => ApiLocaleVibeAgentChatThreadsThreadIdRoute,
   } as any)
 const ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute =
@@ -4019,6 +4392,13 @@ const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute =
         ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
     } as any,
   )
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteImport.update({
+    id: '/project',
+    path: '/project',
+    getParentRoute: () =>
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute,
+  } as any)
 const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute =
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRouteImport.update({
     id: '/rename',
@@ -4057,6 +4437,15 @@ const ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute =
     path: '/files/$threadId/$filename',
     getParentRoute: () => ApiLocaleVibeAgentChatThreadsRoute,
   } as any)
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteImport.update(
+    {
+      id: '/files',
+      path: '/files',
+      getParentRoute: () =>
+        ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute,
+    } as any,
+  )
 const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute =
   ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport.update({
     id: '/vote',
@@ -4064,11 +4453,22 @@ const ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute =
     getParentRoute: () =>
       ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute,
   } as any)
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRouteImport.update(
+    {
+      id: '/$fileId',
+      path: '/$fileId',
+      getParentRoute: () =>
+        ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute,
+    } as any,
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale/help': typeof LocaleHelpRouteWithChildren
+  '/$locale/models': typeof LocaleModelsRouteWithChildren
   '/$locale/story': typeof LocaleStoryRouteWithChildren
   '/$locale/subscription': typeof LocaleSubscriptionRouteWithChildren
   '/$locale/threads': typeof LocaleThreadsRouteWithChildren
@@ -4078,6 +4478,7 @@ export interface FileRoutesByFullPath {
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
   '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
+  '/api/$locale/api-keys': typeof ApiLocaleApiKeysRouteWithChildren
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -4087,6 +4488,7 @@ export interface FileRoutesByFullPath {
   '/$locale/cortex/': typeof LocaleCortexIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
+  '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -4094,6 +4496,7 @@ export interface FileRoutesByFullPath {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/signup': typeof LocaleUserAuthSignupRouteWithChildren
+  '/api/$locale/api-keys/$id': typeof ApiLocaleApiKeysIdRoute
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -4141,6 +4544,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -4158,9 +4564,13 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
+  '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
+  '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
+  '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
+  '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
@@ -4181,10 +4591,12 @@ export interface FileRoutesByFullPath {
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
+  '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
@@ -4197,6 +4609,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter/': typeof LocaleStoryNewsletterIndexRoute
   '/$locale/story/privacy-policy/': typeof LocaleStoryPrivacyPolicyIndexRoute
+  '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service/': typeof LocaleStoryTermsOfServiceIndexRoute
   '/$locale/subscription/buy/': typeof LocaleSubscriptionBuyIndexRoute
@@ -4205,6 +4618,7 @@ export interface FileRoutesByFullPath {
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
+  '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
   '/api/$locale/analytics/evaluators/or': typeof ApiLocaleAnalyticsEvaluatorsOrRoute
   '/api/$locale/analytics/evaluators/script': typeof ApiLocaleAnalyticsEvaluatorsScriptRoute
@@ -4245,6 +4659,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
+  '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
   '/api/$locale/credits/data-sources/credits-packs-created': typeof ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
@@ -4256,6 +4671,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
   '/api/$locale/inventory/stock/list': typeof ApiLocaleInventoryStockListRoute
@@ -4306,8 +4722,14 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
+  '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/lifecycle/backfill': typeof ApiLocaleLeadsLifecycleBackfillRoute
+  '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
+  '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
+  '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -4326,6 +4748,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
+  '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
+  '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
+  '/api/$locale/messenger/system-mailbox/send': typeof ApiLocaleMessengerSystemMailboxSendRoute
   '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent': typeof ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute
   '/api/$locale/newsletter/data-sources/newsletter-events-total': typeof ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
@@ -4368,6 +4794,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/referral/data-sources/referrals-lead-clicks': typeof ApiLocaleReferralDataSourcesReferralsLeadClicksRoute
   '/api/$locale/referral/data-sources/referrals-payouts': typeof ApiLocaleReferralDataSourcesReferralsPayoutsRoute
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
+  '/api/$locale/referral/earnings/confirm': typeof ApiLocaleReferralEarningsConfirmRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
@@ -4399,7 +4826,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -4466,8 +4895,11 @@ export interface FileRoutesByFullPath {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
+  '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
   '/api/$locale/payment/bill/$billId/pay': typeof ApiLocalePaymentBillBillIdPayRoute
@@ -4520,7 +4952,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
   '/api/$locale/user/private/me/avatar': typeof ApiLocaleUserPrivateMeAvatarRoute
+  '/api/$locale/user/private/me/export': typeof ApiLocaleUserPrivateMeExportRoute
   '/api/$locale/user/private/me/password': typeof ApiLocaleUserPrivateMePasswordRoute
+  '/api/$locale/user/private/me/two-factor': typeof ApiLocaleUserPrivateMeTwoFactorRoute
   '/api/$locale/user/private/sessions/$id': typeof ApiLocaleUserPrivateSessionsIdRoute
   '/api/$locale/user/public/creator/$userId': typeof ApiLocaleUserPublicCreatorUserIdRoute
   '/api/$locale/user/public/login/options': typeof ApiLocaleUserPublicLoginOptionsRoute
@@ -4531,6 +4965,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
   '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
@@ -4547,6 +4982,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
+  '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/samples': typeof ApiLocaleVibeAgentRefusalIndexSamplesRoute
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
@@ -4579,8 +5018,15 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
   '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
   '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
+  '/api/$locale/vibe/tasks/watchdog/budget-caps': typeof ApiLocaleVibeTasksWatchdogBudgetCapsRoute
+  '/api/$locale/vibe/tasks/watchdog/cancel': typeof ApiLocaleVibeTasksWatchdogCancelRoute
+  '/api/$locale/vibe/tasks/watchdog/health': typeof ApiLocaleVibeTasksWatchdogHealthRoute
+  '/api/$locale/vibe/tasks/watchdog/sweep': typeof ApiLocaleVibeTasksWatchdogSweepRoute
+  '/$locale/models/compare/$a/$b/': typeof LocaleModelsCompareABIndexRoute
+  '/$locale/story/newsletter/confirm/$token/': typeof LocaleStoryNewsletterConfirmTokenIndexRoute
   '/$locale/story/newsletter/unsubscribe/$email/': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/reset-password/$token/': typeof LocaleUserAuthResetPasswordTokenIndexRoute
+  '/$locale/user/verify-email/$token/': typeof LocaleUserAuthVerifyEmailTokenIndexRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -4616,6 +5062,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
   '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
   '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/refusal-index/model/$modelId': typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
+  '/api/$locale/vibe/agent/refusal-index/questions/$id': typeof ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/$id': typeof ApiLocaleVibeAgentRefusalIndexRunsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/start': typeof ApiLocaleVibeAgentRefusalIndexRunsStartRoute
   '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
   '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
@@ -4634,11 +5084,13 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/report': typeof ApiLocaleVibeAgentChatThreadsThreadIdReportRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
   '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
@@ -4647,16 +5099,20 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
   '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
@@ -4664,6 +5120,7 @@ export interface FileRoutesByTo {
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
   '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
+  '/api/$locale/api-keys': typeof ApiLocaleApiKeysRouteWithChildren
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -4673,12 +5130,14 @@ export interface FileRoutesByTo {
   '/$locale/cortex': typeof LocaleCortexIndexRoute
   '/$locale/design-test': typeof LocaleDesignTestIndexRoute
   '/$locale/help': typeof LocaleHelpIndexRoute
+  '/$locale/models': typeof LocaleModelsIndexRoute
   '/$locale/skills': typeof LocaleSkillsIndexRoute
   '/$locale/story': typeof LocaleStoryIndexRoute
   '/$locale/subscription': typeof LocaleSubscriptionIndexRoute
   '/$locale/threads': typeof LocaleThreadsIndexRoute
   '/$locale/tools': typeof LocaleToolsIndexRoute
   '/$locale/track': typeof LocaleTrackIndexRoute
+  '/api/$locale/api-keys/$id': typeof ApiLocaleApiKeysIdRoute
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -4726,6 +5185,9 @@ export interface FileRoutesByTo {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -4743,9 +5205,13 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
+  '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
+  '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
+  '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
+  '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
@@ -4766,10 +5232,12 @@ export interface FileRoutesByTo {
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/invoice/$invoiceId': typeof LocaleInvoiceInvoiceIdIndexRoute
+  '/$locale/models/$modelId': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us': typeof LocaleStoryAboutUsIndexRoute
@@ -4782,6 +5250,7 @@ export interface FileRoutesByTo {
   '/$locale/story/invest': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter': typeof LocaleStoryNewsletterIndexRoute
   '/$locale/story/privacy-policy': typeof LocaleStoryPrivacyPolicyIndexRoute
+  '/$locale/story/refusal-index': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service': typeof LocaleStoryTermsOfServiceIndexRoute
   '/$locale/subscription/buy': typeof LocaleSubscriptionBuyIndexRoute
@@ -4790,6 +5259,7 @@ export interface FileRoutesByTo {
   '/$locale/subscription/remote': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
+  '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
   '/api/$locale/analytics/evaluators/or': typeof ApiLocaleAnalyticsEvaluatorsOrRoute
   '/api/$locale/analytics/evaluators/script': typeof ApiLocaleAnalyticsEvaluatorsScriptRoute
@@ -4830,6 +5300,7 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
+  '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
   '/api/$locale/credits/data-sources/credits-packs-created': typeof ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
@@ -4841,6 +5312,7 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
   '/api/$locale/inventory/stock/list': typeof ApiLocaleInventoryStockListRoute
@@ -4891,8 +5363,14 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
+  '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/lifecycle/backfill': typeof ApiLocaleLeadsLifecycleBackfillRoute
+  '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
+  '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
+  '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -4911,6 +5389,10 @@ export interface FileRoutesByTo {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
+  '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
+  '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
+  '/api/$locale/messenger/system-mailbox/send': typeof ApiLocaleMessengerSystemMailboxSendRoute
   '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent': typeof ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute
   '/api/$locale/newsletter/data-sources/newsletter-events-total': typeof ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
@@ -4953,6 +5435,7 @@ export interface FileRoutesByTo {
   '/api/$locale/referral/data-sources/referrals-lead-clicks': typeof ApiLocaleReferralDataSourcesReferralsLeadClicksRoute
   '/api/$locale/referral/data-sources/referrals-payouts': typeof ApiLocaleReferralDataSourcesReferralsPayoutsRoute
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
+  '/api/$locale/referral/earnings/confirm': typeof ApiLocaleReferralEarningsConfirmRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
@@ -4984,7 +5467,9 @@ export interface FileRoutesByTo {
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -5051,8 +5536,11 @@ export interface FileRoutesByTo {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
+  '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
   '/api/$locale/payment/bill/$billId/pay': typeof ApiLocalePaymentBillBillIdPayRoute
@@ -5105,7 +5593,9 @@ export interface FileRoutesByTo {
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
   '/api/$locale/user/private/me/avatar': typeof ApiLocaleUserPrivateMeAvatarRoute
+  '/api/$locale/user/private/me/export': typeof ApiLocaleUserPrivateMeExportRoute
   '/api/$locale/user/private/me/password': typeof ApiLocaleUserPrivateMePasswordRoute
+  '/api/$locale/user/private/me/two-factor': typeof ApiLocaleUserPrivateMeTwoFactorRoute
   '/api/$locale/user/private/sessions/$id': typeof ApiLocaleUserPrivateSessionsIdRoute
   '/api/$locale/user/public/creator/$userId': typeof ApiLocaleUserPublicCreatorUserIdRoute
   '/api/$locale/user/public/login/options': typeof ApiLocaleUserPublicLoginOptionsRoute
@@ -5116,6 +5606,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
   '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
@@ -5132,6 +5623,10 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
+  '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/samples': typeof ApiLocaleVibeAgentRefusalIndexSamplesRoute
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
@@ -5164,8 +5659,15 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
   '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
   '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
+  '/api/$locale/vibe/tasks/watchdog/budget-caps': typeof ApiLocaleVibeTasksWatchdogBudgetCapsRoute
+  '/api/$locale/vibe/tasks/watchdog/cancel': typeof ApiLocaleVibeTasksWatchdogCancelRoute
+  '/api/$locale/vibe/tasks/watchdog/health': typeof ApiLocaleVibeTasksWatchdogHealthRoute
+  '/api/$locale/vibe/tasks/watchdog/sweep': typeof ApiLocaleVibeTasksWatchdogSweepRoute
+  '/$locale/models/compare/$a/$b': typeof LocaleModelsCompareABIndexRoute
+  '/$locale/story/newsletter/confirm/$token': typeof LocaleStoryNewsletterConfirmTokenIndexRoute
   '/$locale/story/newsletter/unsubscribe/$email': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/reset-password/$token': typeof LocaleUserAuthResetPasswordTokenIndexRoute
+  '/$locale/user/verify-email/$token': typeof LocaleUserAuthVerifyEmailTokenIndexRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -5201,6 +5703,10 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
   '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
   '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/refusal-index/model/$modelId': typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
+  '/api/$locale/vibe/agent/refusal-index/questions/$id': typeof ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/$id': typeof ApiLocaleVibeAgentRefusalIndexRunsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/start': typeof ApiLocaleVibeAgentRefusalIndexRunsStartRoute
   '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
   '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
@@ -5219,11 +5725,13 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/report': typeof ApiLocaleVibeAgentChatThreadsThreadIdReportRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
   '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
@@ -5232,19 +5740,24 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
   '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale/help': typeof LocaleHelpRouteWithChildren
+  '/$locale/models': typeof LocaleModelsRouteWithChildren
   '/$locale/story': typeof LocaleStoryRouteWithChildren
   '/$locale/subscription': typeof LocaleSubscriptionRouteWithChildren
   '/$locale/threads': typeof LocaleThreadsRouteWithChildren
@@ -5255,6 +5768,7 @@ export interface FileRoutesById {
   '/$locale/user/_account': typeof LocaleUserAccountRouteWithChildren
   '/$locale/user/_auth': typeof LocaleUserAuthRouteWithChildren
   '/api/$locale/$notFound': typeof ApiLocaleNotFoundRoute
+  '/api/$locale/api-keys': typeof ApiLocaleApiKeysRouteWithChildren
   '/api/$locale/contact': typeof ApiLocaleContactRoute
   '/api/$locale/credits': typeof ApiLocaleCreditsRouteWithChildren
   '/api/$locale/manifest': typeof ApiLocaleManifestRoute
@@ -5264,6 +5778,7 @@ export interface FileRoutesById {
   '/$locale/cortex/': typeof LocaleCortexIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
+  '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -5271,6 +5786,7 @@ export interface FileRoutesById {
   '/$locale/tools/': typeof LocaleToolsIndexRoute
   '/$locale/track/': typeof LocaleTrackIndexRoute
   '/$locale/user/_auth/signup': typeof LocaleUserAuthSignupRouteWithChildren
+  '/api/$locale/api-keys/$id': typeof ApiLocaleApiKeysIdRoute
   '/api/$locale/browser/click': typeof ApiLocaleBrowserClickRoute
   '/api/$locale/browser/close-page': typeof ApiLocaleBrowserClosePageRoute
   '/api/$locale/browser/drag': typeof ApiLocaleBrowserDragRoute
@@ -5318,6 +5834,9 @@ export interface FileRoutesById {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
   '/api/$locale/lead-magnet/captures': typeof ApiLocaleLeadMagnetCapturesRoute
@@ -5335,9 +5854,13 @@ export interface FileRoutesById {
   '/api/$locale/leads/stats': typeof ApiLocaleLeadsStatsRoute
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
+  '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
+  '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
+  '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
+  '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
@@ -5358,10 +5881,12 @@ export interface FileRoutesById {
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
+  '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
+  '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
@@ -5374,6 +5899,7 @@ export interface FileRoutesById {
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter/': typeof LocaleStoryNewsletterIndexRoute
   '/$locale/story/privacy-policy/': typeof LocaleStoryPrivacyPolicyIndexRoute
+  '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service/': typeof LocaleStoryTermsOfServiceIndexRoute
   '/$locale/subscription/buy/': typeof LocaleSubscriptionBuyIndexRoute
@@ -5382,6 +5908,7 @@ export interface FileRoutesById {
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
+  '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
   '/api/$locale/analytics/evaluators/not': typeof ApiLocaleAnalyticsEvaluatorsNotRoute
   '/api/$locale/analytics/evaluators/or': typeof ApiLocaleAnalyticsEvaluatorsOrRoute
   '/api/$locale/analytics/evaluators/script': typeof ApiLocaleAnalyticsEvaluatorsScriptRoute
@@ -5422,6 +5949,7 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
+  '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
   '/api/$locale/credits/data-sources/credits-packs-created': typeof ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
@@ -5433,6 +5961,7 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
   '/api/$locale/inventory/stock/list': typeof ApiLocaleInventoryStockListRoute
@@ -5483,8 +6012,14 @@ export interface FileRoutesById {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
+  '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
   '/api/$locale/leads/import/status': typeof ApiLocaleLeadsImportStatusRoute
+  '/api/$locale/leads/lifecycle/backfill': typeof ApiLocaleLeadsLifecycleBackfillRoute
+  '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
+  '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
+  '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -5503,6 +6038,10 @@ export interface FileRoutesById {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
+  '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
+  '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
+  '/api/$locale/messenger/system-mailbox/send': typeof ApiLocaleMessengerSystemMailboxSendRoute
   '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent': typeof ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute
   '/api/$locale/newsletter/data-sources/newsletter-events-total': typeof ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
@@ -5545,6 +6084,7 @@ export interface FileRoutesById {
   '/api/$locale/referral/data-sources/referrals-lead-clicks': typeof ApiLocaleReferralDataSourcesReferralsLeadClicksRoute
   '/api/$locale/referral/data-sources/referrals-payouts': typeof ApiLocaleReferralDataSourcesReferralsPayoutsRoute
   '/api/$locale/referral/data-sources/referrals-signups': typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
+  '/api/$locale/referral/earnings/confirm': typeof ApiLocaleReferralEarningsConfirmRoute
   '/api/$locale/referral/earnings/list': typeof ApiLocaleReferralEarningsListRoute
   '/api/$locale/referral/lead/current': typeof ApiLocaleReferralLeadCurrentRoute
   '/api/$locale/ssh/connections/$id': typeof ApiLocaleSshConnectionsIdRouteWithChildren
@@ -5576,7 +6116,9 @@ export interface FileRoutesById {
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -5643,8 +6185,11 @@ export interface FileRoutesById {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
+  '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
   '/api/$locale/payment/bill/$billId/pay': typeof ApiLocalePaymentBillBillIdPayRoute
@@ -5697,7 +6242,9 @@ export interface FileRoutesById {
   '/api/$locale/tax/rate/$rateId/update': typeof ApiLocaleTaxRateRateIdUpdateRoute
   '/api/$locale/user/private/me/addresses': typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
   '/api/$locale/user/private/me/avatar': typeof ApiLocaleUserPrivateMeAvatarRoute
+  '/api/$locale/user/private/me/export': typeof ApiLocaleUserPrivateMeExportRoute
   '/api/$locale/user/private/me/password': typeof ApiLocaleUserPrivateMePasswordRoute
+  '/api/$locale/user/private/me/two-factor': typeof ApiLocaleUserPrivateMeTwoFactorRoute
   '/api/$locale/user/private/sessions/$id': typeof ApiLocaleUserPrivateSessionsIdRoute
   '/api/$locale/user/public/creator/$userId': typeof ApiLocaleUserPublicCreatorUserIdRoute
   '/api/$locale/user/public/login/options': typeof ApiLocaleUserPublicLoginOptionsRoute
@@ -5708,6 +6255,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
   '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
@@ -5724,6 +6272,10 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
+  '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
+  '/api/$locale/vibe/agent/refusal-index/samples': typeof ApiLocaleVibeAgentRefusalIndexSamplesRoute
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
@@ -5756,8 +6308,15 @@ export interface FileRoutesById {
   '/api/$locale/vibe/tasks/pulse/execute': typeof ApiLocaleVibeTasksPulseExecuteRoute
   '/api/$locale/vibe/tasks/pulse/history': typeof ApiLocaleVibeTasksPulseHistoryRoute
   '/api/$locale/vibe/tasks/pulse/status': typeof ApiLocaleVibeTasksPulseStatusRoute
+  '/api/$locale/vibe/tasks/watchdog/budget-caps': typeof ApiLocaleVibeTasksWatchdogBudgetCapsRoute
+  '/api/$locale/vibe/tasks/watchdog/cancel': typeof ApiLocaleVibeTasksWatchdogCancelRoute
+  '/api/$locale/vibe/tasks/watchdog/health': typeof ApiLocaleVibeTasksWatchdogHealthRoute
+  '/api/$locale/vibe/tasks/watchdog/sweep': typeof ApiLocaleVibeTasksWatchdogSweepRoute
+  '/$locale/models/compare/$a/$b/': typeof LocaleModelsCompareABIndexRoute
+  '/$locale/story/newsletter/confirm/$token/': typeof LocaleStoryNewsletterConfirmTokenIndexRoute
   '/$locale/story/newsletter/unsubscribe/$email/': typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
   '/$locale/user/_auth/reset-password/$token/': typeof LocaleUserAuthResetPasswordTokenIndexRoute
+  '/$locale/user/_auth/verify-email/$token/': typeof LocaleUserAuthVerifyEmailTokenIndexRoute
   '/api/$locale/companies/$companyId/members/$memberId/remove': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   '/api/$locale/companies/$companyId/members/$memberId/update-role': typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsOauthCallbackRoute
@@ -5793,6 +6352,10 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
   '/api/$locale/vibe/agent/chat/threads/search-threads': typeof ApiLocaleVibeAgentChatThreadsSearchThreadsRoute
   '/api/$locale/vibe/agent/cortex/embeddings/backfill': typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  '/api/$locale/vibe/agent/refusal-index/model/$modelId': typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
+  '/api/$locale/vibe/agent/refusal-index/questions/$id': typeof ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/$id': typeof ApiLocaleVibeAgentRefusalIndexRunsIdRoute
+  '/api/$locale/vibe/agent/refusal-index/runs/start': typeof ApiLocaleVibeAgentRefusalIndexRunsStartRoute
   '/api/$locale/vibe/agent/skills/$id/publish': typeof ApiLocaleVibeAgentSkillsIdPublishRoute
   '/api/$locale/vibe/agent/skills/$id/report': typeof ApiLocaleVibeAgentSkillsIdReportRoute
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
@@ -5811,11 +6374,13 @@ export interface FileRoutesById {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/permissions': typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/threads/$threadId/report': typeof ApiLocaleVibeAgentChatThreadsThreadIdReportRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
   '/api/$locale/vibe/platforms/ai/skills/AGENT/md': typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
   '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md': typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
@@ -5824,20 +6389,25 @@ export interface FileRoutesById {
   '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md': typeof ApiLocaleVibePlatformsAiSkillsUSER_WITH_ACCOUNT_SKILLMdRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesPathRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesSearchRoute
   '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename': typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
+  '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale/help'
+    | '/$locale/models'
     | '/$locale/story'
     | '/$locale/subscription'
     | '/$locale/threads'
@@ -5847,6 +6417,7 @@ export interface FileRouteTypes {
     | '/$locale/tools/$'
     | '/$locale/user'
     | '/api/$locale/$notFound'
+    | '/api/$locale/api-keys'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -5856,6 +6427,7 @@ export interface FileRouteTypes {
     | '/$locale/cortex/'
     | '/$locale/design-test/'
     | '/$locale/help/'
+    | '/$locale/models/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -5863,6 +6435,7 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/signup'
+    | '/api/$locale/api-keys/$id'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -5910,6 +6483,9 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/status'
+    | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -5927,9 +6503,13 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/stats'
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
+    | '/api/$locale/newsletter/confirm'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
+    | '/api/$locale/notifications/list'
+    | '/api/$locale/notifications/read'
+    | '/api/$locale/notifications/unread-count'
     | '/api/$locale/payment/checkout'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
@@ -5950,10 +6530,12 @@ export interface FileRouteTypes {
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/v1/models'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
     | '/$locale/invoice/$invoiceId/'
+    | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/about-us/'
@@ -5966,6 +6548,7 @@ export interface FileRouteTypes {
     | '/$locale/story/invest/'
     | '/$locale/story/newsletter/'
     | '/$locale/story/privacy-policy/'
+    | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
     | '/$locale/story/terms-of-service/'
     | '/$locale/subscription/buy/'
@@ -5974,6 +6557,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/remote/'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
+    | '/api/$locale/analytics/evaluators/drop'
     | '/api/$locale/analytics/evaluators/not'
     | '/api/$locale/analytics/evaluators/or'
     | '/api/$locale/analytics/evaluators/script'
@@ -6014,6 +6598,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-expired'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
+    | '/api/$locale/credits/data-sources/credits-free-tier-spend'
     | '/api/$locale/credits/data-sources/credits-packs-created'
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
@@ -6025,6 +6610,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
     | '/api/$locale/inventory/stock/list'
@@ -6075,8 +6661,14 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/growth/links'
+    | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/lifecycle/backfill'
+    | '/api/$locale/leads/lifecycle/overview'
+    | '/api/$locale/leads/lifecycle/run'
+    | '/api/$locale/leads/lifecycle/settings'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -6095,6 +6687,10 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/inbox'
+    | '/api/$locale/messenger/system-mailbox/message'
+    | '/api/$locale/messenger/system-mailbox/report'
+    | '/api/$locale/messenger/system-mailbox/send'
     | '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent'
     | '/api/$locale/newsletter/data-sources/newsletter-events-total'
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
@@ -6137,6 +6733,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-lead-clicks'
     | '/api/$locale/referral/data-sources/referrals-payouts'
     | '/api/$locale/referral/data-sources/referrals-signups'
+    | '/api/$locale/referral/earnings/confirm'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
     | '/api/$locale/ssh/connections/$id'
@@ -6168,7 +6765,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/private/sessions'
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
+    | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/chat/completions'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -6235,8 +6834,11 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/channel-spend'
+    | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
     | '/api/$locale/payment/bill/$billId/pay'
@@ -6289,7 +6891,9 @@ export interface FileRouteTypes {
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
     | '/api/$locale/user/private/me/avatar'
+    | '/api/$locale/user/private/me/export'
     | '/api/$locale/user/private/me/password'
+    | '/api/$locale/user/private/me/two-factor'
     | '/api/$locale/user/private/sessions/$id'
     | '/api/$locale/user/public/creator/$userId'
     | '/api/$locale/user/public/login/options'
@@ -6300,6 +6904,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/moderation'
     | '/api/$locale/vibe/agent/chat/public-feed'
     | '/api/$locale/vibe/agent/chat/settings'
     | '/api/$locale/vibe/agent/chat/threads'
@@ -6316,6 +6921,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/refusal-index/leaderboard'
+    | '/api/$locale/vibe/agent/refusal-index/questions'
+    | '/api/$locale/vibe/agent/refusal-index/runs'
+    | '/api/$locale/vibe/agent/refusal-index/samples'
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
@@ -6348,8 +6957,15 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tasks/pulse/execute'
     | '/api/$locale/vibe/tasks/pulse/history'
     | '/api/$locale/vibe/tasks/pulse/status'
+    | '/api/$locale/vibe/tasks/watchdog/budget-caps'
+    | '/api/$locale/vibe/tasks/watchdog/cancel'
+    | '/api/$locale/vibe/tasks/watchdog/health'
+    | '/api/$locale/vibe/tasks/watchdog/sweep'
+    | '/$locale/models/compare/$a/$b/'
+    | '/$locale/story/newsletter/confirm/$token/'
     | '/$locale/story/newsletter/unsubscribe/$email/'
     | '/$locale/user/reset-password/$token/'
+    | '/$locale/user/verify-email/$token/'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -6385,6 +7001,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
     | '/api/$locale/vibe/agent/chat/threads/search-threads'
     | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+    | '/api/$locale/vibe/agent/refusal-index/questions/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/start'
     | '/api/$locale/vibe/agent/skills/$id/publish'
     | '/api/$locale/vibe/agent/skills/$id/report'
     | '/api/$locale/vibe/agent/skills/$id/vote'
@@ -6403,11 +7023,13 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/report'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
     | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
@@ -6416,16 +7038,20 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
     | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale'
     | '/$locale/frame/$'
@@ -6433,6 +7059,7 @@ export interface FileRouteTypes {
     | '/$locale/tools/$'
     | '/$locale/user'
     | '/api/$locale/$notFound'
+    | '/api/$locale/api-keys'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -6442,12 +7069,14 @@ export interface FileRouteTypes {
     | '/$locale/cortex'
     | '/$locale/design-test'
     | '/$locale/help'
+    | '/$locale/models'
     | '/$locale/skills'
     | '/$locale/story'
     | '/$locale/subscription'
     | '/$locale/threads'
     | '/$locale/tools'
     | '/$locale/track'
+    | '/api/$locale/api-keys/$id'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -6495,6 +7124,9 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/status'
+    | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -6512,9 +7144,13 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/stats'
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
+    | '/api/$locale/newsletter/confirm'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
+    | '/api/$locale/notifications/list'
+    | '/api/$locale/notifications/read'
+    | '/api/$locale/notifications/unread-count'
     | '/api/$locale/payment/checkout'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
@@ -6535,10 +7171,12 @@ export interface FileRouteTypes {
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/v1/models'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId'
     | '/$locale/invoice/$invoiceId'
+    | '/$locale/models/$modelId'
     | '/$locale/shared/$token'
     | '/$locale/skill/$skillId'
     | '/$locale/story/about-us'
@@ -6551,6 +7189,7 @@ export interface FileRouteTypes {
     | '/$locale/story/invest'
     | '/$locale/story/newsletter'
     | '/$locale/story/privacy-policy'
+    | '/$locale/story/refusal-index'
     | '/$locale/story/self-host'
     | '/$locale/story/terms-of-service'
     | '/$locale/subscription/buy'
@@ -6559,6 +7198,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/remote'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
+    | '/api/$locale/analytics/evaluators/drop'
     | '/api/$locale/analytics/evaluators/not'
     | '/api/$locale/analytics/evaluators/or'
     | '/api/$locale/analytics/evaluators/script'
@@ -6599,6 +7239,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-expired'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
+    | '/api/$locale/credits/data-sources/credits-free-tier-spend'
     | '/api/$locale/credits/data-sources/credits-packs-created'
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
@@ -6610,6 +7251,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
     | '/api/$locale/inventory/stock/list'
@@ -6660,8 +7302,14 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/growth/links'
+    | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/lifecycle/backfill'
+    | '/api/$locale/leads/lifecycle/overview'
+    | '/api/$locale/leads/lifecycle/run'
+    | '/api/$locale/leads/lifecycle/settings'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -6680,6 +7328,10 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/inbox'
+    | '/api/$locale/messenger/system-mailbox/message'
+    | '/api/$locale/messenger/system-mailbox/report'
+    | '/api/$locale/messenger/system-mailbox/send'
     | '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent'
     | '/api/$locale/newsletter/data-sources/newsletter-events-total'
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
@@ -6722,6 +7374,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-lead-clicks'
     | '/api/$locale/referral/data-sources/referrals-payouts'
     | '/api/$locale/referral/data-sources/referrals-signups'
+    | '/api/$locale/referral/earnings/confirm'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
     | '/api/$locale/ssh/connections/$id'
@@ -6753,7 +7406,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/private/sessions'
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
+    | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/chat/completions'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -6820,8 +7475,11 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/channel-spend'
+    | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
     | '/api/$locale/payment/bill/$billId/pay'
@@ -6874,7 +7532,9 @@ export interface FileRouteTypes {
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
     | '/api/$locale/user/private/me/avatar'
+    | '/api/$locale/user/private/me/export'
     | '/api/$locale/user/private/me/password'
+    | '/api/$locale/user/private/me/two-factor'
     | '/api/$locale/user/private/sessions/$id'
     | '/api/$locale/user/public/creator/$userId'
     | '/api/$locale/user/public/login/options'
@@ -6885,6 +7545,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/moderation'
     | '/api/$locale/vibe/agent/chat/public-feed'
     | '/api/$locale/vibe/agent/chat/settings'
     | '/api/$locale/vibe/agent/chat/threads'
@@ -6901,6 +7562,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/refusal-index/leaderboard'
+    | '/api/$locale/vibe/agent/refusal-index/questions'
+    | '/api/$locale/vibe/agent/refusal-index/runs'
+    | '/api/$locale/vibe/agent/refusal-index/samples'
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
@@ -6933,8 +7598,15 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tasks/pulse/execute'
     | '/api/$locale/vibe/tasks/pulse/history'
     | '/api/$locale/vibe/tasks/pulse/status'
+    | '/api/$locale/vibe/tasks/watchdog/budget-caps'
+    | '/api/$locale/vibe/tasks/watchdog/cancel'
+    | '/api/$locale/vibe/tasks/watchdog/health'
+    | '/api/$locale/vibe/tasks/watchdog/sweep'
+    | '/$locale/models/compare/$a/$b'
+    | '/$locale/story/newsletter/confirm/$token'
     | '/$locale/story/newsletter/unsubscribe/$email'
     | '/$locale/user/reset-password/$token'
+    | '/$locale/user/verify-email/$token'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -6970,6 +7642,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
     | '/api/$locale/vibe/agent/chat/threads/search-threads'
     | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+    | '/api/$locale/vibe/agent/refusal-index/questions/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/start'
     | '/api/$locale/vibe/agent/skills/$id/publish'
     | '/api/$locale/vibe/agent/skills/$id/report'
     | '/api/$locale/vibe/agent/skills/$id/vote'
@@ -6988,11 +7664,13 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/report'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
     | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
@@ -7001,18 +7679,23 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
     | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId'
   id:
     | '__root__'
     | '/'
+    | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale/help'
+    | '/$locale/models'
     | '/$locale/story'
     | '/$locale/subscription'
     | '/$locale/threads'
@@ -7023,6 +7706,7 @@ export interface FileRouteTypes {
     | '/$locale/user/_account'
     | '/$locale/user/_auth'
     | '/api/$locale/$notFound'
+    | '/api/$locale/api-keys'
     | '/api/$locale/contact'
     | '/api/$locale/credits'
     | '/api/$locale/manifest'
@@ -7032,6 +7716,7 @@ export interface FileRouteTypes {
     | '/$locale/cortex/'
     | '/$locale/design-test/'
     | '/$locale/help/'
+    | '/$locale/models/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -7039,6 +7724,7 @@ export interface FileRouteTypes {
     | '/$locale/tools/'
     | '/$locale/track/'
     | '/$locale/user/_auth/signup'
+    | '/api/$locale/api-keys/$id'
     | '/api/$locale/browser/click'
     | '/api/$locale/browser/close-page'
     | '/api/$locale/browser/drag'
@@ -7086,6 +7772,9 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/status'
+    | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
     | '/api/$locale/lead-magnet/captures'
@@ -7103,9 +7792,13 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/stats'
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
+    | '/api/$locale/newsletter/confirm'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
+    | '/api/$locale/notifications/list'
+    | '/api/$locale/notifications/read'
+    | '/api/$locale/notifications/unread-count'
     | '/api/$locale/payment/checkout'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
@@ -7126,10 +7819,12 @@ export interface FileRouteTypes {
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
     | '/api/$locale/users/view'
+    | '/api/$locale/v1/models'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
     | '/$locale/invoice/$invoiceId/'
+    | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/about-us/'
@@ -7142,6 +7837,7 @@ export interface FileRouteTypes {
     | '/$locale/story/invest/'
     | '/$locale/story/newsletter/'
     | '/$locale/story/privacy-policy/'
+    | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
     | '/$locale/story/terms-of-service/'
     | '/$locale/subscription/buy/'
@@ -7150,6 +7846,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/remote/'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
+    | '/api/$locale/analytics/evaluators/drop'
     | '/api/$locale/analytics/evaluators/not'
     | '/api/$locale/analytics/evaluators/or'
     | '/api/$locale/analytics/evaluators/script'
@@ -7190,6 +7887,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-expired'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
+    | '/api/$locale/credits/data-sources/credits-free-tier-spend'
     | '/api/$locale/credits/data-sources/credits-packs-created'
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
@@ -7201,6 +7899,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
     | '/api/$locale/inventory/stock/list'
@@ -7251,8 +7950,14 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/growth/links'
+    | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
     | '/api/$locale/leads/import/status'
+    | '/api/$locale/leads/lifecycle/backfill'
+    | '/api/$locale/leads/lifecycle/overview'
+    | '/api/$locale/leads/lifecycle/run'
+    | '/api/$locale/leads/lifecycle/settings'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -7271,6 +7976,10 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/inbox'
+    | '/api/$locale/messenger/system-mailbox/message'
+    | '/api/$locale/messenger/system-mailbox/report'
+    | '/api/$locale/messenger/system-mailbox/send'
     | '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent'
     | '/api/$locale/newsletter/data-sources/newsletter-events-total'
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
@@ -7313,6 +8022,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/data-sources/referrals-lead-clicks'
     | '/api/$locale/referral/data-sources/referrals-payouts'
     | '/api/$locale/referral/data-sources/referrals-signups'
+    | '/api/$locale/referral/earnings/confirm'
     | '/api/$locale/referral/earnings/list'
     | '/api/$locale/referral/lead/current'
     | '/api/$locale/ssh/connections/$id'
@@ -7344,7 +8054,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/private/sessions'
     | '/api/$locale/user/public/login'
     | '/api/$locale/user/public/signup'
+    | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/chat/completions'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -7411,8 +8123,11 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/channel-spend'
+    | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
     | '/api/$locale/payment/bill/$billId/pay'
@@ -7465,7 +8180,9 @@ export interface FileRouteTypes {
     | '/api/$locale/tax/rate/$rateId/update'
     | '/api/$locale/user/private/me/addresses'
     | '/api/$locale/user/private/me/avatar'
+    | '/api/$locale/user/private/me/export'
     | '/api/$locale/user/private/me/password'
+    | '/api/$locale/user/private/me/two-factor'
     | '/api/$locale/user/private/sessions/$id'
     | '/api/$locale/user/public/creator/$userId'
     | '/api/$locale/user/public/login/options'
@@ -7476,6 +8193,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stream'
+    | '/api/$locale/vibe/agent/chat/moderation'
     | '/api/$locale/vibe/agent/chat/public-feed'
     | '/api/$locale/vibe/agent/chat/settings'
     | '/api/$locale/vibe/agent/chat/threads'
@@ -7492,6 +8210,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/refusal-index/leaderboard'
+    | '/api/$locale/vibe/agent/refusal-index/questions'
+    | '/api/$locale/vibe/agent/refusal-index/runs'
+    | '/api/$locale/vibe/agent/refusal-index/samples'
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
@@ -7524,8 +8246,15 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tasks/pulse/execute'
     | '/api/$locale/vibe/tasks/pulse/history'
     | '/api/$locale/vibe/tasks/pulse/status'
+    | '/api/$locale/vibe/tasks/watchdog/budget-caps'
+    | '/api/$locale/vibe/tasks/watchdog/cancel'
+    | '/api/$locale/vibe/tasks/watchdog/health'
+    | '/api/$locale/vibe/tasks/watchdog/sweep'
+    | '/$locale/models/compare/$a/$b/'
+    | '/$locale/story/newsletter/confirm/$token/'
     | '/$locale/story/newsletter/unsubscribe/$email/'
     | '/$locale/user/_auth/reset-password/$token/'
+    | '/$locale/user/_auth/verify-email/$token/'
     | '/api/$locale/companies/$companyId/members/$memberId/remove'
     | '/api/$locale/companies/$companyId/members/$memberId/update-role'
     | '/api/$locale/lead-magnet/providers/google-sheets/oauth/callback'
@@ -7561,6 +8290,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
     | '/api/$locale/vibe/agent/chat/threads/search-threads'
     | '/api/$locale/vibe/agent/cortex/embeddings/backfill'
+    | '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+    | '/api/$locale/vibe/agent/refusal-index/questions/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/$id'
+    | '/api/$locale/vibe/agent/refusal-index/runs/start'
     | '/api/$locale/vibe/agent/skills/$id/publish'
     | '/api/$locale/vibe/agent/skills/$id/report'
     | '/api/$locale/vibe/agent/skills/$id/vote'
@@ -7579,11 +8312,13 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
+    | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
+    | '/api/$locale/vibe/agent/chat/threads/$threadId/report'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/share-links'
     | '/api/$locale/vibe/platforms/ai/skills/AGENT/md'
     | '/api/$locale/vibe/platforms/ai/skills/PUBLIC_USER_AI_RUN/md'
@@ -7592,19 +8327,24 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/platforms/ai/skills/USER_WITH_ACCOUNT_SKILL/md'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/move'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/permissions'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/update'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/path'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/search'
     | '/api/$locale/vibe/agent/chat/threads/files/$threadId/$filename'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files'
     | '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
+    | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LocaleSplatRoute: typeof LocaleSplatRoute
   LocaleHelpRoute: typeof LocaleHelpRouteWithChildren
+  LocaleModelsRoute: typeof LocaleModelsRouteWithChildren
   LocaleStoryRoute: typeof LocaleStoryRouteWithChildren
   LocaleSubscriptionRoute: typeof LocaleSubscriptionRouteWithChildren
   LocaleThreadsRoute: typeof LocaleThreadsRouteWithChildren
@@ -7614,6 +8354,7 @@ export interface RootRouteChildren {
   LocaleUserAccountRoute: typeof LocaleUserAccountRouteWithChildren
   LocaleUserAuthRoute: typeof LocaleUserAuthRouteWithChildren
   ApiLocaleNotFoundRoute: typeof ApiLocaleNotFoundRoute
+  ApiLocaleApiKeysRoute: typeof ApiLocaleApiKeysRouteWithChildren
   ApiLocaleContactRoute: typeof ApiLocaleContactRoute
   ApiLocaleCreditsRoute: typeof ApiLocaleCreditsRouteWithChildren
   ApiLocaleManifestRoute: typeof ApiLocaleManifestRoute
@@ -7667,6 +8408,9 @@ export interface RootRouteChildren {
   ApiLocaleDesktopScrollRoute: typeof ApiLocaleDesktopScrollRoute
   ApiLocaleDesktopTakeScreenshotRoute: typeof ApiLocaleDesktopTakeScreenshotRoute
   ApiLocaleDesktopTypeTextRoute: typeof ApiLocaleDesktopTypeTextRoute
+  ApiLocaleFinanceIngestRoute: typeof ApiLocaleFinanceIngestRoute
+  ApiLocaleFinanceStatusRoute: typeof ApiLocaleFinanceStatusRoute
+  ApiLocaleFinanceThresholdsRoute: typeof ApiLocaleFinanceThresholdsRoute
   ApiLocaleInventoryDashboardRoute: typeof ApiLocaleInventoryDashboardRoute
   ApiLocaleLeadMagnetCaptureRoute: typeof ApiLocaleLeadMagnetCaptureRoute
   ApiLocaleLeadMagnetCapturesRoute: typeof ApiLocaleLeadMagnetCapturesRoute
@@ -7684,9 +8428,13 @@ export interface RootRouteChildren {
   ApiLocaleLeadsStatsRoute: typeof ApiLocaleLeadsStatsRoute
   ApiLocaleLeadsTrackingRoute: typeof ApiLocaleLeadsTrackingRouteWithChildren
   ApiLocaleMessengerSendRoute: typeof ApiLocaleMessengerSendRoute
+  ApiLocaleNewsletterConfirmRoute: typeof ApiLocaleNewsletterConfirmRoute
   ApiLocaleNewsletterStatusRoute: typeof ApiLocaleNewsletterStatusRoute
   ApiLocaleNewsletterSubscribeRoute: typeof ApiLocaleNewsletterSubscribeRoute
   ApiLocaleNewsletterUnsubscribeRoute: typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
+  ApiLocaleNotificationsListRoute: typeof ApiLocaleNotificationsListRoute
+  ApiLocaleNotificationsReadRoute: typeof ApiLocaleNotificationsReadRoute
+  ApiLocaleNotificationsUnreadCountRoute: typeof ApiLocaleNotificationsUnreadCountRoute
   ApiLocalePosDashboardRoute: typeof ApiLocalePosDashboardRoute
   ApiLocalePosProductLookupRoute: typeof ApiLocalePosProductLookupRoute
   ApiLocalePurchasingDashboardRoute: typeof ApiLocalePurchasingDashboardRoute
@@ -7696,6 +8444,7 @@ export interface RootRouteChildren {
   ApiLocaleUsersListRoute: typeof ApiLocaleUsersListRoute
   ApiLocaleUsersStatsRoute: typeof ApiLocaleUsersStatsRoute
   ApiLocaleUsersViewRoute: typeof ApiLocaleUsersViewRoute
+  ApiLocaleV1ModelsRoute: typeof ApiLocaleV1ModelsRoute
   ApiLocaleVibeExecuteToolRoute: typeof ApiLocaleVibeExecuteToolRouteWithChildren
   ApiLocaleVibeHelpToolRoute: typeof ApiLocaleVibeHelpToolRoute
   LocaleCreatorUserIdIndexRoute: typeof LocaleCreatorUserIdIndexRoute
@@ -7704,6 +8453,7 @@ export interface RootRouteChildren {
   LocaleSkillSkillIdIndexRoute: typeof LocaleSkillSkillIdIndexRoute
   ApiLocaleAnalyticsEvaluatorsAndRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute: typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
+  ApiLocaleAnalyticsEvaluatorsDropRoute: typeof ApiLocaleAnalyticsEvaluatorsDropRoute
   ApiLocaleAnalyticsEvaluatorsNotRoute: typeof ApiLocaleAnalyticsEvaluatorsNotRoute
   ApiLocaleAnalyticsEvaluatorsOrRoute: typeof ApiLocaleAnalyticsEvaluatorsOrRoute
   ApiLocaleAnalyticsEvaluatorsScriptRoute: typeof ApiLocaleAnalyticsEvaluatorsScriptRoute
@@ -7738,6 +8488,7 @@ export interface RootRouteChildren {
   ApiLocaleCompaniesCompanyIdGetRoute: typeof ApiLocaleCompaniesCompanyIdGetRoute
   ApiLocaleCompaniesCompanyIdOnboardRoute: typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   ApiLocaleCompaniesCompanyIdUpdateRoute: typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  ApiLocaleFinanceDataSourcesFinanceSeriesRoute: typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   ApiLocaleInventoryStockAdjustRoute: typeof ApiLocaleInventoryStockAdjustRoute
   ApiLocaleInventoryStockIssueRoute: typeof ApiLocaleInventoryStockIssueRoute
   ApiLocaleInventoryStockListRoute: typeof ApiLocaleInventoryStockListRoute
@@ -7788,6 +8539,12 @@ export interface RootRouteChildren {
   ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute: typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  ApiLocaleLeadsGrowthLinksRoute: typeof ApiLocaleLeadsGrowthLinksRoute
+  ApiLocaleLeadsGrowthSpendRoute: typeof ApiLocaleLeadsGrowthSpendRoute
+  ApiLocaleLeadsLifecycleBackfillRoute: typeof ApiLocaleLeadsLifecycleBackfillRoute
+  ApiLocaleLeadsLifecycleOverviewRoute: typeof ApiLocaleLeadsLifecycleOverviewRoute
+  ApiLocaleLeadsLifecycleRunRoute: typeof ApiLocaleLeadsLifecycleRunRoute
+  ApiLocaleLeadsLifecycleSettingsRoute: typeof ApiLocaleLeadsLifecycleSettingsRoute
   ApiLocaleMessengerAccountsCreateRoute: typeof ApiLocaleMessengerAccountsCreateRoute
   ApiLocaleMessengerAccountsListRoute: typeof ApiLocaleMessengerAccountsListRoute
   ApiLocaleMessengerDataSourcesMessengerBouncedRoute: typeof ApiLocaleMessengerDataSourcesMessengerBouncedRoute
@@ -7805,6 +8562,10 @@ export interface RootRouteChildren {
   ApiLocaleMessengerMessagesStatsRoute: typeof ApiLocaleMessengerMessagesStatsRoute
   ApiLocaleMessengerPreviewRenderRoute: typeof ApiLocaleMessengerPreviewRenderRoute
   ApiLocaleMessengerPreviewSendTestRoute: typeof ApiLocaleMessengerPreviewSendTestRoute
+  ApiLocaleMessengerSystemMailboxInboxRoute: typeof ApiLocaleMessengerSystemMailboxInboxRoute
+  ApiLocaleMessengerSystemMailboxMessageRoute: typeof ApiLocaleMessengerSystemMailboxMessageRoute
+  ApiLocaleMessengerSystemMailboxReportRoute: typeof ApiLocaleMessengerSystemMailboxReportRoute
+  ApiLocaleMessengerSystemMailboxSendRoute: typeof ApiLocaleMessengerSystemMailboxSendRoute
   ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute: typeof ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute
   ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute: typeof ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute
   ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute: typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
@@ -7842,7 +8603,9 @@ export interface RootRouteChildren {
   ApiLocaleUserPrivateSessionsRoute: typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   ApiLocaleUserPublicLoginRoute: typeof ApiLocaleUserPublicLoginRouteWithChildren
   ApiLocaleUserPublicSignupRoute: typeof ApiLocaleUserPublicSignupRoute
+  ApiLocaleUserPublicVerifyEmailRoute: typeof ApiLocaleUserPublicVerifyEmailRoute
   ApiLocaleUsersUserIdRoute: typeof ApiLocaleUsersUserIdRouteWithChildren
+  ApiLocaleV1ChatCompletionsRoute: typeof ApiLocaleV1ChatCompletionsRoute
   ApiLocaleVibeAgentCodingAgentRoute: typeof ApiLocaleVibeAgentCodingAgentRoute
   ApiLocaleVibeAgentDescribeImageRoute: typeof ApiLocaleVibeAgentDescribeImageRoute
   ApiLocaleVibeAgentDescribeVideoRoute: typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -7883,6 +8646,8 @@ export interface RootRouteChildren {
   ApiLocaleInventoryWarehouseWarehouseIdGetRoute: typeof ApiLocaleInventoryWarehouseWarehouseIdGetRoute
   ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute: typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   ApiLocaleLeadsCampaignsEmailsTestMailRoute: typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute: typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
+  ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute: typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   ApiLocaleMessengerAccountsEditIdRoute: typeof ApiLocaleMessengerAccountsEditIdRoute
   ApiLocalePosOrderOrderIdAddItemRoute: typeof ApiLocalePosOrderOrderIdAddItemRoute
   ApiLocalePosOrderOrderIdAddPaymentRoute: typeof ApiLocalePosOrderOrderIdAddPaymentRoute
@@ -7918,6 +8683,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentAiStreamCancelRoute: typeof ApiLocaleVibeAgentAiStreamCancelRoute
   ApiLocaleVibeAgentAiStreamRunRoute: typeof ApiLocaleVibeAgentAiStreamRunRoute
   ApiLocaleVibeAgentAiStreamStreamRoute: typeof ApiLocaleVibeAgentAiStreamStreamRoute
+  ApiLocaleVibeAgentChatModerationRoute: typeof ApiLocaleVibeAgentChatModerationRoute
   ApiLocaleVibeAgentChatPublicFeedRoute: typeof ApiLocaleVibeAgentChatPublicFeedRoute
   ApiLocaleVibeAgentChatSettingsRoute: typeof ApiLocaleVibeAgentChatSettingsRoute
   ApiLocaleVibeAgentChatThreadsRoute: typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
@@ -7933,6 +8699,10 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentCortexTreeRoute: typeof ApiLocaleVibeAgentCortexTreeRoute
   ApiLocaleVibeAgentCortexWriteRoute: typeof ApiLocaleVibeAgentCortexWriteRoute
   ApiLocaleVibeAgentModelsListRoute: typeof ApiLocaleVibeAgentModelsListRoute
+  ApiLocaleVibeAgentRefusalIndexLeaderboardRoute: typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
+  ApiLocaleVibeAgentRefusalIndexQuestionsRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
+  ApiLocaleVibeAgentRefusalIndexRunsRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
+  ApiLocaleVibeAgentRefusalIndexSamplesRoute: typeof ApiLocaleVibeAgentRefusalIndexSamplesRoute
   ApiLocaleVibeLoggerErrorMonitorCleanupRoute: typeof ApiLocaleVibeLoggerErrorMonitorCleanupRoute
   ApiLocaleVibeLoggerErrorMonitorClientLogRoute: typeof ApiLocaleVibeLoggerErrorMonitorClientLogRoute
   ApiLocaleVibeLoggerErrorMonitorLogsRoute: typeof ApiLocaleVibeLoggerErrorMonitorLogsRoute
@@ -7952,6 +8722,10 @@ export interface RootRouteChildren {
   ApiLocaleVibeTasksPulseExecuteRoute: typeof ApiLocaleVibeTasksPulseExecuteRoute
   ApiLocaleVibeTasksPulseHistoryRoute: typeof ApiLocaleVibeTasksPulseHistoryRoute
   ApiLocaleVibeTasksPulseStatusRoute: typeof ApiLocaleVibeTasksPulseStatusRoute
+  ApiLocaleVibeTasksWatchdogBudgetCapsRoute: typeof ApiLocaleVibeTasksWatchdogBudgetCapsRoute
+  ApiLocaleVibeTasksWatchdogCancelRoute: typeof ApiLocaleVibeTasksWatchdogCancelRoute
+  ApiLocaleVibeTasksWatchdogHealthRoute: typeof ApiLocaleVibeTasksWatchdogHealthRoute
+  ApiLocaleVibeTasksWatchdogSweepRoute: typeof ApiLocaleVibeTasksWatchdogSweepRoute
   ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute: typeof ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute
   ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute: typeof ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute
   ApiLocaleMessengerProvidersEmailImapClientSyncRoute: typeof ApiLocaleMessengerProvidersEmailImapClientSyncRoute
@@ -7973,10 +8747,12 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   ApiLocaleVibeAgentChatFoldersRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
   ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
+  ApiLocaleVibeAgentRefusalIndexModelModelIdRoute: typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
+  ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute: typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
   ApiLocaleVibePlatformsAiSkillsAGENTMdRoute: typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
   ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
@@ -7992,6 +8768,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/': {
@@ -8013,6 +8796,13 @@ declare module '@tanstack/react-router' {
       path: '/$locale/help'
       fullPath: '/$locale/help'
       preLoaderRoute: typeof LocaleHelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$locale/models': {
+      id: '/$locale/models'
+      path: '/$locale/models'
+      fullPath: '/$locale/models'
+      preLoaderRoute: typeof LocaleModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/story': {
@@ -8063,6 +8853,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/help/'
       preLoaderRoute: typeof LocaleHelpIndexRouteImport
       parentRoute: typeof LocaleHelpRoute
+    }
+    '/$locale/models/': {
+      id: '/$locale/models/'
+      path: '/'
+      fullPath: '/$locale/models/'
+      preLoaderRoute: typeof LocaleModelsIndexRouteImport
+      parentRoute: typeof LocaleModelsRoute
     }
     '/$locale/skills/': {
       id: '/$locale/skills/'
@@ -8141,6 +8938,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleNotFoundRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/api-keys': {
+      id: '/api/$locale/api-keys'
+      path: '/api/$locale/api-keys'
+      fullPath: '/api/$locale/api-keys'
+      preLoaderRoute: typeof ApiLocaleApiKeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/contact': {
       id: '/api/$locale/contact'
       path: '/api/$locale/contact'
@@ -8196,6 +9000,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/invoice/$invoiceId/'
       preLoaderRoute: typeof LocaleInvoiceInvoiceIdIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/models/$modelId/': {
+      id: '/$locale/models/$modelId/'
+      path: '/$modelId'
+      fullPath: '/$locale/models/$modelId/'
+      preLoaderRoute: typeof LocaleModelsModelIdIndexRouteImport
+      parentRoute: typeof LocaleModelsRoute
     }
     '/$locale/shared/$token/': {
       id: '/$locale/shared/$token/'
@@ -8281,6 +9092,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryPrivacyPolicyIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/refusal-index/': {
+      id: '/$locale/story/refusal-index/'
+      path: '/refusal-index'
+      fullPath: '/$locale/story/refusal-index/'
+      preLoaderRoute: typeof LocaleStoryRefusalIndexIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/self-host/': {
       id: '/$locale/story/self-host/'
       path: '/self-host'
@@ -8329,6 +9147,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/user/signup'
       preLoaderRoute: typeof LocaleUserAuthSignupRouteImport
       parentRoute: typeof LocaleUserAuthRoute
+    }
+    '/api/$locale/api-keys/$id': {
+      id: '/api/$locale/api-keys/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/api-keys/$id'
+      preLoaderRoute: typeof ApiLocaleApiKeysIdRouteImport
+      parentRoute: typeof ApiLocaleApiKeysRoute
     }
     '/api/$locale/browser/click': {
       id: '/api/$locale/browser/click'
@@ -8659,6 +9484,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleDesktopTypeTextRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/finance/ingest': {
+      id: '/api/$locale/finance/ingest'
+      path: '/api/$locale/finance/ingest'
+      fullPath: '/api/$locale/finance/ingest'
+      preLoaderRoute: typeof ApiLocaleFinanceIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/status': {
+      id: '/api/$locale/finance/status'
+      path: '/api/$locale/finance/status'
+      fullPath: '/api/$locale/finance/status'
+      preLoaderRoute: typeof ApiLocaleFinanceStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/thresholds': {
+      id: '/api/$locale/finance/thresholds'
+      path: '/api/$locale/finance/thresholds'
+      fullPath: '/api/$locale/finance/thresholds'
+      preLoaderRoute: typeof ApiLocaleFinanceThresholdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/inventory/dashboard': {
       id: '/api/$locale/inventory/dashboard'
       path: '/api/$locale/inventory/dashboard'
@@ -8778,6 +9624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleMessengerSendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/newsletter/confirm': {
+      id: '/api/$locale/newsletter/confirm'
+      path: '/api/$locale/newsletter/confirm'
+      fullPath: '/api/$locale/newsletter/confirm'
+      preLoaderRoute: typeof ApiLocaleNewsletterConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/newsletter/status': {
       id: '/api/$locale/newsletter/status'
       path: '/api/$locale/newsletter/status'
@@ -8797,6 +9650,27 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/newsletter/unsubscribe'
       fullPath: '/api/$locale/newsletter/unsubscribe'
       preLoaderRoute: typeof ApiLocaleNewsletterUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/notifications/list': {
+      id: '/api/$locale/notifications/list'
+      path: '/api/$locale/notifications/list'
+      fullPath: '/api/$locale/notifications/list'
+      preLoaderRoute: typeof ApiLocaleNotificationsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/notifications/read': {
+      id: '/api/$locale/notifications/read'
+      path: '/api/$locale/notifications/read'
+      fullPath: '/api/$locale/notifications/read'
+      preLoaderRoute: typeof ApiLocaleNotificationsReadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/notifications/unread-count': {
+      id: '/api/$locale/notifications/unread-count'
+      path: '/api/$locale/notifications/unread-count'
+      fullPath: '/api/$locale/notifications/unread-count'
+      preLoaderRoute: typeof ApiLocaleNotificationsUnreadCountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/payment/checkout': {
@@ -8937,6 +9811,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/users/view'
       fullPath: '/api/$locale/users/view'
       preLoaderRoute: typeof ApiLocaleUsersViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/models': {
+      id: '/api/$locale/v1/models'
+      path: '/api/$locale/v1/models'
+      fullPath: '/api/$locale/v1/models'
+      preLoaderRoute: typeof ApiLocaleV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/execute-tool': {
@@ -9119,6 +10000,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/analytics/evaluators/crossover'
       fullPath: '/api/$locale/analytics/evaluators/crossover'
       preLoaderRoute: typeof ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/analytics/evaluators/drop': {
+      id: '/api/$locale/analytics/evaluators/drop'
+      path: '/api/$locale/analytics/evaluators/drop'
+      fullPath: '/api/$locale/analytics/evaluators/drop'
+      preLoaderRoute: typeof ApiLocaleAnalyticsEvaluatorsDropRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/analytics/evaluators/not': {
@@ -9401,6 +10289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
+    '/api/$locale/credits/data-sources/credits-free-tier-spend': {
+      id: '/api/$locale/credits/data-sources/credits-free-tier-spend'
+      path: '/data-sources/credits-free-tier-spend'
+      fullPath: '/api/$locale/credits/data-sources/credits-free-tier-spend'
+      preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
     '/api/$locale/credits/data-sources/credits-packs-created': {
       id: '/api/$locale/credits/data-sources/credits-packs-created'
       path: '/data-sources/credits-packs-created'
@@ -9477,6 +10372,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/credits/data-sources/credits-wallets-total'
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
+    }
+    '/api/$locale/finance/data-sources/finance-series': {
+      id: '/api/$locale/finance/data-sources/finance-series'
+      path: '/api/$locale/finance/data-sources/finance-series'
+      fullPath: '/api/$locale/finance/data-sources/finance-series'
+      preLoaderRoute: typeof ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/inventory/stock/adjust': {
       id: '/api/$locale/inventory/stock/adjust'
@@ -9828,6 +10730,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/leads/growth/links': {
+      id: '/api/$locale/leads/growth/links'
+      path: '/api/$locale/leads/growth/links'
+      fullPath: '/api/$locale/leads/growth/links'
+      preLoaderRoute: typeof ApiLocaleLeadsGrowthLinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/growth/spend': {
+      id: '/api/$locale/leads/growth/spend'
+      path: '/api/$locale/leads/growth/spend'
+      fullPath: '/api/$locale/leads/growth/spend'
+      preLoaderRoute: typeof ApiLocaleLeadsGrowthSpendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/leads/import/process': {
       id: '/api/$locale/leads/import/process'
       path: '/process'
@@ -9841,6 +10757,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/leads/import/status'
       preLoaderRoute: typeof ApiLocaleLeadsImportStatusRouteImport
       parentRoute: typeof ApiLocaleLeadsImportRoute
+    }
+    '/api/$locale/leads/lifecycle/backfill': {
+      id: '/api/$locale/leads/lifecycle/backfill'
+      path: '/api/$locale/leads/lifecycle/backfill'
+      fullPath: '/api/$locale/leads/lifecycle/backfill'
+      preLoaderRoute: typeof ApiLocaleLeadsLifecycleBackfillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/lifecycle/overview': {
+      id: '/api/$locale/leads/lifecycle/overview'
+      path: '/api/$locale/leads/lifecycle/overview'
+      fullPath: '/api/$locale/leads/lifecycle/overview'
+      preLoaderRoute: typeof ApiLocaleLeadsLifecycleOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/lifecycle/run': {
+      id: '/api/$locale/leads/lifecycle/run'
+      path: '/api/$locale/leads/lifecycle/run'
+      fullPath: '/api/$locale/leads/lifecycle/run'
+      preLoaderRoute: typeof ApiLocaleLeadsLifecycleRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/lifecycle/settings': {
+      id: '/api/$locale/leads/lifecycle/settings'
+      path: '/api/$locale/leads/lifecycle/settings'
+      fullPath: '/api/$locale/leads/lifecycle/settings'
+      preLoaderRoute: typeof ApiLocaleLeadsLifecycleSettingsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/leads/tracking/pixel': {
       id: '/api/$locale/leads/tracking/pixel'
@@ -9966,6 +10910,34 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/messenger/preview/send-test'
       fullPath: '/api/$locale/messenger/preview/send-test'
       preLoaderRoute: typeof ApiLocaleMessengerPreviewSendTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/messenger/system-mailbox/inbox': {
+      id: '/api/$locale/messenger/system-mailbox/inbox'
+      path: '/api/$locale/messenger/system-mailbox/inbox'
+      fullPath: '/api/$locale/messenger/system-mailbox/inbox'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxInboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/messenger/system-mailbox/message': {
+      id: '/api/$locale/messenger/system-mailbox/message'
+      path: '/api/$locale/messenger/system-mailbox/message'
+      fullPath: '/api/$locale/messenger/system-mailbox/message'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxMessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/messenger/system-mailbox/report': {
+      id: '/api/$locale/messenger/system-mailbox/report'
+      path: '/api/$locale/messenger/system-mailbox/report'
+      fullPath: '/api/$locale/messenger/system-mailbox/report'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/messenger/system-mailbox/send': {
+      id: '/api/$locale/messenger/system-mailbox/send'
+      path: '/api/$locale/messenger/system-mailbox/send'
+      fullPath: '/api/$locale/messenger/system-mailbox/send'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxSendRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/newsletter/data-sources/newsletter-campaigns-sent': {
@@ -10262,6 +11234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleReferralDataSourcesReferralsSignupsRouteImport
       parentRoute: typeof ApiLocaleReferralRoute
     }
+    '/api/$locale/referral/earnings/confirm': {
+      id: '/api/$locale/referral/earnings/confirm'
+      path: '/earnings/confirm'
+      fullPath: '/api/$locale/referral/earnings/confirm'
+      preLoaderRoute: typeof ApiLocaleReferralEarningsConfirmRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
     '/api/$locale/referral/earnings/list': {
       id: '/api/$locale/referral/earnings/list'
       path: '/earnings/list'
@@ -10479,11 +11458,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleUserPublicSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/user/public/verify-email': {
+      id: '/api/$locale/user/public/verify-email'
+      path: '/api/$locale/user/public/verify-email'
+      fullPath: '/api/$locale/user/public/verify-email'
+      preLoaderRoute: typeof ApiLocaleUserPublicVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/users/user/$id': {
       id: '/api/$locale/users/user/$id'
       path: '/api/$locale/users/user/$id'
       fullPath: '/api/$locale/users/user/$id'
       preLoaderRoute: typeof ApiLocaleUsersUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/chat/completions': {
+      id: '/api/$locale/v1/chat/completions'
+      path: '/api/$locale/v1/chat/completions'
+      fullPath: '/api/$locale/v1/chat/completions'
+      preLoaderRoute: typeof ApiLocaleV1ChatCompletionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/agent/coding-agent': {
@@ -10675,6 +11668,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeTasksExecuteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/models/compare/$a/$b/': {
+      id: '/$locale/models/compare/$a/$b/'
+      path: '/compare/$a/$b'
+      fullPath: '/$locale/models/compare/$a/$b/'
+      preLoaderRoute: typeof LocaleModelsCompareABIndexRouteImport
+      parentRoute: typeof LocaleModelsRoute
+    }
+    '/$locale/story/newsletter/confirm/$token/': {
+      id: '/$locale/story/newsletter/confirm/$token/'
+      path: '/newsletter/confirm/$token'
+      fullPath: '/$locale/story/newsletter/confirm/$token/'
+      preLoaderRoute: typeof LocaleStoryNewsletterConfirmTokenIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/newsletter/unsubscribe/$email/': {
       id: '/$locale/story/newsletter/unsubscribe/$email/'
       path: '/newsletter/unsubscribe/$email'
@@ -10687,6 +11694,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password/$token'
       fullPath: '/$locale/user/reset-password/$token/'
       preLoaderRoute: typeof LocaleUserAuthResetPasswordTokenIndexRouteImport
+      parentRoute: typeof LocaleUserAuthRoute
+    }
+    '/$locale/user/_auth/verify-email/$token/': {
+      id: '/$locale/user/_auth/verify-email/$token/'
+      path: '/verify-email/$token'
+      fullPath: '/$locale/user/verify-email/$token/'
+      preLoaderRoute: typeof LocaleUserAuthVerifyEmailTokenIndexRouteImport
       parentRoute: typeof LocaleUserAuthRoute
     }
     '/api/$locale/chart-of-accounts/account/$accountId/deactivate': {
@@ -10808,6 +11822,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleLeadsCampaignsEmailsTestMailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/leads/growth/data-sources/channel-spend': {
+      id: '/api/$locale/leads/growth/data-sources/channel-spend'
+      path: '/api/$locale/leads/growth/data-sources/channel-spend'
+      fullPath: '/api/$locale/leads/growth/data-sources/channel-spend'
+      preLoaderRoute: typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/growth/data-sources/funnel-step': {
+      id: '/api/$locale/leads/growth/data-sources/funnel-step'
+      path: '/api/$locale/leads/growth/data-sources/funnel-step'
+      fullPath: '/api/$locale/leads/growth/data-sources/funnel-step'
+      preLoaderRoute: typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/leads/import/jobs/$jobId': {
       id: '/api/$locale/leads/import/jobs/$jobId'
       path: '/jobs/$jobId'
@@ -10821,6 +11849,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/messenger/accounts/edit/$id'
       preLoaderRoute: typeof ApiLocaleMessengerAccountsEditIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/newsletter/unsubscribe/oneclick/$token': {
+      id: '/api/$locale/newsletter/unsubscribe/oneclick/$token'
+      path: '/oneclick/$token'
+      fullPath: '/api/$locale/newsletter/unsubscribe/oneclick/$token'
+      preLoaderRoute: typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRouteImport
+      parentRoute: typeof ApiLocaleNewsletterUnsubscribeRoute
     }
     '/api/$locale/payment/bill/$billId/approve': {
       id: '/api/$locale/payment/bill/$billId/approve'
@@ -11186,11 +12221,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleUserPrivateMeAvatarRouteImport
       parentRoute: typeof ApiLocaleUserPrivateMeRoute
     }
+    '/api/$locale/user/private/me/export': {
+      id: '/api/$locale/user/private/me/export'
+      path: '/export'
+      fullPath: '/api/$locale/user/private/me/export'
+      preLoaderRoute: typeof ApiLocaleUserPrivateMeExportRouteImport
+      parentRoute: typeof ApiLocaleUserPrivateMeRoute
+    }
     '/api/$locale/user/private/me/password': {
       id: '/api/$locale/user/private/me/password'
       path: '/password'
       fullPath: '/api/$locale/user/private/me/password'
       preLoaderRoute: typeof ApiLocaleUserPrivateMePasswordRouteImport
+      parentRoute: typeof ApiLocaleUserPrivateMeRoute
+    }
+    '/api/$locale/user/private/me/two-factor': {
+      id: '/api/$locale/user/private/me/two-factor'
+      path: '/two-factor'
+      fullPath: '/api/$locale/user/private/me/two-factor'
+      preLoaderRoute: typeof ApiLocaleUserPrivateMeTwoFactorRouteImport
       parentRoute: typeof ApiLocaleUserPrivateMeRoute
     }
     '/api/$locale/user/private/sessions/$id': {
@@ -11261,6 +12310,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/vibe/agent/ai-stream/stream'
       fullPath: '/api/$locale/vibe/agent/ai-stream/stream'
       preLoaderRoute: typeof ApiLocaleVibeAgentAiStreamStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/chat/moderation': {
+      id: '/api/$locale/vibe/agent/chat/moderation'
+      path: '/api/$locale/vibe/agent/chat/moderation'
+      fullPath: '/api/$locale/vibe/agent/chat/moderation'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatModerationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/agent/chat/public-feed': {
@@ -11373,6 +12429,34 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/vibe/agent/models/list'
       fullPath: '/api/$locale/vibe/agent/models/list'
       preLoaderRoute: typeof ApiLocaleVibeAgentModelsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/refusal-index/leaderboard': {
+      id: '/api/$locale/vibe/agent/refusal-index/leaderboard'
+      path: '/api/$locale/vibe/agent/refusal-index/leaderboard'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/leaderboard'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/refusal-index/questions': {
+      id: '/api/$locale/vibe/agent/refusal-index/questions'
+      path: '/api/$locale/vibe/agent/refusal-index/questions'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/questions'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/refusal-index/runs': {
+      id: '/api/$locale/vibe/agent/refusal-index/runs'
+      path: '/api/$locale/vibe/agent/refusal-index/runs'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/runs'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/refusal-index/samples': {
+      id: '/api/$locale/vibe/agent/refusal-index/samples'
+      path: '/api/$locale/vibe/agent/refusal-index/samples'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/samples'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexSamplesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/agent/skills/$id': {
@@ -11597,6 +12681,34 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/vibe/tasks/pulse/status'
       fullPath: '/api/$locale/vibe/tasks/pulse/status'
       preLoaderRoute: typeof ApiLocaleVibeTasksPulseStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/watchdog/budget-caps': {
+      id: '/api/$locale/vibe/tasks/watchdog/budget-caps'
+      path: '/api/$locale/vibe/tasks/watchdog/budget-caps'
+      fullPath: '/api/$locale/vibe/tasks/watchdog/budget-caps'
+      preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogBudgetCapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/watchdog/cancel': {
+      id: '/api/$locale/vibe/tasks/watchdog/cancel'
+      path: '/api/$locale/vibe/tasks/watchdog/cancel'
+      fullPath: '/api/$locale/vibe/tasks/watchdog/cancel'
+      preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/watchdog/health': {
+      id: '/api/$locale/vibe/tasks/watchdog/health'
+      path: '/api/$locale/vibe/tasks/watchdog/health'
+      fullPath: '/api/$locale/vibe/tasks/watchdog/health'
+      preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tasks/watchdog/sweep': {
+      id: '/api/$locale/vibe/tasks/watchdog/sweep'
+      path: '/api/$locale/vibe/tasks/watchdog/sweep'
+      fullPath: '/api/$locale/vibe/tasks/watchdog/sweep'
+      preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogSweepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/companies/$companyId/members/$memberId/remove': {
@@ -11844,6 +12956,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/refusal-index/model/$modelId': {
+      id: '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+      path: '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/model/$modelId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/agent/refusal-index/questions/$id': {
+      id: '/api/$locale/vibe/agent/refusal-index/questions/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/questions/$id'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsRoute
+    }
+    '/api/$locale/vibe/agent/refusal-index/runs/$id': {
+      id: '/api/$locale/vibe/agent/refusal-index/runs/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/runs/$id'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRoute
+    }
+    '/api/$locale/vibe/agent/refusal-index/runs/start': {
+      id: '/api/$locale/vibe/agent/refusal-index/runs/start'
+      path: '/start'
+      fullPath: '/api/$locale/vibe/agent/refusal-index/runs/start'
+      preLoaderRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsStartRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRoute
+    }
     '/api/$locale/vibe/agent/skills/$id/publish': {
       id: '/api/$locale/vibe/agent/skills/$id/publish'
       path: '/publish'
@@ -11970,6 +13110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': {
+      id: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+      path: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+      fullPath: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+      preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': {
       id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
       path: '/create'
@@ -12003,6 +13150,13 @@ declare module '@tanstack/react-router' {
       path: '/permissions'
       fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/permissions'
       preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRoute
+    }
+    '/api/$locale/vibe/agent/chat/threads/$threadId/report': {
+      id: '/api/$locale/vibe/agent/chat/threads/$threadId/report'
+      path: '/report'
+      fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/report'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdReportRouteImport
       parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdRoute
     }
     '/api/$locale/vibe/agent/chat/threads/$threadId/share-links': {
@@ -12061,6 +13215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRouteImport
       parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
     }
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project'
+      path: '/project'
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute
+    }
     '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename': {
       id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/rename'
       path: '/rename'
@@ -12103,12 +13264,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsFilesThreadIdFilenameRouteImport
       parentRoute: typeof ApiLocaleVibeAgentChatThreadsRoute
     }
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files'
+      path: '/files'
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute
+    }
     '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote': {
       id: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
       path: '/vote'
       fullPath: '/api/$locale/vibe/agent/chat/threads/$threadId/messages/$messageId/vote'
       preLoaderRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRouteImport
       parentRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRoute
+    }
+    '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId': {
+      id: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId'
+      path: '/$fileId'
+      fullPath: '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId/project/files/$fileId'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute
     }
   }
 }
@@ -12125,6 +13300,22 @@ const LocaleHelpRouteWithChildren = LocaleHelpRoute._addFileChildren(
   LocaleHelpRouteChildren,
 )
 
+interface LocaleModelsRouteChildren {
+  LocaleModelsIndexRoute: typeof LocaleModelsIndexRoute
+  LocaleModelsModelIdIndexRoute: typeof LocaleModelsModelIdIndexRoute
+  LocaleModelsCompareABIndexRoute: typeof LocaleModelsCompareABIndexRoute
+}
+
+const LocaleModelsRouteChildren: LocaleModelsRouteChildren = {
+  LocaleModelsIndexRoute: LocaleModelsIndexRoute,
+  LocaleModelsModelIdIndexRoute: LocaleModelsModelIdIndexRoute,
+  LocaleModelsCompareABIndexRoute: LocaleModelsCompareABIndexRoute,
+}
+
+const LocaleModelsRouteWithChildren = LocaleModelsRoute._addFileChildren(
+  LocaleModelsRouteChildren,
+)
+
 interface LocaleStoryRouteChildren {
   LocaleStoryIndexRoute: typeof LocaleStoryIndexRoute
   LocaleStoryAboutUsIndexRoute: typeof LocaleStoryAboutUsIndexRoute
@@ -12137,6 +13328,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryInvestIndexRoute: typeof LocaleStoryInvestIndexRoute
   LocaleStoryNewsletterIndexRoute: typeof LocaleStoryNewsletterIndexRoute
   LocaleStoryPrivacyPolicyIndexRoute: typeof LocaleStoryPrivacyPolicyIndexRoute
+  LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
@@ -12156,6 +13348,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogWhatsNewNovember2026IndexRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
   LocaleStoryNewsletterEmailIndexRoute: typeof LocaleStoryNewsletterEmailIndexRoute
   LocaleStoryNewsletterUnsubscribeIndexRoute: typeof LocaleStoryNewsletterUnsubscribeIndexRoute
+  LocaleStoryNewsletterConfirmTokenIndexRoute: typeof LocaleStoryNewsletterConfirmTokenIndexRoute
   LocaleStoryNewsletterUnsubscribeEmailIndexRoute: typeof LocaleStoryNewsletterUnsubscribeEmailIndexRoute
 }
 
@@ -12171,6 +13364,7 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryInvestIndexRoute: LocaleStoryInvestIndexRoute,
   LocaleStoryNewsletterIndexRoute: LocaleStoryNewsletterIndexRoute,
   LocaleStoryPrivacyPolicyIndexRoute: LocaleStoryPrivacyPolicyIndexRoute,
+  LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
@@ -12206,6 +13400,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryNewsletterEmailIndexRoute: LocaleStoryNewsletterEmailIndexRoute,
   LocaleStoryNewsletterUnsubscribeIndexRoute:
     LocaleStoryNewsletterUnsubscribeIndexRoute,
+  LocaleStoryNewsletterConfirmTokenIndexRoute:
+    LocaleStoryNewsletterConfirmTokenIndexRoute,
   LocaleStoryNewsletterUnsubscribeEmailIndexRoute:
     LocaleStoryNewsletterUnsubscribeEmailIndexRoute,
 }
@@ -12276,6 +13472,7 @@ interface LocaleUserAuthRouteChildren {
   LocaleUserAuthLoginIndexRoute: typeof LocaleUserAuthLoginIndexRoute
   LocaleUserAuthResetPasswordIndexRoute: typeof LocaleUserAuthResetPasswordIndexRoute
   LocaleUserAuthResetPasswordTokenIndexRoute: typeof LocaleUserAuthResetPasswordTokenIndexRoute
+  LocaleUserAuthVerifyEmailTokenIndexRoute: typeof LocaleUserAuthVerifyEmailTokenIndexRoute
 }
 
 const LocaleUserAuthRouteChildren: LocaleUserAuthRouteChildren = {
@@ -12284,11 +13481,24 @@ const LocaleUserAuthRouteChildren: LocaleUserAuthRouteChildren = {
   LocaleUserAuthResetPasswordIndexRoute: LocaleUserAuthResetPasswordIndexRoute,
   LocaleUserAuthResetPasswordTokenIndexRoute:
     LocaleUserAuthResetPasswordTokenIndexRoute,
+  LocaleUserAuthVerifyEmailTokenIndexRoute:
+    LocaleUserAuthVerifyEmailTokenIndexRoute,
 }
 
 const LocaleUserAuthRouteWithChildren = LocaleUserAuthRoute._addFileChildren(
   LocaleUserAuthRouteChildren,
 )
+
+interface ApiLocaleApiKeysRouteChildren {
+  ApiLocaleApiKeysIdRoute: typeof ApiLocaleApiKeysIdRoute
+}
+
+const ApiLocaleApiKeysRouteChildren: ApiLocaleApiKeysRouteChildren = {
+  ApiLocaleApiKeysIdRoute: ApiLocaleApiKeysIdRoute,
+}
+
+const ApiLocaleApiKeysRouteWithChildren =
+  ApiLocaleApiKeysRoute._addFileChildren(ApiLocaleApiKeysRouteChildren)
 
 interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsAdminAddRoute: typeof ApiLocaleCreditsAdminAddRoute
@@ -12302,6 +13512,7 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsDataSourcesCreditsExpiredRoute: typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
   ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
+  ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
   ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute: typeof ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute
   ApiLocaleCreditsDataSourcesCreditsPurchasedRoute: typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   ApiLocaleCreditsDataSourcesCreditsRefundedRoute: typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
@@ -12333,6 +13544,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
     ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute,
   ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute:
     ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute,
+  ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute:
+    ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute,
   ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute:
     ApiLocaleCreditsDataSourcesCreditsPacksCreatedRoute,
   ApiLocaleCreditsDataSourcesCreditsPurchasedRoute:
@@ -12504,6 +13717,7 @@ interface ApiLocaleReferralRouteChildren {
   ApiLocaleReferralDataSourcesReferralsLeadClicksRoute: typeof ApiLocaleReferralDataSourcesReferralsLeadClicksRoute
   ApiLocaleReferralDataSourcesReferralsPayoutsRoute: typeof ApiLocaleReferralDataSourcesReferralsPayoutsRoute
   ApiLocaleReferralDataSourcesReferralsSignupsRoute: typeof ApiLocaleReferralDataSourcesReferralsSignupsRoute
+  ApiLocaleReferralEarningsConfirmRoute: typeof ApiLocaleReferralEarningsConfirmRoute
   ApiLocaleReferralEarningsListRoute: typeof ApiLocaleReferralEarningsListRoute
   ApiLocaleReferralLeadCurrentRoute: typeof ApiLocaleReferralLeadCurrentRoute
 }
@@ -12525,6 +13739,7 @@ const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
     ApiLocaleReferralDataSourcesReferralsPayoutsRoute,
   ApiLocaleReferralDataSourcesReferralsSignupsRoute:
     ApiLocaleReferralDataSourcesReferralsSignupsRoute,
+  ApiLocaleReferralEarningsConfirmRoute: ApiLocaleReferralEarningsConfirmRoute,
   ApiLocaleReferralEarningsListRoute: ApiLocaleReferralEarningsListRoute,
   ApiLocaleReferralLeadCurrentRoute: ApiLocaleReferralLeadCurrentRoute,
 }
@@ -12635,12 +13850,15 @@ const ApiLocaleLeadsTrackingRouteWithChildren =
 
 interface ApiLocaleNewsletterUnsubscribeRouteChildren {
   ApiLocaleNewsletterUnsubscribeSyncRoute: typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  ApiLocaleNewsletterUnsubscribeOneclickTokenRoute: typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
 }
 
 const ApiLocaleNewsletterUnsubscribeRouteChildren: ApiLocaleNewsletterUnsubscribeRouteChildren =
   {
     ApiLocaleNewsletterUnsubscribeSyncRoute:
       ApiLocaleNewsletterUnsubscribeSyncRoute,
+    ApiLocaleNewsletterUnsubscribeOneclickTokenRoute:
+      ApiLocaleNewsletterUnsubscribeOneclickTokenRoute,
   }
 
 const ApiLocaleNewsletterUnsubscribeRouteWithChildren =
@@ -12737,7 +13955,9 @@ const ApiLocaleUserPrivateMeAddressesRouteWithChildren =
 interface ApiLocaleUserPrivateMeRouteChildren {
   ApiLocaleUserPrivateMeAddressesRoute: typeof ApiLocaleUserPrivateMeAddressesRouteWithChildren
   ApiLocaleUserPrivateMeAvatarRoute: typeof ApiLocaleUserPrivateMeAvatarRoute
+  ApiLocaleUserPrivateMeExportRoute: typeof ApiLocaleUserPrivateMeExportRoute
   ApiLocaleUserPrivateMePasswordRoute: typeof ApiLocaleUserPrivateMePasswordRoute
+  ApiLocaleUserPrivateMeTwoFactorRoute: typeof ApiLocaleUserPrivateMeTwoFactorRoute
 }
 
 const ApiLocaleUserPrivateMeRouteChildren: ApiLocaleUserPrivateMeRouteChildren =
@@ -12745,7 +13965,9 @@ const ApiLocaleUserPrivateMeRouteChildren: ApiLocaleUserPrivateMeRouteChildren =
     ApiLocaleUserPrivateMeAddressesRoute:
       ApiLocaleUserPrivateMeAddressesRouteWithChildren,
     ApiLocaleUserPrivateMeAvatarRoute: ApiLocaleUserPrivateMeAvatarRoute,
+    ApiLocaleUserPrivateMeExportRoute: ApiLocaleUserPrivateMeExportRoute,
     ApiLocaleUserPrivateMePasswordRoute: ApiLocaleUserPrivateMePasswordRoute,
+    ApiLocaleUserPrivateMeTwoFactorRoute: ApiLocaleUserPrivateMeTwoFactorRoute,
   }
 
 const ApiLocaleUserPrivateMeRouteWithChildren =
@@ -13011,6 +14233,7 @@ const ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren =
 interface ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren {
   ApiLocaleVibeAgentChatThreadsThreadIdMessagesRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren
   ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute
+  ApiLocaleVibeAgentChatThreadsThreadIdReportRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdReportRoute
   ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute
 }
 
@@ -13020,6 +14243,8 @@ const ApiLocaleVibeAgentChatThreadsThreadIdRouteChildren: ApiLocaleVibeAgentChat
       ApiLocaleVibeAgentChatThreadsThreadIdMessagesRouteWithChildren,
     ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute:
       ApiLocaleVibeAgentChatThreadsThreadIdPermissionsRoute,
+    ApiLocaleVibeAgentChatThreadsThreadIdReportRoute:
+      ApiLocaleVibeAgentChatThreadsThreadIdReportRoute,
     ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute:
       ApiLocaleVibeAgentChatThreadsThreadIdShareLinksRoute,
   }
@@ -13056,6 +14281,39 @@ const ApiLocaleVibeAgentChatThreadsRouteWithChildren =
     ApiLocaleVibeAgentChatThreadsRouteChildren,
   )
 
+interface ApiLocaleVibeAgentRefusalIndexQuestionsRouteChildren {
+  ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute
+}
+
+const ApiLocaleVibeAgentRefusalIndexQuestionsRouteChildren: ApiLocaleVibeAgentRefusalIndexQuestionsRouteChildren =
+  {
+    ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute:
+      ApiLocaleVibeAgentRefusalIndexQuestionsIdRoute,
+  }
+
+const ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren =
+  ApiLocaleVibeAgentRefusalIndexQuestionsRoute._addFileChildren(
+    ApiLocaleVibeAgentRefusalIndexQuestionsRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentRefusalIndexRunsRouteChildren {
+  ApiLocaleVibeAgentRefusalIndexRunsIdRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsIdRoute
+  ApiLocaleVibeAgentRefusalIndexRunsStartRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsStartRoute
+}
+
+const ApiLocaleVibeAgentRefusalIndexRunsRouteChildren: ApiLocaleVibeAgentRefusalIndexRunsRouteChildren =
+  {
+    ApiLocaleVibeAgentRefusalIndexRunsIdRoute:
+      ApiLocaleVibeAgentRefusalIndexRunsIdRoute,
+    ApiLocaleVibeAgentRefusalIndexRunsStartRoute:
+      ApiLocaleVibeAgentRefusalIndexRunsStartRoute,
+  }
+
+const ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren =
+  ApiLocaleVibeAgentRefusalIndexRunsRoute._addFileChildren(
+    ApiLocaleVibeAgentRefusalIndexRunsRouteChildren,
+  )
+
 interface ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren {
   ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
@@ -13074,9 +14332,40 @@ const ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren =
     ApiLocaleVibeAgentChatFoldersRootFolderIdRouteChildren,
   )
 
+interface ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteChildren {
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute
+}
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteChildren: ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteChildren =
+  {
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesFileIdRoute,
+  }
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute._addFileChildren(
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteChildren,
+  )
+
+interface ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteChildren {
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren
+}
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteChildren: ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteChildren =
+  {
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectFilesRouteWithChildren,
+  }
+
+const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren =
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute._addFileChildren(
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteChildren,
+  )
+
 interface ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren {
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute
+  ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute
 }
@@ -13087,6 +14376,8 @@ const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteChildren: ApiLocale
       ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdMoveRoute,
     ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute:
       ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdPermissionsRoute,
+    ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRoute:
+      ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdProjectRouteWithChildren,
     ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute:
       ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRenameRoute,
     ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdUpdateRoute:
@@ -13100,8 +14391,10 @@ const ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   LocaleSplatRoute: LocaleSplatRoute,
   LocaleHelpRoute: LocaleHelpRouteWithChildren,
+  LocaleModelsRoute: LocaleModelsRouteWithChildren,
   LocaleStoryRoute: LocaleStoryRouteWithChildren,
   LocaleSubscriptionRoute: LocaleSubscriptionRouteWithChildren,
   LocaleThreadsRoute: LocaleThreadsRouteWithChildren,
@@ -13111,6 +14404,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleUserAccountRoute: LocaleUserAccountRouteWithChildren,
   LocaleUserAuthRoute: LocaleUserAuthRouteWithChildren,
   ApiLocaleNotFoundRoute: ApiLocaleNotFoundRoute,
+  ApiLocaleApiKeysRoute: ApiLocaleApiKeysRouteWithChildren,
   ApiLocaleContactRoute: ApiLocaleContactRoute,
   ApiLocaleCreditsRoute: ApiLocaleCreditsRouteWithChildren,
   ApiLocaleManifestRoute: ApiLocaleManifestRoute,
@@ -13174,6 +14468,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleDesktopScrollRoute: ApiLocaleDesktopScrollRoute,
   ApiLocaleDesktopTakeScreenshotRoute: ApiLocaleDesktopTakeScreenshotRoute,
   ApiLocaleDesktopTypeTextRoute: ApiLocaleDesktopTypeTextRoute,
+  ApiLocaleFinanceIngestRoute: ApiLocaleFinanceIngestRoute,
+  ApiLocaleFinanceStatusRoute: ApiLocaleFinanceStatusRoute,
+  ApiLocaleFinanceThresholdsRoute: ApiLocaleFinanceThresholdsRoute,
   ApiLocaleInventoryDashboardRoute: ApiLocaleInventoryDashboardRoute,
   ApiLocaleLeadMagnetCaptureRoute: ApiLocaleLeadMagnetCaptureRoute,
   ApiLocaleLeadMagnetCapturesRoute: ApiLocaleLeadMagnetCapturesRoute,
@@ -13191,10 +14488,15 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadsStatsRoute: ApiLocaleLeadsStatsRoute,
   ApiLocaleLeadsTrackingRoute: ApiLocaleLeadsTrackingRouteWithChildren,
   ApiLocaleMessengerSendRoute: ApiLocaleMessengerSendRoute,
+  ApiLocaleNewsletterConfirmRoute: ApiLocaleNewsletterConfirmRoute,
   ApiLocaleNewsletterStatusRoute: ApiLocaleNewsletterStatusRoute,
   ApiLocaleNewsletterSubscribeRoute: ApiLocaleNewsletterSubscribeRoute,
   ApiLocaleNewsletterUnsubscribeRoute:
     ApiLocaleNewsletterUnsubscribeRouteWithChildren,
+  ApiLocaleNotificationsListRoute: ApiLocaleNotificationsListRoute,
+  ApiLocaleNotificationsReadRoute: ApiLocaleNotificationsReadRoute,
+  ApiLocaleNotificationsUnreadCountRoute:
+    ApiLocaleNotificationsUnreadCountRoute,
   ApiLocalePosDashboardRoute: ApiLocalePosDashboardRoute,
   ApiLocalePosProductLookupRoute: ApiLocalePosProductLookupRoute,
   ApiLocalePurchasingDashboardRoute: ApiLocalePurchasingDashboardRoute,
@@ -13204,6 +14506,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUsersListRoute: ApiLocaleUsersListRoute,
   ApiLocaleUsersStatsRoute: ApiLocaleUsersStatsRoute,
   ApiLocaleUsersViewRoute: ApiLocaleUsersViewRoute,
+  ApiLocaleV1ModelsRoute: ApiLocaleV1ModelsRoute,
   ApiLocaleVibeExecuteToolRoute: ApiLocaleVibeExecuteToolRouteWithChildren,
   ApiLocaleVibeHelpToolRoute: ApiLocaleVibeHelpToolRoute,
   LocaleCreatorUserIdIndexRoute: LocaleCreatorUserIdIndexRoute,
@@ -13213,6 +14516,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleAnalyticsEvaluatorsAndRoute: ApiLocaleAnalyticsEvaluatorsAndRoute,
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute:
     ApiLocaleAnalyticsEvaluatorsCrossoverRoute,
+  ApiLocaleAnalyticsEvaluatorsDropRoute: ApiLocaleAnalyticsEvaluatorsDropRoute,
   ApiLocaleAnalyticsEvaluatorsNotRoute: ApiLocaleAnalyticsEvaluatorsNotRoute,
   ApiLocaleAnalyticsEvaluatorsOrRoute: ApiLocaleAnalyticsEvaluatorsOrRoute,
   ApiLocaleAnalyticsEvaluatorsScriptRoute:
@@ -13275,6 +14579,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleCompaniesCompanyIdOnboardRoute,
   ApiLocaleCompaniesCompanyIdUpdateRoute:
     ApiLocaleCompaniesCompanyIdUpdateRoute,
+  ApiLocaleFinanceDataSourcesFinanceSeriesRoute:
+    ApiLocaleFinanceDataSourcesFinanceSeriesRoute,
   ApiLocaleInventoryStockAdjustRoute: ApiLocaleInventoryStockAdjustRoute,
   ApiLocaleInventoryStockIssueRoute: ApiLocaleInventoryStockIssueRoute,
   ApiLocaleInventoryStockListRoute: ApiLocaleInventoryStockListRoute,
@@ -13364,6 +14670,12 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute,
   ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute:
     ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute,
+  ApiLocaleLeadsGrowthLinksRoute: ApiLocaleLeadsGrowthLinksRoute,
+  ApiLocaleLeadsGrowthSpendRoute: ApiLocaleLeadsGrowthSpendRoute,
+  ApiLocaleLeadsLifecycleBackfillRoute: ApiLocaleLeadsLifecycleBackfillRoute,
+  ApiLocaleLeadsLifecycleOverviewRoute: ApiLocaleLeadsLifecycleOverviewRoute,
+  ApiLocaleLeadsLifecycleRunRoute: ApiLocaleLeadsLifecycleRunRoute,
+  ApiLocaleLeadsLifecycleSettingsRoute: ApiLocaleLeadsLifecycleSettingsRoute,
   ApiLocaleMessengerAccountsCreateRoute: ApiLocaleMessengerAccountsCreateRoute,
   ApiLocaleMessengerAccountsListRoute: ApiLocaleMessengerAccountsListRoute,
   ApiLocaleMessengerDataSourcesMessengerBouncedRoute:
@@ -13388,6 +14700,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleMessengerPreviewRenderRoute: ApiLocaleMessengerPreviewRenderRoute,
   ApiLocaleMessengerPreviewSendTestRoute:
     ApiLocaleMessengerPreviewSendTestRoute,
+  ApiLocaleMessengerSystemMailboxInboxRoute:
+    ApiLocaleMessengerSystemMailboxInboxRoute,
+  ApiLocaleMessengerSystemMailboxMessageRoute:
+    ApiLocaleMessengerSystemMailboxMessageRoute,
+  ApiLocaleMessengerSystemMailboxReportRoute:
+    ApiLocaleMessengerSystemMailboxReportRoute,
+  ApiLocaleMessengerSystemMailboxSendRoute:
+    ApiLocaleMessengerSystemMailboxSendRoute,
   ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute:
     ApiLocaleNewsletterDataSourcesNewsletterCampaignsSentRoute,
   ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRoute:
@@ -13439,7 +14759,9 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleUserPrivateSessionsRouteWithChildren,
   ApiLocaleUserPublicLoginRoute: ApiLocaleUserPublicLoginRouteWithChildren,
   ApiLocaleUserPublicSignupRoute: ApiLocaleUserPublicSignupRoute,
+  ApiLocaleUserPublicVerifyEmailRoute: ApiLocaleUserPublicVerifyEmailRoute,
   ApiLocaleUsersUserIdRoute: ApiLocaleUsersUserIdRouteWithChildren,
+  ApiLocaleV1ChatCompletionsRoute: ApiLocaleV1ChatCompletionsRoute,
   ApiLocaleVibeAgentCodingAgentRoute: ApiLocaleVibeAgentCodingAgentRoute,
   ApiLocaleVibeAgentDescribeImageRoute: ApiLocaleVibeAgentDescribeImageRoute,
   ApiLocaleVibeAgentDescribeVideoRoute: ApiLocaleVibeAgentDescribeVideoRoute,
@@ -13508,6 +14830,10 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute,
   ApiLocaleLeadsCampaignsEmailsTestMailRoute:
     ApiLocaleLeadsCampaignsEmailsTestMailRoute,
+  ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute:
+    ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute,
+  ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute:
+    ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute,
   ApiLocaleMessengerAccountsEditIdRoute: ApiLocaleMessengerAccountsEditIdRoute,
   ApiLocalePosOrderOrderIdAddItemRoute: ApiLocalePosOrderOrderIdAddItemRoute,
   ApiLocalePosOrderOrderIdAddPaymentRoute:
@@ -13560,6 +14886,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeAgentAiStreamCancelRoute: ApiLocaleVibeAgentAiStreamCancelRoute,
   ApiLocaleVibeAgentAiStreamRunRoute: ApiLocaleVibeAgentAiStreamRunRoute,
   ApiLocaleVibeAgentAiStreamStreamRoute: ApiLocaleVibeAgentAiStreamStreamRoute,
+  ApiLocaleVibeAgentChatModerationRoute: ApiLocaleVibeAgentChatModerationRoute,
   ApiLocaleVibeAgentChatPublicFeedRoute: ApiLocaleVibeAgentChatPublicFeedRoute,
   ApiLocaleVibeAgentChatSettingsRoute: ApiLocaleVibeAgentChatSettingsRoute,
   ApiLocaleVibeAgentChatThreadsRoute:
@@ -13577,6 +14904,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeAgentCortexTreeRoute: ApiLocaleVibeAgentCortexTreeRoute,
   ApiLocaleVibeAgentCortexWriteRoute: ApiLocaleVibeAgentCortexWriteRoute,
   ApiLocaleVibeAgentModelsListRoute: ApiLocaleVibeAgentModelsListRoute,
+  ApiLocaleVibeAgentRefusalIndexLeaderboardRoute:
+    ApiLocaleVibeAgentRefusalIndexLeaderboardRoute,
+  ApiLocaleVibeAgentRefusalIndexQuestionsRoute:
+    ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren,
+  ApiLocaleVibeAgentRefusalIndexRunsRoute:
+    ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren,
+  ApiLocaleVibeAgentRefusalIndexSamplesRoute:
+    ApiLocaleVibeAgentRefusalIndexSamplesRoute,
   ApiLocaleVibeLoggerErrorMonitorCleanupRoute:
     ApiLocaleVibeLoggerErrorMonitorCleanupRoute,
   ApiLocaleVibeLoggerErrorMonitorClientLogRoute:
@@ -13605,6 +14940,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeTasksPulseExecuteRoute: ApiLocaleVibeTasksPulseExecuteRoute,
   ApiLocaleVibeTasksPulseHistoryRoute: ApiLocaleVibeTasksPulseHistoryRoute,
   ApiLocaleVibeTasksPulseStatusRoute: ApiLocaleVibeTasksPulseStatusRoute,
+  ApiLocaleVibeTasksWatchdogBudgetCapsRoute:
+    ApiLocaleVibeTasksWatchdogBudgetCapsRoute,
+  ApiLocaleVibeTasksWatchdogCancelRoute: ApiLocaleVibeTasksWatchdogCancelRoute,
+  ApiLocaleVibeTasksWatchdogHealthRoute: ApiLocaleVibeTasksWatchdogHealthRoute,
+  ApiLocaleVibeTasksWatchdogSweepRoute: ApiLocaleVibeTasksWatchdogSweepRoute,
   ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute:
     ApiLocaleCompaniesCompanyIdMembersMemberIdRemoveRoute,
   ApiLocaleCompaniesCompanyIdMembersMemberIdUpdateRoleRoute:
@@ -13647,6 +14987,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren,
   ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute:
     ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute,
+  ApiLocaleVibeAgentRefusalIndexModelModelIdRoute:
+    ApiLocaleVibeAgentRefusalIndexModelModelIdRoute,
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute:
     ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute,
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute:
@@ -13655,6 +14997,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute,
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute:
     ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute,
+  ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute:
+    ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute,
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute:
     ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren,
   ApiLocaleVibePlatformsAiSkillsAGENTMdRoute:

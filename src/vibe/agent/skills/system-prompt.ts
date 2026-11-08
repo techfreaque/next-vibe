@@ -25,9 +25,16 @@ export const skillFragment: SystemPromptFragment = {
       );
 
       if (!result.success) {
-        logger.warn("Skill not found, using default behavior", {
+        // Unknown ids come from callers (a model-chosen skillId on a sub-agent
+        // run, a favorite pointing at a deleted custom skill) and degrade
+        // gracefully to the default persona - warn (could be a stale favorite).
+        const logFn =
+          result.errorType.errorCode >= 500 ? logger.error : logger.warn;
+        logFn.bind(logger)("Skill not found, using default behavior", {
           skillId,
           error: result.message,
+          errorCode: result.errorType.errorCode,
+          isPublic: user.isPublic,
         });
         return null;
       }

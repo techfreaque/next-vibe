@@ -21,7 +21,6 @@ export const translations: typeof enTranslations = {
       "Jak trzy pliki stają się formularzem webowym, poleceniem CLI, narzędziem MCP, ekranem natywnym i automatycznym zadaniem - jednocześnie.",
     fileBarLabel: "definition.ts → web · cli · mcp · native · cron · 10 więcej",
     theaCardTitle: "Kim jest Thea?",
-    allowedRolesLabel: "allowedRoles: [...]",
     fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",

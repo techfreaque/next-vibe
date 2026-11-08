@@ -75,6 +75,10 @@ export const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
+      earnedCreditsPending: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.coerce.number(),
+      }),
       payoutHistory: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
@@ -99,6 +103,7 @@ export const { GET } = createEndpoint({
         earnedCreditsTotal: 500,
         earnedCreditsAvailable: 500,
         earnedCreditsLocked: 0,
+        earnedCreditsPending: 120,
         payoutHistory: [],
       },
     },

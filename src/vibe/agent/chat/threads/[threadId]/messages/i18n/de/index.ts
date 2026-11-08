@@ -40,6 +40,10 @@ export const translations: typeof enTranslations = {
     hideVideoDescription: "Videobeschreibung ausblenden",
   },
   errorCode: "Fehlercode",
+  errorActions: {
+    retry: "Erneut senden",
+    tryAnotherModel: "Anderes Modell wählen",
+  },
   streamInterrupted: {
     label: "Generierung gestoppt",
     hint: "Teilantwort gespeichert. Neue Nachricht senden zum Fortfahren.",
@@ -110,7 +114,7 @@ export const translations: typeof enTranslations = {
             content: "Model",
           },
           skill: {
-            content: "Charakter",
+            content: "Skill",
           },
           tokens: {
             content: "Tokens",
@@ -221,8 +225,8 @@ export const translations: typeof enTranslations = {
       description: "AI model to use for response",
     },
     skill: {
-      label: "Charakter",
-      description: "KI-Charakter/Persona für die Nachricht",
+      label: "Skill",
+      description: "KI-Skill/Persona für die Nachricht",
     },
     metadata: {
       label: "Metadaten",

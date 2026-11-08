@@ -215,9 +215,6 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.QWEN_3_6_PLUS_UNCENSORED]: makeImageVisionOption(
     ImageVisionModelId.QWEN_3_6_PLUS_UNCENSORED,
   ),
-  [ImageVisionModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]: makeImageVisionOption(
-    ImageVisionModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-  ),
   [ImageVisionModelId.MIMO_V2_6_FLASH_ABLITERATED]: makeImageVisionOption(
     ImageVisionModelId.MIMO_V2_6_FLASH_ABLITERATED,
   ),
@@ -323,26 +320,14 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.GPT_6_ASTRA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_ASTRA,
   ),
-  [ImageVisionModelId.GPT_6_ASTRA_PRO]: makeImageVisionOption(
-    ImageVisionModelId.GPT_6_ASTRA_PRO,
-  ),
   [ImageVisionModelId.GPT_6_1_SOL]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_1_SOL,
-  ),
-  [ImageVisionModelId.GPT_6_1_SOL_PRO]: makeImageVisionOption(
-    ImageVisionModelId.GPT_6_1_SOL_PRO,
   ),
   [ImageVisionModelId.GPT_6_1_TERRA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_1_TERRA,
   ),
-  [ImageVisionModelId.GPT_6_1_TERRA_PRO]: makeImageVisionOption(
-    ImageVisionModelId.GPT_6_1_TERRA_PRO,
-  ),
   [ImageVisionModelId.GPT_6_LUNA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_LUNA,
-  ),
-  [ImageVisionModelId.GPT_6_LUNA_PRO]: makeImageVisionOption(
-    ImageVisionModelId.GPT_6_LUNA_PRO,
   ),
   [ImageVisionModelId.GEMINI_4_ARGON]: makeImageVisionOption(
     ImageVisionModelId.GEMINI_4_ARGON,

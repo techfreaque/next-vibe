@@ -26,7 +26,13 @@ declare const plv8: Plv8Global;
 export const getPoolBalance = defineDbFunction({
   name: "credits_get_pool_balance",
   tables: [creditWallets, creditPacks, creditTransactions],
-  params: { p_user_id: "uuid", p_lead_id: "uuid" } as const,
+  // p_free_cap: the pool's monthly free allowance, resolved in TS
+  // (tier + confirmed newsletter bonus, see credits/free-allowance.ts)
+  params: {
+    p_user_id: "uuid",
+    p_lead_id: "uuid",
+    p_free_cap: "numeric",
+  } as const,
   returns: {
     total: "numeric",
     free: "numeric",
@@ -264,8 +270,8 @@ export const getPoolBalance = defineDbFunction({
   }),
 
   // eslint-disable-next-line no-unused-vars -- p_lead_id used by compiled queries (q.*ForLead), not directly in logic body
-  logic: (q, { p_user_id, p_lead_id: _p_lead_id }) => {
-    const MAX_FREE_PER_POOL = 20;
+  logic: (q, { p_user_id, p_lead_id: _p_lead_id, p_free_cap }) => {
+    const MAX_FREE_PER_POOL = Number(p_free_cap) || 0;
 
     // ── Step 1: Determine which query set to use (user vs lead pool) ──────
     const isUserPool = p_user_id !== null;

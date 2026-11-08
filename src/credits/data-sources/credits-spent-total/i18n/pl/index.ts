@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Łączne wydatki",
-    title: "Łączne wydane kredyty",
+    titleShort: "Całość wydatków",
+    title: "Całe wydatki (leady + użytkownicy, płatne + darmowe)",
     description:
-      "Suma wszystkich kwot transakcji użytkowania na przedział rozdzielczości",
+      "Każda transakcja użytkowania, płatna i darmowa, leady i użytkownicy. Obejmuje wydatki, których publiczny limit nie liczy.",
     fields: {
       resolution: {
         label: "Rozdzielczość",
@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
       result: {
-        label: "Łączne wydane kredyty",
+        label: "Całe wydatki",
         description: "Wyjściowa seria czasowa",
       },
       meta: { label: "Meta", description: "Metadane wykonania węzła" },

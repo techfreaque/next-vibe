@@ -110,6 +110,8 @@ export const translations = {
       notConfigured:
         "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
       providerUnsupported: "{{label}} is not supported yet",
+      modelUnavailable:
+        "This model is temporarily unavailable. Pick another model.",
       insufficientCredits:
         "Insufficient credits. Balance: {{balance}}, required: {{minimum}}",
       balanceCheckFailed: "Failed to check your credit balance",

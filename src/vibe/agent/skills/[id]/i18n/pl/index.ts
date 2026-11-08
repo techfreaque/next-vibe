@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Narzędzia AI",
   tags: {
-    skills: "Postacie",
+    skills: "Skille",
   },
   voices: {
     MALE: "Męski głos",
@@ -31,26 +31,26 @@ export const translations: typeof enTranslations = {
   },
 
   get: {
-    title: "Pobierz postacię",
+    title: "Pobierz skill",
     titleShort: "Szczegóły skilla",
-    dynamicTitle: "Postać: {{name}}",
-    description: "Pobierz konkretną postacię według ID",
+    dynamicTitle: "Skill: {{name}}",
+    description: "Pobierz konkretną skill według ID",
     container: {
-      title: "Szczegóły postaciy",
-      description: "Szczegóły żądanej postaciy",
+      title: "Szczegóły skilla",
+      description: "Szczegóły żądanej skilla",
     },
     backButton: {
-      label: "Powrót do postaci",
+      label: "Powrót do skilli",
     },
     openFullPage: "Otwórz pełną stronę",
     editButton: {
-      label: "Edytuj postać",
+      label: "Edytuj skill",
     },
     customizeButton: {
-      label: "Dostosuj postać",
+      label: "Dostosuj skill",
     },
     deleteButton: {
-      label: "Usuń postać",
+      label: "Usuń skill",
     },
     addToFavoritesButton: {
       label: "Dodaj do ulubionych",
@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
     useNow: "Użyj teraz",
     goToChat: "Przejdź do czatu",
     addAnother: "Dodaj kolejną",
-    addAnotherTooltip: "Dodaj kolejną instancję tej postaci do swojej kolekcji",
+    addAnotherTooltip: "Dodaj kolejną instancję tego skilla do swojej kolekcji",
     variants: {
       title: "Wybierz model",
     },
@@ -81,11 +81,11 @@ export const translations: typeof enTranslations = {
       c: "C: Card Hero",
       d: "D: Two-Row",
     },
-    addVariant: "Dodaj wariant",
+    addVariant: "Dodaj kolejny model",
     addVariantHint: "Inny model, osobowość lub styl",
-    yourskill: "Twoja postać",
+    yourskill: "Twój skill",
     signupPrompt: {
-      title: "Dostosuj tę postać",
+      title: "Dostosuj ten skill",
       description:
         "Stwórz spersonalizowaną wersję z własnymi ustawieniami i preferencjami. Zarejestruj się, aby rozpocząć.",
       backButton: "Wstecz",
@@ -93,8 +93,8 @@ export const translations: typeof enTranslations = {
       loginButton: "Zaloguj się",
     },
     id: {
-      label: "ID postaci",
-      description: "Slug lub przyjazne ID postaci",
+      label: "ID skilla",
+      description: "Slug lub przyjazne ID skilla",
     },
     models: {
       brain: "Mózg",
@@ -121,11 +121,11 @@ export const translations: typeof enTranslations = {
     },
     response: {
       skill: {
-        title: "Postać",
-        id: { content: "ID postaciy" },
-        name: { content: "Nazwa postaciy" },
-        description: { content: "Opis postaciy" },
-        icon: { content: "Ikona postaciy" },
+        title: "Skill",
+        id: { content: "ID skilla" },
+        name: { content: "Nazwa skilla" },
+        description: { content: "Opis skilla" },
+        icon: { content: "Ikona skilla" },
         systemPrompt: { content: "Prompt systemowy" },
         category: { content: "Kategoria" },
         source: { content: "Źródło" },
@@ -162,12 +162,12 @@ export const translations: typeof enTranslations = {
         description: "Nie masz uprawnień do dostępu do tego zasobu",
       },
       notFound: {
-        title: "Postać nie znaleziona",
-        description: "Żądana postać nie istnieje",
+        title: "Skill nie zostaÅ znaleziony",
+        description: "Żądany skill nie istnieje",
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił błąd podczas pobierania postaciy",
+        description: "Wystąpił błąd podczas pobierania skilla",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -187,19 +187,20 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Sukces",
-      description: "Postać pobrana pomyślnie",
+      description: "Skill pobrana pomyślnie",
     },
     share: {
       button: "Udostepnij i zarabiaj",
       titleNamed: "Udostępnij {{name}} i zarabiaj",
-      title: "Udostepnij ten skill i zarabiaj",
+      title: "Udostępnij ten skill i zarabiaj",
       description:
-        "Udostepnij ten skill ze swoim linkiem polecajacym. Zarabiaj 10% prowizji od kazdego nowego uzytkownika.",
+        "Udostępnij ten skill swoim linkiem polecającym. Zarabiaj 10% prowizji od każdego nowego użytkownika.",
       selectCode: "Wybierz kod polecajacy:",
       noCodesYet: "Brak kodow polecajacych",
       createCode: "Stworz kod",
       codePlaceholder: "np. MOJKOD",
       creating: "Tworzenie...",
+      createFailed: "Nie udało się utworzyć kodu. Spróbuj innego.",
       linkReady: "Twoj link do udostepnienia:",
       copied: "Skopiowano!",
       copyLink: "Kopiuj link",
@@ -229,40 +230,40 @@ export const translations: typeof enTranslations = {
     },
   },
   patch: {
-    title: "Aktualizuj postacię",
+    title: "Aktualizuj skill",
     titleShort: "Edytuj skill",
     dynamicTitle: "Edycja: {{name}}",
     container: {
-      title: "Aktualizuj postacię",
-      description: "Modyfikuj istniejącą niestandardową postacię",
+      title: "Aktualizuj skill",
+      description: "Modyfikuj istniejącą niestandardowy skill",
     },
     backButton: {
-      label: "Powrót do postaci",
+      label: "Powrót do skilli",
     },
     deleteButton: {
-      label: "Usuń postać",
+      label: "Usuń skill",
     },
     submitButton: {
-      label: "Aktualizuj postacię",
-      loadingText: "Aktualizowanie postaci...",
+      label: "Aktualizuj skill",
+      loadingText: "Aktualizowanie skilla...",
     },
     actions: {
-      update: "Aktualizuj postacię",
-      updating: "Aktualizowanie postaciy",
+      update: "Aktualizuj skill",
+      updating: "Aktualizowanie skilla",
     },
     response: {
       success: {
-        content: "Postać zaktualizowana pomyślnie",
+        content: "Skill zaktualizowany pomyślnie",
       },
     },
     id: {
-      label: "ID postaci",
-      description: "Slug lub przyjazne ID postaci do aktualizacji",
+      label: "ID skilla",
+      description: "Slug lub przyjazne ID skilla do aktualizacji",
     },
     name: {
       label: "Nazwa",
-      description: "Nazwa postaciy",
-      placeholder: "Wprowadź nazwę postaci",
+      description: "Nazwa skilla",
+      placeholder: "Wprowadź nazwę skilla",
       validation: {
         minLength: "Nazwa musi mieć co najmniej 2 znaki",
         maxLength: "Nazwa musi mieć mniej niż 100 znaków",
@@ -270,8 +271,8 @@ export const translations: typeof enTranslations = {
     },
     description: {
       label: "Opis",
-      description: "Krótki opis postaciy",
-      placeholder: "Opisz cel i możliwości postaci",
+      description: "Krótki opis skilla",
+      placeholder: "Opisz cel i możliwości skilla",
       validation: {
         minLength: "Opis musi mieć co najmniej 10 znaków",
         maxLength: "Opis musi mieć mniej niż 500 znaków",
@@ -279,11 +280,11 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Ikona",
-      description: "Ikona emoji dla postaciy",
+      description: "Ikona emoji dla skilla",
     },
     systemPrompt: {
       label: "Prompt systemowy",
-      description: "Prompt systemowy definiujący zachowanie postaciy",
+      description: "Prompt systemowy definiujący zachowanie skilla",
       placeholder: "Wprowadź prompt systemowy",
       validation: {
         minLength: "Prompt systemowy musi mieć co najmniej 10 znaków",
@@ -292,11 +293,11 @@ export const translations: typeof enTranslations = {
     },
     category: {
       label: "Kategoria",
-      description: "Kategoria, do której należy ta postać",
+      description: "Kategoria, do której należy ten skill",
     },
     tagline: {
       label: "Slogan",
-      description: "Krótki slogan opisujący postać",
+      description: "Krótki slogan opisujący skill",
       placeholder: "Wprowadź slogan",
       validation: {
         minLength: "Slogan musi mieć co najmniej 2 znaki",
@@ -306,12 +307,12 @@ export const translations: typeof enTranslations = {
     source: {
       label: "Źródło",
       description:
-        "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
+        "Źródło tego skilla (wbudowane, niestandardowe lub społecznościowe)",
     },
     isPublic: {
       label: "Udostępnij publicznie",
       description:
-        "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
+        "Włącz, aby udostępnić swój skill społeczności. Po wyłączeniu skill pozostaje prywatny i widoczny tylko dla Ciebie.",
     },
     chatModel: {
       label: "Model czatu",
@@ -319,7 +320,7 @@ export const translations: typeof enTranslations = {
     },
     voice: {
       label: "Głos",
-      description: "Głos tekstu na mowę dla tej postaciy",
+      description: "Głos tekstu na mowę dla tego skilla",
       placeholder: "Domyślny systemu",
     },
     sttModel: {
@@ -359,7 +360,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       label: "Wybór modelu",
-      description: "Jak model AI jest wybierany dla tej postaciy",
+      description: "Jak model AI jest wybierany dla tego skilla",
     },
     variants: {
       label: "Warianty",
@@ -375,17 +376,17 @@ export const translations: typeof enTranslations = {
     },
     preferredModel: {
       label: "Preferowany model",
-      description: "Preferowany model AI dla tej postaciy",
+      description: "Preferowany model AI dla tego skilla",
     },
     availableTools: {
       label: "Dozwolone narzędzia",
       description:
-        "Narzędzia dla tej postaci. Każdy wpis wymaga toolId. Null = ustawienia globalne.",
+        "Narzędzia dla tego skilla. Każdy wpis wymaga toolId. Null = ustawienia globalne.",
     },
     pinnedTools: {
       label: "Przypięte narzędzia",
       description:
-        "Przypięte narzędzia paska narzędzi dla tej postaci. Null = ustawienia globalne.",
+        "Przypięte narzędzia paska narzędzi dla tego skilla. Null = ustawienia globalne.",
     },
     compactTrigger: {
       label: "Próg kompresji (tokeny)",
@@ -396,7 +397,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Błąd walidacji",
-        description: "Dane postaciy są nieprawidłowe",
+        description: "Dane skilla są nieprawidłowe",
       },
       network: {
         title: "Błąd sieci",
@@ -404,19 +405,19 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Musisz być zalogowany, aby aktualizować postaciy",
+        description: "Musisz być zalogowany, aby aktualizować skille",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Nie masz uprawnień do aktualizacji tej postaciy",
+        description: "Nie masz uprawnień do aktualizacji tego skilla",
       },
       notFound: {
-        title: "Postać nie znaleziona",
-        description: "Postać, którą próbujesz zaktualizować, nie istnieje",
+        title: "Skill nie zostaÅ znaleziony",
+        description: "Skill, którą próbujesz zaktualizować, nie istnieje",
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił błąd podczas aktualizacji postaciy",
+        description: "Wystąpił błąd podczas aktualizacji skilla",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -432,35 +433,34 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Postać zaktualizowana",
-      description:
-        "Twoja niestandardowa postać została pomyślnie zaktualizowana",
+      title: "Skill zaktualizowany",
+      description: "Twój niestandardowy skill został pomyślnie zaktualizowany",
     },
   },
   delete: {
-    title: "Usuń postać",
+    title: "Usuń skill",
     titleShort: "Usuń skill",
     dynamicTitle: "Usuń: {{name}}",
-    description: "Usuń niestandardową postać",
+    description: "Usuń niestandardowy skill",
     container: {
-      title: "Usuń postać",
-      description: "Trwale usuń tę niestandardową postać",
+      title: "Usuń skill",
+      description: "Trwale usuń tę niestandardowy skill",
     },
     backButton: {
-      label: "Powrót do postaci",
+      label: "Powrót do skilli",
     },
     actions: {
-      delete: "Usuń postać",
-      deleting: "Usuwanie postaci",
+      delete: "Usuń skill",
+      deleting: "Usuwanie skilla",
     },
     id: {
-      label: "ID postaci",
-      description: "Slug lub przyjazne ID postaci do usunięcia",
+      label: "ID skilla",
+      description: "Slug lub przyjazne ID skilla do usunięcia",
     },
     errors: {
       validation: {
         title: "Błąd walidacji",
-        description: "Dane postaci są nieprawidłowe",
+        description: "Dane skilla są nieprawidłowe",
       },
       network: {
         title: "Błąd sieci",
@@ -468,23 +468,23 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Nie masz uprawnień do usunięcia tej postaci",
+        description: "Nie masz uprawnień do usunięcia tego skilla",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Nie masz uprawnień do usunięcia tej postaci",
+        description: "Nie masz uprawnień do usunięcia tego skilla",
       },
       notFound: {
-        title: "Postać nie znaleziona",
-        description: "Postać, którą próbujesz usunąć, nie istnieje",
+        title: "Skill nie zostaÅ znaleziony",
+        description: "Skill, którą próbujesz usunąć, nie istnieje",
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił błąd podczas usuwania postaci",
+        description: "Wystąpił błąd podczas usuwania skilla",
       },
       unknown: {
         title: "Nieznany błąd",
-        description: "Wystąpił nieoczekiwany błąd podczas usuwania postaci",
+        description: "Wystąpił nieoczekiwany błąd podczas usuwania skilla",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
@@ -492,13 +492,13 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Postać została zmodyfikowana przez innego użytkownika",
+        description: "Skill został zmodyfikowany przez innego użytkownika",
       },
     },
     success: {
-      title: "Postać usunięta",
-      description: "Postać została pomyślnie usunięta",
-      content: "Postać usunięta pomyślnie",
+      title: "Skill usunięty",
+      description: "Skill został pomyślnie usunięty",
+      content: "Skill usunięty pomyślnie",
     },
   },
 };

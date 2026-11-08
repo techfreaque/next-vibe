@@ -1,12 +1,17 @@
 /**
  * Credits Free Pool Utilization - Repository
  * Server-only. DB access.
- * Snapshot: ratio of consumed free credits across lead wallets per resolution bucket.
+ *
+ * Month-to-date free allowance utilization:
+ *   free credits consumed / free credits granted, both since the 1st of the (UTC) month.
+ * Independent of the per-wallet tier (guest 20 / user 50 / +20 newsletter) because the
+ * denominator is what was actually granted (FREE_GRANT transactions), not a fixed constant.
+ * Resets on the 1st with the free allowance period. See ../free-tier-series.ts.
  */
 
 import "server-only";
 
-import { and, avg, isNotNull, lt } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -17,11 +22,22 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
-import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { FREE_CREDIT_POOL } from "../../constants";
-import { creditWallets } from "../../db";
+import { creditTransactions } from "../../db";
+import { CreditTransactionType } from "../../enum";
+import {
+  bucketStart,
+  type TimedAmount,
+  utcMonthStart,
+  utilizationSeries,
+} from "../free-tier-series";
+
+function toTimed(rows: { bin: string; total: string | null }[]): TimedAmount[] {
+  return rows.map((r) => ({
+    at: new Date(r.bin),
+    amount: Number(r.total ?? 0),
+  }));
+}
 
 export class QueryCreditsFreePoolUtilizationRepository {
   static async queryCreditsFreePoolUtilization(data: {
@@ -35,35 +51,56 @@ export class QueryCreditsFreePoolUtilizationRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const stepMs = RESOLUTION_MS[resolution];
-    const points: DataPoint[] = [];
+    // Need the whole month before the first bucket for a correct month-to-date baseline.
+    const since = new Date(
+      Math.min(
+        utcMonthStart(range.from).getTime(),
+        bucketStart(range.from, resolution).getTime(),
+      ),
+    );
+    const freeUsed = sql`COALESCE((${creditTransactions.metadata}->>'freeCreditsUsed')::numeric, 0)`;
 
-    let ts = range.from.getTime();
-    while (ts <= range.to.getTime()) {
-      const bucket = new Date(ts);
-      const next = new Date(ts + stepMs);
-
-      const [row] = await db
-        .select({ avgFree: avg(creditWallets.freeCreditsRemaining) })
-        .from(creditWallets)
+    const [usageRows, grantRows] = await Promise.all([
+      db
+        .select({
+          bin: sql<string>`date_bin('15 minutes'::interval, ${creditTransactions.createdAt}, '2000-01-01')::timestamptz`.as(
+            "bin",
+          ),
+          total: sql<string>`sum(${freeUsed})`,
+        })
+        .from(creditTransactions)
         .where(
           and(
-            isNotNull(creditWallets.leadId),
-            lt(creditWallets.createdAt, next),
+            eq(creditTransactions.type, CreditTransactionType.USAGE),
+            gte(creditTransactions.createdAt, since),
+            lte(creditTransactions.createdAt, range.to),
           ),
-        );
+        )
+        .groupBy(sql`1`),
+      db
+        .select({
+          bin: sql<string>`date_bin('15 minutes'::interval, ${creditTransactions.createdAt}, '2000-01-01')::timestamptz`.as(
+            "bin",
+          ),
+          total: sql<string>`sum(${creditTransactions.amount})`,
+        })
+        .from(creditTransactions)
+        .where(
+          and(
+            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+            gte(creditTransactions.createdAt, since),
+            lte(creditTransactions.createdAt, range.to),
+          ),
+        )
+        .groupBy(sql`1`),
+    ]);
 
-      const avgRemaining = Number(row?.avgFree ?? FREE_CREDIT_POOL);
-      const utilization = Math.max(
-        0,
-        (FREE_CREDIT_POOL - avgRemaining) / FREE_CREDIT_POOL,
-      );
-
-      points.push({ timestamp: bucket, value: utilization });
-      ts += stepMs;
-    }
-
-    const result = fillGaps(points, range, resolution);
+    const result = utilizationSeries({
+      consumed: toTimed(usageRows),
+      granted: toTimed(grantRows),
+      range,
+      resolution,
+    });
     return success({
       result,
       meta: {

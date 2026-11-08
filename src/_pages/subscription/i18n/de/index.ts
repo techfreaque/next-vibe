@@ -51,7 +51,8 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Kostenlose monatliche Credits",
-        description: "{{count}} kostenlose Credits pro Monat für alle",
+        description:
+          "{{guest}} Gratis-Credits pro Monat als Gast, {{signedIn}} angemeldet, +{{bonus}} mit dem Newsletter",
       },
       earned: {
         title: "Verdiente Credits",
@@ -71,11 +72,12 @@ export const translations: typeof enTranslations = {
         permanent: {
           title: "Credit-Pakete",
           description:
-            "{{packPrice}} für {{packCredits}} Credits. Verfallen nie. Für Abonnenten, denen {{subCredits}} nicht reichen.",
+            "{{packPrice}} für {{packCredits}} Credits, oder {{largePackPrice}} für {{largePackCredits}}. Verfallen nie. Kein Abo nötig.",
         },
         free: {
           title: "Gratis-Credits",
-          description: "{{count}} Credits zum Start. Keine Karte nötig.",
+          description:
+            "{{guest}} pro Monat als Gast. {{signedIn}} mit kostenlosem Konto, +{{bonus}} mit dem Newsletter. Keine Karte.",
         },
       },
       costs: {
@@ -155,9 +157,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Credit-Pakete",
-        description:
-          "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
-        badge: "Für Power-User",
+        description: "Zahlen, was du nutzt. Kein Abo. Credits verfallen nie.",
+        badge: "Ohne Abo",
         perPack: "/Paket",
         quantity: "Menge",
         total: "{{count}} Credits",
@@ -173,8 +174,6 @@ export const translations: typeof enTranslations = {
         totalPrice: "Gesamt: {{price}}",
         pack: "Paket",
         packs: "Pakete",
-        requiresSubscription:
-          "Credit-Pakete sind für Abonnenten, die mehr als ihr monatliches Kontingent brauchen. Zuerst abonnieren.",
       },
     },
     history: {

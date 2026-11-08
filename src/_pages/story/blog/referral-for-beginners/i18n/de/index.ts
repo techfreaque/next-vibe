@@ -28,7 +28,6 @@ export const translations: typeof enTranslations = {
   different: {
     title: "Einmalig vs. wiederkehrend - warum es wichtig ist",
     p1: "Die meisten Empfehlungsprogramme zahlen einmalig. {{appName}} zahlt für immer. So sieht das in der Praxis aus:",
-    tableTitle: "Vergleich der Empfehlungsarten",
     tableHeaderType: "Art",
     tableHeaderYouEarn: "Du verdienst",
     tableHeaderWhen: "Wann",

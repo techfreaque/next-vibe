@@ -234,7 +234,9 @@ export class DevDatabaseSetup {
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
-          if (!data.skipMigrationGeneration && !isPglite) {
+          // Hermes/preview never generates migrations: Atlas owns schema
+          // generation (`vibe dgen`); Hermes only applies the committed ones.
+          if (!data.skipMigrationGeneration && !isPglite && !isPreview) {
             const generateResult = await DatabaseGenerateRepository.runGenerate(
               logger,
               true,

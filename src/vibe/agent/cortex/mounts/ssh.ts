@@ -106,6 +106,11 @@ export async function readSshPath(
   path: string,
   isAdmin: boolean,
 ): Promise<VirtualReadResult | null> {
+  // Machine access (local fs / SFTP) is admin-only — hosted users get no
+  // terminal or filesystem access to machines.
+  if (!isAdmin) {
+    return null;
+  }
   const segments = path.split("/").filter(Boolean);
   if (segments.length < 2) {
     return null;
@@ -122,7 +127,7 @@ export async function readSshPath(
   if (segments.length === 2) {
     return resolved.kind === "ssh"
       ? renderConnectionSummary(resolved.row, userId)
-      : renderRemoteConnectionSummary(resolved.row);
+      : renderRemoteConnectionSummary(resolved.row, userId);
   }
 
   // Remote connections don't support filesystem browsing
@@ -148,6 +153,9 @@ export async function listSshPath(
   path: string,
   isAdmin: boolean,
 ): Promise<VirtualListEntry[]> {
+  if (!isAdmin) {
+    return [];
+  }
   await ensureLocalConnection(userId, isAdmin);
   const segments = path.split("/").filter(Boolean);
 
@@ -238,6 +246,9 @@ export async function getSshCount(
   userId: string,
   isAdmin: boolean,
 ): Promise<number> {
+  if (!isAdmin) {
+    return 0;
+  }
   await ensureLocalConnection(userId, isAdmin);
   const [sshRows, remoteRows] = await Promise.all([
     db
@@ -417,7 +428,7 @@ async function renderConnectionSummary(
   userId: string,
 ): Promise<VirtualReadResult> {
   const slug = labelToSlug(conn.label);
-  const terminals = getSessionsForConnection(slug);
+  const terminals = getSessionsForConnection(slug, userId);
   const mounts = await getMountsForConnection(conn.id, userId);
 
   const fm = [
@@ -485,10 +496,13 @@ async function renderConnectionSummary(
   };
 }
 
-function renderRemoteConnectionSummary(conn: RemoteRow): VirtualReadResult {
+function renderRemoteConnectionSummary(
+  conn: RemoteRow,
+  userId: string,
+): VirtualReadResult {
   const health = RemoteConnectionRepository.getConnectionHealth(conn);
   const slug = conn.instanceId.toLowerCase();
-  const terminals = getSessionsForConnection(slug);
+  const terminals = getSessionsForConnection(slug, userId);
 
   const fm = [
     "---",

@@ -330,7 +330,9 @@ class WsConnection {
 
     this.ws = ws;
 
+    let everOpened = false;
     ws.addEventListener("open", () => {
+      everOpened = true;
       this.onOpen(ws, remoteEventChannel);
     });
     ws.addEventListener("message", (event: MessageEvent) => {
@@ -344,9 +346,12 @@ class WsConnection {
         "message" in event && typeof event.message === "string"
           ? event.message
           : "unknown";
+      // duringHandshake separates "peer restarting/offline" (the reconnect
+      // loop handles it) from an error on an established socket.
       this.logger.warn("[WsConnection] WS error", {
         instanceId: this.instanceId,
         error: message,
+        duringHandshake: !everOpened,
       });
       // A failed handshake (peer restarting) may never emit a close event in
       // every runtime — without this the retry loop would die silently.
@@ -757,18 +762,26 @@ class WsConnection {
       // no execute()/dispatch re-entry (this runs inside the connector itself).
       // ONE attempt: pull-on-connect either works or it doesn't. No retry loop —
       // a retry masks the real failure and stalls the run.
-      const { response: syncResult } = await RemoteTransport.callEndpointDirect(
-        {
-          connection: { remoteUrl, token, leadId },
-          definition: syncEndpoints.POST,
-          input: body,
-          locale: defaultLocale,
-          timeoutMs: 60_000,
-        },
-      );
+      const {
+        response: syncResult,
+        status: syncStatus,
+        networkError: syncNetworkError,
+      } = await RemoteTransport.callEndpointDirect({
+        connection: { remoteUrl, token, leadId },
+        definition: syncEndpoints.POST,
+        input: body,
+        locale: defaultLocale,
+        timeoutMs: 60_000,
+      });
       if (!syncResult.success) {
+        // The translated message is generic ("An error occurred") on a
+        // network failure - peer URL, HTTP status and the network flag are
+        // what say whether the peer was down, rejected us, or crashed.
         this.logger.warn("[WsConnection] pull-on-connect sync failed", {
           instanceId: this.instanceId,
+          peer: remoteUrl,
+          httpStatus: syncStatus,
+          networkError: syncNetworkError,
           errorType: syncResult.errorType?.errorCode,
           message: syncResult.message,
         });
@@ -789,11 +802,8 @@ class WsConnection {
           // A dead token means every future send fails too — stop the channel,
           // don't keep a zombie socket reconnecting against a deactivated row.
           closeConnection(this.instanceId);
-        } else {
-          this.logger.warn("[WsConnection] pull-on-connect failed", {
-            instanceId: this.instanceId,
-          });
         }
+        // Non-401 failures were logged with full context just above.
         return;
       }
 

@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from "next";
+import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -17,18 +17,14 @@ interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const previousImages = (await parent).openGraph?.images || [];
 
   return metadataGenerator(locale, {
-    path: "terms-of-service",
+    path: "story/terms-of-service",
     title: t("meta.title", { appName }),
     description: t("meta.description", { appName }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/terms-hero.jpg`,
@@ -39,9 +35,8 @@ export async function generateMetadata(
       openGraph: {
         title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription", { appName }),
-        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/terms-of-service`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/story/terms-of-service`,
         type: "website",
-        images: [...previousImages],
       },
       twitter: {
         card: "summary_large_image",

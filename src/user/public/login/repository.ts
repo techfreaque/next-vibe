@@ -45,7 +45,6 @@ import type {
   LoginOptionsGetRequestOutput,
   LoginOptionsGetResponseOutput,
 } from "./options/definition";
-import { SocialProviders } from "./options/enum";
 
 export interface LoginOptions {
   allowPasswordAuth: boolean;
@@ -178,14 +177,34 @@ export class LoginRepository {
         });
       }
 
-      // Check if two-factor auth is required (if implemented)
-      if (userResponse.data.requireTwoFactor) {
-        logger.debug("Login requires 2FA", { email });
-        // Here you would implement 2FA flow
-        // This is a placeholder for the actual implementation
+      // Two-factor gate: only users who completed TOTP setup are affected.
+      // Everyone else logs in exactly as before. Wrong codes count as failed
+      // attempts (same DB-backed lockout as bad passwords).
+      const { TwoFactorRepository } =
+        await import("../../private/me/two-factor/repository");
+      const twoFactor = await TwoFactorRepository.verifyLoginCode(
+        userRow.id,
+        data.twoFactorCode,
+      );
+      if (twoFactor.required && !twoFactor.ok) {
+        const missing = !data.twoFactorCode || data.twoFactorCode.trim() === "";
+        if (!missing) {
+          await this.recordAttemptDb(email, ipAddress, false, false);
+        }
+        logger.debug("Login blocked: two-factor code required/invalid", {
+          userId: userRow.id,
+          missing,
+        });
         return fail({
-          message: t("errors.two_factor_required"),
-          errorType: ErrorResponseTypes.TWO_FACTOR_REQUIRED,
+          message: missing
+            ? t("errors.two_factor_required")
+            : t("errors.invalid_two_factor_code"),
+          // Machine-readable discriminator: the UI keys on errorType, never on
+          // message text. Missing code -> TWO_FACTOR_REQUIRED (reveal step 2);
+          // wrong code -> UNAUTHORIZED (stay on step 2, lockout counted).
+          errorType: missing
+            ? ErrorResponseTypes.TWO_FACTOR_REQUIRED
+            : ErrorResponseTypes.UNAUTHORIZED,
         });
       }
 
@@ -460,7 +479,7 @@ export class LoginRepository {
   ): Promise<ResponseType<LoginOptionsGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     const email = data.email;
-    const optionsResult = await this.getLoginOptions(logger, locale, t, email);
+    const optionsResult = await this.getLoginOptions(logger, t, email);
 
     if (!optionsResult.success) {
       return optionsResult;
@@ -512,7 +531,6 @@ export class LoginRepository {
    */
   static async getLoginOptions(
     logger: EndpointLogger,
-    locale: CountryLanguage,
     t: LoginT,
     email?: string,
   ): Promise<ResponseType<LoginOptions>> {
@@ -525,39 +543,13 @@ export class LoginRepository {
         allowSocialAuth: false,
         maxAttempts: 5,
         requireTwoFactor: false,
-        socialProviders: [
-          {
-            enabled: true,
-            name: "enums.socialProviders.google",
-            providers: [SocialProviders.GOOGLE],
-          },
-          {
-            enabled: true,
-            name: "enums.socialProviders.github",
-            providers: [SocialProviders.GITHUB],
-          },
-          {
-            enabled: true,
-            name: "enums.socialProviders.facebook",
-            providers: [SocialProviders.FACEBOOK],
-          },
-        ],
+        // No user OAuth flow exists yet — advertise no providers. The
+        // SocialProviders enum + response shape stay for when one ships.
+        socialProviders: [],
       };
 
       // If email provided, check user-specific settings
       if (email) {
-        const user = await UserRepository.getUserByEmail(
-          email,
-          UserDetailLevel.STANDARD,
-          locale,
-          logger,
-        );
-        // Unknown emails get the general options — answering "not found" here
-        // would let anyone probe which addresses have an account.
-        if (user.success) {
-          options.requireTwoFactor = user.data.requireTwoFactor === true;
-        }
-
         // Check if account is locked (DB-backed, cross-instance)
         const isLocked = await this.isAccountLockedDb(email, "unknown");
         if (isLocked) {

@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
     },
     defaultTone: {
       label: "Domyślny ton",
-      description: "Domyślna postać/ton dla tego wątku",
+      description: "Domyślny skill/ton dla tego wątku",
     },
     systemPrompt: {
       label: "Prompt systemowy",

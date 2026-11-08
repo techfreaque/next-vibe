@@ -30,6 +30,11 @@ export const translations = {
     capExceeded: {
       content: "Cap Exceeded",
     },
+    perLeadCap: { content: "Per-Lead Cap" },
+    perIpCap: { content: "Per-IP Cap" },
+    topSpenders: { content: "Top Free Spenders Today" },
+    recentEvents: { content: "Recent Cap Events" },
+    noData: "Nothing yet today.",
     success: {
       title: "Cap Status Retrieved",
       description: "Public free-tier cap status retrieved successfully",
@@ -84,6 +89,16 @@ export const translations = {
         "Maximum credits non-paying users can collectively spend per day",
       placeholder: "e.g. 500",
     },
+    perLeadCap: {
+      label: "Per-Lead Daily Cap (credits)",
+      description: "Max free credits one guest/lead can burn per day",
+      placeholder: "e.g. 20",
+    },
+    perIpCap: {
+      label: "Per-IP Daily Cap (credits)",
+      description: "Max free credits one IP can burn per day",
+      placeholder: "e.g. 40",
+    },
     message: {
       content: "Result",
     },
@@ -134,6 +149,10 @@ export const translations = {
     capUpdated: "Daily cap set to {{capAmount}} credits",
     capExceeded:
       "Free tier daily limit reached. Please sign up or try again tomorrow.",
+    leadCapExceeded:
+      "You hit today's free limit. Sign up or add your email for more credits.",
+    capUnavailable:
+      "Free tier is temporarily unavailable. Please sign up to continue.",
     getCapFailed: "Failed to retrieve free-tier cap configuration",
     updateCapFailed: "Failed to update free-tier cap",
     incrementFailed: "Failed to record free-tier spend",

@@ -46,7 +46,7 @@ import {
  */
 export const PROJECT_INSTRUCTIONS = `# Project Overview
 
-**unbottled.ai** - Free speech AI platform with 100+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
+**unbottled.ai** - Free speech AI platform with mainstream, open and uncensored models. Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
 
 **next-vibe** - SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server - via platform markers.
 
@@ -81,7 +81,7 @@ Each instance runs **two server modes** — dev (TanStack/Vite, hot reload) and 
 **Rules:**
 
 - Default work target is **Atlas dev** (\`vibe dev\`). Safe to run anytime — replaces any existing Atlas dev instance.
-- **Hermes dev** (\`vibe --hermes dev\`) — dev server on Hermes DB. Useful when tests need two running instances simultaneously.
+- **Hermes dev** (\`vibe --hermes dev\`) — dev server on the Hermes DB — its own Docker Postgres (docker-compose.preview.yml, port \`PREVIEW_DB_PORT\` 5433, persistent volume), never Atlas PGlite. Override with \`HERMES_DATABASE_URL\` (a \`file:\` URL = separate PGlite). Hermes never generates migrations; \`vibe dgen\` on Atlas owns that. Useful when tests need two running instances simultaneously.
 - **Hermes prod** (\`vibe rebuild\`) — zero-downtime update. \`vibe build && vibe start\` only for a fresh first start. Max's live preview — only touch when explicitly asked.
 - **Thea deploy** — \`vibe image-push\` (builds + pushes Docker image) then run \`./scripts\` on the VPS to pull and restart. NOT \`vibe rebuild\` — that is Hermes-only.
 - Never touch Thea unless doing a dedicated task (e.g. pulling prod logs).

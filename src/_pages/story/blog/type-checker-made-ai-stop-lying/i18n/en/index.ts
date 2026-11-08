@@ -40,8 +40,6 @@ export const translations = {
       "A variable typed as `any` tells the compiler: stop checking here. Not just for this variable - for everything that touches this variable. The error doesn't show up at the `any`. It shows up three files away when some unrelated refactor breaks an assumption that was never enforced.",
     zeroErrors:
       "Zero TypeScript errors means nothing if you have 47 unchecked `any` usages.",
-    zeroErrorsDescription:
-      "You don't have a type-safe codebase. You have a codebase where the compiler gave up in 47 places and you called it passing.",
     doubleAssertion:
       "`as unknown as Whatever` is worse. It's a double type assertion. You're telling the compiler: I know this is wrong, and I'm asserting my way through it anyway. This is AI's favorite escape hatch.",
     bannedTitle: "The banned patterns in this codebase:",
@@ -49,17 +47,14 @@ export const translations = {
       "Not warnings. Errors. The check fails. Claude Code has to fix the root cause or it can't ship.",
     psychologyNote:
       "The reason these are errors and not warnings is psychological as much as technical. AI models treat warnings as optional. Errors close the loop.",
-    infectionDiagramTitle: "The `any` infection diagram",
     infectionDiagramSubtitle:
       "One `any` type spreads through the graph, corrupting downstream type inference",
-    infectionUnsafe: "unsafe",
     counterZeroErrors: "TypeScript errors",
     counterAnyUsages: "`any` usages",
   },
   checker: {
     title: "Introducing @next-vibe/checker",
     subtitle: "One command. Three tools. No escape hatches.",
-    mcpIntegrationTitle: "MCP integration",
     commandDescription:
       "That's the command. One command. It runs three tools in parallel and gives you one unified error list.",
     oxlintDescription:
@@ -68,22 +63,16 @@ export const translations = {
       "The things Oxlint doesn't do yet: React hooks lint, React compiler rules, import sorting.",
     tsDescription:
       "Full type checking. Not just the file you're editing - the whole graph.",
-    parallelNote:
-      "All three run in parallel. You get one unified error list. You fix until it's clean.",
     timingNote:
       "On this codebase - 4,400 files - full TypeScript takes about 12 seconds. Oxlint is under a second. ESLint is a few seconds. Parallel brings it down to 12.",
     mcpNote:
       "It also exposes a `vibe-check mcp` command that starts an MCP server with a `check` tool. The AI doesn't run a shell command - it calls a tool that returns structured error data. Pagination built in. Filtering by path.",
-    architectureTitle: "The checker architecture",
-    architectureSubtitle:
-      "Three tools running in parallel, one unified error list",
     parallel: "in parallel",
     unifiedErrors: "Unified error list",
     unifiedErrorsDescription: "One output. Fix until clean.",
   },
   plugins: {
     title: "Custom plugins",
-    subtitle: "The linter as documentation",
     linterIsDocumentation:
       "The linter is the documentation. And it's enforced.",
     jsxPluginTitle: "jsx-capitalization plugin",
@@ -103,8 +92,6 @@ export const translations = {
     objectBanDescription:
       "`object` is almost always wrong. Either you know the shape - write the interface - or you have `Record<string, SomeType>`. Raw `object` is a signal that the AI gave up.",
     bannedPatternsTitle: "Banned patterns",
-    bannedPatternsSubtitle:
-      "Each banned pattern is caught at check time. The error message tells AI exactly what to do instead.",
     bannedLabel: "BANNED",
     correctLabel: "CORRECT",
   },
@@ -116,22 +103,16 @@ export const translations = {
     round1Description:
       'Ask Claude Code: "Write a helper function that takes a raw API response object and extracts the data field. The response can have different shapes - use whatever type makes this work."',
     round1Result: "Claude Code writes the easy solution:",
-    round1Error:
-      "2 errors found. Both `any`. Claude Code can see this through the MCP tool.",
     round2Title: "Round 2 - AI tries `unknown`",
     round2Description:
       "Watch what it does next. This is the important part. It tries the next escape route:",
     round2Result: "The checker knows that trick.",
-    round2Error:
-      "3 errors. `unknown` is banned too. The error message tells Claude Code exactly what to do instead: find the existing typed interface.",
     round3Title: "Round 3 - AI finds the real type",
     round3Description:
       "Now Claude Code does what it should have done first. It looks at how existing API responses are typed in this codebase. It finds `ResponseType<T>`.",
     round3Result: "Zero errors. And the function is now actually correct.",
     round3Insight:
       "The checker didn't write it. But the checker prevented the shortcut, twice, until Claude Code had to engage with the actual problem.",
-    errorTitle: "Check output",
-    passTitle: "Check passed",
   },
   endpoint: {
     title: "The endpoint connection",
@@ -150,22 +131,11 @@ export const translations = {
     oneSchemaSolution: "When there's one schema, there's nothing to sync.",
     typecheckedNote:
       "And because the TypeScript checker runs on this too - if you change the schema in a way that breaks the inferred type downstream, you get a compiler error. The AI tool schema is type-checked. The CLI flags are type-checked. The React hook is type-checked.",
-    statsTitle: "This codebase by the numbers",
     stat245: "245 endpoints",
     stat0any: "Zero `any`",
     stat0unknown: "Zero `unknown` casts",
     stat0tsExpect: "Zero `@ts-expect-error`",
     statNote: "Not by convention. By the checker.",
-    diagramTitle: "One Zod schema - four consumers",
-    diagramSubtitle: "Change the schema once, everything updates automatically",
-    diagramSource: "definition.ts (Zod schema)",
-    diagramWebApi: "Web API validation",
-    diagramHookTypes: "React hook types",
-    diagramCliFlags: "CLI flags",
-    diagramAiSchema: "AI tool schema",
-    diagramSameSchema: "same schema",
-    diagramInferred: "inferred from schema",
-    diagramGenerated: "generated from schema",
   },
   install: {
     title: "Get @next-vibe/checker",

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -7,12 +9,20 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Calendar } from "next-vibe/ui/components/icons/Calendar";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { Database } from "next-vibe/ui/components/icons/Database";
 import { FileCode } from "next-vibe/ui/components/icons/FileCode";
 import { Github } from "next-vibe/ui/components/icons/Github";
 import { Layers } from "next-vibe/ui/components/icons/Layers";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Navigation } from "next-vibe/ui/components/icons/Navigation";
+import { ShoppingBag } from "next-vibe/ui/components/icons/ShoppingBag";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { X } from "next-vibe/ui/components/icons/X";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
@@ -34,6 +44,7 @@ import {
   Callout,
   Cta,
   CtaRow,
+  FeatureCard,
   FeatureGrid,
   PageHero,
   PageSection,
@@ -41,6 +52,15 @@ import {
   Step,
   StepList,
 } from "../_shared/marketing";
+import {
+  SURFACE_ADD,
+  SURFACE_AI,
+  SURFACE_CLI,
+  SURFACE_CRON,
+  SURFACE_DEFINITION,
+  SURFACE_MCP,
+  SURFACE_ROUTE,
+} from "../_shared/surface-snippets";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -52,6 +72,7 @@ interface Props {
 export interface FrameworkPageData {
   locale: CountryLanguage;
   endpointCount: number;
+  modelCount: number;
   definitionCode: string;
   routeCode: string;
   widgetCode: string;
@@ -278,6 +299,7 @@ export async function tanstackLoader({
   return {
     locale,
     endpointCount: endpointsMeta.length,
+    modelCount: getAvailableModelCount(false, await getEnvAvailability()),
     ...snippets,
     platform: Platform.NEXT_PAGE,
   };
@@ -323,6 +345,27 @@ function unfence(markdown: string): { language: string; code: string } {
   return { language, code: lines.slice(1, -1).join("\n") };
 }
 
+function RawCode({
+  code,
+  filename,
+  language = "typescript",
+}: {
+  code: string;
+  filename: string;
+  language?: string;
+}): JSX.Element {
+  return (
+    <Div className="min-w-0 max-w-full">
+      <CodeSnippet
+        code={code}
+        language={language}
+        filename={filename}
+        variant="file"
+      />
+    </Div>
+  );
+}
+
 function CodeFile({
   markdown,
   filename,
@@ -348,6 +391,7 @@ function CodeFile({
 export function TanstackPage({
   locale,
   endpointCount,
+  modelCount,
   definitionCode,
   routeCode,
   widgetCode,
@@ -366,6 +410,44 @@ export function TanstackPage({
     leadId: "00000000-0000-0000-0000-000000000000",
     roles: [UserPermissionRole.PUBLIC],
   };
+
+  const examples = [
+    { key: "headunit", icon: Navigation },
+    { key: "shop", icon: ShoppingBag },
+    { key: "booking", icon: Calendar },
+    { key: "aiPlatform", icon: Sparkles },
+  ] as const;
+
+  const surfaceCards = [
+    {
+      key: "cli",
+      icon: Terminal,
+      code: SURFACE_CLI,
+      filename: "terminal",
+      language: "bash",
+    },
+    {
+      key: "mcp",
+      icon: Server,
+      code: SURFACE_MCP,
+      filename: ".mcp.json",
+      language: "typescript",
+    },
+    {
+      key: "ai",
+      icon: Bot,
+      code: SURFACE_AI,
+      filename: "tool-call",
+      language: "typescript",
+    },
+    {
+      key: "cron",
+      icon: Clock,
+      code: SURFACE_CRON,
+      filename: "task.ts",
+      language: "typescript",
+    },
+  ] as const;
 
   const files = [
     {
@@ -490,8 +572,95 @@ export function TanstackPage({
         </Callout>
       </PageSection>
 
+      {/* One definition, every surface - real endpoint */}
+      <PageSection
+        label={t("oneDef.eyebrow")}
+        title={t("oneDef.title")}
+        intro={t("oneDef.subtitle")}
+      >
+        <Div className="flex flex-col gap-12 md:gap-16">
+          <Div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-10">
+            <Div>
+              <H3 className="text-lg font-semibold tracking-tight">
+                {t("oneDef.defTitle")}
+              </H3>
+              <P className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {t("oneDef.defBody")}
+              </P>
+            </Div>
+            <RawCode code={SURFACE_DEFINITION} filename="definition.ts" />
+          </Div>
+          <Div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-10">
+            <Div>
+              <H3 className="text-lg font-semibold tracking-tight">
+                {t("oneDef.routeTitle")}
+              </H3>
+              <P className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {t("oneDef.routeBody")}
+              </P>
+            </Div>
+            <RawCode code={SURFACE_ROUTE} filename="route.ts" />
+          </Div>
+          <Div>
+            <H3 className="mb-6 text-xl font-semibold tracking-tight">
+              {t("oneDef.surfacesTitle")}
+            </H3>
+            <Div className="grid gap-6 md:grid-cols-2">
+              {surfaceCards.map((card) => (
+                <FeatureCard
+                  key={card.key}
+                  icon={card.icon}
+                  title={t(`oneDef.${card.key}.title`)}
+                >
+                  {t(`oneDef.${card.key}.body`)}
+                  <Div className="mt-4">
+                    <RawCode
+                      code={card.code}
+                      filename={card.filename}
+                      language={card.language}
+                    />
+                  </Div>
+                </FeatureCard>
+              ))}
+            </Div>
+            <Callout icon={Layers} className="mt-6 font-medium">
+              {t("oneDef.more")}
+            </Callout>
+          </Div>
+          <Div className="max-w-3xl">
+            <H3 className="text-xl font-semibold tracking-tight">
+              {t("oneDef.addTitle")}
+            </H3>
+            <P className="mt-2 mb-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+              {t("oneDef.addBody")}
+            </P>
+            <RawCode code={SURFACE_ADD} filename="terminal" language="bash" />
+          </Div>
+        </Div>
+      </PageSection>
+
       {/* Surfaces - interactive platform explorer */}
       <Architecture locale={locale} />
+
+      {/* Built with next-vibe - example products */}
+      <PageSection
+        label={t("examples.eyebrow")}
+        title={t("examples.title")}
+        intro={t("examples.subtitle", { appName })}
+      >
+        <FeatureGrid columns={4}>
+          {examples.map(({ key, icon: Icon }) => (
+            <FeatureCard
+              key={key}
+              icon={Icon}
+              label={t(`examples.items.${key}.label`)}
+              title={t(`examples.items.${key}.title`, { appName })}
+            >
+              {t(`examples.items.${key}.body`, { appName, modelCount })}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+      </PageSection>
 
       {/* TypeScript rules */}
       <PageSection

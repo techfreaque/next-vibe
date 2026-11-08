@@ -9,6 +9,11 @@ import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import {
+  extractTouch,
+  hasCampaignSignal,
+  isLikelyBot,
+} from "@/leads/growth/attribution";
 
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -16,6 +21,7 @@ import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/languag
 import { db } from "../../../database";
 import { Environment } from "../../../env/env-util";
 import { createEndpointLogger } from "../../../logger/server";
+import type { EndpointLogger } from "../../../logger/types";
 import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
 import { leads } from "../../lead/db";
@@ -171,6 +177,10 @@ export async function createLeadId(
 
   const leadId = await createAnonymousLead(clientInfo, locale, logger);
 
+  if (leadId) {
+    recordAttributionTouch(request, leadId, true, logger);
+  }
+
   if (!leadId) {
     logger.error("Failed to create leadId in middleware");
     // Delete any stale/empty cookie so the next request retries from scratch
@@ -196,6 +206,48 @@ export async function createLeadId(
   logger.debug("Lead ID cookie set in middleware", { leadId });
 
   return response;
+}
+
+/**
+ * Growth attribution: record how this page request arrived.
+ * First visit → first + last touch. Later visits → only when the URL carries
+ * UTM / ref / utm_id (zero DB work otherwise). Skips API calls, prefetches,
+ * non-GET requests and crawlers. Fire-and-forget: never blocks the request.
+ */
+export function recordAttributionTouch(
+  request: NextRequest,
+  leadId: string,
+  isNewLead: boolean,
+  logger: EndpointLogger,
+): void {
+  const path = request.nextUrl.pathname;
+  if (
+    request.method !== "GET" ||
+    path.startsWith("/api/") ||
+    request.headers.get("rsc") !== null ||
+    request.headers.get("next-router-prefetch") !== null ||
+    request.headers.get("purpose") === "prefetch" ||
+    isLikelyBot(request.headers.get("user-agent"))
+  ) {
+    return;
+  }
+  const ownHosts = [
+    new URL(coreEnv.NEXT_PUBLIC_APP_URL).hostname,
+    request.headers.get("x-forwarded-host")?.split(":")[0] ?? "",
+  ].filter((h) => h.length > 0);
+  const touch = extractTouch(
+    new URL(request.nextUrl.href),
+    request.headers.get("referer"),
+    ownHosts,
+  );
+  if (!isNewLead && !hasCampaignSignal(touch)) {
+    return;
+  }
+  void (async (): Promise<void> => {
+    const { GrowthJourneyRepository } =
+      await import("@/leads/growth/repository");
+    await GrowthJourneyRepository.recordTouch(leadId, touch, logger);
+  })();
 }
 
 /**

@@ -1,13 +1,19 @@
 "use client";
 
+import {
+  ContentLevel,
+  type ContentLevelValue,
+} from "next-vibe/agent/skills/enum";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import type { DivMouseEvent } from "next-vibe/ui/components/div";
 import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { Pause } from "next-vibe/ui/components/icons/Pause";
 import { Play } from "next-vibe/ui/components/icons/Play";
 import { Square } from "next-vibe/ui/components/icons/Square";
 import { Volume2 } from "next-vibe/ui/components/icons/Volume2";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H3 } from "next-vibe/ui/components/typography";
 import {
@@ -23,19 +29,47 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
+import { tierName } from "@/_pages/models/_shared/model-format";
+
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
-import { getTtsModelById, ttsModelDefinitions, TtsModelId } from "./models";
+import {
+  getTtsModelById,
+  type TtsModelId,
+  type TtsModelOption,
+  ttsModelOptions,
+} from "./models";
 
-const VOICE_DISPLAY_ORDER: TtsModelId[] = [
-  TtsModelId.OPENAI_NOVA,
-  TtsModelId.OPENAI_ALLOY,
-  TtsModelId.OPENAI_ONYX,
-  TtsModelId.OPENAI_ECHO,
-  TtsModelId.OPENAI_SHIMMER,
-  TtsModelId.OPENAI_FABLE,
-];
+const TIER_DOT: Record<typeof ContentLevelValue, string> = {
+  [ContentLevel.MAINSTREAM]: "bg-primary",
+  [ContentLevel.OPEN]: "bg-info",
+  [ContentLevel.UNCENSORED]: "bg-warning",
+};
+
+interface VoiceGroup {
+  tier: typeof ContentLevelValue;
+  voices: TtsModelOption[];
+}
+
+/** Catalog voices (deduped by id), grouped by content tier, uncensored first. */
+function buildVoiceGroups(): VoiceGroup[] {
+  const seen = new Set<TtsModelId>();
+  const unique: TtsModelOption[] = [];
+  for (const option of ttsModelOptions) {
+    if (!seen.has(option.id)) {
+      seen.add(option.id);
+      unique.push(option);
+    }
+  }
+  return CONTENT_TIER_ORDER.map((tier) => ({
+    tier,
+    voices: unique.filter((v) => v.content === tier),
+  })).filter((g) => g.voices.length > 0);
+}
+
+const VOICE_GROUPS: VoiceGroup[] = buildVoiceGroups();
 
 function genderIcon(gender: string | undefined): string {
   if (gender === "female") {
@@ -190,33 +224,55 @@ export function TextToSpeechContainer({
           <Span className="text-xs font-medium text-muted-foreground">
             {t("post.voice.label")}
           </Span>
-          <Div className="grid grid-cols-3 gap-1.5">
-            {VOICE_DISPLAY_ORDER.map((voiceId) => {
-              const def = ttsModelDefinitions[voiceId];
-              const isSelected = currentVoiceId === voiceId;
-              const meta = def.voiceMeta;
-              return (
-                <Button
-                  key={voiceId}
-                  type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  size="sm"
-                  className="h-auto py-2 px-2 flex flex-col gap-0.5 items-center"
-                  disabled={isDisabled}
-                  onClick={() =>
-                    form?.setValue("voiceId", voiceId, { shouldDirty: true })
-                  }
-                >
-                  <Span className="text-xs font-semibold">{def.name}</Span>
+          <Div className="flex flex-col gap-3">
+            {VOICE_GROUPS.map((group) => (
+              <Div
+                key={group.tier}
+                className="flex flex-col gap-1.5"
+                data-tier={group.tier}
+              >
+                <Div className="flex items-center gap-1.5">
                   <Span
-                    className={`text-[9px] ${isSelected ? "text-primary-foreground/60" : "text-muted-foreground"}`}
-                  >
-                    {genderIcon(meta?.gender)}{" "}
-                    {meta?.style ?? meta?.gender ?? "neutral"}
+                    className={`h-1.5 w-1.5 rounded-full ${TIER_DOT[group.tier]}`}
+                  />
+                  <Span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {tierName(group.tier, locale)}
                   </Span>
-                </Button>
-              );
-            })}
+                </Div>
+                <Div className="grid grid-cols-3 gap-1.5">
+                  {group.voices.map((voice) => {
+                    const voiceId = voice.id;
+                    const isSelected = currentVoiceId === voiceId;
+                    const meta = voice.voiceMeta;
+                    return (
+                      <Button
+                        key={voiceId}
+                        type="button"
+                        variant={isSelected ? "default" : "outline"}
+                        size="sm"
+                        className="h-auto py-2 px-2 flex flex-col gap-0.5 items-center"
+                        disabled={isDisabled}
+                        onClick={() =>
+                          form?.setValue("voiceId", voiceId, {
+                            shouldDirty: true,
+                          })
+                        }
+                      >
+                        <Span className="text-xs font-semibold">
+                          {voice.name}
+                        </Span>
+                        <Span
+                          className={`text-[9px] ${isSelected ? "text-primary-foreground/60" : "text-muted-foreground"}`}
+                        >
+                          {genderIcon(meta?.gender)}{" "}
+                          {meta?.style ?? meta?.gender ?? "neutral"}
+                        </Span>
+                      </Button>
+                    );
+                  })}
+                </Div>
+              </Div>
+            ))}
           </Div>
         </Div>
 
@@ -258,6 +314,22 @@ export function TextToSpeechContainer({
               >
                 <Square className="h-3 w-3" />
               </Button>
+              <ExternalLink
+                href={currentAudioUrl}
+                download="generated-speech.mp3"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-7 w-7 rounded-full shrink-0"
+                  title={t("post.download")}
+                >
+                  <Download className="h-3 w-3" />
+                </Button>
+              </ExternalLink>
 
               {/* Progress bar */}
               <Div

@@ -40,6 +40,25 @@ function trackRequest(method: string, path: string): void {
   }
 }
 
+/**
+ * Compact one-line summary of the recent-request ring buffer for logging.
+ * Keeps the last few entries (newest last) as `METHOD path (Nms ago)` and
+ * prefixes a `+N older` count, so a crash dump is a readable line instead of a
+ * giant nested array.
+ */
+function summarizeRecentRequests(): string {
+  if (recentRequests.length === 0) {
+    return "none";
+  }
+  const now = Date.now();
+  const shown = recentRequests.slice(-4);
+  const older = recentRequests.length - shown.length;
+  const parts = shown.map(
+    (r) => `${r.method} ${r.path} (${String(now - r.ts)}ms ago)`,
+  );
+  return `${older > 0 ? `+${String(older)} older, ` : ""}${parts.join(", ")}`;
+}
+
 // Proxy timeout is always high — timeout enforcement belongs on the app server
 // via the endpoint definition's timeoutMs, not here. The proxy must not cut off
 // long-running requests (SSR cold-start, media gen, execute-tool) before the app
@@ -197,18 +216,11 @@ export async function handleHttpProxy(
           lastProxyError = nodeErr.code ?? err.message;
           // On first ECONNREFUSED, dump recent request history.
           if (attempt === 0) {
-            logger.error(
-              "[Proxy] Next.js went down - recent requests before crash",
-              {
-                path: url.pathname,
-                method: req.method,
-                recentRequests: recentRequests.map((r) => ({
-                  method: r.method,
-                  path: r.path,
-                  agoMs: Date.now() - r.ts,
-                })),
-              },
-            );
+            logger.error("[Proxy] Next.js went down before crash", {
+              path: url.pathname,
+              method: req.method,
+              recent: summarizeRecentRequests(),
+            });
           }
           settle(null); // null = retry
           return;

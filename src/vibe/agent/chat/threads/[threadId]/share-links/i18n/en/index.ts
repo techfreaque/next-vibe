@@ -96,6 +96,11 @@ export const translations = {
         title: "Forbidden",
         description: "You don't have permission to view these share links",
       },
+      removed: {
+        title: "Removed or under review",
+        description:
+          "This shared thread was reported and is no longer available.",
+      },
       notFound: {
         title: "Not Found",
         description: "Thread or share link not found",

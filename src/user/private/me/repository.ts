@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { formatSkillId } from "next-vibe/agent/chat/slugify";
@@ -28,18 +28,23 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
-import { leads } from "next-vibe/identity/lead/db";
+import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { userRoles, users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { contacts } from "../../../contact/db";
 import { creditWallets } from "../../../credits/db";
+import { growthJourneys } from "../../../leads/growth/db";
+import { newsletterSubscriptions } from "../../../newsletter/db";
 import { csvImportJobs, importBatches } from "../../../leads/import/db";
 import { messengerAccounts } from "../../../messenger/accounts/db";
 import { payoutRequests } from "../../../referral/db";
 import { subscriptions } from "../../../subscription/db";
+import { SubscriptionStatus } from "../../../subscription/enum";
 import { SubscriptionRepository } from "../../../subscription/repository";
+import { withTransaction } from "../../../vibe/database/utils/repository-helpers";
 import { passwordResets } from "../../public/reset-password/db";
 import type {
   MeDeleteResponseOutput,
@@ -558,17 +563,24 @@ export class UserProfileRepository {
         });
       }
 
-      // Cancel Stripe subscription before deletion so Stripe is notified properly.
+      // 1. Cancel billing FIRST. If that fails, abort: deleting the account
+      //    while the provider keeps charging would bill a user who no longer
+      //    exists and can no longer cancel.
       const [activeSubscription] = await db
         .select({
           id: subscriptions.id,
+          status: subscriptions.status,
           providerSubscriptionId: subscriptions.providerSubscriptionId,
         })
         .from(subscriptions)
         .where(eq(subscriptions.userId, userId))
         .limit(1);
 
-      if (activeSubscription?.providerSubscriptionId) {
+      const isBillable =
+        activeSubscription?.providerSubscriptionId &&
+        activeSubscription.status !== SubscriptionStatus.CANCELED &&
+        activeSubscription.status !== SubscriptionStatus.INCOMPLETE_EXPIRED;
+      if (isBillable) {
         const cancelResult = await SubscriptionRepository.cancelSubscription(
           { cancelAtPeriodEnd: false },
           userId,
@@ -576,58 +588,142 @@ export class UserProfileRepository {
           locale,
         );
         if (!cancelResult.success) {
-          logger.warn(
-            "Failed to cancel Stripe subscription during account deletion",
+          logger.error(
+            "Account deletion aborted: subscription could not be canceled",
             {
               userId,
+              subscriptionId: activeSubscription.id,
               error: cancelResult.message,
             },
           );
+          return fail({
+            message: t("delete.errors.billingCancelFailed"),
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            cause: cancelResult,
+          });
         }
       }
 
-      // Handle FK constraints with ON DELETE no action before deleting the user.
-      // user_roles must be sequential: nullify assignedBy first so the delete doesn't
-      // violate the self-referential FK on rows where assignedBy = userId = same row.
-      await db
-        .update(userRoles)
-        .set({ assignedBy: null })
-        .where(eq(userRoles.assignedBy, userId));
-      await db.delete(userRoles).where(eq(userRoles.userId, userId));
+      const userEmail = userResponse.data.email;
 
-      // Nullify all other no-action FK references to this user in parallel.
-      // credit_wallets.userId is nullified (not deleted) so the wallet and all
-      // credit transaction history are preserved as an audit record.
-      // leads linked via user_lead_links cascade automatically; the actual lead
-      // records (email captures) are never deleted.
-      await Promise.all([
-        db.delete(passwordResets).where(eq(passwordResets.userId, userId)),
-        db
+      // 2. All DB work in ONE transaction: either the account is fully gone
+      //    or nothing changed.
+      await withTransaction(logger, async (tx) => {
+        // Erase PII from every lead tied to this person (linked devices, the
+        // converted lead, any lead carrying their email). Rows stay as
+        // anonymous aggregates; the unique email is freed.
+        const linkedLeadRows = await tx
+          .select({ leadId: userLeadLinks.leadId })
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.userId, userId));
+        const linkedLeadIds = linkedLeadRows.map((r) => r.leadId);
+        const leadConditions = [eq(leads.convertedUserId, userId)];
+        if (linkedLeadIds.length > 0) {
+          leadConditions.push(inArray(leads.id, linkedLeadIds));
+        }
+        if (userEmail) {
+          leadConditions.push(eq(leads.email, userEmail));
+        }
+        await tx
           .update(leads)
-          .set({ convertedUserId: null })
-          .where(eq(leads.convertedUserId, userId)),
-        db
+          .set({
+            email: null,
+            businessName: "",
+            contactName: null,
+            phone: null,
+            website: null,
+            ipAddress: null,
+            userAgent: null,
+            notes: null,
+            metadata: {},
+            convertedUserId: null,
+            updatedAt: new Date(),
+          })
+          .where(or(...leadConditions));
+
+        // Attribution journeys of those leads keep channel + funnel timestamps
+        // (aggregates) but lose the personal trail: user link, landing path,
+        // ref codes.
+        const journeyConditions = [eq(growthJourneys.userId, userId)];
+        if (linkedLeadIds.length > 0) {
+          journeyConditions.push(inArray(growthJourneys.leadId, linkedLeadIds));
+        }
+        await tx
+          .update(growthJourneys)
+          .set({
+            userId: null,
+            firstLandingPath: null,
+            lastLandingPath: null,
+            firstRefCode: null,
+            lastRefCode: null,
+            updatedAt: new Date(),
+          })
+          .where(or(...journeyConditions));
+
+        // Contact-form messages carry name/email/free text: scrub, keep row.
+        const contactConditions = [eq(contacts.userId, userId)];
+        if (userEmail) {
+          contactConditions.push(eq(contacts.email, userEmail));
+        }
+        await tx
+          .update(contacts)
+          .set({
+            name: "",
+            email: null,
+            company: null,
+            message: "",
+            userId: null,
+            updatedAt: new Date(),
+          })
+          .where(or(...contactConditions));
+
+        // Newsletter rows are keyed by email — remove them outright.
+        if (userEmail) {
+          await tx
+            .delete(newsletterSubscriptions)
+            .where(eq(newsletterSubscriptions.email, userEmail));
+        }
+
+        // Handle FK constraints with ON DELETE no action before deleting the
+        // user. user_roles: nullify assignedBy first so the delete doesn't
+        // violate the self-referential FK on rows where assignedBy = userId.
+        await tx
+          .update(userRoles)
+          .set({ assignedBy: null })
+          .where(eq(userRoles.assignedBy, userId));
+        await tx.delete(userRoles).where(eq(userRoles.userId, userId));
+
+        // credit_wallets.userId is nullified (not deleted) so the wallet and
+        // all credit transaction history are preserved as an audit record.
+        await tx
+          .delete(passwordResets)
+          .where(eq(passwordResets.userId, userId));
+        await tx
           .update(creditWallets)
           .set({ userId: null })
-          .where(eq(creditWallets.userId, userId)),
-        db.delete(csvImportJobs).where(eq(csvImportJobs.uploadedBy, userId)),
-        db.delete(importBatches).where(eq(importBatches.uploadedBy, userId)),
-        db
+          .where(eq(creditWallets.userId, userId));
+        await tx
+          .delete(csvImportJobs)
+          .where(eq(csvImportJobs.uploadedBy, userId));
+        await tx
+          .delete(importBatches)
+          .where(eq(importBatches.uploadedBy, userId));
+        await tx
           .update(messengerAccounts)
           .set({ createdBy: null })
-          .where(eq(messengerAccounts.createdBy, userId)),
-        db
+          .where(eq(messengerAccounts.createdBy, userId));
+        await tx
           .update(messengerAccounts)
           .set({ updatedBy: null })
-          .where(eq(messengerAccounts.updatedBy, userId)),
-        db
+          .where(eq(messengerAccounts.updatedBy, userId));
+        await tx
           .update(payoutRequests)
           .set({ processedByUserId: null })
-          .where(eq(payoutRequests.processedByUserId, userId)),
-      ]);
+          .where(eq(payoutRequests.processedByUserId, userId));
 
-      // Delete user — all remaining FK constraints use ON DELETE cascade.
-      await db.delete(users).where(eq(users.id, userId));
+        // Delete user — all remaining FK constraints use ON DELETE cascade.
+        await tx.delete(users).where(eq(users.id, userId));
+      });
 
       logger.debug("Successfully deleted user account", { userId });
 
@@ -635,13 +731,12 @@ export class UserProfileRepository {
         exists: true,
       });
     } catch (error) {
-      logger.error("Error deleting user account", parseError(error));
-      const parsedError = parseError(error);
+      // Full detail goes to the log only — never raw DB/driver text to the user.
+      logger.error("Error deleting user account", parseError(error), {
+        userId: user.id,
+      });
       return fail({
-        message: t("delete.errors.internal.detail", {
-          error: parsedError.message,
-          userId: user.id,
-        }),
+        message: t("delete.errors.internal.retry"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

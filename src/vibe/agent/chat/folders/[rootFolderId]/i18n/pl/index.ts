@@ -33,6 +33,7 @@ export const translations: typeof enTranslations = {
       moveDown: "Przenieś niżej",
       newSubfolder: "Nowy podfolder",
       managePermissions: "Zarządzaj uprawnieniami",
+      projectSettings: "Ustawienia projektu",
       renameFolder: "Zmień nazwę folderu",
       moveToFolder: "Przenieś do folderu",
       deleteFolder: "Usuń folder",
@@ -57,6 +58,9 @@ export const translations: typeof enTranslations = {
     },
     newFolder: {
       title: "Utwórz nowy folder",
+    },
+    project: {
+      dialogTitle: "Ustawienia projektu",
     },
     permissions: {
       folderTitle: "Uprawnienia folderu",

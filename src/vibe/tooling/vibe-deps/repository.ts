@@ -28,6 +28,11 @@ import type {
 } from "./definition";
 import type { CheckVibeDepsT } from "./i18n";
 import {
+  collectI18nReferences,
+  extractTranslationKeys,
+  isI18nKeyReferenced,
+} from "./i18n-keys";
+import {
   domainOf,
   importsOnlyRunInProcess,
   isCategoryImporter,
@@ -2111,6 +2116,55 @@ function writeBoundariesJson(
 }
 
 // ============================================================
+// Unused i18n keys
+// ============================================================
+
+const EN_TRANSLATIONS_FILE = /\/i18n\/en\/index\.ts$/;
+
+/**
+ * Keys of every scoped `i18n/en/index.ts` under `scope` that no non-i18n
+ * source references (see i18n-keys.ts for what counts as a reference).
+ */
+function buildUnusedI18n(
+  allFiles: readonly string[],
+  scope: string,
+): { entries: DepsEntry[]; scannedFiles: number } {
+  const referenceSources: string[] = [];
+  const enFiles: string[] = [];
+  for (const file of allFiles) {
+    if (EN_TRANSLATIONS_FILE.test(file)) {
+      if (!isGenerated(file) && (!scope || file.includes(scope))) {
+        enFiles.push(file);
+      }
+    } else if (!/\/i18n\/(?:en|de|pl)\//.test(file)) {
+      // i18n helpers (i18n/utils.ts, …) reference keys too — only the
+      // translation files themselves are excluded
+      referenceSources.push(readFileSync(file, "utf8"));
+    }
+  }
+  const index = collectI18nReferences(referenceSources);
+  const entries: DepsEntry[] = [];
+  for (const file of enFiles.toSorted()) {
+    const path = toPosixPath(relative(PROJECT_ROOT, file));
+    for (const def of extractTranslationKeys(readFileSync(file, "utf8"))) {
+      if (!isI18nKeyReferenced(def.key, index)) {
+        entries.push({
+          path: `${path}:${String(def.line)}`,
+          imports: [],
+          importedBy: [],
+          importCount: 0,
+          importedByCount: 0,
+          isUnused: true,
+          symbol: def.key,
+          symbolKind: "i18n-key",
+        });
+      }
+    }
+  }
+  return { entries, scannedFiles: enFiles.length };
+}
+
+// ============================================================
 // Repository
 // ============================================================
 
@@ -2126,6 +2180,26 @@ export class VibeDepsRepository {
       const effectiveDepth = depth ?? 1;
       const effectiveLimit = limit ?? 100;
       const view = effectiveMode;
+
+      // ── Unused i18n keys (text scan — no import graph needed) ──
+      if (effectiveMode === "unused-i18n") {
+        const { entries, scannedFiles } = buildUnusedI18n(
+          scanTsFiles(PROJECT_ROOT),
+          focus ? toPosixPath(focus).replace(/\/+$/, "") : "",
+        );
+        logger.info(
+          `vibe-deps: unused-i18n — ${entries.length} unreferenced keys in ${scannedFiles} en files`,
+        );
+        return success({
+          view,
+          entries: entries.slice(0, effectiveLimit),
+          groups: [],
+          violations: emptyViolations(),
+          totalFiles: scannedFiles,
+          totalEdges: 0,
+          unusedCount: entries.length,
+        });
+      }
 
       // Scan the WHOLE PROJECT (cwd), not just src/ — root-level config files
       // (release.config.ts, build.config.ts, vibe-deps.config.ts, …) import

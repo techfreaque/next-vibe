@@ -636,10 +636,13 @@ export async function fetchFavoriteConfigAndModel(
       const variantId =
         favoriteConfig.variantId ??
         parseSkillId(favoriteConfig.skillId).variantId;
+      // Same fallback as the production resolver (skills/resolver.ts): a
+      // favorite pinned to a variant the skill no longer has (e.g. a removed
+      // "kimi" variant) runs the default variant instead of resolving nothing.
       const variant = variants
-        ? variantId
-          ? variants.find((v) => v.id === variantId)
-          : (variants.find((v) => v.isDefault) ?? variants[0])
+        ? ((variantId ? variants.find((v) => v.id === variantId) : undefined) ??
+          variants.find((v) => v.isDefault) ??
+          variants[0])
         : null;
       if (variant?.modelSelection) {
         model = getBestChatModel(

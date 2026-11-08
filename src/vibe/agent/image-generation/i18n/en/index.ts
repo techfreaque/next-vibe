@@ -169,7 +169,7 @@ export const translations = {
         "Automatically picks the best model based on your filters",
       manualModeDescription: "Choose any model you want",
       characterBasedModeDescription:
-        "Uses the model this character was designed for",
+        "Uses the model this skill was designed for",
       typeChat: "Chat",
       typeImage: "Image",
       typeVideo: "Video",

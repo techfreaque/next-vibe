@@ -592,7 +592,7 @@ function buildToolCatalog(
   const lines: string[] = [
     "<tool-catalog>",
     "Execute any tool via: execute-tool({ toolName, input, callbackMode? })",
-    "callbackMode: omit=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn",
+    "callbackMode: leave the field out=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn",
     "",
   ];
   for (const e of localEntries) {

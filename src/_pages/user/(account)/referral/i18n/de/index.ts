@@ -8,13 +8,13 @@ export const translations: typeof enTranslations = {
 
   hero: {
     directEarning: "Du verdienst",
-    directLabel: "auf jede Zahlung",
     directNote: "von Personen, die du empfiehlst, für immer",
     bonusEarning: "Als Skill-Ersteller",
     bonusNote: "wenn andere deinen Skill teilen, für immer",
   },
 
   commissionTable: {
+    youLabel: "Du",
     perMonth: "/ Mon.",
     colLevel: "Wer verdient",
     colCut: "Anteil",
@@ -24,38 +24,14 @@ export const translations: typeof enTranslations = {
     chainTitle: "10 Abonnenten. Was du pro Monat verdienst.",
     chainSubtitle:
       "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut - zahlt für immer.",
-    youLabel: "Du",
     whoLabel0: "Du - wer auch immer sie direkt empfohlen hat",
     whoLabel1: "Skill-Ersteller (falls anders) oder dein Empfehler",
     whoLabel2: "Der Empfehler des Empfehlers",
     whoLabel3: "Ebene 4",
     whoLabel4: "Ebene 5",
     whoLabel5: "Ebene 6",
-    colExample: "Beispiel ({{examplePrice}}/Monat)",
     tableNote:
       "Empfehlungslink: {{directPct}} pro Nutzer. Dein Skill, von anderen geteilt: {{skillBonusPct}} pro Nutzer. Beides wiederkehrend, für immer.",
-  },
-
-  commission: {
-    title: "Die Kette, Ebene für Ebene",
-    subtitle:
-      "Jede Zahlung deiner Empfehlungen fließt die Kette hoch. Du sitzt auf Ebene 1 - {{directPct}} für immer. Jede Ebene darüber verdient auch.",
-    directTitle: "Direkte Provision",
-    directAmount: "Immer {{directPct}}",
-    directDesc:
-      "Jedes Mal, wenn jemand, den du empfohlen hast, zahlt, kriegst du {{directPct}}. Keine Ausnahmen. Kein Ablauf.",
-    bonusTitle: "Netzwerkeinnahmen",
-    bonusAmount: "Bis zu {{uplinePct}} mehr",
-    bonusDesc:
-      "Deine Empfehlungen empfehlen andere - du verdienst auch einen Anteil. {{level2Pct}} von Ebene 2, {{level3Pct}} von Ebene 3, jede Ebene halbiert.",
-    totalTitle: "Gesamtpotenzial",
-    totalAmount: "Bis zu {{totalPct}}",
-    totalDesc: "Wenn deine Empfehlungen auch andere empfehlen",
-    levelsTitle: "Ebenenübersicht",
-    level1: "Du empfiehlst jemanden → {{directPct}} seiner Zahlungen",
-    level2: "Er empfiehlt jemanden → {{level2Pct}} dieser Zahlungen",
-    level3: "Diese empfehlen andere → {{level3Pct}}",
-    level4: "Und so weiter, bis zu {{maxUplineLevels}} Ebenen",
   },
 
   story: {
@@ -104,43 +80,14 @@ export const translations: typeof enTranslations = {
       "Empfehlungslink → {{directPct}} pro Nutzer, für immer. Dein Skill, von anderen geteilt → {{skillBonusPct}} pro Nutzer. Zwei Quellen, null Mehraufwand.",
     step3Title: "Bezahlt werden",
     step3Body:
-      "Credits sind sofort da. Ab {{minPayout}} in BTC oder USDC auszahlen.",
+      "Einnahmen werden {{holdDays}} Tage nach jeder Zahlung freigegeben - die Rückerstattungsfrist. Dann als Credits nutzen oder ab {{minPayout}} in BTC/USDC auszahlen.",
   },
 
   manage: {
-    createSubtitle: "Codes für bestimmte Kampagnen oder Zielgruppen erstellen.",
     codesSubtitle: "Link kopieren, teilen, mitverdienen.",
-  },
-  createCode: {
-    title: "Empfehlungscode erstellen",
-    create: "Code erstellen",
-    creating: "Wird erstellt...",
   },
   myCodes: {
     title: "Deine Links",
-    loading: "Lädt...",
-    error: "Codes konnten nicht geladen werden",
-    empty: "Noch keine Codes. Ersten Code oben erstellen ↑",
-    copy: "Link kopieren",
-    copied: "Kopiert!",
-    uses: "Nutzungen",
-    signups: "Anmeldungen",
-    revenue: "Umsatz",
-    earnings: "Verdient",
-    inactive: "Inaktiv",
-  },
-  stats: {
-    loading: "Lädt...",
-    error: "Statistiken konnten nicht geladen werden",
-    totalSignups: "Anmeldungen gesamt",
-    totalSignupsDesc: "Nutzer, die sich über deinen Code angemeldet haben",
-    totalRevenue: "Generierter Umsatz",
-    totalRevenueDesc: "Gesamter Abonnementwert aus deinen Empfehlungen",
-    totalEarned: "Gesamt verdient",
-    totalEarnedDesc: "Deine Provision über alle Empfehlungen",
-    availableBalance: "Verfügbares Guthaben",
-    availableBalanceDesc:
-      "Für KI-Chats ausgeben - andere Credits zuerst. {{minPayout}} verdienen, um Auszahlung freizuschalten.",
   },
   cta: {
     title: "Konto erstellen und anfangen zu verdienen",
@@ -151,7 +98,8 @@ export const translations: typeof enTranslations = {
     pitch1: "{{directPct}} Empfehlungsprovision - wiederkehrend, kein Ablauf",
     pitch2:
       "Skill veröffentlichen → {{skillBonusPct}} von jedem, den andere darüber bringen",
-    pitch3: "Credits sofort. BTC/USDC ab {{minPayout}} Minimum.",
+    pitch3:
+      "Freigabe {{holdDays}} Tage nach Zahlung. BTC/USDC ab {{minPayout}}.",
   },
   payout: {
     title: "Einnahmen auszahlen",

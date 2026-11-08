@@ -43,6 +43,7 @@ import {
   StreamAbortError,
 } from "../core/constants";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
+import { isTransientErrorText } from "../errors/transient";
 import {
   abortReasonAsError,
   complete,
@@ -742,11 +743,9 @@ export class StreamLoop implements StreamLoopState {
       // Upstream capacity/availability problems (rate limit, 5xx, overload,
       // timeouts) are outside our control and already shown to the user as an
       // error bubble - warn, so the error log stays for actual bugs.
-      const transient =
-        /\b(429|500|502|503|504|529)\b|rate.?limit|concurrent request limit|overloaded|provider_unavailable|temporarily unavailable|timed? ?out|ECONNRESET|stream failed/i.test(
-          errorText,
-        );
+      const transient = isTransientErrorText(errorText);
       const errorMeta = { error: errorText, model, threadId, transient };
+      this.p.ctx.lastProviderErrorText = errorText;
       if (transient) {
         logger.warn(
           "[AI Stream] Provider emitted transient error part",

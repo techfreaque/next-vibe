@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Użycie puli",
-    title: "Wykorzystanie darmowej puli kredytów",
+    titleShort: "Darmowy limit wykorzystany",
+    title: "Darmowy limit wykorzystany (od początku miesiąca)",
     description:
-      "Wskaźnik zużytych darmowych kredytów w portfelach leadów na przedział rozdzielczości",
+      "Zużyte darmowe kredyty podzielone przez przyznane darmowe kredyty, oba od początku miesiąca (miesiąc UTC, reset 1.). 0 = nic nie użyto, 1 = zużyto każdy przyznany kredyt. Działa dla limitów warstwowych (gość / użytkownik / newsletter).",
     fields: {
       resolution: {
         label: "Rozdzielczość",
@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
       result: {
-        label: "Wykorzystanie darmowej puli",
+        label: "Darmowy limit wykorzystany",
         description: "Wyjściowa seria czasowa",
       },
       meta: { label: "Meta", description: "Metadane wykonania węzła" },

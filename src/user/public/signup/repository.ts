@@ -103,6 +103,29 @@ export class SignupRepository {
         });
       }
 
+      // Reject a bad referral code BEFORE the account exists — the user can fix
+      // or clear it. Silently dropping it would cost their referrer the credit.
+      const trimmedReferralCode = referralCode?.trim();
+      if (trimmedReferralCode) {
+        const { ReferralRepository } =
+          await import("../../../referral/repository");
+        const codeCheck = await ReferralRepository.validateReferralCode(
+          trimmedReferralCode,
+          logger,
+          locale,
+        );
+        if (
+          !codeCheck.success &&
+          codeCheck.errorType.errorCode !==
+            ErrorResponseTypes.INTERNAL_ERROR.errorCode
+        ) {
+          return fail({
+            message: t("fields.referralCode.validation.invalid"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
+
       // Create the user account with extracted data
       const result = await SignupRepository.createUserInternal(
         { email, password, privateName, publicName, subscribeToNewsletter },
@@ -130,22 +153,59 @@ export class SignupRepository {
       // Link leadId to user
       const { LeadAuthRepository } =
         await import("next-vibe/identity/lead/device-auth");
-      await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
+      // The link is what pools the pre-signup lead wallet into the user's
+      // credits — retry once, then record loudly (account already exists).
+      let leadLink = await LeadAuthRepository.linkLeadToUser(
+        user.leadId,
+        userData.id,
+        logger,
+      );
+      if (!leadLink.success) {
+        leadLink = await LeadAuthRepository.linkLeadToUser(
+          user.leadId,
+          userData.id,
+          logger,
+        );
+      }
+      if (!leadLink.success) {
+        logger.error(
+          "CRITICAL: lead not linked to new user — pre-signup credits not pooled, link manually",
+          { userId: userData.id, leadId: user.leadId },
+        );
+      }
+
+      // Growth funnel: the user inherits the lead's first/last-touch attribution
+      const { GrowthJourneyRepository } =
+        await import("@/leads/growth/repository");
+      await GrowthJourneyRepository.attachUser(
+        user.leadId,
+        userData.id,
+        logger,
+      );
 
       // Link referral code if provided manually in form
       const { ReferralRepository } =
         await import("../../../referral/repository");
-      if (referralCode) {
+      if (trimmedReferralCode) {
         logger.debug("Linking manual referral code to lead", {
-          referralCode,
+          referralCode: trimmedReferralCode,
           leadId: user.leadId,
         });
-        await ReferralRepository.linkReferralToLead(
+        const referralLink = await ReferralRepository.linkReferralToLead(
           user.leadId,
-          referralCode,
+          trimmedReferralCode,
           logger,
           locale,
         );
+        if (!referralLink.success) {
+          // Code was valid moments ago — this is an infrastructure failure.
+          logger.error("Failed to link referral code during signup", {
+            userId: userData.id,
+            leadId: user.leadId,
+            referralCode: trimmedReferralCode,
+            error: referralLink.message,
+          });
+        }
       }
 
       // Resolve skillCreatorUserId from lead.skillId (if it's a UUID → look up customSkills owner)
@@ -196,24 +256,36 @@ export class SignupRepository {
         user.leadId,
         logger,
       );
-      const mergeResult = await CreditRepository.mergePendingLeadWallets(
+      // The pool is derived from userLeadLinks on every balance read, so a
+      // failed eager merge self-heals on the next read/login as long as the
+      // lead link above landed. Retry once; log with full context otherwise.
+      const mergeLeadIds = [user.leadId, ...linkedLeadIds];
+      let mergeResult = await CreditRepository.mergePendingLeadWallets(
         userData.id,
-        [user.leadId, ...linkedLeadIds],
+        mergeLeadIds,
         logger,
         creditsT,
         locale,
       );
-      let creditMergeFailed = false;
       if (!mergeResult.success) {
-        // CRITICAL: Log as error but track failure so we can inform user
-        // User will still be registered, but may not have their pre-signup credits
-        creditMergeFailed = true;
-        logger.error("CRITICAL: Failed to merge lead wallet during signup", {
+        mergeResult = await CreditRepository.mergePendingLeadWallets(
+          userData.id,
+          mergeLeadIds,
+          logger,
+          creditsT,
+          locale,
+        );
+      }
+      if (!mergeResult.success) {
+        logger.error("Failed to merge lead wallets during signup", {
           userId: userData.id,
           leadId: user.leadId,
+          leadIds: mergeLeadIds,
+          leadLinked: leadLink.success,
           error: mergeResult.message,
-          action:
-            "User registered but credits may be missing - requires manual intervention",
+          action: leadLink.success
+            ? "Self-heals on next balance read (pool derives from lead links)"
+            : "Lead link missing too — pre-signup credits need a manual link",
         });
       }
 
@@ -325,10 +397,17 @@ export class SignupRepository {
         locale,
       );
       if (!tokenResponse.success) {
+        // The account exists but the user is NOT signed in. Reporting success
+        // would leave the client believing it is logged in — say so instead.
         logger.error("Failed to sign JWT token after signup", {
           userId: userData.id,
+          error: tokenResponse.message,
         });
-        // Continue without auto-login - user can manually log in
+        return fail({
+          message: t("errors.autoLoginFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: tokenResponse,
+        });
       } else {
         const expiresAt = new Date(
           Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
@@ -338,7 +417,21 @@ export class SignupRepository {
           token: tokenResponse.data,
           expiresAt,
         };
-        await SessionRepository.create(sessionData, locale);
+        const sessionResult = await SessionRepository.create(
+          sessionData,
+          locale,
+        );
+        if (!sessionResult.success) {
+          logger.error("Failed to create session after signup", {
+            userId: userData.id,
+            error: sessionResult.message,
+          });
+          return fail({
+            message: t("errors.autoLoginFailed"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            cause: sessionResult,
+          });
+        }
 
         // Store auth token using platform-specific handler
         const storeResult = await AuthRepository.storeAuthTokenForPlatform(
@@ -349,27 +442,20 @@ export class SignupRepository {
           logger,
           locale,
         );
-        if (storeResult.success) {
-          logger.debug("Auth token stored successfully after signup", {
+        if (!storeResult.success) {
+          logger.error("Error storing auth token after signup", {
             userId: userData.id,
+            error: storeResult.message,
           });
-        } else {
-          logger.error(
-            "Error storing auth token after signup",
-            parseError(storeResult),
-          );
-          // Continue even if token storage fails
+          return fail({
+            message: t("errors.autoLoginFailed"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            cause: storeResult,
+          });
         }
-      }
-
-      // Log warning if credit merge failed - user should contact support
-      if (creditMergeFailed) {
-        logger.warn(
-          "User registered but credit merge failed - manual intervention may be needed",
-          {
-            userId: userData.id,
-          },
-        );
+        logger.debug("Auth token stored successfully after signup", {
+          userId: userData.id,
+        });
       }
 
       // Return simple message response
@@ -464,7 +550,7 @@ export class SignupRepository {
       }
 
       // Note: Free credits are automatically created for the lead when it's first accessed
-      // No need to manually add credits here - the lead already has 20 free credits
+      // No need to manually add credits here - the pool tops up to the signed-in allowance on next balance read
       // from when it was created (in getOrCreateLeadByIp or getLeadBalance)
 
       logger.debug("User created successfully", {

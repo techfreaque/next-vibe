@@ -708,15 +708,15 @@ export const translations: typeof enTranslations = {
           favoriteId: {
             title: "ID ulubionego",
             description:
-              "UUID zapisanego ulubionego do załadowania modelu i postaci.",
+              "UUID zapisanego ulubionego do załadowania modelu i skilla.",
           },
           modelId: {
             title: "ID modelu",
             description: "Model AI dla wznowionego kroku.",
           },
           skillId: {
-            title: "ID postaci",
-            description: "Postać/persona dla wznowionego kroku.",
+            title: "ID skilla",
+            description: "Skill/persona dla wznowionego kroku.",
           },
           callbackMode: {
             title: "Tryb callback",
@@ -939,7 +939,7 @@ export const translations: typeof enTranslations = {
       folders: "Foldery",
       files: "Pliki",
       messages: "Wiadomości",
-      characters: "Persony",
+      characters: "Skille",
       memories: "Wspomnienia",
       favorites: "Ulubione",
       credits: "Kredyty",
@@ -1103,7 +1103,7 @@ export const translations: typeof enTranslations = {
         subscriptionButton: {
           title: "Kredyty i subskrypcja",
           description:
-            "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Bezpłatni użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc.",
+            "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, +{{bonusCredits}} z newsletterem.",
         },
         chatInput: {
           title: "Wpisz swoją wiadomość",
@@ -1154,8 +1154,8 @@ export const translations: typeof enTranslations = {
       modelOnly: "Tylko model",
       editModelSettings: "Edytuj ustawienia modelu",
       editSettings: "Edytuj ustawienia",
-      switchSkill: "Zmień postać",
-      editSkill: "Edytuj postać",
+      switchSkill: "Zmień skill",
+      editSkill: "Edytuj skill",
       delete: "Usuń",
       autoSelectedModel: "FILTROWANE",
       manualSelectedModel: "WYBRANE RĘCZNIE",
@@ -1182,7 +1182,7 @@ export const translations: typeof enTranslations = {
       saveAsDefault: "Dodaj do ulubionych",
       deleteSetup: "Usuń konfigurację",
       content: "Przeszukaj treść...",
-      characterSetup: "Konfiguracja persony",
+      characterSetup: "Konfiguracja skilla",
       noResults: "Brak wyników",
       add: "Dodaj do ulubionych",
       added: "Dodano",
@@ -1191,7 +1191,7 @@ export const translations: typeof enTranslations = {
       createCustom: "Utwórz własną",
       customizeSettings: "Dostosuj ustawienia",
       requirements: {
-        characterConflict: "Konflikty wymagań postaci",
+        characterConflict: "Konflikty wymagań skilla",
         tooLow: "zbyt niski",
         tooHigh: "zbyt wysoki",
         min: "min",
@@ -1236,14 +1236,14 @@ export const translations: typeof enTranslations = {
         deleteMessage: "Usuń wiadomość",
       },
       characterSelector: {
-        placeholder: "Wybierz personę",
-        addNewLabel: "Utwórz własną personę",
+        placeholder: "Wybierz skill",
+        addNewLabel: "Utwórz własny skill",
         grouping: {
           bySource: "Według źródła",
           byCategory: "Według kategorii",
           sourceLabels: {
             builtIn: "Wbudowane",
-            my: "Moje persony",
+            my: "Moje skille",
             community: "Społeczność",
           },
           sourceIcons: {
@@ -1253,11 +1253,11 @@ export const translations: typeof enTranslations = {
           },
         },
         addDialog: {
-          title: "Utwórz własną personę",
+          title: "Utwórz własny skill",
           fields: {
             name: {
               label: "Nazwa",
-              placeholder: "Wprowadź nazwę persony",
+              placeholder: "Wprowadź nazwę skilla",
             },
             icon: {
               label: "Ikona (emoji)",
@@ -1265,11 +1265,11 @@ export const translations: typeof enTranslations = {
             },
             description: {
               label: "Opis",
-              placeholder: "Krótki opis persony",
+              placeholder: "Krótki opis skilla",
             },
             systemPrompt: {
               label: "Prompt systemowy",
-              placeholder: "Zdefiniuj, jak zachowuje się postać...",
+              placeholder: "Zdefiniuj, jak zachowuje się skill...",
             },
             category: {
               label: "Kategoria",
@@ -1277,7 +1277,7 @@ export const translations: typeof enTranslations = {
           },
           createCategory: "Utwórz kategorię",
           cancel: "Anuluj",
-          create: "Utwórz personę",
+          create: "Utwórz skill",
         },
         addCategoryDialog: {
           title: "Utwórz kategorię",
@@ -2386,6 +2386,14 @@ export const translations: typeof enTranslations = {
       descriptions: {
         openaiWhisper: "OpenAI Whisper",
         deepgramNova2: "Deepgram Nova-2",
+        whisperLargeV3:
+          "Whisper Large V3 - Otwarty model OpenAI, 99 języków, znacznie tańszy niż whisper-1.",
+        voxtralMini:
+          "Voxtral Mini Transcribe - transkrypcja Mistral z rozdzielaniem mówców i znacznikami czasu, do 10 minut.",
+        nemotronAsr:
+          "Nemotron ASR - otwarte wielojęzyczne rozpoznawanie mowy NVIDIA, 40 wariantów językowych, niskie opóźnienie.",
+        gpt4oMiniTranscribe:
+          "GPT-4o Mini Transcribe - niższy współczynnik błędów niż Whisper, lepsze wykrywanie języka.",
       },
     },
   },
@@ -2500,6 +2508,29 @@ export const translations: typeof enTranslations = {
         elevenlabsJosh: "ElevenLabs Josh",
         elevenlabsBella: "ElevenLabs Bella",
         elevenlabsAdam: "ElevenLabs Adam",
+        kokoroBella:
+          "Kokoro Bella - Otwarty model 82M, ciepły amerykański głos kobiecy. Bez filtra treści.",
+        kokoroSarah:
+          "Kokoro Sarah - Otwarty model 82M, wyraźny amerykański głos kobiecy. Bez filtra treści.",
+        kokoroNicole:
+          "Kokoro Nicole - Otwarty model 82M, miękki, stonowany głos kobiecy. Bez filtra treści.",
+        kokoroAdam:
+          "Kokoro Adam - Otwarty model 82M, spokojny amerykański głos męski. Bez filtra treści.",
+        kokoroMichael:
+          "Kokoro Michael - Otwarty model 82M, pewny siebie amerykański głos męski. Bez filtra treści.",
+        kokoroEmma:
+          "Kokoro Emma - Otwarty model 82M, brytyjski głos kobiecy. Bez filtra treści.",
+        kokoroGeorge:
+          "Kokoro George - Otwarty model 82M, brytyjski głos męski. Bez filtra treści.",
+        inworldAshley:
+          "Inworld Ashley - Szybki, tani głos kobiecy o żywej narracji.",
+        inworldCraig: "Inworld Craig - Szybki, tani brytyjski głos męski.",
+        xaiEve:
+          "xAI Eve - Ekspresyjny głos kobiecy ze sterowaniem emocjami w tekście.",
+        geminiZephyr:
+          "Gemini Zephyr - Jasny głos kobiecy, ponad 100 języków, sterowanie intonacją.",
+        geminiPuck:
+          "Gemini Puck - Energiczny głos męski, ponad 100 języków, sterowanie intonacją.",
       },
     },
   },

@@ -3,7 +3,9 @@
  * Provides consistent, beautiful formatting for different types of log messages
  */
 
-import { bold, dim, maybeColorize, semantic } from "./colors";
+import { bold, colors, dim, maybeColorize, semantic } from "./colors";
+import { formatElapsed } from "./uptime";
+import type { LoggerMetadata } from "./types";
 
 /**
  * Format a startup message
@@ -75,22 +77,7 @@ export function createNextjsFormatter(
       return new Date().toISOString().slice(11, 23);
     }
     const startTime = Number(process.env["VIBE_START_TIME"]);
-    const totalMs = Date.now() - startTime;
-    const totalSec = totalMs / 1000;
-    if (totalSec < 60) {
-      return `${totalSec.toFixed(3)}s`;
-    }
-    const days = Math.floor(totalSec / 86400);
-    const hours = Math.floor((totalSec % 86400) / 3600);
-    const minutes = Math.floor((totalSec % 3600) / 60);
-    const secs = Math.floor(totalSec % 60);
-    if (days > 0) {
-      return `${days}d${hours}h${minutes}m${secs}s`;
-    }
-    if (hours > 0) {
-      return `${hours}h${minutes}m${secs}s`;
-    }
-    return `${minutes}m${secs}s`;
+    return formatElapsed((Date.now() - startTime) / 1000);
   };
 
   let lastPrefix = "";
@@ -120,7 +107,9 @@ export function createNextjsFormatter(
         );
       } else {
         lastPrefix = prefix;
-        out.push(maybeColorize(`${prefix}${raw}`, semantic.nextjs));
+        out.push(
+          `${maybeColorize(prefix.trimEnd(), semantic.highlight)} ${maybeColorize(raw, semantic.nextjs)}`,
+        );
       }
     }
 
@@ -224,4 +213,192 @@ export function formatHint(text: string): string {
  */
 export function formatActionCommand(action: string, command: string): string {
   return `${action} ${maybeColorize(`'${command}'`, semantic.muted)}`;
+}
+
+/**
+ * Prefixes (inside leading square brackets) of the remote-connector log family.
+ * Matched against the START of the message only - never scanned mid-line.
+ */
+const CONNECTOR_PREFIXES: readonly string[] = [
+  "Connector",
+  "WsConnection",
+  "WsProvider",
+  "runReverseWsPulse",
+];
+
+/** Prefixes of the reverse-proxy / upstream-health log family. */
+const PROXY_PREFIXES: readonly string[] = ["Proxy"];
+
+const LOG_PREFIX_RE = /^\s*\[([A-Za-z][\w-]*)\]/;
+
+/**
+ * Pick a console colour for a log message by its leading `[Prefix]` tag.
+ * Returns undefined when the message has no dedicated category colour.
+ */
+export function getLogCategoryColor(message: string): string | undefined {
+  const match = LOG_PREFIX_RE.exec(message);
+  const tag = match?.[1] ?? "";
+  if (CONNECTOR_PREFIXES.includes(tag)) {
+    return semantic.connector;
+  }
+  if (PROXY_PREFIXES.includes(tag)) {
+    return semantic.proxy;
+  }
+  return undefined;
+}
+
+/**
+ * True when a message's metadata should render as compact `key=value` pairs
+ * (connector + proxy families) rather than the generic indented pretty-printer.
+ */
+export function usesCompactMetadata(message: string): boolean {
+  return getLogCategoryColor(message) !== undefined;
+}
+
+/**
+ * Colourize a console log message by category (console only, never the file log).
+ * Categorised lines get a bold `[Tag]` followed by the message in the same hue.
+ */
+export function colorizeLogMessage(message: string): string {
+  const color = getLogCategoryColor(message);
+  if (!color) {
+    return message;
+  }
+  const match = LOG_PREFIX_RE.exec(message);
+  if (match) {
+    const tagLen = match[0].length;
+    const tag = message.slice(0, tagLen).trimStart();
+    const lead = message.slice(0, tagLen - tag.length);
+    return `${lead}${maybeColorize(tag, `${color}${colors.bold}`)}${maybeColorize(message.slice(tagLen), color)}`;
+  }
+  return maybeColorize(message, color);
+}
+
+function connectorValue(v: LoggerMetadata): string {
+  if (v === null || v === undefined) {
+    return String(v);
+  }
+  if (typeof v === "string") {
+    return /[\s,[\]{}]/.test(v) ? JSON.stringify(v) : v;
+  }
+  if (Array.isArray(v)) {
+    return `[${v.map((x) => connectorValue(x)).join(", ")}]`;
+  }
+  if (typeof v === "object" && !(v instanceof Date) && !(v instanceof Error)) {
+    return `{ ${Object.entries(v)
+      .map(([k, x]) => `${k}=${connectorValue(x)}`)
+      .join(" ")} }`;
+  }
+  return v instanceof Date ? v.toISOString() : String(v);
+}
+
+/**
+ * Compact `key=value` rendering for connector metadata: keys dim, values plain,
+ * one line when it fits. Falls back to the generic pretty printer when wide.
+ */
+export function formatConnectorMetadata(value: LoggerMetadata): string {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    value instanceof Date ||
+    value instanceof Error
+  ) {
+    return formatMetadata(value);
+  }
+  const pairs = Object.entries(value).map(
+    ([k, v]) => [k, connectorValue(v)] as const,
+  );
+  const plain = pairs.map(([k, v]) => `${k}=${v}`).join("  ");
+  if (plain.length > 140) {
+    return formatMetadata(value);
+  }
+  return pairs
+    .map(([k, v]) => `${maybeColorize(`${k}=`, semantic.muted)}${v}`)
+    .join("  ");
+}
+
+/** Colourize an HTTP request line (GET /path 200 in 12ms). */
+export function formatHttpRequest(line: string): string {
+  return maybeColorize(line, semantic.webServer);
+}
+
+const PRETTY_INLINE_MAX = 100;
+const PRETTY_MAX_DEPTH = 6;
+const PRETTY_INDENT = "  ";
+
+function prettyKey(key: string): string {
+  return maybeColorize(`${key}:`, semantic.muted);
+}
+
+function prettyValue(
+  value: LoggerMetadata,
+  depth: number,
+  seen: Set<LoggerMetadata>,
+): { inline: string; multi: string[] | null } {
+  if (value === null || value === undefined) {
+    return { inline: String(value), multi: null };
+  }
+  if (typeof value === "string") {
+    return { inline: JSON.stringify(value), multi: null };
+  }
+  if (typeof value !== "object") {
+    return { inline: String(value), multi: null };
+  }
+  if (value instanceof Date) {
+    return { inline: value.toISOString(), multi: null };
+  }
+  if (value instanceof Error) {
+    return { inline: `${value.name}: ${value.message}`, multi: null };
+  }
+  if (seen.has(value) || depth >= PRETTY_MAX_DEPTH) {
+    return { inline: seen.has(value) ? "[Circular]" : "[…]", multi: null };
+  }
+  seen.add(value);
+  const entries: Array<
+    [string | null, { inline: string; multi: string[] | null }]
+  > = Array.isArray(value)
+    ? value.map((v): [null, ReturnType<typeof prettyValue>] => [
+        null,
+        prettyValue(v, depth + 1, seen),
+      ])
+    : Object.entries(value).map(
+        ([k, v]): [string, ReturnType<typeof prettyValue>] => [
+          k,
+          prettyValue(v, depth + 1, seen),
+        ],
+      );
+  seen.delete(value);
+
+  const open = Array.isArray(value) ? "[" : "{";
+  const close = Array.isArray(value) ? "]" : "}";
+  if (entries.length === 0) {
+    return { inline: `${open}${close}`, multi: null };
+  }
+  const parts = entries.map(([k, v]) =>
+    k === null ? v.inline : `${prettyKey(k)} ${v.inline}`,
+  );
+  // eslint-disable-next-line no-control-regex
+  const plainLen = parts.join(", ").replace(/\u001B\[[0-9;]*m/g, "").length;
+  const anyMulti = entries.some(([, v]) => v.multi !== null);
+  const inline = `${open}${parts.join(", ")}${close}`;
+  if (!anyMulti && plainLen <= PRETTY_INLINE_MAX) {
+    return { inline: `${open} ${parts.join(", ")} ${close}`, multi: null };
+  }
+  const lines = entries.map(([k, v]) => {
+    const body = v.multi ? v.multi.join("\n") : v.inline;
+    return `${PRETTY_INDENT}${k === null ? "" : `${prettyKey(k)} `}${body.split("\n").join(`\n${PRETTY_INDENT}`)}`;
+  });
+  const multi = [open, ...lines.map((l) => l), close];
+  return { inline, multi };
+}
+
+/**
+ * Pretty-print a structured metadata value for the terminal.
+ * Small values collapse onto one line; large ones are indented with dim keys.
+ * Console only - file logs keep full structured JSON.
+ */
+export function formatMetadata(value: LoggerMetadata): string {
+  const result = prettyValue(value, 0, new Set());
+  return result.multi ? result.multi.join("\n") : result.inline;
 }

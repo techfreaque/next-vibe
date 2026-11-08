@@ -122,6 +122,7 @@ export function getReferralParams(
     ),
     minPayout: fmtUSD(REFERRAL_CONFIG.MIN_PAYOUT_CENTS, locale),
     cryptoPayoutHours: String(REFERRAL_CONFIG.CRYPTO_PAYOUT_HOURS),
+    holdDays: String(REFERRAL_CONFIG.EARNING_HOLD_DAYS),
     story_noob_users: String(noobUsers),
     story_noob_earning: fmtUSD(noobEarningCents, locale),
     story_mid_users: String(midUsers),

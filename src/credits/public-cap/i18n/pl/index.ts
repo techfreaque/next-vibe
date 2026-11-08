@@ -34,6 +34,11 @@ export const translations: typeof enTranslations = {
     capExceeded: {
       content: "Limit przekroczony",
     },
+    perLeadCap: { content: "Limit na leada" },
+    perIpCap: { content: "Limit na IP" },
+    topSpenders: { content: "Najwięksi darmowi użytkownicy dziś" },
+    recentEvents: { content: "Ostatnie zdarzenia limitu" },
+    noData: "Dziś jeszcze nic.",
     success: {
       title: "Status limitu pobrany",
       description:
@@ -89,6 +94,16 @@ export const translations: typeof enTranslations = {
         "Maksymalna liczba kredytów, które użytkownicy niepłacący mogą łącznie wydać dziennie",
       placeholder: "np. 500",
     },
+    perLeadCap: {
+      label: "Dzienny limit na leada (kredyty)",
+      description: "Ile darmowych kredytów może zużyć jeden gość dziennie",
+      placeholder: "np. 20",
+    },
+    perIpCap: {
+      label: "Dzienny limit na IP (kredyty)",
+      description: "Ile darmowych kredytów może zużyć jedno IP dziennie",
+      placeholder: "np. 40",
+    },
     message: {
       content: "Wynik",
     },
@@ -139,6 +154,10 @@ export const translations: typeof enTranslations = {
     capUpdated: "Dzienny limit ustawiony na {{capAmount}} kredytów",
     capExceeded:
       "Osiągnięto dzienny limit darmowych kredytów. Zarejestruj się lub spróbuj ponownie jutro.",
+    leadCapExceeded:
+      "Dzisiejszy darmowy limit wyczerpany. Zarejestruj się lub podaj e-mail, a dostaniesz więcej kredytów.",
+    capUnavailable:
+      "Darmowy plan jest chwilowo niedostępny. Zarejestruj się, by kontynuować.",
     getCapFailed: "Nie udało się pobrać konfiguracji limitu darmowych kredytów",
     updateCapFailed: "Nie udało się zaktualizować limitu darmowych kredytów",
     incrementFailed: "Nie udało się zarejestrować wydatków darmowych kredytów",

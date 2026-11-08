@@ -56,6 +56,12 @@ export const semantic = {
   generator: colors.brightMagenta,
   sense: colors.brightRed,
   nextjs: colors.brightCyan,
+  /** HTTP request lines (GET/POST ... 200 in 64ms) */
+  webServer: colors.brightCyan, // identical to nextjs: one web-server colour
+  /** [Connector] / [WsConnection] remote-instance connector family */
+  connector: "\u001B[38;5;141m", // soft violet (256-colour #af87ff)
+  /** [Proxy] reverse-proxy / upstream-health family */
+  proxy: "\u001B[38;5;214m", // soft amber (256-colour #ffaf00)
 
   // Accent colors
   highlight: colors.white,

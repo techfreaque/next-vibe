@@ -18,6 +18,12 @@ export const REFERRAL_CONFIG = {
   EXAMPLE_PRICE_CENTS: 2000,
   /** Crypto payout processing time in hours (used in UI and emails) */
   CRYPTO_PAYOUT_HOURS: 48,
+  /**
+   * Refund window: a new earning stays PENDING (not spendable, not payable)
+   * for this many days. A refund or dispute inside the window cancels it
+   * outright; after it, the confirm cron turns it into earned credits.
+   */
+  EARNING_HOLD_DAYS: 30,
 } as const;
 
 /**

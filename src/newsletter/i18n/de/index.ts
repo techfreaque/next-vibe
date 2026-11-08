@@ -485,6 +485,11 @@ export const translations: typeof enTranslations = {
       bounced: "Zurückgewiesen",
       complained: "Beschwerde",
     },
+    creditBonus: {
+      active: "Bonus aktiv",
+      pendingConfirmation: "E-Mail bestätigen zum Freischalten",
+      claimedElsewhere: "Bereits von einem anderen Konto beansprucht",
+    },
   },
   hooks: {
     errors: {

@@ -73,6 +73,64 @@ export const ThreadStatusDB = [
 ] as const;
 
 /**
+ * Moderation status of a publicly visible thread (PUBLIC feed / SHARED links).
+ * VISIBLE -> UNDER_REVIEW (auto-hidden at the report threshold) -> REMOVED (admin).
+ */
+export const {
+  enum: ThreadModerationStatus,
+  options: ThreadModerationStatusOptions,
+  Value: ThreadModerationStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  VISIBLE: "enums.threadModerationStatus.visible",
+  UNDER_REVIEW: "enums.threadModerationStatus.underReview",
+  REMOVED: "enums.threadModerationStatus.removed",
+});
+
+export const ThreadModerationStatusDB = [
+  ThreadModerationStatus.VISIBLE,
+  ThreadModerationStatus.UNDER_REVIEW,
+  ThreadModerationStatus.REMOVED,
+] as const;
+
+/** Why a viewer reported a public thread. */
+export const {
+  enum: ThreadReportReason,
+  options: ThreadReportReasonOptions,
+  Value: ThreadReportReasonValue,
+} = createEnumOptions(scopedTranslation, {
+  SPAM: "enums.threadReportReason.spam",
+  ILLEGAL: "enums.threadReportReason.illegal",
+  ABUSE: "enums.threadReportReason.abuse",
+  CSAM_FLAG: "enums.threadReportReason.csamFlag",
+  OTHER: "enums.threadReportReason.other",
+});
+
+export const ThreadReportReasonDB = [
+  ThreadReportReason.SPAM,
+  ThreadReportReason.ILLEGAL,
+  ThreadReportReason.ABUSE,
+  ThreadReportReason.CSAM_FLAG,
+  ThreadReportReason.OTHER,
+] as const;
+
+/** Admin decision on a reported thread. */
+export const {
+  enum: ThreadModerationAction,
+  options: ThreadModerationActionOptions,
+  Value: ThreadModerationActionValue,
+} = createEnumOptions(scopedTranslation, {
+  DISMISS: "enums.threadModerationAction.dismiss",
+  REMOVE: "enums.threadModerationAction.remove",
+  BAN_AUTHOR: "enums.threadModerationAction.banAuthor",
+});
+
+export const ThreadModerationActionDB = [
+  ThreadModerationAction.DISMISS,
+  ThreadModerationAction.REMOVE,
+  ThreadModerationAction.BAN_AUTHOR,
+] as const;
+
+/**
  * View mode enum for message display
  */
 export const {

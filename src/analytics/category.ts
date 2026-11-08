@@ -166,5 +166,15 @@ export const category: CategoryDefinition = {
         "pl-PL": "Dane systemowe",
       },
     },
+    financeData: {
+      icon: "wallet",
+      order: 20,
+      label: {
+        "en-US": "Finance Data",
+        "en-GLOBAL": "Finance Data",
+        "de-DE": "Finanzdaten",
+        "pl-PL": "Dane finansowe",
+      },
+    },
   },
 };

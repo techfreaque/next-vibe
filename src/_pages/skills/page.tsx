@@ -6,6 +6,8 @@
 
 export const dynamic = "force-dynamic";
 
+import type { SkillListResponseOutput } from "next-vibe/agent/skills/definition";
+import { SkillSourceFilter } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -24,6 +26,8 @@ export interface SkillsPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
+  /** Built-in skills resolved server-side so the list paints on first load. */
+  initialData: SkillListResponseOutput | undefined;
 }
 
 export async function tanstackLoader({
@@ -38,15 +42,40 @@ export async function tanstackLoader({
     logger,
   );
 
-  return { locale, user, platform: Platform.NEXT_PAGE };
+  // Dynamic import: the skills repository's import tree cycles when pulled
+  // in at page module top-level (same reason skills-content is lazy).
+  const { SkillsRepository } =
+    await import("next-vibe/agent/skills/repository");
+  const skills = await SkillsRepository.getSkills(
+    { sourceFilter: SkillSourceFilter.BUILT_IN },
+    user,
+    logger,
+    locale,
+    Platform.NEXT_PAGE,
+  );
+
+  return {
+    locale,
+    user,
+    platform: Platform.NEXT_PAGE,
+    initialData: skills.success ? skills.data : undefined,
+  };
 }
 
 export function TanstackPage({
   locale,
   user,
   platform,
+  initialData,
 }: SkillsPageData): JSX.Element {
-  return <SkillsPageClient locale={locale} user={user} platform={platform} />;
+  return (
+    <SkillsPageClient
+      locale={locale}
+      user={user}
+      platform={platform}
+      initialData={initialData}
+    />
+  );
 }
 
 export default async function SkillsPage({

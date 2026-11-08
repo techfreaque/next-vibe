@@ -52,10 +52,6 @@ export const translations: typeof enTranslations = {
     deleteLine: "Usuń folder. Feature znika z każdej platformy naraz.",
   },
   surfaces: {
-    eyebrow: "Every Platform",
-    title: "Jedna definicja. Trzynaście platform.",
-    subtitle:
-      "Gdy dodajesz feature do next-vibe, nie staje się tylko endpointem API. Działa wszędzie naraz.",
     items: {
       webApi: {
         label: "Web API",
@@ -156,6 +152,34 @@ export const translations: typeof enTranslations = {
     vibeCheck:
       "vibe check uruchamia Oxlint (Rust), ESLint i sprawdzanie typów TypeScript równolegle. Zero błędów wymagane przed wysyłką.",
   },
+  examples: {
+    eyebrow: "Zbudowane na next-vibe",
+    title: "Od deski rozdzielczej auta po platformę AI.",
+    subtitle:
+      "Jedna baza kodu, dowolny ekran. To prawdziwe produkty na next-vibe - komputer samochodowy, sklepy internetowe, strony z rezerwacjami i samo {{appName}}. Jeden framework, skrajnie różne produkty.",
+    items: {
+      headunit: {
+        label: "Kokpit samochodowy",
+        title: "Pełny headunit samochodowy",
+        body: "Nawigacja, klimatyzacja, radio, Spotify, rozmowy przez Bluetooth i diagnostyka pojazdu na żywo - plus Android Auto - na dotykowym komputerze samochodowym. Zbudowane jako fork next-vibe.",
+      },
+      shop: {
+        label: "E-commerce",
+        title: "Sklepy internetowe, które sprzedają",
+        body: "Witryna, koszyk, płatność, magazyn i kasa z jednej instalacji. Prawdziwy sklep już na tym działa.",
+      },
+      booking: {
+        label: "Rezerwacje",
+        title: "Strony dla gabinetów i rezerwacji",
+        body: "Wizyty, kartoteki klientów, faktury i publiczna strona - kręgosłup działalności usługowej. Ten sam stack co sklep.",
+      },
+      aiPlatform: {
+        label: "Platforma AI",
+        title: "{{appName}}",
+        body: "{{modelCount}} modeli, czat, trwała pamięć, agenci, rozliczenia i MCP - flagowy produkt. Dokładnie ta baza kodu, na produkcji.",
+      },
+    },
+  },
   quickstart: {
     eyebrow: "Zacznij",
     title: "Sforkuj, zapytaj, wdróż.",
@@ -179,19 +203,46 @@ export const translations: typeof enTranslations = {
       description:
         "Otwórz czat {{appName}} lub Claude Code i opisz feature, który chcesz. AI napisze wszystkie pliki - definicję, route, widget, i18n - i automatycznie uruchomi vibe check.",
     },
-    step5: {
-      label: "Wdróż",
-      description:
-        "vibe rebuild aktualizuje produkcję bez przestojów. Sprawdza, przebudowuje i hot-restartuje - bez ręcznego edytowania plików, bez przestojów.",
-    },
     docsLink: "Dokumentacja wzorców",
     githubLink: "github.com/techfreaque/next-vibe",
+  },
+  oneDef: {
+    eyebrow: "Jedna definicja",
+    title: "Napisz raz. Uruchom wszędzie.",
+    subtitle:
+      "Prawdziwy endpoint z tego repo: odczyt aktywnego okna na pulpicie Linuksa. Trzy pliki. Zero kodu klejącego. Pojawia się jako strona, komenda CLI, narzędzie MCP, narzędzie dla AI i zadanie cron.",
+    defTitle: "definition.ts",
+    defBody:
+      "Ścieżka, alias, role, schemat Zod, widget, błędy, przykłady. Wszystko, czego potrzebuje każda powierzchnia, w jednym miejscu.",
+    routeTitle: "route.ts",
+    routeBody:
+      "Łączy definicję z funkcją repozytorium. Ten handler wywołuje każda powierzchnia.",
+    surfacesTitle: "Co dostajesz bez dopisywania kodu",
+    cli: {
+      title: "Komenda CLI",
+      body: "Alias staje się komendą. Wynik rysuje ten sam widget, ułożony pod terminal.",
+    },
+    mcp: {
+      title: "Narzędzie MCP",
+      body: "Wskaż dowolnemu klientowi MCP vibe mcp. Schematy biorą się wprost z pól Zod.",
+    },
+    ai: {
+      title: "Narzędzie dla AI",
+      body: "Modele dostają schemat function calling wygenerowany z definicji. Role decydują, kto może wywołać.",
+    },
+    cron: {
+      title: "Zadanie cron",
+      body: "Ten sam handler, teraz według harmonogramu. To prawdziwy plik zadania wygaszania kredytów.",
+    },
+    more: "Do tego strona pod /tools/<alias>, typowana trasa REST i ekran natywny. Widget działa na każdej. Usuń folder endpointu, a znikną wszystkie powierzchnie.",
+    addTitle: "Własny endpoint w pięciu linijkach shella",
+    addBody:
+      "Utwórz folder, napisz trzy pliki, wygeneruj, sprawdź. Jeśli vibe check pokaże 0 błędów, działa wszędzie.",
   },
   enterprise: {
     eyebrow: "Enterprise",
     title: "Budujesz coś dużego?",
     description:
       "Pomagamy zespołom przy konfiguracji, niestandardowych integracjach, przeglądzie architektury i bieżącym wsparciu deweloperskim. Ta sama baza kodu, twój deployment.",
-    cta: "Skontaktuj się",
   },
 };

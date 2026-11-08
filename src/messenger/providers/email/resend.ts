@@ -28,6 +28,7 @@ import {
 import { messengerEnv } from "../../env";
 import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
+import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
 import { SendOnlyProvider } from "../send-only-base";
 
 /** Resend client cache keyed by api key */
@@ -90,7 +91,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
         html: input.html,
         replyTo: input.replyTo,
         headers: input.unsubscribeUrl
-          ? { "List-Unsubscribe": `<${input.unsubscribeUrl}>` }
+          ? buildListUnsubscribeHeaders(input.to, input.unsubscribeUrl)
           : undefined,
       });
 

@@ -45,6 +45,9 @@ describe("GET /user/public/login/options", () => {
     );
     expect(response.loginMethods.social).toBeDefined();
     expect(response.loginMethods.social.providers).toBeInstanceOf(Array);
+    // No user OAuth flow exists — nothing may be advertised as available
+    expect(response.loginMethods.social.enabled).toBe(false);
+    expect(response.loginMethods.social.providers).toEqual([]);
     expect(response.security.maxAttempts).toBeTypeOf("number");
     expect(response.security.maxAttempts).toBeGreaterThan(0);
     expect(response.security.securityDescription).toBeTypeOf("string");

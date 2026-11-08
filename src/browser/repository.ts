@@ -204,9 +204,21 @@ function createMCPProcess(logger: EndpointLogger): MCPProcess {
   });
 
   proc.stderr?.on("data", (chunk: Buffer) => {
-    logger.warn("[Browser] chrome-devtools-mcp stderr", {
-      data: chunk.toString().trim(),
-    });
+    // chrome-devtools-mcp prints a fixed disclaimer/usage-statistics banner on
+    // every start. Only THAT known text is downgraded - any other stderr
+    // (whatever its wording) stays a warning, so unknown failures surface.
+    const data = chunk.toString().trim();
+    const isKnownBanner =
+      /^(chrome-devtools-mcp exposes content|Avoid sharing sensitive|Performance tools may send trace URLs|Google collects usage statistics|For more details, visit: https:\/\/github\.com\/ChromeDevTools)/.test(
+        data,
+      ) &&
+      !/error|fail|exception|cannot|could not|unable|denied|refused|crash/i.test(
+        data,
+      );
+    (isKnownBanner ? logger.info : logger.warn).bind(logger)(
+      "[Browser] chrome-devtools-mcp stderr",
+      { data },
+    );
   });
 
   proc.on("exit", (code) => {
@@ -403,10 +415,21 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
     }
   }
 
-  const proc = spawn(findChromeBinary(), args, {
+  const chromeBinary = findChromeBinary();
+  const proc = spawn(chromeBinary, args, {
     stdio: "ignore",
     detached: true,
     env: chromeEnv,
+  });
+  // Keep WHY Chrome never came up (missing binary, sandbox crash in a
+  // container) - without this the only trace was "did not become ready".
+  let chromeSpawnError: string | null = null;
+  let chromeExit: { code: number | null; signal: string | null } | null = null;
+  proc.on("error", (spawnErr) => {
+    chromeSpawnError = spawnErr.message;
+  });
+  proc.on("exit", (code, signal) => {
+    chromeExit = { code, signal };
   });
   proc.unref();
 
@@ -438,7 +461,13 @@ async function ensureChrome(logger: EndpointLogger): Promise<void> {
       return;
     }
   }
-  logger.warn("[Browser] Chrome did not become ready in time");
+  logger.warn("[Browser] Chrome did not become ready in time", {
+    chromeBinary,
+    headless: useHeadless,
+    port: CHROME_REMOTE_DEBUG_PORT,
+    spawnError: chromeSpawnError,
+    exitedEarly: chromeExit,
+  });
 }
 
 // ---------------------------------------------------------------------------

@@ -2757,7 +2757,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Co dostajesz za darmo, na zawsze:",
           credits:
-            "{{freeCredits}} creditów miesięcznie - bez karty, bez daty wygaśnięcia",
+            "{{freeCreditsSignedIn}} darmowych kredytów co miesiąc, +{{freeCreditsNewsletterBonus}} z newsletterem - bez karty",
           allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
           uncensored:
             "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",

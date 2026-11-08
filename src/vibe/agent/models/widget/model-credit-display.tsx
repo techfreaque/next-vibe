@@ -12,7 +12,6 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -23,10 +22,17 @@ import {
 } from "next-vibe/ui/components/popover";
 import { Span } from "next-vibe/ui/components/span";
 import { Strong } from "next-vibe/ui/components/strong";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
+import {
+  FREE_PLAN_MONTHLY_CREDITS,
+  formatCreditsAsMoney,
+  formatCreditUnitPrice,
+  freePlanMessageCount,
+} from "@/products/credit-money";
 
 import { type ChatModelOption, chatModelOptions } from "../../ai-stream/models";
 import {
@@ -72,6 +78,12 @@ export interface ModelCreditDisplayProps {
 
   /** User's locale for currency formatting */
   locale: CountryLanguage;
+
+  /** Append the money equivalent ("≈ $0.04"). Defaults to true. */
+  showMoney?: boolean;
+
+  /** Extra classes for the money suffix, e.g. "hidden sm:inline" in tight rows */
+  moneyClassName?: string;
 }
 
 /**
@@ -162,6 +174,8 @@ export function ModelCreditDisplay({
   className,
   locale,
   interactive = true,
+  showMoney = true,
+  moneyClassName,
 }: ModelCreditDisplayProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const model = findModel(modelId);
@@ -169,15 +183,20 @@ export function ModelCreditDisplay({
   const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Determine currency based on country
-  const country = getCountryFromLocale(locale);
-  const currency = country === "DE" ? "EUR" : "USD";
-  const creditValue = currency === "EUR" ? "0.01 EUR" : "$0.01 USD";
+  // Credit value in the visitor's checkout currency (credit pack price)
+  const creditValue = formatCreditUnitPrice(locale);
+  const creditValueLine = t("creditDisplay.creditValue", {
+    value: creditValue,
+  });
 
   // ─── Billing shape narrowing & cost text ────────────────────────────────────
 
   let costText: string;
   let popoverContent: JSX.Element;
+  /** Credits charged per unit shown in costText - drives the money hint */
+  let costCredits = 0;
+  /** Chat models: cost is per message, so the free-plan message count applies */
+  let perMessage = false;
 
   if (!model) {
     // Unknown model - show free
@@ -193,6 +212,7 @@ export function ModelCreditDisplay({
     // Image generation (fixed cost per image)
     const cost = getModelPrice(model);
     costText = t("creditDisplay.badge.perImg", { cost });
+    costCredits = cost;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -215,7 +235,7 @@ export function ModelCreditDisplay({
         </Div>
         <Div className="pt-3 border-t">
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -224,6 +244,7 @@ export function ModelCreditDisplay({
     // Music/audio generation (fixed cost per clip)
     const cost = getModelPrice(model);
     costText = t("creditDisplay.badge.perClip", { cost });
+    costCredits = cost;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -246,7 +267,7 @@ export function ModelCreditDisplay({
         </Div>
         <Div className="pt-3 border-t">
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -263,6 +284,7 @@ export function ModelCreditDisplay({
         model.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE) * 10000,
       ) / 10000;
     costText = t("creditDisplay.badge.perClip", { cost: totalCost });
+    costCredits = totalCost;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -292,7 +314,7 @@ export function ModelCreditDisplay({
         </Div>
         <Div className="pt-3 border-t">
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -311,6 +333,7 @@ export function ModelCreditDisplay({
       { name: "creditDisplay.media.ttsScenarios.long" as const, chars: 2000 },
     ];
     costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+    costCredits = avgCost;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -364,7 +387,7 @@ export function ModelCreditDisplay({
             {t("creditDisplay.media.ttsDescription")}
           </Span>
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -386,6 +409,7 @@ export function ModelCreditDisplay({
       { name: "creditDisplay.media.sttScenarios.long" as const, seconds: 60 },
     ];
     costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+    costCredits = avgCost;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -439,7 +463,7 @@ export function ModelCreditDisplay({
             {t("creditDisplay.media.sttDescription")}
           </Span>
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -456,6 +480,8 @@ export function ModelCreditDisplay({
     const midCost =
       costRanges.length > 1 ? costRanges[1].cost : (minCost + maxCost) / 2;
     costText = t("creditDisplay.badge.approxPerMsg", { cost: midCost });
+    costCredits = midCost;
+    perMessage = true;
 
     popoverContent = (
       <Div className="space-y-4">
@@ -538,7 +564,7 @@ export function ModelCreditDisplay({
             })}
           </Span>
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -552,6 +578,8 @@ export function ModelCreditDisplay({
       costText = t("selector.free");
     } else {
       costText = t("creditDisplay.badge.exactPerMsg", { cost: creditCostRaw });
+      costCredits = creditCostRaw;
+      perMessage = true;
     }
 
     const modelName = model.name;
@@ -600,7 +628,7 @@ export function ModelCreditDisplay({
         {/* Footer */}
         <Div className="pt-3 border-t">
           <Span className="text-[10px] text-muted-foreground block">
-            {t("creditDisplay.creditValue", { value: creditValue })}
+            {creditValueLine}
           </Span>
         </Div>
       </Div>
@@ -609,13 +637,28 @@ export function ModelCreditDisplay({
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
+  // Human scale next to the credit price: "≈ $0.04" in the checkout currency
+  const moneyText = showMoney
+    ? formatCreditsAsMoney(costCredits, locale)
+    : null;
+  const moneySuffix = moneyText ? (
+    <Span className={cn("ml-1 font-normal opacity-70", moneyClassName)}>
+      {moneyText}
+    </Span>
+  ) : null;
+  const freeMessages = perMessage ? freePlanMessageCount(costCredits) : null;
+
   const baseContent =
     variant === "badge" ? (
       <Badge variant={badgeVariant} className={className}>
         {costText}
+        {moneySuffix}
       </Badge>
     ) : (
-      <Span className={className}>{costText}</Span>
+      <Span className={className}>
+        {costText}
+        {moneySuffix}
+      </Span>
     );
 
   if (!interactive) {
@@ -675,6 +718,14 @@ export function ModelCreditDisplay({
           }}
         >
           {popoverContent}
+          {freeMessages !== null && (
+            <Span className="mt-1 block text-[10px] text-muted-foreground">
+              {t("creditDisplay.freePlanMessages", {
+                count: freeMessages,
+                credits: FREE_PLAN_MONTHLY_CREDITS,
+              })}
+            </Span>
+          )}
         </PopoverContent>
       </Popover>
     </Div>

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   id: {
     category: "Narzędzia AI",
     tags: {
-      skills: "Postacie",
+      skills: "Skille",
     },
     voices: {
       MALE: "Męski głos",
@@ -32,25 +32,25 @@ export const translations: typeof enTranslations = {
     },
 
     get: {
-      title: "Pobierz postacię",
-      dynamicTitle: "Postać: {{name}}",
-      description: "Pobierz konkretną postacię według ID",
+      title: "Pobierz skill",
+      dynamicTitle: "Skill: {{name}}",
+      description: "Pobierz konkretną skill według ID",
       container: {
-        title: "Szczegóły postaciy",
-        description: "Szczegóły żądanej postaciy",
+        title: "Szczegóły skilla",
+        description: "Szczegóły żądanej skilla",
       },
       backButton: {
-        label: "Powrót do postaci",
+        label: "Powrót do skilli",
       },
       openFullPage: "Otwórz pełną stronę",
       editButton: {
-        label: "Edytuj postać",
+        label: "Edytuj skill",
       },
       customizeButton: {
-        label: "Dostosuj postać",
+        label: "Dostosuj skill",
       },
       deleteButton: {
-        label: "Usuń postać",
+        label: "Usuń skill",
       },
       addToFavoritesButton: {
         label: "Dodaj do ulubionych",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
       goToChat: "Przejdź do czatu",
       addAnother: "Dodaj kolejną",
       addAnotherTooltip:
-        "Dodaj kolejną instancję tej postaci do swojej kolekcji",
+        "Dodaj kolejną instancję tego skilla do swojej kolekcji",
       variants: {
         title: "Warianty",
       },
@@ -82,9 +82,9 @@ export const translations: typeof enTranslations = {
       },
       addVariant: "Dodaj wariant",
       addVariantHint: "Inny model, osobowość lub styl",
-      yourskill: "Twoja postać",
+      yourskill: "Twój skill",
       signupPrompt: {
-        title: "Dostosuj tę postać",
+        title: "Dostosuj ten skill",
         description:
           "Stwórz spersonalizowaną wersję z własnymi ustawieniami i preferencjami. Zarejestruj się, aby rozpocząć.",
         backButton: "Wstecz",
@@ -92,8 +92,8 @@ export const translations: typeof enTranslations = {
         loginButton: "Zaloguj się",
       },
       id: {
-        label: "ID postaci",
-        description: "Slug lub przyjazne ID postaci",
+        label: "ID skilla",
+        description: "Slug lub przyjazne ID skilla",
       },
       models: {
         brain: "Mózg",
@@ -120,11 +120,11 @@ export const translations: typeof enTranslations = {
       },
       response: {
         skill: {
-          title: "Postać",
-          id: { content: "ID postaciy" },
-          name: { content: "Nazwa postaciy" },
-          description: { content: "Opis postaciy" },
-          icon: { content: "Ikona postaciy" },
+          title: "Skill",
+          id: { content: "ID skilla" },
+          name: { content: "Nazwa skilla" },
+          description: { content: "Opis skilla" },
+          icon: { content: "Ikona skilla" },
           systemPrompt: { content: "Prompt systemowy" },
           category: { content: "Kategoria" },
           source: { content: "Źródło" },
@@ -162,12 +162,12 @@ export const translations: typeof enTranslations = {
           description: "Nie masz uprawnień do dostępu do tego zasobu",
         },
         notFound: {
-          title: "Postać nie znaleziona",
-          description: "Żądana postać nie istnieje",
+          title: "Skill nie zostaÅ znaleziony",
+          description: "Żądany skill nie istnieje",
         },
         server: {
           title: "Błąd serwera",
-          description: "Wystąpił błąd podczas pobierania postaciy",
+          description: "Wystąpił błąd podczas pobierania skilla",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -187,7 +187,7 @@ export const translations: typeof enTranslations = {
       },
       success: {
         title: "Sukces",
-        description: "Postać pobrana pomyślnie",
+        description: "Skill pobrana pomyślnie",
       },
       share: {
         button: "Udostepnij i zarabiaj",
@@ -239,39 +239,39 @@ export const translations: typeof enTranslations = {
       },
     },
     patch: {
-      title: "Aktualizuj postacię",
+      title: "Aktualizuj skill",
       dynamicTitle: "Edycja: {{name}}",
       container: {
-        title: "Aktualizuj postacię",
-        description: "Modyfikuj istniejącą niestandardową postacię",
+        title: "Aktualizuj skill",
+        description: "Modyfikuj istniejącą niestandardowy skill",
       },
       backButton: {
-        label: "Powrót do postaci",
+        label: "Powrót do skilli",
       },
       deleteButton: {
-        label: "Usuń postać",
+        label: "Usuń skill",
       },
       submitButton: {
-        label: "Aktualizuj postacię",
-        loadingText: "Aktualizowanie postaci...",
+        label: "Aktualizuj skill",
+        loadingText: "Aktualizowanie skilla...",
       },
       actions: {
-        update: "Aktualizuj postacię",
-        updating: "Aktualizowanie postaciy",
+        update: "Aktualizuj skill",
+        updating: "Aktualizowanie skilla",
       },
       response: {
         success: {
-          content: "Postać zaktualizowana pomyślnie",
+          content: "Skill zaktualizowany pomyślnie",
         },
       },
       id: {
-        label: "ID postaci",
-        description: "Slug lub przyjazne ID postaci do aktualizacji",
+        label: "ID skilla",
+        description: "Slug lub przyjazne ID skilla do aktualizacji",
       },
       name: {
         label: "Nazwa",
-        description: "Nazwa postaciy",
-        placeholder: "Wprowadź nazwę postaci",
+        description: "Nazwa skilla",
+        placeholder: "Wprowadź nazwę skilla",
         validation: {
           minLength: "Nazwa musi mieć co najmniej 2 znaki",
           maxLength: "Nazwa musi mieć mniej niż 100 znaków",
@@ -279,8 +279,8 @@ export const translations: typeof enTranslations = {
       },
       description: {
         label: "Opis",
-        description: "Krótki opis postaciy",
-        placeholder: "Opisz cel i możliwości postaci",
+        description: "Krótki opis skilla",
+        placeholder: "Opisz cel i możliwości skilla",
         validation: {
           minLength: "Opis musi mieć co najmniej 10 znaków",
           maxLength: "Opis musi mieć mniej niż 500 znaków",
@@ -288,11 +288,11 @@ export const translations: typeof enTranslations = {
       },
       icon: {
         label: "Ikona",
-        description: "Ikona emoji dla postaciy",
+        description: "Ikona emoji dla skilla",
       },
       systemPrompt: {
         label: "Prompt systemowy",
-        description: "Prompt systemowy definiujący zachowanie postaciy",
+        description: "Prompt systemowy definiujący zachowanie skilla",
         placeholder: "Wprowadź prompt systemowy",
         validation: {
           minLength: "Prompt systemowy musi mieć co najmniej 10 znaków",
@@ -301,11 +301,11 @@ export const translations: typeof enTranslations = {
       },
       category: {
         label: "Kategoria",
-        description: "Kategoria, do której należy ta postać",
+        description: "Kategoria, do której należy ten skill",
       },
       tagline: {
         label: "Slogan",
-        description: "Krótki slogan opisujący postać",
+        description: "Krótki slogan opisujący skill",
         placeholder: "Wprowadź slogan",
         validation: {
           minLength: "Slogan musi mieć co najmniej 2 znaki",
@@ -315,12 +315,12 @@ export const translations: typeof enTranslations = {
       source: {
         label: "Źródło",
         description:
-          "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
+          "Źródło tego skilla (wbudowane, niestandardowe lub społecznościowe)",
       },
       isPublic: {
         label: "Udostępnij publicznie",
         description:
-          "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
+          "Włącz, aby udostępnić swój skill społeczności. Po wyłączeniu skill pozostaje prywatny i widoczny tylko dla Ciebie.",
       },
       chatModel: {
         label: "Model czatu",
@@ -328,7 +328,7 @@ export const translations: typeof enTranslations = {
       },
       voice: {
         label: "Głos",
-        description: "Głos tekstu na mowę dla tej postaciy",
+        description: "Głos tekstu na mowę dla tego skilla",
         placeholder: "Domyślny systemu",
       },
       sttModel: {
@@ -368,7 +368,7 @@ export const translations: typeof enTranslations = {
       },
       modelSelection: {
         label: "Wybór modelu",
-        description: "Jak model AI jest wybierany dla tej postaciy",
+        description: "Jak model AI jest wybierany dla tego skilla",
       },
       variants: {
         label: "Warianty",
@@ -384,17 +384,17 @@ export const translations: typeof enTranslations = {
       },
       preferredModel: {
         label: "Preferowany model",
-        description: "Preferowany model AI dla tej postaciy",
+        description: "Preferowany model AI dla tego skilla",
       },
       availableTools: {
         label: "Dozwolone narzędzia",
         description:
-          "Narzędzia dla tej postaci. Każdy wpis wymaga toolId. Null = ustawienia globalne.",
+          "Narzędzia dla tego skilla. Każdy wpis wymaga toolId. Null = ustawienia globalne.",
       },
       pinnedTools: {
         label: "Przypięte narzędzia",
         description:
-          "Przypięte narzędzia paska narzędzi dla tej postaci. Null = ustawienia globalne.",
+          "Przypięte narzędzia paska narzędzi dla tego skilla. Null = ustawienia globalne.",
       },
       compactTrigger: {
         label: "Próg kompresji (tokeny)",
@@ -405,7 +405,7 @@ export const translations: typeof enTranslations = {
       errors: {
         validation: {
           title: "Błąd walidacji",
-          description: "Dane postaciy są nieprawidłowe",
+          description: "Dane skilla są nieprawidłowe",
         },
         network: {
           title: "Błąd sieci",
@@ -413,19 +413,19 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nieautoryzowany",
-          description: "Musisz być zalogowany, aby aktualizować postaciy",
+          description: "Musisz być zalogowany, aby aktualizować skille",
         },
         forbidden: {
           title: "Zabronione",
-          description: "Nie masz uprawnień do aktualizacji tej postaciy",
+          description: "Nie masz uprawnień do aktualizacji tego skilla",
         },
         notFound: {
-          title: "Postać nie znaleziona",
-          description: "Postać, którą próbujesz zaktualizować, nie istnieje",
+          title: "Skill nie zostaÅ znaleziony",
+          description: "Skill, którą próbujesz zaktualizować, nie istnieje",
         },
         server: {
           title: "Błąd serwera",
-          description: "Wystąpił błąd podczas aktualizacji postaciy",
+          description: "Wystąpił błąd podczas aktualizacji skilla",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -441,34 +441,34 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Postać zaktualizowana",
+        title: "Skill zaktualizowany",
         description:
-          "Twoja niestandardowa postać została pomyślnie zaktualizowana",
+          "Twój niestandardowy skill został pomyślnie zaktualizowany",
       },
     },
     delete: {
-      title: "Usuń postać",
+      title: "Usuń skill",
       dynamicTitle: "Usuń: {{name}}",
-      description: "Usuń niestandardową postać",
+      description: "Usuń niestandardowy skill",
       container: {
-        title: "Usuń postać",
-        description: "Trwale usuń tę niestandardową postać",
+        title: "Usuń skill",
+        description: "Trwale usuń tę niestandardowy skill",
       },
       backButton: {
-        label: "Powrót do postaci",
+        label: "Powrót do skilli",
       },
       actions: {
-        delete: "Usuń postać",
-        deleting: "Usuwanie postaci",
+        delete: "Usuń skill",
+        deleting: "Usuwanie skilla",
       },
       id: {
-        label: "ID postaci",
-        description: "Slug lub przyjazne ID postaci do usunięcia",
+        label: "ID skilla",
+        description: "Slug lub przyjazne ID skilla do usunięcia",
       },
       errors: {
         validation: {
           title: "Błąd walidacji",
-          description: "Dane postaci są nieprawidłowe",
+          description: "Dane skilla są nieprawidłowe",
         },
         network: {
           title: "Błąd sieci",
@@ -476,23 +476,23 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Brak autoryzacji",
-          description: "Nie masz uprawnień do usunięcia tej postaci",
+          description: "Nie masz uprawnień do usunięcia tego skilla",
         },
         forbidden: {
           title: "Zabronione",
-          description: "Nie masz uprawnień do usunięcia tej postaci",
+          description: "Nie masz uprawnień do usunięcia tego skilla",
         },
         notFound: {
-          title: "Postać nie znaleziona",
-          description: "Postać, którą próbujesz usunąć, nie istnieje",
+          title: "Skill nie zostaÅ znaleziony",
+          description: "Skill, którą próbujesz usunąć, nie istnieje",
         },
         server: {
           title: "Błąd serwera",
-          description: "Wystąpił błąd podczas usuwania postaci",
+          description: "Wystąpił błąd podczas usuwania skilla",
         },
         unknown: {
           title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd podczas usuwania postaci",
+          description: "Wystąpił nieoczekiwany błąd podczas usuwania skilla",
         },
         unsavedChanges: {
           title: "Niezapisane zmiany",
@@ -500,19 +500,19 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Konflikt",
-          description: "Postać została zmodyfikowana przez innego użytkownika",
+          description: "Skill został zmodyfikowany przez innego użytkownika",
         },
       },
       success: {
-        title: "Postać usunięta",
-        description: "Postać została pomyślnie usunięta",
-        content: "Postać usunięta pomyślnie",
+        title: "Skill usunięty",
+        description: "Skill został pomyślnie usunięty",
+        content: "Skill usunięty pomyślnie",
       },
     },
   },
   category: "Chat",
   tags: {
-    skills: "Postacie",
+    skills: "Skille",
   },
   voices: {
     MALE: "Męski głos",
@@ -549,7 +549,7 @@ export const translations: typeof enTranslations = {
       community: "Społeczność",
     },
     ownershipType: {
-      system: "Wbudowana postać",
+      system: "Wbudowany skill",
       user: "Utworzone przez ciebie",
       public: "Ze społeczności",
     },
@@ -562,7 +562,7 @@ export const translations: typeof enTranslations = {
       manual: "Ręczny",
     },
     selectionType: {
-      skillBased: "Na podstawie postaci",
+      skillBased: "Na podstawie skilla",
       manual: "Konkretny model",
       filters: "Kryteria filtrów",
     },
@@ -807,7 +807,7 @@ export const translations: typeof enTranslations = {
       shortDesc: "Kreatywne myślenie i generowanie pomysłów",
       suggestedPrompts: {
         0: "Napisz wiersz o oceanie",
-        1: "Stwórz unikalną postać do opowiadania",
+        1: "Stwórz unikalną skill do opowiadania",
         2: "Zaprojektuj koncepcję logo dla startupu",
         3: "Wymyśl pomysły na kreatywną kampanię marketingową",
       },
@@ -1186,7 +1186,7 @@ export const translations: typeof enTranslations = {
     },
     tutor: {
       name: "Korepetytor",
-      description: "Cierpliwy korepetytor do spostacializowanej nauki",
+      description: "Cierpliwy korepetytor do spersonalizowanej nauki",
       tagline: "Ucz się Razem",
       shortDesc: "Spersonalizowane korepetycje i nauka",
       suggestedPrompts: {
@@ -1223,7 +1223,7 @@ export const translations: typeof enTranslations = {
       shortDesc: "Wciągające opowiadanie historii i narracje",
       suggestedPrompts: {
         0: "Pomóż mi rozwinąć ten pomysł na historię",
-        1: "Stwórz przekonującą postać",
+        1: "Stwórz przekonującą skill",
         2: "Napisz scenę otwierającą dla...",
         3: "Popraw ten dialog",
       },
@@ -1474,7 +1474,7 @@ export const translations: typeof enTranslations = {
       suggestedPrompts: {
         0: "Napisz mroczny thriller psychologiczny",
         1: "Stwórz dojrzałą scenę romantyczną",
-        2: "Opracuj moralnie złożoną postać",
+        2: "Opracuj moralnie złożoną skill",
         3: "Napisz horror z graficznymi elementami",
       },
       variants: {
@@ -1483,15 +1483,15 @@ export const translations: typeof enTranslations = {
       },
     },
     roleplaySkill: {
-      name: "Postać do Odgrywania Ról",
+      name: "Skill do Odgrywania Ról",
       description: "Immersyjne odgrywanie postaci bez ograniczeń",
       tagline: "Bądź Kimkolwiek",
       shortDesc: "Autentyczne odgrywanie postaci i scenariusze",
       suggestedPrompts: {
-        0: "Odegraj postać fantasy",
+        0: "Odegraj skill fantasy",
         1: "Stwórz scenariusz przygody sci-fi",
-        2: "Wciel się w postać historyczną",
-        3: "Rozwiń złożoną relację między postaciami",
+        2: "Wciel się w skill historyczną",
+        3: "Rozwiń złożoną relację między skillami",
       },
       variants: {
         creative: "Kreatywny",
@@ -1659,16 +1659,16 @@ export const translations: typeof enTranslations = {
       },
     },
     skillCreator: {
-      name: "Kreator Postaci",
+      name: "Kreator Skilli",
       description:
-        "Projektuj i twórz postacie AI z dopasowanymi osobowościami, promptami systemowymi, narzędziami i konfiguracjami modeli. Zarządza też ulubionymi i ustawieniami.",
-      tagline: "Projektuj Persony AI",
-      shortDesc: "Tworzenie i zarządzanie postaciami AI",
+        "Projektuj i twórz skille AI z dopasowanymi osobowościami, promptami systemowymi, narzędziami i konfiguracjami modeli. Zarządza też ulubionymi i ustawieniami.",
+      tagline: "Projektuj Skille AI",
+      shortDesc: "Tworzenie i zarządzanie skillami AI",
       suggestedPrompts: {
-        0: "Pomóż mi stworzyć nową postać AI do pomocy z kodowaniem",
-        1: "Pokaż mi wszystkie istniejące postacie i zasugeruj czego brakuje",
-        2: "Zaprojektuj postać do kreatywnego pisania z unikalną osobowością",
-        3: "Dodaj postać do moich ulubionych i skonfiguruj ustawienia czatu",
+        0: "Pomóż mi stworzyć nowy skill AI do pomocy z kodowaniem",
+        1: "Pokaż mi wszystkie istniejące skille i zasugeruj czego brakuje",
+        2: "Zaprojektuj skill do kreatywnego pisania z unikalną osobowością",
+        3: "Dodaj skill do moich ulubionych i skonfiguruj ustawienia czatu",
       },
       variants: {
         gemini: "Gemini",
@@ -1717,22 +1717,22 @@ export const translations: typeof enTranslations = {
     },
   },
   get: {
-    title: "Postacie",
-    titleShort: "Umiejętności",
-    dynamicTitle: "Postacie ({{count}})",
+    title: "Skille",
+    titleShort: "Skille",
+    dynamicTitle: "Skille ({{count}})",
     description:
-      "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
+      "Pobierz wszystkie dostępne skille (domyślne + niestandardowe)",
     fields: {
       query: {
         label: "Szukaj (opcjonalne)",
         description:
-          "Filtruj postacie po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukiwanie podciągów bez rozróżniania wielkości liter po nazwie, tagline, opisie, kategorii. Pozostaw puste aby wyświetlić wszystkie.",
+          "Filtruj skille po słowie kluczowym. Słowa oddzielone spacją są wszystkie wymagane. Wyszukiwanie podciągów bez rozróżniania wielkości liter po nazwie, tagline, opisie, kategorii. Pozostaw puste aby wyświetlić wszystkie.",
         placeholder: "np. badania, generowanie obrazów",
       },
       skillId: {
-        label: "ID postaci",
+        label: "ID skilla",
         description:
-          "Pobierz pełne szczegóły dla konkretnej postaci. Zwraca prompt systemowy, narzędzia i konfigurację modelu.",
+          "Pobierz pełne szczegóły dla konkretnej skilla. Zwraca prompt systemowy, narzędzia i konfigurację modelu.",
       },
       page: {
         label: "Strona",
@@ -1747,7 +1747,7 @@ export const translations: typeof enTranslations = {
       sourceFilter: {
         label: "Źródło",
         description:
-          "Filtruj po źródle: wbudowane, społeczność lub twoje własne postacie.",
+          "Filtruj po źródle: wbudowane, społeczność lub twoje własne skille.",
       },
       targetUserId: {
         label: "ID użytkownika docelowego",
@@ -1756,17 +1756,17 @@ export const translations: typeof enTranslations = {
       },
     },
     container: {
-      title: "Lista postaci",
-      description: "Wszystkie dostępne postaciy dla użytkownika",
+      title: "Lista skilli",
+      description: "Wszystkie dostępne skille dla użytkownika",
     },
     createButton: {
-      label: "Utwórz Własną Postać",
+      label: "Utwórz Własną Skill",
     },
     openFullPage: "Otwórz pełną stronę",
     browser: {
       advancedModelAccess: "Wybierz swoje doświadczenie AI",
       configureFiltersText:
-        "Wybierz modele bezpośrednio lub zacznij od gotowych postaci",
+        "Wybierz modele bezpośrednio lub zacznij od gotowych skilli",
       aiModels: "modele AI",
       configureAiModelsTitle: "Bezpośredni wybór modelu",
       advancedChooseText:
@@ -1776,21 +1776,21 @@ export const translations: typeof enTranslations = {
       selectButton: {
         label: "Przeglądaj Modele",
       },
-      skillPresets: "Gotowe postacie",
+      skillPresets: "Gotowe skille",
       pickSkillText:
-        "Zacznij od ekspercko dostrojonych postaci z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
+        "Zacznij od ekspercko dostrojonych skilli z już wybranym idealnym modelem. Dostosuj w dowolnym momencie.",
     },
     signupPrompt: {
-      title: "Twórz własne postacie AI",
+      title: "Twórz własne skille AI",
       description:
-        "Projektuj niestandardowe postacie z unikalnymi osobowościami i zachowaniami. Zarejestruj się, aby rozpocząć.",
-      backButton: "Przeglądaj Postacie",
+        "Projektuj niestandardowe skille z unikalnymi osobowościami i zachowaniami. Zarejestruj się, aby rozpocząć.",
+      backButton: "Przeglądaj skille",
       signupButton: "Utwórz Konto",
       loginButton: "Zaloguj Się",
     },
     search: {
-      placeholder: "Szukaj skill...",
-      noResults: "Nie znaleziono skill",
+      placeholder: "Szukaj skilli...",
+      noResults: "Nie znaleziono skilli",
       results: "Wyniki wyszukiwania",
     },
     card: {
@@ -1804,18 +1804,18 @@ export const translations: typeof enTranslations = {
         inUse: "Aktywny",
         goToChat: "Przejdź do czatu",
         useThis: "Użyj tego",
-        chooseFavorite: "Wybierz ulubione",
-        selectFavorite: "Wybierz ulubione do aktywacji:",
-        addVariant: "Dodaj wariant",
+        chooseFavorite: "Wybierz model",
+        selectFavorite: "Wybierz model do rozmowy:",
+        addVariant: "Dodaj kolejny model",
         view: "Zobacz",
         edit: "Edytuj",
         vote: "Oceń",
         report: "Zgłoś",
-        addMissing: "Dodaj wszystkie warianty do ulubionych",
+        addMissing: "Dodaj wszystkie modele do Moich skilli",
         add: "Dodaj",
         added: "Dodano",
       },
-      showVariants: "Warianty ({{count}})",
+      showVariants: "Modele ({{count}})",
     },
     section: {
       showMore: "Pokaż {{count}} więcej",
@@ -1825,12 +1825,12 @@ export const translations: typeof enTranslations = {
     response: {
       skills: {
         skill: {
-          title: "Postać",
-          id: { content: "ID postaciy" },
-          name: { content: "Nazwa postaciy" },
-          tagline: { content: "Slogan postaci" },
-          description: { content: "Opis postaciy" },
-          icon: { content: "Ikona postaciy" },
+          title: "Skill",
+          id: { content: "ID skilla" },
+          name: { content: "Nazwa skilla" },
+          tagline: { content: "Slogan skilla" },
+          description: { content: "Opis skilla" },
+          icon: { content: "Ikona skilla" },
           systemPrompt: { content: "Prompt systemowy" },
           category: { content: "Kategoria" },
           source: { content: "Źródło" },
@@ -1869,7 +1869,7 @@ export const translations: typeof enTranslations = {
       unauthorized: {
         title: "Nieautoryzowany",
         description:
-          "Musisz być zalogowany, aby uzyskać dostęp do niestandardowych postaci",
+          "Musisz być zalogowany, aby uzyskać dostęp do niestandardowych skilli",
       },
       forbidden: {
         title: "Zabronione",
@@ -1881,7 +1881,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił błąd podczas pobierania postaci",
+        description: "Wystąpił błąd podczas pobierania skilla",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -1898,34 +1898,34 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Sukces",
-      description: "Persony pobrane pomyślnie",
+      description: "Skille pobrane pomyślnie",
     },
   },
   post: {
-    title: "Utwórz postacię",
+    title: "Utwórz skill",
     titleShort: "Utwórz skill",
     dynamicTitle: "Utwórz: {{name}}",
-    description: "Utwórz nową niestandardową postacię",
+    description: "Utwórz nową niestandardowy skill",
     form: {
-      title: "Utwórz swoją niestandardową postać",
+      title: "Utwórz swój niestandardowy skill",
       description:
-        "Zaprojektuj unikalną postać AI z niestandardowym zachowaniem, osobowością i możliwościami. Wybierz konkretny model lub pozwól systemowi wybrać na podstawie Twoich wymagań.",
+        "Zaprojektuj unikalny skill AI z niestandardowym zachowaniem, osobowością i możliwościami. Wybierz konkretny model lub pozwól systemowi wybrać na podstawie Twoich wymagań.",
     },
     submitButton: {
-      text: "Utwórz niestandardową postacię",
-      loadingText: "Tworzenie postacię...",
+      text: "Utwórz niestandardowy skill",
+      loadingText: "Tworzenie skill...",
     },
     backButton: {
       label: "Wstecz",
     },
     container: {
-      title: "Utwórz nową postacię",
-      description: "Zdefiniuj nową niestandardową postacię",
+      title: "Utwórz nowy skill",
+      description: "Zdefiniuj nową niestandardowy skill",
     },
     name: {
       label: "Nazwa",
-      description: "Nazwa postaciy",
-      placeholder: "Wprowadź nazwę postaci",
+      description: "Nazwa skilla",
+      placeholder: "Wprowadź nazwę skilla",
       validation: {
         minLength: "Nazwa musi mieć co najmniej 2 znaki",
         maxLength: "Nazwa musi mieć mniej niż 100 znaków",
@@ -1933,8 +1933,8 @@ export const translations: typeof enTranslations = {
     },
     skillDescription: {
       label: "Opis",
-      description: "Krótki opis postaciy",
-      placeholder: "Opisz cel i możliwości postaci",
+      description: "Krótki opis skilla",
+      placeholder: "Opisz cel i możliwości skilla",
       validation: {
         minLength: "Opis musi mieć co najmniej 10 znaków",
         maxLength: "Opis musi mieć mniej niż 500 znaków",
@@ -1942,11 +1942,11 @@ export const translations: typeof enTranslations = {
     },
     icon: {
       label: "Ikona",
-      description: "Ikona emoji dla postaciy",
+      description: "Ikona emoji dla skilla",
     },
     systemPrompt: {
       label: "Prompt systemowy",
-      description: "Prompt systemowy definiujący zachowanie postaciy",
+      description: "Prompt systemowy definiujący zachowanie skilla",
       placeholder: "Jesteś pomocnym asystentem, który specjalizuje się w...",
       validation: {
         minLength: "Prompt systemowy musi mieć co najmniej 10 znaków",
@@ -1955,11 +1955,11 @@ export const translations: typeof enTranslations = {
     },
     category: {
       label: "Kategoria",
-      description: "Kategoria, do której należy ta postacia",
+      description: "Kategoria, do której należy ten skill",
     },
     tagline: {
       label: "Slogan",
-      description: "Krótki slogan opisujący postać",
+      description: "Krótki slogan opisujący skill",
       placeholder: "Wprowadź slogan",
       validation: {
         minLength: "Slogan musi mieć co najmniej 2 znaki",
@@ -1969,25 +1969,25 @@ export const translations: typeof enTranslations = {
     isPublic: {
       label: "Udostępnij publicznie",
       description:
-        "Włącz, aby udostępnić swoją postać społeczności. Po wyłączeniu postać pozostaje prywatna i widoczna tylko dla Ciebie.",
+        "Włącz, aby udostępnić swój skill społeczności. Po wyłączeniu skill pozostaje prywatny i widoczny tylko dla Ciebie.",
     },
     modelSelection: {
       title: "Wybór modelu",
       label: "Wybór modelu",
       description:
-        "Wybierz sposób wyboru modelu AI dla tej postaciy - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
+        "Wybierz sposób wyboru modelu AI dla tego skilla - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
     },
     selectionType: {
       label: "Typ wyboru",
-      skillBased: "Na podstawie postaci",
+      skillBased: "Na podstawie skilla",
       manual: "Konkretny model",
       filters: "Kryteria filtrowania",
     },
     preferredModel: {
       label: "Preferowany model",
       description:
-        "Wybierz konkretny model AI, który będzie zawsze używany z tą postacią",
-      helpText: "Wybór konkretnego modelu blokuje tę postacię do tego modelu",
+        "Wybierz konkretny model AI, który będzie zawsze używany z tym skillem",
+      helpText: "Wybór konkretnego modelu blokuje ten skill do tego modelu",
     },
     intelligence: {
       label: "Poziom inteligencji",
@@ -2024,12 +2024,12 @@ export const translations: typeof enTranslations = {
     },
     minPrice: {
       label: "Minimalna cena",
-      description: "Minimalny koszt kredytów na wiadomość z tą postacią",
+      description: "Minimalny koszt kredytów na wiadomość z tym skillem",
     },
     maxPrice: {
       label: "Maksymalna cena",
       description:
-        "Maksymalny koszt kredytów, który jesteś gotów wydać na wiadomość z tą postacią",
+        "Maksymalny koszt kredytów, który jesteś gotów wydać na wiadomość z tym skillem",
     },
     contentLevel: {
       label: "Poziom treści",
@@ -2056,7 +2056,7 @@ export const translations: typeof enTranslations = {
     },
     manualModelId: {
       label: "Model ręczny",
-      description: "Konkretny model zawsze używany z tą postacią",
+      description: "Konkretny model zawsze używany z tym skillem",
     },
     variants: {
       label: "Warianty",
@@ -2066,12 +2066,12 @@ export const translations: typeof enTranslations = {
     availableTools: {
       label: "Dozwolone narzędzia",
       description:
-        "Narzędzia dla tej postaci. Każdy wpis wymaga toolId (system_help_GET dla ID). Null = ustawienia globalne.",
+        "Narzędzia dla tego skilla. Każdy wpis wymaga toolId (system_help_GET dla ID). Null = ustawienia globalne.",
     },
     pinnedTools: {
       label: "Przypięte narzędzia",
       description:
-        "Przypięte narzędzia paska narzędzi dla tej postaci. Null = ustawienia globalne.",
+        "Przypięte narzędzia paska narzędzi dla tego skilla. Null = ustawienia globalne.",
     },
     compactTrigger: {
       label: "Próg kompresji (tokeny)",
@@ -2084,7 +2084,7 @@ export const translations: typeof enTranslations = {
     },
     voice: {
       label: "Głos",
-      description: "Głos zamiany tekstu na mowę dla tej postaciy",
+      description: "Głos zamiany tekstu na mowę dla tego skilla",
       placeholder: "Domyślny systemowy",
     },
     sttModel: {
@@ -2124,16 +2124,16 @@ export const translations: typeof enTranslations = {
     },
     suggestedPrompts: {
       label: "Sugerowane prompty",
-      description: "Przykładowe prompty do użycia z tą postacią",
+      description: "Przykładowe prompty do użycia z tym skillem",
       placeholder: "Dodaj sugerowany prompt...",
     },
     response: {
-      id: { content: "ID utworzonej postaciy" },
+      id: { content: "ID utworzonej skilla" },
     },
     errors: {
       validation: {
         title: "Błąd walidacji",
-        description: "Dane postaciy są nieprawidłowe",
+        description: "Dane skilla są nieprawidłowe",
       },
       network: {
         title: "Błąd sieci",
@@ -2141,11 +2141,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Musisz być zalogowany, aby tworzyć postaciy",
+        description: "Musisz być zalogowany, aby tworzyć skille",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Nie masz uprawnień do tworzenia postaci",
+        description: "Nie masz uprawnień do tworzenia skilla",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -2153,7 +2153,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił błąd podczas tworzenia postaciy",
+        description: "Wystąpił błąd podczas tworzenia skilla",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -2165,12 +2165,12 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Postać o tej nazwie już istnieje",
+        description: "Skill o tej nazwie już istnieje",
       },
     },
     success: {
-      title: "Postać utworzona",
-      description: "Twoja niestandardowa postacia została pomyślnie utworzona",
+      title: "Skill utworzony",
+      description: "Twój niestandardowy skill został pomyślnie utworzona",
     },
   },
   onboarding: {

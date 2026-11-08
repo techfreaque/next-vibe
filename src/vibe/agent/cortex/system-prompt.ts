@@ -105,6 +105,8 @@ export const cortexFragment: SystemPromptFragment = {
       taskCount: 0,
       languageName,
       localeRoots,
+      machineAccess:
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
     };
 
     const isPublicFolder = rootFolderId === "public";
@@ -283,6 +285,8 @@ export interface CortexRenderData {
   taskCount: number;
   languageName: string | undefined;
   localeRoots: { memories: string; documents: string };
+  /** Admin-only /ssh machine mount + cortex-exec — hidden from everyone else */
+  machineAccess: boolean;
 }
 
 /** Unavailable cortex state — no data, just a reason string */
@@ -342,9 +346,11 @@ ${treeStr}
 **Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use \`cortex-edit\` to update existing files, \`${CORTEX_WRITE_ALIAS}\` only for new files or full rewrites.
 **Rules:** One idea per file. <200 words. Names: \`specific-kebab-case.md\`. Consolidate duplicates. Archive (\`archived: true\` frontmatter) over deleting. Pin critical files (\`pinned: true\`) - always shown.
 **Writable:** ${memoriesPath}/ (knowledge) · ${documentsPath}/ (working files) · /skills/ (custom skills)
-**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only
-**SSH/Machines:** \`${CORTEX_LIST_ALIAS}(path="/ssh")\` → machines + their mounts. \`${CORTEX_EXEC_ALIAS}(path="/ssh/<machine>", command="...")\` → run commands (only /ssh/ paths). \`${CORTEX_TERMINALS_ALIAS}\` → active terminals with cwd. Mounts at \`/ssh/<machine>/<mount>/\` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. \`${CORTEX_LIST_ALIAS}(path="/ssh/<machine>/<mount>/")\` → browse mount. \`${CORTEX_READ_ALIAS}(path="/ssh/<machine>/path")\` → read file.`;
+**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/${data.machineAccess ? " · /ssh/" : ""} - use \`${CORTEX_READ_ALIAS}\` or \`${CORTEX_LIST_ALIAS}\` only${data.machineAccess ? machineAccessLine : ""}`;
 }
+
+const machineAccessLine = `
+**SSH/Machines:** \`${CORTEX_LIST_ALIAS}(path="/ssh")\` → machines + their mounts. \`${CORTEX_EXEC_ALIAS}(path="/ssh/<machine>", command="...")\` → run commands (only /ssh/ paths). \`${CORTEX_TERMINALS_ALIAS}\` → active terminals with cwd. Mounts at \`/ssh/<machine>/<mount>/\` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. \`${CORTEX_LIST_ALIAS}(path="/ssh/<machine>/<mount>/")\` → browse mount. \`${CORTEX_READ_ALIAS}(path="/ssh/<machine>/path")\` → read file.`;
 
 // ─── Shared Utilities ─────────────────────────────────────────────────────────
 

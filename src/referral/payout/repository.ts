@@ -37,6 +37,7 @@ export const PayoutRepository = {
       earnedCreditsTotal: result.data.earnedCredits.total,
       earnedCreditsAvailable: result.data.earnedCredits.available,
       earnedCreditsLocked: result.data.earnedCredits.locked,
+      earnedCreditsPending: result.data.earnedCredits.pending,
       payoutHistory: result.data.payoutHistory,
     });
   },

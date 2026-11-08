@@ -19,7 +19,6 @@ export const translations = {
       "How three files become a web form, CLI command, MCP tool, native screen, and automated job - simultaneously.",
     fileBarLabel: "definition.ts → web · cli · mcp · native · cron · 10 more",
     theaCardTitle: "Who is Thea?",
-    allowedRolesLabel: "allowedRoles: [...]",
     fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",

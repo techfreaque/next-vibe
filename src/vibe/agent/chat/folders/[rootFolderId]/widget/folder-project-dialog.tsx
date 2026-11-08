@@ -1,0 +1,78 @@
+"use client";
+
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { type EndpointLogger } from "next-vibe/logger/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe/ui/components/dialog";
+import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import type { JSX } from "react";
+import { useMemo } from "react";
+
+import folderProjectDefinitions from "../../subfolders/[subFolderId]/project/definition";
+import { scopedTranslation } from "../i18n";
+
+interface FolderProjectDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  folderId: string;
+  folderName: string;
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+}
+
+export function FolderProjectDialog({
+  open,
+  onOpenChange,
+  folderId,
+  folderName,
+  locale,
+  user,
+}: FolderProjectDialogProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const platform = useWidgetPlatform();
+
+  const endpointOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { subFolderId: folderId },
+        queryOptions: {
+          enabled: open && !!folderId,
+          refetchOnWindowFocus: false,
+          staleTime: 30 * 1000,
+        },
+      },
+      update: {
+        urlPathParams: { subFolderId: folderId },
+        formOptions: { persistForm: false },
+      },
+    }),
+    [folderId, open],
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="shrink-0">
+          <DialogTitle>
+            {t("widget.project.dialogTitle")} ({folderName})
+          </DialogTitle>
+        </DialogHeader>
+
+        <EndpointsPage
+          endpoint={folderProjectDefinitions}
+          locale={locale}
+          user={user}
+          platform={platform}
+          endpointOptions={endpointOptions}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -70,7 +70,7 @@ export const translations = {
     navigation: {
       subscription: "Subscription & Credits",
       referral: "Referral Program",
-      settings: "My Profile",
+      settings: "My Profile & Settings",
       leadMagnet: "Lead Magnet",
       help: "Feedback & Support",
       about: "About",
@@ -198,7 +198,7 @@ export const translations = {
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free users get {{freeCredits}} credits/month.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, +{{bonusCredits}} with the newsletter.",
       },
       chatInput: {
         title: "Type Your Message",

@@ -77,6 +77,18 @@ export interface WebhookData {
   subscription?: string;
   billing_reason?: string;
   parent?: Stripe.InvoiceItem.Parent | Stripe.Invoice.Parent;
+  /** Charge / dispute / checkout session: the payment intent it belongs to */
+  payment_intent?: string;
+  /** Charge or dispute amount in the smallest currency unit */
+  amount?: number;
+  /** Charge: cumulative refunded amount in the smallest currency unit */
+  amount_refunded?: number;
+  /** Dispute: the disputed charge id */
+  charge?: string;
+  /** Unix seconds when the object was created */
+  created?: number;
+  /** Dispute reason */
+  reason?: string;
 }
 
 export interface WebhookEvent<T extends WebhookData = WebhookData> {

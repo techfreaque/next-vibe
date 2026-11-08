@@ -363,6 +363,10 @@ export function MessengerAccountEditContainer({
                 fieldName={"isFailover"}
                 field={children.isFailover}
               />
+              <BooleanFieldWidget
+                fieldName={"isSystem"}
+                field={children.isSystem}
+              />
             </Div>
             <NumberFieldWidget
               fieldName={"failoverPriority"}

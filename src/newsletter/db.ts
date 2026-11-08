@@ -5,6 +5,7 @@
 
 import {
   boolean,
+  index,
   jsonb,
   pgTable,
   text,
@@ -12,6 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
@@ -24,34 +26,53 @@ import {
  * Newsletter subscriptions table schema
  * Stores newsletter subscription information
  */
-export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
-  name: text("name"),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
-  status: text("status", { enum: NewsletterSubscriptionStatusDB })
-    .notNull()
-    .default(NewsletterSubscriptionStatus.SUBSCRIBED),
-  preferences: jsonb("preferences").default("[]"),
-  subscriptionDate: timestamp("subscription_date", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  unsubscribedDate: timestamp("unsubscribed_date", { withTimezone: true }),
-  lastEmailSentDate: timestamp("last_email_sent_date", { withTimezone: true }),
-  bounceCount: text("bounce_count").default("0"),
-  source: text("source").default("website"),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
-  confirmationToken: text("confirmation_token"),
-  marketingConsent: boolean("marketing_consent").notNull().default(true),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const newsletterSubscriptions = pgTable(
+  "newsletter_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull().unique(),
+    name: text("name"),
+    userId: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    // Lead that claimed this subscription. The free-credit newsletter bonus lands
+    // on the pool that contains this lead (one email -> one lead -> one pool).
+    leadId: uuid("lead_id").references(() => leads.id, {
+      onDelete: "set null",
+    }),
+    status: text("status", { enum: NewsletterSubscriptionStatusDB })
+      .notNull()
+      .default(NewsletterSubscriptionStatus.SUBSCRIBED),
+    preferences: jsonb("preferences").default("[]"),
+    subscriptionDate: timestamp("subscription_date", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    unsubscribedDate: timestamp("unsubscribed_date", { withTimezone: true }),
+    lastEmailSentDate: timestamp("last_email_sent_date", {
+      withTimezone: true,
+    }),
+    bounceCount: text("bounce_count").default("0"),
+    source: text("source").default("website"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    // Double opt-in: token mailed in the welcome email; confirmedAt set when clicked.
+    // Newsletter delivery does not wait on it - only the free-credit bonus does.
+    confirmationToken: text("confirmation_token").unique(),
+    marketingConsent: boolean("marketing_consent").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    // Free-credit bonus lookup: "does this pool own a confirmed subscription?"
+    index("idx_newsletter_subscriptions_lead_id").on(table.leadId),
+    index("idx_newsletter_subscriptions_user_id").on(table.userId),
+  ],
+);
 
 /**
  * Newsletter campaigns table schema

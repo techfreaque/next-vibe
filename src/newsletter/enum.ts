@@ -54,3 +54,17 @@ export const NewsletterSubscriptionStatusDB = [
   NewsletterSubscriptionStatus.BOUNCED,
   NewsletterSubscriptionStatus.COMPLAINED,
 ] as const;
+
+/**
+ * Free-credit newsletter bonus state, returned by subscribe so the UI can say
+ * whether the +20/month is live or waits on the confirmation email.
+ */
+export const {
+  enum: NewsletterCreditBonus,
+  options: NewsletterCreditBonusOptions,
+  Value: NewsletterCreditBonusValue,
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "enum.creditBonus.active",
+  PENDING_CONFIRMATION: "enum.creditBonus.pendingConfirmation",
+  CLAIMED_ELSEWHERE: "enum.creditBonus.claimedElsewhere",
+});

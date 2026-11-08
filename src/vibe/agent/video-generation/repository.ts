@@ -248,6 +248,14 @@ export class VideoGenerationRepository {
       promptLength: data.prompt.length,
     });
 
+    // Fail-closed: a paid model with a resolved cost of 0 must never generate for free.
+    if (creditCost <= 0) {
+      return fail({
+        message: t("post.errors.modelUnavailable"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
     const balanceCheck = await checkMediaBalance(
       user,
       creditCost,
@@ -352,7 +360,13 @@ export class VideoGenerationRepository {
     let { videoUrl } = generationResult.data;
     const finalDurationSeconds =
       generationResult.data.durationSeconds ?? durationSeconds;
-    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
+    // Provider-reported cost (OpenRouter usage.cost) is raw upstream USD - apply
+    // the standard markup. A 0/missing report falls back to the priced estimate.
+    const reportedCost = generationResult.data.creditCost;
+    const finalCreditCost =
+      reportedCost !== undefined && reportedCost > 0
+        ? Math.round(reportedCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10) / 10
+        : creditCost;
 
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by

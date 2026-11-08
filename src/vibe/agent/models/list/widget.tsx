@@ -25,6 +25,8 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { CONTENT_DISPLAY } from "../../skills/enum";
+import { scopedTranslation as modelsScopedTranslation } from "../i18n";
 import type { AnyModelId } from "../models";
 import { ModelCreditDisplay } from "../widget/model-credit-display";
 import type definition from "./definition";
@@ -246,6 +248,7 @@ export function ModelsListWidget({
 }: ModelsListWidgetProps): JSX.Element {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tModels } = modelsScopedTranslation.scopedT(locale);
   const value = useWidgetValue<typeof definition.GET>();
   const onPick = usePickerCallback<ModelListItem>();
   const isPickerMode = !!onPick;
@@ -319,19 +322,25 @@ export function ModelsListWidget({
               >
                 {t("get.browser.allLabel")}
               </Button>
-              {contentLevels.map((level) => (
-                <Button
-                  key={level}
-                  variant={activeContent === level ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={() => {
-                    setActiveContent(activeContent === level ? null : level);
-                  }}
-                >
-                  {level}
-                </Button>
-              ))}
+              {contentLevels.map((level) => {
+                const tier = CONTENT_DISPLAY.find((d) =>
+                  d.value.endsWith(`.${level}`),
+                );
+                return (
+                  <Button
+                    key={level}
+                    variant={activeContent === level ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs"
+                    title={tier?.help ? tModels(tier.help) : undefined}
+                    onClick={() => {
+                      setActiveContent(activeContent === level ? null : level);
+                    }}
+                  >
+                    {tier ? tModels(tier.label) : level}
+                  </Button>
+                );
+              })}
             </Div>
           )}
         </Div>

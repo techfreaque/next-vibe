@@ -58,6 +58,7 @@ import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
+import foldersDefinition from "../../../chat/folders/[rootFolderId]/definition";
 import rootPermissionsDefinition from "../../../chat/folders/[rootFolderId]/root-permissions/definition";
 import { isIncognitoFolder } from "../../../chat/config";
 import {
@@ -94,6 +95,7 @@ import {
 } from "../hooks/input-store";
 import { RecordingInputArea } from "../hooks/recording-input-area";
 import { useAIStreamStore } from "../hooks/store";
+import { OutOfCreditsCard } from "./out-of-credits-card";
 import { useAIStream } from "../hooks/use-ai-stream";
 import {
   getDraftKey,
@@ -366,6 +368,32 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     currentRootFolderId,
     rootPermissionsQuery.data,
   ]);
+  // Sub-folder permissions (e.g. guests may post in Public but not in its
+  // Announcements sub-folder). The chat store's `folders` map is not fed by the
+  // sidebar, so read the folder list query (same cache as the sidebar) - and
+  // deny until it has landed: falling back to the ROOT permission meanwhile let
+  // a guest type into a sub-folder they cannot post in.
+  const needsSubFolderPermissions =
+    !activeThread &&
+    !!currentSubFolderId &&
+    !folders[currentSubFolderId] &&
+    !isIncognitoFolder(currentRootFolderId);
+  const subFoldersQuery = useApiQuery({
+    endpoint: foldersDefinition.GET,
+    urlPathParams: { rootFolderId: currentRootFolderId },
+    logger,
+    user,
+    options: {
+      enabled: needsSubFolderPermissions,
+      staleTime: 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  });
+  const subFolderList =
+    subFoldersQuery.data?.folders ??
+    (bootRootMatches ? bootContext.initialFoldersData?.folders : undefined);
+  const subFolderPermissionsPending =
+    needsSubFolderPermissions && subFolderList === undefined;
   const canPost = useMemo(() => {
     if (activeThread) {
       // canPost is null when the thread inherits from its folder (treat as allowed).
@@ -382,16 +410,30 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     }
     if (currentSubFolderId) {
       const currentFolder = folders[currentSubFolderId];
-      // Same logic: undefined means the folder came from a partial WS payload.
-      if (currentFolder?.canCreateThread === undefined) {
+      if (currentFolder) {
+        // Same logic: undefined means the folder came from a partial WS payload.
+        return (
+          currentFolder.canCreateThread ?? rootFolderPermissions.canCreateThread
+        );
+      }
+      if (isIncognitoFolder(currentRootFolderId)) {
         return rootFolderPermissions.canCreateThread;
       }
-      return (
-        currentFolder.canCreateThread ?? rootFolderPermissions.canCreateThread
+      // Not loaded yet → deny; loaded but absent (not visible to this user) → deny.
+      const listedFolder = subFolderList?.find(
+        (folder) => folder.id === currentSubFolderId,
       );
+      return listedFolder?.canCreateThread ?? false;
     }
     return rootFolderPermissions.canCreateThread;
-  }, [activeThread, currentSubFolderId, folders, rootFolderPermissions]);
+  }, [
+    activeThread,
+    currentSubFolderId,
+    currentRootFolderId,
+    folders,
+    rootFolderPermissions,
+    subFolderList,
+  ]);
   const noPermissionReason = undefined; // Simplified - full logic can be restored later
 
   const { t } = aiStreamScopedTranslation.scopedT(locale);
@@ -415,6 +457,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const insufficientCredits =
     !noCredits && modelCost > 0 && messageOps.creditsTotal < modelCost;
   const isInputDisabled = !canPost || noCredits || insufficientCredits;
+  // Guests can't top up: an empty balance shows the email / sign-up card
+  const guestOutOfCredits =
+    user.isPublic && canPost && (noCredits || insufficientCredits);
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -490,6 +535,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isAborting = useAIStreamStore((s) =>
     activeThreadId ? s.isAborting(activeThreadId) : false,
   );
+  const creditRefusal = useAIStreamStore((s) => s.creditRefusal);
+  const setCreditRefusal = useAIStreamStore((s) => s.setCreditRefusal);
   // Submitting state - send clicked but stream hasn't confirmed start yet
   const isSubmitting = useChatInputStore((s) => s.isSubmitting);
 
@@ -640,6 +687,18 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       {/* Call mode indicator */}
       <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
+      {/* Send refused for lack of credits (402): the way forward, not an error */}
+      {(creditRefusal || guestOutOfCredits) && (
+        <OutOfCreditsCard
+          locale={locale}
+          isGuest={user.isPublic}
+          onDismiss={
+            guestOutOfCredits ? undefined : (): void => setCreditRefusal(false)
+          }
+          className="mb-2 max-w-none"
+        />
+      )}
+
       {/* Recording modal */}
       <RecordingInputArea
         isRecording={voice.isRecording}
@@ -741,30 +800,55 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           )}
 
           {/* No permission message */}
-          {!canPost && !rootPermissionsPending && (
-            <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
-              {noPermissionReason || t("input.noPermission")}
+          {!canPost &&
+            !rootPermissionsPending &&
+            !subFolderPermissionsPending && (
+              <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
+                {noPermissionReason || t("input.noPermission")}
+              </Div>
+            )}
+
+          {/* Balance failed to load: say so and offer a retry - never "0" */}
+          {canPost && messageOps.creditsLoadFailed && (
+            <Div className="absolute right-2 top-1.5 z-10 flex items-center gap-2 rounded-md border border-destructive/30 bg-background/95 px-2 py-0.5 text-xs">
+              <Span className="text-destructive">
+                {t("input.creditsLoadFailed.title")}
+              </Span>
+              <Button
+                type="button"
+                variant="link"
+                size="unset"
+                className="h-auto p-0 text-xs"
+                onClick={messageOps.retryCredits}
+              >
+                {t("input.creditsLoadFailed.retry")}
+              </Button>
             </Div>
           )}
 
           {/* No credits / insufficient credits error */}
-          {canPost && (noCredits || insufficientCredits) && (
+          {canPost && (noCredits || insufficientCredits) && !creditRefusal && (
             // Opaque backdrop: a kept draft must not bleed through the notice
             <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-t-md bg-background/95">
-              <Div className="text-sm font-medium text-destructive">
-                {noCredits
-                  ? t("input.noCredits.title")
-                  : t("input.insufficientCredits.title", {
-                      cost: modelCost,
-                      balance: messageOps.creditsTotal,
-                    })}
-              </Div>
-              <Link
-                href={`/${locale}/subscription/buy`}
-                className="pointer-events-auto text-xs text-primary underline underline-offset-2 hover:text-primary/80"
-              >
-                {t("input.noCredits.addCredits")}
-              </Link>
+              {/* Guests: the out-of-credits card above the composer carries the actions */}
+              {!user.isPublic && (
+                <>
+                  <Div className="text-sm font-medium text-destructive">
+                    {noCredits
+                      ? t("input.noCredits.title")
+                      : t("input.insufficientCredits.title", {
+                          cost: modelCost,
+                          balance: messageOps.creditsTotal,
+                        })}
+                  </Div>
+                  <Link
+                    href={`/${locale}/subscription/buy`}
+                    className="pointer-events-auto text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+                  >
+                    {t("input.noCredits.addCredits")}
+                  </Link>
+                </>
+              )}
             </Div>
           )}
         </Div>

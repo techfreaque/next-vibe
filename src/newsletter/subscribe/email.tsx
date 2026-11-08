@@ -15,6 +15,7 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { contactClientRepository } from "@/contact/repository-client";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { configScopedTranslation } from "@/env/i18n";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 
@@ -39,6 +40,8 @@ const newsletterWelcomePropsSchema = z.object({
   name: z.string().optional(),
   leadId: z.string().optional(),
   userId: z.string().optional(),
+  /** Double opt-in token; present while the address is unconfirmed */
+  confirmationToken: z.string().optional(),
 });
 
 type NewsletterWelcomeProps = z.infer<typeof newsletterWelcomePropsSchema>;
@@ -130,6 +133,60 @@ function NewsletterWelcomeEmail({
         </li>
       </ul>
 
+      {/* Double opt-in: confirming unlocks the monthly free-credit bonus */}
+      {props.confirmationToken && (
+        <Section
+          style={{
+            backgroundColor: "#eef2ff",
+            borderRadius: "8px",
+            padding: "20px",
+            marginBottom: "24px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#111827",
+              marginBottom: "8px",
+            }}
+          >
+            {t("emailTemplate.welcome.confirm_title", {
+              bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+            })}
+          </div>
+          <div
+            style={{
+              fontSize: "15px",
+              lineHeight: "1.6",
+              color: "#374151",
+              marginBottom: "16px",
+            }}
+          >
+            {t("emailTemplate.welcome.confirm_text", {
+              bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+            })}
+          </div>
+          <Button
+            href={`${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/story/newsletter/confirm/${encodeURIComponent(
+              props.confirmationToken,
+            )}`}
+            style={{
+              backgroundColor: "#4f46e5",
+              color: "#ffffff",
+              padding: "12px 20px",
+              borderRadius: "6px",
+              fontWeight: "600",
+              textDecoration: "none",
+            }}
+          >
+            {t("emailTemplate.welcome.confirm_button", {
+              bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+            })}
+          </Button>
+        </Section>
+      )}
+
       {/* Frequency note */}
       <div
         style={{
@@ -218,15 +275,23 @@ export const newsletterWelcomeEmailTemplate: EmailTemplateDefinition<
     name: "Max Mustermann",
     leadId: "example-lead-id-456",
     userId: "example-user-id-123",
+    confirmationToken: "example-confirmation-token",
   },
-  render: ({ requestData, responseData, locale, t }) => {
+  render: async ({ requestData, responseData, locale, t }) => {
     const { t: configT } = configScopedTranslation.scopedT(locale);
     try {
+      // Server-side lookup: the token goes to the mailbox only, never the API response
+      const { NewsletterSubscribeRepository } = await import("./repository");
+      const confirmationToken =
+        await NewsletterSubscribeRepository.getPendingConfirmationToken(
+          responseData.subscriptionId,
+        );
       const templateProps: NewsletterWelcomeProps = {
         email: requestData.email,
         name: requestData.name,
         leadId: responseData.leadId,
         userId: responseData.userId,
+        confirmationToken: confirmationToken ?? undefined,
       };
 
       return success({

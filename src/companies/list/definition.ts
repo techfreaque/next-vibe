@@ -46,7 +46,7 @@ const { GET } = createEndpoint({
   category: "companies",
   subCategory: "Company Management",
   tags: ["tags.companies", "tags.list"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN],
   defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN],
   icon: "building",
 

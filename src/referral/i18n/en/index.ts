@@ -190,6 +190,30 @@ export const translations = {
 
   // Earnings List endpoint
   earnings: {
+    confirm: {
+      post: {
+        title: "Confirm Referral Earnings",
+        titleShort: "Confirm Earnings",
+        description:
+          "Unlock referral earnings whose refund window has passed. Runs daily.",
+        container: {
+          title: "Earnings Confirmation",
+          description: "Pending earnings past the refund window",
+        },
+        response: {
+          confirmedCount: "Confirmed",
+          failedCount: "Failed",
+        },
+        success: {
+          title: "Earnings Confirmed",
+          description: "Matured referral earnings are now spendable",
+        },
+      },
+      task: {
+        description:
+          "Turns referral earnings older than the refund window into earned credits",
+      },
+    },
     list: {
       get: {
         title: "List Referral Earnings",
@@ -367,7 +391,7 @@ export const translations = {
         "Referral link: {{directPct}} of every payment from that user, forever. Your skill shared by others: {{skillBonusPct}} of every payment from those users - income from links you never posted.",
       step3Title: "Get paid",
       step3Body:
-        "Earnings are instant. Use them as chat credits or withdraw to crypto.",
+        "Earnings unlock {{holdDays}} days after each payment - the refund window. Then use them as chat credits or withdraw to crypto.",
       withdrawTitle: "Withdraw Your Earnings",
       withdrawDescription: "Multiple ways to use your referral earnings",
       useAsCredits: "Use as Chat Credits",
@@ -381,6 +405,9 @@ export const translations = {
       unlockedOf: "unlocked of",
       viewHistory: "View History",
       historyEmpty: "Your payouts will appear here",
+      pendingTitle: "{{amount}} pending",
+      pendingNote:
+        "Unlocks {{holdDays}} days after each payment - the refund window. Refunded payments cancel their earnings.",
     },
     email: {
       user: {
@@ -418,6 +445,8 @@ export const translations = {
       minimumAmount: "Minimum payout amount is {{minPayout}}",
       walletRequired: "Wallet address is required for crypto payouts",
       insufficientBalance: "Insufficient balance for payout",
+      conversionFailed:
+        "Conversion failed. Your earnings are untouched - try again in a minute.",
       notFound: "Payout request not found",
       invalidStatus: "Invalid payout request status for this operation",
     },

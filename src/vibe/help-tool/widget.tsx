@@ -191,7 +191,10 @@ function FolderCell({
           {count}
         </Span>
       </Div>
-      <Span className="text-[10px] leading-tight line-clamp-3 w-full font-medium">
+      <Span
+        className="text-[10px] leading-tight line-clamp-3 w-full font-medium whitespace-normal break-words"
+        title={label}
+      >
         {label}
       </Span>
     </Button>
@@ -2031,7 +2034,12 @@ export function HelpToolsWidget(): JSX.Element {
                 />
               )}
             </Div>
-            <Span className="text-[10px] leading-tight line-clamp-3 w-full font-medium">
+            {/* Button is nowrap by default - let the label wrap so the clamp
+                works instead of cutting "Generate Image" mid-word. */}
+            <Span
+              className="text-[10px] leading-tight line-clamp-3 w-full font-medium whitespace-normal break-words"
+              title={getToolLabel(tool)}
+            >
               {getToolLabel(tool)}
             </Span>
           </Button>
@@ -2716,6 +2724,10 @@ export function HelpToolsWidget(): JSX.Element {
               className="flex flex-col flex-1"
             />
           </HelpAdminLayoutActiveContext.Provider>
+        ) : isMobile ? (
+          // Phones: no tool picked yet → the tool list IS the page. An empty
+          // "Select a tool" pane with the list hidden in a drawer is a dead end.
+          <Div className="flex flex-col flex-1 w-full">{toolListSidebar}</Div>
         ) : (
           <Div className="flex flex-col items-center justify-center h-full text-center px-8 gap-4 min-h-[400px]">
             <Div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center">

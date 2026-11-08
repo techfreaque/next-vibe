@@ -158,8 +158,9 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "Produkt-Updates erhalten",
-      description: "Neue Modelle und Features. Selten. Kein Spam.",
+      label: "+20 Gratis-Credits pro Monat",
+      description:
+        "Newsletter abonnieren und monatlich 20 Bonus-Credits sichern - plus neue Modelle und Features zuerst. Kein Spam, jederzeit kündbar.",
     },
 
     referralCode: {
@@ -169,6 +170,10 @@ export const translations: typeof enTranslations = {
       labelPrefilled: "Empfehlungscode",
       descriptionPrefilled:
         "Dein Freund wird belohnt, wenn du ein Konto erstellst.",
+      validation: {
+        invalid:
+          "Diesen Empfehlungscode gibt es nicht oder er ist nicht mehr aktiv. Korrigiere ihn oder leere das Feld.",
+      },
     },
     supportedSkillId: {
       label: "Creator unterstützen",
@@ -233,6 +238,8 @@ export const translations: typeof enTranslations = {
       title: "Nicht gespeicherte Änderungen",
       description: "Sie haben nicht gespeicherte Änderungen",
     },
+    autoLoginFailed:
+      "Konto erstellt, aber die automatische Anmeldung ist fehlgeschlagen. Melde dich mit deinem neuen Passwort an.",
     internal: {
       title: "Registrierung für {{email}} fehlgeschlagen: {{error}}",
       description: "Ein interner Fehler ist aufgetreten",
@@ -433,7 +440,7 @@ export const translations: typeof enTranslations = {
     free: {
       title: "Was du kostenlos bekommst, für immer:",
       credits:
-        "{{freeCredits}} Credits pro Monat - keine Karte, kein Ablaufdatum",
+        "{{freeCreditsSignedIn}} Gratis-Credits jeden Monat, +{{freeCreditsNewsletterBonus}} mit dem Newsletter - ohne Karte",
       allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
       uncensored:
         "4 unzensierte Modelle, die deine Fragen wirklich beantworten",

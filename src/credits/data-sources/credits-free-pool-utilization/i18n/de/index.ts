@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Pool-Nutzung",
-    title: "Credits Gratispool-Auslastung",
+    titleShort: "Gratis-Kontingent genutzt",
+    title: "Gratis-Kontingent genutzt (Monat bisher)",
     description:
-      "Verhältnis verbrauchter kostenloser Credits über Lead-Wallets pro Auflösungs-Bucket",
+      "Verbrauchte Gratis-Credits geteilt durch vergebene Gratis-Credits, beides seit Monatsanfang (UTC, Reset am 1.). 0 = nichts genutzt, 1 = jedes vergebene Gratis-Credit verbraucht. Gilt für gestaffelte Kontingente (Gast / Nutzer / Newsletter).",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
         description: "Extra Balken vor Bereichsstart",
       },
       result: {
-        label: "Gratispool-Auslastung",
+        label: "Gratis-Kontingent genutzt",
         description: "Ausgabe-Zeitreihe",
       },
       meta: { label: "Meta", description: "Knotenausführungsmetadaten" },

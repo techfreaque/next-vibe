@@ -7,12 +7,19 @@
  */
 
 import type { CountryLanguage } from "../core/i18n/core/config";
-import { parseError } from "../core/utils/parse-error";
 import { colors, maybeColorize, semantic } from "./colors";
+import {
+  colorizeLogMessage,
+  formatConnectorMetadata,
+  formatMetadata,
+  usesCompactMetadata,
+} from "./formatters";
 import { enableDebugLogger, mcpSilentMode } from "./debug";
+import { formatElapsed } from "./uptime";
+import { serializeLogRecord } from "./serialize";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
 
-function serializeDebugMeta(meta: LoggerMetadata[]): string {
+function serializeDebugMeta(meta: LoggerMetadata[], pretty: boolean): string {
   if (meta.length === 0) {
     return "";
   }
@@ -27,6 +34,11 @@ function serializeDebugMeta(meta: LoggerMetadata[]): string {
       if (typeof m === "number" || typeof m === "boolean") {
         return String(m);
       }
+      if (pretty) {
+        return m instanceof Error
+          ? `${m.name}: ${m.message}`
+          : formatMetadata(m);
+      }
       try {
         return JSON.stringify(m);
       } catch {
@@ -35,6 +47,30 @@ function serializeDebugMeta(meta: LoggerMetadata[]): string {
     })
     .filter(Boolean)
     .join(" ")}`;
+}
+
+/**
+ * Console args for metadata: Errors stay raw (stack via util.inspect),
+ * strings stay as-is, everything else is pretty-printed and dimmed.
+ */
+function prettyConsoleArgs(
+  meta: LoggerMetadata[],
+  message = "",
+): Array<string | Error> {
+  const compact = usesCompactMetadata(message);
+  return meta.flatMap((m): Array<string | Error> => {
+    if (m === undefined || m === null) {
+      return [];
+    }
+    if (m instanceof Error || typeof m === "string") {
+      return [m];
+    }
+    return [
+      compact
+        ? formatConnectorMetadata(m)
+        : maybeColorize(formatMetadata(m), colors.dim),
+    ];
+  });
 }
 
 type PersistFn = (
@@ -50,6 +86,17 @@ type FileLogFn = (
   data?: Record<string, LoggerMetadata>,
 ) => void;
 
+/** File sinks JSON-encode metadata - serialize first so Errors are not `{}`. */
+function withSerializedData(
+  onFileLog: FileLogFn | undefined,
+): FileLogFn | undefined {
+  if (!onFileLog) {
+    return undefined;
+  }
+  return (message, data) =>
+    onFileLog(message, data ? serializeLogRecord(data) : undefined);
+}
+
 function getTimePrefix(): string {
   const startTime = Number(process.env["VIBE_START_TIME"]);
   // Browsers have no VIBE_START_TIME — uptime would print as "NaNmNaNs"
@@ -59,21 +106,7 @@ function getTimePrefix(): string {
   ) {
     return new Date().toISOString().slice(11, 23);
   }
-  const totalSec = (Date.now() - startTime) / 1000;
-  if (totalSec < 60) {
-    return `${totalSec.toFixed(3)}s`;
-  }
-  const days = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const minutes = Math.floor((totalSec % 3600) / 60);
-  const secs = Math.floor(totalSec % 60);
-  if (days > 0) {
-    return `${days}d${hours}h${minutes}m${secs}s`;
-  }
-  if (hours > 0) {
-    return `${hours}h${minutes}m${secs}s`;
-  }
-  return `${minutes}m${secs}s`;
+  return formatElapsed((Date.now() - startTime) / 1000);
 }
 
 export function formatLogPrefix(): string {
@@ -87,12 +120,19 @@ export function createLogger(
   debugEnabled = false,
   locale: CountryLanguage,
   onPersist?: PersistFn,
-  onFileLog?: FileLogFn,
+  rawOnFileLog?: FileLogFn,
 ): EndpointLogger {
+  const onFileLog = withSerializedData(rawOnFileLog);
   const noTimePrefix = !!process.env["NEXT_RUNTIME"];
 
   const fmt = (message: string): string =>
     noTimePrefix ? message : `[${getTimePrefix()}] ${message}`;
+
+  /** Console variant: the `[time]` prefix is white, the message keeps its category colour. */
+  const fmtC = (message: string): string =>
+    noTimePrefix
+      ? message
+      : `${maybeColorize(`[${getTimePrefix()}]`, semantic.highlight)} ${message}`;
 
   return {
     info(message: string, ...metadata: LoggerMetadata[]): void {
@@ -102,7 +142,10 @@ export function createLogger(
         return;
       }
       // oxlint-disable-next-line no-console
-      console.log(fmt(message), ...metadata);
+      console.log(
+        fmtC(colorizeLogMessage(message)),
+        ...prettyConsoleArgs(metadata, message),
+      );
       onFileLog?.(fmt(message), metadataObj);
     },
 
@@ -113,9 +156,10 @@ export function createLogger(
     ): void {
       onPersist?.("error", message, error, metadata, locale);
 
-      const typedError = error ? parseError(error) : undefined;
+      // Raw error (not parseError's flattened copy) so the cause chain and
+      // provider fields (statusCode, responseBody, ...) survive serialization.
       const metadataObj = {
-        ...(typedError !== undefined && { error: typedError }),
+        ...(error !== undefined && error !== null && { error }),
         ...(metadata.length > 0 && { metadata }),
       };
       const hasMetadata = Object.keys(metadataObj).length > 0;
@@ -129,9 +173,11 @@ export function createLogger(
       }
       // oxlint-disable-next-line no-console
       console.error(
-        fmt(message),
-        ...(error !== undefined ? [error] : []),
-        ...metadata,
+        fmtC(colorizeLogMessage(message)),
+        ...(error instanceof Error
+          ? [error]
+          : prettyConsoleArgs(error === undefined ? [] : [error])),
+        ...prettyConsoleArgs(metadata, message),
       );
       onFileLog?.(fmt(message), hasMetadata ? metadataObj : undefined);
     },
@@ -145,7 +191,10 @@ export function createLogger(
         return;
       }
       // oxlint-disable-next-line no-console
-      console.warn(fmt(message), ...metadata);
+      console.warn(
+        fmtC(colorizeLogMessage(message)),
+        ...prettyConsoleArgs(metadata, message),
+      );
       onFileLog?.(fmt(message), metadataObj);
     },
 
@@ -157,7 +206,10 @@ export function createLogger(
         return;
       }
       // oxlint-disable-next-line no-console
-      console.log(`${prefix}${message}`, ...metadata);
+      console.log(
+        `${noTimePrefix ? "" : `${maybeColorize(`[${getTimePrefix()}]`, semantic.highlight)} `}${colorizeLogMessage(message)}`,
+        ...prettyConsoleArgs(metadata, message),
+      );
       onFileLog?.(`${prefix}${message}`, metadataObj);
     },
 
@@ -170,7 +222,7 @@ export function createLogger(
         onFileLog?.(`[DEBUG] ${fmt(message)}`, metadataObj);
         return;
       }
-      const meta = serializeDebugMeta(metadata);
+      const meta = serializeDebugMeta(metadata, true);
       const timeTag = noTimePrefix
         ? ""
         : `${colors.dim}[${getTimePrefix()}]${colors.reset} `;
@@ -178,7 +230,7 @@ export function createLogger(
       console.log(
         `${timeTag}${maybeColorize(`${message}${meta}`, semantic.debug)}`,
       );
-      const meta2 = serializeDebugMeta(metadata);
+      const meta2 = serializeDebugMeta(metadata, false);
       const timeTag2 = noTimePrefix ? "" : `[${getTimePrefix()}] `;
       onFileLog?.(`${timeTag2}${message}${meta2}`, metadataObj);
     },

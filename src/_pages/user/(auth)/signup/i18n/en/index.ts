@@ -17,53 +17,6 @@ export const translations = {
     twitterDescription:
       "Create your account and start building with {{appName}}",
   },
-  auth: {
-    signup: {
-      title: "Start Your Journey with {{appName}}",
-      subtitle: "Join the community for uncensored AI conversations",
-      createAccountButton: "Create Account",
-      creatingAccount: "Creating Account...",
-      alreadyHaveAccount: "Already have an account?",
-      signIn: "Sign in",
-      termsAndConditions: "I agree to the",
-      avatarAlt: "User avatar",
-      userCount: "10,000+ developers",
-      trustText: "Trusted by developers worldwide",
-      createAccountAndBook: "Create Account & Book Meeting",
-      directDescription: "Get started immediately with your account",
-      scheduleDescription: "Schedule a personalized onboarding session",
-      meetingPreferenceOptions: {
-        direct: "Direct Access",
-        schedule: "Schedule Meeting",
-      },
-      benefits: {
-        contentCreation: {
-          title: "Powerful Content Creation",
-          description: "Create and manage content with our intuitive tools",
-        },
-        dataStrategy: {
-          title: "Smart Data Strategy",
-          description: "Leverage data-driven insights for better decisions",
-        },
-        saveTime: {
-          title: "Save Time & Effort",
-          description: "Automate workflows and boost productivity",
-        },
-      },
-      privateName: "Private Name",
-      privateNamePlaceholder: "Enter your private name",
-      publicName: "Public Name",
-      publicNamePlaceholder: "Enter your public name",
-      emailLabel: "Email Address",
-      emailPlaceholder: "Enter your email",
-      passwordLabel: "Password",
-      passwordPlaceholder: "Create a password",
-      confirmPasswordLabel: "Confirm Password",
-      confirmPasswordPlaceholder: "Confirm your password",
-      newsletterSubscription: "Subscribe to newsletter",
-      usingReferralCode: "Using referral code",
-    },
-  },
   post: {
     title: "Signup",
     description: "Signup endpoint",

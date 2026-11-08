@@ -79,7 +79,7 @@ export const translations = {
       c: "C: Card Hero",
       d: "D: Two-Row",
     },
-    addVariant: "Add Variant",
+    addVariant: "Add another model",
     addVariantHint: "Different model, personality, or style",
     yourskill: "Your skill",
     signupPrompt: {
@@ -198,6 +198,7 @@ export const translations = {
       createCode: "Create a code",
       codePlaceholder: "e.g. MYCODE",
       creating: "Creating...",
+      createFailed: "Couldn't create that code. Try another.",
       linkReady: "Your share link:",
       copied: "Copied!",
       copyLink: "Copy Link",

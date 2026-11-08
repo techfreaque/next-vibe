@@ -82,6 +82,37 @@ const { GET } = createEndpoint({
         label: "get.capExceeded.content" as const,
         schema: z.boolean(),
       }),
+      perLeadCap: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.perLeadCap.content" as const,
+        schema: z.number(),
+      }),
+      perIpCap: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.perIpCap.content" as const,
+        schema: z.number(),
+      }),
+      topSpenders: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.topSpenders.content" as const,
+        schema: z.array(
+          z.object({ kind: z.string(), key: z.string(), spend: z.number() }),
+        ),
+      }),
+      recentEvents: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.recentEvents.content" as const,
+        schema: z.array(
+          z.object({
+            kind: z.string(),
+            leadId: z.string(),
+            ipHash: z.string(),
+            model: z.string(),
+            cost: z.number(),
+            createdAt: dateSchema,
+          }),
+        ),
+      }),
     },
   }),
 
@@ -138,6 +169,19 @@ const { GET } = createEndpoint({
         percentUsed: 24.6,
         lastResetAt: "2026-03-07T00:00:00.000Z",
         capExceeded: false,
+        perLeadCap: 20,
+        perIpCap: 40,
+        topSpenders: [{ kind: "lead", key: "lead-123", spend: 12.5 }],
+        recentEvents: [
+          {
+            kind: "lead-cap",
+            leadId: "lead-123",
+            ipHash: "ab12cd34ef56ab12",
+            model: "gpt-5",
+            cost: 1.5,
+            createdAt: "2026-03-07T10:00:00.000Z",
+          },
+        ],
       },
     },
   },
@@ -171,6 +215,24 @@ const { POST } = createEndpoint({
         placeholder: "post.capAmount.placeholder" as const,
         schema: z.coerce.number().positive(),
         columns: 12,
+      }),
+      perLeadCap: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.perLeadCap.label" as const,
+        description: "post.perLeadCap.description" as const,
+        placeholder: "post.perLeadCap.placeholder" as const,
+        schema: z.coerce.number().positive().optional(),
+        columns: 6,
+      }),
+      perIpCap: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.perIpCap.label" as const,
+        description: "post.perIpCap.description" as const,
+        placeholder: "post.perIpCap.placeholder" as const,
+        schema: z.coerce.number().positive().optional(),
+        columns: 6,
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -70,7 +70,7 @@ const baseFields = {
     schema: z.string().optional(),
     example: "sk-or-v1-...",
     comment:
-      "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
+      "OpenRouter API key - access hundreds of AI models. Get yours at https://openrouter.ai/keys",
     commented: true,
     sensitive: true,
     onboardingRequired: true,

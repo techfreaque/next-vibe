@@ -27,6 +27,8 @@ import {
 } from "@dnd-kit/sortable";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
+import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
+import { ArrowUp } from "next-vibe/ui/components/icons/ArrowUp";
 import { Div, type DivRefObject } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Compass } from "next-vibe/ui/components/icons/Compass";
@@ -330,6 +332,45 @@ async function openEditFavorite(
 /** Max variant rows shown for a group that doesn't hold the active favorite. */
 const COLLAPSED_ROW_COUNT = 1;
 
+/** Up/down step for menu-driven reorder (phones have no drag handles) */
+type MoveDirection = -1 | 1;
+
+/**
+ * "Move up" / "Move down" menu items - the touch-friendly twin of the drag
+ * handles. Renders nothing when there is nowhere to move.
+ */
+function MoveMenuItems({
+  onMoveUp,
+  onMoveDown,
+  locale,
+}: {
+  onMoveUp: (() => void) | undefined;
+  onMoveDown: (() => void) | undefined;
+  locale: CountryLanguage;
+}): React.JSX.Element | null {
+  const { t } = scopedTranslation.scopedT(locale);
+  if (!onMoveUp && !onMoveDown) {
+    return null;
+  }
+  return (
+    <>
+      {onMoveUp && (
+        <DropdownMenuItem onSelect={onMoveUp} className="cursor-pointer">
+          <ArrowUp className="mr-2 h-4 w-4" />
+          {t("get.actions.moveUp")}
+        </DropdownMenuItem>
+      )}
+      {onMoveDown && (
+        <DropdownMenuItem onSelect={onMoveDown} className="cursor-pointer">
+          <ArrowDown className="mr-2 h-4 w-4" />
+          {t("get.actions.moveDown")}
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuSeparator />
+    </>
+  );
+}
+
 // ============================================================================
 // Variant row - one selectable model config
 // ============================================================================
@@ -347,6 +388,8 @@ const VariantRow = React.memo(function VariantRow({
   isTouch,
   isPickerMode,
   sortable,
+  onMoveUp,
+  onMoveDown,
 }: {
   item: FavoriteCard;
   /** Model-only favorites show the model as the title instead */
@@ -356,6 +399,9 @@ const VariantRow = React.memo(function VariantRow({
   isTouch: boolean;
   isPickerMode: boolean;
   sortable: boolean;
+  /** undefined = already first / nothing to reorder */
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }): React.JSX.Element {
   const { t } = scopedTranslation.scopedT(deps.locale);
   const variantLabel = showVariantLabel
@@ -431,13 +477,14 @@ const VariantRow = React.memo(function VariantRow({
             >
               {title}
             </Span>
-            <Span className="flex min-w-0 items-center gap-1.5 text-xs leading-tight text-muted-foreground">
-              <Span className="truncate">{subtitle}</Span>
+            {/* Phones: price (credits + money) gets its own line so the model name never truncates to one letter */}
+            <Span className="flex min-w-0 flex-col items-start gap-x-1.5 text-xs leading-tight text-muted-foreground sm:flex-row sm:items-center">
+              <Span className="max-w-full truncate">{subtitle}</Span>
               {item.modelId ? (
                 <>
                   <Span
                     aria-hidden
-                    className="h-1 w-1 shrink-0 rounded-full bg-current opacity-40"
+                    className="hidden h-1 w-1 shrink-0 rounded-full bg-current opacity-40 sm:block"
                   />
                   <ModelCreditDisplay
                     modelId={item.modelId}
@@ -492,6 +539,11 @@ const VariantRow = React.memo(function VariantRow({
                   {t("get.actions.edit")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <MoveMenuItems
+                  onMoveUp={onMoveUp}
+                  onMoveDown={onMoveDown}
+                  locale={deps.locale}
+                />
                 <DropdownMenuItem
                   onSelect={() => setConfirmOpen(true)}
                   className="cursor-pointer text-destructive focus:text-destructive"
@@ -528,6 +580,9 @@ const SortableGroup = React.memo(function SortableGroup({
   handleSelectFavorite,
   deps,
   onItemDragEnd,
+  onMoveItem,
+  onMoveUp,
+  onMoveDown,
   isTouch,
   isPickerMode,
 }: {
@@ -535,6 +590,14 @@ const SortableGroup = React.memo(function SortableGroup({
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
   deps: ActionDeps;
   onItemDragEnd: (groupId: string, event: DragEndEvent) => void;
+  onMoveItem: (
+    groupId: string,
+    itemId: string,
+    direction: MoveDirection,
+  ) => void;
+  /** Move this whole group within its section; undefined at the edge */
+  onMoveUp: (() => void) | undefined;
+  onMoveDown: (() => void) | undefined;
   isTouch: boolean;
   isPickerMode: boolean;
 }): React.JSX.Element {
@@ -612,6 +675,8 @@ const SortableGroup = React.memo(function SortableGroup({
               isTouch={isTouch}
               isPickerMode={isPickerMode}
               sortable={false}
+              onMoveUp={onMoveUp}
+              onMoveDown={onMoveDown}
             />
           ) : null}
         </Div>
@@ -707,6 +772,11 @@ const SortableGroup = React.memo(function SortableGroup({
                     {t("get.actions.share")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <MoveMenuItems
+                    onMoveUp={onMoveUp}
+                    onMoveDown={onMoveDown}
+                    locale={deps.locale}
+                  />
                   <DropdownMenuItem
                     onSelect={() => setConfirmOpen(true)}
                     className="cursor-pointer text-destructive focus:text-destructive"
@@ -765,18 +835,31 @@ const SortableGroup = React.memo(function SortableGroup({
             <Div
               className={cn("flex flex-col gap-0.5 pb-2 pr-1.5", ROW_INDENT)}
             >
-              {visibleItems.map((item) => (
-                <VariantRow
-                  key={item.id}
-                  item={item}
-                  showVariantLabel
-                  handleSelectFavorite={handleSelectFavorite}
-                  deps={deps}
-                  isTouch={isTouch}
-                  isPickerMode={isPickerMode}
-                  sortable={expanded && isMulti}
-                />
-              ))}
+              {visibleItems.map((item) => {
+                const index = group.items.findIndex((i) => i.id === item.id);
+                return (
+                  <VariantRow
+                    key={item.id}
+                    item={item}
+                    showVariantLabel
+                    handleSelectFavorite={handleSelectFavorite}
+                    deps={deps}
+                    isTouch={isTouch}
+                    isPickerMode={isPickerMode}
+                    sortable={expanded && isMulti}
+                    onMoveUp={
+                      expanded && index > 0
+                        ? () => onMoveItem(group.id, item.id, -1)
+                        : undefined
+                    }
+                    onMoveDown={
+                      expanded && isMulti && index < group.items.length - 1
+                        ? () => onMoveItem(group.id, item.id, 1)
+                        : undefined
+                    }
+                  />
+                );
+              })}
               {canCollapse && (
                 <Button
                   type="button"
@@ -1017,19 +1100,14 @@ export function FavoritesListContainer(): React.JSX.Element {
   );
 
   /**
-   * Handle group-level drag end - reorder within one section only.
+   * Reorder groups within one section only: move activeId to overId's slot.
    * Receives the section's groups subset; rebuilds full list preserving other sections.
    */
-  const handleGroupDragEnd = useCallback(
-    (sectionGroups: SkillGroup[], event: DragEndEvent): void => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) {
-        return;
-      }
-
-      const oldIndex = sectionGroups.findIndex((g) => g.id === active.id);
-      const newIndex = sectionGroups.findIndex((g) => g.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) {
+  const reorderGroups = useCallback(
+    (sectionGroups: SkillGroup[], activeId: string, overId: string): void => {
+      const oldIndex = sectionGroups.findIndex((g) => g.id === activeId);
+      const newIndex = sectionGroups.findIndex((g) => g.id === overId);
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
         return;
       }
 
@@ -1057,25 +1135,18 @@ export function FavoritesListContainer(): React.JSX.Element {
     [groups, persistPositions],
   );
 
-  /**
-   * Handle item-level drag end - reorder within a group
-   */
-  const handleItemDragEnd = useCallback(
-    (groupId: string, event: DragEndEvent): void => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) {
-        return;
-      }
-
+  /** Reorder items within a group: move activeId to overId's slot. */
+  const reorderItems = useCallback(
+    (groupId: string, activeId: string, overId: string): void => {
       const groupIndex = groups.findIndex((g) => g.id === groupId);
       if (groupIndex === -1) {
         return;
       }
 
       const group = groups[groupIndex];
-      const oldIndex = group.items.findIndex((i) => i.id === active.id);
-      const newIndex = group.items.findIndex((i) => i.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) {
+      const oldIndex = group.items.findIndex((i) => i.id === activeId);
+      const newIndex = group.items.findIndex((i) => i.id === overId);
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
         return;
       }
 
@@ -1094,6 +1165,42 @@ export function FavoritesListContainer(): React.JSX.Element {
       persistPositions(flattenGroups(newGroups));
     },
     [groups, persistPositions],
+  );
+
+  const handleGroupDragEnd = useCallback(
+    (sectionGroups: SkillGroup[], event: DragEndEvent): void => {
+      const { active, over } = event;
+      if (!over) {
+        return;
+      }
+      reorderGroups(sectionGroups, String(active.id), String(over.id));
+    },
+    [reorderGroups],
+  );
+
+  const handleItemDragEnd = useCallback(
+    (groupId: string, event: DragEndEvent): void => {
+      const { active, over } = event;
+      if (!over) {
+        return;
+      }
+      reorderItems(groupId, String(active.id), String(over.id));
+    },
+    [reorderItems],
+  );
+
+  /** Menu-driven reorder: swap an item with its neighbour inside the group. */
+  const handleMoveItem = useCallback(
+    (groupId: string, itemId: string, direction: MoveDirection): void => {
+      const group = groups.find((g) => g.id === groupId);
+      const index = group?.items.findIndex((i) => i.id === itemId) ?? -1;
+      const neighbour = group?.items[index + direction];
+      if (index === -1 || !neighbour) {
+        return;
+      }
+      reorderItems(groupId, itemId, neighbour.id);
+    },
+    [groups, reorderItems],
   );
 
   const handleBrowseSkills = useCallback(async (): Promise<void> => {
@@ -1202,17 +1309,42 @@ export function FavoritesListContainer(): React.JSX.Element {
                     strategy={verticalListSortingStrategy}
                   >
                     <Div className="flex flex-col gap-2">
-                      {section.groups.map((group) => (
-                        <SortableGroup
-                          key={group.id}
-                          group={group}
-                          handleSelectFavorite={handleSelectFavorite}
-                          deps={deps}
-                          onItemDragEnd={handleItemDragEnd}
-                          isTouch={isTouch}
-                          isPickerMode={isPickerMode}
-                        />
-                      ))}
+                      {section.groups.map((group, groupIdx) => {
+                        const prev = section.groups[groupIdx - 1];
+                        const next = section.groups[groupIdx + 1];
+                        return (
+                          <SortableGroup
+                            key={group.id}
+                            group={group}
+                            handleSelectFavorite={handleSelectFavorite}
+                            deps={deps}
+                            onItemDragEnd={handleItemDragEnd}
+                            onMoveItem={handleMoveItem}
+                            onMoveUp={
+                              prev
+                                ? () =>
+                                    reorderGroups(
+                                      section.groups,
+                                      group.id,
+                                      prev.id,
+                                    )
+                                : undefined
+                            }
+                            onMoveDown={
+                              next
+                                ? () =>
+                                    reorderGroups(
+                                      section.groups,
+                                      group.id,
+                                      next.id,
+                                    )
+                                : undefined
+                            }
+                            isTouch={isTouch}
+                            isPickerMode={isPickerMode}
+                          />
+                        );
+                      })}
                     </Div>
                   </SortableContext>
                 </DndContext>

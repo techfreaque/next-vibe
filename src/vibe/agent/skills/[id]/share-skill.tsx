@@ -100,6 +100,7 @@ function SharePanel({
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [newCode, setNewCode] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -149,6 +150,7 @@ function SharePanel({
       return;
     }
     setCreating(true);
+    setCreateError(null);
     try {
       const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
       const referralDef = await import("@/referral/definition");
@@ -164,7 +166,12 @@ function SharePanel({
         setCodes((prev) => [{ code, label: null }, ...(prev ?? [])]);
         setSelectedCode(code);
         setNewCode("");
+      } else {
+        // Repository messages arrive translated (e.g. "code already exists")
+        setCreateError(result.message || t("get.share.createFailed"));
       }
+    } catch {
+      setCreateError(t("get.share.createFailed"));
     } finally {
       setCreating(false);
     }
@@ -276,7 +283,11 @@ function SharePanel({
           <Div className="flex gap-2">
             <Input
               value={newCode}
-              onChange={(e) => setNewCode(e.target.value)}
+              onChange={(e) => {
+                setNewCode(e.target.value);
+                setCreateError(null);
+              }}
+              aria-invalid={createError !== null}
               placeholder={t("get.share.codePlaceholder")}
               className="h-10 font-mono text-sm"
               onKeyDown={(e) => {
@@ -297,6 +308,11 @@ function SharePanel({
               )}
             </Button>
           </Div>
+          {createError && (
+            <Span role="alert" className="text-xs text-destructive">
+              {createError}
+            </Span>
+          )}
         </Div>
       )}
     </Div>

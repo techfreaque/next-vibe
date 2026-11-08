@@ -183,7 +183,7 @@ export class UserRepository {
         locale: user.locale,
         emailVerified: user.emailVerified,
         isActive: user.isActive,
-        requireTwoFactor: false,
+        requireTwoFactor: user.twoFactorEnabled,
         marketingConsent: user.marketingConsent ?? false,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,

@@ -48,3 +48,9 @@ export function extractLocaleFromPath(path: string): string | undefined {
   const localeMatch = path.match(/^\/([a-z]{2}-[A-Z]+)/);
   return localeMatch?.[1];
 }
+
+/**
+ * OpenAI-compatible API mount: /api/<locale>/v1/... - called server-to-server
+ * with an API key, no cookies and no lead identity.
+ */
+export const V1_API_PATH_REGEX = /^\/api\/[a-z]{2}-[A-Z]+\/v1(\/|$)/;

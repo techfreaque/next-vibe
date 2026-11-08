@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "In {{appName}} investieren",
     description:
-      "Tickets ab 5.000 $. Die Open-Source-KI-Plattform auf next-vibe - über 100 Modelle, live im Betrieb, den Filter bestimmt der Nutzer.",
+      "Tickets ab 5.000 $. Die Open-Source-KI-Plattform auf next-vibe - {{modelCount}} Modelle, live im Betrieb, den Filter bestimmt der Nutzer.",
     category: "Investieren",
     imageAlt: "In {{appName}} investieren",
     keywords:

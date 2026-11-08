@@ -26,6 +26,7 @@ import { IntelligenceLevel, ModelSelectionType } from "../skills/enum";
 import {
   chatModelDefinitions,
   ChatModelId,
+  chatModelOptions,
   chatModelOptionsPool,
   chatModelSuccessors,
   filterChatModels,
@@ -107,6 +108,14 @@ describe("chat model successor map", () => {
     }
   });
 
+  it("every legacy model has a successor", () => {
+    for (const id of allChatIds) {
+      if (isLegacyChatModel(id)) {
+        expect(chatModelSuccessors[id], `${id} is LEGACY without successor`).toBeDefined();
+      }
+    }
+  });
+
   it("leaves current models and successor-less legacy models unchanged", () => {
     expect(resolveChatModelSuccessor(ChatModelId.CLAUDE_OPUS_5_5)).toBe(
       ChatModelId.CLAUDE_OPUS_5_5,
@@ -114,6 +123,7 @@ describe("chat model successor map", () => {
     expect(resolveChatModelSuccessor(ChatModelId.DEEPSEEK_V4_PRO)).toBe(
       ChatModelId.DEEPSEEK_V4_PRO,
     );
+    expect(isLegacyChatModel(ChatModelId.DEEPSEEK_V4_PRO)).toBe(false);
   });
 
   it("resolves superseded flagships to the new generation", () => {
@@ -217,14 +227,22 @@ describe("MANUAL selections with a legacy model id", () => {
         openRouterOnly,
       ),
     ).toBe(ChatModelId.GPT_6_1_SOL);
-    // Current ids pass straight through.
+    // Legacy Qwen 3.7 Flash now resolves to its successor 3.8 Flash.
     expect(
       resolveChatModelForUser(
         ChatModelId.QWEN_3_7_FLASH,
         publicUser,
         openRouterOnly,
       ),
-    ).toBe(ChatModelId.QWEN_3_7_FLASH);
+    ).toBe(ChatModelId.QWEN_3_8_FLASH);
+    // Current ids pass straight through.
+    expect(
+      resolveChatModelForUser(
+        ChatModelId.QWEN_3_8_FLASH,
+        publicUser,
+        openRouterOnly,
+      ),
+    ).toBe(ChatModelId.QWEN_3_8_FLASH);
   });
 
   it("vision bridge MANUAL picks resolve to the successor too", () => {
@@ -294,6 +312,7 @@ describe("model browser", () => {
       ChatModelId.GEMINI_4_ARGON,
       ChatModelId.GROK_4_7,
       ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+      ChatModelId.GLM_5_3_UNCENSORED,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(true);
     }
@@ -303,6 +322,39 @@ describe("model browser", () => {
       ChatModelId.GROK_4_6,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(false);
+    }
+  });
+});
+
+describe("abliterated checkpoints are merged into the uncensored model", () => {
+  const pairs = [
+    [ChatModelId.GLM_5_3_ABLITERATED, ChatModelId.GLM_5_3_UNCENSORED],
+    [
+      ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
+      ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+    ],
+  ] as const;
+
+  it("abliterated is legacy -> uncensored, which carries multiple providers", () => {
+    for (const [abliterated, uncensored] of pairs) {
+      expect(isLegacyChatModel(abliterated), abliterated).toBe(true);
+      expect(chatModelSuccessors[abliterated], abliterated).toBe(uncensored);
+      expect(isLegacyChatModel(uncensored), uncensored).toBe(false);
+      const external = chatModelDefinitions[uncensored].providers.filter(
+        (p) => p.apiProvider !== ApiProvider.UNBOTTLED,
+      );
+      expect(external.length).toBeGreaterThanOrEqual(3);
+      expect(chatModelDefinitions[abliterated].enabled, abliterated).toBe(
+        false,
+      );
+      expect(
+        chatModelOptions.some((o) => o.id === abliterated),
+        `${abliterated} must not be in the option list`,
+      ).toBe(false);
+      expect(
+        chatModelOptionsPool.some((o) => o.id === abliterated),
+        `${abliterated} must not be in the option pool`,
+      ).toBe(false);
     }
   });
 });

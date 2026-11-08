@@ -44,6 +44,7 @@ import {
   CWD_MARKER_SUFFIX,
   extractCwdFromOutput,
   getDefaultSession,
+  getOwnedSession,
   sessionPool,
   updateSessionCwd,
 } from "./pool";
@@ -313,14 +314,17 @@ export class CortexExecRepository {
     t: CortexExecT,
   ): Promise<ResponseType<{ sessionId: string }>> {
     if (terminalId) {
-      const existing = sessionPool.get(terminalId);
-      if (!existing) {
+      const pooled = sessionPool.get(terminalId);
+      // Sessions belonging to another user are reported as not found — never
+      // confirm that a foreign terminal id exists.
+      if (!pooled || pooled.ownerUserId !== user.id) {
         return fail({
           message: t("post.errors.notFound.description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (existing.connectionSlug !== conn.slug) {
+      const existing = getOwnedSession(terminalId, conn.connectionId, user.id!);
+      if (!existing) {
         return fail({
           message: t("post.errors.conflict.description"),
           errorType: ErrorResponseTypes.CONFLICT,
@@ -333,7 +337,7 @@ export class CortexExecRepository {
       return success({ sessionId: terminalId });
     }
 
-    const existing = getDefaultSession(conn.slug);
+    const existing = getDefaultSession(conn.connectionId, user.id!);
     if (existing) {
       clearTimeout(existing.idleTimer);
       existing.idleTimer = setTimeout(() => {
@@ -441,6 +445,7 @@ export class CortexExecRepository {
         cwd: startCwd,
         connectionSlug: conn.slug,
         connectionId: conn.connectionId,
+        ownerUserId: userId,
         name: "",
         lastCommandAt: now,
       });
@@ -562,6 +567,7 @@ export class CortexExecRepository {
       cwd: startCwd,
       connectionSlug: conn.slug,
       connectionId: conn.connectionId,
+      ownerUserId: user.id!,
       name: "",
       lastCommandAt: now,
     });
@@ -779,7 +785,9 @@ export class CortexExecRepository {
       output: `[Task escalated - result will be injected when complete. taskId=${taskId}]`,
       exitCode: 0,
       cwd: "",
-      terminalId: "",
+      // No terminal session for an escalated run - omit it ("" is not a UUID
+      // and failed the response schema).
+      terminalId: undefined,
       backend: conn.kind === "local" ? ExecBackend.LOCAL : ExecBackend.SSH,
       truncated: false,
     });

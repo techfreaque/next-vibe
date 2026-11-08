@@ -313,6 +313,70 @@ function emitProxyShell(
   }
 }
 
+/**
+ * Root routes: `src/_pages/_root/<public file>/root-route.ts` (e.g.
+ * `sitemap.xml`) is served at `/<public file>`, outside `[locale]`.
+ * Emitted as `src/app/<public file>/route.ts`; shells whose source is gone
+ * are pruned.
+ */
+const ROOT_ROUTES_DIR = join(UI_DIR, "_root");
+const ROOT_ROUTE_FILE = "root-route.ts";
+
+function listRootRouteNames(rootRoutesDir: string): string[] {
+  if (!existsSync(rootRoutesDir)) {
+    return [];
+  }
+  return readdirSync(rootRoutesDir).filter((name) =>
+    existsSync(join(rootRoutesDir, name, ROOT_ROUTE_FILE)),
+  );
+}
+
+function emitRootRouteShells(
+  created: string[],
+  skipped: string[],
+  removed: string[],
+  errors: { file: string; error: string }[],
+): void {
+  const names = listRootRouteNames(ROOT_ROUTES_DIR);
+  for (const name of names) {
+    const srcFile = join(ROOT_ROUTES_DIR, name, ROOT_ROUTE_FILE);
+    const outPath = join(OUT_ROOT, name, "route.ts");
+    const srcRel = relative(PROJECT_ROOT, srcFile).replaceAll("\\", "/");
+    const content = [
+      `// AUTO-GENERATED from ${srcRel}. Add "use custom" to this file to preserve customizations.`,
+      `export * from "${sourceAlias(srcFile, outPath)}";`,
+      ``,
+    ].join("\n");
+    try {
+      if (writeIfNotCustom(outPath, content)) {
+        created.push(relative(PROJECT_ROOT, outPath));
+      } else {
+        skipped.push(relative(PROJECT_ROOT, outPath));
+      }
+    } catch (error) {
+      errors.push({ file: srcRel, error: parseError(error).message });
+    }
+  }
+  // Prune root shells whose source root-route.ts no longer exists
+  if (!existsSync(OUT_ROOT)) {
+    return;
+  }
+  for (const entry of readdirSync(OUT_ROOT, { withFileTypes: true })) {
+    if (!entry.isDirectory() || names.includes(entry.name)) {
+      continue;
+    }
+    const shellPath = join(OUT_ROOT, entry.name, "route.ts");
+    if (!existsSync(shellPath) || hasCustomDirective(shellPath)) {
+      continue;
+    }
+    const head = readFileSync(shellPath, "utf8").split("\n")[0] ?? "";
+    if (head.includes("AUTO-GENERATED from src/_pages/_root/")) {
+      rmSync(join(OUT_ROOT, entry.name), { recursive: true, force: true });
+      removed.push(relative(PROJECT_ROOT, shellPath));
+    }
+  }
+}
+
 export const generator: GeneratorDefinition = {
   key: "next-app",
   phase: "default",
@@ -331,6 +395,7 @@ export const generator: GeneratorDefinition = {
     if (live) {
       return [
         ...live.routeFiles,
+        ...findFiles(UI_DIR, ROOT_ROUTE_FILE),
         ...findFiles(UI_DIR, "page.tsx"),
         ...findFiles(UI_DIR, "layout.tsx"),
         ...specials,
@@ -338,6 +403,7 @@ export const generator: GeneratorDefinition = {
     }
     return [
       ...findFiles(API_DIR, "route.ts"),
+      ...findFiles(UI_DIR, ROOT_ROUTE_FILE),
       ...findFiles(UI_DIR, "page.tsx"),
       ...findFiles(UI_DIR, "layout.tsx"),
       ...specials,
@@ -399,6 +465,9 @@ export const generator: GeneratorDefinition = {
 
     // — proxy.ts at app root —
     emitProxyShell(created, skipped, errors);
+
+    // — root routes (sitemap.xml, …) at app root —
+    emitRootRouteShells(created, skipped, removed, errors);
 
     // — Stale shell cleanup —
     cleanupStaleShells(OUT_UI, UI_DIR, removed);

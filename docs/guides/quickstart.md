@@ -67,7 +67,7 @@ npm install
 vibe dev
 ```
 
-Start the dev server, then open http://localhost:3000 and log in with the default admin credentials (`admin@example.com` / `change-me-now`). You'll be redirected automatically to the Settings page where the setup wizard walks you through configuration step by step.
+Start the dev server, then open http://localhost:3000 and log in with the default admin credentials (`admin@please.change.me` / `change-me-now` - the defaults for `VIBE_ADMIN_USER_EMAIL` and `VIBE_ADMIN_USER_PASSWORD`). In dev you can also just click the **Login as Admin** quick-login button - no password needed. You'll be redirected automatically to the Settings page where the setup wizard walks you through configuration step by step.
 
 **Option B - CLI wizard:**
 
@@ -101,6 +101,17 @@ This single command will:
 - ✅ Seed development data
 - ✅ Start dev server on http://localhost:3000
 - ✅ Start cron task runner
+
+### No Docker? Use embedded PGlite
+
+Don't want to run Docker? Point the database at a file instead of a Postgres server:
+
+```bash
+# In .env - relative or absolute path both work
+DATABASE_URL="file:./data.db"
+```
+
+With a `file:` URL, `vibe dev` runs on embedded PGlite (a WASM Postgres stored in that file) - no Docker, no separate database process, nothing to install. Everything else works the same.
 
 ---
 
@@ -328,7 +339,7 @@ vibe hello_world --name="John"
 
 ### Explore the Example
 
-- **[Unbottled.ai](../examples/unbottled-ai/UNBOTTLED_AI.md)** - Full commercial application built with NextVibe
+- **[Unbottled.ai](https://unbottled.ai)** - Full commercial AI platform (197 models) built with NextVibe
 
 ### Build Your Feature
 

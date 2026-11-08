@@ -11,6 +11,7 @@ import {
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
+  isProviderSellable,
   type ModelDefinition,
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
@@ -1461,8 +1462,9 @@ function buildImageGenModelOptionsPool(): ImageGenModelOption[] {
     );
     for (const provider of sortedProviders) {
       if (
-        provider.creditCostPerImage !== undefined ||
-        typeof provider.creditCost === "function"
+        (provider.creditCostPerImage !== undefined ||
+          typeof provider.creditCost === "function") &&
+        isProviderSellable(def, provider)
       ) {
         pool.push(buildImageGenOption(modelId, def, provider));
       }

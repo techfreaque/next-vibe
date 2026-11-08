@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -14,8 +16,7 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
-import { READING_COLUMN } from "../_shared/article";
-import { Cta, CtaBand, PageHero } from "../_shared/marketing";
+import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
@@ -34,7 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: "story/invest",
     title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", {
+      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+    }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
@@ -84,11 +87,8 @@ export function TanstackPage({
           </>
         }
       />
-      <Div
-        id="brief"
-        className={cn(READING_COLUMN, "scroll-mt-20 py-12 md:py-16")}
-      >
-        <Div className="min-w-0 text-[1.0625rem] leading-[1.75] md:text-lg [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_hr]:my-10 [&_hr]:border-border [&_pre]:max-w-full [&_pre]:overflow-x-auto">
+      <Div id="brief" className={cn(CONTAINER, "scroll-mt-20 py-12 md:py-16")}>
+        <Div className="min-w-0 max-w-3xl text-[1.0625rem] leading-[1.75] md:text-lg [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-8 [&_hr]:my-10 [&_hr]:border-border [&_pre]:max-w-full [&_pre]:overflow-x-auto">
           <Markdown content={investContent} />
         </Div>
       </Div>

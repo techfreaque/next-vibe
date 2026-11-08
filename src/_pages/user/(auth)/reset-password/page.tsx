@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   return metadataGenerator(locale, {
-    path: "reset-password",
+    path: "user/reset-password",
     title: t("meta.passwordReset.title", { appName }),
     description: t("meta.passwordReset.description", { appName }),
     category: t("meta.passwordReset.category"),
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: t("meta.passwordReset.title", { appName }),
         description: t("meta.passwordReset.description", { appName }),
-        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/reset-password`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password`,
         type: "website",
         images: [
           {

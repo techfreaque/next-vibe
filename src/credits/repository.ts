@@ -5,13 +5,13 @@
  * CRITICAL ARCHITECTURE:
  *
  * 1. WALLET STRUCTURE:
- *    - Lead Wallets: Each lead has separate wallet with FREE credits (0-20 per pool)
+ *    - Lead Wallets: Each lead has separate wallet with FREE credits (pool allowance)
  *    - User Wallets: Each user has separate wallet with PAID credits ONLY (no free credits)
  *    - Linked Leads: All leads linked to a user maintain separate wallets
  *
- * 2. FREE CREDIT POOL (20 credits shared):
- *    - All linked leads share ONE pool of max 20 free credits total
- *    - NOT 20 credits per lead - prevents gaming the system
+ * 2. FREE CREDIT POOL (one monthly allowance shared, see free-allowance.ts):
+ *    - Guest pool 20, user pool 50, +20 with a confirmed newsletter subscription
+ *    - All linked leads share ONE allowance - NOT per lead - prevents gaming the system
  *    - Free credits stored in lead wallets only (never in user wallets)
  *    - Monthly renewal: entire pool resets to 20 total (not per lead)
  *
@@ -70,6 +70,7 @@ import type { CreditPackCheckoutSession } from "@/payment/providers/types";
 import { subscriptions } from "@/subscription/db";
 import { SubscriptionStatus } from "@/subscription/enum";
 
+import { FREE_CREDIT_ALLOWANCE } from "../products/constants";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -84,7 +85,6 @@ import type {
 } from "../vibe/agent/ai-stream/vision-models";
 import { withTransaction } from "../vibe/database/utils/repository-helpers";
 import { createEndpointEmitter } from "../vibe/realtime/core/emitter";
-import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,
   creditTransactions,
@@ -92,6 +92,12 @@ import {
   creditWallets,
 } from "./db";
 import { getPoolBalance } from "./db-functions";
+import {
+  computeFreeAllowance,
+  computeFreeAvailable,
+  computeFreeTopUp,
+  poolHasConfirmedNewsletter,
+} from "./free-allowance";
 import type { CreditsGetResponseOutput } from "./definition";
 import creditsDefinitions from "./definition";
 import {
@@ -759,12 +765,13 @@ export class CreditRepository {
 
   /**
    * Calculate balance across all wallets in pool
-   * Enforces pool limit: max 20 free credits available per period
+   * Enforces pool limit: max `allowance` free credits available per period
    * Refetches wallets to get current balances after any deductions
    * AUTOMATIC EXPIRATION: Expires old credits before calculating balance
    */
   private static async calculatePoolBalance(
     pool: CreditPool,
+    allowance: number,
     logger: EndpointLogger,
   ): Promise<CreditsGetResponseOutput> {
     // Refetch all wallets to get current balances
@@ -861,14 +868,12 @@ export class CreditRepository {
       }, 0);
     }
 
-    // Enforce pool limit: max 20 free credits can be spent per period
-    const freeCreditsAvailable = Math.max(
-      0,
-      Math.min(
-        totalFreeInWallets,
-        FREE_CREDIT_POOL - freeCreditsSpentThisPeriod,
-      ),
-    );
+    // Enforce pool limit: max `allowance` free credits can be spent per period
+    const freeCreditsAvailable = computeFreeAvailable({
+      allowance,
+      spentThisPeriod: freeCreditsSpentThisPeriod,
+      remainingInWallets: totalFreeInWallets,
+    });
 
     return {
       total: freeCreditsAvailable + totalPaid,
@@ -877,7 +882,7 @@ export class CreditRepository {
       permanent: totalPermanent,
       earned: totalEarned,
       expiresAt: earliestExpiry ?? null,
-      capacity: packCapacity + FREE_CREDIT_POOL,
+      capacity: packCapacity + allowance,
     };
   }
 
@@ -1010,7 +1015,7 @@ export class CreditRepository {
   /**
    * Get or create wallet for a lead
    * ATOMIC: Wallet creation and FREE_GRANT transaction are wrapped in database transaction
-   * NEW ARCHITECTURE: Always grants 20 free credits when creating new lead wallet
+   * Grants the guest allowance when creating a new lead wallet (pool-aware)
    *
    * @param leadId - The lead ID to get/create wallet for
    * @param logger - Logger instance
@@ -1066,12 +1071,14 @@ export class CreditRepository {
       (sum, w) => sum + (w.freeCreditsRemaining ?? 0),
       0,
     );
+    // New lead wallets start at the guest allowance. Higher tiers (signed-in,
+    // newsletter) are topped up by ensureMonthlyFreeCreditsForPool on next access.
     const initialCredits =
-      poolFreeCredits >= FREE_CREDIT_POOL
+      poolFreeCredits >= FREE_CREDIT_ALLOWANCE.guest
         ? 0
         : Math.min(
             CreditRepository.getInitialFreeCredits(locale),
-            FREE_CREDIT_POOL - poolFreeCredits,
+            FREE_CREDIT_ALLOWANCE.guest - poolFreeCredits,
           );
 
     try {
@@ -1150,16 +1157,182 @@ export class CreditRepository {
   }
 
   /**
-   * Check and reset monthly free credits for entire pool (pool-aware)
-   * Per spec: "When any wallet in pool hits new month: Reset entire pool to 20 total free credits"
-   *
-   * CRITICAL: Only reset when moving to a NEW period (future month), not when syncing old periods
-   * This prevents resetting credits that were already spent in the current period
+   * Resolve the pool's monthly free allowance (tier + confirmed newsletter bonus).
+   */
+  private static async resolvePoolFreeAllowance(
+    pool: CreditPool,
+  ): Promise<number> {
+    const userId = pool.userWallet?.userId ?? null;
+    const leadIds = pool.leadWallets
+      .map((w) => w.leadId)
+      .filter((id): id is string => id !== null);
+    const hasConfirmedNewsletter = await poolHasConfirmedNewsletter({
+      userId,
+      leadIds,
+    });
+    return computeFreeAllowance({
+      isUserPool: pool.poolType === "USER_POOL" && userId !== null,
+      hasConfirmedNewsletter,
+    });
+  }
+
+  /**
+   * Keep the pool's free credits current and return its monthly allowance.
+   * 1. New calendar month -> reset the pool to the allowance.
+   * 2. Allowance rose mid-month (signup, newsletter confirmed) -> top up the difference once.
+   * The returned allowance is the cap every balance/deduction path must use.
    */
   private static async ensureMonthlyFreeCreditsForPool(
     pool: CreditPool,
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars -- kept for call-site stability; allowance no longer depends on locale
     locale: CountryLanguage,
+  ): Promise<number> {
+    const allowance = await CreditRepository.resolvePoolFreeAllowance(pool);
+    await CreditRepository.resetMonthlyFreeCreditsIfNeeded(
+      pool,
+      allowance,
+      logger,
+    );
+    await CreditRepository.topUpFreeAllowanceForPool(pool, allowance, logger);
+    return allowance;
+  }
+
+  /**
+   * Top up a pool whose allowance rose mid-period.
+   * Adds min(allowance - grantedThisPeriod, allowance - spent - remaining):
+   * - bounded by what was already GRANTED this period, so zeroed or spent credits
+   *   are never regenerated and repeated calls are idempotent
+   * - bounded by what is still owed, so legacy wallets without grant rows never overshoot
+   */
+  private static async topUpFreeAllowanceForPool(
+    pool: CreditPool,
+    allowance: number,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const leadWalletIds = pool.leadWallets.map((w) => w.id);
+    if (leadWalletIds.length === 0) {
+      return;
+    }
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const readTopUp = async (
+      tx: Pick<Parameters<Parameters<typeof db.transaction>[0]>[0], "select">,
+      lock: boolean,
+    ): Promise<{ topUp: number; target: CreditWallet | undefined }> => {
+      const walletsQuery = tx
+        .select()
+        .from(creditWallets)
+        .where(inArray(creditWallets.id, leadWalletIds));
+      const wallets = lock
+        ? await walletsQuery.for("update")
+        : await walletsQuery;
+      const periodTxs = await tx
+        .select({
+          type: creditTransactions.type,
+          amount: creditTransactions.amount,
+          metadata: creditTransactions.metadata,
+        })
+        .from(creditTransactions)
+        .where(
+          and(
+            inArray(creditTransactions.walletId, leadWalletIds),
+            eq(creditTransactions.freePeriodId, periodId),
+            inArray(creditTransactions.type, [
+              CreditTransactionType.USAGE,
+              CreditTransactionType.FREE_GRANT,
+            ]),
+          ),
+        );
+
+      let spentThisPeriod = 0;
+      let grantedThisPeriod = 0;
+      for (const row of periodTxs) {
+        const meta = row.metadata;
+        if (row.type === CreditTransactionType.USAGE) {
+          spentThisPeriod +=
+            "freeCreditsUsed" in meta ? (meta.freeCreditsUsed ?? 0) : 0;
+        } else if ("reason" in meta && meta.reason !== "admin_grant") {
+          grantedThisPeriod += row.amount;
+        }
+      }
+      const remainingInWallets = wallets.reduce(
+        (sum, w) => sum + w.freeCreditsRemaining,
+        0,
+      );
+      const owed = computeFreeTopUp({
+        allowance,
+        spentThisPeriod,
+        remainingInWallets,
+      });
+      const topUp = Math.max(0, Math.min(allowance - grantedThisPeriod, owed));
+      const target = wallets.toSorted(
+        (a, b) => a.freePeriodStart.getTime() - b.freePeriodStart.getTime(),
+      )[0];
+      return { topUp, target };
+    };
+
+    // Cheap unlocked check first - the hot path almost always ends here
+    const probe = await readTopUp(db, false);
+    if (probe.topUp <= 0) {
+      return;
+    }
+
+    await withTransaction(logger, async (tx) => {
+      const { topUp, target } = await readTopUp(tx, true);
+      if (topUp <= 0 || !target) {
+        return;
+      }
+      const freeAfter = target.freeCreditsRemaining + topUp;
+      // Compare-and-swap on the value we read: a concurrent top-up or deduction
+      // makes this a no-op (retried on the next read) instead of a double grant.
+      // Row locks alone are not enough on PGlite, where pooled clients share one session.
+      const [swapped] = await tx
+        .update(creditWallets)
+        .set({ freeCreditsRemaining: freeAfter, updatedAt: now })
+        .where(
+          and(
+            eq(creditWallets.id, target.id),
+            eq(creditWallets.freeCreditsRemaining, target.freeCreditsRemaining),
+          ),
+        )
+        .returning({ id: creditWallets.id });
+      if (!swapped) {
+        return;
+      }
+      await tx.insert(creditTransactions).values({
+        walletId: target.id,
+        amount: topUp,
+        balanceAfter: freeAfter + (pool.userWallet?.balance ?? 0),
+        type: CreditTransactionType.FREE_GRANT,
+        freePeriodId: periodId,
+        metadata: {
+          reason: "allowance_topup",
+          freeCreditsRemaining: freeAfter,
+          totalPoolFreeCredits: allowance,
+        },
+      });
+      logger.debug("Topped up pool free allowance", {
+        poolId: pool.poolId,
+        walletId: target.id,
+        topUp,
+        allowance,
+      });
+    });
+  }
+
+  /**
+   * Check and reset monthly free credits for entire pool (pool-aware)
+   * Per spec: "When any wallet in pool hits new month: Reset entire pool to its allowance"
+   *
+   * CRITICAL: Only reset when moving to a NEW period (future month), not when syncing old periods
+   * This prevents resetting credits that were already spent in the current period
+   */
+  private static async resetMonthlyFreeCreditsIfNeeded(
+    pool: CreditPool,
+    allowance: number,
+    logger: EndpointLogger,
   ): Promise<void> {
     const now = new Date();
 
@@ -1226,10 +1399,7 @@ export class CreditRepository {
       0,
     );
 
-    const maxFreeCreditsPerPool = productsRepository.getProduct(
-      ProductIds.FREE_TIER,
-      locale,
-    ).credits;
+    const maxFreeCreditsPerPool = allowance;
 
     await withTransaction(logger, async (tx) => {
       // Lock the oldest wallet first and re-check if period was already advanced
@@ -1250,7 +1420,7 @@ export class CreditRepository {
         return;
       }
 
-      // CRITICAL: ALWAYS reset to exactly 20 credits when entering new period
+      // CRITICAL: ALWAYS reset to exactly the pool allowance when entering new period
       // This ensures fresh credits each month, regardless of leftover from previous period
 
       // Reset all lead wallets to 0 first
@@ -1268,7 +1438,7 @@ export class CreditRepository {
           .where(eq(creditWallets.id, wallet.id));
       }
 
-      // Grant all 20 credits to the oldest lead wallet
+      // Grant the full allowance to the oldest lead wallet
       await tx
         .update(creditWallets)
         .set({
@@ -1322,6 +1492,37 @@ export class CreditRepository {
   }
 
   /**
+   * Balance for a logged-out device whose lead is linked to an account.
+   * Mirrors deductCredits for a lead-only identifier: free credits come from the
+   * account's whole pool (account cap, account-wide spending), paid credits are
+   * not spendable without signing in - so they are not shown.
+   */
+  private static async getLinkedLeadFreeBalance(
+    pool: CreditPool,
+    leadId: string,
+    freeAllowance: number,
+    logger: EndpointLogger,
+  ): Promise<CreditsGetResponseOutput> {
+    const result = await getPoolBalance.call(
+      {
+        p_user_id: pool.poolId,
+        p_lead_id: leadId,
+        p_free_cap: freeAllowance,
+      },
+      logger,
+    );
+    return {
+      total: result.free,
+      free: result.free,
+      expiring: 0,
+      permanent: 0,
+      earned: 0,
+      expiresAt: null,
+      capacity: freeAllowance,
+    };
+  }
+
+  /**
    * Get balance for identifier
    */
   static async getBalance(
@@ -1360,18 +1561,31 @@ export class CreditRepository {
         return poolResult;
       }
 
-      // Monthly free credit reset (side effect - must happen before balance read)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        poolResult.data,
-        logger,
-        locale,
-      );
+      // Monthly free credit reset + tier top-up (side effect - must happen before balance read)
+      const freeAllowance =
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+          poolResult.data,
+          logger,
+          locale,
+        );
+
+      if (user.isPublic && poolResult.data.poolType === "USER_POOL") {
+        return success(
+          await CreditRepository.getLinkedLeadFreeBalance(
+            poolResult.data,
+            user.leadId,
+            freeAllowance,
+            logger,
+          ),
+        );
+      }
 
       // Atomic balance calc: expiry + aggregation in one PG call
       const result = await getPoolBalance.call(
         {
           p_user_id: user.isPublic ? null : user.id,
           p_lead_id: user.leadId ?? null,
+          p_free_cap: freeAllowance,
         },
         logger,
       );
@@ -1418,15 +1632,16 @@ export class CreditRepository {
         return poolResult;
       }
 
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        poolResult.data,
-        logger,
-        locale,
-      );
+      const freeAllowance =
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+          poolResult.data,
+          logger,
+          locale,
+        );
 
       // Atomic balance calc in one PG call
       const result = await getPoolBalance.call(
-        { p_user_id: null, p_lead_id: leadId },
+        { p_user_id: null, p_lead_id: leadId, p_free_cap: freeAllowance },
         logger,
       );
       return success(result.total);
@@ -1453,7 +1668,9 @@ export class CreditRepository {
       // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
-        poolResult = await CreditRepository.getLeadPoolOnly(
+        // Same pool resolution as deductions: a logged-out device whose lead
+        // belongs to an account draws on that account's free allowance.
+        poolResult = await CreditRepository.getLeadPool(
           user.leadId,
           logger,
           t,
@@ -1472,18 +1689,31 @@ export class CreditRepository {
         return poolResult;
       }
 
-      // Monthly free credit reset (side effect)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        poolResult.data,
-        logger,
-        locale,
-      );
+      // Monthly free credit reset + tier top-up (side effect)
+      const freeAllowance =
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+          poolResult.data,
+          logger,
+          locale,
+        );
+
+      if (user.isPublic && poolResult.data.poolType === "USER_POOL") {
+        return success(
+          await CreditRepository.getLinkedLeadFreeBalance(
+            poolResult.data,
+            user.leadId,
+            freeAllowance,
+            logger,
+          ),
+        );
+      }
 
       // Atomic balance calc: expiry + aggregation in one PG call
       const result = await getPoolBalance.call(
         {
           p_user_id: user.isPublic ? null : user.id,
           p_lead_id: user.isPublic ? user.leadId : null,
+          p_free_cap: freeAllowance,
         },
         logger,
       );
@@ -1540,15 +1770,17 @@ export class CreditRepository {
         }
 
         // Ensure monthly credits are current for pool
-        await CreditRepository.ensureMonthlyFreeCreditsForPool(
-          poolResult.data,
-          logger,
-          locale,
-        );
+        const freeAllowance =
+          await CreditRepository.ensureMonthlyFreeCreditsForPool(
+            poolResult.data,
+            logger,
+            locale,
+          );
 
         // Calculate total credits across pool
         const balance = await CreditRepository.calculatePoolBalance(
           poolResult.data,
+          freeAllowance,
           logger,
         );
 
@@ -1885,7 +2117,7 @@ export class CreditRepository {
 
   /**
    * Deduct credits with priority: free credits → expiring paid credits → permanent paid credits
-   * Max 20 free credits can be spent per pool per period
+   * Max pool-allowance free credits can be spent per pool per period
    * Uses database transaction with row locking to prevent race conditions
    */
   private static async deductCredits(
@@ -1967,7 +2199,7 @@ export class CreditRepository {
       // For authenticated users: ensure the current session's lead wallet is included
       // in the pool even if the lead isn't yet in userLeadLinks (e.g. new session
       // before the link is established). Without this, each unlinked lead gets its own
-      // independent 20 free credits, bypassing the pool cap entirely.
+      // independent free allowance, bypassing the pool cap entirely.
       if (identifier.userId && identifier.leadId) {
         const currentLeadAlreadyInPool = pool.leadWallets.some(
           (w) => w.leadId === identifier.leadId,
@@ -1994,19 +2226,41 @@ export class CreditRepository {
       ].filter((id): id is string => id !== undefined);
       await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
-      // Ensure monthly credits are current for ENTIRE pool (pool-aware reset)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        pool,
-        logger,
-        locale,
-      );
+      // Ensure monthly credits are current for ENTIRE pool (pool-aware reset + tier top-up)
+      const freeAllowance =
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+          pool,
+          logger,
+          locale,
+        );
 
       // Global daily cap check for free-tier pools (no paid credits anywhere)
       const isFreeTierPool =
         (pool.userWallet?.balance ?? 0) === 0 &&
         pool.leadWallets.every((w) => w.balance === 0);
-      if (isFreeTierPool) {
-        const capCheck = await PublicCapRepository.checkCap(logger, locale);
+      // Model usage (allowPartial) is gated BEFORE generation by gateFreeTierCap; a
+      // post-generation rejection would only hand out the generation for free.
+      // Tools/features are billed up-front here, so gate them in this path.
+      let capIpAddress: string | undefined;
+      if (isFreeTierPool && currentLeadId) {
+        const [capLead] = await db
+          .select({ ipAddress: leads.ipAddress })
+          .from(leads)
+          .where(eq(leads.id, currentLeadId))
+          .limit(1);
+        capIpAddress = capLead?.ipAddress ?? undefined;
+      }
+      if (isFreeTierPool && !allowPartial) {
+        const capCheck = await PublicCapRepository.gate(
+          {
+            leadId: currentLeadId,
+            ipAddress: capIpAddress,
+            expectedCost: amount,
+            model: feature ?? "feature",
+          },
+          logger,
+          locale,
+        );
         if (!capCheck.success) {
           return capCheck;
         }
@@ -2023,11 +2277,17 @@ export class CreditRepository {
         walletsForDeduction = pool.leadWallets;
       }
 
+      // Tracks how much of this deduction came from the FREE pool (STEP 1).
+      // The public free-tier cap must count only free credits spent, never paid
+      // pack/subscription spend — otherwise paid usage inflates the cap counter
+      // and can wrongly block free users. (withTransaction does not retry, so a
+      // single-pass accumulator is safe.)
+      let freeCreditsDeducted = 0;
       // Execute deduction within a transaction for atomicity
       const result = await withTransaction(logger, async (tx) => {
         let remaining = amount;
 
-        // Enforce pool limit: max 20 free credits can be spent per period
+        // Enforce pool limit: max `freeAllowance` free credits can be spent per period
         const now = new Date();
         const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -2072,10 +2332,11 @@ export class CreditRepository {
           // but their combined period spending already exceeds the pool limit.
           // Example: lead A spent 15, lead B spent 15 → 30 spent total → 0 available,
           // even though wallets still show freeCreditsRemaining > 0.
-          const freeCreditsAvailableInPool = Math.min(
-            actualFreeRemaining,
-            Math.max(0, FREE_CREDIT_POOL - freeCreditsSpentThisPeriod),
-          );
+          const freeCreditsAvailableInPool = computeFreeAvailable({
+            allowance: freeAllowance,
+            spentThisPeriod: freeCreditsSpentThisPeriod,
+            remainingInWallets: actualFreeRemaining,
+          });
 
           logger.debug("Pool free credit limit check", {
             poolId: pool.poolId,
@@ -2148,6 +2409,7 @@ export class CreditRepository {
 
             remaining -= deduction;
             freeCreditsToDeduct -= deduction;
+            freeCreditsDeducted += deduction;
           }
         }
 
@@ -2444,9 +2706,18 @@ export class CreditRepository {
         partial: result.data.partial,
       });
 
-      // Increment global public cap counter for free-tier pools (non-fatal, fire-and-forget)
-      if (isFreeTierPool) {
-        void PublicCapRepository.incrementSpend(amount, logger);
+      // Count ONLY the free credits actually spent against the public cap —
+      // never paid pack/subscription spend (which would inflate the counter and
+      // can wrongly block free users). Fire-and-forget: the increment is a
+      // single atomic UPDATE (no lost updates), but we don't block the response
+      // on it — keeps the hot path lean. incrementSpend swallows its own errors,
+      // so no unhandled rejection. A not-yet-applied increment widens overshoot
+      // slightly, which is acceptable (bounded, "slight overshoot is fine").
+      if (freeCreditsDeducted > 0) {
+        void PublicCapRepository.incrementSpend(freeCreditsDeducted, logger, {
+          leadId: currentLeadId,
+          ipAddress: capIpAddress,
+        });
       }
 
       return success({ partial: result.data.partial });
@@ -3580,6 +3851,17 @@ export class CreditRepository {
         invoiceId: invoice.providerInvoiceId,
         userId,
       });
+
+      // Growth funnel: first payment (write-once on the user's journey)
+      const { GrowthJourneyRepository } =
+        await import("@/leads/growth/repository");
+      const { FunnelStep, PaidKind } = await import("@/leads/growth/enum");
+      await GrowthJourneyRepository.markStep(
+        { userId },
+        FunnelStep.PAID,
+        logger,
+        PaidKind.PACK,
+      );
     } catch (error) {
       logger.error("Failed to process NOWPayments credit redirect", {
         error: String(error),
@@ -3647,6 +3929,53 @@ export class CreditRepository {
    * Check if identifier has sufficient credits (repository-level business logic)
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
+  /**
+   * Pre-generation gate for the public free-tier daily cap. No-op for pools that
+   * hold paid credits. Fails CLOSED (PAYMENT_REQUIRED, drives the out-of-credits
+   * nudge) when the pool, the lead or the IP has hit its daily ceiling.
+   */
+  static async gateFreeTierCap(
+    user: JwtPayloadType,
+    ipAddress: string | undefined,
+    expectedCost: number,
+    model: string,
+    logger: EndpointLogger,
+    t: CreditsT,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<void>> {
+    if (expectedCost <= 0) {
+      return success(undefined);
+    }
+    const poolResult =
+      !user.isPublic && user.id
+        ? await CreditRepository.getUserPool(user.id, logger, t, locale)
+        : user.leadId
+          ? await CreditRepository.getLeadPool(user.leadId, logger, t, locale)
+          : undefined;
+    if (!poolResult) {
+      return success(undefined);
+    }
+    if (!poolResult.success) {
+      // Cannot tell whether this is a free pool: fail closed.
+      return fail({
+        message: t("errors.getBalanceFailed"),
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      });
+    }
+    const pool = poolResult.data;
+    const isFreeTierPool =
+      (pool.userWallet?.balance ?? 0) === 0 &&
+      pool.leadWallets.every((w) => w.balance === 0);
+    if (!isFreeTierPool) {
+      return success(undefined);
+    }
+    return PublicCapRepository.gate(
+      { leadId: user.leadId, ipAddress, expectedCost, model },
+      logger,
+      locale,
+    );
+  }
+
   static async hasSufficientCredits(
     user: JwtPayloadType,
     required: number,
@@ -3893,6 +4222,19 @@ export class CreditRepository {
           )
           .orderBy(creditPacks.createdAt)
           .for("update");
+
+        // Check coverage BEFORE mutating: a fail() returned mid-loop would
+        // commit the partial pack deductions (only a throw rolls back).
+        const earnedTotal = earnedPacks.reduce(
+          (sum, pack) => sum + pack.remaining,
+          0,
+        );
+        if (earnedTotal < amountCents) {
+          return fail({
+            message: t("errors.deductEarnedCreditsFailed"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
 
         let remaining = amountCents;
 

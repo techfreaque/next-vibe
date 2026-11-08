@@ -192,6 +192,31 @@ export const translations: typeof enTranslations = {
 
   // Earnings List endpoint
   earnings: {
+    confirm: {
+      post: {
+        title: "Empfehlungseinnahmen bestätigen",
+        titleShort: "Einnahmen bestätigen",
+        description:
+          "Gibt Empfehlungseinnahmen frei, deren Rückerstattungsfrist abgelaufen ist. Läuft täglich.",
+        container: {
+          title: "Einnahmen-Bestätigung",
+          description:
+            "Ausstehende Einnahmen nach Ablauf der Rückerstattungsfrist",
+        },
+        response: {
+          confirmedCount: "Bestätigt",
+          failedCount: "Fehlgeschlagen",
+        },
+        success: {
+          title: "Einnahmen bestätigt",
+          description: "Fällige Empfehlungseinnahmen sind jetzt nutzbar",
+        },
+      },
+      task: {
+        description:
+          "Wandelt Empfehlungseinnahmen nach Ablauf der Rückerstattungsfrist in Credits um",
+      },
+    },
     list: {
       get: {
         title: "Empfehlungseinnahmen auflisten",
@@ -369,7 +394,7 @@ export const translations: typeof enTranslations = {
         "Empfehlungslink: {{directPct}} jeder Zahlung von diesem Nutzer, für immer. Dein Skill, von anderen geteilt: {{skillBonusPct}} jeder Zahlung dieser Nutzer - Einnahmen aus Links, die du nie gepostet hast.",
       step3Title: "Bezahlt werden",
       step3Body:
-        "Einnahmen sind sofort verfügbar. Als Chat-Credits nutzen oder in Krypto auszahlen.",
+        "Einnahmen werden {{holdDays}} Tage nach jeder Zahlung freigegeben - die Rückerstattungsfrist. Dann als Chat-Credits nutzen oder in Krypto auszahlen.",
       withdrawTitle: "Einnahmen auszahlen",
       withdrawDescription:
         "Mehrere Möglichkeiten, Ihre Empfehlungseinnahmen zu nutzen",
@@ -385,6 +410,9 @@ export const translations: typeof enTranslations = {
       unlockedOf: "freigeschaltet von",
       viewHistory: "Verlauf anzeigen",
       historyEmpty: "Ihre Auszahlungen erscheinen hier",
+      pendingTitle: "{{amount}} ausstehend",
+      pendingNote:
+        "Freigabe {{holdDays}} Tage nach jeder Zahlung - die Rückerstattungsfrist. Erstattete Zahlungen streichen ihre Einnahmen.",
     },
     email: {
       user: {
@@ -423,6 +451,8 @@ export const translations: typeof enTranslations = {
       minimumAmount: "Mindestauszahlungsbetrag ist {{minPayout}}",
       walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",
       insufficientBalance: "Unzureichendes Guthaben für Auszahlung",
+      conversionFailed:
+        "Umwandlung fehlgeschlagen. Ihre Einnahmen sind unverändert - versuchen Sie es gleich noch einmal.",
       notFound: "Auszahlungsanfrage nicht gefunden",
       invalidStatus:
         "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",

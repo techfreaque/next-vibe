@@ -390,9 +390,15 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           // If the error is already an ErrorResponseType, use it directly
           let errorResponse: ErrorResponseType;
           if (isErrorResponseType(error)) {
-            // Known API error responses (permission denied, not found, etc.) are
-            // expected, user-facing outcomes — log at warn, not error.
-            logger.warn("Error in submitForm", parseError(error), logMeta);
+            // Known API error responses (bad input, permission denied, not
+            // found) are expected, user-facing outcomes the form displays -
+            // warn. A 5xx is an error.
+            const isServerFailure = error.errorType.errorCode >= 500;
+            (isServerFailure ? logger.error : logger.warn).bind(logger)(
+              "Error in submitForm",
+              parseError(error),
+              logMeta,
+            );
             errorResponse = error;
           } else {
             // Unexpected throw (network failure, code bug) — real error.

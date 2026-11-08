@@ -22,7 +22,6 @@ export const translations: typeof enTranslations = {
     fileBarLabel:
       "definition.ts → web · cli · mcp · native · cron · 10 weitere",
     theaCardTitle: "Wer ist Thea?",
-    allowedRolesLabel: "allowedRoles: [...]",
     fileTreePath: "~/src/explain-to-my-boss/",
     codeBlockLabel: "allowedRoles: [",
     closingBracket: "]",

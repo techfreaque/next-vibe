@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
             content: "Modell",
           },
           skill: {
-            content: "Charakter",
+            content: "Skill",
           },
           errorType: {
             content: "Fehlertyp",

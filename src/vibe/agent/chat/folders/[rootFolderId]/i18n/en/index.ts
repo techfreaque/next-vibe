@@ -31,6 +31,7 @@ export const translations = {
       moveDown: "Move Down",
       newSubfolder: "New Subfolder",
       managePermissions: "Manage Permissions",
+      projectSettings: "Project settings",
       renameFolder: "Rename Folder",
       moveToFolder: "Move to Folder",
       deleteFolder: "Delete Folder",
@@ -55,6 +56,9 @@ export const translations = {
     },
     newFolder: {
       title: "Create New Folder",
+    },
+    project: {
+      dialogTitle: "Project Settings",
     },
     permissions: {
       folderTitle: "Folder Permissions",

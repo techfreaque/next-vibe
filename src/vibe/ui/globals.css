@@ -57,6 +57,10 @@
 
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  /* Fills (bg-primary, gradients) resolve --background-color-* before --color-*.
+     Lets dark mode use a deeper fill for white button text while text-primary
+     stays bright enough to read on the dark page. */
+  --background-color-primary: hsl(var(--primary-surface));
 
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
@@ -352,6 +356,7 @@
     --popover: #ffffff;
     --popover-foreground: #141a2b;
     --primary: #2251e0;
+    --primary-surface: #2251e0;
     --primary-foreground: #ffffff;
     --secondary: #eef0f5;
     --secondary-foreground: #1c2438;
@@ -379,6 +384,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 36% 12%;
     --primary: 226 75% 51%;
+    --primary-surface: 226 75% 51%;
     --primary-foreground: 0 0% 100%;
     --secondary: 225 22% 95%;
     --secondary-foreground: 225 30% 16%;
@@ -422,6 +428,7 @@
     --popover: #141a27;
     --popover-foreground: #eef1f7;
     --primary: #4a7bf7;
+    --primary-surface: #3565e9;
     --primary-foreground: #ffffff;
     --secondary: #1b2232;
     --secondary-foreground: #dbe1ec;
@@ -448,7 +455,9 @@
     --card-foreground: 220 33% 95%;
     --popover: 224 28% 12%;
     --popover-foreground: 220 33% 95%;
+    /* text-primary on background 4.89:1; white on primary-surface 5.02:1 */
     --primary: 224 90% 63%;
+    --primary-surface: 224 80% 56%;
     --primary-foreground: 0 0% 100%;
     --secondary: 224 26% 15%;
     --secondary-foreground: 220 25% 88%;
@@ -498,6 +507,7 @@
     --color-popover-foreground: hsl(var(--popover-foreground));
     --color-primary: hsl(var(--primary));
     --color-primary-foreground: hsl(var(--primary-foreground));
+    --background-color-primary: hsl(var(--primary-surface));
     --color-secondary: hsl(var(--secondary));
     --color-secondary-foreground: hsl(var(--secondary-foreground));
     --color-muted: hsl(var(--muted));

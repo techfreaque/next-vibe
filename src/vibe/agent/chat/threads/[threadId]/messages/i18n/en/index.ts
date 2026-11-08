@@ -38,6 +38,10 @@ export const translations = {
     hideVideoDescription: "Hide video description",
   },
   errorCode: "Error Code",
+  errorActions: {
+    retry: "Retry",
+    tryAnotherModel: "Try another model",
+  },
   streamInterrupted: {
     label: "Generation stopped",
     hint: "Partial response saved. Send a new message to continue.",
@@ -220,7 +224,7 @@ export const translations = {
     },
     skill: {
       label: "Skill",
-      description: "AI character/persona for the message",
+      description: "AI skill/persona for the message",
     },
     metadata: {
       label: "Metadata",

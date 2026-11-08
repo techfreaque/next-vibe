@@ -561,14 +561,22 @@ export class AbortErrorHandler {
             streamAbort?.reason === AbortReason.USER_CANCELLED
               ? StreamErrorType.STREAM_INTERRUPTED
               : StreamErrorType.STREAM_ERROR;
+          const interruptionMessage =
+            streamAbort?.reason === AbortReason.BILLING_FAILED
+              ? t("info.billingFailed")
+              : streamAbort?.reason === AbortReason.BUDGET_EXCEEDED
+                ? t("info.budgetExceeded")
+                : streamAbort?.reason === AbortReason.TASK_WATCHDOG
+                  ? t("info.taskWatchdog")
+                  : t("info.streamInterrupted");
           await ctx.dbWriter.emitErrorMessage({
             threadId,
             errorType: emitErrorType,
             error: fail({
-              message: t("info.streamInterrupted"),
+              message: interruptionMessage,
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
             }),
-            content: t("info.streamInterrupted"),
+            content: interruptionMessage,
             parentId: ctx.lastParentId,
             sequenceId: ctx.sequenceId,
             user,
@@ -647,17 +655,16 @@ export class StreamErrorHandler {
     } = params;
 
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorStack = error instanceof Error ? error.stack : undefined;
     const errorName =
       error instanceof Error ? error.constructor.name : typeof error;
 
-    logger.error("Stream error", {
-      error: errorMessage,
+    // Pass the raw error: the logger serializes name/message/stack/cause plus
+    // provider fields (statusCode, url, responseBody) - never `{}`.
+    logger.error("Stream error", error, {
       errorType: errorName,
       threadId,
       userId: user.isPublic ? null : user.id,
       leadId: user.leadId,
-      stack: errorStack,
     });
 
     let translationKey: AiStreamTranslationKey;

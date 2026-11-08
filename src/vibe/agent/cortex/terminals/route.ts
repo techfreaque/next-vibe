@@ -8,6 +8,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data }) => CortexTerminalsRepository.list(data.path),
+    handler: async ({ data, user }) =>
+      CortexTerminalsRepository.list(data.path, user.id),
   },
 });

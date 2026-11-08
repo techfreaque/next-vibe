@@ -20,7 +20,12 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { NewsletterPreference, NewsletterPreferenceOptions } from "../enum";
+import {
+  NewsletterCreditBonus,
+  NewsletterCreditBonusOptions,
+  NewsletterPreference,
+  NewsletterPreferenceOptions,
+} from "../enum";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -117,6 +122,19 @@ const { POST } = createEndpoint({
         label: "response.userId",
         schema: z.string().optional(),
       }),
+      // Free-credit bonus: ACTIVE (applies now), PENDING_CONFIRMATION (welcome
+      // email carries the confirm link), CLAIMED_ELSEWHERE (email owned by another pool)
+      creditBonus: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        label: "response.creditBonus",
+        enumOptions: NewsletterCreditBonusOptions,
+        schema: z.enum(NewsletterCreditBonus),
+      }),
+      bonusCredits: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.bonusCredits",
+        schema: z.number(),
+      }),
     },
   }),
   errorTypes: {
@@ -183,12 +201,16 @@ const { POST } = createEndpoint({
         leadId: "123e4567-e89b-12d3-a456-426614174000",
         subscriptionId: "sub_123456789",
         userId: "user_987654321",
+        creditBonus: NewsletterCreditBonus.ACTIVE,
+        bonusCredits: 20,
       },
       minimal: {
         success: true,
         message: "Successfully subscribed to newsletter",
         leadId: "123e4567-e89b-12d3-a456-426614174000",
         subscriptionId: "sub_123456789",
+        creditBonus: NewsletterCreditBonus.PENDING_CONFIRMATION,
+        bonusCredits: 20,
       },
     },
   },

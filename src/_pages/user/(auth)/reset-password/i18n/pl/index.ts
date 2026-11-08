@@ -16,24 +16,6 @@ export const translations: typeof enTranslations = {
   },
   auth: {
     resetPassword: {
-      title: "Zresetuj swoje hasło",
-      subtitle: "Wprowadź swój adres e-mail, a wyślemy Ci link do resetowania",
-      sendResetLink: "Wyślij link resetujący",
-      backToLogin: "Powrót do logowania",
-      emailSent: "E-mail wysłany!",
-      successTitle: "Sprawdź swoją pocztę",
-      successMessage:
-        "Wysłaliśmy Ci link do resetowania hasła. Sprawdź swoją skrzynkę odbiorczą.",
-      requestNewLink: "Poproś o nowy link",
-      createNewPasswordTitle: "Utwórz nowe hasło",
-      createNewPasswordSubtitle: "Wprowadź poniżej swoje nowe hasło",
-      resetPasswordButton: "Zresetuj hasło",
-      emailLabel: "Adres e-mail",
-      emailPlaceholder: "Wprowadź swój e-mail",
-      newPasswordLabel: "Nowe hasło",
-      newPasswordPlaceholder: "Wprowadź swoje nowe hasło",
-      confirmPasswordLabel: "Potwierdź hasło",
-      confirmPasswordPlaceholder: "Potwierdź swoje nowe hasło",
       errors: {
         loadingError: "Nie udało się załadować formularza resetowania hasła",
       },

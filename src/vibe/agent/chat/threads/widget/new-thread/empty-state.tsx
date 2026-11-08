@@ -5,10 +5,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Compass } from "next-vibe/ui/components/icons/Compass";
-import { Flame } from "next-vibe/ui/components/icons/Flame";
-import { Image } from "next-vibe/ui/components/icons/Image";
-import { Lightbulb } from "next-vibe/ui/components/icons/Lightbulb";
-import { Search } from "next-vibe/ui/components/icons/Search";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
@@ -18,20 +15,18 @@ import { DOM_IDS, LAYOUT } from "@/_pages/chat/lib/config/constants";
 
 import { useChatInputStore } from "../../../../ai-stream/stream/hooks/input-store";
 import { getDefaultFolderConfig } from "../../../config";
+import { parseSkillId } from "../../../slugify";
+import { DEFAULT_SKILLS, NO_SKILL } from "../../../../skills/config";
+import { scopedTranslation as skillsScopedTranslation } from "../../../../skills/i18n";
 import { useTourState } from "../../../tour-state";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../i18n";
 
-const STARTERS = [
-  { id: "explain", icon: Lightbulb },
-  { id: "search", icon: Search },
-  { id: "image", icon: Image },
-  { id: "honest", icon: Flame },
-] as const;
-
 interface ChatEmptyStateProps {
   locale: CountryLanguage;
   inputHeight: number;
+  /** Currently selected skill id; null/unknown falls back to the default assistant. */
+  skillId: string | null;
 }
 
 /**
@@ -41,8 +36,18 @@ interface ChatEmptyStateProps {
 export function ChatEmptyState({
   locale,
   inputHeight,
+  skillId,
 }: ChatEmptyStateProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tSkills } = skillsScopedTranslation.scopedT(locale);
+  // selectedSkill is a composite "skillSlug__variantId" (e.g. "thea__oracle");
+  // the skill config id is just the base slug, so parse before matching.
+  const baseSkillId = skillId ? parseSkillId(skillId).skillId : null;
+  const skill = DEFAULT_SKILLS.find((c) => c.id === baseSkillId);
+  const promptKeys =
+    skill && skill.suggestedPrompts.length > 0
+      ? skill.suggestedPrompts
+      : NO_SKILL.suggestedPrompts;
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
   const setInput = useChatInputStore((s) => s.setInput);
   const requestTour = useTourState((s) => s.requestTour);
@@ -147,7 +152,7 @@ export function ChatEmptyState({
               }
         }
       >
-        <Div className="mx-auto flex max-w-2xl flex-col items-center px-4 pt-20">
+        <Div className="mx-auto flex max-w-3xl flex-col items-center px-3 pt-20 sm:px-4 md:px-8 lg:px-10">
           {/* Where you are: folder + what it means for your data */}
           <Div
             className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ${getColorClasses("bg")}`}
@@ -173,34 +178,32 @@ export function ChatEmptyState({
                 {t("widget.suggestedPrompts.tryOne")}
               </Span>
               <Div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {STARTERS.map(({ id, icon: StarterIcon }) => (
-                  <Button
-                    key={id}
-                    type="button"
-                    variant="outline"
-                    data-starter={id}
-                    className="h-auto justify-start gap-3 whitespace-normal rounded-xl bg-card px-3.5 py-3 text-left font-normal shadow-sm hover:border-primary/40 hover:bg-card"
-                    onClick={() =>
-                      setInput(
-                        t(`widget.suggestedPrompts.starters.${id}.prompt`),
-                      )
-                    }
-                  >
-                    <Span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getColorClasses("bg")} ${getColorClasses("text")}`}
+                {promptKeys.map((key, index) => {
+                  const prompt = tSkills(key);
+                  return (
+                    <Button
+                      key={key}
+                      type="button"
+                      variant="outline"
+                      data-starter={index}
+                      className="h-auto justify-start gap-3 whitespace-normal rounded-xl bg-card px-3.5 py-3 text-left font-normal shadow-sm hover:border-primary/40 hover:bg-card"
+                      onClick={() => setInput(prompt)}
                     >
-                      <StarterIcon className="h-4 w-4" />
-                    </Span>
-                    <Span className="flex min-w-0 flex-col">
-                      <Span className="text-sm font-medium">
-                        {t(`widget.suggestedPrompts.starters.${id}.label`)}
+                      <Span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getColorClasses("bg")} ${getColorClasses("text")}`}
+                      >
+                        {skill ? (
+                          <Icon icon={skill.icon} className="h-4 w-4" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
                       </Span>
-                      <Span className="line-clamp-2 text-xs text-muted-foreground">
-                        {t(`widget.suggestedPrompts.starters.${id}.prompt`)}
+                      <Span className="line-clamp-2 min-w-0 text-sm">
+                        {prompt}
                       </Span>
-                    </Span>
-                  </Button>
-                ))}
+                    </Button>
+                  );
+                })}
               </Div>
 
               {/* How to change who answers + optional tour */}

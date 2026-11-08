@@ -1,10 +1,10 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Pool Usage",
-    title: "Credits Free Pool Utilization",
+    titleShort: "Free Allowance Used",
+    title: "Free Allowance Used (month-to-date)",
     description:
-      "Ratio of consumed free credits across lead wallets per resolution bucket",
+      "Free credits consumed divided by free credits granted, both month-to-date (UTC month, resets on the 1st). 0 = nothing used, 1 = every granted free credit spent. Works for tiered allowances (guest / user / newsletter).",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },
@@ -13,7 +13,7 @@ export const translations = {
         description: "Extra bars before range start",
       },
       result: {
-        label: "Free Pool Utilization",
+        label: "Free Allowance Used",
         description: "Output time series",
       },
       meta: { label: "Meta", description: "Node execution metadata" },

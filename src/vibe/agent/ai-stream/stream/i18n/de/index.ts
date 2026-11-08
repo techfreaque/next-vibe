@@ -577,15 +577,21 @@ export const translations: typeof enTranslations = {
   info: {
     streamInterrupted:
       "Generierung wurde gestoppt. Teilantwort wurde gespeichert.",
+    billingFailed:
+      "Gestoppt: Die Credits für diese Antwort ließen sich nicht abbuchen. Nichts ist verloren - senden Sie Ihre Nachricht gleich noch einmal.",
+    budgetExceeded:
+      "Gestoppt: Dieser Hintergrund-Task hat sein Credit-Limit erreicht. Erhöhen Sie das Limit unter Task-Budgetgrenzen, damit er weiterläuft.",
+    taskWatchdog:
+      "Gestoppt: Der Task-Wächter hat diesen Lauf beendet, weil er sein Zeit-, Runden- oder Tool-Aufruf-Limit überschritten hat.",
   },
   headless: {
     errors: {
       missingModelOrSkill:
-        "Modell oder Charakter erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
+        "Modell oder Skill erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
       favoriteNotFound:
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
       ambiguousModel:
-        "Entweder ein explizites Modell ODER einen Favoriten/Charakter angeben - nicht beides",
+        "Entweder ein explizites Modell ODER einen Favoriten/Skill angeben - nicht beides",
     },
   },
   providers: {
@@ -607,6 +613,9 @@ export const translations: typeof enTranslations = {
       signIn: "Anmelden und synchronisieren",
       start: "Chat starten",
       saving: "Wird eingerichtet...",
+      failed:
+        "Setup konnte nicht gespeichert werden. Prüfe die Verbindung und versuch es nochmal.",
+      retry: "Nochmal versuchen",
     },
     usecases: {
       noProviderAvailable:
@@ -659,6 +668,10 @@ export const translations: typeof enTranslations = {
       addCredits: "Credits aufladen",
       description: "Dein Guthaben ist leer. Lade auf und chatte weiter.",
     },
+    creditsLoadFailed: {
+      title: "Guthaben nicht geladen.",
+      retry: "Erneut laden",
+    },
     insufficientCredits: {
       title: "Nicht genug Credits (benötigt {{cost}}, vorhanden {{balance}})",
       description: "Lade auf oder wähle ein günstigeres Modell.",
@@ -683,6 +696,33 @@ export const translations: typeof enTranslations = {
       uploadFile: "Dateien anhängen",
       attachedFiles: "Angehängte Dateien",
       addMore: "Weitere hinzufügen",
+    },
+  },
+  outOfCredits: {
+    dismiss: "Schließen",
+    guest: {
+      title: "Gratis-Credits aufgebraucht",
+      description:
+        "Deine Gast-Credits sind weg. E-Mail eintragen oder kostenlos registrieren und weiterchatten.",
+      emailLabel: "E-Mail",
+      emailPlaceholder: "du@beispiel.de",
+      emailSubmit: "{{bonus}} Credits extra holen",
+      emailSubmitting: "Wird gesendet …",
+      invalidEmail: "Bitte eine gültige E-Mail-Adresse eingeben.",
+      added: "{{bonus}} Credits gutgeschrieben. Weiter geht's.",
+      confirm:
+        "Schau in dein Postfach. Bestätige deine E-Mail, um +{{bonus}} Credits freizuschalten.",
+      claimed:
+        "Diese E-Mail hat ihren Bonus schon eingelöst. Registriere dich: {{signedIn}} Credits/Monat gratis.",
+      or: "oder",
+      signUp: "Registrieren: {{signedIn}} Credits/Monat gratis",
+      haveAccount: "Schon ein Konto?",
+      logIn: "Anmelden",
+    },
+    member: {
+      title: "Keine Credits mehr",
+      description: "Credits aufladen und genau hier weiterchatten.",
+      getCredits: "Credits aufladen",
     },
   },
   imageGen: {
