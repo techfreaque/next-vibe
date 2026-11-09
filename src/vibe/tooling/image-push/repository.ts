@@ -151,8 +151,20 @@ export class ImagePushRepository {
   /**
    * Transfers the already-built (docker --load'ed) image directly to a
    * server over SSH: `docker save <ref> | gzip | ssh <target> "docker load"`.
-   * The pipe runs in-process (Node zlib + streams) - no `sh`, `gzip` or
-   * `sshpass` binaries needed, so it works the same on Windows and Linux.
+   *
+   * When a password is set AND the `sshpass` + `gzip` binaries are available,
+   * the whole thing runs as ONE shell pipeline via system binaries. This is the
+   * only form that survives a multi-GB upload unattended: both ssh2 and a
+   * plain-`ssh` child fed by Node's zlib stream stall ~5 min in on a multi-GB
+   * push ("unexpected EOF" at the remote `gunzip`), because Node's stream
+   * back-pressure over the child stdin pipe starves the upload. A pure
+   * shell pipeline (`docker save | gzip -1 | sshpass -e ssh ... "gunzip |
+   * docker load"`) keeps the bytes flowing through OS pipes end to end and
+   * transfers reliably (proven by the manual deploy command).
+   *
+   * Falls back to the in-process pipe (Node zlib + streams via `runRemote`)
+   * when `sshpass`/`gzip` are unavailable (e.g. Windows / no-sshpass hosts),
+   * so those environments still work.
    */
   private static async transferViaSsh(
     refs: string[],
@@ -176,6 +188,22 @@ export class ImagePushRepository {
       `${shaRef.split(":")[0]}:latest`;
     // docker rmi before load so the old image is deleted rather than renamed to <none>.
     const remoteCmd = `docker rmi -f ${refs.join(" ")} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}`;
+
+    const password = imagePushEnv.SSH_SERVER_PWD;
+    // Only the shell pipeline survives a large unattended upload (see doc above).
+    // It needs a password (for `sshpass -e`) plus the `sshpass` and `gzip`
+    // binaries; otherwise fall back to the in-process pipe.
+    if (password && ImagePushRepository.shellPipelineAvailable()) {
+      return ImagePushRepository.transferViaShellPipeline(
+        shaRef,
+        refs,
+        sshTarget,
+        password,
+        remoteCmd,
+        logger,
+        t,
+      );
+    }
 
     const save = spawn("docker", ["save", shaRef], {
       stdio: ["ignore", "pipe", "inherit"],
@@ -215,6 +243,83 @@ export class ImagePushRepository {
         message: t("post.repository.messages.sshTransferFailed", {
           target: sshTarget,
           error,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    return success(undefined);
+  }
+
+  /** True when both `sshpass` and `gzip` system binaries are callable. */
+  private static shellPipelineAvailable(): boolean {
+    const hasSshpass =
+      spawnSync("sshpass", ["-V"], { stdio: "ignore" }).status === 0;
+    const hasGzip =
+      spawnSync("gzip", ["--version"], { stdio: "ignore" }).status === 0;
+    return hasSshpass && hasGzip;
+  }
+
+  /** Single-quotes a value for safe embedding in a POSIX `sh -c` string. */
+  private static shellQuote(value: string): string {
+    return `'${value.replace(/'/g, `'\\''`)}'`;
+  }
+
+  /**
+   * Runs the transfer as one OS-level shell pipeline, replicating the proven
+   * manual deploy command:
+   *   docker save <sha> | gzip -1 | sshpass -e ssh <opts> <target> "<remoteCmd>"
+   * The password is handed to `sshpass` through the SSHPASS env var only -
+   * never in argv and never logged. Exit status is the pipeline's (ssh's),
+   * so a remote failure surfaces as a non-zero code -> fail().
+   */
+  private static async transferViaShellPipeline(
+    shaRef: string,
+    refs: string[],
+    sshTarget: string,
+    password: string,
+    remoteCmd: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const { username, host, port } =
+      ImagePushRepository.parseSshTarget(sshTarget);
+    const q = ImagePushRepository.shellQuote;
+
+    const sshOpts = [
+      "-oStrictHostKeyChecking=no",
+      "-oServerAliveInterval=30",
+      "-oServerAliveCountMax=10000",
+      "-oTCPKeepAlive=yes",
+      `-oPort=${q(String(port))}`,
+    ].join(" ");
+
+    const pipeline =
+      `docker save ${q(shaRef)} | gzip -1 | ` +
+      `sshpass -e ssh ${sshOpts} ${q(`${username}@${host}`)} ${q(remoteCmd)}`;
+
+    const exitCode = await new Promise<number>((resolve) => {
+      const child = spawn("sh", ["-c", pipeline], {
+        stdio: "inherit",
+        cwd: process.cwd(),
+        // SSHPASS reaches sshpass via the env only - never argv, never logs.
+        env: { ...process.env, SSHPASS: password },
+      });
+      child.on("error", () => resolve(-1));
+      child.on("close", (code) => resolve(code ?? -1));
+    });
+
+    if (exitCode !== 0) {
+      logger.error("SSH image transfer failed", {
+        refs,
+        pipelineExitCode: exitCode,
+      });
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: sshTarget,
+          error: t("post.repository.messages.buildExitCode", {
+            code: exitCode,
+          }),
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });

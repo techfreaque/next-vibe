@@ -239,6 +239,47 @@ describe("detectDayAnomalies", () => {
       FinanceAlertType.BILLING_GAP,
     );
   });
+
+  // Free-tier / credit-prepaid economics must NOT trip the margin or billing-gap
+  // alarms: cost is judged against credit-value consumed, not same-day sales.
+  it("stays silent on a free-tier day: $0 sales, cost covered by credits consumed", () => {
+    // 11-08 prod shape: no sales revenue, real upstream, credits consumed > cost.
+    expect(
+      types({
+        grossRevenueUsd: 0,
+        upstreamCostUsd: 0.96,
+        internalBilledUsd: 7.14,
+      }),
+    ).toEqual([]);
+  });
+  it("does not cry wolf on a cold-start sampling artifact (tiny billed vs measured cost)", () => {
+    // The reported false alerts: cost measured but almost nothing billed in the
+    // window - a sparse-sampling / day-boundary artifact, not a per-use loss.
+    expect(
+      types({
+        grossRevenueUsd: 0,
+        upstreamCostUsd: 4.36,
+        internalBilledUsd: 0.04,
+      }),
+    ).toEqual([]);
+    expect(
+      types({
+        grossRevenueUsd: 0,
+        upstreamCostUsd: 1.05,
+        internalBilledUsd: 0.24,
+      }),
+    ).toEqual([]);
+  });
+  it("still flags genuine mis-pricing: substantive billing below upstream cost", () => {
+    // Real leak: enough billed to trust the data, yet billed < cost.
+    const alerts = types({
+      grossRevenueUsd: 0,
+      upstreamCostUsd: 60,
+      internalBilledUsd: 20,
+    });
+    expect(alerts).toContain(FinanceAlertType.NEGATIVE_MARGIN);
+    expect(alerts).toContain(FinanceAlertType.BILLING_GAP);
+  });
 });
 
 describe("thresholds + dedup window", () => {
@@ -322,7 +363,7 @@ const testDeps: FinanceDeps = {
       : undefined,
   stripePort: () => stripePort,
   nowPaymentsPort: () => null,
-  recipient: () => "ops@example.com",
+  recipients: () => ["ops@example.com"],
   async sendMail(input) {
     mails.push({ to: input.to, subject: input.subject });
     return { ok: true, detail: "sent" };
@@ -554,7 +595,7 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("without a recipient the alert is still logged and recorded", async () => {
-    FinanceRepository.deps = { ...testDeps, recipient: () => null };
+    FinanceRepository.deps = { ...testDeps, recipients: () => [] };
     try {
       await seedPreviousReading(100);
       openRouterUsage = 190;

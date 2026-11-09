@@ -291,34 +291,64 @@ export function detectDayAnomalies(
 ): AlertCandidate[] {
   const out: AlertCandidate[] = [];
   const margin = computeMargin(facts);
+
+  // Cost coverage, credit-prepaid + free-tier safe. On this platform most usage
+  // is prepaid credits or the free tier, so same-day *sales* revenue (recognized
+  // at credit purchase, and $0 for free-tier usage) is the wrong yardstick for a
+  // per-use margin: judging cost against it fires NEGATIVE_MARGIN on every dollar
+  // of inference while revenue is $0, which is normal loss-leader economics, not a
+  // leak. The economic unit that actually covers a turn's cost is the credit-value
+  // users consumed on it (internalBilled); calculateCreditCost bills upstream x
+  // markup per turn, so this is always >= cost for real user usage. Use whichever
+  // basis is larger so real sales revenue still counts once it flows.
+  const coverageUsd = round2(
+    Math.max(margin.netRevenueUsd, facts.internalBilledUsd),
+  );
+  const coverageMarginUsd = round2(coverageUsd - facts.upstreamCostUsd);
+  const coverageMarginPct =
+    coverageUsd > 0 ? round2((coverageMarginUsd / coverageUsd) * 100) : null;
+  // Only judge margin / billing-gap when a substantive amount was actually billed
+  // to compare the measured cost against. A tiny billed figure next to a measured
+  // cost is a sampling / day-boundary artifact (sparse provider balance readings
+  // lumped across UTC midnight, platform-overhead spend that bills no user), not a
+  // per-use loss - and billing can never structurally fall below cost for real
+  // usage. This is what made the cold-start "net $0 vs cost $1.05" / "cost $4.36 vs
+  // billed $0.04" alerts cry wolf.
+  const billingMeasurable = facts.internalBilledUsd >= th.minCostUsd;
   const base = {
     day: facts.day,
     netRevenueUsd: margin.netRevenueUsd,
+    internalBilledUsd: round2(facts.internalBilledUsd),
     upstreamCostUsd: round2(facts.upstreamCostUsd),
-    grossMarginUsd: margin.grossMarginUsd,
-    grossMarginPct: margin.grossMarginPct,
+    coverageMarginUsd,
+    coverageMarginPct,
   };
 
-  if (margin.grossMarginUsd < 0 && facts.upstreamCostUsd >= th.minCostUsd) {
+  if (
+    coverageMarginUsd < 0 &&
+    facts.upstreamCostUsd >= th.minCostUsd &&
+    billingMeasurable
+  ) {
     out.push({
       type: FinanceAlertType.NEGATIVE_MARGIN,
       severity: AlertSeverity.CRITICAL,
       subject: facts.day,
       dedupKey: `${FinanceAlertType.NEGATIVE_MARGIN}:${facts.day}`,
-      message: `Negative margin on ${facts.day}: net revenue ${money(margin.netRevenueUsd)} vs upstream cost ${money(facts.upstreamCostUsd)} (${money(margin.grossMarginUsd)}).`,
+      message: `Negative margin on ${facts.day}: upstream cost ${money(facts.upstreamCostUsd)} exceeds credits billed ${money(facts.internalBilledUsd)} (net sales ${money(margin.netRevenueUsd)}, shortfall ${money(coverageMarginUsd)}). Mis-pricing, not free-tier.`,
       metadata: base,
     });
   } else if (
-    margin.grossMarginPct !== null &&
-    margin.netRevenueUsd >= th.minRevenueUsd &&
-    margin.grossMarginPct < th.marginFloorPct
+    coverageMarginPct !== null &&
+    billingMeasurable &&
+    coverageUsd >= th.minRevenueUsd &&
+    coverageMarginPct < th.marginFloorPct
   ) {
     out.push({
       type: FinanceAlertType.THIN_MARGIN,
       severity: AlertSeverity.WARNING,
       subject: facts.day,
       dedupKey: `${FinanceAlertType.THIN_MARGIN}:${facts.day}`,
-      message: `Thin margin on ${facts.day}: ${margin.grossMarginPct.toFixed(1)}% (floor ${th.marginFloorPct}%). Net revenue ${money(margin.netRevenueUsd)}, upstream cost ${money(facts.upstreamCostUsd)}.`,
+      message: `Thin margin on ${facts.day}: ${coverageMarginPct.toFixed(1)}% (floor ${th.marginFloorPct}%). Credits billed ${money(facts.internalBilledUsd)}, net sales ${money(margin.netRevenueUsd)}, upstream cost ${money(facts.upstreamCostUsd)}.`,
       metadata: base,
     });
   }
@@ -380,7 +410,8 @@ export function detectDayAnomalies(
   if (
     margin.billingGapPct !== null &&
     margin.billingGapPct > th.billingGapPct &&
-    facts.upstreamCostUsd >= th.minCostUsd
+    facts.upstreamCostUsd >= th.minCostUsd &&
+    billingMeasurable
   ) {
     out.push({
       type: FinanceAlertType.BILLING_GAP,
@@ -388,7 +419,7 @@ export function detectDayAnomalies(
       subject: facts.day,
       dedupKey: `${FinanceAlertType.BILLING_GAP}:${facts.day}`,
       message: `Billing gap on ${facts.day}: upstream spent ${money(facts.upstreamCostUsd)} but users were billed ${money(facts.internalBilledUsd)} (+${margin.billingGapPct.toFixed(0)}%, limit ${th.billingGapPct}%). Mis-pricing or leakage.`,
-      metadata: { ...base, internalBilledUsd: round2(facts.internalBilledUsd) },
+      metadata: base,
     });
   }
   return out;

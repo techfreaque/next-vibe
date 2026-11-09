@@ -26,6 +26,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditTransactions } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
+import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
 import { SystemMailboxRepository } from "@/messenger/system-mailbox/repository";
 import { scopedTranslation as mailScopedTranslation } from "@/messenger/system-mailbox/i18n";
 import { paymentEnv } from "@/payment/env";
@@ -102,8 +103,8 @@ export interface FinanceDeps {
   apiKey(source: typeof FinanceSourceValue): string | undefined;
   stripePort(): StripeLedgerPort | null;
   nowPaymentsPort(http: FinanceHttp): NowPaymentsPort | null;
-  /** Alert recipient (THEA_MAIL_REPORT_TO), null when unset. */
-  recipient(): string | null;
+  /** Finance-alert recipients (ops inbox + Thea mailbox); empty when none resolve. */
+  recipients(): string[];
   sendMail(
     input: { to: string; subject: string; text: string },
     userId: string | undefined,
@@ -142,7 +143,16 @@ export const defaultFinanceDeps: FinanceDeps = {
   },
   stripePort: () => createStripePort(),
   nowPaymentsPort: (http) => createNowPaymentsPort(http),
-  recipient: () => SystemMailboxRepository.getDefaultReportRecipient(),
+  recipients() {
+    // Ops inbox + the Thea mailbox, deduped. Deliberately NOT
+    // THEA_MAIL_REPORT_TO: that is the founder's personal address for the daily
+    // status report, and finance alerts must not land there.
+    const list = [
+      FINANCE_CONFIG.alertInbox,
+      nonEmpty(systemMailboxEnv.THEA_MAIL_ADDRESS),
+    ].filter((v): v is string => v !== undefined && v.trim() !== "");
+    return [...new Set(list.map((v) => v.trim()))];
+  },
   async sendMail(input, userId, logger, locale) {
     const { t } = mailScopedTranslation.scopedT(locale);
     const result = await SystemMailboxRepository.send(input, userId, logger, t);
@@ -932,25 +942,30 @@ export class FinanceRepository {
       }
 
       let delivery: string;
-      const recipient = deps.recipient();
-      if (!recipient) {
-        delivery = "skipped: no recipient (set THEA_MAIL_REPORT_TO)";
+      const recipients = deps.recipients();
+      if (recipients.length === 0) {
+        delivery = "skipped: no recipient (set THEA_MAIL_ADDRESS)";
       } else {
-        try {
-          const mail = await deps.sendMail(
-            {
-              to: recipient,
-              subject: `[finance] ${c.severity === "enums.severity.critical" ? "CRITICAL" : "WARNING"}: ${c.message.slice(0, 120)}`,
-              text: `${c.message}\n\n${JSON.stringify(c.metadata, null, 2)}\n\nOpen Finance in the admin to review balances and thresholds.`,
-            },
-            userId,
-            logger,
-            locale,
-          );
-          delivery = mail.ok ? "sent" : `failed: ${mail.detail}`;
-        } catch (error) {
-          delivery = `failed: ${parseError(error).message}`;
+        const subject = `[finance] ${c.severity === "enums.severity.critical" ? "CRITICAL" : "WARNING"}: ${c.message.slice(0, 120)}`;
+        const text = `${c.message}\n\n${JSON.stringify(c.metadata, null, 2)}\n\nOpen Finance in the admin to review balances and thresholds.`;
+        const failures: string[] = [];
+        for (const to of recipients) {
+          try {
+            const mail = await deps.sendMail(
+              { to, subject, text },
+              userId,
+              logger,
+              locale,
+            );
+            if (!mail.ok) {
+              failures.push(`${to}: ${mail.detail}`);
+            }
+          } catch (error) {
+            failures.push(`${to}: ${parseError(error).message}`);
+          }
         }
+        delivery =
+          failures.length === 0 ? "sent" : `failed: ${failures.join("; ")}`;
       }
 
       await db.insert(financeAlerts).values({

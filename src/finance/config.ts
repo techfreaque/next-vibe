@@ -34,6 +34,13 @@ export const FINANCE_CONFIG = {
   creditValueUsd: 0.01,
 
   /**
+   * Finance alerts go to the shared ops inbox AND the Thea mailbox
+   * (THEA_MAIL_ADDRESS) - never the personal founder address in
+   * THEA_MAIL_REPORT_TO (that stays the daily status report's recipient).
+   */
+  alertInbox: "hi@unbottled.ai",
+
+  /**
    * USD value of one native unit for providers that report a non-USD balance.
    * null = unknown, the provider is tracked but excluded from USD cost.
    */
