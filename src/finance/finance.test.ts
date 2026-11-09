@@ -13,8 +13,19 @@ import "server-only";
 import { and, gte, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { paymentRefunds, paymentTransactions } from "@/payment/db";
+import {
+  PaymentProvider,
+  PaymentStatus,
+  type PaymentStatusValue,
+  RefundStatus,
+} from "@/payment/enum";
+
+type TestCurrency = "USD" | "EUR" | "PLN";
 
 import {
   financeAlerts,
@@ -386,6 +397,48 @@ async function purge(): Promise<void> {
     .where(gte(financeDailyRollups.day, FUTURE));
 }
 
+async function insertPayment(
+  userId: string,
+  amount: string,
+  currency: TestCurrency,
+  status: typeof PaymentStatusValue,
+  createdAt: Date,
+): Promise<string> {
+  const [row] = await db
+    .insert(paymentTransactions)
+    .values({
+      userId,
+      amount,
+      currency,
+      status,
+      provider: PaymentProvider.STRIPE,
+      createdAt,
+    })
+    .returning({ id: paymentTransactions.id });
+  if (!row) {
+    throw new Error("failed to seed payment transaction");
+  }
+  return row.id;
+}
+
+async function insertRefund(
+  userId: string,
+  transactionId: string,
+  amount: string,
+  currency: TestCurrency,
+  createdAt: Date,
+): Promise<void> {
+  await db.insert(paymentRefunds).values({
+    userId,
+    transactionId,
+    providerRefundId: `re_test_${transactionId}`,
+    amount,
+    currency,
+    status: RefundStatus.SUCCEEDED,
+    createdAt,
+  });
+}
+
 async function ingest(
   scope: typeof IngestScopeValue,
   dryRun = false,
@@ -525,17 +578,81 @@ describe("finance ingest (mocked externals)", () => {
     expect(rollups.map((r) => r.netRevenueUsd).sort()).toEqual([0, 70]);
   });
 
-  it("records a missing Stripe key as skipped, never crashes the run", async () => {
-    FinanceRepository.deps = { ...testDeps, stripePort: () => null };
+  it("falls back to the local sales ledger when a processor API key is missing", async () => {
+    // No Stripe / NOWPayments API key: the run must not skip revenue. It reads
+    // our own succeeded payments instead (none in this 2031 window) and stays OK.
+    FinanceRepository.deps = {
+      ...testDeps,
+      stripePort: () => null,
+      nowPaymentsPort: () => null,
+    };
     try {
       const data = await ingest(IngestScope.REVENUE);
       const stripe = data.sources.find((s) => s.source === FinanceSource.STRIPE);
-      expect(stripe?.status).toBe(SourceRunStatus.SKIPPED);
-      expect(stripe?.reason).toBe("STRIPE_SECRET_KEY not configured");
+      expect(stripe?.status).toBe(SourceRunStatus.OK);
+      expect(stripe?.reason).toContain("Local sales ledger");
+      expect(stripe?.events).toBe(0);
       const np = data.sources.find((s) => s.source === FinanceSource.NOWPAYMENTS);
-      expect(np?.status).toBe(SourceRunStatus.SKIPPED);
+      expect(np?.status).toBe(SourceRunStatus.OK);
+      expect(np?.reason).toContain("Local sales ledger");
     } finally {
       FinanceRepository.deps = testDeps;
+    }
+  });
+
+  it("counts real succeeded payments as revenue, excluding pending / failed", async () => {
+    // Seed real sales in the test window: two succeeded USD charges ($25 + $50),
+    // one pending ($20, must NOT count), one EUR charge (FX -> USD), one refund.
+    const [anyUser] = await db.select({ id: users.id }).from(users).limit(1);
+    if (!anyUser) {
+      throw new Error("test requires at least one user");
+    }
+    const day = new Date(Date.UTC(2031, 2, 3, 15));
+    const okA = await insertPayment(anyUser.id, "25.00", "USD", PaymentStatus.SUCCEEDED, day);
+    const okB = await insertPayment(anyUser.id, "50.00", "USD", PaymentStatus.SUCCEEDED, day);
+    await insertPayment(anyUser.id, "20.00", "USD", PaymentStatus.PENDING, day);
+    await insertPayment(anyUser.id, "10.00", "EUR", PaymentStatus.SUCCEEDED, day);
+    await insertRefund(anyUser.id, okB, "5.00", "USD", day);
+
+    // Realistic prod shape: the Stripe key is set but the connected account
+    // returns no charges (empty / test account), so revenue must come from our
+    // own succeeded payments via reconciliation.
+    FinanceRepository.deps = {
+      ...testDeps,
+      stripePort: () => ({
+        listBalanceTransactions: async () => [],
+        listCancellations: async () => [],
+      }),
+      nowPaymentsPort: () => null,
+    };
+    try {
+      const data = await ingest(IngestScope.REVENUE);
+      const stripe = data.sources.find((s) => s.source === FinanceSource.STRIPE);
+      expect(stripe?.status).toBe(SourceRunStatus.OK);
+      // 2 USD charges + 1 EUR charge + 1 refund = 4 events; pending excluded.
+      expect(stripe?.events).toBe(4);
+
+      const snap = await db
+        .select()
+        .from(financeRevenueSnapshots)
+        .where(gte(financeRevenueSnapshots.day, FUTURE));
+      expect(snap).toHaveLength(1);
+      // 25 + 50 USD + 10 EUR * 1.08 = 85.80 gross; refund 5; net 80.80.
+      expect(snap[0]?.grossUsd).toBe(85.8);
+      expect(snap[0]?.refundsUsd).toBe(5);
+      expect(snap[0]?.netUsd).toBe(80.8);
+      expect(snap[0]?.paymentCount).toBe(3);
+
+      const rolled = data.days.find((d) => d.day === "2031-03-03");
+      expect(rolled?.netRevenueUsd).toBe(80.8);
+    } finally {
+      FinanceRepository.deps = testDeps;
+      await db
+        .delete(paymentRefunds)
+        .where(gte(paymentRefunds.createdAt, FUTURE));
+      await db
+        .delete(paymentTransactions)
+        .where(gte(paymentTransactions.createdAt, FUTURE));
     }
   });
 

@@ -29,6 +29,7 @@ import { CreditTransactionType } from "@/credits/enum";
 import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
 import { SystemMailboxRepository } from "@/messenger/system-mailbox/repository";
 import { scopedTranslation as mailScopedTranslation } from "@/messenger/system-mailbox/i18n";
+import { PaymentProvider } from "@/payment/enum";
 import { paymentEnv } from "@/payment/env";
 import { agentEnv } from "@/vibe/agent/env";
 
@@ -78,8 +79,10 @@ import {
   createNowPaymentsPort,
   createStripePort,
   type NowPaymentsPort,
+  pullLocalPaymentLedger,
   pullNowPayments,
   pullStripe,
+  reconcileWithLocalSales,
   type RevenuePull,
   type StripeLedgerPort,
 } from "./sources/revenue";
@@ -564,16 +567,35 @@ export class FinanceRepository {
       let pull: RevenuePull;
       if (source === FinanceSource.STRIPE) {
         const port = deps.stripePort();
-        if (!port) {
-          return { ...base, reason: "STRIPE_SECRET_KEY not configured" };
-        }
-        pull = await pullStripe(port, since);
+        // Count real sales even when the Stripe API is missing or its account
+        // diverges from our records, so revenue is never silently $0.
+        pull = port
+          ? await reconcileWithLocalSales(
+              await pullStripe(port, since),
+              PaymentProvider.STRIPE,
+              FinanceSource.STRIPE,
+              since,
+            )
+          : await pullLocalPaymentLedger(
+              PaymentProvider.STRIPE,
+              FinanceSource.STRIPE,
+              since,
+            );
       } else {
         const port = deps.nowPaymentsPort(deps.http);
-        if (!port) {
-          return { ...base, reason: "NOWPAYMENTS_API_KEY not configured" };
-        }
-        pull = pullNowPayments(await port.load(since));
+        // Same reconciliation for crypto against the local IPN ledger.
+        pull = port
+          ? await reconcileWithLocalSales(
+              pullNowPayments(await port.load(since)),
+              PaymentProvider.NOWPAYMENTS,
+              FinanceSource.NOWPAYMENTS,
+              since,
+            )
+          : await pullLocalPaymentLedger(
+              PaymentProvider.NOWPAYMENTS,
+              FinanceSource.NOWPAYMENTS,
+              since,
+            );
       }
 
       pulled.push(...pull.events);

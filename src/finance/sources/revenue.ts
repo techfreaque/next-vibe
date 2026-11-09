@@ -20,7 +20,12 @@ import { db } from "next-vibe/database";
 import { z } from "zod";
 
 import { paymentRefunds, paymentTransactions } from "@/payment/db";
-import { PaymentProvider, PaymentStatus } from "@/payment/enum";
+import {
+  PaymentProvider,
+  type PaymentProviderValue,
+  PaymentStatus,
+  RefundStatus,
+} from "@/payment/enum";
 import { paymentEnv } from "@/payment/env";
 import { StripeProvider } from "@/payment/providers/stripe/repository";
 
@@ -28,6 +33,7 @@ import { FINANCE_CONFIG } from "../config";
 import { financeEnv } from "../env";
 import {
   FinanceSource,
+  type FinanceSourceValue,
   RevenueEventKind,
   type RevenueEventKindValue,
 } from "../enum";
@@ -363,5 +369,135 @@ export function pullNowPayments(ledger: NowPaymentsLedger): RevenuePull {
       ledger.origin === "local"
         ? "NOWPayments payment list needs a JWT (set NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD); used the local IPN ledger. Payouts unavailable."
         : "Payouts unavailable (not pulled).",
+  };
+}
+
+// ─── Local sales ledger (our own DB) ─────────────────────────────────────────
+
+/**
+ * Real sales from our own records, used when a processor's external API key is
+ * not configured (so revenue is never silently $0 while real money came in).
+ *
+ * Source of truth: payment_transactions with status SUCCEEDED (pending /
+ * processing / failed are NOT revenue) plus their succeeded refunds, by UTC day
+ * and currency, normalized to USD via the static FX table. A currency without a
+ * rate is counted as unconvertible, never guessed. Idempotent by the row id, so
+ * a re-pull inside the window rebuilds the same snapshots.
+ *
+ * Deliberately NOT sourced from credit_transactions `purchase` rows: those carry
+ * credit counts and an unreliable `totalPaid` (often 0 for crypto / webhook
+ * grants), so they are the wrong yardstick for cash received.
+ */
+export async function pullLocalPaymentLedger(
+  provider: typeof PaymentProviderValue,
+  source: typeof FinanceSourceValue,
+  since: Date,
+): Promise<RevenuePull> {
+  const charges = await db
+    .select()
+    .from(paymentTransactions)
+    .where(
+      and(
+        eq(paymentTransactions.provider, provider),
+        eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
+        gte(paymentTransactions.createdAt, since),
+      ),
+    );
+  const refunds = await db
+    .select({ r: paymentRefunds })
+    .from(paymentRefunds)
+    .innerJoin(
+      paymentTransactions,
+      eq(paymentRefunds.transactionId, paymentTransactions.id),
+    )
+    .where(
+      and(
+        eq(paymentTransactions.provider, provider),
+        eq(paymentRefunds.status, RefundStatus.SUCCEEDED),
+        gte(paymentRefunds.createdAt, since),
+      ),
+    );
+
+  const events: RevenueEventInput[] = [];
+  let unconvertible = 0;
+  for (const row of charges) {
+    const amountUsd = minorToUsd(
+      Math.round(Number(row.amount) * 100),
+      row.currency,
+    );
+    if (amountUsd === null) {
+      unconvertible += 1;
+      continue;
+    }
+    events.push({
+      source,
+      kind: RevenueEventKind.CHARGE,
+      externalId: row.id,
+      amountUsd,
+      feeUsd: 0,
+      currency: row.currency.toLowerCase(),
+      occurredAt: row.createdAt,
+    });
+  }
+  for (const { r } of refunds) {
+    const amountUsd = minorToUsd(
+      Math.round(Number(r.amount) * 100),
+      r.currency,
+    );
+    if (amountUsd === null) {
+      unconvertible += 1;
+      continue;
+    }
+    events.push({
+      source,
+      kind: RevenueEventKind.REFUND,
+      externalId: r.id,
+      amountUsd,
+      feeUsd: 0,
+      currency: r.currency.toLowerCase(),
+      occurredAt: r.createdAt,
+    });
+  }
+  return {
+    events,
+    unconvertible,
+    note: "Local sales ledger (payment_transactions): succeeded payments only; processor API not configured, so fees / payouts are unavailable.",
+  };
+}
+
+/**
+ * Reconcile a live-processor pull against our own sales ledger.
+ *
+ * The processor API is trusted when it actually reports sales. When it reports
+ * none (key points at an empty / test account, or the account simply diverges
+ * from our records) we take charges + refunds from our own succeeded
+ * payment_transactions so real revenue is never reported as $0, while keeping
+ * any dispute / payout / cancellation signal the processor did return.
+ *
+ * NOTE (flagged): if a live account returns SOME charges but is missing others
+ * that exist only locally, we trust the processor and do not add the local
+ * ones - this avoids double counting but can under-count a half-synced account.
+ */
+export async function reconcileWithLocalSales(
+  external: RevenuePull,
+  provider: typeof PaymentProviderValue,
+  source: typeof FinanceSourceValue,
+  since: Date,
+): Promise<RevenuePull> {
+  if (external.events.some((e) => e.kind === RevenueEventKind.CHARGE)) {
+    return external;
+  }
+  const local = await pullLocalPaymentLedger(provider, source, since);
+  const keep = external.events.filter(
+    (e) =>
+      e.kind !== RevenueEventKind.CHARGE && e.kind !== RevenueEventKind.REFUND,
+  );
+  const note = [external.note, local.note].filter(
+    (n): n is string => n !== null,
+  );
+  return {
+    events: [...local.events, ...keep],
+    unconvertible: local.unconvertible + external.unconvertible,
+    note: note.length > 0 ? note.join("; ") : null,
   };
 }
