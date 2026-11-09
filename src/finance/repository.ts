@@ -75,6 +75,8 @@ import {
   startOfUtcHour,
   THRESHOLD_FIELD,
   type Thresholds,
+  type TrailingRate,
+  trailingSpendRate,
 } from "./logic";
 import { type FinanceHttp, liveHttp } from "./sources/http";
 import { PROVIDER_ADAPTERS, providerLabel } from "./sources/providers";
@@ -482,7 +484,7 @@ export class FinanceRepository {
 
       if (delta) {
         runSpend.set(provider, delta.spendUsd);
-        const trailing = await FinanceRepository.trailingHourlySpend(
+        const trailing = await FinanceRepository.trailingProviderSpend(
           provider,
           bucketAt,
         );
@@ -492,7 +494,7 @@ export class FinanceRepository {
             providerLabel: providerLabel(provider),
             spendUsd: delta.spendUsd,
             elapsedHours: delta.elapsedHours,
-            trailingAvgHourlyUsd: trailing,
+            trailing,
             balanceUsd: result.balanceUsd,
             thresholds,
           }),
@@ -542,18 +544,27 @@ export class FinanceRepository {
     }
   }
 
-  /** Average dollars per hour over the trailing baseline, excluding the current bucket. */
-  private static async trailingHourlySpend(
+  /**
+   * True dollars-per-hour over the trailing baseline, excluding the current
+   * bucket and gap-robust. Total cost over the window (gap cost included) is
+   * divided by the hours we actually have gap-free coverage for - never by
+   * wall-clock hours that count every un-snapshotted hour as $0. A reading whose
+   * interval is longer than the gap tolerance is a gap: its cost still counts,
+   * its uncertain hours do not. trailingSpendRate turns too-little coverage into
+   * an insufficient-data (null) rate rather than a falsely-tiny baseline.
+   */
+  private static async trailingProviderSpend(
     provider: (typeof ProviderSources)[number],
     bucketAt: Date,
-  ): Promise<number> {
+  ): Promise<TrailingRate> {
     const from = new Date(
       bucketAt.getTime() - FINANCE_CONFIG.baselineDays * DAY_MS,
     );
+    const gapCutHours = 1 + FINANCE_CONFIG.costGapToleranceHours;
     const [row] = await db
       .select({
         spend: sql<number>`coalesce(sum(${financeProviderSnapshots.spendUsd}), 0)`,
-        hours: sql<number>`coalesce(sum(${financeProviderSnapshots.elapsedHours}), 0)`,
+        coveredHours: sql<number>`coalesce(sum(case when ${financeProviderSnapshots.elapsedHours} <= ${gapCutHours} then ${financeProviderSnapshots.elapsedHours} else 0 end), 0)`,
       })
       .from(financeProviderSnapshots)
       .where(
@@ -563,8 +574,10 @@ export class FinanceRepository {
           lt(financeProviderSnapshots.bucketAt, bucketAt),
         ),
       );
-    const hours = Number(row?.hours ?? 0);
-    return hours > 0 ? Number(row?.spend ?? 0) / hours : 0;
+    return trailingSpendRate({
+      windowSpendUsd: Number(row?.spend ?? 0),
+      coveredHours: Number(row?.coveredHours ?? 0),
+    });
   }
 
   // ─── Revenue ───────────────────────────────────────────────────────────────

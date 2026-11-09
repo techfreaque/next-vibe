@@ -257,6 +257,61 @@ function round6(value: number): number {
   return Math.round(value * 1_000_000) / 1_000_000;
 }
 
+// ─── Trailing spend rate ───────────────────────────────────────────────────────
+
+export interface TrailingSpendInput {
+  /**
+   * Total upstream cost over the baseline window, USD. Includes cost that fell
+   * inside a gap (a single reading spanning many hours): the money was spent, so
+   * it counts toward the rate even though we cannot place it in a clean hour.
+   */
+  windowSpendUsd: number;
+  /**
+   * Hours of the window with gap-free snapshot coverage - the sum of the elapsed
+   * time of intervals short enough to trust (<= 1 + costGapToleranceHours).
+   * Long gaps are unobserved time and are excluded.
+   */
+  coveredHours: number;
+}
+
+export interface TrailingRate {
+  /** True $/h over covered time, or null when there is too little covered data. */
+  perHourUsd: number | null;
+  /** Gap-free hours the rate was measured over (0 when none). */
+  coveredHours: number;
+  coverage: typeof CostCoverageValue;
+}
+
+/**
+ * Trailing spend RATE for the drain tripwire, gap-robust.
+ *
+ * The true dollars-per-hour is the window's total upstream cost over the hours we
+ * actually have gap-free coverage for - NOT over wall-clock hours. Dividing by
+ * wall-clock time counts every un-snapshotted hour as $0 and dilutes the baseline
+ * until any normal hour reads as an 8x spike (the exact false "key compromise"
+ * this fixes): e.g. ~$6.4 of real cost measured over ~3 covered hours is ~$2.1/h,
+ * but spread across a 24h window with 21 missing hours it collapses to ~$0.3/h.
+ *
+ * Gap intervals are unobserved time: their cost still counts (numerator), the
+ * uncertain hours do not (denominator). Under baselineMinCoveredHours of gap-free
+ * data there is no meaningful rate - insufficient data, so the rate is null and
+ * the relative tripwire stays silent while the absolute hourly cap still guards.
+ */
+export function trailingSpendRate(input: TrailingSpendInput): TrailingRate {
+  const coveredHours = Math.max(input.coveredHours, 0);
+  const coverage: typeof CostCoverageValue =
+    coveredHours >= FINANCE_CONFIG.baselineMinCoveredHours
+      ? CostCoverage.COMPLETE
+      : coveredHours > 0
+        ? CostCoverage.PARTIAL
+        : CostCoverage.NONE;
+  const perHourUsd =
+    coverage === CostCoverage.COMPLETE
+      ? round6(Math.max(input.windowSpendUsd, 0) / coveredHours)
+      : null;
+  return { perHourUsd, coveredHours: round2(coveredHours), coverage };
+}
+
 // ─── Alerts ──────────────────────────────────────────────────────────────────
 
 export interface AlertCandidate {
@@ -282,7 +337,7 @@ export function detectProviderAnomalies(input: {
   providerLabel: string;
   spendUsd: number;
   elapsedHours: number;
-  trailingAvgHourlyUsd: number;
+  trailing: TrailingRate;
   balanceUsd: number | null;
   thresholds: Thresholds;
 }): AlertCandidate[] {
@@ -291,13 +346,17 @@ export function detectProviderAnomalies(input: {
     return [];
   }
   const perHour = input.spendUsd / input.elapsedHours;
+  const trailingPerHour = input.trailing.perHourUsd;
   const out: AlertCandidate[] = [];
   const metadata = {
     provider: input.provider,
     spendUsd: round2(input.spendUsd),
     elapsedHours: round2(input.elapsedHours),
     perHourUsd: round2(perHour),
-    trailingAvgHourlyUsd: round2(input.trailingAvgHourlyUsd),
+    trailingAvgHourlyUsd:
+      trailingPerHour === null ? null : round2(trailingPerHour),
+    trailingCoveredHours: input.trailing.coveredHours,
+    trailingCoverage: input.trailing.coverage,
     balanceUsd: input.balanceUsd === null ? null : round2(input.balanceUsd),
   };
   if (perHour > th.hourlySpendCapUsd) {
@@ -311,15 +370,16 @@ export function detectProviderAnomalies(input: {
     });
   }
   if (
-    input.trailingAvgHourlyUsd > 0 &&
-    perHour > input.trailingAvgHourlyUsd * th.drainMultiplier
+    trailingPerHour !== null &&
+    trailingPerHour > 0 &&
+    perHour > trailingPerHour * th.drainMultiplier
   ) {
     out.push({
       type: FinanceAlertType.BALANCE_DRAIN,
       severity: AlertSeverity.CRITICAL,
       subject: input.provider,
       dedupKey: `${FinanceAlertType.BALANCE_DRAIN}:${input.provider}`,
-      message: `Possible key compromise: ${input.providerLabel}. Spending ${money(perHour)}/h is ${(perHour / input.trailingAvgHourlyUsd).toFixed(1)}x the trailing average of ${money(input.trailingAvgHourlyUsd)}/h (limit ${th.drainMultiplier}x).`,
+      message: `Possible key compromise: ${input.providerLabel}. Spending ${money(perHour)}/h is ${(perHour / trailingPerHour).toFixed(1)}x the trailing average of ${money(trailingPerHour)}/h over ${input.trailing.coveredHours.toFixed(1)}h of covered data (limit ${th.drainMultiplier}x).`,
       metadata,
     });
   }

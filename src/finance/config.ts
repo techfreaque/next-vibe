@@ -20,6 +20,15 @@ export const FINANCE_CONFIG = {
   /** Trailing window the drain / cancellation baselines use. */
   baselineDays: 7,
   /**
+   * Minimum hours of gap-free snapshot coverage in the baseline window before a
+   * trailing spend RATE can be formed. Snapshots are unreliable early on, so the
+   * window can be almost all gaps; under this much clean coverage there is no
+   * meaningful rate (insufficient data, NOT a baseline of ~$0), and the relative
+   * drain tripwire stays silent - the absolute hourly cap still guards. One clean
+   * hour anchors a rate; below that there is no gap-free measurement at all.
+   */
+  baselineMinCoveredHours: 1,
+  /**
    * Hours of missing provider snapshots a fully-tracked day may still have and
    * count as COMPLETE cost coverage (one or two missed hourly cron runs is noise,
    * a wide gap is not). Beyond this a day is PARTIAL.

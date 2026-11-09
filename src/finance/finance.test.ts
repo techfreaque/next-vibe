@@ -57,6 +57,7 @@ import {
   minorToUsd,
   resolveThresholds,
   spendBetween,
+  trailingSpendRate,
 } from "./logic";
 import { type FinanceDeps, FinanceRepository, defaultFinanceDeps } from "./repository";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
@@ -217,6 +218,29 @@ describe("spendBetween", () => {
   });
 });
 
+describe("trailingSpendRate", () => {
+  it("rates total cost over gap-free hours, never over wall-clock hours", () => {
+    // The real 2026-11-09 16:00 OpenRouter window: $6.364 of cost, but one
+    // overnight reading spans a 15h gap. Covered (gap-free) hours = 1.001 +
+    // 1.476 + 0.517 = 2.994. True rate = 6.364 / 2.994 = ~$2.13/h - NOT the
+    // 6.364 / 17.995 = ~$0.35/h the wall-clock denominator produced.
+    const rate = trailingSpendRate({
+      windowSpendUsd: 6.364,
+      coveredHours: 2.994,
+    });
+    expect(rate.coverage).toBe(CostCoverage.COMPLETE);
+    expect(rate.perHourUsd).toBeCloseTo(2.126, 2);
+  });
+  it("reports insufficient data (null rate) under a clean hour of coverage", () => {
+    const rate = trailingSpendRate({ windowSpendUsd: 0.4, coveredHours: 0.5 });
+    expect(rate.coverage).toBe(CostCoverage.PARTIAL);
+    expect(rate.perHourUsd).toBeNull();
+    const none = trailingSpendRate({ windowSpendUsd: 0, coveredHours: 0 });
+    expect(none.coverage).toBe(CostCoverage.NONE);
+    expect(none.perHourUsd).toBeNull();
+  });
+});
+
 describe("detectProviderAnomalies", () => {
   const base = {
     provider: FinanceSource.OPENROUTER,
@@ -224,12 +248,17 @@ describe("detectProviderAnomalies", () => {
     balanceUsd: 100,
     thresholds: DEFAULT_THRESHOLDS,
   };
+  /** A fully-covered trailing baseline at the given $/h. */
+  const baselineAt = (perHourUsd: number): ReturnType<typeof trailingSpendRate> =>
+    trailingSpendRate({ windowSpendUsd: perHourUsd * 48, coveredHours: 48 });
+  const noBaseline = trailingSpendRate({ windowSpendUsd: 0, coveredHours: 0 });
+
   it("flags an hourly spend over the cap as possible key compromise", () => {
     const out = detectProviderAnomalies({
       ...base,
       spendUsd: 60,
       elapsedHours: 1,
-      trailingAvgHourlyUsd: 40,
+      trailing: baselineAt(40),
     });
     expect(out.map((a) => a.type)).toContain(FinanceAlertType.SPEND_SPIKE);
     expect(out[0]?.message).toContain("Possible key compromise: OpenRouter");
@@ -239,7 +268,7 @@ describe("detectProviderAnomalies", () => {
       ...base,
       spendUsd: 10,
       elapsedHours: 1,
-      trailingAvgHourlyUsd: 1,
+      trailing: baselineAt(1),
     });
     expect(out.map((a) => a.type)).toEqual([FinanceAlertType.BALANCE_DRAIN]);
   });
@@ -249,7 +278,7 @@ describe("detectProviderAnomalies", () => {
         ...base,
         spendUsd: 2.5,
         elapsedHours: 1,
-        trailingAvgHourlyUsd: 1,
+        trailing: baselineAt(1),
       }),
     ).toEqual([]);
     expect(
@@ -257,7 +286,7 @@ describe("detectProviderAnomalies", () => {
         ...base,
         spendUsd: 1.5,
         elapsedHours: 0.01,
-        trailingAvgHourlyUsd: 0.1,
+        trailing: baselineAt(0.1),
       }),
     ).toEqual([]);
     expect(
@@ -265,7 +294,7 @@ describe("detectProviderAnomalies", () => {
         ...base,
         spendUsd: 5,
         elapsedHours: 1,
-        trailingAvgHourlyUsd: 0,
+        trailing: noBaseline,
       }),
     ).toEqual([]);
   });
@@ -275,9 +304,58 @@ describe("detectProviderAnomalies", () => {
       ...base,
       spendUsd: 30,
       elapsedHours: 6,
-      trailingAvgHourlyUsd: 1,
+      trailing: baselineAt(1),
     });
     expect(out.map((a) => a.type)).toEqual([FinanceAlertType.BALANCE_DRAIN]);
+  });
+
+  it("does NOT alarm when a sparse window dilutes the baseline (regression)", () => {
+    // Exact 2026-11-09 16:00 OpenRouter false positive: a normal $2.68/h hour
+    // against a gap-diluted baseline. Correct trailing rate is ~$2.13/h over the
+    // 2.994 covered hours, so $2.67/h is ~1.3x - well under the 3x drain limit.
+    // The old wall-clock math made the baseline ~$0.35/h and fired an 8x CRITICAL.
+    const trailing = trailingSpendRate({
+      windowSpendUsd: 6.363911,
+      coveredHours: 2.9939,
+    });
+    const out = detectProviderAnomalies({
+      ...base,
+      spendUsd: 2.67797,
+      elapsedHours: 1.0018,
+      trailing,
+    });
+    expect(out).toEqual([]);
+  });
+
+  it("stays silent on insufficient trailing data instead of crying wolf", () => {
+    // Under a clean hour of covered data there is no meaningful baseline, so the
+    // relative drain tripwire holds its fire (the absolute cap still guards).
+    const trailing = trailingSpendRate({ windowSpendUsd: 0.2, coveredHours: 0.5 });
+    const out = detectProviderAnomalies({
+      ...base,
+      spendUsd: 10,
+      elapsedHours: 1,
+      trailing,
+    });
+    expect(out).toEqual([]);
+  });
+
+  it("still fires on a genuine sustained rate spike with a solid baseline", () => {
+    // Two days of covered data at ~$0.31/h, then $30 in one hour: both the drain
+    // (97x) and the absolute cap trip - real detection is intact.
+    const trailing = trailingSpendRate({ windowSpendUsd: 15, coveredHours: 48 });
+    const out = detectProviderAnomalies({
+      ...base,
+      spendUsd: 30,
+      elapsedHours: 1,
+      trailing,
+    });
+    expect(out.map((a) => a.type)).toEqual(
+      expect.arrayContaining([
+        FinanceAlertType.SPEND_SPIKE,
+        FinanceAlertType.BALANCE_DRAIN,
+      ]),
+    );
   });
 });
 
