@@ -288,7 +288,8 @@ export class PulseHealthRepository {
           }
 
           const isDue =
-            options.force || isCronTaskDue(logger, dbTask.schedule, now);
+            options.force ||
+            isCronTaskDue(logger, dbTask.schedule, now, dbTask.lastExecutedAt);
           if (!isDue) {
             tasksSkipped.push(dbTask.displayName);
             continue;

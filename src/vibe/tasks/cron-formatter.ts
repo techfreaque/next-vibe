@@ -507,30 +507,53 @@ export function validateCronSchedule(
 }
 
 /**
- * Check if a cron task is due to run based on its schedule
- * Uses cron-parser to determine if the current time matches the task's schedule
+ * Check if a cron task is due to run based on its schedule.
+ *
+ * Catch-up semantics: a task is due when a scheduled occurrence has elapsed
+ * since it last ran (the most recent scheduled fire time is strictly after
+ * `lastExecutedAt`). This is drift- and restart-proof — a missed tick is picked
+ * up on the very next pulse instead of being lost for the whole period.
+ *
+ * Why not a fixed window: the old implementation only returned true inside a
+ * 60-second window after each scheduled time. The pulse runner sleeps AFTER
+ * each cycle, so pulse start times drift relative to the wall clock. An
+ * every-minute task has a due window every minute and is always caught, but an
+ * hourly/daily task has a single 60s window per period — any drift, GC pause or
+ * slow pulse that misses that window silently skips the entire period. That is
+ * why `finance-balances-hourly` missed ~14h overnight while `db-health` ran
+ * every minute.
+ *
+ * - `lastExecutedAt` null (never ran) → due now: catch-up on first boot / after
+ *   a task is created, exactly once (the run stamps `lastExecutedAt`).
+ * - Within the same scheduled period after a run → not due (no double-fire).
  */
 export function isCronTaskDue(
   logger: EndpointLogger,
   schedule: string,
   currentDate?: Date,
+  lastExecutedAt?: Date | null,
 ): boolean {
   if (schedule === "manual") {
     return false;
   }
   try {
+    const now = currentDate || new Date();
     const interval = cronParser.parse(schedule, {
       tz: "UTC",
-      currentDate: currentDate || new Date(),
+      currentDate: now,
     });
 
-    // Get the previous execution time
+    // Most recent scheduled fire time at or before `now`.
     const prevExecution = interval.prev().toDate();
-    const now = currentDate || new Date();
 
-    // Check if we're within the execution window (1 minute tolerance)
-    const timeDiff = now.getTime() - prevExecution.getTime();
-    return timeDiff >= 0 && timeDiff < 60000; // Within 1 minute
+    // Never executed: fire on the next pulse (catch-up on startup / new task).
+    if (!lastExecutedAt) {
+      return true;
+    }
+
+    // Due when a scheduled occurrence has elapsed since the last run. Strict `>`
+    // means a task that already ran on this tick is not re-fired.
+    return prevExecution.getTime() > lastExecutedAt.getTime();
   } catch (error) {
     logger.error("Failed to check if cron task is due", parseError(error), {
       schedule,
