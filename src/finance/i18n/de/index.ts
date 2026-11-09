@@ -65,6 +65,11 @@ export const translations: typeof enTranslations = {
       balances: "Nur Anbieter-Guthaben",
       revenue: "Nur Umsatz",
     },
+    costCoverage: {
+      complete: "Vollständig",
+      partial: "Kosten unvollständig",
+      none: "Kosten unbekannt",
+    },
     metric: {
       stripeRevenue: "Stripe-Umsatz (brutto, $)",
       nowpaymentsRevenue: "NOWPayments-Umsatz (brutto, $)",
@@ -103,6 +108,16 @@ export const translations: typeof enTranslations = {
         label: "Umsatzfenster (Tage)",
         description: "Wie weit zurück der Umsatz neu geholt wird. Standard 3.",
       },
+      backfillFrom: {
+        label: "Nachfüllen ab (JJJJ-MM-TT)",
+        description:
+          "Tagesauswertungen ab diesem UTC-Tag bis zum Nachfüllen-bis-Tag (Standard heute) neu berechnen. Baut den Umsatz aus unserer gesamten Zahlungshistorie neu auf; schreibt immer (ignoriert den Probelauf). Leer lassen für einen normalen Abruf.",
+      },
+      backfillTo: {
+        label: "Nachfüllen bis (JJJJ-MM-TT)",
+        description:
+          "Letzter UTC-Tag, der neu berechnet wird. Standard: heute.",
+      },
     },
     response: {
       dryRun: "Probelauf",
@@ -121,6 +136,7 @@ export const translations: typeof enTranslations = {
       resultDry: "Probelauf (nichts gespeichert, nichts gesendet)",
       events: "{{count}} Zeilen",
       margin: "Marge: Nettoumsatz - Einkaufskosten",
+      costUnknown: "Kosten unbekannt",
       alerts: "Alarme: {{raised}} ausgelöst, {{suppressed}} unterdrückt",
     },
   },
@@ -152,6 +168,9 @@ export const translations: typeof enTranslations = {
         margin: "Bruttomarge",
         pct: "Marge %",
         empty: "Noch keine Auswertung. Abruf starten.",
+        costUnknown: "Kosten unbekannt",
+        costIncomplete:
+          "Die Einkaufskosten sind für einige Tage in diesem Zeitraum unvollständig — die Marge lässt nicht erfasste Kosten aus und ist nur ein Teilwert.",
       },
       providers: {
         title: "Anbieter-Guthaben",
@@ -261,6 +280,12 @@ export const translations: typeof enTranslations = {
     },
     invalidThreshold: "Ein Schwellenwert braucht eine nicht negative Zahl",
     ingestFailed: "Finanz-Abruf fehlgeschlagen: {{error}}",
+    backfill: {
+      invalidRange:
+        "Das Nachfüllen braucht ein gültiges Von-Datum am oder vor dem Bis-Datum (JJJJ-MM-TT)",
+      tooWide:
+        "Nachfüll-Zeitraum zu groß: höchstens {{max}} Tage pro Durchlauf",
+    },
   },
   success: {
     title: "Erledigt",

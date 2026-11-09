@@ -65,6 +65,11 @@ export const translations: typeof enTranslations = {
       balances: "Tylko salda dostawców",
       revenue: "Tylko przychód",
     },
+    costCoverage: {
+      complete: "Pełne",
+      partial: "Koszt niepełny",
+      none: "Koszt nieznany",
+    },
     metric: {
       stripeRevenue: "Przychód Stripe (brutto, $)",
       nowpaymentsRevenue: "Przychód NOWPayments (brutto, $)",
@@ -103,6 +108,15 @@ export const translations: typeof enTranslations = {
         label: "Okno przychodu (dni)",
         description: "Jak daleko wstecz pobrać przychód. Domyślnie 3.",
       },
+      backfillFrom: {
+        label: "Uzupełnij od (RRRR-MM-DD)",
+        description:
+          "Przelicz dzienne podsumowania od tego dnia UTC do dnia uzupełnij-do (domyślnie dziś). Odbudowuje przychód z całej naszej historii płatności; zawsze zapisuje (ignoruje próbę). Zostaw puste dla zwykłego pobrania.",
+      },
+      backfillTo: {
+        label: "Uzupełnij do (RRRR-MM-DD)",
+        description: "Ostatni dzień UTC do przeliczenia. Domyślnie: dziś.",
+      },
     },
     response: {
       dryRun: "Próba",
@@ -121,6 +135,7 @@ export const translations: typeof enTranslations = {
       resultDry: "Próba (nic nie zapisano, nic nie wysłano)",
       events: "{{count}} wierszy",
       margin: "Marża: przychód netto - koszt u dostawców",
+      costUnknown: "koszt nieznany",
       alerts: "Alerty: {{raised}} wywołane, {{suppressed}} stłumione",
     },
   },
@@ -152,6 +167,9 @@ export const translations: typeof enTranslations = {
         margin: "Marża brutto",
         pct: "Marża %",
         empty: "Brak podsumowań. Uruchom pobranie.",
+        costUnknown: "koszt nieznany",
+        costIncomplete:
+          "Koszt u dostawców jest niepełny dla niektórych dni w tym okresie — marża pomija nieśledzony koszt i jest wartością częściową.",
       },
       providers: {
         title: "Salda dostawców",
@@ -258,6 +276,12 @@ export const translations: typeof enTranslations = {
     },
     invalidThreshold: "Próg wymaga nieujemnej liczby",
     ingestFailed: "Pobranie danych finansowych nie powiodło się: {{error}}",
+    backfill: {
+      invalidRange:
+        "Uzupełnianie wymaga poprawnej daty od, nie późniejszej niż data do (RRRR-MM-DD)",
+      tooWide:
+        "Zakres uzupełniania zbyt szeroki: najwyżej {{max}} dni na przebieg",
+    },
   },
   success: {
     title: "Gotowe",

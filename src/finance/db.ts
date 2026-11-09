@@ -25,6 +25,8 @@ import {
 
 import {
   AlertSeverityDB,
+  CostCoverage,
+  CostCoverageDB,
   FinanceAlertTypeDB,
   FinanceSourceDB,
   RevenueEventKindDB,
@@ -124,10 +126,20 @@ export const financeDailyRollups = pgTable("finance_daily_rollups", {
   refundsUsd: doublePrecision("refunds_usd").notNull().default(0),
   disputesUsd: doublePrecision("disputes_usd").notNull().default(0),
   netRevenueUsd: doublePrecision("net_revenue_usd").notNull().default(0),
-  upstreamCostUsd: doublePrecision("upstream_cost_usd").notNull().default(0),
-  grossMarginUsd: doublePrecision("gross_margin_usd").notNull().default(0),
-  /** null when there is no revenue to divide by */
+  /**
+   * Measured upstream cost. NULL when cost coverage is NONE (no provider
+   * snapshots that day): the cost is unknown, never faked to 0. When coverage is
+   * PARTIAL the value is a real but incomplete lower bound - read costCoverage.
+   */
+  upstreamCostUsd: doublePrecision("upstream_cost_usd"),
+  /** NULL unless costCoverage is COMPLETE - a margin off incomplete cost misleads. */
+  grossMarginUsd: doublePrecision("gross_margin_usd"),
+  /** null when there is no revenue to divide by, or cost coverage is not COMPLETE */
   grossMarginPct: doublePrecision("gross_margin_pct"),
+  /** How trustworthy upstreamCostUsd / the margin are for this day. */
+  costCoverage: text("cost_coverage", { enum: CostCoverageDB })
+    .notNull()
+    .default(CostCoverage.NONE),
   /** Credits users burned (USAGE transactions) valued at the credit price */
   internalBilledUsd: doublePrecision("internal_billed_usd")
     .notNull()

@@ -25,6 +25,7 @@ import { FINANCE_INGEST_ALIAS } from "../constants";
 import { financeErrorTypes } from "../error-types";
 import {
   AlertSeverityDB,
+  CostCoverageDB,
   FinanceAlertTypeDB,
   FinanceSourceDB,
   IngestScope,
@@ -53,10 +54,13 @@ const dayReportSchema = z.object({
   refundsUsd: z.number(),
   disputesUsd: z.number(),
   netRevenueUsd: z.number(),
-  upstreamCostUsd: z.number(),
-  grossMarginUsd: z.number(),
+  // null when cost coverage is NONE (cost unknown, never faked to 0).
+  upstreamCostUsd: z.number().nullable(),
+  // null unless cost coverage is COMPLETE (a margin off partial cost misleads).
+  grossMarginUsd: z.number().nullable(),
   grossMarginPct: z.number().nullable(),
   internalBilledUsd: z.number(),
+  costCoverage: z.enum(CostCoverageDB),
 });
 
 const alertReportSchema = z.object({
@@ -112,6 +116,22 @@ const { POST } = createEndpoint({
         description: "ingest.fields.windowDays.description",
         columns: 6,
         schema: z.number().int().min(1).max(30).optional(),
+      }),
+      backfillFrom: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "ingest.fields.backfillFrom.label",
+        description: "ingest.fields.backfillFrom.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      backfillTo: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "ingest.fields.backfillTo.label",
+        description: "ingest.fields.backfillTo.description",
+        columns: 6,
+        schema: z.string().optional(),
       }),
 
       ranAt: responseField(scopedTranslation, {

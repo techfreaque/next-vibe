@@ -3992,6 +3992,7 @@ export const endpointsMeta: EndpointMeta[] = [
             upstreamCostUsd: 48,
             grossMarginUsd: 72,
             grossMarginPct: 60,
+            costComplete: true,
           },
           days: [],
           alerts: [],

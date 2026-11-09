@@ -63,6 +63,11 @@ export const translations = {
       balances: "Provider balances only",
       revenue: "Revenue only",
     },
+    costCoverage: {
+      complete: "Complete",
+      partial: "Cost partial",
+      none: "Cost unknown",
+    },
     metric: {
       stripeRevenue: "Stripe revenue (gross, $)",
       nowpaymentsRevenue: "NOWPayments revenue (gross, $)",
@@ -101,6 +106,15 @@ export const translations = {
         label: "Revenue window (days)",
         description: "How far back to re-pull revenue. Default 3.",
       },
+      backfillFrom: {
+        label: "Backfill from (YYYY-MM-DD)",
+        description:
+          "Recompute daily rollups from this UTC day through backfill-to (default today). Rebuilds revenue from our full payment history; always writes (ignores dry-run). Leave empty for a normal ingest.",
+      },
+      backfillTo: {
+        label: "Backfill to (YYYY-MM-DD)",
+        description: "Last UTC day to recompute. Default: today.",
+      },
     },
     response: {
       dryRun: "Dry run",
@@ -119,6 +133,7 @@ export const translations = {
       resultDry: "Dry run (nothing stored, nothing sent)",
       events: "{{count}} rows",
       margin: "Margin: net revenue - upstream cost",
+      costUnknown: "cost unknown",
       alerts: "Alerts: {{raised}} raised, {{suppressed}} suppressed",
     },
   },
@@ -150,6 +165,9 @@ export const translations = {
         margin: "Gross margin",
         pct: "Margin %",
         empty: "No rollups yet. Run an ingest.",
+        costUnknown: "cost unknown",
+        costIncomplete:
+          "Upstream cost is incomplete for some days in this window — margin excludes untracked cost and is a partial figure.",
       },
       providers: {
         title: "Provider balances",
@@ -256,6 +274,11 @@ export const translations = {
     },
     invalidThreshold: "A threshold needs a non-negative number",
     ingestFailed: "Finance ingest failed: {{error}}",
+    backfill: {
+      invalidRange:
+        "Backfill needs a valid from date on or before the to date (YYYY-MM-DD)",
+      tooWide: "Backfill range is too wide: at most {{max}} days per run",
+    },
   },
   success: {
     title: "Done",

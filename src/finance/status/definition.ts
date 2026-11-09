@@ -15,6 +15,7 @@ import { z } from "zod";
 import { FINANCE_STATUS_ALIAS } from "../constants";
 import {
   AlertSeverityDB,
+  CostCoverageDB,
   FinanceAlertTypeDB,
   FinanceSourceDB,
   SourceRunStatusDB,
@@ -42,10 +43,11 @@ const sourceSchema = z.object({
 const daySchema = z.object({
   day: z.string(),
   netRevenueUsd: z.number(),
-  upstreamCostUsd: z.number(),
-  grossMarginUsd: z.number(),
+  upstreamCostUsd: z.number().nullable(),
+  grossMarginUsd: z.number().nullable(),
   grossMarginPct: z.number().nullable(),
   billingGapPct: z.number().nullable(),
+  costCoverage: z.enum(CostCoverageDB),
 });
 
 const alertSchema = z.object({
@@ -102,6 +104,7 @@ const { GET } = createEndpoint({
           upstreamCostUsd: z.number(),
           grossMarginUsd: z.number(),
           grossMarginPct: z.number().nullable(),
+          costComplete: z.boolean(),
         }),
       }),
       days: responseField(scopedTranslation, {
@@ -137,6 +140,7 @@ const { GET } = createEndpoint({
           upstreamCostUsd: 48,
           grossMarginUsd: 72,
           grossMarginPct: 60,
+          costComplete: true,
         },
         days: [],
         alerts: [],

@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, gte, like } from "drizzle-orm";
+import { and, eq, gte, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
@@ -37,6 +37,7 @@ import {
   financeThresholds,
 } from "./db";
 import {
+  CostCoverage,
   FinanceAlertType,
   FinanceSource,
   IngestScope,
@@ -47,6 +48,7 @@ import {
 import { scopedTranslation } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import {
+  classifyCostCoverage,
   computeMargin,
   DEFAULT_THRESHOLDS,
   detectDayAnomalies,
@@ -91,6 +93,83 @@ describe("computeMargin", () => {
     expect(m.grossMarginUsd).toBe(-5);
     expect(m.grossMarginPct).toBeNull();
     expect(m.billingGapPct).toBeNull();
+  });
+});
+
+describe("classifyCostCoverage", () => {
+  // Prod shape: cost tracking began 2026-11-08 21:00 UTC.
+  const firstHour = new Date(Date.UTC(2026, 10, 8, 21));
+  const now = new Date(Date.UTC(2026, 10, 9, 13));
+  const day = (y: number, m: number, d: number): { start: Date; end: Date } => ({
+    start: new Date(Date.UTC(y, m, d)),
+    end: new Date(Date.UTC(y, m, d + 1)),
+  });
+
+  it("is NONE before tracking began or when no snapshots exist", () => {
+    const d = day(2026, 10, 7);
+    expect(
+      classifyCostCoverage({
+        snapshotHours: 0,
+        dayStart: d.start,
+        dayEnd: d.end,
+        firstSnapshotHour: firstHour,
+        now,
+        gapToleranceHours: 2,
+      }),
+    ).toBe(CostCoverage.NONE);
+    // No snapshots anywhere yet.
+    expect(
+      classifyCostCoverage({
+        snapshotHours: 5,
+        dayStart: d.start,
+        dayEnd: d.end,
+        firstSnapshotHour: null,
+        now,
+        gapToleranceHours: 2,
+      }),
+    ).toBe(CostCoverage.NONE);
+  });
+
+  it("is PARTIAL on the day tracking began (straddles the start)", () => {
+    const d = day(2026, 10, 8); // starts 00:00, before firstHour 21:00
+    expect(
+      classifyCostCoverage({
+        snapshotHours: 2,
+        dayStart: d.start,
+        dayEnd: d.end,
+        firstSnapshotHour: firstHour,
+        now,
+        gapToleranceHours: 2,
+      }),
+    ).toBe(CostCoverage.PARTIAL);
+  });
+
+  it("is COMPLETE on a fully-tracked day whose elapsed hours are covered", () => {
+    const d = day(2026, 10, 9); // starts after firstHour; 13 elapsed hours by now
+    expect(
+      classifyCostCoverage({
+        snapshotHours: 13,
+        dayStart: d.start,
+        dayEnd: d.end,
+        firstSnapshotHour: firstHour,
+        now,
+        gapToleranceHours: 2,
+      }),
+    ).toBe(CostCoverage.COMPLETE);
+  });
+
+  it("is PARTIAL on a fully-tracked day with a wide gap in readings", () => {
+    const d = day(2026, 10, 9);
+    expect(
+      classifyCostCoverage({
+        snapshotHours: 5, // 13 expected, far below tolerance
+        dayStart: d.start,
+        dayEnd: d.end,
+        firstSnapshotHour: firstHour,
+        now,
+        gapToleranceHours: 2,
+      }),
+    ).toBe(CostCoverage.PARTIAL);
   });
 });
 
@@ -650,6 +729,64 @@ describe("finance ingest (mocked externals)", () => {
       await db
         .delete(paymentRefunds)
         .where(gte(paymentRefunds.createdAt, FUTURE));
+      await db
+        .delete(paymentTransactions)
+        .where(gte(paymentTransactions.createdAt, FUTURE));
+    }
+  });
+
+  it("backfills a past day from the payment ledger and marks missing cost incomplete", async () => {
+    // A real sale on a historical day that has NO provider cost snapshots.
+    const [anyUser] = await db.select({ id: users.id }).from(users).limit(1);
+    if (!anyUser) {
+      throw new Error("test requires at least one user");
+    }
+    const sale = new Date(Date.UTC(2031, 2, 2, 15)); // 2031-03-02
+    await insertPayment(
+      anyUser.id,
+      "30.00",
+      "USD",
+      PaymentStatus.SUCCEEDED,
+      sale,
+    );
+    try {
+      const result = await FinanceRepository.ingest(
+        {
+          scope: IngestScope.ALL,
+          dryRun: false,
+          backfillFrom: "2031-03-01",
+          backfillTo: "2031-03-03",
+        },
+        undefined,
+        logger,
+        t,
+        defaultLocale,
+      );
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      // Three days recomputed; revenue reconstructed from the ledger.
+      expect(result.data.days).toHaveLength(3);
+      const day = result.data.days.find((d) => d.day === "2031-03-02");
+      expect(day?.netRevenueUsd).toBe(30);
+      // No cost snapshots that day: cost and margin are UNKNOWN, never a faked 0
+      // or a false negative margin.
+      expect(day?.costCoverage).toBe(CostCoverage.NONE);
+      expect(day?.upstreamCostUsd).toBeNull();
+      expect(day?.grossMarginUsd).toBeNull();
+
+      // Persisted the same way.
+      const [rollup] = await db
+        .select()
+        .from(financeDailyRollups)
+        .where(eq(financeDailyRollups.day, new Date(Date.UTC(2031, 2, 2))));
+      expect(rollup?.netRevenueUsd).toBe(30);
+      expect(rollup?.upstreamCostUsd).toBeNull();
+      expect(rollup?.grossMarginUsd).toBeNull();
+      expect(rollup?.costCoverage).toBe(CostCoverage.NONE);
+      // Backfill raises no alerts.
+      expect(result.data.alertsRaised).toBe(0);
+    } finally {
       await db
         .delete(paymentTransactions)
         .where(gte(paymentTransactions.createdAt, FUTURE));

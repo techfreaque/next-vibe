@@ -44,6 +44,8 @@ import {
   financeThresholds,
 } from "./db";
 import {
+  CostCoverage,
+  type CostCoverageValue,
   FinanceAlertType,
   FinanceSource,
   type FinanceSourceValue,
@@ -59,6 +61,7 @@ import type { FinanceT } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import {
   type AlertCandidate,
+  classifyCostCoverage,
   computeMargin,
   dayKey,
   DEFAULT_THRESHOLDS,
@@ -170,6 +173,15 @@ export const defaultFinanceDeps: FinanceDeps = {
 type SourceReport = FinanceIngestResponseOutput["sources"][number];
 type DayReport = FinanceIngestResponseOutput["days"][number];
 type AlertReport = FinanceIngestResponseOutput["alerts"][number];
+
+/** One recomputed day plus the pieces anomaly detection and the report need. */
+interface DayComputation {
+  report: DayReport;
+  revenue: DayRevenue;
+  upstreamCostUsd: number | null;
+  internalBilledUsd: number;
+  coverage: typeof CostCoverageValue;
+}
 
 interface DayRevenue {
   grossUsd: number;
@@ -290,6 +302,8 @@ export class FinanceRepository {
       scope: typeof IngestScopeValue;
       dryRun: boolean;
       windowDays?: number;
+      backfillFrom?: string;
+      backfillTo?: string;
     },
     userId: string | undefined,
     logger: EndpointLogger,
@@ -299,6 +313,15 @@ export class FinanceRepository {
     const deps = FinanceRepository.deps;
     try {
       const now = deps.now();
+
+      // Backfill mode: recompute the daily rollups over a historical range from
+      // the complete source ledgers (payments + credits + whatever cost
+      // snapshots exist). Reuses the same rollup logic as the live path; raises
+      // no alerts (historical) and always writes (dry-run does not apply).
+      if (data.backfillFrom !== undefined && data.backfillFrom.trim() !== "") {
+        return FinanceRepository.runBackfill(data, now, t, logger);
+      }
+
       const thresholds = await FinanceRepository.loadThresholds();
       const candidates: AlertCandidate[] = [];
       const sources: SourceReport[] = [];
@@ -721,140 +744,397 @@ export class FinanceRepository {
   ): Promise<DayReport[]> {
     const today = startOfUtcDay(now);
     const yesterday = new Date(today.getTime() - DAY_MS);
+    const firstSnapshotHour =
+      await FinanceRepository.firstProviderSnapshotHour();
     const out: DayReport[] = [];
     for (const dayStart of [yesterday, today]) {
       const key = dayKey(dayStart);
-      const next = new Date(dayStart.getTime() + DAY_MS);
-
-      // Revenue: stored snapshots; a dry run overlays what it just pulled.
-      const revenue = emptyDay();
-      if (data.dryRun) {
-        for (const days of aggregateEvents(pulled).values()) {
-          addDay(revenue, days.get(key));
-        }
-      } else {
-        const snaps = await db
-          .select()
-          .from(financeRevenueSnapshots)
-          .where(eq(financeRevenueSnapshots.day, dayStart));
-        for (const s of snaps) {
-          addDay(revenue, {
-            grossUsd: s.grossUsd,
-            refundsUsd: s.refundsUsd,
-            disputesUsd: s.disputesUsd,
-            refundCount: s.refundCount,
-            disputeCount: s.disputeCount,
-            paymentCount: s.paymentCount,
-            cancellationCount: s.cancellationCount,
-            payoutsUsd: s.payoutsUsd,
+      const isToday = key === dayKey(today);
+      const comp = data.dryRun
+        ? await FinanceRepository.computeDayDryRun(
+            dayStart,
+            now,
+            firstSnapshotHour,
+            pulled,
+            runSpend,
+            isToday,
+          )
+        : await FinanceRepository.rollupDay(dayStart, now, firstSnapshotHour, {
+            persist: true,
           });
-        }
-      }
-
-      // Upstream cost: sum of measured provider spend in the day.
-      const spendRows = await db
-        .select({
-          provider: financeProviderSnapshots.provider,
-          spend: sql<number>`coalesce(sum(${financeProviderSnapshots.spendUsd}), 0)`,
-        })
-        .from(financeProviderSnapshots)
-        .where(
-          and(
-            gte(financeProviderSnapshots.bucketAt, dayStart),
-            lt(financeProviderSnapshots.bucketAt, next),
-          ),
-        )
-        .groupBy(financeProviderSnapshots.provider);
-      const perProvider: Record<string, number> = {};
-      for (const row of spendRows) {
-        perProvider[row.provider] = round2(Number(row.spend));
-      }
-      if (data.dryRun && key === dayKey(today)) {
-        for (const [provider, spend] of runSpend) {
-          perProvider[provider] = round2((perProvider[provider] ?? 0) + spend);
-        }
-      }
-      const upstreamCostUsd = round2(
-        Object.values(perProvider).reduce((a, b) => a + b, 0),
-      );
-
-      const internalBilledUsd = await FinanceRepository.internalBilled(
-        dayStart,
-        next,
-      );
-      const margin = computeMargin({
-        grossRevenueUsd: revenue.grossUsd,
-        refundsUsd: revenue.refundsUsd,
-        disputesUsd: revenue.disputesUsd,
-        upstreamCostUsd,
-        internalBilledUsd,
-      });
-
-      if (!data.dryRun) {
-        const values = {
-          day: dayStart,
-          grossRevenueUsd: round2(revenue.grossUsd),
-          refundsUsd: round2(revenue.refundsUsd),
-          disputesUsd: round2(revenue.disputesUsd),
-          netRevenueUsd: margin.netRevenueUsd,
-          upstreamCostUsd,
-          grossMarginUsd: margin.grossMarginUsd,
-          grossMarginPct: margin.grossMarginPct,
-          internalBilledUsd: round2(internalBilledUsd),
-          billingGapPct: margin.billingGapPct,
-          cancellationCount: revenue.cancellationCount,
-          perProviderSpend: perProvider,
-          computedAt: new Date(),
-        };
-        await db.insert(financeDailyRollups).values(values).onConflictDoUpdate({
-          target: financeDailyRollups.day,
-          set: values,
-        });
-      }
+      out.push(comp.report);
 
       const trailingCancel =
         await FinanceRepository.trailingCancellations(dayStart);
-      const isToday = key === dayKey(today);
       const anomalies = detectDayAnomalies(
         {
           day: key,
-          grossRevenueUsd: revenue.grossUsd,
-          refundsUsd: revenue.refundsUsd,
-          disputesUsd: revenue.disputesUsd,
-          refundCount: revenue.refundCount,
-          disputeCount: revenue.disputeCount,
-          cancellationCount: revenue.cancellationCount,
+          grossRevenueUsd: comp.revenue.grossUsd,
+          refundsUsd: comp.revenue.refundsUsd,
+          disputesUsd: comp.revenue.disputesUsd,
+          refundCount: comp.revenue.refundCount,
+          disputeCount: comp.revenue.disputeCount,
+          cancellationCount: comp.revenue.cancellationCount,
           trailingAvgCancellations: trailingCancel,
-          upstreamCostUsd,
-          internalBilledUsd,
+          upstreamCostUsd: comp.upstreamCostUsd ?? 0,
+          internalBilledUsd: comp.internalBilledUsd,
         },
         thresholds,
       );
-      // Today is partial: margin and billing-gap are only judged on complete days.
+      // Margin / billing-gap are only judged on a complete, fully-tracked past
+      // day: never on a partial "today", and never when cost coverage is not
+      // COMPLETE (an incomplete cost would cry wolf with a false negative margin).
+      const costTrusted = !isToday && comp.coverage === CostCoverage.COMPLETE;
       candidates.push(
         ...anomalies.filter(
           (a) =>
-            !isToday ||
+            costTrusted ||
             (a.type !== FinanceAlertType.NEGATIVE_MARGIN &&
               a.type !== FinanceAlertType.THIN_MARGIN &&
               a.type !== FinanceAlertType.BILLING_GAP),
         ),
       );
-
-      out.push({
-        day: key,
-        grossRevenueUsd: round2(revenue.grossUsd),
-        refundsUsd: round2(revenue.refundsUsd),
-        disputesUsd: round2(revenue.disputesUsd),
-        netRevenueUsd: margin.netRevenueUsd,
-        upstreamCostUsd,
-        grossMarginUsd: margin.grossMarginUsd,
-        grossMarginPct: margin.grossMarginPct,
-        internalBilledUsd: round2(internalBilledUsd),
-      });
     }
     logger.debug("[Finance] Rollup computed", { days: out.length });
     return out;
+  }
+
+  /** Hour-floored earliest provider snapshot ever, or null when none exist. */
+  private static async firstProviderSnapshotHour(): Promise<Date | null> {
+    const [row] = await db
+      .select({ bucketAt: financeProviderSnapshots.bucketAt })
+      .from(financeProviderSnapshots)
+      .orderBy(asc(financeProviderSnapshots.bucketAt))
+      .limit(1);
+    return row ? startOfUtcHour(row.bucketAt) : null;
+  }
+
+  /** Measured per-provider spend and distinct snapshot-hour count for a UTC day. */
+  private static async readDayCost(
+    dayStart: Date,
+    next: Date,
+  ): Promise<{ perProvider: Record<string, number>; snapshotHours: number }> {
+    const spendRows = await db
+      .select({
+        provider: financeProviderSnapshots.provider,
+        spend: sql<number>`coalesce(sum(${financeProviderSnapshots.spendUsd}), 0)`,
+      })
+      .from(financeProviderSnapshots)
+      .where(
+        and(
+          gte(financeProviderSnapshots.bucketAt, dayStart),
+          lt(financeProviderSnapshots.bucketAt, next),
+        ),
+      )
+      .groupBy(financeProviderSnapshots.provider);
+    const perProvider: Record<string, number> = {};
+    for (const row of spendRows) {
+      perProvider[row.provider] = round2(Number(row.spend));
+    }
+    const [hours] = await db
+      .select({
+        hours: sql<number>`count(distinct date_trunc('hour', ${financeProviderSnapshots.bucketAt}))`,
+      })
+      .from(financeProviderSnapshots)
+      .where(
+        and(
+          gte(financeProviderSnapshots.bucketAt, dayStart),
+          lt(financeProviderSnapshots.bucketAt, next),
+        ),
+      );
+    return { perProvider, snapshotHours: Number(hours?.hours ?? 0) };
+  }
+
+  /** Read stored revenue snapshots for one UTC day into a DayRevenue total. */
+  private static async readDayRevenue(dayStart: Date): Promise<DayRevenue> {
+    const revenue = emptyDay();
+    const snaps = await db
+      .select()
+      .from(financeRevenueSnapshots)
+      .where(eq(financeRevenueSnapshots.day, dayStart));
+    for (const s of snaps) {
+      addDay(revenue, {
+        grossUsd: s.grossUsd,
+        refundsUsd: s.refundsUsd,
+        disputesUsd: s.disputesUsd,
+        refundCount: s.refundCount,
+        disputeCount: s.disputeCount,
+        paymentCount: s.paymentCount,
+        cancellationCount: s.cancellationCount,
+        payoutsUsd: s.payoutsUsd,
+      });
+    }
+    return revenue;
+  }
+
+  /**
+   * Finalize one day: classify cost coverage, compute margin ONLY when coverage
+   * is COMPLETE (otherwise cost / margin are left unknown rather than faked),
+   * optionally persist, and return the report plus the pieces anomaly detection
+   * needs. The single place both the live rollup and the backfill agree on.
+   */
+  private static async finalizeDay(input: {
+    dayStart: Date;
+    now: Date;
+    revenue: DayRevenue;
+    perProvider: Record<string, number>;
+    snapshotHours: number;
+    firstSnapshotHour: Date | null;
+    persist: boolean;
+  }): Promise<DayComputation> {
+    const { dayStart, revenue } = input;
+    const next = new Date(dayStart.getTime() + DAY_MS);
+    const internalBilledUsd = await FinanceRepository.internalBilled(
+      dayStart,
+      next,
+    );
+    const coverage = classifyCostCoverage({
+      snapshotHours: input.snapshotHours,
+      dayStart,
+      dayEnd: next,
+      firstSnapshotHour: input.firstSnapshotHour,
+      now: input.now,
+      gapToleranceHours: FINANCE_CONFIG.costGapToleranceHours,
+    });
+    const measuredCost = round2(
+      Object.values(input.perProvider).reduce((a, b) => a + b, 0),
+    );
+    // NONE: cost unknown, store NULL (never 0). PARTIAL/COMPLETE: store what we measured.
+    const upstreamCostUsd =
+      coverage === CostCoverage.NONE ? null : measuredCost;
+    const netRevenueUsd = round2(
+      revenue.grossUsd - revenue.refundsUsd - revenue.disputesUsd,
+    );
+    // Margin only when the whole day's cost is trustworthy.
+    const margin =
+      coverage === CostCoverage.COMPLETE
+        ? computeMargin({
+            grossRevenueUsd: revenue.grossUsd,
+            refundsUsd: revenue.refundsUsd,
+            disputesUsd: revenue.disputesUsd,
+            upstreamCostUsd: measuredCost,
+            internalBilledUsd,
+          })
+        : null;
+    const grossMarginUsd = margin ? margin.grossMarginUsd : null;
+    const grossMarginPct = margin ? margin.grossMarginPct : null;
+    const billingGapPct = margin ? margin.billingGapPct : null;
+
+    if (input.persist) {
+      const values = {
+        day: dayStart,
+        grossRevenueUsd: round2(revenue.grossUsd),
+        refundsUsd: round2(revenue.refundsUsd),
+        disputesUsd: round2(revenue.disputesUsd),
+        netRevenueUsd,
+        upstreamCostUsd,
+        grossMarginUsd,
+        grossMarginPct,
+        internalBilledUsd: round2(internalBilledUsd),
+        billingGapPct,
+        cancellationCount: revenue.cancellationCount,
+        perProviderSpend: input.perProvider,
+        costCoverage: coverage,
+        computedAt: new Date(),
+      };
+      await db.insert(financeDailyRollups).values(values).onConflictDoUpdate({
+        target: financeDailyRollups.day,
+        set: values,
+      });
+    }
+
+    return {
+      report: {
+        day: dayKey(dayStart),
+        grossRevenueUsd: round2(revenue.grossUsd),
+        refundsUsd: round2(revenue.refundsUsd),
+        disputesUsd: round2(revenue.disputesUsd),
+        netRevenueUsd,
+        upstreamCostUsd,
+        grossMarginUsd,
+        grossMarginPct,
+        internalBilledUsd: round2(internalBilledUsd),
+        costCoverage: coverage,
+      },
+      revenue,
+      upstreamCostUsd,
+      internalBilledUsd,
+      coverage,
+    };
+  }
+
+  /** Recompute one day from stored source ledgers (revenue snapshots + cost + credits). */
+  private static async rollupDay(
+    dayStart: Date,
+    now: Date,
+    firstSnapshotHour: Date | null,
+    opts: { persist: boolean },
+  ): Promise<DayComputation> {
+    const next = new Date(dayStart.getTime() + DAY_MS);
+    const revenue = await FinanceRepository.readDayRevenue(dayStart);
+    const { perProvider, snapshotHours } = await FinanceRepository.readDayCost(
+      dayStart,
+      next,
+    );
+    return FinanceRepository.finalizeDay({
+      dayStart,
+      now,
+      revenue,
+      perProvider,
+      snapshotHours,
+      firstSnapshotHour,
+      persist: opts.persist,
+    });
+  }
+
+  /** Dry-run day: revenue from what this run pulled, cost overlaid with runSpend; nothing persisted. */
+  private static async computeDayDryRun(
+    dayStart: Date,
+    now: Date,
+    firstSnapshotHour: Date | null,
+    pulled: RevenueEventInput[],
+    runSpend: Map<string, number>,
+    isToday: boolean,
+  ): Promise<DayComputation> {
+    const next = new Date(dayStart.getTime() + DAY_MS);
+    const key = dayKey(dayStart);
+    const revenue = emptyDay();
+    for (const days of aggregateEvents(pulled).values()) {
+      addDay(revenue, days.get(key));
+    }
+    const { perProvider, snapshotHours } = await FinanceRepository.readDayCost(
+      dayStart,
+      next,
+    );
+    if (isToday) {
+      for (const [provider, spend] of runSpend) {
+        perProvider[provider] = round2((perProvider[provider] ?? 0) + spend);
+      }
+    }
+    return FinanceRepository.finalizeDay({
+      dayStart,
+      now,
+      revenue,
+      perProvider,
+      snapshotHours,
+      firstSnapshotHour,
+      persist: false,
+    });
+  }
+
+  // ─── Backfill ──────────────────────────────────────────────────────────────
+
+  /**
+   * Validate the range, then recompute the daily rollups across it. Reuses the
+   * same per-day rollup as the live path and raises no alerts. Revenue + billed
+   * come from complete source history, so every day is accurate; upstream cost
+   * is only trustworthy where snapshots exist and is flagged per day otherwise.
+   */
+  private static async runBackfill(
+    data: { backfillFrom?: string; backfillTo?: string; dryRun: boolean },
+    now: Date,
+    t: FinanceT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<FinanceIngestResponseOutput>> {
+    const from = new Date(data.backfillFrom ?? "");
+    const to =
+      data.backfillTo !== undefined && data.backfillTo.trim() !== ""
+        ? new Date(data.backfillTo)
+        : now;
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      return fail({
+        message: t("errors.backfill.invalidRange"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+    const fromDay = startOfUtcDay(from);
+    const toDay = startOfUtcDay(to);
+    if (fromDay.getTime() > toDay.getTime()) {
+      return fail({
+        message: t("errors.backfill.invalidRange"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+    const spanDays =
+      Math.round((toDay.getTime() - fromDay.getTime()) / DAY_MS) + 1;
+    if (spanDays > FINANCE_CONFIG.backfillMaxDays) {
+      return fail({
+        message: t("errors.backfill.tooWide", {
+          max: FINANCE_CONFIG.backfillMaxDays,
+        }),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    // 1. Rebuild revenue snapshots across the range from the complete local
+    //    payment ledger (uncapped, idempotent). The source of historical truth.
+    const sources: SourceReport[] = [];
+    for (const source of RevenueSources) {
+      sources.push(await FinanceRepository.backfillRevenue(source, fromDay));
+    }
+    if (!data.dryRun) {
+      for (const report of sources) {
+        await FinanceRepository.recordSourceStatus(report, now);
+      }
+    }
+
+    // 2. Recompute every day in the range from the now-rebuilt ledgers.
+    const firstSnapshotHour =
+      await FinanceRepository.firstProviderSnapshotHour();
+    const days: DayReport[] = [];
+    for (let ms = fromDay.getTime(); ms <= toDay.getTime(); ms += DAY_MS) {
+      const comp = await FinanceRepository.rollupDay(
+        new Date(ms),
+        now,
+        firstSnapshotHour,
+        { persist: !data.dryRun },
+      );
+      days.push(comp.report);
+    }
+    logger.info("[Finance] Backfill complete", {
+      from: dayKey(fromDay),
+      to: dayKey(toDay),
+      days: days.length,
+      dryRun: data.dryRun,
+    });
+
+    return success({
+      ranAt: now.toISOString(),
+      dryRunResult: data.dryRun,
+      sources,
+      days,
+      alertsRaised: 0,
+      alertsSuppressed: 0,
+      alerts: [],
+    });
+  }
+
+  /** Rebuild one revenue source's events + daily snapshots from our own succeeded payments. */
+  private static async backfillRevenue(
+    source: (typeof RevenueSources)[number],
+    since: Date,
+  ): Promise<SourceReport> {
+    const base: SourceReport = {
+      source,
+      kind: "revenue",
+      status: SourceRunStatus.SKIPPED,
+      reason: null,
+      balanceUsd: null,
+      spendUsd: null,
+      events: 0,
+    };
+    const provider =
+      source === FinanceSource.STRIPE
+        ? PaymentProvider.STRIPE
+        : PaymentProvider.NOWPAYMENTS;
+    const pull = await pullLocalPaymentLedger(provider, source, since);
+    await FinanceRepository.persistEvents(source, pull.events, since);
+    return {
+      ...base,
+      status: SourceRunStatus.OK,
+      reason: pull.note,
+      events: pull.events.length,
+    };
   }
 
   /** Credits users burned in [from, to) valued at the credit price. */
@@ -1055,9 +1335,17 @@ export class FinanceRepository {
         grossMarginUsd: r.grossMarginUsd,
         grossMarginPct: r.grossMarginPct,
         billingGapPct: r.billingGapPct,
+        costCoverage: r.costCoverage,
       }));
+      // Revenue is always known; cost / margin only over days whose cost we
+      // actually captured (coverage != NONE), so the week total never mixes in a
+      // faked zero for an untracked day. The week is flagged partial when any day
+      // in it lacks complete cost coverage.
       const net = rollups.reduce((a, r) => a + r.netRevenueUsd, 0);
-      const cost = rollups.reduce((a, r) => a + r.upstreamCostUsd, 0);
+      const cost = rollups.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
+      const costComplete = rollups.every(
+        (r) => r.costCoverage === CostCoverage.COMPLETE,
+      );
       const weekMargin = computeMargin({
         grossRevenueUsd: net,
         refundsUsd: 0,
@@ -1086,6 +1374,7 @@ export class FinanceRepository {
           upstreamCostUsd: round2(cost),
           grossMarginUsd: weekMargin.grossMarginUsd,
           grossMarginPct: weekMargin.grossMarginPct,
+          costComplete,
         },
         days,
         alerts: alertRows.map((a) => ({

@@ -145,60 +145,72 @@ export function FinanceStatusWidget(): JSX.Element {
         </P>
 
         <Section title={t("status.widget.margin.title")}>
-          <Div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
-            <Stat
-              label={t("status.widget.margin.revenue")}
-              value={money.format(data.week.netRevenueUsd)}
-            />
-            <Stat
-              label={t("status.widget.margin.cost")}
-              value={money.format(data.week.upstreamCostUsd)}
-            />
-            <Stat
-              label={t("status.widget.margin.margin")}
-              value={money.format(data.week.grossMarginUsd)}
-              negative={data.week.grossMarginUsd < 0}
-            />
-            <Stat
-              label={t("status.widget.margin.pct")}
-              value={
-                data.week.grossMarginPct === null
-                  ? "-"
-                  : `${pct.format(data.week.grossMarginPct)}%`
-              }
-              negative={(data.week.grossMarginPct ?? 0) < 0}
-            />
-          </Div>
-          {data.days.length === 0 ? (
-            <Empty text={t("status.widget.margin.empty")} />
-          ) : (
-            <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
-              {data.days.map((d) => (
-                <Div
-                  key={d.day}
-                  className="flex items-center justify-between gap-3 px-4 py-2 text-sm tabular-nums"
-                >
-                  <Span className="font-medium">{d.day}</Span>
-                  <Span className="text-muted-foreground">
-                    {money.format(d.netRevenueUsd)} -{" "}
-                    {money.format(d.upstreamCostUsd)}
-                  </Span>
-                  <Span
-                    className={
-                      d.grossMarginUsd < 0
-                        ? "text-destructive font-semibold"
-                        : "font-semibold"
-                    }
-                  >
-                    {money.format(d.grossMarginUsd)}
-                    {d.grossMarginPct === null
-                      ? ""
-                      : ` (${pct.format(d.grossMarginPct)}%)`}
-                  </Span>
-                </Div>
-              ))}
+          <>
+            <Div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
+              <Stat
+                label={t("status.widget.margin.revenue")}
+                value={money.format(data.week.netRevenueUsd)}
+              />
+              <Stat
+                label={t("status.widget.margin.cost")}
+                value={money.format(data.week.upstreamCostUsd)}
+              />
+              <Stat
+                label={t("status.widget.margin.margin")}
+                value={money.format(data.week.grossMarginUsd)}
+                negative={data.week.grossMarginUsd < 0}
+              />
+              <Stat
+                label={t("status.widget.margin.pct")}
+                value={
+                  data.week.grossMarginPct === null
+                    ? "-"
+                    : `${pct.format(data.week.grossMarginPct)}%`
+                }
+                negative={(data.week.grossMarginPct ?? 0) < 0}
+              />
             </Div>
-          )}
+            {!data.week.costComplete && (
+              <P className="text-xs text-muted-foreground">
+                {t("status.widget.margin.costIncomplete")}
+              </P>
+            )}
+            {data.days.length === 0 ? (
+              <Empty text={t("status.widget.margin.empty")} />
+            ) : (
+              <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
+                {data.days.map((d) => (
+                  <Div
+                    key={d.day}
+                    className="flex items-center justify-between gap-3 px-4 py-2 text-sm tabular-nums"
+                  >
+                    <Span className="font-medium">{d.day}</Span>
+                    <Span className="text-muted-foreground">
+                      {money.format(d.netRevenueUsd)} -{" "}
+                      {d.upstreamCostUsd === null
+                        ? t("status.widget.margin.costUnknown")
+                        : money.format(d.upstreamCostUsd)}
+                    </Span>
+                    <Span
+                      className={
+                        (d.grossMarginUsd ?? 0) < 0
+                          ? "text-destructive font-semibold"
+                          : "font-semibold"
+                      }
+                    >
+                      {d.grossMarginUsd === null
+                        ? t(d.costCoverage)
+                        : `${money.format(d.grossMarginUsd)}${
+                            d.grossMarginPct === null
+                              ? ""
+                              : ` (${pct.format(d.grossMarginPct)}%)`
+                          }`}
+                    </Span>
+                  </Div>
+                ))}
+              </Div>
+            )}
+          </>
         </Section>
 
         <Section

@@ -21,6 +21,7 @@ import {
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
@@ -55,6 +56,13 @@ export function FinanceIngestContainer({
         <SelectFieldWidget fieldName="scope" field={children.scope} />
         <NumberFieldWidget fieldName="windowDays" field={children.windowDays} />
         <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
+      </Div>
+      <Div className="grid grid-cols-2 items-end gap-3">
+        <TextFieldWidget
+          fieldName="backfillFrom"
+          field={children.backfillFrom}
+        />
+        <TextFieldWidget fieldName="backfillTo" field={children.backfillTo} />
       </Div>
       <FormAlertWidget field={{}} />
       <Div className="flex justify-end">
@@ -129,13 +137,18 @@ export function FinanceIngestContainer({
                   <Span className="font-medium">{d.day}</Span>
                   <Span className="text-muted-foreground">
                     {money.format(d.netRevenueUsd)} -{" "}
-                    {money.format(d.upstreamCostUsd)}
+                    {d.upstreamCostUsd === null
+                      ? t("ingest.widget.costUnknown")
+                      : money.format(d.upstreamCostUsd)}
                   </Span>
                   <Span className="font-semibold">
-                    {money.format(d.grossMarginUsd)}
-                    {d.grossMarginPct === null
-                      ? ""
-                      : ` (${d.grossMarginPct.toFixed(1)}%)`}
+                    {d.grossMarginUsd === null
+                      ? t(d.costCoverage)
+                      : `${money.format(d.grossMarginUsd)}${
+                          d.grossMarginPct === null
+                            ? ""
+                            : ` (${d.grossMarginPct.toFixed(1)}%)`
+                        }`}
                   </Span>
                 </Div>
               ))}

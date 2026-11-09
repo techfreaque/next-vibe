@@ -187,6 +187,29 @@ export const {
   REVENUE: "enums.scope.revenue",
 });
 
+/**
+ * How trustworthy a day's upstream-cost figure is. Cost comes from the hourly
+ * provider-balance snapshots, which only started on 2026-11-08: any earlier day
+ * has no cost data at all (NONE), and the day tracking began on is only
+ * partially covered (PARTIAL). Only a fully-tracked day yields a trustworthy
+ * margin (COMPLETE). Revenue and billed are always complete, independent of this.
+ */
+export const {
+  enum: CostCoverage,
+  options: CostCoverageOptions,
+  Value: CostCoverageValue,
+} = createEnumOptions(scopedTranslation, {
+  COMPLETE: "enums.costCoverage.complete",
+  PARTIAL: "enums.costCoverage.partial",
+  NONE: "enums.costCoverage.none",
+});
+
+export const CostCoverageDB = [
+  CostCoverage.COMPLETE,
+  CostCoverage.PARTIAL,
+  CostCoverage.NONE,
+] as const;
+
 /** Series a Finance data source node can chart. */
 export const {
   enum: FinanceMetric,

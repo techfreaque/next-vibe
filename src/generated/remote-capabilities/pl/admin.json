@@ -84366,6 +84366,52 @@
           },
           "schemaType": "primitive"
         },
+        "backfillFrom": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Uzupełnij od (RRRR-MM-DD)",
+          "description": "Przelicz dzienne podsumowania od tego dnia UTC do dnia uzupełnij-do (domyślnie dziś). Odbudowuje przychód z całej naszej historii płatności; zawsze zapisuje (ignoruje próbę). Zostaw puste dla zwykłego pobrania.",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "backfillTo": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Uzupełnij do (RRRR-MM-DD)",
+          "description": "Ostatni dzień UTC do przeliczenia. Domyślnie: dziś.",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "ranAt": {
           "type": "text",
           "label": "Uruchomiono",
@@ -84714,19 +84760,31 @@
                     },
                     "upstreamCostUsd": {
                       "def": {
-                        "type": "number",
-                        "checks": []
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
                       },
-                      "type": "number",
-                      "isFinite": true
+                      "type": "nullable"
                     },
                     "grossMarginUsd": {
                       "def": {
-                        "type": "number",
-                        "checks": []
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
                       },
-                      "type": "number",
-                      "isFinite": true
+                      "type": "nullable"
                     },
                     "grossMarginPct": {
                       "def": {
@@ -84749,6 +84807,27 @@
                       },
                       "type": "number",
                       "isFinite": true
+                    },
+                    "costCoverage": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.costCoverage.complete": "enums.costCoverage.complete",
+                          "enums.costCoverage.partial": "enums.costCoverage.partial",
+                          "enums.costCoverage.none": "enums.costCoverage.none"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.costCoverage.complete": "enums.costCoverage.complete",
+                        "enums.costCoverage.partial": "enums.costCoverage.partial",
+                        "enums.costCoverage.none": "enums.costCoverage.none"
+                      },
+                      "options": [
+                        "enums.costCoverage.complete",
+                        "enums.costCoverage.partial",
+                        "enums.costCoverage.none"
+                      ]
                     }
                   }
                 },
@@ -84800,19 +84879,31 @@
                   },
                   "upstreamCostUsd": {
                     "def": {
-                      "type": "number",
-                      "checks": []
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
                     },
-                    "type": "number",
-                    "isFinite": true
+                    "type": "nullable"
                   },
                   "grossMarginUsd": {
                     "def": {
-                      "type": "number",
-                      "checks": []
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
                     },
-                    "type": "number",
-                    "isFinite": true
+                    "type": "nullable"
                   },
                   "grossMarginPct": {
                     "def": {
@@ -84835,6 +84926,27 @@
                     },
                     "type": "number",
                     "isFinite": true
+                  },
+                  "costCoverage": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.costCoverage.complete": "enums.costCoverage.complete",
+                        "enums.costCoverage.partial": "enums.costCoverage.partial",
+                        "enums.costCoverage.none": "enums.costCoverage.none"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.costCoverage.complete": "enums.costCoverage.complete",
+                      "enums.costCoverage.partial": "enums.costCoverage.partial",
+                      "enums.costCoverage.none": "enums.costCoverage.none"
+                    },
+                    "options": [
+                      "enums.costCoverage.complete",
+                      "enums.costCoverage.partial",
+                      "enums.costCoverage.none"
+                    ]
                   }
                 }
               },
@@ -85474,6 +85586,12 @@
                     }
                   },
                   "type": "nullable"
+                },
+                "costComplete": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
                 }
               }
             },
@@ -85510,19 +85628,31 @@
                     },
                     "upstreamCostUsd": {
                       "def": {
-                        "type": "number",
-                        "checks": []
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
                       },
-                      "type": "number",
-                      "isFinite": true
+                      "type": "nullable"
                     },
                     "grossMarginUsd": {
                       "def": {
-                        "type": "number",
-                        "checks": []
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
                       },
-                      "type": "number",
-                      "isFinite": true
+                      "type": "nullable"
                     },
                     "grossMarginPct": {
                       "def": {
@@ -85551,6 +85681,27 @@
                         }
                       },
                       "type": "nullable"
+                    },
+                    "costCoverage": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.costCoverage.complete": "enums.costCoverage.complete",
+                          "enums.costCoverage.partial": "enums.costCoverage.partial",
+                          "enums.costCoverage.none": "enums.costCoverage.none"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.costCoverage.complete": "enums.costCoverage.complete",
+                        "enums.costCoverage.partial": "enums.costCoverage.partial",
+                        "enums.costCoverage.none": "enums.costCoverage.none"
+                      },
+                      "options": [
+                        "enums.costCoverage.complete",
+                        "enums.costCoverage.partial",
+                        "enums.costCoverage.none"
+                      ]
                     }
                   }
                 },
@@ -85578,19 +85729,31 @@
                   },
                   "upstreamCostUsd": {
                     "def": {
-                      "type": "number",
-                      "checks": []
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
                     },
-                    "type": "number",
-                    "isFinite": true
+                    "type": "nullable"
                   },
                   "grossMarginUsd": {
                     "def": {
-                      "type": "number",
-                      "checks": []
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
                     },
-                    "type": "number",
-                    "isFinite": true
+                    "type": "nullable"
                   },
                   "grossMarginPct": {
                     "def": {
@@ -85619,6 +85782,27 @@
                       }
                     },
                     "type": "nullable"
+                  },
+                  "costCoverage": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.costCoverage.complete": "enums.costCoverage.complete",
+                        "enums.costCoverage.partial": "enums.costCoverage.partial",
+                        "enums.costCoverage.none": "enums.costCoverage.none"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.costCoverage.complete": "enums.costCoverage.complete",
+                      "enums.costCoverage.partial": "enums.costCoverage.partial",
+                      "enums.costCoverage.none": "enums.costCoverage.none"
+                    },
+                    "options": [
+                      "enums.costCoverage.complete",
+                      "enums.costCoverage.partial",
+                      "enums.costCoverage.none"
+                    ]
                   }
                 }
               },

@@ -12,6 +12,8 @@ import { FINANCE_CONFIG } from "./config";
 import {
   AlertSeverity,
   type AlertSeverityValue,
+  CostCoverage,
+  type CostCoverageValue,
   FinanceAlertType,
   type FinanceAlertTypeValue,
   ThresholdKey,
@@ -111,6 +113,59 @@ export function startOfUtcHour(date: Date): Date {
 
 export function dayKey(date: Date): string {
   return startOfUtcDay(date).toISOString().slice(0, 10);
+}
+
+// ─── Cost coverage ─────────────────────────────────────────────────────────────
+
+const HOUR_MS = FINANCE_CONFIG.hourMs;
+
+/**
+ * How trustworthy a day's upstream-cost figure is, from the provider-snapshot
+ * coverage of that UTC day. Pure so it is unit-testable.
+ *
+ *  - NONE:     no snapshot in the day (every day before cost tracking began, or
+ *              a day the cron never ran) - cost is genuinely unknown.
+ *  - PARTIAL:  the day straddles the start of tracking, or has a wide gap in its
+ *              hourly readings - we have *some* cost but not the whole day.
+ *  - COMPLETE: the day is fully inside the tracked period and its elapsed hours
+ *              are covered (within a small gap tolerance) - cost is trustworthy.
+ *
+ * A not-yet-finished "today" is judged against the hours elapsed so far, so a
+ * fully-tracked today reads COMPLETE for the margin-to-date.
+ */
+export function classifyCostCoverage(input: {
+  /** Distinct hour buckets in [dayStart, dayEnd) that have a provider snapshot. */
+  snapshotHours: number;
+  dayStart: Date;
+  /** Exclusive end of the UTC day (dayStart + 24h). */
+  dayEnd: Date;
+  /** Hour-floored earliest provider snapshot ever, or null when none exist. */
+  firstSnapshotHour: Date | null;
+  now: Date;
+  gapToleranceHours: number;
+}): typeof CostCoverageValue {
+  if (input.firstSnapshotHour === null || input.snapshotHours <= 0) {
+    return CostCoverage.NONE;
+  }
+  // The day must begin at or after tracking started to be fully coverable.
+  if (input.dayStart.getTime() < input.firstSnapshotHour.getTime()) {
+    return CostCoverage.PARTIAL;
+  }
+  // Hours we could expect to see so far: the day up to min(dayEnd, now).
+  const horizon = Math.min(input.dayEnd.getTime(), input.now.getTime());
+  const expectedHours = Math.max(
+    0,
+    Math.floor((horizon - input.dayStart.getTime()) / HOUR_MS),
+  );
+  if (expectedHours <= 1) {
+    // Barely into the day: one reading is all we could have.
+    return input.snapshotHours >= expectedHours
+      ? CostCoverage.COMPLETE
+      : CostCoverage.PARTIAL;
+  }
+  return input.snapshotHours >= expectedHours - input.gapToleranceHours
+    ? CostCoverage.COMPLETE
+    : CostCoverage.PARTIAL;
 }
 
 // ─── Margin ──────────────────────────────────────────────────────────────────

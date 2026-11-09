@@ -19,6 +19,14 @@ export const FINANCE_CONFIG = {
   revenueWindowDays: 3,
   /** Trailing window the drain / cancellation baselines use. */
   baselineDays: 7,
+  /**
+   * Hours of missing provider snapshots a fully-tracked day may still have and
+   * count as COMPLETE cost coverage (one or two missed hourly cron runs is noise,
+   * a wide gap is not). Beyond this a day is PARTIAL.
+   */
+  costGapToleranceHours: 2,
+  /** Hard cap on a single rollup backfill range (days), so one call cannot run away. */
+  backfillMaxDays: 400,
   /** Hard page cap per paginated external list: a runaway account cannot hang a run. */
   maxPages: 50,
   /** Per external request timeout. */
