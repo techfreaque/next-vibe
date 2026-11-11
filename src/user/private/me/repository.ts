@@ -184,9 +184,15 @@ export class UserProfileRepository {
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
       if (!user.id || user.isPublic) {
+        // A logged-out visitor hitting /me. The GET endpoint allows PUBLIC at
+        // the role gate, so this 403 comes from here, not the permission
+        // registry. Expected noise (the client probes /me on page load), so it
+        // logs at debug - a logged-IN user reaching this branch would be a real
+        // auth drop, which still surfaces because `user.isPublic` would be false.
         return fail({
           message: t("get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
+          expected: true,
         });
       }
       const userId: string = user.id;

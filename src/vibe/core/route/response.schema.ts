@@ -22,16 +22,26 @@ export function fail({
   message,
   errorType,
   cause,
+  expected,
 }: {
   message: TranslatedKeyType;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;
+  /**
+   * Marks a client error (4xx) that is a normal, expected outcome rather than a
+   * fault worth a warn-level log line - e.g. a logged-out visitor's `/me` probe
+   * or a public caller hitting a role-gated endpoint. The log site downgrades
+   * these to debug so genuine auth drops (a logged-IN user seen as public) stay
+   * visible. Internal only: stripped at the wire boundary, never sent to clients.
+   */
+  expected?: boolean;
 }): ErrorResponseType {
   return {
     success: false,
     message,
     errorType,
     cause,
+    ...(expected ? { expected: true } : {}),
   };
 }
 
@@ -310,6 +320,12 @@ export type ErrorResponseType<
   message: TKey;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;
+  /**
+   * An expected 4xx (benign auth noise from a public caller). Downgrades the log
+   * line from warn to debug. Internal only - `errorResponseSchema` omits it, so
+   * it never crosses a wire or reaches a client.
+   */
+  expected?: boolean;
 };
 
 export interface SuccessResponseType<TResponseData> {

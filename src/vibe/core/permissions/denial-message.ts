@@ -63,6 +63,8 @@ export function resolveEndpointAccessDenial(
   const userRoles = denial.userRoles.map((role) => tRoles(role)).join(", ");
 
   if (denial.userId === null) {
+    // Public (logged-out) caller hitting a role-gated endpoint. Expected noise -
+    // the frontend probes these on public pages - so it logs at debug, not warn.
     return fail({
       message: userRoles
         ? t("shared.permissions.errors.insufficientRolesPublic", {
@@ -73,6 +75,7 @@ export function resolveEndpointAccessDenial(
             requiredRoles,
           }),
       errorType: ErrorResponseTypes.FORBIDDEN,
+      expected: true,
     });
   }
 

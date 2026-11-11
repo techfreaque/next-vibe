@@ -415,7 +415,12 @@ export function startWebSocketServer(
 
         if (!user) {
           const cookieHeader = req.headers.get("cookie") ?? "";
-          logger.warn("[WS] Rejected upgrade - missing lead_id cookie", {
+          // Auth accepts EITHER httpOnly cookies (browser) OR ?token/?leadId
+          // query params (server-to-server self-connections, e.g.
+          // KeyedRemoteSignal's openHubWs). Log which was even attempted so a
+          // rejection is unambiguous: a self-connection that reaches here lost
+          // its leadId query param, a browser one lost its cookies.
+          logger.warn("[WS] Rejected upgrade - no lead id (cookie or query)", {
             userAgent: req.headers.get("user-agent") ?? undefined,
             origin: req.headers.get("origin") ?? undefined,
             ip:
@@ -429,8 +434,10 @@ export function startWebSocketServer(
                   .map((c) => c.trim().split("=")[0])
                   .filter(Boolean)
               : [],
+            hasQueryToken: url.searchParams.has("token"),
+            hasQueryLeadId: url.searchParams.has("leadId"),
           });
-          return new Response("Missing lead_id cookie", { status: 401 });
+          return new Response("Missing lead id", { status: 401 });
         }
 
         if (channel) {

@@ -88,6 +88,29 @@ export function TableRow({
   tabIndex,
   ...props
 }: TableRowProps): React.JSX.Element {
+  // Only attach interactive handlers when the row is actually interactive.
+  // A static (non-clickable) row must render as plain markup with NO function
+  // props: in the production RSC build, a server component that renders a row
+  // with a function prop (e.g. a blog post using <Table>) throws
+  // "Event handlers cannot be passed to Client Component props" and 500s the
+  // page. Static rows therefore carry no onClick/onKeyDown/role/tabIndex.
+  const isInteractive = Boolean(onClick) || Boolean(onKeyDown);
+  const interactiveProps = isInteractive
+    ? {
+        onClick,
+        onKeyDown: (e: DivKeyboardEvent): void => {
+          if (onKeyDown) {
+            onKeyDown(e);
+          }
+          if (onClick && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            onClick();
+          }
+        },
+        role: role ?? (onClick ? "button" : undefined),
+        tabIndex: tabIndex ?? (onClick ? 0 : undefined),
+      }
+    : {};
   return (
     <tr
       className={cn(
@@ -95,18 +118,7 @@ export function TableRow({
         onClick && "cursor-pointer",
         className,
       )}
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (onKeyDown) {
-          onKeyDown(e);
-        }
-        if (onClick && (e.key === "Enter" || e.key === " ")) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      role={role ?? (onClick ? "button" : undefined)}
-      tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
+      {...interactiveProps}
       {...props}
     />
   );

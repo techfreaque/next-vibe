@@ -86,7 +86,12 @@ export function wrapErrorResponse(
     errorKey: error.errorType.errorKey,
     errorCode,
   };
-  if (
+  if (error.expected) {
+    // A benign, expected 4xx - a logged-out visitor's /me probe, or a public
+    // caller hitting a role-gated endpoint. Not a fault; kept at debug so real
+    // auth drops (a logged-IN user wrongly seen as public) stay visible at warn.
+    logger.debug(`API Error (expected):\n${logChain.join("\n")}`, logMeta);
+  } else if (
     error.errorType.errorKey ===
     ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey
   ) {

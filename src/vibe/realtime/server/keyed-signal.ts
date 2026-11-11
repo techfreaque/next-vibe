@@ -156,6 +156,33 @@ function localBroadcastUrl(): string {
 }
 
 /**
+ * Close a hub socket safely regardless of its handshake state. Calling close()
+ * on a socket still in CONNECTING makes Bun's WS client emit "Connection was
+ * closed before it was established." / "Received network error or non-101 status
+ * code." — pure noise, since nothing was ever subscribed. This is why a FAST
+ * tool call (execute-tool tool-control) logged the error while a long-lived AI
+ * stream (ai-stream stream-control) never did: the fast call's execPromise
+ * settles and tears the subscription down within a few ms — often before the
+ * self-JWT-signed upgrade has even reached 101 — whereas the stream keeps its
+ * socket open for its whole lifetime. So defer the close to the `open` event
+ * when the socket is still connecting.
+ */
+function closeWsWhenReady(socket: WebSocket): void {
+  const safeClose = (): void => {
+    try {
+      socket.close();
+    } catch {
+      /* already closing */
+    }
+  };
+  if (socket.readyState === WebSocket.CONNECTING) {
+    socket.addEventListener("open", safeClose, { once: true });
+    return;
+  }
+  safeClose();
+}
+
+/**
  * A live keyed-signal subscription: `signal` resolves with the FIRST payload the
  * caller's `parse` accepts; `cancel` tears the subscription down if the caller
  * settles another way. No races — exactly one of {parsed result, cancel} wins.
@@ -183,6 +210,11 @@ export const KeyedRemoteSignal = {
     const userId = user.isPublic ? user.leadId : user.id;
     const channel = signalChannel(ref, userId, logger);
     let settled = false;
+    // Set the instant WE decide to tear the socket down. A socket closed by our
+    // own teardown (the signal resolved, or the caller's execution finished
+    // first and called cancel) is the NORMAL end of life — its error/close
+    // events are expected and must not be logged as warnings.
+    let tornDown = false;
     let ws: WebSocket | null = null;
     let unsubAdapter: (() => void) | null = null;
 
@@ -191,14 +223,11 @@ export const KeyedRemoteSignal = {
         return;
       }
       settled = true;
+      tornDown = true;
       unsubAdapter?.();
       unsubAdapter = null;
       if (ws) {
-        try {
-          ws.close();
-        } catch {
-          /* already closing */
-        }
+        closeWsWhenReady(ws);
         ws = null;
       }
     };
@@ -256,11 +285,19 @@ export const KeyedRemoteSignal = {
           return;
         }
         if (settled || !opened) {
-          logger.warn(
+          // Normal for a fast signal: the caller settled (e.g. the raced tool
+          // execution finished) before the upgrade completed. Tear the socket
+          // down via closeSocket so we never call close() mid-handshake (which
+          // would emit the spurious "closed before established" error). debug,
+          // not warn — nothing is wrong.
+          logger.debug(
             "[KeyedRemoteSignal] subscribe: settled before WS opened or openHubWs returned null",
             { channel, settled, hasOpened: !!opened },
           );
-          opened?.close();
+          tornDown = true;
+          if (opened) {
+            closeWsWhenReady(opened);
+          }
           return;
         }
         ws = opened;
@@ -279,11 +316,27 @@ export const KeyedRemoteSignal = {
         ws.addEventListener("error", (event) => {
           // String(ErrorEvent) is just "[object ErrorEvent]" - pull the real fields
           const detail = event as Event & { message?: string; error?: Error };
-          logger.warn("[KeyedRemoteSignal] hub WS error", {
+          // A socket we tore down ourselves (the signal resolved, or the caller
+          // settled first) erroring is expected noise — log it at debug. Only an
+          // error on a socket we still expect to be live is a real problem.
+          const errorInfo = {
             channel,
             settled,
+            tornDown,
+            // readyState tells apart a genuine upgrade failure (still CONNECTING
+            // = never reached 101, e.g. a 401/403/non-101 from the hub) from a
+            // mid-life transport drop (OPEN) — the two need different fixes.
+            readyState: ws?.readyState,
+            // The exact loopback URL this socket targeted, so a port/host
+            // mismatch is visible in the log without re-deriving it by hand.
+            wsBase,
             error: detail.message ?? detail.error?.message ?? event.type,
-          });
+          };
+          if (tornDown) {
+            logger.debug("[KeyedRemoteSignal] hub WS error", errorInfo);
+          } else {
+            logger.warn("[KeyedRemoteSignal] hub WS error", errorInfo);
+          }
         });
         ws.addEventListener("close", (event: CloseEvent) => {
           // Closing after the signal resolved (or was unsubscribed) is the
@@ -293,8 +346,10 @@ export const KeyedRemoteSignal = {
             code: event.code,
             reason: event.reason,
             settled,
+            tornDown,
+            wsBase,
           };
-          if (settled) {
+          if (settled || tornDown) {
             logger.debug("[KeyedRemoteSignal] hub WS closed", closeInfo);
           } else {
             logger.warn("[KeyedRemoteSignal] hub WS closed", closeInfo);

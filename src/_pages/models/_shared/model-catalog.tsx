@@ -121,7 +121,7 @@ function EntryRow({
         <Span className="flex min-w-0 items-center gap-1.5">
           <Span
             className={cn(
-              "truncate font-medium",
+              "min-w-0 break-words font-medium",
               link && "group-hover:text-primary group-hover:underline",
             )}
           >
@@ -134,7 +134,9 @@ function EntryRow({
           )}
         </Span>
         {sub.length > 0 && (
-          <Span className="truncate text-xs text-muted-foreground">{sub}</Span>
+          <Span className="break-words text-xs text-muted-foreground">
+            {sub}
+          </Span>
         )}
       </Span>
       <ModelCreditDisplay
