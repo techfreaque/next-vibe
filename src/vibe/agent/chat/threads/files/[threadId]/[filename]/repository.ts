@@ -22,6 +22,7 @@ import { agentEnv } from "../../../../../env";
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
 import type { FileMetadata } from "../../../../storage/index";
+import { getStorageAdapter } from "../../../../storage/index";
 import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
 import type { ChatFileT } from "./i18n";
@@ -58,20 +59,32 @@ export class ChatFileRepository {
     }
   }
 
+  /**
+   * Resolve a file's metadata regardless of the active storage backend.
+   * Filesystem keeps the fast path-based read; S3/MinIO goes through the
+   * storage adapter (object-store lookup). Keeping this abstraction here is
+   * what lets the serving route work when CHAT_STORAGE_TYPE=s3.
+   */
+  private static async resolveFileMetadata(
+    threadId: string,
+    filename: string,
+  ): Promise<FileMetadata | null> {
+    if (agentEnv.CHAT_STORAGE_TYPE === "filesystem") {
+      return ChatFileRepository.readFileMetadata(threadId, filename);
+    }
+    const fileId = filename.split(".")[0];
+    if (!fileId) {
+      return null;
+    }
+    return getStorageAdapter().getFileMetadata(fileId);
+  }
+
   static async getFile(
     data: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<{ buffer: Buffer; contentType: string }> {
-    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
-      logger.error("File serving only available for filesystem storage");
-      return {
-        buffer: Buffer.from(""),
-        contentType: "text/plain",
-      };
-    }
-
     // Check thread access permissions
     try {
       // Get thread
@@ -95,7 +108,7 @@ export class ChatFileRepository {
         // Incognito threads have no server-side thread row — their files carry
         // the owning leadId. Access is granted purely on leadId match (never
         // userId), so the same browser keeps access whether logged in or not.
-        const fileMetadata = await ChatFileRepository.readFileMetadata(
+        const fileMetadata = await ChatFileRepository.resolveFileMetadata(
           data.threadId,
           data.filename,
         );
@@ -160,6 +173,29 @@ export class ChatFileRepository {
       return {
         buffer: Buffer.from(""),
         contentType: "text/plain",
+      };
+    }
+
+    // S3/MinIO: read bytes through the storage adapter (object store). The app
+    // proxies the file so the bucket can stay internal-only (no public URL).
+    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
+      const fileId = data.filename.split(".")[0];
+      if (!fileId) {
+        return { buffer: Buffer.from(""), contentType: "text/plain" };
+      }
+      const storage = getStorageAdapter();
+      const base64 = await storage.readFileAsBase64(fileId, data.threadId);
+      if (!base64) {
+        logger.error("File not found in object storage", {
+          threadId: data.threadId,
+          filename: data.filename,
+        });
+        return { buffer: Buffer.from(""), contentType: "text/plain" };
+      }
+      const metadata = await storage.getFileMetadata(fileId);
+      return {
+        buffer: Buffer.from(base64, "base64"),
+        contentType: metadata?.mimeType ?? "application/octet-stream",
       };
     }
 

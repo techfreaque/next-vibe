@@ -873,6 +873,8 @@ export const translations: typeof enTranslations = {
         "Claude Haiku 5.5 - Anthropics schnellstes Modell. Bildverständnis, Tools und 1M-Kontext für ein Zehntel des Haiku-4.5-Preises.",
       claudeFable51:
         "Claude Fable 5.1 - Anthropics Frontier-Denker. Tiefe Synthese, langfristige Planung, präziser als Fable 5. 1M-Token-Kontext.",
+      claudeFable52:
+        "Claude Fable 5.2 - Anthropics Frontier-Denker. Tiefere Synthese und stabilere Langzeitplanung als Fable 5.1, zum niedrigeren Preis. 1M-Token-Kontext.",
       gpt6Astra:
         "GPT-6 Astra - OpenAIs leistungsstärkstes Modell. Maximale Denktiefe für die schwierigsten Probleme. 1,05M-Token-Kontext.",
       gpt6AstraPro:

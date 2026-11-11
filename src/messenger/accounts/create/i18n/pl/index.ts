@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
       retention: "Retencja",
       winback: "Odzyskanie",
       newsletterMay2026: "Newsletter maj 2026",
+      newsletterNov2026: "Newsletter listopad 2026",
     },
     emailCampaignStage: {
       notStarted: "Nie rozpoczęto",

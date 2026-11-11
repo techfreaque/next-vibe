@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
       retention: "Kundenbindung",
       winback: "Rückgewinnung",
       newsletterMay2026: "Newsletter Mai 2026",
+      newsletterNov2026: "Newsletter November 2026",
     },
   },
   get: {

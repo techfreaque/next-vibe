@@ -811,6 +811,11 @@ export const translations: typeof enTranslations = {
     },
   },
   footer: {
+    newsletter: {
+      title: "Bleib auf dem Laufenden",
+      subtitle:
+        "Neue unzensierte Modelle und Produkt-Updates direkt in dein Postfach. E-Mail bestätigen und monatlich 20 Gratis-Credits sichern.",
+    },
     tagline: "Chatten, erschaffen, verbinden - Text, Bilder, Videos und Musik",
     privacyTagline:
       "Datenschutzorientierte KI mit {{modelCount}} Modellen - Chat, Bilder, Videos & Musik",

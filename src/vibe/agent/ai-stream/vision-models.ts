@@ -317,6 +317,9 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.CLAUDE_FABLE_5_1]: makeImageVisionOption(
     ImageVisionModelId.CLAUDE_FABLE_5_1,
   ),
+  [ImageVisionModelId.CLAUDE_FABLE_5_2]: makeImageVisionOption(
+    ImageVisionModelId.CLAUDE_FABLE_5_2,
+  ),
   [ImageVisionModelId.GPT_6_ASTRA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_ASTRA,
   ),

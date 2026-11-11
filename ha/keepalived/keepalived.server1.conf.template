@@ -1,0 +1,57 @@
+# keepalived — SERVER 1 (primary, higher priority). Install to
+# /etc/keepalived/keepalived.conf. Render __PLACEHOLDERS__.
+global_defs {
+    router_id srv1
+    enable_script_security
+    script_user root
+}
+
+# Lower our priority when the local app is unhealthy so the peer takes over.
+vrrp_script chk_app {
+    script "/etc/keepalived/chk_app.sh"
+    interval 3
+    timeout 2
+    weight -60      # unhealthy → drop below Server 2's base priority
+    fall 2
+    rise 2
+}
+
+# ── Public floating IP (edge) — may preempt back to srv1 (stateless) ──
+vrrp_instance VI_PUBLIC {
+    state MASTER
+    interface __PUBLIC_IFACE__       # e.g. eth0
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass __VRRP_PASS_PUBLIC__
+    }
+    virtual_ipaddress {
+        __FLOATING_IP__              # the public floating IP (or a LAN VIP)
+    }
+    track_script { chk_app }
+    # Hostinger/Hetzner floating IP: reattach via provider API on takeover.
+    notify_master "/etc/keepalived/floating-ip-attach.sh srv1"
+}
+
+# ── Private DB/Redis primary VIP on wg0 — nopreempt (no auto-resync) ──
+vrrp_instance VI_DB {
+    state MASTER
+    interface wg0
+    virtual_router_id 52
+    priority 150
+    advert_int 1
+    nopreempt
+    authentication {
+        auth_type PASS
+        auth_pass __VRRP_PASS_DB__
+    }
+    virtual_ipaddress {
+        10.88.0.10/24 dev wg0
+    }
+    track_script { chk_app }
+    notify_master "/etc/keepalived/notify-pg.sh master"
+    notify_backup "/etc/keepalived/notify-pg.sh backup"
+    notify_fault  "/etc/keepalived/notify-pg.sh fault"
+}

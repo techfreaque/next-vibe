@@ -66,6 +66,14 @@ export const translations = {
       label: "Date Range Preset",
       description: "Select a predefined date range",
     },
+    dateFrom: {
+      label: "From",
+      description: "Custom range start. Overrides the preset.",
+    },
+    dateTo: {
+      label: "To",
+      description: "Custom range end. Overrides the preset.",
+    },
     includeComparison: {
       label: "Include Comparison",
       description: "Include comparison with previous period",

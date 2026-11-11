@@ -231,6 +231,22 @@ const { GET } = createEndpoint({
               .enum(DateRangePreset)
               .default(DateRangePreset.LAST_30_DAYS),
           }),
+          dateFrom: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.DATE,
+            label: "fields.dateFrom.label" as const,
+            description: "fields.dateFrom.description" as const,
+            columns: 3,
+            schema: dateSchema.optional(),
+          }),
+          dateTo: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.DATE,
+            label: "fields.dateTo.label" as const,
+            description: "fields.dateTo.description" as const,
+            columns: 3,
+            schema: dateSchema.optional(),
+          }),
           chartType: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,

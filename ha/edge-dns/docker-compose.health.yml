@@ -1,0 +1,49 @@
+# ============================================================================
+# ha-dns-health — the failover daemon, one per node, paired with the node's
+# PowerDNS (docker-compose.edge-dns.yml). Probes EVERY node's app over the
+# public internet and rewrites THIS node's apex A set to the healthy node(s).
+# PowerDNS (bind-check-interval=5) auto-reloads the changed zone within ~5s.
+#
+# Bring up (same env as edge-dns):
+#   NODE_PUBLIC_IP=... NODE_WG_IP=... \
+#   docker compose -f ha/edge-dns/docker-compose.edge-dns.yml \
+#                  -f ha/edge-dns/docker-compose.health.yml up -d
+#
+# Uses a stock alpine + curl; mounts the SAME host zone dir pdns reads, plus the
+# template. It does not need the pdns control socket (auto-reload handles it).
+# ============================================================================
+services:
+  ha-dns-health:
+    image: alpine:3.20
+    container_name: ha-edge-dns-health
+    restart: unless-stopped
+    # curl for the probes; then exec the daemon.
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "apk add --no-cache curl >/dev/null 2>&1 || true; exec sh /ha-dns-health.sh",
+      ]
+    environment:
+      # Probe BOTH nodes over the public internet (Host/SNI = unbottled.ai).
+      NODES: "${EDGE_NODES:-s1=72.61.156.49 s2=179.198.214.41}"
+      HEALTH_HOST: "${EDGE_HEALTH_HOST:-unbottled.ai}"
+      HEALTH_PATH: "${EDGE_HEALTH_PATH:-/robots.txt}"
+      ZONE_FILE: "/etc/powerdns/zones/unbottled.ai.zone"
+      ZONE_TMPL: "/zone.tmpl"
+      CHECK_INTERVAL: "${EDGE_CHECK_INTERVAL:-10}"
+      PROBE_TIMEOUT: "${EDGE_PROBE_TIMEOUT:-4}"
+      # PRE-CUTOVER: accept the peer box's internal (self-signed) cert for
+      # unbottled.ai (a real LE cert can't be issued until the registrar
+      # delegates). Set EDGE_PROBE_INSECURE=0 at cutover once both boxes hold a
+      # real LE cert for unbottled.ai. Liveness (200 on /robots.txt) is unchanged.
+      PROBE_INSECURE: "${EDGE_PROBE_INSECURE:-0}"
+      FAIL_THRESHOLD: "${EDGE_FAIL_THRESHOLD:-2}"
+      RISE_THRESHOLD: "${EDGE_RISE_THRESHOLD:-2}"
+      APEX_TTL: "${EDGE_APEX_TTL:-30}"
+    volumes:
+      - ./health/ha-dns-health.sh:/ha-dns-health.sh:ro
+      - ./zone.unbottled.ai.tmpl:/zone.tmpl:ro
+      - ${EDGE_ZONE_DIR:-/srv/ha-edge/zones}:/etc/powerdns/zones
+    depends_on:
+      - pdns

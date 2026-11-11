@@ -61,18 +61,26 @@ export const IMAGE_GEN = {
     sortDirection2: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** GPT-5 Image Mini - fast, cheap mainstream image model for most skills. */
+  /**
+   * Nano Banana (Gemini 3.1 Flash Image) - fast, cheap mainstream image model for most skills.
+   * Swapped from GPT-5 Image Mini on 2026-11-09: the whole GPT-5 image family was
+   * 502'ing upstream on OpenRouter ("Complexity not supported" / deprecated), breaking
+   * image gen for all users. Gemini image verified working via direct API probe.
+   */
   mainstreamCheap: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.GPT_5_IMAGE_MINI,
+    manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
-  /** GPT-5.4 Image 2 - best non-legacy mainstream image model, falls back by intelligence then price. */
+  /**
+   * Nano Banana Pro (Gemini 3 Pro Image) - best mainstream image model, falls back by
+   * intelligence then price. Swapped from GPT-5.4 Image 2 on 2026-11-09 (see mainstreamCheap).
+   */
   mainstreamSmart: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.GPT_5_4_IMAGE_2,
+    manualModelId: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,

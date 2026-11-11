@@ -15,6 +15,7 @@ import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { HelpCircle } from "next-vibe/ui/components/icons/HelpCircle";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { User } from "next-vibe/ui/components/icons/User";
@@ -30,6 +31,8 @@ import {
 import type { JSX } from "react";
 
 import { useCredits } from "@/credits/hooks";
+import { useNewsletterManager } from "@/newsletter/hooks";
+import { useUser } from "@/user/private/me/hooks";
 
 import { useChatBootContext } from "../../../../../../chat/hooks/context";
 import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
@@ -66,6 +69,17 @@ export function SidebarFooter({
 
   // Determine if user is logged in
   const isLoggedIn = user && !user.isPublic;
+
+  // Hide the Newsletter nav entry for logged-in users who are already
+  // subscribed. Guests (public users) always see it so they can sign up.
+  // We read the subscription status by the user's own email, same source the
+  // profile hub uses, so this stays in sync with the real subscribe/unsubscribe
+  // state rather than always showing a dead "Newsletter" link.
+  const { user: meProfile } = useUser(user, logger);
+  const myEmail =
+    meProfile && !meProfile.isPublic ? meProfile.email : undefined;
+  const { isSubscribed } = useNewsletterManager(user, myEmail);
+  const showNewsletterLink = !isLoggedIn || !isSubscribed;
 
   return (
     <Div className="border-t border-border bg-background">
@@ -228,6 +242,21 @@ export function SidebarFooter({
                   {t("components.navigation.websiteBlog")}
                 </Button>
               </Link>
+
+              {/* Newsletter (hidden once the logged-in user is subscribed) */}
+              {showNewsletterLink && (
+                <Link href={`/${locale}/story/newsletter`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                    aria-label="Subscribe to the newsletter"
+                  >
+                    <Mail className="h-3.5 w-3.5 mr-2" />
+                    {t("components.navigation.newsletter")}
+                  </Button>
+                </Link>
+              )}
 
               {/* Admin Dashboard */}
               {isLoggedIn && user.roles?.includes(UserRole.ADMIN) && (

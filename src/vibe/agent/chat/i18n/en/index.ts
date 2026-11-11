@@ -866,6 +866,8 @@ export const translations = {
         "Claude Haiku 5.5 - Anthropic's fastest model. Vision, tools and 1M context for a tenth of Haiku 4.5's price.",
       claudeFable51:
         "Claude Fable 5.1 - Anthropic's frontier reasoner. Deep synthesis, long-horizon planning, sharper than Fable 5. 1M-token context.",
+      claudeFable52:
+        "Claude Fable 5.2 - Anthropic's frontier reasoner. Deeper synthesis and steadier long-horizon planning than Fable 5.1, at a lower price. 1M-token context.",
       gpt6Astra:
         "GPT-6 Astra - OpenAI's most capable model. Maximum reasoning depth for the hardest problems. 1.05M-token context.",
       gpt6AstraPro:

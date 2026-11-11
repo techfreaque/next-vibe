@@ -278,6 +278,37 @@ export const translations: typeof enTranslations = {
           totalEarnedCents: {
             content: "Gesamtverdienst (Cent)",
           },
+          confirmedEarnedCents: {
+            content: "Bestätigter Verdienst (Cent)",
+          },
+          pendingEarnedCents: {
+            content: "Ausstehender Verdienst (Cent)",
+          },
+        },
+        engagement: {
+          title: "Guthaben & Aktivität",
+          description: "Guthaben, Verbrauch, Verdienst und Aktivität",
+          creditBalance: {
+            content: "Guthaben",
+          },
+          freeAllowance: {
+            content: "Freikontingent",
+          },
+          lifetimeCreditsSpent: {
+            content: "Gesamtverbrauch",
+          },
+          favoritesCount: {
+            content: "Favoriten",
+          },
+          customSkillsCount: {
+            content: "Eigene Skills",
+          },
+          newsletterConsent: {
+            content: "Newsletter-Zustimmung",
+          },
+          hasConfirmedNewsletter: {
+            content: "Newsletter bestätigt",
+          },
         },
         leadId: {
           content: "Zugehörige Lead-ID",
@@ -706,6 +737,19 @@ export const translations: typeof enTranslations = {
       referrals: "Empfehlungen",
       subscription: "Abonnement",
       creditHistory: "Kreditverlauf",
+      engagementTitle: "Guthaben & Aktivität",
+      balance: "Guthaben",
+      freeAllowance: "Freikontingent",
+      lifetimeSpend: "Gesamtverbrauch",
+      earned: "Verdient",
+      earnedPending: "Ausstehend:",
+      referred: "Geworben",
+      favorites: "Favoriten",
+      skills: "Skills",
+      newsletter: "Newsletter",
+      newsletterConfirmed: "Bestätigt",
+      newsletterConsent: "Zugestimmt",
+      newsletterNone: "Keiner",
       deleteUser: "Benutzer löschen",
       userDeletedSuccessfully: "Benutzer erfolgreich gelöscht",
       deletedAt: "Gelöscht am",

@@ -1,0 +1,35 @@
+# PgBouncer in front of Postgres on each node. The app's DATABASE_URL points at
+# PgBouncer (host `pgbouncer`, port 6432), which forwards to the CURRENT PRIMARY
+# via the keepalived VIP 10.88.0.10:5432. On failover the VIP moves and the
+# keepalived hook issues `PAUSE; RECONNECT; RESUME` to PgBouncer, so the app
+# never restarts and in-flight pools re-point to the new primary.
+#
+#   docker compose -f ha/postgres/pgbouncer/docker-compose.pgbouncer.yml up -d
+services:
+  pgbouncer:
+    image: edoburu/pgbouncer:1.23.1-p2
+    container_name: unbottled-pgbouncer
+    restart: unless-stopped
+    volumes:
+      - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./userlist.txt:/etc/pgbouncer/userlist.txt:ro
+    networks:
+      - app-network
+    # Reachable from the app container as `pgbouncer:6432`. Also expose on the WG
+    # IP so the keepalived hook on either node can PAUSE/RESUME it.
+    ports:
+      - "127.0.0.1:6432:6432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -p 6432 -U ${POSTGRES_USER:-postgres} || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    external: true
+    name: ${APP_NETWORK:-unbottled_app-network}

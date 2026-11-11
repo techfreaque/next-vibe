@@ -1,0 +1,15 @@
+# WireGuard config for SERVER 1 (primary, 10.88.0.1).
+# Render: replace __SRV1_PRIVATE_KEY__, __SRV2_PUBLIC_KEY__, __SRV2_PUBLIC_ENDPOINT__.
+# Install to /etc/wireguard/wg0.conf (chmod 600), then: systemctl enable --now wg-quick@wg0
+[Interface]
+Address = 10.88.0.1/24
+ListenPort = 51820
+PrivateKey = __SRV1_PRIVATE_KEY__
+# No DNS / no default-route changes: this tunnel carries ONLY 10.88.0.0/24.
+
+[Peer]
+# Server 2
+PublicKey = __SRV2_PUBLIC_KEY__
+Endpoint = __SRV2_PUBLIC_ENDPOINT__:51820
+AllowedIPs = 10.88.0.0/24
+PersistentKeepalive = 25

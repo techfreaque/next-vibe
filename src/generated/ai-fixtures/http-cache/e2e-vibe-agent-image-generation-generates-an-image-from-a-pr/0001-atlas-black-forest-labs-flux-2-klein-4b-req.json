@@ -1,5 +1,5 @@
 {
-  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "url": "https://openrouter.ai/api/v1/images",
   "method": "POST",
   "headers": {
     "Authorization": "[redacted]",
@@ -9,11 +9,6 @@
   },
   "body": {
     "model": "black-forest-labs/flux.2-klein-4b",
-    "messages": [
-      {
-        "role": "user",
-        "content": "A small red circle on a white background"
-      }
-    ]
+    "prompt": "A small red circle on a white background"
   }
 }

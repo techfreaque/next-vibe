@@ -12,6 +12,7 @@ import {
 import { H3, P } from "next-vibe/ui/components/typography";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
+import { querySelector } from "next-vibe/ui/lib/dom";
 import { storage } from "next-vibe/ui/lib/storage";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -45,6 +46,36 @@ import {
 // Step indices
 const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" - clicks open selector
 const BROWSE_SKILLS_STEP_INDEX = 3; // Shown inside open selector - browse skills button
+
+// How long a step's `before` hook / target poll waits for a late-mounting target
+// element before giving up. Keeps the tour from rendering a hole-less dead overlay.
+const TOUR_TARGET_WAIT_TIMEOUT = 4000;
+const TOUR_TARGET_POLL_INTERVAL = 80;
+
+/**
+ * Resolve once the given tour-target selector exists in the DOM, or after
+ * TOUR_TARGET_WAIT_TIMEOUT as a safety cap. Used as a step `before` hook so the
+ * tour waits for the real element (showing a loader) instead of spotlighting a
+ * zero-size rect and covering the whole screen with an un-clickable overlay.
+ */
+function waitForTourTarget(selector: string): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (querySelector(selector) !== null) {
+      resolve();
+      return;
+    }
+    const start = Date.now();
+    const timer = setInterval(() => {
+      if (
+        querySelector(selector) !== null ||
+        Date.now() - start >= TOUR_TARGET_WAIT_TIMEOUT
+      ) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, TOUR_TARGET_POLL_INTERVAL);
+  });
+}
 
 interface WelcomeTourProps {
   isAuthenticated: boolean;
@@ -300,8 +331,11 @@ export function WelcomeTour({
 
       // If a companion was added during onboarding, inject a "meet your companion" step
       if (onboardingCompanionId) {
+        const companionSelector = getTourSelector(
+          TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP,
+        );
         const companionStep: TourStepConfig = {
-          target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP),
+          target: companionSelector,
           content: (
             <Div className="space-y-2">
               <H3 className="text-lg font-semibold">
@@ -317,6 +351,16 @@ export function WelcomeTour({
           ),
           placement: TOUR_PLACEMENTS.BOTTOM,
           skipBeacon: true,
+          // BUG 1: let the user click a companion variant row directly inside
+          // the spotlight (overrides the global blockTargetInteraction: true).
+          blockTargetInteraction: false,
+          // BUG 2: block the step until the favorites list has actually rendered
+          // the companion group, instead of flashing a dead, hole-less overlay
+          // when the target is still mounting. The engine shows a loader and
+          // waits for this promise (capped by beforeTimeout).
+          before: () => waitForTourTarget(companionSelector),
+          // Give the built-in target poll extra headroom too (belt-and-suspenders).
+          targetWaitTimeout: TOUR_TARGET_WAIT_TIMEOUT,
         };
         const insertAt = stepIndex + 1;
         setSteps((prev) => {
@@ -467,6 +511,16 @@ export function WelcomeTour({
             setRun(false);
             navigateForTarget(target);
             setTimeout(() => setRun(true), 600);
+            return;
+          }
+          // Companion group not rendered yet: pause and wait for it to appear
+          // instead of leaving a dead, hole-less overlay on screen.
+          if (
+            target ===
+            getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP)
+          ) {
+            setRun(false);
+            void waitForTourTarget(target).then(() => setRun(true));
             return;
           }
           // For any other missing sidebar target, pause briefly then retry

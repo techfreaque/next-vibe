@@ -111,6 +111,7 @@ import {
 } from "@/_pages/creator/[userId]/_shared/profile-content";
 import creditsDef from "@/credits/definition";
 import configDef from "@/lead-magnet/config/definition";
+import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
@@ -1475,6 +1476,21 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
           />
         </HubCard>
       </Div>
+
+      {/* ── NEWSLETTER ── */}
+      <HubSection
+        title={t("widget.newsletter.title")}
+        subtitle={t("widget.newsletter.subtitle")}
+      >
+        <Div className="p-3.5">
+          <NewsletterSubscribeInline
+            locale={locale}
+            user={user}
+            userEmail={profile?.email}
+            variant="card"
+          />
+        </Div>
+      </HubSection>
 
       {/* ── CREATOR ── */}
       <HubSection

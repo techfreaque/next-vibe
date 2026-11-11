@@ -1,0 +1,10 @@
+# Overlay: bind each node's MinIO API (9000) + console (9001) to its WireGuard
+# IP so the peer can replicate over the private tunnel. The app keeps using the
+# internal docker hostname `minio:9000`, so nothing public is exposed.
+#   Server 1:  MINIO_BIND_IP=10.88.0.1 docker compose -f docker-compose.prod.yml -f ha/minio/minio-wg.override.yml up -d minio
+#   Server 2:  MINIO_BIND_IP=10.88.0.2 ... (same)
+services:
+  minio:
+    ports:
+      - "${MINIO_BIND_IP:-10.88.0.1}:9000:9000"
+      - "${MINIO_BIND_IP:-10.88.0.1}:9001:9001"

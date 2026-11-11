@@ -192,6 +192,19 @@ export class ImageGenerationRepository {
       });
     }
 
+    // Reject a reference image on a model that cannot consume one. Passing it
+    // to a text-to-image-only model would have the provider silently drop it
+    // and return nothing, surfacing as a blank "generation failed". Fail loud
+    // and tell the caller to pick an image-to-image model instead.
+    if (data.inputMediaUrl && !imageModel.inputs.includes("image")) {
+      return fail({
+        message: t("post.errors.modelNoReferenceImage", {
+          model: data.model,
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
     const creditCost = calculateImageCreditCost(
       imageModel,
       data.size,
@@ -302,6 +315,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
+          inputMediaUrl: data.inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -545,6 +559,18 @@ export class ImageGenerationRepository {
 
     let imageUrl = result.data.lastGeneratedMediaUrl;
     if (!imageUrl) {
+      // The headless sub-stream ran but produced no image. When it carries a
+      // provider error part, surface the real upstream cause (e.g. a transient
+      // `provider_unavailable` outage) instead of the generic "no image" — the
+      // AI caller can then tell the user it is a temporary service issue and
+      // retry/fall back, rather than treat it as a permanent dead-end.
+      const providerError = result.data.providerErrorText;
+      if (providerError) {
+        return fail({
+          message: t("post.errors.generationFailed", { error: providerError }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
       return fail({
         message: t("post.errors.noImageGenerated"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

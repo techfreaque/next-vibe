@@ -183,11 +183,24 @@ export class ImagePushRepository {
     // image produces one archive but the tag metadata can get lost on load.
     // We retag as :latest explicitly after load so docker compose picks it up.
     const shaRef = refs[0] ?? "";
+    const imageName = shaRef.split(":")[0] ?? "";
     const latestRef =
-      refs.find((r) => r.endsWith(":latest")) ??
-      `${shaRef.split(":")[0]}:latest`;
-    // docker rmi before load so the old image is deleted rather than renamed to <none>.
-    const remoteCmd = `docker rmi -f ${refs.join(" ")} 2>/dev/null; gunzip | docker load && docker tag ${shaRef} ${latestRef}`;
+      refs.find((r) => r.endsWith(":latest")) ?? `${imageName}:latest`;
+    const rollbackRef = `${imageName}:rollback`;
+    // Rollback-safe swap (NEVER `docker rmi -f :latest` here - that was the
+    // footgun that deleted the only rollback image and, with the deploy
+    // script's `system prune -a`, left no way back):
+    //   1. Point :rollback at whatever :latest currently is (the running image),
+    //      so a bad deploy can be reverted by retagging :rollback -> :latest.
+    //   2. Load the new image and move :latest onto its SHA.
+    //   3. Drop ONLY the incoming SHA ref if it already existed (avoids a
+    //      dangling <none>); leave :latest and :rollback intact.
+    // The compose app service is recreated by the deploy script, not here, so
+    // this step only manages tags and never touches the running container.
+    const remoteCmd =
+      `docker tag ${latestRef} ${rollbackRef} 2>/dev/null; ` +
+      `docker rmi ${shaRef} 2>/dev/null; ` +
+      `gunzip | docker load && docker tag ${shaRef} ${latestRef}`;
 
     const password = imagePushEnv.SSH_SERVER_PWD;
     // Only the shell pipeline survives a large unattended upload (see doc above).
@@ -467,17 +480,25 @@ export class ImagePushRepository {
       script,
     });
 
-    // Run the deploy script. Strip git lines (the image is the deploy unit, not
-    // the checkout) and run from the project root so docker compose -f resolves.
-    // The stripped script runs from a temp file, NOT piped into `bash` - piped,
-    // bash reads the script from stdin and the first stdin-forwarding command in
-    // it (`docker compose exec -T`) swallows the rest, so bash exits 0 having
+    // Run the deploy script. The image is the deploy unit, not the checkout, so
+    // we must NOT let the script git-reset the checkout: that reset reverts any
+    // locally-patched scripts/install-docker.sh (e.g. the rollback-safe prune)
+    // back to origin, which silently reintroduced the `docker system prune -a`
+    // footgun that deletes the :rollback image on every deploy. The script
+    // supports NO_GIT_RESET=1 to skip its whole git-fetch/reset `if` block, so we
+    // set that env var. We do NOT grep the git lines out: they sit INSIDE an
+    // `if ...; then ... fi` block, and deleting the body lines leaves a dangling
+    // `fi` ("syntax error near unexpected token `fi'"). NO_GIT_RESET=1 skips the
+    // whole block cleanly via the script's own guard, so no stripping is needed.
+    // The script runs from a temp file, NOT piped into `bash` - piped, bash reads
+    // the script from stdin and the first stdin-forwarding command in it
+    // (`docker compose exec -T`) swallows the rest, so bash exits 0 having
     // skipped the pull, migrations and container swap.
     const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
     const projectDir = scriptDir.endsWith("/scripts")
       ? scriptDir.slice(0, -"/scripts".length)
       : scriptDir;
-    const remoteCmd = `cd ${projectDir} && f=$(mktemp) && grep -v "^git " ${script} > "$f"; bash "$f" < /dev/null; rc=$?; rm -f "$f"; exit $rc`;
+    const remoteCmd = `cd ${projectDir} && NO_GIT_RESET=1 bash ${script} < /dev/null`;
 
     const result = await ImagePushRepository.runRemote(sshTarget, remoteCmd);
 

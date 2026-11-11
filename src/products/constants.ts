@@ -24,3 +24,25 @@ export const FREE_CREDIT_ALLOWANCE = {
   signedIn: 50,
   newsletterBonus: 20,
 } as const;
+
+/**
+ * Derived free-credit totals for a USER pool (additive model).
+ *
+ * A user pool stacks its lead's guest allowance ON TOP of the signed-in grant:
+ * every signed-in user started as a guest lead, so the two accumulate rather than
+ * the guest 20 being subsumed into the signed-in 50.
+ *
+ * - signedInTotal: guest + signedIn = the free credits a signed-in account holds
+ *   per month before any newsletter bonus (70).
+ * - maxTotal: guest + signedIn + newsletterBonus = the ceiling once a confirmed
+ *   newsletter subscription is attached (90).
+ *
+ * These are the numbers all "signed-in free credits" copy must state. The raw
+ * FREE_CREDIT_ALLOWANCE.signedIn (50) is only the grant delta, not a displayable
+ * total.
+ */
+export const FREE_CREDIT_SIGNED_IN_TOTAL =
+  FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
+
+export const FREE_CREDIT_MAX_TOTAL =
+  FREE_CREDIT_SIGNED_IN_TOTAL + FREE_CREDIT_ALLOWANCE.newsletterBonus;

@@ -1,0 +1,27 @@
+# HAProxy TCP front for Redis on each node. The app connects to
+# redis://127.0.0.1:6379 (this proxy); HAProxy health-checks both Redis nodes
+# and routes to whichever answers `role:master`, so the app's REDIS_URL never
+# changes across a failover.
+services:
+  redis-haproxy:
+    image: haproxy:2.9-alpine
+    container_name: unbottled-redis-haproxy
+    restart: unless-stopped
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    # App reaches it at redis-haproxy:6379 on app-network, and at 127.0.0.1:6379
+    # on the host.
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 6379 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  app-network:
+    external: true
+    name: ${APP_NETWORK:-unbottled_app-network}

@@ -1,0 +1,52 @@
+# unbottled.ai — active-active, health-checked, connection-draining edge.
+# Drop into a static Caddyfile (Server 1) or `import` it on Server 2.
+#
+# Upstreams are the two app instances over WireGuard:
+#   srv1 10.88.0.1:3000 (http) / :4000 (ws)
+#   srv2 10.88.0.2:3100 (http) / :4100 (ws)
+#
+# lb_policy + passive/active health checks: a node whose /health returns a
+# non-2xx (it returns 500/critical while DRAINING) is removed from rotation,
+# which is what makes a rolling deploy seamless. fail_duration gives passive
+# ejection; health_uri gives active probing.
+
+unbottled.ai {
+	# WebSocket upgrades → :4000/:4100 pool.
+	@ws path /ws*
+	handle @ws {
+		reverse_proxy 10.88.0.1:4000 10.88.0.2:4100 {
+			lb_policy least_conn
+			health_uri /vibe/platforms/web/health
+			health_interval 5s
+			health_timeout 2s
+			health_status 2xx
+			fail_duration 10s
+			max_fails 2
+		}
+	}
+
+	handle {
+		reverse_proxy 10.88.0.1:3000 10.88.0.2:3100 {
+			lb_policy least_conn
+			# Active health check: pulls a DRAINING node (health → critical/500)
+			# out of rotation so in-flight streams finish while new traffic shifts.
+			health_uri /vibe/platforms/web/health
+			health_interval 5s
+			health_timeout 2s
+			health_status 2xx
+			# Passive: eject on connection errors too.
+			fail_duration 10s
+			max_fails 2
+			# Connection draining: let in-flight requests finish on a node being
+			# removed (Caddy stops sending NEW requests to an unhealthy upstream
+			# but does not cut active ones).
+			lb_try_duration 5s
+			lb_try_interval 250ms
+		}
+	}
+}
+
+www.unbottled.ai {
+	@all path /*
+	redir @all https://unbottled.ai{uri} 308
+}

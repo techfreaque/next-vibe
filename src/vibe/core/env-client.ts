@@ -6,12 +6,41 @@ import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { z } from "zod";
 
 import { defineEnvClient } from "../env/define-env-client";
+import { isHermesDev, isPreviewMode } from "../env/detect";
 import { Environment, VibeMode, VibeModeValues } from "../env/env-util";
 
 const isServer = typeof window === "undefined";
 const isBrowser = !isServer && typeof document !== "undefined";
 
 export const platform = { isServer, isReactNative: false, isBrowser };
+
+/**
+ * Rewrite a localhost app URL's port to match the local instance this process
+ * actually targets, server-side only. `--hermes`/`--preview` tool commands run
+ * against the Hermes instance, NOT Atlas (:3000) — and this URL seeds the
+ * realtime hub address (localHubWsUrl in keyed-signal.ts). Getting it wrong
+ * means a cross-process WS subscription (e.g. a remote one-shot `ai-run` waiting
+ * for Thea's result) joins the WRONG hub and hangs forever. Hermes dev is :3002;
+ * Hermes prod (`vibe --hermes start/build`) honours PREVIEW_PORT, default :3001.
+ * Mirrors the same rewrite in core/env.ts. Non-localhost hosts are left as-is.
+ */
+function applyLocalInstancePort(raw: string): string {
+  if (!isPreviewMode) {
+    return raw;
+  }
+  try {
+    const parsed = new URL(raw);
+    if (parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") {
+      return raw;
+    }
+    parsed.port = isHermesDev
+      ? "3002"
+      : (process.env["PREVIEW_PORT"] ?? "3001");
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return raw;
+  }
+}
 
 export const {
   envClient: coreClientEnv,
@@ -29,7 +58,7 @@ export const {
       .url()
       .default("http://localhost:3000")
       .transform((s) =>
-        isBrowser ? getCurrentOrigin() : s.replace(/\/$/, ""),
+        isBrowser ? getCurrentOrigin() : applyLocalInstancePort(s),
       ),
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",

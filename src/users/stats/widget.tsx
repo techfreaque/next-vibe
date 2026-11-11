@@ -24,6 +24,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
@@ -284,6 +285,14 @@ export function UsersStatsContainer({
               fieldName={"timePeriodOptions.dateRangePreset"}
               field={children.timePeriodOptions.children.dateRangePreset}
             />
+            <DateFieldWidget
+              fieldName={"timePeriodOptions.dateFrom"}
+              field={children.timePeriodOptions.children.dateFrom}
+            />
+            <DateFieldWidget
+              fieldName={"timePeriodOptions.dateTo"}
+              field={children.timePeriodOptions.children.dateTo}
+            />
             <SelectFieldWidget
               fieldName={"timePeriodOptions.chartType"}
               field={children.timePeriodOptions.children.chartType}
@@ -300,7 +309,7 @@ export function UsersStatsContainer({
               }}
             />
             <Span className="text-sm">
-              {children.timePeriodOptions.children.includeComparison.label}
+              {t(children.timePeriodOptions.children.includeComparison.label)}
             </Span>
           </Label>
           <Button

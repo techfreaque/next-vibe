@@ -101,6 +101,8 @@ export function TanstackPage({
           locale={locale}
           totalModelCount={totalModelCount}
           isPublic={user.isPublic}
+          user={user}
+          userEmail={userProfile?.email}
         />
       </Main>
     </PageLayout>

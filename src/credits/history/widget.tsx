@@ -14,6 +14,7 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -35,15 +36,24 @@ export function CreditHistoryContainer({
   const { locale } = context;
   const tField = useWidgetTranslation<typeof definition.GET>();
   const value = useWidgetValue<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
   const children = field.children;
   const creditsT = creditsScopedTranslation.scopedT(locale).t;
 
   const transactions = value?.transactions ?? [];
   const paginationInfo = value?.paginationInfo;
 
+  // When an admin views ANOTHER entity's history (targetUserId/targetLeadId
+  // set by the user-view embed), the balance/subscription header reads the
+  // logged-in admin's OWN wallet - wrong owner. Suppress it; the target's
+  // balance is shown target-scoped by the embedding user-view overview.
+  const targetUserId = form?.watch("targetUserId");
+  const targetLeadId = form?.watch("targetLeadId");
+  const isAdminTargetView = Boolean(targetUserId ?? targetLeadId);
+
   return (
     <WidgetShell className="gap-6">
-      <CreditsTabHeader activeTab="history" />
+      {!isAdminTargetView && <CreditsTabHeader activeTab="history" />}
 
       {transactions.length > 0 ? (
         <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">

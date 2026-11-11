@@ -29,7 +29,8 @@ import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
-import { creditWallets } from "./db";
+import { creditTransactions, creditWallets } from "./db";
+import { CreditTransactionType } from "./enum";
 import { publicFreeTierDailyCap } from "./public-cap/db";
 import {
   computeFreeAllowance,
@@ -39,7 +40,10 @@ import {
 import { scopedTranslation } from "./i18n";
 import { CreditRepository } from "./repository";
 
-const { guest, signedIn, newsletterBonus } = FREE_CREDIT_ALLOWANCE;
+const { guest, newsletterBonus } = FREE_CREDIT_ALLOWANCE;
+// A USER pool stacks the lead's guest allowance under the signed-in grant:
+// guest 20 + signedIn 50 = 70 base, +20 newsletter = 90.
+const userBase = FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
 
@@ -158,12 +162,13 @@ describe("free allowance math", () => {
     expect(
       computeFreeAllowance({ isUserPool: false, hasConfirmedNewsletter: true }),
     ).toBe(40);
+    // User pool is ADDITIVE: lead 20 + user 50 = 70 base, +20 newsletter = 90.
     expect(
       computeFreeAllowance({ isUserPool: true, hasConfirmedNewsletter: false }),
-    ).toBe(50);
+    ).toBe(70);
     expect(
       computeFreeAllowance({ isUserPool: true, hasConfirmedNewsletter: true }),
-    ).toBe(70);
+    ).toBe(90);
   });
 
   it("available is capped by allowance minus period spending", () => {
@@ -233,9 +238,9 @@ describe("free allowance pools (DB)", () => {
     const user = created.data.user;
     createdUserIds.push(user.id);
 
-    expect(await freeBalance(user)).toBe(signedIn);
+    expect(await freeBalance(user)).toBe(userBase);
     await addNewsletter({ userId: user.id }, true);
-    expect(await freeBalance(user)).toBe(signedIn + newsletterBonus);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
   });
 
   it("linked leads share one cap - spending on both counts together", async () => {
@@ -276,16 +281,16 @@ describe("free allowance pools (DB)", () => {
       .insert(userLeadLinks)
       .values({ userId: user.id, leadId: guestLead, linkReason: "login" });
 
-    expect(await freeBalance(user)).toBe(signedIn - 15);
+    expect(await freeBalance(user)).toBe(userBase - 15);
 
     // Guest's earlier newsletter claim (lead-owned) follows into the user pool
     await addNewsletter({ leadId: guestLead }, true);
-    expect(await freeBalance(user)).toBe(signedIn + newsletterBonus - 15);
-    expect(await freeBalance(user)).toBe(signedIn + newsletterBonus - 15);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
 
     // Logged out on that device: display matches what deductions draw on
     // (account cap + account-wide spending, free credits only)
-    const expected = signedIn + newsletterBonus - 15;
+    const expected = userBase + newsletterBonus - 15;
     expect(await freeBalance(asGuest)).toBe(expected);
     const shown = await CreditRepository.getCreditBalanceForUser(
       asGuest,
@@ -297,6 +302,71 @@ describe("free allowance pools (DB)", () => {
     expect(shown.success && shown.data.total).toBe(expected);
     await spend(asGuest, 5);
     expect(await freeBalance(user)).toBe(expected - 5);
+  });
+
+  it("existing user under the old cap is topped up to the new cap on next activity (not double-granted, prior spend carries)", async () => {
+    const created = await createTestUser(uniqueEmail("existing"));
+    expect(created.success, JSON.stringify(created)).toBe(true);
+    if (!created.success) {
+      return;
+    }
+    const user = created.data.user;
+    createdUserIds.push(user.id);
+    // Create the lead's wallet by accessing it as a guest first (free credits
+    // live only on lead wallets, created lazily on access), then link it into
+    // the user pool - the same path a real login takes.
+    const leadId = await createGuestLead();
+    expect(await freeBalance(guestUser(leadId))).toBe(guest);
+    await db
+      .insert(userLeadLinks)
+      .values({ userId: user.id, leadId, linkReason: "login" });
+
+    // Fresh account already converges to the new additive base on first read.
+    expect(await freeBalance(user)).toBe(userBase);
+
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const [wallet] = await db
+      .select({ id: creditWallets.id })
+      .from(creditWallets)
+      .where(eq(creditWallets.leadId, leadId))
+      .limit(1);
+    expect(wallet).toBeDefined();
+    if (!wallet) {
+      return;
+    }
+
+    // Simulate an EXISTING user left mid-period under the OLD, lower cap: wipe
+    // this period's grant rows (so grantedThisPeriod reflects only the old cap)
+    // and force stored free credits down to the old amount. No usage yet.
+    const oldCap = 20;
+    await db
+      .delete(creditTransactions)
+      .where(
+        and(
+          eq(creditTransactions.walletId, wallet.id),
+          eq(creditTransactions.freePeriodId, periodId),
+          eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        ),
+      );
+    await db
+      .update(creditWallets)
+      .set({ freeCreditsRemaining: oldCap })
+      .where(eq(creditWallets.id, wallet.id));
+
+    // Next activity recomputes the allowance (70) and lazily tops up the delta,
+    // never beyond the cap.
+    expect(await freeBalance(user)).toBe(userBase);
+
+    // Prior spend carries: after spending 15, the balance is cap - spent = 55.
+    await spend(user, 15);
+    expect(await freeBalance(user)).toBe(userBase - 15);
+
+    // Confirming the newsletter lifts the ceiling to 90; still minus prior spend.
+    await addNewsletter({ userId: user.id }, true);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
+    // Idempotent: repeated reads never push past the cap.
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
   });
 
   it("zeroed or spent free credits are never regenerated by the top-up", async () => {

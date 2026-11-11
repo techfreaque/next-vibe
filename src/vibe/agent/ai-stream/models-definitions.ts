@@ -127,6 +127,7 @@ export enum ChatModelId {
   CLAUDE_SONNET_5_5 = "claude-sonnet-5.5",
   CLAUDE_HAIKU_5_5 = "claude-haiku-5.5",
   CLAUDE_FABLE_5_1 = "claude-fable-5.1",
+  CLAUDE_FABLE_5_2 = "claude-fable-5.2",
   GPT_6_ASTRA = "gpt-6-astra",
   GPT_6_1_SOL = "gpt-6.1-sol",
   GPT_6_1_TERRA = "gpt-6.1-terra",
@@ -168,7 +169,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.UNCENSORED_LM_V1_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "uncensored-lm-v1.2",
-        creditCost: 6.5, // updated: 2026-11-07 from unbottled.ai
+        creditCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -185,6 +186,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING],
   },
   [ChatModelId.FREEDOMGPT_LIBERTY]: {
+    enabled: false, // auto-disabled: price not verified + modality not verified
     name: "FreedomGPT Liberty",
     by: "freedomGPT",
     description: "chat.models.descriptions.freedomgptLiberty",
@@ -204,7 +206,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.FREEDOMGPT_LIBERTY,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "freedomgpt-liberty",
-        creditCost: 10.4, // updated: 2026-11-07 from unbottled.ai
+        creditCost: 10.4, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -221,6 +223,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ChatModelId.GAB_AI_ARYA]: {
+    enabled: false, // auto-disabled: price not verified + modality not verified
     name: "Gab AI Arya",
     by: "gabAI",
     description: "chat.models.descriptions.gabAiArya",
@@ -240,7 +243,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.GAB_AI_ARYA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gab-ai-arya",
-        creditCost: 6.5, // updated: 2026-11-07 from unbottled.ai
+        creditCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -283,8 +286,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "venice-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.17, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.17, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -322,8 +325,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "venice-uncensored-roleplay",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -362,8 +365,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemma-4-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.2113, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.2113, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -406,10 +409,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-3.6-plus-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.8125, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 4.875, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0813, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 1.014, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.8125, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.0813, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 1.014, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -448,9 +451,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.7-flash-heretic",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.091, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.52, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0455, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.0455, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -544,9 +547,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.6-flash-abliterated",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.95, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.3575, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.95, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.3575, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -603,9 +606,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.3-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.925, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.925, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -645,9 +648,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.3-flash-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.04, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.091, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.04, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -751,10 +754,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-haiku-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -800,10 +803,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 32.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 8.125, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -849,10 +852,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 32.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 8.125, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -898,8 +901,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 32.5, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -945,10 +950,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-sonnet-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 4.875, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -994,10 +999,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-sonnet-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 4.875, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1043,9 +1048,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.975, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1087,9 +1092,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.065, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1125,8 +1130,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1169,8 +1174,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.20",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1212,8 +1218,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 156, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 156, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1250,8 +1256,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-54-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 39, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1295,8 +1301,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-52-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 27.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 218.4, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 27.3, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 218.4, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1342,9 +1348,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1382,9 +1388,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-53-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.275, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 18.2, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.275, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 18.2, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1427,9 +1433,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-51-codex",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1472,9 +1478,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-51",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1512,8 +1518,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-55",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 39, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1557,8 +1564,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-55-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 39, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1603,9 +1610,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-54",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.325, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1649,8 +1656,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.4-mini",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.975, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.85, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.975, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.85, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1693,8 +1701,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.4-nano",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1732,9 +1741,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-52",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.275, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 18.2, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.275, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 18.2, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1778,9 +1787,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-53-chat",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.275, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 18.2, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.275, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 18.2, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1823,9 +1832,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-52-chat",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.275, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 18.2, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.275, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 18.2, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1870,9 +1879,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1910,9 +1919,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-mini",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.325, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1950,9 +1959,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-nano",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.065, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.52, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -1985,17 +1994,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "openai/gpt-oss-120b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.02, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 0.07, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.02, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.15, // updated: 2026-11-09 from openrouter-api
+        outputTokenCost: 0.6, // updated: 2026-11-09 from openrouter-api
+        cacheReadTokenCost: 0.08, // updated: 2026-11-09 from openrouter-api
       },
       {
         id: ChatModelId.GPT_OSS_120B,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-oss-120b-free",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.78, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2030,8 +2040,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k2.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.858, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 4.433, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.845, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.433, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -2072,9 +2083,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.182, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.78, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.182, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2106,18 +2117,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.15, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.53, // updated: 2026-11-09 from openrouter-api
+        outputTokenCost: 3.33, // updated: 2026-11-09 from openrouter-api
+        cacheReadTokenCost: 0.21, // updated: 2026-11-09 from openrouter-api
       },
       {
         id: ChatModelId.KIMI_K2_5,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi_k2_5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.494, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.639, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.247, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.689, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.329, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.273, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -2158,9 +2169,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k2-thinking",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.78, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2203,8 +2214,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.274, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.59, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.82, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.72, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.338, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -2243,9 +2255,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.496, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.156, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.16, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2285,8 +2297,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5-turbo",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.56, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.2, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.312, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2327,9 +2340,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.52, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.275, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.78, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.86, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.143, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2368,9 +2381,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.078, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.52, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.078, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2395,8 +2408,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.5-air",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
-        outputTokenCost: 0.85, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 0.2, // updated: 2026-11-09 from openrouter-api
+        outputTokenCost: 1.1, // updated: 2026-11-09 from openrouter-api
         cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
       },
       {
@@ -2404,9 +2417,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.5-air",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.105, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.43, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2440,8 +2453,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.559, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.262, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2480,9 +2494,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-4.5v",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.34, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.143, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.78, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.34, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.143, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2497,7 +2511,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     by: "miniMax",
     description: "chat.models.descriptions.minimaxM27",
     parameterCount: undefined,
-    contextWindow: 204800,
+    contextWindow: 196608,
     icon: "si-minimax",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
@@ -2516,8 +2530,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "minimax-m2.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.936, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.273, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.092, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2538,7 +2553,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     by: "xiaomi",
     description: "chat.models.descriptions.mimoV2Pro",
     parameterCount: undefined,
-    contextWindow: 1050000,
+    contextWindow: 1024000,
     icon: "si-xiaomi",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
@@ -2557,8 +2572,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.3965, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.7917, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.624, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.34, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2599,10 +2615,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-2.5-flash-lite",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.52, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2640,10 +2656,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-2.5-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2681,10 +2697,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.494, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2722,10 +2738,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.1-pro-preview-customtools",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 15.6, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.494, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2767,8 +2783,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.1-flash-image-preview",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -2806,10 +2822,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.1-flash-lite-preview",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.325, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.95, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.95, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2852,10 +2868,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.5-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.95, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 11.7, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.95, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 11.7, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2898,10 +2914,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.9, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.065, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -2953,17 +2969,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-v4-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.63, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 1.25, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.05, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.89, // updated: 2026-11-09 from openrouter-api
+        outputTokenCost: 1.78, // updated: 2026-11-09 from openrouter-api
+        cacheReadTokenCost: 0.07, // updated: 2026-11-09 from openrouter-api
       },
       {
         id: ChatModelId.DEEPSEEK_V4_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-v4-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.572, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.131, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.157, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.314, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3002,8 +3019,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-v4-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.117, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.117, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3042,8 +3060,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-v3.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.299, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.442, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.338, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3082,8 +3101,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-v3.1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.273, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.027, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.235, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3117,9 +3137,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-r1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.795, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.455, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.795, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.455, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3159,8 +3179,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen3_235b-free",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.585, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.366, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.585, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.366, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3194,8 +3214,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-r1-distill",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.377, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.377, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.377, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.377, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3232,8 +3252,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-2-5-7b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.052, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
 
@@ -3271,8 +3291,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-code-haiku",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3313,8 +3333,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-code-sonnet",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3356,8 +3376,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-code-opus",
         creditCost: calculateCreditCost,
-        inputTokenCost: 5.2, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 26, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3399,8 +3419,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-code-fable",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3443,10 +3463,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3-pro-image-preview",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 15.6, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.494, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3484,9 +3504,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-image-mini",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.325, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3528,9 +3548,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5-image",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3573,12 +3593,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.4-image-2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 10.4, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 19.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 10.4, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
       },
     ],
+    // LEGACY 2026-11-09: 502s upstream on OpenRouter ("Complexity 'none' is not
+    // supported for this image model" / provider_unavailable). Superseded by
+    // GPT-5 Image Mini, the only working OpenAI image model on OpenRouter (probed).
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -3621,10 +3645,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-4.8",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 32.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 8.125, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3667,10 +3691,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-sonnet-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3713,10 +3737,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 32.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 8.125, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3760,10 +3784,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-5-fast",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 16.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3806,10 +3830,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-fable-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 16.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3850,8 +3874,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3891,8 +3916,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -3933,8 +3959,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-luna",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
@@ -3970,8 +3998,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-luna-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.78, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4012,8 +4042,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-terra",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4055,8 +4087,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-terra-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4098,8 +4132,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-sol",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 39, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4142,8 +4178,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-5.6-sol-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 39, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4186,10 +4224,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.6-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.95, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 9.75, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.975, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4229,10 +4267,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.5-flash-lite",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.39, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.104, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -4267,10 +4305,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4875, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.4375, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0494, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.052, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.975, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4310,8 +4348,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 3.64, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 18.2, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.247, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 20.8, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.234, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4352,8 +4391,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4004, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.2584, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 8.84, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4394,8 +4434,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "minimax-m3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.299, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.248, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.078, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4435,8 +4476,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-3.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.169, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
@@ -4470,8 +4513,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-3.8-max",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4510,8 +4554,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.1547, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.3094, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4531,7 +4576,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     by: "xiaomi",
     description: "chat.models.descriptions.mimoV25Pro",
     parameterCount: undefined,
-    contextWindow: 1050000,
+    contextWindow: 1024000,
     icon: "si-xiaomi",
     inputs: ["text"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
@@ -4549,8 +4594,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.3965, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.7917, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.3965, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.7917, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4590,8 +4635,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "meta-muse-spark-1.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.525, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.525, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4630,8 +4676,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mistral-medium-3.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.95, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 9.75, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.95, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 9.75, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4681,10 +4727,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-opus-5.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 5.2, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 26, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4735,10 +4779,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-sonnet-5.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4789,10 +4831,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-haiku-5.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.1625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4819,15 +4859,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
       {
-        id: ChatModelId.CLAUDE_CODE_FABLE,
-        apiProvider: ApiProvider.CLAUDE_CODE,
-        providerModel: "claude-fable-5-1",
-        creditCost: calculateCreditCost,
-        inputTokenCost: 10,
-        outputTokenCost: 50,
-        adminOnly: true,
-      },
-      {
         id: ChatModelId.CLAUDE_FABLE_5_1,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "anthropic/claude-fable-5.1",
@@ -4842,10 +4873,61 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "claude-fable-5.1",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.325, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 16.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.CREATIVE,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
+  },
+  [ChatModelId.CLAUDE_FABLE_5_2]: {
+    name: "Claude Fable 5.2",
+    by: "anthropic",
+    description: "chat.models.descriptions.claudeFable52",
+    parameterCount: undefined,
+    contextWindow: 1000000,
+    icon: "si-anthropic",
+    inputs: ["text", "image"], // updated: 2026-11-09 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-09 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.CLAUDE_CODE_FABLE,
+        apiProvider: ApiProvider.CLAUDE_CODE,
+        providerModel: "claude-fable-5-2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 8,
+        outputTokenCost: 40,
+        adminOnly: true,
+      },
+      {
+        id: ChatModelId.CLAUDE_FABLE_5_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-fable-5.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 8, // updated: 2026-11-09 from openrouter-api
+        outputTokenCost: 40, // updated: 2026-11-09 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-11-09 from openrouter-api
+        cacheWriteTokenCost: 10, // updated: 2026-11-09 from openrouter-api
+      },
+      {
+        id: ChatModelId.CLAUDE_FABLE_5_2,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "claude-fable-5.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 10.4, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 52, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4886,10 +4968,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-6-astra",
         creditCost: calculateCreditCost,
-        inputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 16.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4931,10 +5013,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-6.1-sol",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 3.25, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -4976,10 +5058,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-6.1-terra",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.3, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 6.5, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.065, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5020,10 +5102,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gpt-6-luna",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.013, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.1625, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -5059,10 +5141,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-4-argon",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.13, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.2444, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.247, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5103,10 +5185,10 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-3.8-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.0725, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.3625, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.1079, // updated: 2026-11-07 from unbottled.ai
-        cacheWriteTokenCost: 0.0546, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.079, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.369, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.104, // updated: 2026-11-09 from unbottled.ai
+        cacheWriteTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5145,9 +5227,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "grok-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 7.8, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5186,9 +5268,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k3.1-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 2.6, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 13, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5229,9 +5311,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepseek-v4.1-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.0663, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.7371, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0234, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.741, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5270,9 +5352,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen-3.8-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.611, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0208, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.611, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5311,9 +5393,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.091, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.82, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0897, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.82, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5352,9 +5434,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.3-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.65, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.039, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5393,9 +5475,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.6-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.5655, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.131, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0052, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.572, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.131, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5435,9 +5517,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.6-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.182, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 0.364, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0039, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.182, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 0.364, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5476,9 +5558,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "meta-muse-spark-1.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 1.625, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 5.525, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.195, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 5.525, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.195, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5517,9 +5599,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "meta-muse-wonder",
         creditCost: calculateCreditCost,
-        inputTokenCost: 5.2, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 26, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.26, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5560,9 +5642,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mistral-large-4",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.91, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 2.73, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.091, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.91, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 2.73, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.091, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5630,9 +5712,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "venice-deepseek-v4.1-flash-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.429, // updated: 2026-11-07 from unbottled.ai
-        outputTokenCost: 1.716, // updated: 2026-11-07 from unbottled.ai
-        cacheReadTokenCost: 0.0107, // updated: 2026-11-07 from unbottled.ai
+        inputTokenCost: 0.429, // updated: 2026-11-09 from unbottled.ai
+        outputTokenCost: 1.716, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.0107, // updated: 2026-11-09 from unbottled.ai
       },
     ],
     utilities: [
@@ -5667,12 +5749,17 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.CLAUDE_SONNET_4_6]: ChatModelId.CLAUDE_SONNET_5_5,
   [ChatModelId.CLAUDE_SONNET_5]: ChatModelId.CLAUDE_SONNET_5_5,
   [ChatModelId.CLAUDE_HAIKU_4_5]: ChatModelId.CLAUDE_HAIKU_5_5,
-  [ChatModelId.CLAUDE_FABLE_5]: ChatModelId.CLAUDE_FABLE_5_1,
+  [ChatModelId.CLAUDE_FABLE_5]: ChatModelId.CLAUDE_FABLE_5_2,
+  [ChatModelId.CLAUDE_FABLE_5_1]: ChatModelId.CLAUDE_FABLE_5_2,
   [ChatModelId.GPT_5]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_1]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_2]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_4]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_IMAGE]: ChatModelId.GPT_5_4_IMAGE_2,
+  // GPT image: gpt-5-image returns no image, gpt-5.4-image-2 502s upstream
+  // (probed 2026-11-09). gpt-5-image-mini is the only working OpenAI image
+  // model on OpenRouter, so both broken ids resolve to it.
+  [ChatModelId.GPT_5_IMAGE]: ChatModelId.GPT_5_IMAGE_MINI,
+  [ChatModelId.GPT_5_4_IMAGE_2]: ChatModelId.GPT_5_IMAGE_MINI,
   [ChatModelId.GPT_5_5]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_6_SOL]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_1_SOL,
@@ -5732,7 +5819,7 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.CLAUDE_CODE_HAIKU]: ChatModelId.CLAUDE_HAIKU_5_5,
   [ChatModelId.CLAUDE_CODE_SONNET]: ChatModelId.CLAUDE_SONNET_5_5,
   [ChatModelId.CLAUDE_CODE_OPUS]: ChatModelId.CLAUDE_OPUS_5_5,
-  [ChatModelId.CLAUDE_CODE_FABLE]: ChatModelId.CLAUDE_FABLE_5_1,
+  [ChatModelId.CLAUDE_CODE_FABLE]: ChatModelId.CLAUDE_FABLE_5_2,
   [ChatModelId.GLM_4_7_FLASH_HERETIC]: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
   [ChatModelId.GLM_4_5_AIR]: ChatModelId.GLM_5_3_FLASH,
   [ChatModelId.GLM_5_TURBO]: ChatModelId.GLM_5_3,

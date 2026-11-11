@@ -269,6 +269,37 @@ export const translations: typeof enTranslations = {
           totalEarnedCents: {
             content: "Łączne zarobki (centy)",
           },
+          confirmedEarnedCents: {
+            content: "Potwierdzone zarobki (centy)",
+          },
+          pendingEarnedCents: {
+            content: "Oczekujące zarobki (centy)",
+          },
+        },
+        engagement: {
+          title: "Kredyty i aktywność",
+          description: "Saldo, wydatki, zarobki i aktywność",
+          creditBalance: {
+            content: "Saldo kredytów",
+          },
+          freeAllowance: {
+            content: "Darmowy limit",
+          },
+          lifetimeCreditsSpent: {
+            content: "Łączne wydatki",
+          },
+          favoritesCount: {
+            content: "Ulubione",
+          },
+          customSkillsCount: {
+            content: "Własne umiejętności",
+          },
+          newsletterConsent: {
+            content: "Zgoda na newsletter",
+          },
+          hasConfirmedNewsletter: {
+            content: "Newsletter potwierdzony",
+          },
         },
         leadId: {
           content: "ID powiązanego leada",
@@ -688,6 +719,19 @@ export const translations: typeof enTranslations = {
       referrals: "Polecenia",
       subscription: "Subskrypcja",
       creditHistory: "Historia kredytów",
+      engagementTitle: "Kredyty i aktywność",
+      balance: "Saldo",
+      freeAllowance: "Darmowy limit",
+      lifetimeSpend: "Łączne wydatki",
+      earned: "Zarobiono",
+      earnedPending: "Oczekuje:",
+      referred: "Poleceni",
+      favorites: "Ulubione",
+      skills: "Umiejętności",
+      newsletter: "Newsletter",
+      newsletterConfirmed: "Potwierdzony",
+      newsletterConsent: "Zapisany",
+      newsletterNone: "Brak",
       deleteUser: "Usuń użytkownika",
       userDeletedSuccessfully: "Użytkownik usunięty pomyślnie",
       deletedAt: "Usunięto o",

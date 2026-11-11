@@ -79,6 +79,13 @@ export const translations = {
           longDescription:
             "May 2026 product update newsletter sent to all signed-up users with honest bug admission and feature highlights",
         },
+        newsletterNov2026: {
+          name: "Newsletter November 2026",
+          description:
+            "One-off re-activation newsletter: a companion on your side, your filter, and a cheaper default",
+          longDescription:
+            "November 2026 conversion newsletter to consented newsletter opt-ins, led by the companion ethos and the cheaper default model",
+        },
       },
     },
   },

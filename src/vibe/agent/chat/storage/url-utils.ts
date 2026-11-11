@@ -1,11 +1,21 @@
-import { coreClientEnv as envClient } from "next-vibe/core/env-client";
+import { coreEnv } from "next-vibe/core/env";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 /**
- * Converts a relative storage URL to an absolute URL by prepending NEXT_PUBLIC_APP_URL.
+ * Converts a relative storage URL to an absolute URL by prepending the app URL.
  * Used so that AI models, SSE events, and external consumers see fully-qualified URLs.
  * If the URL is already absolute (starts with http:// or https://) it is returned as-is.
+ *
+ * Uses the SERVER env (`coreEnv`, server-only), NOT the client env: this module
+ * runs server-side only (storage adapters), and NEXT_PUBLIC_* values on the
+ * client env are INLINED at build time. The Docker prod image is built with
+ * placeholder env and no NEXT_PUBLIC_APP_URL, so the client value is baked to the
+ * `http://localhost:3000` schema default and never patched at runtime (no sentinel
+ * is injected for a key absent from the build env). `coreEnv` re-reads
+ * `process.env.NEXT_PUBLIC_APP_URL` at runtime, so prod gets the real
+ * `https://unbottled.ai` and dev keeps `http://localhost:3000` (incl. the
+ * Hermes preview-port rewrite, which `coreEnv` applies identically).
  */
 export function makeAbsoluteStorageUrl(relativeUrl: string): string {
   if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
@@ -13,7 +23,7 @@ export function makeAbsoluteStorageUrl(relativeUrl: string): string {
   }
 
   // Remove trailing slash from app URL before joining
-  const base = envClient.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  const base = coreEnv.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   return `${base}${relativeUrl}`;
 }
 

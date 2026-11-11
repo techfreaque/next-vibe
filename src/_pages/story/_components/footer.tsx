@@ -1,5 +1,6 @@
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { Div } from "next-vibe/ui/components/div";
 import { Footer as FooterContainer } from "next-vibe/ui/components/footer";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
@@ -27,6 +28,7 @@ import type React from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
+import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
 
 import { Logo } from "../../_components/logo";
 import { scopedTranslation } from "./i18n";
@@ -35,6 +37,8 @@ interface FooterProps {
   locale: CountryLanguage;
   totalModelCount: number;
   isPublic: boolean;
+  user: JwtPayloadType;
+  userEmail: string | undefined;
 }
 
 /** Server-rendered — kept outside the component body so render stays pure. */
@@ -46,6 +50,8 @@ const Footer: React.FC<FooterProps> = ({
   locale,
   totalModelCount,
   isPublic,
+  user,
+  userEmail,
 }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -54,6 +60,26 @@ const Footer: React.FC<FooterProps> = ({
   return (
     <FooterContainer className="w-full border-t border-border bg-muted/40">
       <Div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 md:py-16">
+        {/* Newsletter capture — appears on every non-home story page */}
+        <Div className="mb-10 flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 md:mb-14 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
+          <Div className="flex flex-col gap-1.5 md:max-w-sm">
+            <H3 className="m-0 border-0 p-0 text-base font-semibold text-foreground">
+              {t("footer.newsletter.title")}
+            </H3>
+            <P className="text-sm text-muted-foreground">
+              {t("footer.newsletter.subtitle")}
+            </P>
+          </Div>
+          <Div className="w-full md:max-w-md">
+            <NewsletterSubscribeInline
+              locale={locale}
+              user={user}
+              userEmail={userEmail}
+              variant="compact"
+            />
+          </Div>
+        </Div>
+
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
           <Div className="lg:col-span-1 flex flex-col gap-4">

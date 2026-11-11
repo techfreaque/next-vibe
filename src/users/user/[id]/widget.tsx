@@ -7,18 +7,21 @@
 import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { BarChart2 } from "next-vibe/ui/components/icons/BarChart2";
+import { Bookmark } from "next-vibe/ui/components/icons/Bookmark";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Edit } from "next-vibe/ui/components/icons/Edit";
-import { Link } from "next-vibe/ui/components/icons/Link";
+import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
-import { Package } from "next-vibe/ui/components/icons/Package";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { User } from "next-vibe/ui/components/icons/User";
+import { Users } from "next-vibe/ui/components/icons/Users";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
@@ -91,6 +94,30 @@ export function UserDetailContainer({
   const updatedAt = data?.updatedAt ?? data?.timestamps?.updatedAt;
   const leadId = data?.leadId;
 
+  // Target-user engagement + credits (scoped to [id], never the viewer)
+  const engagement = data?.engagement;
+  const referralInfo = data?.referralInfo;
+  const creditBalance = engagement?.creditBalance;
+  const freeAllowance = engagement?.freeAllowance;
+  const lifetimeCreditsSpent = engagement?.lifetimeCreditsSpent;
+  const favoritesCount = engagement?.favoritesCount;
+  const customSkillsCount = engagement?.customSkillsCount;
+  const newsletterConsent = engagement?.newsletterConsent ?? false;
+  const hasConfirmedNewsletter = engagement?.hasConfirmedNewsletter ?? false;
+  const totalReferrals = referralInfo?.totalReferrals ?? 0;
+  const confirmedEarnedCents = referralInfo?.confirmedEarnedCents ?? 0;
+  const pendingEarnedCents = referralInfo?.pendingEarnedCents ?? 0;
+
+  const fmtNum = (n: number | null | undefined): string =>
+    n === null || n === undefined ? "—" : n.toLocaleString(locale);
+  const fmtCents = (n: number | null | undefined): string =>
+    n === null || n === undefined
+      ? "—"
+      : (n / 100).toLocaleString(locale, {
+          style: "currency",
+          currency: "USD",
+        });
+
   const handleEdit = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
@@ -115,16 +142,6 @@ export function UserDetailContainer({
     });
   }, [navigate, userId]);
 
-  const handleViewCreditHistory = useCallback((): void => {
-    if (!userId) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      const defs = await import("./definition");
-      navigate(defs.default.GET, { urlPathParams: { id: userId } });
-    })();
-  }, [navigate, userId]);
-
   const handleViewLead = useCallback((): void => {
     if (!leadId) {
       return;
@@ -134,36 +151,6 @@ export function UserDetailContainer({
       navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
     })();
   }, [navigate, leadId]);
-
-  const handleFullProfile = useCallback((): void => {
-    if (!userId) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      const defs = await import("./definition");
-      navigate(defs.default.GET, { urlPathParams: { id: userId } });
-    })();
-  }, [navigate, userId]);
-
-  const handleReferralStats = useCallback((): void => {
-    if (!userId) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      const defs = await import("./definition");
-      navigate(defs.default.GET, { urlPathParams: { id: userId } });
-    })();
-  }, [navigate, userId]);
-
-  const handleSubscription = useCallback((): void => {
-    if (!userId) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      const defs = await import("./definition");
-      navigate(defs.default.GET, { urlPathParams: { id: userId } });
-    })();
-  }, [navigate, userId]);
 
   const handleCopyUserId = useCallback((): void => {
     if (!userId) {
@@ -382,51 +369,105 @@ export function UserDetailContainer({
           )}
         </Div>
 
-        {/* Quick actions */}
-        <Div className="flex flex-wrap gap-2 pt-2 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleFullProfile}
-            className="gap-1"
-            title="View full profile with stats"
-          >
-            <BarChart2 className="h-3.5 w-3.5" />
-            {t("id.widget.fullProfile")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleReferralStats}
-            className="gap-1"
-            title={t("id.widget.titleReferralCodes")}
-          >
-            <Link className="h-3.5 w-3.5" />
-            {t("id.widget.referrals")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleSubscription}
-            className="gap-1"
-            title={t("id.widget.titleSubscription")}
-          >
-            <Package className="h-3.5 w-3.5" />
-            {t("id.widget.subscription")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleViewCreditHistory}
-            className="gap-1"
-          >
-            <CreditCard className="h-3.5 w-3.5" />
-            {t("id.widget.creditHistory")}
-          </Button>
+        {/* Engagement & credits (target [id] user, not the viewer) */}
+        <Div className="pt-2 border-t">
+          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            {t("id.widget.engagementTitle")}
+          </Span>
+          <Div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Wallet className="h-3.5 w-3.5" />
+                {t("id.widget.balance")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(creditBalance)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Gift className="h-3.5 w-3.5" />
+                {t("id.widget.freeAllowance")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(freeAllowance)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Coins className="h-3.5 w-3.5" />
+                {t("id.widget.lifetimeSpend")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(lifetimeCreditsSpent)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <CreditCard className="h-3.5 w-3.5" />
+                {t("id.widget.earned")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums text-success">
+                {fmtCents(confirmedEarnedCents)}
+              </Span>
+              {pendingEarnedCents > 0 && (
+                <Span className="text-xs text-muted-foreground">
+                  {t("id.widget.earnedPending")} {fmtCents(pendingEarnedCents)}
+                </Span>
+              )}
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Users className="h-3.5 w-3.5" />
+                {t("id.widget.referred")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(totalReferrals)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Bookmark className="h-3.5 w-3.5" />
+                {t("id.widget.favorites")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(favoritesCount)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5" />
+                {t("id.widget.skills")}
+              </Div>
+              <Span className="text-lg font-bold tabular-nums">
+                {fmtNum(customSkillsCount)}
+              </Span>
+            </Div>
+            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
+              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Mail className="h-3.5 w-3.5" />
+                {t("id.widget.newsletter")}
+              </Div>
+              <Span className="inline-flex items-center gap-1 text-sm font-medium">
+                {hasConfirmedNewsletter ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    {t("id.widget.newsletterConfirmed")}
+                  </>
+                ) : newsletterConsent ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-warning" />
+                    {t("id.widget.newsletterConsent")}
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4 text-muted-foreground" />
+                    {t("id.widget.newsletterNone")}
+                  </>
+                )}
+              </Span>
+            </Div>
+          </Div>
         </Div>
       </Div>
     </Div>

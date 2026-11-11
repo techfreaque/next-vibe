@@ -1130,6 +1130,7 @@ export class AiStreamRepository {
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
     let capturedLastGeneratedMediaUrl: string | null = null;
+    let capturedProviderErrorText: string | null = null;
     let capturedTotalCreditsDeducted = 0;
     const capturedPinnedToolCount = tools ? Object.keys(tools).length : 0;
     // Set to true when prepareStep injects a queued message mid-stream.
@@ -1768,6 +1769,11 @@ export class AiStreamRepository {
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
           // on the writer is updated on every write so it always holds the final one.
           capturedQueueInjected = ctx.queueInjectedInStream;
+          // Capture the provider error-part text (if the stream hit an upstream
+          // error) regardless of whether an assistant message was written, so
+          // headless callers can surface the real cause (e.g. a transient
+          // provider_unavailable outage) instead of a generic failure.
+          capturedProviderErrorText = ctx.lastProviderErrorText;
           if (ctx.dbWriter.lastAssistantMessageId) {
             capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
             capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
@@ -2008,6 +2014,7 @@ export class AiStreamRepository {
             lastAiMessageId: capturedLastAiMessageId,
             lastAiMessageContent: capturedLastAiMessageContent,
             lastGeneratedMediaUrl: capturedLastGeneratedMediaUrl,
+            providerErrorText: capturedProviderErrorText,
             totalCreditsDeducted: capturedTotalCreditsDeducted,
             pinnedToolCount: capturedPinnedToolCount,
           },

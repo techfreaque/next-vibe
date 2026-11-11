@@ -29,7 +29,10 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 import {
   getPricingParams,
   ProductIds,
@@ -111,7 +114,7 @@ export function CreditsTabHeader({
   // Monthly free allowance by tier (guest / signed-in / +newsletter)
   const freeTiers = {
     guest: FREE_CREDIT_ALLOWANCE.guest,
-    signedIn: FREE_CREDIT_ALLOWANCE.signedIn,
+    signedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
     bonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
   };
 
@@ -122,7 +125,7 @@ export function CreditsTabHeader({
       : t("get.balance.credits", { count: totalFormatted })
     : "—";
   // Under a fifth of the signed-in monthly allowance counts as running low.
-  const lowBalanceThreshold = FREE_CREDIT_ALLOWANCE.signedIn / 5;
+  const lowBalanceThreshold = FREE_CREDIT_SIGNED_IN_TOTAL / 5;
   const isLowBalance = data !== undefined && data.total < lowBalanceThreshold;
   const isEmptyBalance = data !== undefined && data.total <= 0;
   const headerTitle = isAdmin

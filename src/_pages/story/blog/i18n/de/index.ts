@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    uncensoredGuide: {
+      title: "Die unzensierten Modelle, eins nach dem anderen.",
+      category: "Modell-Guide",
+      excerpt:
+        "Worin jedes unzensierte Modell gut ist, wo es schwächelt und warum die volle Auswahl der Punkt ist. Venice, GLM, Qwen, Gemma, Arya, FreedomGPT und mehr.",
+      readTime: "7 Min. Lesezeit",
+    },
     modelRefresh: {
       title: "Die neuesten Modelle sind da. Unzensiert wird ernst.",
       category: "Modell-Update",

@@ -1,0 +1,74 @@
+# Redis HA overlay. Apply per node with the matching profile:
+#   Server 1 (master):  REDIS_ROLE=master  docker compose -f ha/redis/docker-compose.redis-ha.yml up -d
+#   Server 2 (replica): REDIS_ROLE=replica REDIS_MASTER_HOST=10.88.0.1 ... up -d
+#
+# Replaces the base compose's single `redis` with a replication-aware one bound
+# to the WireGuard IP, plus a Sentinel. The app connects through the HAProxy
+# front (ha/redis/haproxy/), not directly, so REDIS_URL stays stable.
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: unbottled-redis
+    restart: unless-stopped
+    # REDIS_REPLICAOF is empty on the master, "10.88.0.1 6379" on the replica.
+    # announce-ip/port = the WG address so Sentinel hands clients a reachable host.
+    command:
+      - sh
+      - -c
+      - |
+        exec redis-server \
+          --appendonly yes \
+          --protected-mode no \
+          --replica-announce-ip ${REDIS_ANNOUNCE_IP:-10.88.0.1} \
+          --replica-announce-port 6379 \
+          ${REDIS_REPLICAOF:+--replicaof ${REDIS_REPLICAOF}} \
+          --masterauth "${REDIS_PASSWORD:-}" \
+          --requirepass "${REDIS_PASSWORD:-}"
+    volumes:
+      - redis-data:/data
+    # Bind to the WG IP only — Redis must be reachable peer-to-peer but NEVER public.
+    ports:
+      - "${REDIS_ANNOUNCE_IP:-10.88.0.1}:6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD:-}",
+          "--no-auth-warning",
+          "ping",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-sentinel:
+    image: redis:7-alpine
+    container_name: unbottled-redis-sentinel
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ./sentinel.conf:/etc/redis/sentinel.conf
+    # Copy the template to a writable file (Sentinel rewrites its own config) then run.
+    command:
+      - sh
+      - -c
+      - |
+        cp /etc/redis/sentinel.conf /data/sentinel.conf 2>/dev/null || true
+        exec redis-sentinel /data/sentinel.conf
+    ports:
+      - "${REDIS_ANNOUNCE_IP:-10.88.0.1}:26379:26379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+    name: ${APP_NETWORK:-unbottled_app-network}
+
+volumes:
+  redis-data:

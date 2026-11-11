@@ -29,6 +29,7 @@ import type {
   ToolSet,
 } from "ai";
 import {
+  APICallError,
   stepCountIs,
   type StopCondition,
   streamText as aiStreamText,
@@ -44,6 +45,11 @@ import {
 } from "../core/constants";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { isTransientErrorText } from "../errors/transient";
+import {
+  type DrainableLoop,
+  deregisterActiveLoop,
+  registerActiveLoop,
+} from "./active-loops";
 import {
   abortReasonAsError,
   complete,
@@ -97,8 +103,37 @@ export class StreamLoop implements StreamLoopState {
   /**
    * Run the loop to completion: configure streamText, pump every part,
    * handle aborts/errors, finalize tokens + credits, complete the stream.
+   *
+   * Thin wrapper over {@link runInner} that registers this loop in the
+   * process-local active-loop registry for the duration of the run. The
+   * graceful-shutdown drain (G1, see loop/active-loops.ts) waits on that
+   * registry so a rolling deploy never severs an in-flight AI stream.
+   * Deregistration is in `finally`, so it fires on completion, abort and error
+   * alike.
    */
   async run(): Promise<void> {
+    const drainable: DrainableLoop = {
+      abort: (reason: string): void => {
+        if (!this.p.streamAbortController.signal.aborted) {
+          this.p.streamAbortController.abort(
+            new StreamAbortError(AbortReason.SERVER_SHUTDOWN),
+          );
+        }
+        this.p.logger.warn(
+          "[AI Stream] Loop aborted by shutdown drain (timed out waiting to finish)",
+          { reason, threadId: this.p.threadId },
+        );
+      },
+    };
+    registerActiveLoop(drainable);
+    try {
+      await this.runInner();
+    } finally {
+      deregisterActiveLoop(drainable);
+    }
+  }
+
+  private async runInner(): Promise<void> {
     const {
       provider,
       modelConfig,
@@ -734,8 +769,25 @@ export class StreamLoop implements StreamLoopState {
 
     if (part.type === "error") {
       const rawError = "error" in part ? part.error : undefined;
-      const errorText =
-        rawError instanceof Error
+      // The AI SDK often surfaces only the human-readable `message`, burying the
+      // HTTP status and the provider's own error-type (e.g. OpenRouter's
+      // `{ code: 502, metadata: { error_type: "provider_unavailable" } }`) in
+      // sibling fields. Fold the structured fields into the text so the
+      // transient classifier below sees the `502` / `provider_unavailable`
+      // signal and treats the outage as the transient upstream failure it is.
+      const errorText = APICallError.isInstance(rawError)
+        ? [
+            rawError.message,
+            rawError.statusCode === undefined
+              ? ""
+              : String(rawError.statusCode),
+            typeof rawError.responseBody === "string"
+              ? rawError.responseBody
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ")
+        : rawError instanceof Error
           ? rawError.message
           : rawError !== undefined && rawError !== null
             ? JSON.stringify(rawError)

@@ -12,7 +12,11 @@ import { ImageGenModelId } from "./models";
  */
 export const DEFAULT_IMAGE_GEN_MODEL_SELECTION: ImageGenModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ImageGenModelId.GPT_5_IMAGE,
+  // Set to Lustify V8 on 2026-11-11 (Max): on-brand uncensored default via Venice,
+  // cheap (1 credit/image) and verified working. Note Lustify is text-to-image only;
+  // when a reference image is attached the resolver/AI must pick an image-input model
+  // (inputs includes "image") instead, since Lustify cannot consume a reference.
+  manualModelId: ImageGenModelId.LUSTIFY_V8,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,

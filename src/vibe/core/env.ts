@@ -380,8 +380,15 @@ export const {
           ) {
             return raw;
           }
-          const previewPort =
-            process.env["PREVIEW_PORT"] ?? (isHermesDev ? "3002" : "3001");
+          // Hermes DEV always runs on :3002 — PREVIEW_PORT is a prod-server knob
+          // (vibe --hermes start/build on :3001) and must NOT override the dev
+          // port, or a --hermes tool command's realtime hub resolution lands on
+          // the wrong port and a remote one-shot (ai-run → Thea) hangs waiting
+          // for a result delivered on :3002. Prod-preview still honours
+          // PREVIEW_PORT, defaulting to :3001.
+          const previewPort = isHermesDev
+            ? "3002"
+            : (process.env["PREVIEW_PORT"] ?? "3001");
           parsed.port = previewPort;
           return parsed.toString();
         } catch {

@@ -1,0 +1,17 @@
+# Redis Sentinel — monitors the Server 1 master over WireGuard.
+# Install on BOTH nodes. Sentinel rewrites this file at runtime, so the compose
+# copies it to a writable /data/sentinel.conf first.
+port 26379
+bind 0.0.0.0
+sentinel resolve-hostnames yes
+sentinel announce-ip __THIS_NODE_WG_IP__
+sentinel announce-port 26379
+
+# mymaster = the unbottled Redis master. quorum 2 (both sentinels must agree).
+# Initially the master is Server 1 (10.88.0.1). After a failover Sentinel
+# rewrites this line to the promoted replica automatically.
+sentinel monitor mymaster 10.88.0.1 6379 2
+sentinel auth-pass mymaster __REDIS_PASSWORD__
+sentinel down-after-milliseconds mymaster 5000
+sentinel failover-timeout mymaster 15000
+sentinel parallel-syncs mymaster 1

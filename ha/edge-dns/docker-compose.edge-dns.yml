@@ -1,0 +1,43 @@
+# ============================================================================
+# Edge DNS — self-hosted PowerDNS authoritative server, one per node.
+#
+# TWO of these (Server 1 = ns1, Server 2 = ns2) are the authoritative
+# nameservers for unbottled.ai after the registrar NS flip (see README).
+# Each is paired with the ha-dns-health daemon (docker-compose.health.yml) that
+# rewrites the apex A set to the currently-healthy node(s) and reloads pdns.
+#
+# Bring up:  NODE_PUBLIC_IP=72.61.156.49 NODE_WG_IP=10.88.0.1 \
+#            docker compose -f ha/edge-dns/docker-compose.edge-dns.yml up -d
+#
+# Safe to run on prod: it only opens :53 on the node's OWN public + WG IP and
+# touches NOTHING the app/caddy/postgres stack uses. It does not become live
+# for the public domain until the registrar delegation is pointed here.
+# ============================================================================
+services:
+  pdns:
+    image: powerdns/pdns-auth-49:4.9.11
+    container_name: ha-edge-pdns
+    restart: unless-stopped
+    # Publish :53 ONLY on this node's public IP and its WireGuard IP — never
+    # 0.0.0.0 (systemd-resolved owns 127.0.0.53:53; we must not shadow it).
+    ports:
+      - "${NODE_PUBLIC_IP}:53:53/udp"
+      - "${NODE_PUBLIC_IP}:53:53/tcp"
+      - "${NODE_WG_IP}:53:53/udp"
+      - "${NODE_WG_IP}:53:53/tcp"
+    volumes:
+      - ./pdns/pdns.conf:/etc/powerdns/pdns.conf:ro
+      - ./pdns/named.conf:/etc/powerdns/named.conf:ro
+      # The rendered zone lives on a host dir the health daemon also writes.
+      - ${EDGE_ZONE_DIR:-/srv/ha-edge/zones}:/etc/powerdns/zones
+      - ha-edge-pdns-run:/var/run/pdns
+    healthcheck:
+      # dig the apex through the local pdns; non-empty answer = serving.
+      test: ["CMD-SHELL", "pdns_control rping >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    # share the control socket dir with the health daemon so it can reload.
+volumes:
+  ha-edge-pdns-run:
+    name: ha-edge-pdns-run

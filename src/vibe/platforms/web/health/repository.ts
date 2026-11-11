@@ -54,6 +54,14 @@ export class HealthCheckRepository {
       // Get environment information
       const envInfo = getCurrentEnvironmentInfo();
 
+      // Graceful-shutdown drain: once SIGTERM has started draining in-flight AI
+      // streams, report the node UNHEALTHY so a health-checking load balancer
+      // (Caddy reverse_proxy health_uri) stops routing NEW requests here while
+      // existing streams finish. This is the belt-and-suspenders signal that
+      // complements the rolling-deploy script's explicit LB deregistration.
+      const drainCheck = await HealthCheckRepository.performDrainCheck();
+      checks.push(drainCheck);
+
       // Basic health check
       const basicCheck = await HealthCheckRepository.performBasicCheck();
       checks.push(basicCheck);
@@ -164,6 +172,46 @@ export class HealthCheckRepository {
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  /**
+   * Drain check — fails (status "fail" ⇒ overall "critical") once the process
+   * has begun graceful shutdown, so a health-checking LB deregisters this node.
+   * Also reports the in-flight AI-stream count for observability.
+   */
+  private static async performDrainCheck(): Promise<{
+    name: string;
+    status: "pass" | "fail" | "warn";
+    message?: string;
+    duration?: number;
+  }> {
+    const start = performance.now();
+    try {
+      const { isDraining, activeLoopCount } =
+        await import("../../../agent/ai-stream/repository/loop/active-loops");
+      if (isDraining()) {
+        return {
+          name: "drain",
+          status: "fail",
+          message: `Node is draining (${activeLoopCount()} in-flight stream(s))`, // eslint-disable-line i18next/no-literal-string
+          duration: performance.now() - start,
+        };
+      }
+      return {
+        name: "drain",
+        status: "pass",
+        message: `Accepting traffic (${activeLoopCount()} in-flight stream(s))`, // eslint-disable-line i18next/no-literal-string
+        duration: performance.now() - start,
+      };
+    } catch (error) {
+      // Never fail health over an inability to read the drain flag.
+      return {
+        name: "drain",
+        status: "pass",
+        message: parseError(error).message,
+        duration: performance.now() - start,
+      };
     }
   }
 

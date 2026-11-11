@@ -59,6 +59,9 @@ export enum ImageGenModelId {
   // Uncensored image models via Venice.ai (added 2026-11-07)
   LUSTIFY_V8 = "lustify-v8",
   CHROMA = "chroma",
+  // Venice.ai image EDIT models (image-to-image, added 2026-11-11)
+  QWEN_EDIT = "qwen-edit",
+  FIRERED_IMAGE_EDIT = "firered-image-edit",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
@@ -133,7 +136,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -182,6 +185,9 @@ export const imageGenModelDefinitions: Record<
     parameterCount: 4,
     contextWindow: 0,
     icon: "image",
+    // Klein 4B is the distilled open-weight base; OpenRouter lists only output
+    // image pricing (no image-input modality), so left text-only pending
+    // confirmation of an image-edit path.
     inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
@@ -219,7 +225,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -264,7 +270,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -305,7 +311,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -346,7 +352,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -383,7 +389,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -420,7 +426,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -460,7 +466,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -508,7 +514,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text"], // updated: 2026-04-03 from image-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"], // updated: 2026-04-03 from image-gen-deterministic
     providers: [
       {
@@ -1037,7 +1043,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "si-x",
-    inputs: ["text"],
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"],
     providers: [
       {
@@ -1074,7 +1080,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "si-alibabadotcom",
-    inputs: ["text"],
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"],
     providers: [
       {
@@ -1111,7 +1117,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "si-alibabadotcom",
-    inputs: ["text"],
+    inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"],
     providers: [
       {
@@ -1195,6 +1201,69 @@ export const imageGenModelDefinitions: Record<
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
       ModelUtility.ADULT_EXPLICIT,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.UNCENSORED,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+  [ImageGenModelId.QWEN_EDIT]: {
+    name: "Qwen Edit Uncensored",
+    by: "veniceAI",
+    description: "chat.models.descriptions.veniceQwenEdit",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text", "image"], // updated: 2026-11-11 from venice-api (image edit)
+    outputs: ["image"], // updated: 2026-11-11 from venice-api
+    providers: [
+      {
+        id: ImageGenModelId.QWEN_EDIT,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "qwen-edit-uncensored",
+        creditCostPerImage: 4, // updated: 2026-11-11 from venice-api ($0.04/edit → 4 credits)
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
+      ModelUtility.ADULT_EXPLICIT,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.UNCENSORED,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+  [ImageGenModelId.FIRERED_IMAGE_EDIT]: {
+    name: "FireRed Image Edit",
+    by: "veniceAI",
+    description: "chat.models.descriptions.veniceFireredImageEdit",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text", "image"], // updated: 2026-11-11 from venice-api (image edit)
+    outputs: ["image"], // updated: 2026-11-11 from venice-api
+    providers: [
+      {
+        id: ImageGenModelId.FIRERED_IMAGE_EDIT,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "firered-image-edit",
+        creditCostPerImage: 4, // updated: 2026-11-11 from venice-api ($0.04/edit → 4 credits)
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,

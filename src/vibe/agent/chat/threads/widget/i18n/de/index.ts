@@ -77,6 +77,7 @@ export const translations: typeof enTranslations = {
       help: "Feedback & Support",
       about: "Über uns",
       websiteBlog: "Geschichten",
+      newsletter: "Newsletter (+20 Gratis-Credits)",
       admin: "Admin-Dashboard",
     },
     confirmations: {

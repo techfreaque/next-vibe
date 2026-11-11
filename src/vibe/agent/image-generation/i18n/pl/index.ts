@@ -118,10 +118,13 @@ export const translations: typeof enTranslations = {
         "Model {{model}} nie obsługuje jakości {{quality}}. Obsługiwane jakości: {{supported}}",
       unsupportedAspectRatio:
         "Model {{model}} nie obsługuje proporcji {{aspectRatio}}. Obsługiwane proporcje: {{supported}}",
+      modelNoReferenceImage:
+        "Model {{model}} nie przyjmuje obrazów referencyjnych. Wybierz model typu obraz-do-obrazu (taki, którego wejścia obejmują obraz), aby użyć referencji.",
       generationFailed: "Generowanie obrazu nie powiodło się",
       providerError: "Błąd dostawcy: {{error}}",
       noImageUrl: "Dostawca nie zwrócił URL obrazu",
-      noImageGenerated: "Model nie wygenerował żadnego obrazu",
+      noImageGenerated:
+        "Model nie zwrócił żadnego obrazu. Zwykle oznacza to, że prompt został odrzucony (na przykład broń, prawdziwe osoby lub chronione postacie) albo żądanie nie jest obsługiwane przez ten model. Przeformułuj prompt lub wybierz inny model graficzny. Uwaga: modele text-to-image, takie jak ten, nie korzystają z obrazów referencyjnych. Za tę próbę nie pobrano kredytów.",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie obrazu",
       apiKeyNotConfigured: "Klucz API nie jest skonfigurowany",
       externalServiceError: "Błąd zewnętrznej usługi: {{message}}",

@@ -1156,6 +1156,13 @@ export const translations = {
                 longDescription:
                   "May 2026 product update newsletter sent to all signed-up users with honest bug admission and feature highlights",
               },
+              newsletterNov2026: {
+                name: "Newsletter November 2026",
+                description:
+                  "One-off re-activation newsletter: a companion on your side, your filter, and a cheaper default",
+                longDescription:
+                  "November 2026 conversion newsletter sent to consented newsletter opt-ins, leading with the companion ethos and the cheaper default model",
+              },
             },
           },
         },
@@ -5072,6 +5079,7 @@ export const translations = {
       retention: "Retention",
       winback: "Winback",
       newsletterMay2026: "Newsletter May 2026",
+      newsletterNov2026: "Newsletter November 2026",
     },
     emailJourneyVariantFilter: {
       all: "All",
@@ -5082,6 +5090,7 @@ export const translations = {
       retention: "Retention",
       winback: "Winback",
       newsletterMay2026: "Newsletter May 2026",
+      newsletterNov2026: "Newsletter November 2026",
     },
     sortOrder: {
       asc: "Ascending",

@@ -1400,11 +1400,11 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Unzensiertes KI-Modell für kreative und uneingeschränkte Konversationen",
+          "UncensoredLM v1.2 - Das Reasoning-Modell von Uncensored.ai, ein DeepSeek-R1-Distill auf 14B-Qwen-Basis. Denkt sichtbar mit, antwortet direkt, ruft Tools auf. 32K Kontext. Experimentell und nicht die erste Wahl, wenn es um Code geht.",
         freedomgptLiberty:
-          "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
+          "FreedomGPT Liberty - Das Flaggschiff von Age of AI und der Free-Speech-Chatbot, der die ganze Kategorie losgetreten hat. Auf offenen Gewichten gebaut, auf klare Antworten ohne Belehrung getrimmt. Schnell und schlagfertig, 32K Kontext. Schwächer bei Tools, Coding und tiefer Analyse.",
         gabAiArya:
-          "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
+          "Gab AI Arya - Gabs unzensierter Assistent, von seinem Anbieter bewusst rechts verortet und darauf ausgelegt, ohne die üblichen Schranken zu antworten. Clever, 131K Kontext, nutzt Tools. Eine bewusst andere Perspektive im Katalog. Schwächer beim Coding, Basismodell nicht offengelegt.",
         gemini31ProPreviewCustomTools:
           "Gemini 3.1 Pro Preview (Custom Tools) - Gemini-3.1-Pro-Variante mit verbesserter Werkzeugauswahl für Coding-Agenten und komplexe Multi-Tool-Workflows",
         gemini31FlashImagePreview:
@@ -1469,6 +1469,10 @@ export const translations: typeof enTranslations = {
           "Lustify v8 - SDXL-Checkpoint für fotorealistische Erwachsenenbilder. Kein Weichzeichner, keine Verweigerungen. Ein Cent pro Bild.",
         veniceChroma:
           "Chroma - Unzensiertes offenes Modell der Flux-Klasse. Lange Prompts, große künstlerische Bandbreite, kein Weichzeichner. Ein Cent pro Bild.",
+        veniceQwenEdit:
+          "Qwen Edit Uncensored - Referenzbild plus Prompt rein, bearbeitetes Bild zurück. Elemente tauschen, umstylen, Szenen neu aufbauen. Kein Weichzeichner, keine Verweigerungen.",
+        veniceFireredImageEdit:
+          "FireRed Image Edit - Bildbearbeitung per Prompt. Ändert, was du beschreibst, lässt den Rest. Schnell, unzensiert, mit Referenzbild.",
         claudeOpus45:
           "Claude Opus 4.5 - Leistungsstärkstes Claude-Modell mit außergewöhnlichen Reasoning- und kreativen Fähigkeiten",
         claudeOpus46:
@@ -1821,6 +1825,8 @@ export const translations: typeof enTranslations = {
           "Claude Haiku 5.5 - Anthropics schnellstes Modell. Bildverständnis, Tools und 1M-Kontext für ein Zehntel des Haiku-4.5-Preises.",
         claudeFable51:
           "Claude Fable 5.1 - Anthropics Frontier-Denker. Tiefe Synthese, langfristige Planung, präziser als Fable 5. 1M-Token-Kontext.",
+        claudeFable52:
+          "Claude Fable 5.2 - Anthropics Frontier-Denker. Tiefere Synthese und stabilere Langzeitplanung als Fable 5.1, zum niedrigeren Preis. 1M-Token-Kontext.",
         gpt6Astra:
           "GPT-6 Astra - OpenAIs leistungsstärkstes Modell. Maximale Denktiefe für die schwierigsten Probleme. 1,05M-Token-Kontext.",
         gpt6AstraPro:

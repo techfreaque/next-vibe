@@ -26,7 +26,10 @@ import {
   listAllCatalogEntries,
 } from "@/_pages/models/_shared/model-catalog-entries";
 import { scopedTranslation as subscriptionT } from "@/_pages/subscription/i18n";
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 import {
   FEATURE_COSTS,
   getPricingParams,
@@ -115,7 +118,7 @@ export function CreditsBalanceContainer(): JSX.Element {
       title: tSub("subscription.overview.howItWorks.free.title"),
       description: tSub("subscription.overview.howItWorks.free.description", {
         guest: FREE_CREDIT_ALLOWANCE.guest,
-        signedIn: FREE_CREDIT_ALLOWANCE.signedIn,
+        signedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
         bonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       }),
     },

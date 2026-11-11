@@ -36,6 +36,7 @@ export const translations = {
       retention: "Retention",
       winback: "Winback",
       newsletterMay2026: "Newsletter May 2026",
+      newsletterNov2026: "Newsletter November 2026",
     },
     emailCampaignStage: {
       notStarted: "Not Started",

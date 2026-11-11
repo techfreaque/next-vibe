@@ -20,6 +20,10 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { userLeadLinks } from "next-vibe/identity/lead/db";
+import {
+  UserPermissionRole,
+  type UserRoleDB,
+} from "next-vibe/identity/roles/enum";
 import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -41,6 +45,58 @@ import type {
 import { scopedTranslation } from "./i18n";
 
 export class UsersStatsRepository {
+  /**
+   * Resolve the queried window.
+   * An explicit custom range (CUSTOM preset, or any from/to supplied) wins over
+   * the preset so the date pickers actually filter; otherwise fall back to the
+   * selected preset. `to` is pushed to the end of its day so the upper bound is
+   * inclusive of signups made that day.
+   */
+  private static resolveDateRange(
+    preset: (typeof DateRangePreset)[keyof typeof DateRangePreset],
+    from: Date | undefined,
+    to: Date | undefined,
+  ): { from: Date; to: Date } {
+    const hasCustom = preset === DateRangePreset.CUSTOM || Boolean(from ?? to);
+    if (hasCustom && (from ?? to)) {
+      const preset30 = getDateRangeFromPreset(DateRangePreset.LAST_30_DAYS);
+      const resolvedFrom = from ?? preset30.from;
+      const resolvedToRaw = to ?? new Date();
+      const resolvedTo = new Date(resolvedToRaw);
+      resolvedTo.setHours(23, 59, 59, 999);
+      // Guard against an inverted range: swap so queries stay valid.
+      return resolvedFrom <= resolvedTo
+        ? { from: resolvedFrom, to: resolvedTo }
+        : { from: resolvedTo, to: resolvedFrom };
+    }
+    return getDateRangeFromPreset(preset);
+  }
+
+  /**
+   * Map a UserRoleFilter value to the stored permission role.
+   * The filter carries an i18n key ("list.enums.userRoleFilter.customer") while
+   * user_roles.role stores the permission role ("enums.userRole.customer"), so a
+   * raw string compare always missed - the role filter silently matched nobody.
+   */
+  private static roleFilterToDbRole(
+    role: string,
+  ): (typeof UserRoleDB)[number] | null {
+    switch (role) {
+      case UserRoleFilter.PUBLIC:
+        return UserPermissionRole.PUBLIC;
+      case UserRoleFilter.CUSTOMER:
+        return UserPermissionRole.CUSTOMER;
+      case UserRoleFilter.PARTNER_ADMIN:
+        return UserPermissionRole.PARTNER_ADMIN;
+      case UserRoleFilter.PARTNER_EMPLOYEE:
+        return UserPermissionRole.PARTNER_EMPLOYEE;
+      case UserRoleFilter.ADMIN:
+        return UserPermissionRole.ADMIN;
+      default:
+        return null;
+    }
+  }
+
   private static getDateTruncFormat(
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): string {
@@ -121,37 +177,45 @@ export class UsersStatsRepository {
         language: locationFilters?.language,
         dateRangePreset:
           timePeriodOptions?.dateRangePreset ?? DateRangePreset.LAST_30_DAYS,
+        dateFrom: timePeriodOptions?.dateFrom,
+        dateTo: timePeriodOptions?.dateTo,
       };
 
       logger.debug("Fetching user statistics", query);
 
-      const dateRange = getDateRangeFromPreset(query.dateRangePreset);
+      const dateRange = UsersStatsRepository.resolveDateRange(
+        query.dateRangePreset,
+        query.dateFrom,
+        query.dateTo,
+      );
 
-      const whereConditions: SQL[] = [];
-      whereConditions.push(gte(users.createdAt, dateRange.from));
-      whereConditions.push(lte(users.createdAt, dateRange.to));
+      // Attribute conditions (status/role/country/subscription/payment/search)
+      // are kept separate from the signup-date window: signup counts filter by
+      // users.createdAt in range, but revenue/subscription counts must scope to
+      // the SAME users while using their OWN event date for the window.
+      const attrConditions: SQL[] = [];
 
       if (query.status && query.status !== UserStatusFilter.ALL) {
         switch (query.status) {
           case UserStatusFilter.ACTIVE:
-            whereConditions.push(eq(users.isActive, true));
+            attrConditions.push(eq(users.isActive, true));
             break;
           case UserStatusFilter.INACTIVE:
-            whereConditions.push(eq(users.isActive, false));
+            attrConditions.push(eq(users.isActive, false));
             break;
           case UserStatusFilter.PENDING:
-            whereConditions.push(eq(users.isActive, false));
-            whereConditions.push(eq(users.emailVerified, false));
+            attrConditions.push(eq(users.isActive, false));
+            attrConditions.push(eq(users.emailVerified, false));
             break;
           case UserStatusFilter.SUSPENDED:
-            whereConditions.push(eq(users.isActive, false));
-            whereConditions.push(eq(users.emailVerified, true));
+            attrConditions.push(eq(users.isActive, false));
+            attrConditions.push(eq(users.emailVerified, true));
             break;
           case UserStatusFilter.EMAIL_VERIFIED:
-            whereConditions.push(eq(users.emailVerified, true));
+            attrConditions.push(eq(users.emailVerified, true));
             break;
           case UserStatusFilter.EMAIL_UNVERIFIED:
-            whereConditions.push(eq(users.emailVerified, false));
+            attrConditions.push(eq(users.emailVerified, false));
             break;
         }
       }
@@ -163,22 +227,25 @@ export class UsersStatsRepository {
           ilike(users.email, `%${query.search}%`),
         );
         if (searchCondition) {
-          whereConditions.push(searchCondition);
+          attrConditions.push(searchCondition);
         }
       }
 
       if (query.role && query.role !== UserRoleFilter.ALL) {
-        whereConditions.push(
-          sql`${users.id} IN (SELECT user_id FROM user_roles WHERE role = ${query.role})`,
-        );
+        const dbRole = UsersStatsRepository.roleFilterToDbRole(query.role);
+        if (dbRole) {
+          attrConditions.push(
+            sql`${users.id} IN (SELECT user_id FROM user_roles WHERE role = ${dbRole})`,
+          );
+        }
       }
 
       if (query.country) {
-        whereConditions.push(ilike(users.locale, `%-${query.country}`));
+        attrConditions.push(ilike(users.locale, `%-${query.country}`));
       }
 
       if (query.language) {
-        whereConditions.push(ilike(users.locale, `${query.language}-%`));
+        attrConditions.push(ilike(users.locale, `${query.language}-%`));
       }
 
       if (
@@ -188,11 +255,11 @@ export class UsersStatsRepository {
         if (
           query.subscriptionStatus === SubscriptionStatusFilter.NO_SUBSCRIPTION
         ) {
-          whereConditions.push(
+          attrConditions.push(
             sql`${users.id} NOT IN (SELECT user_id FROM subscriptions)`,
           );
         } else {
-          whereConditions.push(
+          attrConditions.push(
             sql`${users.id} IN (SELECT user_id FROM subscriptions WHERE status = ${query.subscriptionStatus})`,
           );
         }
@@ -203,26 +270,38 @@ export class UsersStatsRepository {
         query.paymentMethod !== PaymentMethodFilter.ALL
       ) {
         if (query.paymentMethod === PaymentMethodFilter.NO_PAYMENT_METHOD) {
-          whereConditions.push(
+          attrConditions.push(
             sql`${users.id} NOT IN (SELECT user_id FROM payment_methods)`,
           );
         } else if (query.paymentMethod === PaymentMethodFilter.CRYPTO) {
-          whereConditions.push(
+          attrConditions.push(
             sql`${users.id} IN (SELECT user_id FROM payment_transactions WHERE provider = 'NOWPAYMENTS')`,
           );
         } else {
-          whereConditions.push(
+          attrConditions.push(
             sql`${users.id} IN (SELECT user_id FROM payment_methods WHERE type = ${query.paymentMethod})`,
           );
         }
       }
 
-      const whereClause =
-        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      // Signup-window clause: createdAt in range AND all attribute filters.
+      const signupConditions: SQL[] = [
+        gte(users.createdAt, dateRange.from),
+        lte(users.createdAt, dateRange.to),
+        ...attrConditions,
+      ];
+      const whereClause = and(...signupConditions);
+
+      // Bare attribute predicate (no date window) reused to scope
+      // revenue/subscription aggregates to the same filtered users; undefined
+      // when no attribute filter is set so platform-wide totals are used.
+      const attrUserScope =
+        attrConditions.length > 0 ? and(...attrConditions) : undefined;
 
       const timePeriod = timePeriodOptions?.timePeriod ?? TimePeriod.DAY;
       const response = await UsersStatsRepository.buildResponse(
         whereClause,
+        attrUserScope,
         dateRange,
         timePeriod,
       );
@@ -241,6 +320,7 @@ export class UsersStatsRepository {
 
   private static async buildResponse(
     whereClause: SQL | undefined,
+    attrUserScope: SQL | undefined,
     dateRange: { from: Date; to: Date },
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): Promise<UserStatsResponseOutput> {
@@ -280,6 +360,11 @@ export class UsersStatsRepository {
         and(
           gte(subscriptions.createdAt, dateRange.from),
           lte(subscriptions.createdAt, dateRange.to),
+          ...(attrUserScope
+            ? [
+                sql`${subscriptions.userId} IN (SELECT ${users.id} FROM ${users} WHERE ${attrUserScope})`,
+              ]
+            : []),
         ),
       );
 
@@ -302,6 +387,11 @@ export class UsersStatsRepository {
         and(
           gte(paymentTransactions.createdAt, dateRange.from),
           lte(paymentTransactions.createdAt, dateRange.to),
+          ...(attrUserScope
+            ? [
+                sql`${paymentTransactions.userId} IN (SELECT ${users.id} FROM ${users} WHERE ${attrUserScope})`,
+              ]
+            : []),
         ),
       );
 
@@ -315,6 +405,11 @@ export class UsersStatsRepository {
         and(
           gte(paymentRefunds.createdAt, dateRange.from),
           lte(paymentRefunds.createdAt, dateRange.to),
+          ...(attrUserScope
+            ? [
+                sql`${paymentRefunds.userId} IN (SELECT ${users.id} FROM ${users} WHERE ${attrUserScope})`,
+              ]
+            : []),
         ),
       );
 
@@ -351,12 +446,7 @@ export class UsersStatsRepository {
         count: sql<number>`count(*)::int`,
       })
       .from(users)
-      .where(
-        and(
-          gte(users.createdAt, dateRange.from),
-          lte(users.createdAt, dateRange.to),
-        ),
-      )
+      .where(whereClause)
       .groupBy(
         sql`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${users.createdAt})`,
       )

@@ -68,6 +68,15 @@ export const translations: typeof enTranslations = {
       label: "Datumsbereichsvorlage",
       description: "Wählen Sie einen vordefinierten Datumsbereich",
     },
+    dateFrom: {
+      label: "Von",
+      description:
+        "Startdatum des eigenen Zeitraums. Überschreibt die Vorlage.",
+    },
+    dateTo: {
+      label: "Bis",
+      description: "Enddatum des eigenen Zeitraums. Überschreibt die Vorlage.",
+    },
     includeComparison: {
       label: "Vergleich einbeziehen",
       description: "Vergleich mit vorherigem Zeitraum einbeziehen",

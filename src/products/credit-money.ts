@@ -7,7 +7,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
-import { FREE_CREDIT_ALLOWANCE } from "./constants";
+import { FREE_CREDIT_SIGNED_IN_TOTAL } from "./constants";
 import { ProductIds, productsRepository } from "./repository-client";
 
 /** Price of a single credit in the locale's checkout currency. */
@@ -71,9 +71,9 @@ export function freePlanMessageCount(creditsPerMessage: number): number | null {
   if (creditsPerMessage <= 0) {
     return null;
   }
-  const count = Math.floor(FREE_CREDIT_ALLOWANCE.signedIn / creditsPerMessage);
+  const count = Math.floor(FREE_CREDIT_SIGNED_IN_TOTAL / creditsPerMessage);
   return count > 0 ? count : null;
 }
 
-/** Signed-in free allowance per month (credits). */
-export const FREE_PLAN_MONTHLY_CREDITS = FREE_CREDIT_ALLOWANCE.signedIn;
+/** Signed-in free allowance per month (credits): lead 20 + user 50 = 70. */
+export const FREE_PLAN_MONTHLY_CREDITS = FREE_CREDIT_SIGNED_IN_TOTAL;

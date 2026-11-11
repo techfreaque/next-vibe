@@ -156,6 +156,12 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
+    post("uncensored-models-what-each-is-good-at", {
+      title: t("posts.uncensoredGuide.title"),
+      category: t("posts.uncensoredGuide.category"),
+      excerpt: t("posts.uncensoredGuide.excerpt"),
+      readTime: t("posts.uncensoredGuide.readTime"),
+    }),
     post("model-refresh-uncensored-providers", {
       title: t("posts.modelRefresh.title"),
       category: t("posts.modelRefresh.category"),

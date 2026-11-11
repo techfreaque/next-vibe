@@ -13,15 +13,44 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { agentEnv } from "../../env";
 import { scopedTranslation } from "../i18n";
 
-interface OpenRouterImageMessage {
-  role: string;
-  content: string | null;
-  images?: Array<{ type: string; image_url?: { url: string } }>;
+/**
+ * OpenRouter dedicated image generation via POST /api/v1/images.
+ *
+ * Only dedicated text-to-image / image-edit models are routed here (flux.2-*,
+ * qwen-image-3*, seedream, riverflow, grok-imagine). Multimodal LLM image
+ * models (gemini/gpt image preview) are token-based and go through the headless
+ * AI runner instead, never this provider.
+ *
+ * The old chat/completions path 404s for these models with
+ * "... is an image generation model and cannot be used with the
+ * chat/completions endpoint. Use the /api/v1/images endpoint instead."
+ *
+ * Image-to-image/edit: a reference image URL is passed in `input_references`.
+ * Response images come back as base64 in `data[i].b64_json` (no hosted URL), so
+ * the bytes are wrapped as a `data:` URI for the repository's storage step to
+ * fetch and persist (never inlined into model context).
+ */
+
+const OPENROUTER_IMAGES_URL = "https://openrouter.ai/api/v1/images";
+
+interface OpenRouterImageData {
+  b64_json?: string;
+  media_type?: string;
+  url?: string;
 }
 
-interface OpenRouterChatResponse {
-  choices?: Array<{ message?: OpenRouterImageMessage }>;
-  error?: { message: string; code?: number };
+interface OpenRouterImagesResponse {
+  data?: OpenRouterImageData[];
+  error?: { message?: string; code?: number };
+}
+
+/** Coerce the provider-reported media type to a safe image mime. */
+function safeImageMime(mediaType: string | undefined): string {
+  if (mediaType && mediaType.startsWith("image/")) {
+    return mediaType.split(";")[0].trim();
+  }
+  // eslint-disable-next-line i18next/no-literal-string
+  return "image/png";
 }
 
 export async function generateWithOpenRouter(params: {
@@ -29,7 +58,7 @@ export async function generateWithOpenRouter(params: {
   prompt: string;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  inputMediaUrl?: string;
+  inputMediaUrl?: string | null;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
@@ -47,44 +76,39 @@ export async function generateWithOpenRouter(params: {
   logger.debug("[OpenRouter Image] Generating image", {
     model: providerModel,
     promptLength: prompt.length,
+    imageToImage: Boolean(inputMediaUrl),
   });
 
   try {
-    const response = await fetchImpl(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          "HTTP-Referer": "https://unbottled.ai",
-          // eslint-disable-next-line i18next/no-literal-string
-          "X-Title": "Unbottled AI",
-        },
-        body: JSON.stringify({
-          model: providerModel,
-          messages: [
-            {
-              role: "user",
-              content: inputMediaUrl
-                ? [
-                    { type: "image_url", image_url: { url: inputMediaUrl } },
-                    { type: "text", text: prompt },
-                  ]
-                : prompt,
-            },
-          ],
-        }),
+    const response = await fetchImpl(OPENROUTER_IMAGES_URL, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        // eslint-disable-next-line i18next/no-literal-string
+        "HTTP-Referer": "https://unbottled.ai",
+        // eslint-disable-next-line i18next/no-literal-string
+        "X-Title": "Unbottled AI",
       },
-    );
+      body: JSON.stringify({
+        model: providerModel,
+        prompt,
+        ...(inputMediaUrl
+          ? {
+              input_references: [
+                { type: "image_url", image_url: { url: inputMediaUrl } },
+              ],
+            }
+          : {}),
+      }),
+    });
 
     const rawText = await response.text();
 
-    let data: OpenRouterChatResponse;
+    let data: OpenRouterImagesResponse;
     try {
-      data = JSON.parse(rawText) as OpenRouterChatResponse;
+      data = JSON.parse(rawText) as OpenRouterImagesResponse;
     } catch {
       logger.error("[OpenRouter Image] Failed to parse response as JSON", {
         status: response.status,
@@ -108,16 +132,18 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
-    const message = data.choices?.[0]?.message;
-
-    // Images are returned in message.images array as { type: "image_url", image_url: { url } }
-    const imageEntry = message?.images?.[0];
-    const imageUrl = imageEntry?.image_url?.url;
+    // Images are returned as base64 in data[i].b64_json (no hosted URL). Wrap as
+    // a data: URI so the repository's storage step fetches + persists it. Some
+    // providers may return a hosted url instead — honor it when present.
+    const first = data.data?.[0];
+    const imageUrl = first?.b64_json
+      ? `data:${safeImageMime(first.media_type)};base64,${first.b64_json}`
+      : first?.url;
 
     if (!imageUrl) {
       logger.error("[OpenRouter Image] No image in response", {
-        hasImages: Boolean(message?.images),
-        imagesCount: message?.images?.length ?? 0,
+        hasData: Boolean(data.data),
+        dataCount: data.data?.length ?? 0,
       });
       return fail({
         message: t("post.errors.noImageUrl"),

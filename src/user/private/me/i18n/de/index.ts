@@ -448,6 +448,10 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    newsletter: {
+      title: "Newsletter",
+      subtitle: "Updates in dein Postfach, plus 20 Gratis-Credits pro Monat",
+    },
     loadState: {
       loading: "Wird geladen...",
       profileFailed: "Profil konnte nicht geladen werden.",

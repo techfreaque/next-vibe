@@ -119,10 +119,13 @@ export const translations: typeof enTranslations = {
         "Modell {{model}} unterstützt die Qualität {{quality}} nicht. Unterstützte Qualitäten: {{supported}}",
       unsupportedAspectRatio:
         "Modell {{model}} unterstützt das Seitenverhältnis {{aspectRatio}} nicht. Unterstützte Verhältnisse: {{supported}}",
+      modelNoReferenceImage:
+        "Das Modell {{model}} verarbeitet keine Referenzbilder. Wähle ein Bild-zu-Bild-Modell (dessen Eingaben Bild umfassen), um eine Referenz zu nutzen.",
       generationFailed: "Bildgenerierung fehlgeschlagen",
       providerError: "Anbieter-Fehler: {{error}}",
       noImageUrl: "Kein Bild-URL vom Anbieter zurückgegeben",
-      noImageGenerated: "Das Modell hat kein Bild erzeugt",
+      noImageGenerated:
+        "Das Modell hat kein Bild zurückgegeben. Meist wurde der Prompt abgelehnt (zum Beispiel Waffen, reale Personen oder geschützte Figuren) oder die Anfrage wird von diesem Modell nicht unterstützt. Formuliere den Prompt um oder wähle ein anderes Bildmodell. Hinweis: Referenzbilder werden von Text-zu-Bild-Modellen wie diesem nicht verwendet. Für diesen Versuch wurden dir keine Credits berechnet.",
       creditsFailed:
         "Credits für Bildgenerierung konnten nicht abgezogen werden",
       apiKeyNotConfigured: "API-Schlüssel nicht konfiguriert",

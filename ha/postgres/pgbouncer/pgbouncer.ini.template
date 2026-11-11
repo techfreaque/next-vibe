@@ -1,0 +1,25 @@
+; PgBouncer — forwards the app to the CURRENT PRIMARY via the keepalived VIP.
+; Render: the `host` is always 10.88.0.10 (the VIP). On each node the VIP is
+; only "up" on the node that currently owns the primary role; keepalived keeps
+; it on the live primary. dbname `unbottled` on Server 2's shared container, or
+; `postgres` on Server 1 — set TARGET_DB per node.
+[databases]
+app = host=10.88.0.10 port=5432 dbname=__TARGET_DB__
+
+[pgbouncer]
+listen_addr = 0.0.0.0
+listen_port = 6432
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+; transaction pooling: safe for the app's short-lived queries, lets the pool
+; survive a primary swap without dropping the app's own connections.
+pool_mode = transaction
+max_client_conn = 1000
+default_pool_size = 40
+; server_lifetime short so pooled server connections re-resolve the VIP soon
+; after a failover even without an explicit RECONNECT.
+server_lifetime = 120
+server_idle_timeout = 60
+ignore_startup_parameters = extra_float_digits,search_path,options
+admin_users = __ADMIN_USER__
+; Allow the keepalived hook to issue PAUSE/RECONNECT/RESUME over the admin console.

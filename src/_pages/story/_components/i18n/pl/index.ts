@@ -813,6 +813,11 @@ export const translations: typeof enTranslations = {
     },
   },
   footer: {
+    newsletter: {
+      title: "Bądź na bieżąco",
+      subtitle:
+        "Nowe nieocenzurowane modele i nowości prosto na Twoją skrzynkę. Potwierdź e-mail i odbieraj +20 darmowych kredytów co miesiąc.",
+    },
     tagline: "Rozmawiaj, twórz i łącz się - tekst, obrazy, wideo i muzyka",
     privacyTagline:
       "Prywatna AI z {{modelCount}} modelami - czat, obrazy, wideo i muzyka",

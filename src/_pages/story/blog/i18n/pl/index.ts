@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    uncensoredGuide: {
+      title: "Modele niecenzurowane, jeden po drugim.",
+      category: "Przewodnik po modelach",
+      excerpt:
+        "W czym każdy niecenzurowany model jest dobry, gdzie zawodzi i dlaczego pełen wachlarz opcji to sedno. Venice, GLM, Qwen, Gemma, Arya, FreedomGPT i więcej.",
+      readTime: "7 min czytania",
+    },
     modelRefresh: {
       title: "Najnowsze modele już są. Bez cenzury - na poważnie.",
       category: "Nowe modele",

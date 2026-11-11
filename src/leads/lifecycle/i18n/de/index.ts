@@ -118,9 +118,9 @@ export const translations: typeof enTranslations = {
     },
     inviteSignup: {
       subject: "Du bist auf der Liste. Jetzt fehlt das Konto.",
-      preview: "Gratis-Konto. 50 Credits jeden Monat.",
+      preview: "Gratis-Konto. 70 Credits jeden Monat.",
       body1:
-        "Ein kostenloses Konto bringt dir 50 Credits pro Monat und Zugriff auf {{modelCount}} Modelle, mit einem Filter, den du selbst setzt.",
+        "Ein kostenloses Konto bringt dir 70 Credits pro Monat und Zugriff auf {{modelCount}} Modelle, mit einem Filter, den du selbst setzt.",
       body2:
         "Newsletter-Abonnenten bekommen jeden Monat zusätzlich +20 Credits Bonus.",
       cta: "Gratis-Konto erstellen",
@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
       body1:
         "Du liest uns per Mail. Du kannst uns direkt nutzen: Modell wählen, alles fragen, Filter selbst bestimmen.",
       body2:
-        "Gratis-Konten bekommen 50 Credits pro Monat. Newsletter-Abonnenten bekommen 20 dazu.",
+        "Gratis-Konten bekommen 70 Credits pro Monat. Newsletter-Abonnenten bekommen 20 dazu.",
       cta: "Gratis-Konto erstellen",
     },
   },

@@ -1,0 +1,32 @@
+# ============================================================================
+# STANDALONE overlay — run a COMPLETE, self-contained unbottled stack (app +
+# its OWN postgres + redis + minio) on a host that ALREADY runs another vibe
+# site (Server 2 co-hosts heilpraktiker). This is the "stateless app on a new
+# server" milestone — the first step toward multi-server HA, WITHOUT the
+# shared-Postgres / WireGuard / Sentinel machinery of docker-compose.ha.yml.
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.standalone.yml up -d
+#
+# Everything that must not collide with the co-located site is parameterized in
+# .env (see ha/ENV-SERVER2.md): container names (unbottled-*), host ports
+# (3100/4100), host data dirs (/srv/unbottled/*). This overlay only adjusts the
+# two things the base compose can't express per-tenant:
+#
+#   1. Drop the caddy-docker-proxy label + network. The co-located site already
+#      owns this box's public hostname on Caddy; a second label for the same
+#      host would conflict. The unbottled app is reached DIRECTLY on its host
+#      ports (3100 HTTP, 4100 WS sidecar) — verified end-to-end there. Point a
+#      dedicated DNS name at it and add a caddy label later when it goes public.
+#   2. Own postgres stays IN this stack (unlike docker-compose.ha.yml, which
+#      no-ops it to reuse a shared replica). Nothing to override here — the base
+#      `postgres` service already runs, parameterized by PG_CONTAINER_NAME /
+#      PG_DATA_HOST_DIR.
+# ============================================================================
+services:
+  app:
+    # Reached directly on host ports (APP_HOST_PORT / APP_WS_HOST_PORT). No
+    # caddy label (the co-located site owns this host's Caddy hostname), so the
+    # external caddy_internal network is not needed either.
+    networks: !override
+      - app-network
+    labels: !reset []

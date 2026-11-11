@@ -40,7 +40,7 @@ export const THEA_VARIANTS: SkillVariant[] = [
   },
   {
     id: "cheap",
-    variantName: "enums.intelligence.smart" as const,
+    variantName: "skills.thea.variants.openSmart" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -50,6 +50,26 @@ export const THEA_VARIANTS: SkillVariant[] = [
       sortDirection2: ModelSortDirection.ASC,
     },
     isDefault: true,
+    imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
+    musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
+    videoGenModelSelection: VIDEO_GEN.cheap,
+    voiceModelSelection: VOICE.femaleWarm,
+    sttModelSelection: STT.cheap,
+    audioVisionModelSelection: AUDIO_VISION.cheap,
+  },
+  {
+    id: "hacker",
+    variantName: "skills.thea.variants.hacker" as const,
+    modelSelection: {
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: ChatModelId.GLM_5_3_UNCENSORED,
+      contentRange: {
+        min: ContentLevel.UNCENSORED,
+        max: ContentLevel.UNCENSORED,
+      },
+      sortBy: ModelSortField.INTELLIGENCE,
+      sortDirection: ModelSortDirection.DESC,
+    },
     imageGenModelSelection: IMAGE_GEN.mainstreamCheap,
     musicGenModelSelection: MUSIC_GEN.mainstreamCheap,
     videoGenModelSelection: VIDEO_GEN.cheap,

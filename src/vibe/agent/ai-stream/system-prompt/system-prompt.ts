@@ -10,7 +10,10 @@ import { VibeMode } from "next-vibe/env/env-util";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users as usersTable } from "next-vibe/identity/user/db";
 
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DefaultFolderId } from "../../../core/execution-context";
@@ -232,7 +235,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
       vibeMode === VibeMode.AGENT
         ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
         : `- **Credits:** 1 credit = $0.01. Cost varies by model.
-- **Free tier:** ${freeTierCredits} credits/month via browser ID - no account needed. ${FREE_CREDIT_ALLOWANCE.signedIn}/month with a free account, +${FREE_CREDIT_ALLOWANCE.newsletterBonus} with a confirmed newsletter subscription.
+- **Free tier:** ${freeTierCredits} credits/month via browser ID - no account needed. ${FREE_CREDIT_SIGNED_IN_TOTAL}/month with a free account, +${FREE_CREDIT_ALLOWANCE.newsletterBonus} with a confirmed newsletter subscription.
 - **Subscription:** ${subLabel}. **Credit packs:** ${packLabel}.`;
 
     return `## ${appName}
@@ -570,7 +573,7 @@ You're chatting as a guest on this self-hosted instance - no account required fo
 
       return `## Getting Started
 
-You're chatting as a guest - no account required. You have **${freeTierCredits} free credits/month** (shared across your devices). A few messages with a standard model will use most of that. A free account raises it to ${FREE_CREDIT_ALLOWANCE.signedIn}/month; confirming the newsletter adds ${FREE_CREDIT_ALLOWANCE.newsletterBonus} more.
+You're chatting as a guest - no account required. You have **${freeTierCredits} free credits/month** (shared across your devices). A few messages with a standard model will use most of that. A free account raises it to ${FREE_CREDIT_SIGNED_IN_TOTAL}/month; confirming the newsletter adds ${FREE_CREDIT_ALLOWANCE.newsletterBonus} more.
 
 **What you get with a free account:**
 - **Cortex** - ${appName}'s persistent memory system. It remembers facts, preferences, and context across every session - so the AI already knows who you are next time.
@@ -681,7 +684,7 @@ This user has **no account** and is in **incognito mode** - nothing leaves the b
 
 - **Cortex is not available here.** No memories, no tasks, no persistent context. Everything is forgotten when the tab closes.
 - If they ask about saving memories or persistent context: explain that incognito is by design ephemeral. To get persistent memory, they need to **create a free account** and use the **private** folder - that's where cortex lives.
-- They have **${freeTierCredits} free credits/month**. Once exhausted, they need an account to continue (a free account gets ${FREE_CREDIT_ALLOWANCE.signedIn}/month, +${FREE_CREDIT_ALLOWANCE.newsletterBonus} with a confirmed newsletter subscription).
+- They have **${freeTierCredits} free credits/month**. Once exhausted, they need an account to continue (a free account gets ${FREE_CREDIT_SIGNED_IN_TOTAL}/month, +${FREE_CREDIT_ALLOWANCE.newsletterBonus} with a confirmed newsletter subscription).
 - Favour concise responses - credits are limited.`;
     }
 
@@ -690,7 +693,7 @@ This user has **no account** and is in **incognito mode** - nothing leaves the b
 This user has **no account** - they browse as a guest identified by a browser ID.
 
 - They can only access **public** and **incognito** folders.
-- They have **${freeTierCredits} free credits/month** shared across all their devices. A few messages with a standard model exhausts this quota. A free account gets ${FREE_CREDIT_ALLOWANCE.signedIn}/month; a confirmed newsletter subscription adds ${FREE_CREDIT_ALLOWANCE.newsletterBonus} (guests too).
+- They have **${freeTierCredits} free credits/month** shared across all their devices. A few messages with a standard model exhausts this quota. A free account gets ${FREE_CREDIT_SIGNED_IN_TOTAL}/month; a confirmed newsletter subscription adds ${FREE_CREDIT_ALLOWANCE.newsletterBonus} (guests too).
 - **Cortex is not available** without an account - no memories, tasks, or persistent context across sessions.
 - Once credits are gone they must **create an account** to purchase more - they cannot buy credits or subscribe as a guest.
 - If credits run low or they ask about remembering things, mention the subscription (${subLabel}) or a credit pack (${packLabel}) - and that creating an account is free.

@@ -233,6 +233,70 @@ const { GET } = createEndpoint({
               "id.get.response.referralInfo.totalEarnedCents.content" as const,
             schema: z.coerce.number(),
           }),
+          confirmedEarnedCents: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.confirmedEarnedCents.content" as const,
+            schema: z.coerce.number(),
+          }),
+          pendingEarnedCents: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.referralInfo.pendingEarnedCents.content" as const,
+            schema: z.coerce.number(),
+          }),
+        },
+      }),
+
+      // === ENGAGEMENT & CREDITS ===
+      engagement: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "id.get.response.engagement.title" as const,
+        description: "id.get.response.engagement.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          creditBalance: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.creditBalance.content" as const,
+            schema: z.coerce.number(),
+          }),
+          freeAllowance: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.freeAllowance.content" as const,
+            schema: z.coerce.number(),
+          }),
+          lifetimeCreditsSpent: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.lifetimeCreditsSpent.content" as const,
+            schema: z.coerce.number(),
+          }),
+          favoritesCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.favoritesCount.content" as const,
+            schema: z.coerce.number(),
+          }),
+          customSkillsCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.customSkillsCount.content" as const,
+            schema: z.coerce.number(),
+          }),
+          newsletterConsent: responseField(scopedTranslation, {
+            type: WidgetType.BADGE,
+            text: "id.get.response.engagement.newsletterConsent.content" as const,
+            schema: z.boolean(),
+          }),
+          hasConfirmedNewsletter: responseField(scopedTranslation, {
+            type: WidgetType.BADGE,
+            text: "id.get.response.engagement.hasConfirmedNewsletter.content" as const,
+            schema: z.boolean(),
+          }),
         },
       }),
 
@@ -383,6 +447,17 @@ const { GET } = createEndpoint({
           referredByCode: null,
           totalReferrals: 0,
           totalEarnedCents: 0,
+          confirmedEarnedCents: 0,
+          pendingEarnedCents: 0,
+        },
+        engagement: {
+          creditBalance: 0,
+          freeAllowance: 70,
+          lifetimeCreditsSpent: 0,
+          favoritesCount: 0,
+          customSkillsCount: 0,
+          newsletterConsent: false,
+          hasConfirmedNewsletter: false,
         },
         // Backward compatibility fields
         leadId: null,

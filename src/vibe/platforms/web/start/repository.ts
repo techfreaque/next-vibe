@@ -1084,20 +1084,16 @@ export class ServerStartRepository {
     process.off("SIGTERM", ServerStartRepository.earlyExitOnTerm);
 
     const handleShutdownOnInt = (): void => {
-      // Signal auto-restart loop not to re-spawn after we kill Next.js
-      ServerStartRepository.nextServerShuttingDown = true;
-      // Leave the pid file intact so the next startup can kill our children (e.g. orphaned Next.js).
-      ServerStartRepository.stopAllProcesses();
-      writeServerLogOfflineHint();
-      process.exit(0);
+      void ServerStartRepository.gracefulShutdown(logger).then(() => {
+        writeServerLogOfflineHint();
+        process.exit(0);
+      });
     };
     const handleShutdownOnTerm = (): void => {
-      // Signal auto-restart loop not to re-spawn after we kill Next.js
-      ServerStartRepository.nextServerShuttingDown = true;
-      // Leave the pid file intact so the next startup can kill our children (e.g. orphaned Next.js).
-      ServerStartRepository.stopAllProcesses();
       // On SIGTERM the new vibe start process already wrote the offline hint.
-      process.exit(0);
+      void ServerStartRepository.gracefulShutdown(logger).then(() => {
+        process.exit(0);
+      });
     };
 
     process.on("SIGINT", handleShutdownOnInt);
@@ -1660,6 +1656,79 @@ export class ServerStartRepository {
   /**
    * Stop all running processes
    */
+  /**
+   * Graceful shutdown (G1): forward SIGTERM to the Next.js child and WAIT for
+   * it to exit so its in-process drain (src/instrumentation.ts) can let every
+   * in-flight AI stream finish before the process dies. Only if the child
+   * overruns the bounded window do we SIGKILL it. Stops the WS sidecar + aux
+   * children too. Leaves the pid file intact (next startup kills orphans).
+   *
+   * Timeout budget = STREAM_DRAIN_TIMEOUT_MS (the child's drain window) + a
+   * margin for the child to flush and exit. Rolling-deploy / docker stop must
+   * allow at least this long (compose `stop_grace_period`, deploy script wait).
+   */
+  private static async gracefulShutdown(logger: EndpointLogger): Promise<void> {
+    // Signal auto-restart loop not to re-spawn after we kill Next.js.
+    ServerStartRepository.nextServerShuttingDown = true;
+
+    const drainMs = Number.parseInt(
+      process.env["STREAM_DRAIN_TIMEOUT_MS"] ?? "",
+      10,
+    );
+    const drainTimeout =
+      Number.isFinite(drainMs) && drainMs > 0 ? drainMs : 90_000;
+    const graceMs = drainTimeout + 15_000;
+
+    // Stop the health snapshot interval + WS sidecar immediately (new traffic
+    // is already drained at the LB; the child owns the in-flight streams).
+    if (ServerStartRepository.healthSnapshotInterval !== null) {
+      clearInterval(ServerStartRepository.healthSnapshotInterval);
+      ServerStartRepository.healthSnapshotInterval = null;
+    }
+
+    const child = ServerStartRepository.nextServerProcess;
+    if (child && !child.killed) {
+      logger.info(
+        `🛑 Graceful shutdown — draining Next.js (up to ${Math.round(graceMs / 1000)}s)`,
+      );
+      await new Promise<void>((resolve) => {
+        let settled = false;
+        const done = (): void => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          resolve();
+        };
+        child.once("exit", done);
+        try {
+          child.kill("SIGTERM");
+        } catch {
+          done();
+          return;
+        }
+        // Hard-kill fallback if the child overruns the drain window.
+        setTimeout(() => {
+          try {
+            if (!child.killed) {
+              logger.warn(
+                "Next.js did not drain within the shutdown window - SIGKILL",
+              );
+              child.kill("SIGKILL");
+            }
+          } catch {
+            // already dead
+          }
+          done();
+        }, graceMs);
+      });
+    }
+    ServerStartRepository.nextServerProcess = null;
+
+    // WS sidecar + aux children last (after the app has drained its streams).
+    ServerStartRepository.stopAllProcesses();
+  }
+
   private static stopAllProcesses(): void {
     // Stop the health snapshot interval
     if (ServerStartRepository.healthSnapshotInterval !== null) {

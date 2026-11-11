@@ -1,0 +1,5 @@
+; PgBouncer SCRAM userlist. Generate the verifier from the real PG password:
+;   on the PG container:  psql -U postgres -Atqc "SELECT rolname||' '||rolpassword FROM pg_authid WHERE rolname IN ('postgres','unbottled_repl');"
+; and paste the "username SCRAM-SHA-256$..." lines here (quoted). NEVER store
+; the plaintext password in this file.
+"__PG_USER__" "__PG_SCRAM_VERIFIER__"

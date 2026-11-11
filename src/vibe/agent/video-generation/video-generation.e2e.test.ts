@@ -50,6 +50,19 @@ describe("E2E: video generation", () => {
     expect(result.response.success, JSON.stringify(result.response).slice(0, 500)).toBe(true);
     if (!result.response.success) return;
     expect(result.response.data.videoUrl.length).toBeGreaterThan(0);
+    // The returned URL must never be a bare relative "/path" — storage URLs are
+    // built from runtime NEXT_PUBLIC_APP_URL and come back absolute (http...),
+    // guarding the localhost/relative-URL regression. Standalone tool runs may
+    // return the provider URL directly (http or inline data:), which is fine.
+    expect(
+      result.response.data.videoUrl.startsWith("http") ||
+        result.response.data.videoUrl.startsWith("data:"),
+      `expected an absolute http(s) url or data: uri, got ${result.response.data.videoUrl.slice(0, 80)}`,
+    ).toBe(true);
+    expect(
+      result.response.data.videoUrl.startsWith("/"),
+      `generated video url is relative (lost NEXT_PUBLIC_APP_URL prefix): ${result.response.data.videoUrl.slice(0, 80)}`,
+    ).toBe(false);
 
     // The clip lands in a playable <video> element
     const video = form.root.locator("video[src], video source[src]").first();

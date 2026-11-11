@@ -75,6 +75,7 @@ export const translations = {
       help: "Feedback & Support",
       about: "About",
       websiteBlog: "Stories",
+      newsletter: "Newsletter (+20 free credits)",
       admin: "Admin Dashboard",
     },
     confirmations: {

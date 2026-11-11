@@ -118,10 +118,13 @@ export const translations = {
         "Model {{model}} does not support quality {{quality}}. Supported qualities: {{supported}}",
       unsupportedAspectRatio:
         "Model {{model}} does not support aspect ratio {{aspectRatio}}. Supported ratios: {{supported}}",
+      modelNoReferenceImage:
+        "The model {{model}} does not accept reference images. Choose an image-to-image model (one whose inputs include image) to use a reference.",
       generationFailed: "Image generation failed",
       providerError: "Image provider error: {{error}}",
       noImageUrl: "No image URL returned from provider",
-      noImageGenerated: "The model did not generate an image",
+      noImageGenerated:
+        "The model returned no image. This usually means the prompt was refused (for example weapons, real people, or copyrighted characters) or the request is not supported by this model. Try rephrasing the prompt, or pick a different image model. Note: reference images are not used by text-to-image models like this one. You were not charged for this attempt.",
       creditsFailed: "Failed to deduct credits for image generation",
       apiKeyNotConfigured: "API key not configured",
       externalServiceError: "External service error: {{message}}",

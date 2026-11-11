@@ -1,0 +1,17 @@
+{
+  "url": "https://api.venice.ai/api/v1/images/generations",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "lustify-v8",
+    "prompt": "A small red circle on a white background",
+    "n": 1,
+    "size": "1024x1024",
+    "response_format": "b64_json",
+    "output_format": "webp",
+    "moderation": "low"
+  }
+}

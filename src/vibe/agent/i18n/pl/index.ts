@@ -1388,11 +1388,11 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Niecenzurowany model AI dla kreatywnych i nieograniczonych rozmów",
+          "UncensoredLM v1.2 - Model rozumujący od Uncensored.ai, destylat DeepSeek-R1 na bazie Qwen 14B. Myśli na głos, odpowiada wprost, korzysta z narzędzi. Kontekst 32K. Eksperymentalny i nie do kodu.",
         freedomgptLiberty:
-          "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
+          "FreedomGPT Liberty - Flagowy model Age of AI i chatbot wolności słowa, od którego zaczęła się cała kategoria. Zbudowany na otwartych wagach, nastawiony na szczere odpowiedzi bez morałów. Szybki i bystry, kontekst 32K. Słabszy w narzędziach, kodowaniu i głębokiej analizie.",
         gabAiArya:
-          "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
+          "Gab AI Arya - Niecenzurowany asystent Gab, świadomie ustawiony po prawej stronie przez swojego twórcę i zaprojektowany tak, by odpowiadać bez typowych barier. Bystry, kontekst 131K, korzysta z narzędzi. Celowo inny punkt widzenia w katalogu. Słabszy w kodowaniu, model bazowy nieujawniony.",
         gemini31ProPreviewCustomTools:
           "Gemini 3.1 Pro Preview (Custom Tools) - Wariant Gemini 3.1 Pro z ulepszoną selekcją narzędzi dla agentów kodowania i złożonych przepływów wielonarzędziowych",
         gemini31FlashImagePreview:
@@ -1457,6 +1457,10 @@ export const translations: typeof enTranslations = {
           "Lustify v8 - Checkpoint SDXL do fotorealistycznych obrazów dla dorosłych. Bez rozmycia, bez odmów. Jeden cent za obraz.",
         veniceChroma:
           "Chroma - Niecenzurowany otwarty model klasy Flux. Długie prompty, szeroki zakres artystyczny, bez rozmycia. Jeden cent za obraz.",
+        veniceQwenEdit:
+          "Qwen Edit Uncensored - Podaj obraz referencyjny i prompt, odbierz gotową edycję. Podmieniaj elementy, zmieniaj styl, przebudowuj sceny. Bez rozmycia, bez odmów.",
+        veniceFireredImageEdit:
+          "FireRed Image Edit - Edycja obrazu sterowana promptem. Zmienia to, co opiszesz, resztę zostawia. Szybka, niecenzurowana, na obrazie referencyjnym.",
         claudeOpus45:
           "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
         claudeOpus46:
@@ -1805,6 +1809,8 @@ export const translations: typeof enTranslations = {
           "Claude Haiku 5.5 - Najszybszy model Anthropic. Obrazy, narzędzia i kontekst 1M za dziesiątą część ceny Haiku 4.5.",
         claudeFable51:
           "Claude Fable 5.1 - Graniczny model rozumujący Anthropic. Głęboka synteza, planowanie długoterminowe, ostrzejszy niż Fable 5. Kontekst 1M tokenów.",
+        claudeFable52:
+          "Claude Fable 5.2 - Graniczny model rozumujący Anthropic. Głębsza synteza i pewniejsze planowanie długoterminowe niż Fable 5.1, w niższej cenie. Kontekst 1M tokenów.",
         gpt6Astra:
           "GPT-6 Astra - Najpotężniejszy model OpenAI. Maksymalna głębia rozumowania na najtrudniejsze problemy. Kontekst 1,05M tokenów.",
         gpt6AstraPro:

@@ -1172,6 +1172,13 @@ export const translations: typeof enTranslations = {
                 longDescription:
                   "Newsletter z aktualizacją produktu maj 2026 dla wszystkich zarejestrowanych użytkowników z szczerym przyznaniem się do błędów i przeglądem funkcji",
               },
+              newsletterNov2026: {
+                name: "Newsletter listopad 2026",
+                description:
+                  "Jednorazowy newsletter reaktywacyjny: towarzysz po Twojej stronie, Twój filtr i tańszy model domyślny",
+                longDescription:
+                  "Newsletter konwersyjny listopad 2026 do potwierdzonych subskrybentów, skupiony na etosie towarzysza i tańszym modelu domyślnym",
+              },
             },
           },
         },
@@ -5121,6 +5128,7 @@ export const translations: typeof enTranslations = {
       retention: "Utrzymanie klienta",
       winback: "Odzyskanie klienta",
       newsletterMay2026: "Newsletter maj 2026",
+      newsletterNov2026: "Newsletter listopad 2026",
     },
     emailJourneyVariantFilter: {
       all: "Wszystkie",
@@ -5131,6 +5139,7 @@ export const translations: typeof enTranslations = {
       retention: "Utrzymanie klienta",
       winback: "Odzyskanie klienta",
       newsletterMay2026: "Newsletter maj 2026",
+      newsletterNov2026: "Newsletter listopad 2026",
     },
     sortOrder: {
       asc: "Rosnąco",

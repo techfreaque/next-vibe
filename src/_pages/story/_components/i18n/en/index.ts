@@ -804,6 +804,11 @@ export const translations = {
     },
   },
   footer: {
+    newsletter: {
+      title: "Stay in the loop",
+      subtitle:
+        "New uncensored models and product drops, straight to your inbox. Confirm your email for +20 free credits every month.",
+    },
     tagline: "Chat, create, and connect - text, images, video, and music",
     privacyTagline:
       "Privacy-first AI with {{modelCount}} models - chat, images, video & music",

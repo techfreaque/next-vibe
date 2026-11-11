@@ -558,7 +558,8 @@ export class AbortErrorHandler {
           // "stopped" indicator instead of a generic error bubble with report UI.
           // All other abort reasons that reach this point use STREAM_ERROR.
           const emitErrorType =
-            streamAbort?.reason === AbortReason.USER_CANCELLED
+            streamAbort?.reason === AbortReason.USER_CANCELLED ||
+            streamAbort?.reason === AbortReason.SERVER_SHUTDOWN
               ? StreamErrorType.STREAM_INTERRUPTED
               : StreamErrorType.STREAM_ERROR;
           const interruptionMessage =
@@ -603,7 +604,11 @@ export class AbortErrorHandler {
     // Without this, PendingCalls.hasForThread() returns true for the in-flight
     // remote call, clearStreamingState pins the thread to WAITING, and a second
     // cancel finds WAITING → sends StreamControl to a dead stream → stuck forever.
-    if (streamAbort?.reason === AbortReason.USER_CANCELLED && threadId) {
+    if (
+      (streamAbort?.reason === AbortReason.USER_CANCELLED ||
+        streamAbort?.reason === AbortReason.SERVER_SHUTDOWN) &&
+      threadId
+    ) {
       const { PendingCalls } =
         await import("next-vibe/execute-tool/repository/pending-calls");
       PendingCalls.cancelAllForThread(threadId);

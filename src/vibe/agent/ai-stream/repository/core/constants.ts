@@ -58,6 +58,14 @@ export enum AbortReason {
   BUDGET_EXCEEDED = "budget_exceeded",
   /** The task watchdog stopped the run (duration, turn or tool-call ceiling) */
   TASK_WATCHDOG = "task_watchdog",
+  /**
+   * The node is shutting down (rolling deploy / scale-in) and the graceful
+   * drain timed out waiting for this loop to finish. Treated like a user cancel
+   * for persistence (partial content saved, credits settled, UI shows a
+   * "stopped" indicator) — the client reconnects to a surviving node and can
+   * resume/retry.
+   */
+  SERVER_SHUTDOWN = "server_shutdown",
 }
 
 /**

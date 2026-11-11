@@ -24,6 +24,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation } from "../journeys/i18n";
 import { newsletterMay2026JourneyTemplates } from "../journeys/newsletter-may-2026.email";
+import { newsletterNov2026JourneyTemplates } from "../journeys/newsletter-nov-2026.email";
 import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";
 import { retentionJourneyTemplates } from "../journeys/retention.email";
 import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
@@ -165,6 +166,7 @@ const JOURNEY_TEMPLATES: Partial<
   [EmailJourneyVariant.WINBACK]: winbackJourneyTemplates,
   // One-off newsletter blasts
   [EmailJourneyVariant.NEWSLETTER_MAY_2026]: newsletterMay2026JourneyTemplates,
+  [EmailJourneyVariant.NEWSLETTER_NOV_2026]: newsletterNov2026JourneyTemplates,
 };
 
 /**

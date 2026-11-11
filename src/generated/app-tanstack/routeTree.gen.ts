@@ -176,6 +176,7 @@ import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
 import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './routes/$locale.story.blog.skill-sharing-economy.index'
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
+import { Route as LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport } from './routes/$locale.story.blog.uncensored-models-what-each-is-good-at.index'
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
 import { Route as LocaleStoryBlogWhatsNewNovember2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-november-2026.index'
@@ -275,6 +276,7 @@ import { Route as ApiLocaleLeadsCampaignsCampaignStarterRouteImport } from './ro
 import { Route as ApiLocaleLeadsCampaignsEmailCampaignsRouteImport } from './routes/api.$locale.leads.campaigns.email-campaigns'
 import { Route as ApiLocaleLeadsCampaignsHaltAllRouteImport } from './routes/api.$locale.leads.campaigns.halt-all'
 import { Route as ApiLocaleLeadsCampaignsJourneyVariantsRouteImport } from './routes/api.$locale.leads.campaigns.journey-variants'
+import { Route as ApiLocaleLeadsCampaignsNewsletterBlastRouteImport } from './routes/api.$locale.leads.campaigns.newsletter-blast'
 import { Route as ApiLocaleLeadsCampaignsQueueRouteImport } from './routes/api.$locale.leads.campaigns.queue'
 import { Route as ApiLocaleLeadsCampaignsStatsRouteImport } from './routes/api.$locale.leads.campaigns.stats'
 import { Route as ApiLocaleLeadsDataSourcesLeadsActiveRouteImport } from './routes/api.$locale.leads.data-sources.leads-active'
@@ -1577,6 +1579,12 @@ const LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute =
     path: '/blog/type-checker-made-ai-stop-lying/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute =
+  LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport.update({
+    id: '/blog/uncensored-models-what-each-is-good-at/',
+    path: '/blog/uncensored-models-what-each-is-good-at/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogWhatsNewApril2026IndexRoute =
   LocaleStoryBlogWhatsNewApril2026IndexRouteImport.update({
     id: '/blog/whats-new-april-2026/',
@@ -2169,6 +2177,12 @@ const ApiLocaleLeadsCampaignsJourneyVariantsRoute =
   ApiLocaleLeadsCampaignsJourneyVariantsRouteImport.update({
     id: '/api/$locale/leads/campaigns/journey-variants',
     path: '/api/$locale/leads/campaigns/journey-variants',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsCampaignsNewsletterBlastRoute =
+  ApiLocaleLeadsCampaignsNewsletterBlastRouteImport.update({
+    id: '/api/$locale/leads/campaigns/newsletter-blast',
+    path: '/api/$locale/leads/campaigns/newsletter-blast',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleLeadsCampaignsQueueRoute =
@@ -4719,6 +4733,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
   '/api/$locale/leads/campaigns/halt-all': typeof ApiLocaleLeadsCampaignsHaltAllRoute
   '/api/$locale/leads/campaigns/journey-variants': typeof ApiLocaleLeadsCampaignsJourneyVariantsRoute
+  '/api/$locale/leads/campaigns/newsletter-blast': typeof ApiLocaleLeadsCampaignsNewsletterBlastRoute
   '/api/$locale/leads/campaigns/queue': typeof ApiLocaleLeadsCampaignsQueueRoute
   '/api/$locale/leads/campaigns/stats': typeof ApiLocaleLeadsCampaignsStatsRoute
   '/api/$locale/leads/data-sources/leads-active': typeof ApiLocaleLeadsDataSourcesLeadsActiveRoute
@@ -4882,6 +4897,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -5362,6 +5378,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
   '/api/$locale/leads/campaigns/halt-all': typeof ApiLocaleLeadsCampaignsHaltAllRoute
   '/api/$locale/leads/campaigns/journey-variants': typeof ApiLocaleLeadsCampaignsJourneyVariantsRoute
+  '/api/$locale/leads/campaigns/newsletter-blast': typeof ApiLocaleLeadsCampaignsNewsletterBlastRoute
   '/api/$locale/leads/campaigns/queue': typeof ApiLocaleLeadsCampaignsQueueRoute
   '/api/$locale/leads/campaigns/stats': typeof ApiLocaleLeadsCampaignsStatsRoute
   '/api/$locale/leads/data-sources/leads-active': typeof ApiLocaleLeadsDataSourcesLeadsActiveRoute
@@ -5525,6 +5542,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/uncensored-models-what-each-is-good-at': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -6013,6 +6031,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
   '/api/$locale/leads/campaigns/halt-all': typeof ApiLocaleLeadsCampaignsHaltAllRoute
   '/api/$locale/leads/campaigns/journey-variants': typeof ApiLocaleLeadsCampaignsJourneyVariantsRoute
+  '/api/$locale/leads/campaigns/newsletter-blast': typeof ApiLocaleLeadsCampaignsNewsletterBlastRoute
   '/api/$locale/leads/campaigns/queue': typeof ApiLocaleLeadsCampaignsQueueRoute
   '/api/$locale/leads/campaigns/stats': typeof ApiLocaleLeadsCampaignsStatsRoute
   '/api/$locale/leads/data-sources/leads-active': typeof ApiLocaleLeadsDataSourcesLeadsActiveRoute
@@ -6176,6 +6195,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -6664,6 +6684,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/campaigns/email-campaigns'
     | '/api/$locale/leads/campaigns/halt-all'
     | '/api/$locale/leads/campaigns/journey-variants'
+    | '/api/$locale/leads/campaigns/newsletter-blast'
     | '/api/$locale/leads/campaigns/queue'
     | '/api/$locale/leads/campaigns/stats'
     | '/api/$locale/leads/data-sources/leads-active'
@@ -6827,6 +6848,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
@@ -7307,6 +7329,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/campaigns/email-campaigns'
     | '/api/$locale/leads/campaigns/halt-all'
     | '/api/$locale/leads/campaigns/journey-variants'
+    | '/api/$locale/leads/campaigns/newsletter-blast'
     | '/api/$locale/leads/campaigns/queue'
     | '/api/$locale/leads/campaigns/stats'
     | '/api/$locale/leads/data-sources/leads-active'
@@ -7470,6 +7493,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers'
     | '/$locale/story/blog/skill-sharing-economy'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
+    | '/$locale/story/blog/uncensored-models-what-each-is-good-at'
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
     | '/$locale/story/blog/whats-new-november-2026'
@@ -7957,6 +7981,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/campaigns/email-campaigns'
     | '/api/$locale/leads/campaigns/halt-all'
     | '/api/$locale/leads/campaigns/journey-variants'
+    | '/api/$locale/leads/campaigns/newsletter-blast'
     | '/api/$locale/leads/campaigns/queue'
     | '/api/$locale/leads/campaigns/stats'
     | '/api/$locale/leads/data-sources/leads-active'
@@ -8120,6 +8145,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
@@ -8547,6 +8573,7 @@ export interface RootRouteChildren {
   ApiLocaleLeadsCampaignsEmailCampaignsRoute: typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
   ApiLocaleLeadsCampaignsHaltAllRoute: typeof ApiLocaleLeadsCampaignsHaltAllRoute
   ApiLocaleLeadsCampaignsJourneyVariantsRoute: typeof ApiLocaleLeadsCampaignsJourneyVariantsRoute
+  ApiLocaleLeadsCampaignsNewsletterBlastRoute: typeof ApiLocaleLeadsCampaignsNewsletterBlastRoute
   ApiLocaleLeadsCampaignsQueueRoute: typeof ApiLocaleLeadsCampaignsQueueRoute
   ApiLocaleLeadsCampaignsStatsRoute: typeof ApiLocaleLeadsCampaignsStatsRoute
   ApiLocaleLeadsDataSourcesLeadsActiveRoute: typeof ApiLocaleLeadsDataSourcesLeadsActiveRoute
@@ -9957,6 +9984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/uncensored-models-what-each-is-good-at/': {
+      id: '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
+      path: '/blog/uncensored-models-what-each-is-good-at'
+      fullPath: '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
+      preLoaderRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/whats-new-april-2026/': {
       id: '/$locale/story/blog/whats-new-april-2026/'
       path: '/blog/whats-new-april-2026'
@@ -10648,6 +10682,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/leads/campaigns/journey-variants'
       fullPath: '/api/$locale/leads/campaigns/journey-variants'
       preLoaderRoute: typeof ApiLocaleLeadsCampaignsJourneyVariantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/campaigns/newsletter-blast': {
+      id: '/api/$locale/leads/campaigns/newsletter-blast'
+      path: '/api/$locale/leads/campaigns/newsletter-blast'
+      fullPath: '/api/$locale/leads/campaigns/newsletter-blast'
+      preLoaderRoute: typeof ApiLocaleLeadsCampaignsNewsletterBlastRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/leads/campaigns/queue': {
@@ -13394,6 +13435,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   LocaleStoryBlogSkillSharingEconomyIndexRoute: typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   LocaleStoryBlogWhatsNewNovember2026IndexRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -13442,6 +13484,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogSkillSharingEconomyIndexRoute,
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute:
     LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute,
+  LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute:
+    LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute,
   LocaleStoryBlogWhatsNewApril2026IndexRoute:
     LocaleStoryBlogWhatsNewApril2026IndexRoute,
   LocaleStoryBlogWhatsNewMay2026IndexRoute:
@@ -14690,6 +14734,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadsCampaignsHaltAllRoute: ApiLocaleLeadsCampaignsHaltAllRoute,
   ApiLocaleLeadsCampaignsJourneyVariantsRoute:
     ApiLocaleLeadsCampaignsJourneyVariantsRoute,
+  ApiLocaleLeadsCampaignsNewsletterBlastRoute:
+    ApiLocaleLeadsCampaignsNewsletterBlastRoute,
   ApiLocaleLeadsCampaignsQueueRoute: ApiLocaleLeadsCampaignsQueueRoute,
   ApiLocaleLeadsCampaignsStatsRoute: ApiLocaleLeadsCampaignsStatsRoute,
   ApiLocaleLeadsDataSourcesLeadsActiveRoute:

@@ -76,6 +76,11 @@ describe("E2E: signup page", () => {
       logger,
     );
     expect(created.success && created.data?.privateName).toBe("E2E Signup");
+    // Browser signup must leave the email UNVERIFIED — a verification mail is
+    // sent (wired in signup/route.ts) and the account stays unconfirmed until
+    // the mailed link is opened. This is what keeps unverified addresses out of
+    // marketing sends (lifecycle + consented blast gate on emailVerified).
+    expect(created.success && created.data?.emailVerified).toBe(false);
   });
 
   e2e.it("refuses to continue until the terms are accepted", async ({ open, uniqueEmail }) => {

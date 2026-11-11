@@ -116,9 +116,9 @@ export const translations = {
     },
     inviteSignup: {
       subject: "You're on the list. Now get the account.",
-      preview: "Free account. 50 credits every month.",
+      preview: "Free account. 70 credits every month.",
       body1:
-        "A free account gives you 50 credits every month and access to {{modelCount}} models, with the filter level set by you.",
+        "A free account gives you 70 credits every month and access to {{modelCount}} models, with the filter level set by you.",
       body2:
         "Newsletter subscribers get a +20 credit bonus on top, every month.",
       cta: "Create free account",
@@ -129,7 +129,7 @@ export const translations = {
       body1:
         "You read us by email. You can use us directly: pick a model, ask anything, decide your own filter.",
       body2:
-        "Free accounts get 50 credits per month. Newsletter subscribers get 20 more.",
+        "Free accounts get 70 credits per month. Newsletter subscribers get 20 more.",
       cta: "Create free account",
     },
   },

@@ -1,0 +1,90 @@
+# ============================================================================
+# OVERLAY: point the Server-2 unbottled app at the SHARED prod backends on
+# Server 1 over WireGuard — the active-active data topology.
+#
+#   Redis  : redis://10.88.0.1:6379   (S1 prod-redis, no auth, WG-only)
+#   MinIO  : http://10.88.0.1:9000     (S1 prod-minio, WG-only, bucket chat-media)
+#   DB     : postgres://s2app@10.88.0.1:5432  (S1 prod-postgres, already shared)
+#
+# WHY shared-primary (not isolated test redis/minio, not bidirectional repl):
+#   - Classic Redis pub/sub does NOT propagate across replicas — WS/stream
+#     events only cross boxes if BOTH apps publish/subscribe on the SAME Redis
+#     primary. So both boxes MUST hit one Redis. (SPOF — Sentinel follow-up
+#     below; single shared primary is the accepted v1.)
+#   - MinIO: a single shared bucket gives strong read-after-write across boxes
+#     (an upload on one box is instantly GET-able on the other). Bidirectional
+#     active-active replication is eventually-consistent (lag) — strictly more
+#     fragile for the "media visible on the other box NOW" requirement. The
+#     existing S1->S2 replication rule stays as a harmless warm backup.
+#
+# The S1 prod-minio and S2 unbottled-minio share identical root creds, so the
+# app's existing S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY work against S1
+# unchanged — only S3_ENDPOINT is repointed. prod-redis has no auth.
+#
+# depends_on on the LOCAL redis/minio is dropped (they can keep running idle;
+# the app no longer uses them). The shared-prod DB guards (--seed/--db-setup/
+# --task-runner=false) + prod DATABASE_URL + single-port proxy are restated so
+# later -f layers don't lose them.
+#
+# Layer LAST, after caddy-public.yml:
+#   docker compose -p unbottled --env-file .env \
+#     -f docker-compose.prod.yml \
+#     -f docker-compose.standalone.yml \
+#     -f docker-compose.shared-prod.yml \
+#     -f docker-compose.caddy-public.yml \
+#     -f docker-compose.shared-backends.yml up -d --force-recreate --no-deps app
+#
+# SPOF / Sentinel follow-up (v2, NOT built yet): the shared Redis primary on S1
+# is a single point of failure — if S1's Redis dies, cross-box WS/stream fanout
+# stops (the app still serves; only live pub/sub breaks). v2 = Redis replica on
+# S2 (replicaof 10.88.0.1 6379) + a 3-node Sentinel quorum (one extra arbiter,
+# e.g. on S3/mail or a tie-breaker) + the app's REDIS_URL pointed at a local
+# HAProxy/Sentinel-aware front that follows the promoted primary. Templates for
+# this already exist under ha/redis/ (sentinel.conf.template, haproxy). Same
+# story for MinIO: promote the S1->S2 replication to true active-active (or
+# shared erasure set) once the pub/sub SPOF is addressed.
+# ============================================================================
+services:
+  app:
+    environment:
+      # Shared backends on S1 over WireGuard (the active-active data layer).
+      REDIS_URL: "redis://10.88.0.1:6379"
+      WS_PUBSUB_TYPE: "redis"
+      CHAT_STORAGE_TYPE: "s3"
+      S3_ENDPOINT: "http://10.88.0.1:9000"
+      S3_REGION: "us-east-1"
+      S3_BUCKET: "chat-media"
+      # Keep the shared-prod DB override + single-port proxy from earlier layers.
+      DATABASE_URL: "postgres://s2app:35015650ed07d017f6a36f24ecdb81cb78f84138@10.88.0.1:5432/postgres?schema=public"
+      VIBE_DISABLE_PROXY: "false"
+      NEXT_PUBLIC_APP_URL: "https://s2.unbottled.ai"
+      NEXT_PUBLIC_PROJECT_URL: "https://s2.unbottled.ai"
+    # The app no longer depends on the LOCAL redis/minio — it uses S1's over WG.
+    depends_on: !override []
+    # TWO Caddy sites on this box's caddy-docker-proxy (label prefix caddy_internal):
+    #   site 1 = s2.unbottled.ai  (real LE cert — the test-node hostname, unchanged)
+    #   site 2 = unbottled.ai     (the HA apex vhost). Served with a REAL Let's
+    #            Encrypt cert obtained via DNS-01 through the hosttech API (acme.sh
+    #            dns_hosttech) — DNS-01 does NOT need the registrar delegation, so
+    #            S2 presents a publicly-trusted cert for unbottled.ai NOW, before
+    #            cutover. The cert lives in Caddy's data volume at
+    #            /root/caddy_data/custom-certs/ (= /data/custom-certs inside the
+    #            container); acme.sh --install-cert renews it + reloads Caddy
+    #            (docker kill -s USR1 caddy). The health daemons now validate the
+    #            real cert (EDGE_PROBE_INSECURE back to 0).
+    labels: !override
+      caddy_internal_1: "https://s2.unbottled.ai"
+      caddy_internal_1.reverse_proxy: "{{upstreams 3000}}"
+      caddy_internal_2: "https://unbottled.ai"
+      caddy_internal_2.tls: "/data/custom-certs/unbottled.ai.crt /data/custom-certs/unbottled.ai.key"
+      caddy_internal_2.reverse_proxy: "{{upstreams 3000}}"
+    # Restate the shared-prod guard command so these overrides don't drop it.
+    command:
+      [
+        "bun",
+        "src/vibe/platforms/cli/vibe-runtime.ts",
+        "start",
+        "--seed=false",
+        "--db-setup=false",
+        "--task-runner=false",
+      ]

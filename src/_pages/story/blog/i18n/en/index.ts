@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    uncensoredGuide: {
+      title: "The uncensored models, one by one.",
+      category: "Model Guide",
+      excerpt:
+        "What each uncensored model is good at, where it falls short, and why having the full spread of options is the point. Venice, GLM, Qwen, Gemma, Arya, FreedomGPT and more.",
+      readTime: "7 min read",
+    },
     modelRefresh: {
       title: "The newest models are in. Uncensored got serious.",
       category: "Model Update",

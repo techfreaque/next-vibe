@@ -443,6 +443,10 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    newsletter: {
+      title: "Newsletter",
+      subtitle: "Aktualności na skrzynkę i 20 darmowych kredytów miesięcznie",
+    },
     loadState: {
       loading: "Ładowanie...",
       profileFailed: "Nie udało się wczytać profilu.",

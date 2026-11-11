@@ -3,14 +3,34 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
-    container_name: prod-postgres
+    # Parameterized so unbottled can run its OWN postgres ALONGSIDE another vibe
+    # site's `prod-postgres` on the same host (Server 2 / heilpraktiker) without
+    # a container-name clash. Default keeps Server 1 EXACTLY as before.
+    container_name: ${PG_CONTAINER_NAME:-prod-postgres}
     restart: unless-stopped
+    # HA: logical-replication publisher settings. wal_level=logical is REQUIRED
+    # to publish to the Server 2 replica. Default stays "logical" but this only
+    # takes effect on a container (re)start — the cutover runbook flags that one
+    # restart on Server 1. On a non-replicating single node it is harmless.
+    # Override PG_WAL_LEVEL=replica to opt a node out of being a publisher.
+    command:
+      [
+        "postgres",
+        "-c",
+        "wal_level=${PG_WAL_LEVEL:-logical}",
+        "-c",
+        "max_replication_slots=${PG_MAX_REPLICATION_SLOTS:-10}",
+        "-c",
+        "max_wal_senders=${PG_MAX_WAL_SENDERS:-10}",
+      ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
-      - /next-vibe-db-data:/var/lib/postgresql/data
+      # Host bind path parameterized so a second vibe site on the same box uses a
+      # DISTINCT data dir (never shares heilpraktiker's /next-vibe-db-data).
+      - ${PG_DATA_HOST_DIR:-/next-vibe-db-data}:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -19,6 +39,80 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  # ── Redis: cross-instance WebSocket pub/sub (stream tokens, cache invalidation) ──
+  # Internal-only (no published port). Enabled on the app via WS_PUBSUB_TYPE=redis.
+  # Flip WS_PUBSUB_TYPE back to "local" in .env to revert to single-instance mode.
+  redis:
+    image: redis:7-alpine
+    container_name: ${REDIS_CONTAINER_NAME:-prod-redis}
+    restart: unless-stopped
+    # appendonly persistence so queued/last state survives a restart.
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ── MinIO: self-hosted S3-compatible object storage for chat/media files ──
+  # Internal-only (no published port) - the app proxies every file through its own
+  # /threads/files route, so the bucket never needs to be publicly reachable.
+  # Enabled on the app via CHAT_STORAGE_TYPE=s3. Flip back to "filesystem" to revert.
+  # NOTE: image is Chainguard's (cgr.dev), NOT docker.io/minio/minio. As of 2025
+  # MinIO's own Docker Hub + quay.io images are gated behind a registry login, so
+  # `docker compose up` cannot pull them on a box without MinIO creds. The
+  # Chainguard image is a drop-in, freely pullable, and ships a shell + the `mc`
+  # client (used below for init), so no separate minio/mc image is needed.
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: ${MINIO_CONTAINER_NAME:-prod-minio}
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-data:/data
+    networks:
+      - app-network
+    # `mc ready` probes the local server's cluster-readiness endpoint. The image
+    # ships mc, so no extra tooling is needed. `local` is mc's implicit alias for
+    # the host it runs on only after configuring; use an explicit one-off alias.
+    healthcheck:
+      test: ["CMD", "mc", "ready", "--json", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── One-shot: create the bucket on first start (idempotent, --ignore-existing) ──
+  # Same Chainguard image (has a shell + mc). Waits for minio to be healthy, then
+  # creates the bucket and makes sure it is private (app proxies every file).
+  minio-init:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: ${MINIO_INIT_CONTAINER_NAME:-prod-minio-init}
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: ${S3_BUCKET:-chat-media}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set remote http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      mc mb --ignore-existing remote/$$S3_BUCKET;
+      mc anonymous set none remote/$$S3_BUCKET;
+      echo 'minio bucket ready:' $$S3_BUCKET;
+      "
+    networks:
+      - app-network
 
   app:
     # Pulled from the registry by default (see: vibe image-push + scripts/install-docker.sh) -
@@ -34,8 +128,18 @@ services:
       # BEGIN_GENERATED_ENV_ARGS
       args: {}
       # END_GENERATED_ENV_ARGS
-    container_name: next-vibe-app
+    # Parameterized so the app can run as MULTIPLE coexisting instances (HA):
+    # each node sets APP_CONTAINER_NAME uniquely, and on a node that already
+    # runs another vibe site (Server 2 / heilpraktiker) it also sets APP_HOST_*
+    # ports to 0 (see docker-compose.ha.yml, which drops host ports entirely and
+    # routes via caddy-docker-proxy labels over the private net). Defaults keep
+    # Server 1 EXACTLY as before.
+    container_name: ${APP_CONTAINER_NAME:-next-vibe-app}
     restart: unless-stopped
+    # Graceful-stream-drain (G1): give the app time to finish in-flight AI
+    # streams on SIGTERM before Docker SIGKILLs it. Must exceed the app's
+    # STREAM_DRAIN_TIMEOUT_MS + margin (vibe start waits drain+15s).
+    stop_grace_period: ${APP_STOP_GRACE_PERIOD:-120s}
     env_file: .env
     environment:
       NODE_ENV: production
@@ -43,17 +147,44 @@ services:
       CHAT_STORAGE_TYPE: ${CHAT_STORAGE_TYPE}
       CHAT_STORAGE_PATH: ${CHAT_STORAGE_PATH:-/app/uploads/chat}
       VIBE_DISABLE_PROXY: ${VIBE_DISABLE_PROXY:-false}
+      # ── WebSocket pub/sub (Redis) — set WS_PUBSUB_TYPE=redis in .env to enable HA ──
       WS_PUBSUB_TYPE: ${WS_PUBSUB_TYPE:-local}
-      REDIS_URL: ${REDIS_URL:-}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      # ── Object storage (MinIO / S3) — set CHAT_STORAGE_TYPE=s3 in .env to enable HA ──
+      # Internal endpoint; forcePathStyle is set by the adapter. Leave S3_PUBLIC_URL_BASE
+      # UNSET so files are proxied through the app and MinIO stays private.
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-chat-media}
+      # App's S3 creds are the MinIO root creds (single source of truth).
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
     volumes:
-      # Mount volume for local file storage
-      - /next-vibe-uploads:/app/uploads
+      # Mount volume for local file storage (filesystem mode / pre-migration source).
+      # Host path parameterized so a second vibe site on the same box uses a
+      # DISTINCT uploads dir (never shares heilpraktiker's /next-vibe-uploads).
+      - ${UPLOADS_HOST_DIR:-/next-vibe-uploads}:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    # Host ports parameterized so a second vibe site on the same box binds
+    # DISTINCT ports (unbottled: 3100/4100) and never collides with the first
+    # site's 3000/4000. Defaults keep Server 1 EXACTLY as before.
+    #
+    # IMPORTANT — host port MUST equal container port here. The app derives its
+    # OWN listen port from NEXT_PUBLIC_APP_URL's port (vibe start: "port = URL
+    # port, else 3000"), and in direct mode (VIBE_DISABLE_PROXY=true) the WS
+    # sidecar listens on that port + 1000. So a co-located instance sets
+    # NEXT_PUBLIC_APP_URL=...:3100 → the container listens on 3100 (HTTP) + 4100
+    # (WS), and the mapping must target those same container ports, not 3000/4000.
+    # Keep APP_WS_HOST_PORT = APP_HOST_PORT + 1000.
     ports:
-      - "3000:3000"
-      - "4000:4000"
+      - "${APP_HOST_PORT:-3000}:${APP_HOST_PORT:-3000}"
+      - "${APP_WS_HOST_PORT:-4000}:${APP_WS_HOST_PORT:-4000}"
     networks:
       - app-network
       - caddy_internal
@@ -66,3 +197,7 @@ networks:
     driver: bridge
   caddy_internal:
     external: true
+
+volumes:
+  redis-data:
+  minio-data:

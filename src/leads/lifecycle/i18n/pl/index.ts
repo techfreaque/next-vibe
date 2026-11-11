@@ -119,9 +119,9 @@ export const translations: typeof enTranslations = {
     },
     inviteSignup: {
       subject: "Jesteś na liście. Teraz czas na konto.",
-      preview: "Darmowe konto. 50 kredytów co miesiąc.",
+      preview: "Darmowe konto. 70 kredytów co miesiąc.",
       body1:
-        "Darmowe konto daje 50 kredytów miesięcznie i dostęp do {{modelCount}} modeli, z filtrem ustawianym przez ciebie.",
+        "Darmowe konto daje 70 kredytów miesięcznie i dostęp do {{modelCount}} modeli, z filtrem ustawianym przez ciebie.",
       body2:
         "Subskrybenci newslettera dostają co miesiąc dodatkowy bonus +20 kredytów.",
       cta: "Załóż darmowe konto",
@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
       body1:
         "Czytasz nas w mailu. Możesz korzystać z nas bezpośrednio: wybierz model, pytaj o wszystko, sam decyduj o filtrze.",
       body2:
-        "Darmowe konta dostają 50 kredytów miesięcznie. Subskrybenci newslettera dostają 20 więcej.",
+        "Darmowe konta dostają 70 kredytów miesięcznie. Subskrybenci newslettera dostają 20 więcej.",
       cta: "Załóż darmowe konto",
     },
   },

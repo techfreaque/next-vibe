@@ -260,6 +260,37 @@ export const translations = {
           totalEarnedCents: {
             content: "Total Earned (cents)",
           },
+          confirmedEarnedCents: {
+            content: "Confirmed Earned (cents)",
+          },
+          pendingEarnedCents: {
+            content: "Pending Earned (cents)",
+          },
+        },
+        engagement: {
+          title: "Credits & Engagement",
+          description: "Balance, spend, earnings and activity",
+          creditBalance: {
+            content: "Credit Balance",
+          },
+          freeAllowance: {
+            content: "Free Allowance",
+          },
+          lifetimeCreditsSpent: {
+            content: "Lifetime Spend",
+          },
+          favoritesCount: {
+            content: "Favorites",
+          },
+          customSkillsCount: {
+            content: "Custom Skills",
+          },
+          newsletterConsent: {
+            content: "Newsletter Consent",
+          },
+          hasConfirmedNewsletter: {
+            content: "Newsletter Confirmed",
+          },
         },
         leadId: {
           content: "Associated Lead ID",
@@ -668,6 +699,19 @@ export const translations = {
       referrals: "Referrals",
       subscription: "Subscription",
       creditHistory: "Credit History",
+      engagementTitle: "Credits & Engagement",
+      balance: "Balance",
+      freeAllowance: "Free Tier",
+      lifetimeSpend: "Lifetime Spend",
+      earned: "Earned",
+      earnedPending: "Pending:",
+      referred: "Referred",
+      favorites: "Favorites",
+      skills: "Skills",
+      newsletter: "Newsletter",
+      newsletterConfirmed: "Confirmed",
+      newsletterConsent: "Opted in",
+      newsletterNone: "None",
       deleteUser: "Delete User",
       userDeletedSuccessfully: "User deleted successfully",
       deletedAt: "Deleted at",

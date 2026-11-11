@@ -1,16 +1,25 @@
 /**
  * Monthly Free Credit Allowance
  *
- * One cap per pool per calendar month:
+ * One cap per pool per calendar month. The user-pool cap is ADDITIVE: a signed-in
+ * user keeps its original guest lead's allowance and stacks the signed-in grant on
+ * top, because every user began as a guest lead and the two accumulate.
  * - Guest pool (public leads, linked via lead_lead_links): FREE_CREDIT_ALLOWANCE.guest
- * - User pool (user + every linked lead): FREE_CREDIT_ALLOWANCE.signedIn
+ *   (20).
+ * - User pool (user + every linked lead):
+ *   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn = lead 20 + user 50
+ *   = 70 base.
  * - Either pool +FREE_CREDIT_ALLOWANCE.newsletterBonus once it holds a CONFIRMED
- *   newsletter subscription (double opt-in link clicked).
+ *   newsletter subscription (double opt-in link clicked): guest pool 20 -> 40,
+ *   user pool 70 -> 90.
  *
  * Spending is counted per pool per period (credit_transactions.metadata.freeCreditsUsed),
- * so the cap is "allowance - spent" no matter how often the tier changes mid-month:
- * guest -> user carries usage over, unsubscribing lowers the cap, re-subscribing
- * never grants a second bonus.
+ * so the cap is "allowance - spent" no matter how often the tier changes mid-month.
+ * The lead's 20 stays the SAME 20 it had as a guest: when a guest converts to a
+ * user, its pool and period-spend are unchanged, only the ceiling rises (20 -> 70),
+ * so any guest spend already made on another device/IP still counts against the 70
+ * (and 90 with newsletter). One IP cannot mass-signup to farm fresh credits.
+ * Unsubscribing lowers the cap; re-subscribing never grants a second bonus.
  */
 
 import "server-only";
@@ -38,7 +47,7 @@ export function computeFreeAllowance({
   hasConfirmedNewsletter,
 }: FreeAllowanceInput): number {
   const base = isUserPool
-    ? FREE_CREDIT_ALLOWANCE.signedIn
+    ? FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn
     : FREE_CREDIT_ALLOWANCE.guest;
   return hasConfirmedNewsletter
     ? base + FREE_CREDIT_ALLOWANCE.newsletterBonus

@@ -78,6 +78,7 @@ export enum ImageVisionModelId {
   CLAUDE_SONNET_5_5 = "claude-sonnet-5.5",
   CLAUDE_HAIKU_5_5 = "claude-haiku-5.5",
   CLAUDE_FABLE_5_1 = "claude-fable-5.1",
+  CLAUDE_FABLE_5_2 = "claude-fable-5.2",
   GPT_6_ASTRA = "gpt-6-astra",
   GPT_6_1_SOL = "gpt-6.1-sol",
   GPT_6_1_TERRA = "gpt-6.1-terra",

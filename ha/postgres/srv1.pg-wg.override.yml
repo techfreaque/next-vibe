@@ -1,0 +1,7 @@
+# Server-1-ONLY override: publish Postgres 5432 on the WireGuard IP so the
+# Server 2 subscriber can connect over the private tunnel. NEVER 0.0.0.0.
+#   docker compose -f docker-compose.prod.yml -f ha/postgres/srv1.pg-wg.override.yml up -d postgres
+services:
+  postgres:
+    ports:
+      - "10.88.0.1:5432:5432"

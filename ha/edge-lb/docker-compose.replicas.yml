@@ -1,0 +1,50 @@
+# ============================================================================
+# Per-box app REPLICAS overlay — run N app containers on ONE node so all cores
+# are used, fronted by the node's Caddy LB (ha/edge-lb/unbottled.ai.lb.caddy).
+#
+# Layer AFTER the node's base stack, e.g. on the cutover node:
+#   docker compose -p unbottled --env-file .env \
+#     -f docker-compose.prod.yml \
+#     -f <node overlay: standalone|shared-prod> \
+#     -f ha/edge-lb/docker-compose.replicas.yml up -d
+#
+# What a replica is: a COPY of the `app` service with a DISTINCT container_name
+# and NO host ports (Caddy reaches every replica by container DNS name on the
+# shared `caddy_internal` network — cross-replica balancing is Caddy's job,
+# cross-node balancing is the DNS edge's job). All replicas on a node share that
+# node's postgres/redis/minio and its uploads volume, so they are truly
+# interchangeable. Each keeps the G1 stream-drain stop_grace_period.
+#
+# PORT MATH: in single-port proxy mode (VIBE_DISABLE_PROXY=false) with a
+# PORTLESS NEXT_PUBLIC_APP_URL=https://unbottled.ai, every replica listens on
+# 3000 (http+/ws) internally. No host port, no collision — N replicas all bind
+# container-port 3000 on their OWN network namespace. The LB block targets
+# unbottled-app:3000 + unbottled-app-2:3000 (+ -3/-4…).
+#
+# SCALING N: this file defines replica #2. For #3/#4 copy the `app-2` block to
+# `app-3`/`app-4` (bump container_name + depends_on only). deploy-ha.sh reads
+# the node's `replicas` column and expects the names unbottled-app, -2, -3, …
+# (see container_name() in deploy-ha.sh). Keep this file's replica count ==
+# the node's ha-fleet.conf `replicas` column, and the LB caddy upstream list
+# in sync (deploy-ha.sh renders the Caddy upstreams from `replicas`).
+#
+# NOTE: replica #1 is the base `app` service (container_name
+# ${APP_CONTAINER_NAME}). This overlay only ADDS #2+. It changes nothing on a
+# node that is not scaled up.
+# ============================================================================
+services:
+  app-2:
+    extends:
+      file: ../../docker-compose.prod.yml
+      service: app
+    container_name: ${APP_CONTAINER_NAME:-unbottled-app}-2
+    # No host ports — reached only via caddy_internal by container name.
+    ports: !reset []
+    # Same networks as the base app so Caddy (on caddy_internal) and the shared
+    # postgres/redis/minio (on app-network) are reachable.
+    networks:
+      - app-network
+      - caddy_internal
+    # No caddy-docker-proxy label: the HA edge is a STATIC Caddyfile block
+    # (ha/edge-lb/unbottled.ai.lb.caddy) that lists every replica explicitly.
+    labels: !reset []

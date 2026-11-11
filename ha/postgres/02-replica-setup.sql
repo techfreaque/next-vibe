@@ -1,0 +1,32 @@
+-- Run on SERVER 2's SHARED prod-postgres container.
+-- Creates a SEPARATE `unbottled` database (heilpraktiker's `postgres` DB is
+-- never touched) and subscribes it to Server 1's publication.
+--
+-- This script runs in TWO connections (setup-replication.sh handles it):
+--   A) connected to `postgres` (maintenance DB) to CREATE DATABASE unbottled
+--   B) connected to `unbottled` to load the schema + CREATE SUBSCRIPTION
+--
+-- ── Connection A (maintenance DB) ──────────────────────────────────────────
+-- CREATE DATABASE cannot run inside a DO block / transaction, so the shell
+-- driver guards it with: SELECT 'exists' FROM pg_database WHERE datname='unbottled'
+-- and only runs CREATE DATABASE unbottled; when absent.
+
+-- ── Connection B (database `unbottled`) ─────────────────────────────────────
+-- The schema is loaded FIRST (pg_dump --schema-only from Server 1) so the
+-- subscription has tables to copy into. Then:
+--
+-- CREATE SUBSCRIPTION unbottled_sub
+--   CONNECTION 'host=10.88.0.1 port=5432 dbname=postgres user=unbottled_repl password=... sslmode=disable'
+--   PUBLICATION unbottled_pub
+--   WITH (copy_data = true, create_slot = true, slot_name = 'unbottled_sub_slot',
+--         streaming = on, synchronous_commit = off);
+--
+-- copy_data=true performs the INITIAL snapshot (~1.2 GB) then streams changes.
+-- sslmode=disable is fine: the link is already encrypted by WireGuard.
+-- The real statement (with the injected password) is issued by setup-replication.sh.
+
+-- Verify after setup:
+--   \dRs+ unbottled_sub            -- subscription status
+--   SELECT * FROM pg_stat_subscription;
+--   SELECT srsubid, srrelid::regclass, srsubstate  -- 'r' = ready (streaming)
+--     FROM pg_subscription_rel;

@@ -1,0 +1,68 @@
+# ============================================================================
+# HA overlay — apply ON TOP of docker-compose.prod.yml on a node that must run
+# the unbottled app ALONGSIDE another vibe site (Server 2 / heilpraktiker) and
+# participate in the active-active pair.
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.ha.yml up -d
+#
+# What it changes vs. the Server-1 baseline:
+#   • Binds the app's host ports to the WireGuard IP only (never 0.0.0.0), on
+#     3100/4100 so they NEVER collide with heilpraktiker's 3000/4000.
+#   • Leaves the shared Postgres OUT of this compose (on Server 2 the app uses
+#     the EXISTING prod-postgres container's `unbottled` DB — a logical replica;
+#     see ha/postgres/). So `postgres` is overridden to a no-op external ref via
+#     the app's DATABASE_URL pointing at the shared container over app-network.
+#   • Points Redis/MinIO at the local replica endpoints.
+#
+# Server 1 continues to use ONLY docker-compose.prod.yml (do not apply this
+# overlay there) — its app keeps publishing 3000/4000 on 0.0.0.0 behind its
+# static Caddyfile.
+# ============================================================================
+services:
+  app:
+    container_name: ${APP_CONTAINER_NAME:-unbottled-app}
+    # Bind to the WireGuard private IP only. Caddy on each node load-balances
+    # unbottled across 10.88.0.1:3000 (srv1) and 10.88.0.2:3100 (srv2). No
+    # public port, no 0.0.0.0, no collision with heilpraktiker.
+    ports: !override
+      - "${APP_BIND_IP:-10.88.0.2}:${APP_HOST_PORT:-3100}:3000"
+      - "${APP_BIND_IP:-10.88.0.2}:${APP_WS_HOST_PORT:-4100}:4000"
+    # On Server 2 the app talks to the SHARED prod-postgres container (the one
+    # heilpraktiker owns) over its app-network, DB name `unbottled`. That value
+    # is set in this node's .env as DATABASE_URL — env_file already carries it.
+    # We also attach to heilpraktiker's network so the shared PG is reachable.
+    networks:
+      - app-network
+      - caddy_internal
+      - shared-postgres
+    depends_on: !override
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    # No caddy-docker-proxy label here: the HA edge is a STATIC Caddyfile on
+    # each node (ha/caddy/) that health-checks + load-balances both instances.
+    labels: !reset []
+
+  # This node does NOT run its own unbottled postgres container — it reuses the
+  # shared one. Override the baseline `postgres` service to a tiny no-op so
+  # `up` on this overlay never starts a second PG that would fight for data.
+  postgres: !reset
+    image: busybox:1.36
+    container_name: unbottled-pg-noop
+    command:
+      [
+        "sh",
+        "-c",
+        "echo 'postgres is the shared prod-postgres container (see ha/postgres/README.md); this placeholder exits.'; exit 0",
+      ]
+    restart: "no"
+    profiles: ["never"]
+
+networks:
+  # heilpraktiker's existing app-network, joined so the shared prod-postgres is
+  # reachable at hostname `prod-postgres`. Marked external — provisioning
+  # ensures it exists (it already does: heilpraktiker-brandstaetter_app-network).
+  shared-postgres:
+    external: true
+    name: ${SHARED_PG_NETWORK:-heilpraktiker-brandstaetter_app-network}

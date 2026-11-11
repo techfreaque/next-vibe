@@ -1405,11 +1405,11 @@ export const translations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Uncensored AI model for creative and unrestricted conversations",
+          "UncensoredLM v1.2 - Uncensored.ai's reasoning model, a DeepSeek-R1 distill on a 14B Qwen base. Thinks out loud, answers straight, calls tools. 32K context. Experimental, and not the one to reach for when you need code.",
         freedomgptLiberty:
-          "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
+          "FreedomGPT Liberty - Age of AI's flagship uncensored model, the free-speech chatbot that started the category. Built on open weights, tuned for blunt answers with no lecture. Fast and quick-witted, 32K context. Light on tools, coding and deep analysis.",
         gabAiArya:
-          "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+          "Gab AI Arya - Gab's uncensored assistant, positioned on the political right by its maker and built to answer without the usual guardrails. Smart, 131K context, calls tools. A deliberately different viewpoint in the catalog. Weaker at coding, and its base model is undisclosed.",
         gemini31ProPreviewCustomTools:
           "Gemini 3.1 Pro Preview (Custom Tools) - Gemini 3.1 Pro variant with improved tool selection that prevents overuse of bash tools in favor of more efficient third-party functions, ideal for coding agents and multi-tool workflows",
         gemini31FlashImagePreview:
@@ -1474,6 +1474,10 @@ export const translations = {
           "Lustify v8 - SDXL checkpoint built for photoreal adult imagery. No blur, no refusals. One cent per image.",
         veniceChroma:
           "Chroma - Uncensored open Flux-class model. Long prompts, artistic range, no blur. One cent per image.",
+        veniceQwenEdit:
+          "Qwen Edit Uncensored - Feed it a reference image and a prompt, get the edit back. Swap elements, restyle, rework scenes. No blur, no refusals.",
+        veniceFireredImageEdit:
+          "FireRed Image Edit - Prompt-driven image editing. Change what you describe, keep the rest. Fast, uncensored, reference-image in.",
         claudeOpus45:
           "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
         claudeOpus46:
@@ -1827,6 +1831,8 @@ export const translations = {
           "Claude Haiku 5.5 - Anthropic's fastest model. Vision, tools and 1M context for a tenth of Haiku 4.5's price.",
         claudeFable51:
           "Claude Fable 5.1 - Anthropic's frontier reasoner. Deep synthesis, long-horizon planning, sharper than Fable 5. 1M-token context.",
+        claudeFable52:
+          "Claude Fable 5.2 - Anthropic's frontier reasoner. Deeper synthesis and steadier long-horizon planning than Fable 5.1, at a lower price. 1M-token context.",
         gpt6Astra:
           "GPT-6 Astra - OpenAI's most capable model. Maximum reasoning depth for the hardest problems. 1.05M-token context.",
         gpt6AstraPro:

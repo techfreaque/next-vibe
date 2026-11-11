@@ -15,7 +15,11 @@ import type { SubscriptionPlanValue } from "@/subscription/enum";
 import { SubscriptionPlan } from "@/subscription/enum";
 
 import type { PaymentInterval } from "../payment/providers/types";
-import { FREE_CREDIT_ALLOWANCE } from "./constants";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "./constants";
 import type { ProductsTranslationKey } from "./i18n";
 
 /**
@@ -494,7 +498,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
 
     return t("summary", {
       freeCredits: freeTier.credits,
-      freeCreditsSignedIn: FREE_CREDIT_ALLOWANCE.signedIn,
+      freeCreditsSignedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
       freeCreditsNewsletterBonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       packCurrency: packCurrencySymbol,
       packPrice: packPrice,
@@ -545,14 +549,12 @@ export function getPricingParams(
   return {
     freeCredits: String(free.credits),
     freeCreditsGuest: String(FREE_CREDIT_ALLOWANCE.guest),
-    freeCreditsSignedIn: String(FREE_CREDIT_ALLOWANCE.signedIn),
+    freeCreditsSignedIn: String(FREE_CREDIT_SIGNED_IN_TOTAL),
     freeCreditsNewsletterBonus: String(FREE_CREDIT_ALLOWANCE.newsletterBonus),
     freeCreditsGuestNewsletter: String(
       FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.newsletterBonus,
     ),
-    freeCreditsMax: String(
-      FREE_CREDIT_ALLOWANCE.signedIn + FREE_CREDIT_ALLOWANCE.newsletterBonus,
-    ),
+    freeCreditsMax: String(FREE_CREDIT_MAX_TOTAL),
     subscriptionCredits: String(sub.credits),
     packCredits: String(pack.credits),
     subscriptionPrice: `${subSymbol}${subPriceData.price}`,

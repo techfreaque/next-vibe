@@ -86,7 +86,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-alloy",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -126,7 +126,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-nova",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -166,11 +166,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-onyx",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
   [TtsModelId.OPENAI_ECHO]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Echo",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiEcho",
@@ -200,11 +201,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-echo",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
   [TtsModelId.OPENAI_SHIMMER]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Shimmer",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiShimmer",
@@ -234,11 +236,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-shimmer",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
   [TtsModelId.OPENAI_FABLE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Fable",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiFable",
@@ -268,7 +271,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-fable",
-        creditCostPerCharacter: 0.002, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.002, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -303,7 +306,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-rachel",
-        creditCostPerCharacter: 0.039, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -338,7 +341,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-josh",
-        creditCostPerCharacter: 0.039, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -373,7 +376,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-bella",
-        creditCostPerCharacter: 0.039, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -408,19 +411,20 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-adam",
-        creditCostPerCharacter: 0.039, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
   [TtsModelId.KOKORO_BELLA]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Bella (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroBella",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "warm", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -438,17 +442,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:af_bella",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_BELLA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-bella",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_SARAH]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Sarah (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroSarah",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "clear", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -466,17 +477,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:af_sarah",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_SARAH,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-sarah",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_NICOLE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Nicole (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroNicole",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "soft", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -494,17 +512,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:af_nicole",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_NICOLE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-nicole",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_ADAM]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Adam (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroAdam",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "male", style: "steady", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -522,17 +547,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:am_adam",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_ADAM,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-adam",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_MICHAEL]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Michael (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroMichael",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "male", style: "confident", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -550,17 +582,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:am_michael",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_MICHAEL,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-michael",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_EMMA]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Emma (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroEmma",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "british", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -578,17 +617,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:bf_emma",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_EMMA,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-emma",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.KOKORO_GEORGE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "George (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroGeorge",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "male", style: "british", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -606,17 +652,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "Kokoro-82m:bm_george",
         creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.KOKORO_GEORGE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "kokoro-george",
+        creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.INWORLD_MINI_ASHLEY]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Ashley (Inworld)",
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldAshley",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "lively", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -634,17 +687,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "inworld-tts-1.5-mini:Ashley",
         creditCostPerCharacter: 0.00102, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.INWORLD_MINI_ASHLEY,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "inworld-mini-ashley",
+        creditCostPerCharacter: 0.0013, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.INWORLD_MINI_CRAIG]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Craig (Inworld)",
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldCraig",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "male", style: "british", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -662,17 +722,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "inworld-tts-1.5-mini:Craig",
         creditCostPerCharacter: 0.00102, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.INWORLD_MINI_CRAIG,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "inworld-mini-craig",
+        creditCostPerCharacter: 0.0013, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.XAI_EVE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Eve (xAI)",
     by: "xai",
     description: "textToSpeech.models.descriptions.xaiEve",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "expressive", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -690,17 +757,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "xai-tts:Eve",
         creditCostPerCharacter: 0.00165, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.XAI_EVE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "xai-eve",
+        creditCostPerCharacter: 0.0021, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.GEMINI_ZEPHYR]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Zephyr (Gemini)",
     by: "google",
     description: "textToSpeech.models.descriptions.geminiZephyr",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "female", style: "bright", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -718,17 +792,24 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         providerModel: "google/gemini-3.8-flash-lite-tts:Zephyr",
         creditCostPerCharacter: 0.003, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
       },
+      {
+        id: TtsModelId.GEMINI_ZEPHYR,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-zephyr",
+        creditCostPerCharacter: 0.0039, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [TtsModelId.GEMINI_PUCK]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Puck (Gemini)",
     by: "google",
     description: "textToSpeech.models.descriptions.geminiPuck",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "volume-2",
-    inputs: ["text"],
-    outputs: ["audio"],
+    inputs: ["text"], // updated: 2026-11-09 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-11-09 from tts-deterministic
     voiceMeta: { gender: "male", style: "upbeat", language: "en" },
     utilities: [ModelUtility.TTS],
     supportsTools: false,
@@ -745,6 +826,12 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "google/gemini-3.8-flash-lite-tts:Puck",
         creditCostPerCharacter: 0.003, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+      },
+      {
+        id: TtsModelId.GEMINI_PUCK,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gemini-puck",
+        creditCostPerCharacter: 0.0039, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },

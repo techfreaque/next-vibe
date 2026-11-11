@@ -86,8 +86,13 @@ done
 
 echo "Deployment successful - new app is responding."
 echo "Cleaning up docker resources..."
-# Remove unused images / build cache to reclaim disk after the swap.
-docker system prune -a -f
+# Reclaim disk WITHOUT destroying the rollback image. `docker system prune -a`
+# would delete every image not attached to a running container - including the
+# `:rollback` tag image-push just set to the previous release, leaving no way
+# back. So prune only build cache and DANGLING (untagged <none>) images, which
+# never includes the tagged :rollback or :latest images.
+docker builder prune -a -f
+docker image prune -f
 # Only dangling (anonymous, unreferenced) volumes - NEVER `-a`, which would also
 # target named volumes like the Postgres data volume. The DB volume survives.
 docker volume prune -f

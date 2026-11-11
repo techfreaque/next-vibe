@@ -401,6 +401,13 @@ export interface HeadlessAiStreamResult {
   lastAiMessageContent: string | null;
   /** URL of the last generated media (image/audio/video) - set when native file parts are emitted */
   lastGeneratedMediaUrl?: string | null;
+  /**
+   * The provider's error-part text when the stream finished with an error
+   * (null otherwise). Lets headless callers (e.g. image-gen polyfill) surface
+   * the real upstream cause — e.g. a transient `provider_unavailable` outage —
+   * instead of a generic "nothing was produced" message.
+   */
+  providerErrorText?: string | null;
   /** Total credits deducted during this stream (model + tools) - for cost display in callers */
   totalCreditsDeducted?: number;
   /**

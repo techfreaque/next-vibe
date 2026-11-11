@@ -1,0 +1,56 @@
+; ===========================================================================
+; unbottled.ai — authoritative zone served by the self-hosted PowerDNS edge.
+;
+; This is a TEMPLATE. The health daemon replaces the sentinel line (a line that
+; is exactly the APEX marker token) with the CURRENTLY-HEALTHY apex A record set
+; (one or both node IPs), writes the result to the zone file, bumps the serial.
+; The SERIAL marker token is replaced with a monotonic serial.
+;
+; Static records below mirror the hosttech zone (391416) EXACTLY so cutting the
+; registrar delegation to these nameservers changes NOTHING except who answers
+; — mail (MX/SPF/DKIM/DMARC to a42.ch), the wildcard, and s2 all keep working.
+;
+; TTLs: apex A = 30s (fast failover). Everything static = 1h.
+; ===========================================================================
+$ORIGIN unbottled.ai.
+$TTL 3600
+
+@   IN SOA ns1.unbottled.ai. hostmaster.unbottled.ai. (
+        @@SERIAL@@   ; serial (epoch-1.7e9, uint32-safe + monotonic; set by daemon)
+        7200         ; refresh
+        120          ; retry
+        2419200      ; expire
+        300 )        ; negative-cache TTL
+
+; ---- authoritative nameservers (the two self-hosted edge boxes) ----
+@           IN NS    ns1.unbottled.ai.
+@           IN NS    ns2.unbottled.ai.
+; glue — these A records are what the registrar glue must also carry.
+ns1         IN A     72.61.156.49
+ns2         IN A     179.198.214.41
+
+; ---- apex: round-robin A across the HEALTHY nodes (low TTL, health-managed) ----
+; The sentinel line below is replaced with 30s-TTL A records for every node that
+; passed its health check. Never empty: if the health view says both are down
+; (almost always a probe fault, not a real double-outage) it falls back to
+; publishing BOTH so the site is never dark.
+;;APEX_A_RECORDS;;
+
+; ---- www → apex (served by each node's Caddy with a 308 to the bare host) ----
+www         IN A     72.61.156.49
+www         IN A     179.198.214.41
+
+; ---- wildcard (kept from hosttech: everything else → prod/S1) ----
+*           IN A     72.61.156.49
+
+; ---- s2 test node (kept from hosttech) ----
+s2          IN A     179.198.214.41
+
+; ---- mail: delegated to a42.ch (mailcow on Server 3), unchanged from hosttech ----
+@               IN MX    10 mail.a42.ch.
+@               IN TXT   "v=spf1 mx a:mail.a42.ch ip4:213.167.224.8 ~all"
+_dmarc          IN TXT   "v=DMARC1; p=quarantine; rua=mailto:dmarc@a42.ch"
+dkim._domainkey IN TXT   "v=DKIM1;k=rsa;t=s;s=email;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQEAy5Wp4ilOAMbYtzGV+qxfbxPbL6I/mDyg66BIH7jvt3rRAil6oYWRyKCke0aR7Lo4klBLe1nVTezuiVlehcH2aJ056MBUhp/HDNJhoS51gKelAMztLnyYyYpO/1jucNUAyRo7vkplGFBEnsrpMkkcufTp7jPqgkkE8P4TH15sDGLST55wz5hjkX5eXh6C07BVp5lyZuBelgdbK2Q/q8zoaC1XeZA9A2H4mp6Jg29bIF2ipgaUyRzgHVRZkVFnNZv83tdFQPAg1+Ft/Xs5H4QIdxAIzmrGvJjdxHqRMP9yWquJAETgm5YeitZtjNlY7qYUdFJ7RKpez3xax2KL+hmDHQIDAQAB"
+autodiscover    IN CNAME mail.a42.ch.
+autoconfig      IN CNAME mail.a42.ch.
+_autodiscover._tcp IN SRV 0 0 443 mail.a42.ch.

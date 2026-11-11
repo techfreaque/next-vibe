@@ -715,8 +715,12 @@ export class CampaignSchedulerService {
   }
 
   /**
-   * Bootstrap a one-off newsletter blast for all users.
+   * Bootstrap a one-off newsletter blast for all mailable account holders.
    * Targets the users table (actual account holders), NOT cold leads.
+   * Audience is gated the same way as {@link bootstrapConsentedNewsletterBlast}:
+   * marketing consent granted AND email verified AND email present. Unverified
+   * or non-consented addresses are never mailed (bounce risk, no confirmed
+   * ownership / consent).
    * For each user, finds or creates a linked lead, then creates a campaign row.
    * Deduplicates by email across all leads for the same journey variant.
    */
@@ -728,7 +732,8 @@ export class CampaignSchedulerService {
     const result = { scheduled: 0, skipped: 0, errors: 0 };
 
     try {
-      // Find all users with an email address
+      // Mailable account holders: marketing consent granted, email verified,
+      // email present. Opt-outs and unverified addresses are excluded.
       const allUsers = await db
         .select({
           id: users.id,
@@ -736,7 +741,13 @@ export class CampaignSchedulerService {
           locale: users.locale,
         })
         .from(users)
-        .where(isNotNull(users.email));
+        .where(
+          and(
+            eq(users.marketingConsent, true),
+            eq(users.emailVerified, true),
+            isNotNull(users.email),
+          ),
+        );
 
       logger.info("newsletter.blast.bootstrap.start", {
         journeyVariant,
@@ -887,6 +898,207 @@ export class CampaignSchedulerService {
       return result;
     } catch (error) {
       logger.error("newsletter.blast.bootstrap.error", parseError(error));
+      return result;
+    }
+  }
+
+  /**
+   * Bootstrap a consent-filtered one-off newsletter blast.
+   *
+   * Audience: every account holder who granted marketing consent
+   * (users.marketing_consent = true), has a verified email
+   * (users.email_verified = true) and has an email. Unverified addresses are
+   * never mailed — they are unconfirmed and a bounce risk. Anyone whose lead is
+   * bounced / unsubscribed / invalid is excluded, so opt-outs and bad addresses
+   * are always respected. This is broader than the newsletter double-opt-in
+   * (which gates on newsletter_subscriptions.SUBSCRIBED) but still consent-based.
+   *
+   * For an account holder without a lead row yet, one is created (status
+   * SIGNED_UP), mirroring {@link bootstrapNewsletterBlast}.
+   *
+   * Idempotent: deduplicates by email and skips any (lead, variant) that already
+   * has a campaign row, so running it twice never double-sends. Honours dryRun
+   * (counts the would-send audience without writing any rows).
+   */
+  async bootstrapConsentedNewsletterBlast(
+    journeyVariant: typeof EmailJourneyVariantValue,
+    logger: EndpointLogger,
+    options: { dryRun?: boolean } = {},
+  ): Promise<{ scheduled: number; skipped: number; errors: number }> {
+    const result = { scheduled: 0, skipped: 0, errors: 0 };
+
+    try {
+      // Consented account holders: marketing consent granted, email verified,
+      // email present. Unverified addresses are excluded (bounce risk, no
+      // confirmed ownership).
+      const consentedUsers = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          locale: users.locale,
+        })
+        .from(users)
+        .where(
+          and(
+            eq(users.marketingConsent, true),
+            eq(users.emailVerified, true),
+            isNotNull(users.email),
+          ),
+        );
+
+      logger.info("newsletter.blast.consented.start", {
+        journeyVariant,
+        totalConsented: consentedUsers.length,
+        dryRun: options.dryRun ?? false,
+      });
+
+      const scheduledEmails = new Set<string>();
+
+      for (const user of consentedUsers) {
+        if (!user.email) {
+          continue;
+        }
+
+        // Deduplicate by email across users.
+        if (scheduledEmails.has(user.email)) {
+          result.skipped++;
+          continue;
+        }
+
+        try {
+          // Resolve the lead that carries this campaign: the lead linked to the
+          // user, else the lead that owns this email, else create one.
+          let leadRow: { id: string; status: string } | undefined;
+
+          [leadRow] = await db
+            .select({ id: leads.id, status: leads.status })
+            .from(leads)
+            .where(eq(leads.convertedUserId, user.id))
+            .limit(1);
+
+          if (!leadRow) {
+            [leadRow] = await db
+              .select({ id: leads.id, status: leads.status })
+              .from(leads)
+              .where(eq(leads.email, user.email))
+              .limit(1);
+          }
+
+          if (!leadRow) {
+            const localeParts = (user.locale ?? "en-GLOBAL").split("-");
+            const lang = (localeParts[0] ?? "en") as "en" | "de" | "pl";
+            const ctry = (localeParts[1] ?? "GLOBAL") as
+              | "DE"
+              | "PL"
+              | "US"
+              | "GLOBAL";
+
+            const [newLead] = await db
+              .insert(leads)
+              .values({
+                email: user.email,
+                businessName: "",
+                convertedUserId: user.id,
+                language: lang,
+                country: ctry,
+                status: LeadStatus.SIGNED_UP,
+                source: LeadSource.WEBSITE,
+                signedUpAt: new Date(),
+                convertedAt: new Date(),
+              })
+              .onConflictDoNothing()
+              .returning({ id: leads.id, status: leads.status });
+
+            if (newLead) {
+              leadRow = newLead;
+            } else {
+              // Race: created elsewhere - re-read by email.
+              [leadRow] = await db
+                .select({ id: leads.id, status: leads.status })
+                .from(leads)
+                .where(eq(leads.email, user.email))
+                .limit(1);
+            }
+          }
+
+          if (!leadRow) {
+            logger.error("newsletter.blast.consented.lead_create_failed", {
+              userId: user.id,
+            });
+            result.errors++;
+            continue;
+          }
+
+          // Respect bounces and opt-outs recorded on the lead.
+          if (
+            leadRow.status === LeadStatus.BOUNCED ||
+            leadRow.status === LeadStatus.UNSUBSCRIBED ||
+            leadRow.status === LeadStatus.INVALID
+          ) {
+            result.skipped++;
+            continue;
+          }
+
+          // Idempotency: already has a campaign for this variant?
+          const [existing] = await db
+            .select({ id: emailCampaigns.id })
+            .from(emailCampaigns)
+            .where(
+              and(
+                eq(emailCampaigns.leadId, leadRow.id),
+                eq(emailCampaigns.journeyVariant, journeyVariant),
+              ),
+            )
+            .limit(1);
+
+          if (existing) {
+            result.skipped++;
+            scheduledEmails.add(user.email);
+            continue;
+          }
+
+          if (options.dryRun) {
+            result.scheduled++;
+            scheduledEmails.add(user.email);
+            continue;
+          }
+
+          const campaignId = await this.scheduleEmail(
+            {
+              leadId: leadRow.id,
+              campaignType: CampaignType.NEWSLETTER,
+              journeyVariant,
+              stage: EmailCampaignStage.INITIAL,
+              scheduledAt: new Date(),
+            },
+            logger,
+          );
+
+          if (campaignId) {
+            result.scheduled++;
+            scheduledEmails.add(user.email);
+          } else {
+            result.errors++;
+          }
+        } catch (error) {
+          logger.error("newsletter.blast.consented.error", parseError(error), {
+            userId: user.id,
+          });
+          result.errors++;
+        }
+      }
+
+      logger.info("newsletter.blast.consented.done", {
+        journeyVariant,
+        ...result,
+      });
+
+      return result;
+    } catch (error) {
+      logger.error(
+        "newsletter.blast.consented.bootstrap.error",
+        parseError(error),
+      );
       return result;
     }
   }

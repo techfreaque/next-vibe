@@ -436,6 +436,10 @@ export const translations = {
   },
 
   widget: {
+    newsletter: {
+      title: "Newsletter",
+      subtitle: "Updates in your inbox, plus 20 free credits a month",
+    },
     loadState: {
       loading: "Loading...",
       profileFailed: "Your profile didn't load.",

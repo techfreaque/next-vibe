@@ -84,6 +84,13 @@ export const translations: typeof enTranslations = {
           longDescription:
             "Produkt-Update-Newsletter Mai 2026 für alle registrierten Nutzer mit ehrlichem Bug-Eingeständnis und Feature-Highlights",
         },
+        newsletterNov2026: {
+          name: "Newsletter November 2026",
+          description:
+            "Einmaliger Reaktivierungs-Newsletter: ein Begleiter auf deiner Seite, dein Filter und ein günstigeres Standardmodell",
+          longDescription:
+            "Conversion-Newsletter November 2026 an bestätigte Abonnenten, mit dem Begleiter-Ethos und dem günstigeren Standardmodell im Fokus",
+        },
       },
     },
   },

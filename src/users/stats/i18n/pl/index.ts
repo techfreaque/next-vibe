@@ -68,6 +68,14 @@ export const translations: typeof enTranslations = {
       label: "Szablon zakresu dat",
       description: "Wybierz predefiniowany zakres dat",
     },
+    dateFrom: {
+      label: "Od",
+      description: "Początek własnego zakresu. Zastępuje szablon.",
+    },
+    dateTo: {
+      label: "Do",
+      description: "Koniec własnego zakresu. Zastępuje szablon.",
+    },
     includeComparison: {
       label: "Uwzględnij porównanie",
       description: "Uwzględnij porównanie z poprzednim okresem",

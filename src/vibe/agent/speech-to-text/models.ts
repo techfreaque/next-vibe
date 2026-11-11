@@ -69,7 +69,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "openai-whisper",
-        creditCostPerSecond: 0.013, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerSecond: 0.013, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
@@ -103,19 +103,20 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "deepgram-nova-2",
-        creditCostPerSecond: 0.0126, // updated: 2026-07-10 from unbottled.ai
+        creditCostPerSecond: 0.0126, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
   [SttModelId.WHISPER_LARGE_V3]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Whisper Large V3",
     by: "openAI",
     description: "speechToText.models.descriptions.whisperLargeV3",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "mic",
-    inputs: ["audio"],
-    outputs: ["text"],
+    inputs: ["audio"], // updated: 2026-11-09 from stt-deterministic
+    outputs: ["text"], // updated: 2026-11-09 from stt-deterministic
     utilities: [ModelUtility.STT, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
@@ -132,17 +133,24 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "Whisper-Large-V3",
         creditCostPerSecond: 0.000825, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.000495/min)
       },
+      {
+        id: SttModelId.WHISPER_LARGE_V3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "whisper-large-v3",
+        creditCostPerSecond: 0.0011, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [SttModelId.VOXTRAL_MINI_TRANSCRIBE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Voxtral Mini Transcribe",
     by: "mistral",
     description: "speechToText.models.descriptions.voxtralMini",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "mic",
-    inputs: ["audio"],
-    outputs: ["text"],
+    inputs: ["audio"], // updated: 2026-11-09 from stt-deterministic
+    outputs: ["text"], // updated: 2026-11-09 from stt-deterministic
     utilities: [ModelUtility.STT],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
@@ -159,17 +167,24 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "voxtral-mini-transcribe-3-0",
         creditCostPerSecond: 0.00642, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.00385/min)
       },
+      {
+        id: SttModelId.VOXTRAL_MINI_TRANSCRIBE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "voxtral-mini-transcribe",
+        creditCostPerSecond: 0.0083, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [SttModelId.NEMOTRON_ASR]: {
+    enabled: false, // auto-disabled: price not verified
     name: "Nemotron ASR",
     by: "nvidia",
     description: "speechToText.models.descriptions.nemotronAsr",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "mic",
-    inputs: ["audio"],
-    outputs: ["text"],
+    inputs: ["audio"], // updated: 2026-11-09 from stt-deterministic
+    outputs: ["text"], // updated: 2026-11-09 from stt-deterministic
     utilities: [ModelUtility.STT, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
@@ -186,17 +201,24 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         providerModel: "nvidia/nemotron-asr-multilingual/asr",
         creditCostPerSecond: 0.02267, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0136/min)
       },
+      {
+        id: SttModelId.NEMOTRON_ASR,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "nemotron-asr",
+        creditCostPerSecond: 0.0295, // updated: 2026-11-09 from unbottled.ai
+      },
     ],
   },
   [SttModelId.GPT4O_MINI_TRANSCRIBE]: {
+    enabled: false, // auto-disabled: price not verified
     name: "GPT-4o Mini Transcribe",
     by: "openAI",
     description: "speechToText.models.descriptions.gpt4oMiniTranscribe",
     contextWindow: 0,
     parameterCount: undefined,
     icon: "mic",
-    inputs: ["audio"],
-    outputs: ["text"],
+    inputs: ["audio"], // updated: 2026-11-09 from stt-deterministic
+    outputs: ["text"], // updated: 2026-11-09 from stt-deterministic
     utilities: [ModelUtility.STT],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
@@ -212,6 +234,12 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "gpt-4o-mini-transcribe",
         creditCostPerSecond: 0.0085, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0051/min)
+      },
+      {
+        id: SttModelId.GPT4O_MINI_TRANSCRIBE,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "gpt4o-mini-transcribe",
+        creditCostPerSecond: 0.0111, // updated: 2026-11-09 from unbottled.ai
       },
     ],
   },
