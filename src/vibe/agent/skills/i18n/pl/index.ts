@@ -1144,6 +1144,23 @@ export const translations: typeof enTranslations = {
         budget: "Budżet",
       },
     },
+    hacker: {
+      name: "Haker",
+      description: "Inżynier bezpieczeństwa od ataku i obrony",
+      tagline: "Łam i broń",
+      shortDesc: "Badania bezpieczeństwa, pentest i hartowanie",
+      suggestedPrompts: {
+        0: "Sprawdź ten kod pod kątem podatności",
+        1: "Napisz fuzzer sterowany pokryciem dla tego parsera",
+        2: "Wyjaśnij to CVE i napisz działający PoC",
+        3: "Zahartuj tę konfigurację serwera i dodaj detekcje",
+      },
+      variants: {
+        glm: "GLM Genialny",
+        glmFlash: "GLM Flash",
+        deepseekFlash: "DeepSeek Flash",
+      },
+    },
     brilliantCoder: {
       name: "Genialny Programista",
       description: "Elitarny architekt dla złożonych systemów i algorytmów",

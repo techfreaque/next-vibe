@@ -1147,6 +1147,23 @@ export const translations = {
         budget: "Budget",
       },
     },
+    hacker: {
+      name: "Hacker",
+      description: "Offensive and defensive security engineer",
+      tagline: "Break & Defend",
+      shortDesc: "Security research, pentest, and hardening",
+      suggestedPrompts: {
+        0: "Review this code for vulnerabilities",
+        1: "Write a coverage-guided fuzzer for this parser",
+        2: "Explain this CVE and write a working PoC",
+        3: "Harden this server config and add detections",
+      },
+      variants: {
+        glm: "GLM Brilliant",
+        glmFlash: "GLM Flash",
+        deepseekFlash: "DeepSeek Flash",
+      },
+    },
     brilliantCoder: {
       name: "Brilliant Coder",
       description: "Elite architect for complex systems and algorithms",
