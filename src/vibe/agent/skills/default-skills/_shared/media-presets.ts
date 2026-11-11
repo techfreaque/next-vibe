@@ -62,28 +62,28 @@ export const IMAGE_GEN = {
   } satisfies ImageGenModelSelection,
 
   /**
-   * Lustify V8 - the platform default image model (Max, 2026-11-11): on-brand
+   * Chroma - the platform default image model (Max, 2026-11-11): on-brand
    * uncensored via Venice, cheap (1 credit/image) and verified working. Set as
    * the default across ALL skills, not just the no-skill constant, since skills
    * resolve their own imageGenModelSelection and would otherwise override it.
    * Price sort as tiebreaker so an env without Venice still resolves a model.
-   * Note Lustify is text-to-image only; a reference-image request resolves to an
+   * Note Chroma is text-to-image only; a reference-image request resolves to an
    * image-input model via the capability guard instead.
    */
   mainstreamCheap: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.LUSTIFY_V8,
+    manualModelId: ImageGenModelId.CHROMA,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
   /**
-   * Lustify V8 for the "smart" tier too (Max, 2026-11-11): same platform default,
-   * with intelligence then price fallback if Lustify is unavailable in an env.
+   * Chroma for the "smart" tier too (Max, 2026-11-11): same platform default,
+   * with intelligence then price fallback if Chroma is unavailable in an env.
    */
   mainstreamSmart: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.LUSTIFY_V8,
+    manualModelId: ImageGenModelId.CHROMA,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,
