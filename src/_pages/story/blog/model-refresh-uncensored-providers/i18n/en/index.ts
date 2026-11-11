@@ -58,12 +58,12 @@ export const translations = {
       "Venice runs most of our uncensored catalog. Its flagship moved to {{veniceModel}}, and a whole lineup joined:",
     nanoTitle: "NanoGPT: a second route",
     nanoBody:
-      "New provider. It brings {{glm}} and {{glmFlash}} with a 1M-token context, and it serves {{deepseek}}, {{abliterated}} and {{deepseekAbliterated}} next to Venice - plus {{mimoAbliterated}}, its own. One provider stumbles - the other picks up.",
+      "New provider. It brings {{glm}} and {{glmFlash}} with a 1M-token context, and it serves {{deepseek}} next to Venice - plus {{mimoAbliterated}}, its own. One provider stumbles - the other picks up.",
     imagesTitle: "First uncensored image models",
     imagesBody:
       "{{lustify}} and {{chroma}}, via Venice. One credit per image. Every image model before them was mainstream or open.",
     warning:
-      "{{abliterated}} is the least restricted model we have ever listed. It sits behind the uncensored content level - you only get it if you choose it.",
+      "{{model}} is the least restricted model we have ever listed. It sits behind the uncensored content level - you only get it if you choose it.",
   },
   underTheHood: {
     title: "Under the hood",

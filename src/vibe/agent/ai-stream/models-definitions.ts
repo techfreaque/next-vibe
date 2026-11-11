@@ -80,8 +80,6 @@ export enum ChatModelId {
   GEMMA_4_UNCENSORED = "gemma-4-uncensored",
   QWEN_3_6_PLUS_UNCENSORED = "qwen-3.6-plus-uncensored",
   GLM_4_7_FLASH_HERETIC = "glm-4.7-flash-heretic",
-  GLM_5_3_ABLITERATED = "glm-5.3-abliterated",
-  DEEPSEEK_V4_1_FLASH_ABLITERATED = "deepseek-v4.1-flash-abliterated",
   MIMO_V2_6_FLASH_ABLITERATED = "mimo-v2.6-flash-abliterated",
   GLM_5_3_UNCENSORED = "glm-5.3-uncensored",
   GLM_5_3_FLASH_UNCENSORED = "glm-5.3-flash-uncensored",
@@ -472,60 +470,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.ANALYSIS],
   },
 
-  [ChatModelId.GLM_5_3_ABLITERATED]: {
-    enabled: false, // merged into the uncensored model as providers; kept only so the id resolves
-    // Abliteration.ai's "Abliterated Large V2" — GLM-5.3 with refusals ablated.
-    name: "GLM 5.3 Abliterated",
-    by: "abliterationAI",
-    description: "chat.models.descriptions.glm53Abliterated",
-    parameterCount: undefined,
-    contextWindow: 1048576, // updated: 2026-11-07 from venice-api
-    icon: "si-zendesk",
-    inputs: ["text"], // updated: 2026-11-07 from venice-api
-    outputs: ["text"], // updated: 2026-11-07 from venice-api
-    providers: [],
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.UNCENSORED,
-      ModelUtility.SMART,
-      ModelUtility.REASONING,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.ILLEGAL_INFO,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.BRILLIANT,
-    content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.FAST],
-  },
-  [ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]: {
-    enabled: false, // merged into the uncensored model as providers; kept only so the id resolves
-    // Abliteration.ai's "Abliterated Large Flash" — DeepSeek V4.1 Flash 1017 with refusals ablated.
-    name: "DeepSeek V4.1 Flash Abliterated",
-    by: "abliterationAI",
-    description: "chat.models.descriptions.deepseekV41FlashAbliterated",
-    parameterCount: 552,
-    contextWindow: 1048576, // updated: 2026-11-07 from nano-gpt-api
-    icon: "whale",
-    inputs: ["text", "image"], // updated: 2026-11-07 from nano-gpt-api
-    outputs: ["text"], // updated: 2026-11-07 from nano-gpt-api
-    providers: [],
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.UNCENSORED,
-      ModelUtility.SMART,
-      ModelUtility.REASONING,
-      ModelUtility.CODING,
-      ModelUtility.ANALYSIS,
-      ModelUtility.VISION,
-      ModelUtility.ILLEGAL_INFO,
-    ],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.SMART,
-    content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures, toolCalling: true },
-  },
   [ChatModelId.MIMO_V2_6_FLASH_ABLITERATED]: {
     name: "MiMo V2.6 Flash Abliterated",
     by: "xiaomi",
@@ -5796,9 +5740,6 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GEMINI_2_5_FLASH_LITE]: ChatModelId.GEMINI_3_5_FLASH_LITE,
   [ChatModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]:
     ChatModelId.GEMINI_3_5_FLASH_LITE,
-  [ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED]:
-    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-  [ChatModelId.GLM_5_3_ABLITERATED]: ChatModelId.GLM_5_3_UNCENSORED,
   [ChatModelId.GROK_4]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_3]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_20]: ChatModelId.GROK_4_7,

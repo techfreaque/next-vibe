@@ -107,7 +107,7 @@ const VENICE_LINEUP = [
   ChatModelId.GEMMA_4_UNCENSORED,
   ChatModelId.QWEN_3_6_PLUS_UNCENSORED,
   ChatModelId.GLM_4_7_FLASH_HERETIC,
-  ChatModelId.GLM_5_3_ABLITERATED,
+  ChatModelId.GLM_5_3_UNCENSORED,
   ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
 ] as const;
 
@@ -241,7 +241,6 @@ export function TanstackPage({
     },
   };
 
-  const abliterated = modelName(ChatModelId.GLM_5_3_ABLITERATED);
   const successorCode = SUCCESSOR_EXAMPLES.map(
     ([from, to]) => `${modelName(from)}  →  ${modelName(to)}`,
   ).join("\n");
@@ -328,10 +327,6 @@ export function TanstackPage({
                 deepseek: modelName(
                   ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
                 ),
-                abliterated,
-                deepseekAbliterated: modelName(
-                  ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-                ),
                 mimoAbliterated: modelName(
                   ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
                 ),
@@ -348,7 +343,9 @@ export function TanstackPage({
             </P>
           </ProviderBlock>
           <Callout icon={AlertTriangle} tone="warning">
-            {t("uncensored.warning", { abliterated })}
+            {t("uncensored.warning", {
+              model: modelName(ChatModelId.GLM_5_3_UNCENSORED),
+            })}
           </Callout>
         </ArticleSection>
 

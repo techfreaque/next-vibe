@@ -203,6 +203,9 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.KIMI_K2_5]: makeImageVisionOption(
     ImageVisionModelId.KIMI_K2_5,
   ),
+  [ImageVisionModelId.GAB_AI_ARYA]: makeImageVisionOption(
+    ImageVisionModelId.GAB_AI_ARYA,
+  ),
   [ImageVisionModelId.VENICE_UNCENSORED]: makeImageVisionOption(
     ImageVisionModelId.VENICE_UNCENSORED,
   ),
@@ -399,6 +402,9 @@ const videoVisionModelOptionsIndex: Record<
   ),
   [VideoVisionModelId.GEMINI_2_5_FLASH_LITE]: makeVideoVisionOption(
     VideoVisionModelId.GEMINI_2_5_FLASH_LITE,
+  ),
+  [VideoVisionModelId.GAB_AI_ARYA]: makeVideoVisionOption(
+    VideoVisionModelId.GAB_AI_ARYA,
   ),
   [VideoVisionModelId.GEMINI_3_6_FLASH]: makeVideoVisionOption(
     VideoVisionModelId.GEMINI_3_6_FLASH,

@@ -26,7 +26,6 @@ import { IntelligenceLevel, ModelSelectionType } from "../skills/enum";
 import {
   chatModelDefinitions,
   ChatModelId,
-  chatModelOptions,
   chatModelOptionsPool,
   chatModelSuccessors,
   filterChatModels,
@@ -322,39 +321,6 @@ describe("model browser", () => {
       ChatModelId.GROK_4_6,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(false);
-    }
-  });
-});
-
-describe("abliterated checkpoints are merged into the uncensored model", () => {
-  const pairs = [
-    [ChatModelId.GLM_5_3_ABLITERATED, ChatModelId.GLM_5_3_UNCENSORED],
-    [
-      ChatModelId.DEEPSEEK_V4_1_FLASH_ABLITERATED,
-      ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
-    ],
-  ] as const;
-
-  it("abliterated is legacy -> uncensored, which carries multiple providers", () => {
-    for (const [abliterated, uncensored] of pairs) {
-      expect(isLegacyChatModel(abliterated), abliterated).toBe(true);
-      expect(chatModelSuccessors[abliterated], abliterated).toBe(uncensored);
-      expect(isLegacyChatModel(uncensored), uncensored).toBe(false);
-      const external = chatModelDefinitions[uncensored].providers.filter(
-        (p) => p.apiProvider !== ApiProvider.UNBOTTLED,
-      );
-      expect(external.length).toBeGreaterThanOrEqual(3);
-      expect(chatModelDefinitions[abliterated].enabled, abliterated).toBe(
-        false,
-      );
-      expect(
-        chatModelOptions.some((o) => o.id === abliterated),
-        `${abliterated} must not be in the option list`,
-      ).toBe(false);
-      expect(
-        chatModelOptionsPool.some((o) => o.id === abliterated),
-        `${abliterated} must not be in the option pool`,
-      ).toBe(false);
     }
   });
 });

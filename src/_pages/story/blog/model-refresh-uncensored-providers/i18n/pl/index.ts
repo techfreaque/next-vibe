@@ -60,12 +60,12 @@ export const translations: typeof enTranslations = {
       "Venice obsługuje większość naszego katalogu bez cenzury. Flagowcem jest teraz {{veniceModel}}, a do tego doszła cała seria:",
     nanoTitle: "NanoGPT: druga droga",
     nanoBody:
-      "Nowy dostawca. Wnosi {{glm}} i {{glmFlash}} z kontekstem 1 mln tokenów, a {{deepseek}}, {{abliterated}} i {{deepseekAbliterated}} serwuje obok Venice - plus własny {{mimoAbliterated}}. Jeden dostawca się potknie - drugi przejmuje.",
+      "Nowy dostawca. Wnosi {{glm}} i {{glmFlash}} z kontekstem 1 mln tokenów, a {{deepseek}} serwuje obok Venice - plus własny {{mimoAbliterated}}. Jeden dostawca się potknie - drugi przejmuje.",
     imagesTitle: "Pierwsze modele graficzne bez cenzury",
     imagesBody:
       "{{lustify}} i {{chroma}}, przez Venice. Jeden kredyt za obraz. Każdy wcześniejszy model graficzny był mainstreamowy albo otwarty.",
     warning:
-      "{{abliterated}} to najmniej ograniczony model, jaki kiedykolwiek mieliśmy. Siedzi za poziomem „bez cenzury” - dostajesz go tylko, gdy świadomie go wybierzesz.",
+      "{{model}} to najmniej ograniczony model, jaki kiedykolwiek mieliśmy. Siedzi za poziomem „bez cenzury” - dostajesz go tylko, gdy świadomie go wybierzesz.",
   },
   underTheHood: {
     title: "Pod maską",

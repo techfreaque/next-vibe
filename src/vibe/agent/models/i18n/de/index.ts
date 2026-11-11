@@ -227,8 +227,6 @@ export const translations: typeof enTranslations = {
     GEMMA_4_UNCENSORED: "Gemma 4 26B Uncensored",
     QWEN_3_6_PLUS_UNCENSORED: "Qwen 3.6 Plus Uncensored",
     GLM_4_7_FLASH_HERETIC: "GLM 4.7 Flash Heretic",
-    GLM_5_3_ABLITERATED: "GLM 5.3 Abliterated",
-    DEEPSEEK_V4_1_FLASH_ABLITERATED: "DeepSeek V4.1 Flash Abliterated",
     MIMO_V2_6_FLASH_ABLITERATED: "MiMo V2.6 Flash Abliterated",
     GLM_5_3_UNCENSORED: "GLM 5.3 Uncensored",
     GLM_5_3_FLASH_UNCENSORED: "GLM 5.3 Flash Uncensored",

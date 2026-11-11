@@ -63,12 +63,12 @@ export const translations: typeof enTranslations = {
       "Venice trägt den Großteil unseres unzensierten Katalogs. Das Flaggschiff ist jetzt {{veniceModel}}, und eine ganze Reihe kam dazu:",
     nanoTitle: "NanoGPT: ein zweiter Weg",
     nanoBody:
-      "Neuer Anbieter. Er bringt {{glm}} und {{glmFlash}} mit 1 Million Token Kontext und liefert {{deepseek}}, {{abliterated}} und {{deepseekAbliterated}} parallel zu Venice - dazu exklusiv {{mimoAbliterated}}. Fällt ein Anbieter aus, übernimmt der andere.",
+      "Neuer Anbieter. Er bringt {{glm}} und {{glmFlash}} mit 1 Million Token Kontext und liefert {{deepseek}} parallel zu Venice - dazu exklusiv {{mimoAbliterated}}. Fällt ein Anbieter aus, übernimmt der andere.",
     imagesTitle: "Die ersten unzensierten Bildmodelle",
     imagesBody:
       "{{lustify}} und {{chroma}}, über Venice. Ein Credit pro Bild. Jedes Bildmodell davor war Mainstream oder offen.",
     warning:
-      "{{abliterated}} ist das am wenigsten eingeschränkte Modell, das wir je gelistet haben. Es liegt hinter der Stufe „unzensiert“ - du bekommst es nur, wenn du es bewusst wählst.",
+      "{{model}} ist das am wenigsten eingeschränkte Modell, das wir je gelistet haben. Es liegt hinter der Stufe „unzensiert“ - du bekommst es nur, wenn du es bewusst wählst.",
   },
   underTheHood: {
     title: "Unter der Haube",
