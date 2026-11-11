@@ -530,6 +530,10 @@ export const translations: typeof enTranslations = {
       open: "Otwarty",
       uncensored: "Bez cenzury",
     },
+    variantsMode: {
+      all: "Wszystkie warianty",
+      some: "Niektóre warianty",
+    },
   },
   modelSelection: {
     sort: {

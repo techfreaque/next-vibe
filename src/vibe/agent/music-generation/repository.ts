@@ -38,6 +38,7 @@ import type { MusicGenerationT } from "./i18n";
 import {
   filterMusicGenModels,
   getMusicGenModelById,
+  musicGenModelOptions,
   type MusicGenModelSelection,
 } from "./models";
 import { generateMusicWithFalAi } from "./providers/fal-ai";
@@ -319,7 +320,11 @@ export class MusicGenerationRepository {
     },
     requestedModel: string | undefined,
   ): Promise<Partial<MusicGenerationPostRequestInput>> {
-    if (keepsExplicitMediaModel(ctx.platform, requestedModel)) {
+    if (
+      keepsExplicitMediaModel(ctx.platform, requestedModel, (model) =>
+        musicGenModelOptions.some((option) => option.id === model),
+      )
+    ) {
       return {};
     }
     const { getEnvAvailability } = await import("../env-availability");

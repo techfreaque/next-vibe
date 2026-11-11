@@ -38,6 +38,7 @@ import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../../config";
 import { SkillsRepository } from "../../repository";
 import { chatFavorites } from "../db";
+import { reconcileVariantsMode } from "../variants-mode";
 import createDefinitions, {
   type FavoriteCreateRequestOutput,
   type FavoriteCreateResponseOutput,
@@ -371,6 +372,19 @@ export class FavoritesCreateRepository {
         return fail({
           message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      // Maintain the per-companion variants-mode flag. Adding this favorite may
+      // have completed the companion's full variant set (-> ALL, which also
+      // back-adds any variant still missing), or it stays a subset (-> SOME).
+      // Reuses the skill variant list already fetched above.
+      if (character && character.variants.length >= 2) {
+        await reconcileVariantsMode({
+          userId,
+          skillId: canonicalSkillId,
+          variantIds: character.variants.map((v) => v.id),
+          logger,
         });
       }
 

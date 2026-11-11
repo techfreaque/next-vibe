@@ -64,6 +64,7 @@ export class FreedomGptPriceFetcher extends PriceFetcher {
           updates,
           failures,
           error: `API responded with ${response.status}`,
+          failedApiProviders: [ApiProvider.FREEDOMGPT],
         };
       }
 
@@ -76,6 +77,7 @@ export class FreedomGptPriceFetcher extends PriceFetcher {
         updates,
         failures,
         error: parseError(err).message,
+        failedApiProviders: [ApiProvider.FREEDOMGPT],
       };
     }
 

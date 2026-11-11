@@ -186,7 +186,6 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING],
   },
   [ChatModelId.FREEDOMGPT_LIBERTY]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
     name: "FreedomGPT Liberty",
     by: "freedomGPT",
     description: "chat.models.descriptions.freedomgptLiberty",
@@ -223,15 +222,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ChatModelId.GAB_AI_ARYA]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
+    // Gab AI is flat-rate: its /models API returns credit_cost: null, so there
+    // is no per-call price to fetch. creditCost below is maintained manually.
+    // Verified present + modality from gab.ai/v1/models on 2026-11-11.
+    enabledWithoutPrice: true,
     name: "Gab AI Arya",
     by: "gabAI",
     description: "chat.models.descriptions.gabAiArya",
     parameterCount: undefined,
     contextWindow: 131072,
     icon: "gab-ai-logo",
-    inputs: ["text"], // updated: 2026-04-03 from chat.freedomgpt.com
-    outputs: ["text"], // updated: 2026-04-03 from chat.freedomgpt.com
+    inputs: ["text", "image", "video"], // updated: 2026-11-11 from gab.ai
+    outputs: ["text"], // updated: 2026-11-11 from gab.ai
     providers: [
       {
         id: ChatModelId.GAB_AI_ARYA,
@@ -469,6 +471,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ANALYSIS],
   },
+
   [ChatModelId.GLM_5_3_ABLITERATED]: {
     enabled: false, // merged into the uncensored model as providers; kept only so the id resolves
     // Abliteration.ai's "Abliterated Large V2" — GLM-5.3 with refusals ablated.
@@ -1323,8 +1326,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
+
   [ChatModelId.GPT_5_CODEX]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
+    enabled: false, // delisted: OpenRouter Codex line starts at gpt-5.1-codex; "openai/gpt-5-codex" gone (verified 2026-11-11), no price obtainable
     name: "GPT-5 Codex",
     by: "openAI",
     description: "chat.models.descriptions.gpt5Codex",
@@ -1364,6 +1368,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
   },
+
   [ChatModelId.GPT_5_3_CODEX]: {
     name: "GPT-5.3-Codex",
     by: "openAI",
@@ -1763,7 +1768,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ChatModelId.GPT_5_3_CHAT]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
+    enabled: false, // delisted: OpenRouter has gpt-5.3-codex and gpt-5.2-chat but no "openai/gpt-5.3-chat" (verified 2026-11-11), no price obtainable
     name: "GPT-5.3 Chat",
     by: "openAI",
     description: "chat.models.descriptions.gpt53Chat",
@@ -3156,31 +3161,34 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ChatModelId.QWEN3_235B_FREE]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
     name: "Qwen3 235B ",
     by: "alibaba",
     description: "chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
     contextWindow: 131072,
     icon: "si-alibabadotcom",
-    inputs: ["text"], // updated: 2026-04-03 from openrouter-api
-    outputs: ["text"], // updated: 2026-04-03 from openrouter-api
+    inputs: ["text"], // updated: 2026-11-11 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-11 from openrouter-api
     providers: [
       {
         id: ChatModelId.QWEN3_235B_FREE,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "qwen/qwen3-235b-a22b",
+        // Upstream renamed the base snapshot with a -2507 date suffix; the old
+        // "qwen/qwen3-235b-a22b" id is gone from OpenRouter. Same model.
+        providerModel: "qwen/qwen3-235b-a22b-2507",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.45, // updated: 2026-03-31 from openrouter-api
-        outputTokenCost: 1.82, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 0.14, // updated: 2026-11-11 from openrouter-api
+        outputTokenCost: 0.8, // updated: 2026-11-11 from openrouter-api
+        cacheReadTokenCost: 0.05, // updated: 2026-11-11 from openrouter-api
       },
       {
         id: ChatModelId.QWEN3_235B_FREE,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "qwen3_235b-free",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.585, // updated: 2026-11-09 from unbottled.ai
-        outputTokenCost: 2.366, // updated: 2026-11-09 from unbottled.ai
+        inputTokenCost: 0.182, // updated: 2026-11-11 from unbottled.ai
+        outputTokenCost: 1.04, // updated: 2026-11-11 from unbottled.ai
+        cacheReadTokenCost: 0.065, // updated: 2026-11-11 from unbottled.ai
       },
     ],
 
@@ -3191,7 +3199,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ChatModelId.DEEPSEEK_R1_DISTILL]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
+    enabled: false, // delisted: OpenRouter lists no deepseek-r1-distill variant; the 32B Qwen distill is gone (verified 2026-11-11), r1-0528 is a different model, no honest price
     name: "DeepSeek R1 Distill",
     by: "deepSeek",
     description: "chat.models.descriptions.deepseekR1Distill",
@@ -3759,7 +3767,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
   },
 
   [ChatModelId.CLAUDE_OPUS_5_FAST]: {
-    enabled: false, // auto-disabled: price not verified + modality not verified
+    enabled: false, // delisted: OpenRouter lists anthropic/claude-opus-5 but no "-fast" SKU (verified 2026-11-11); plain opus-5 would misprice it, no honest price
     name: "Claude Opus 5 Fast",
     by: "anthropic",
     description: "chat.models.descriptions.claudeOpus5Fast",

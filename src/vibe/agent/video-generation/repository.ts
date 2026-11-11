@@ -41,6 +41,7 @@ import type { VideoGenerationT } from "./i18n";
 import {
   filterVideoGenModels,
   getVideoGenModelById,
+  videoGenModelOptions,
   type VideoGenModelSelection,
 } from "./models";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
@@ -482,7 +483,11 @@ export class VideoGenerationRepository {
     },
     requestedModel: string | undefined,
   ): Promise<Partial<VideoGenerationPostRequestInput>> {
-    if (keepsExplicitMediaModel(ctx.platform, requestedModel)) {
+    if (
+      keepsExplicitMediaModel(ctx.platform, requestedModel, (model) =>
+        videoGenModelOptions.some((option) => option.id === model),
+      )
+    ) {
       return {};
     }
     const { getEnvAvailability } = await import("../env-availability");

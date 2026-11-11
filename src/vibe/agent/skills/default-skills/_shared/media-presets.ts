@@ -62,25 +62,28 @@ export const IMAGE_GEN = {
   } satisfies ImageGenModelSelection,
 
   /**
-   * Nano Banana (Gemini 3.1 Flash Image) - fast, cheap mainstream image model for most skills.
-   * Swapped from GPT-5 Image Mini on 2026-11-09: the whole GPT-5 image family was
-   * 502'ing upstream on OpenRouter ("Complexity not supported" / deprecated), breaking
-   * image gen for all users. Gemini image verified working via direct API probe.
+   * Lustify V8 - the platform default image model (Max, 2026-11-11): on-brand
+   * uncensored via Venice, cheap (1 credit/image) and verified working. Set as
+   * the default across ALL skills, not just the no-skill constant, since skills
+   * resolve their own imageGenModelSelection and would otherwise override it.
+   * Price sort as tiebreaker so an env without Venice still resolves a model.
+   * Note Lustify is text-to-image only; a reference-image request resolves to an
+   * image-input model via the capability guard instead.
    */
   mainstreamCheap: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+    manualModelId: ImageGenModelId.LUSTIFY_V8,
     sortBy: ModelSortField.PRICE,
     sortDirection: ModelSortDirection.ASC,
   } satisfies ImageGenModelSelection,
 
   /**
-   * Nano Banana Pro (Gemini 3 Pro Image) - best mainstream image model, falls back by
-   * intelligence then price. Swapped from GPT-5.4 Image 2 on 2026-11-09 (see mainstreamCheap).
+   * Lustify V8 for the "smart" tier too (Max, 2026-11-11): same platform default,
+   * with intelligence then price fallback if Lustify is unavailable in an env.
    */
   mainstreamSmart: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+    manualModelId: ImageGenModelId.LUSTIFY_V8,
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
     sortBy2: ModelSortField.PRICE,

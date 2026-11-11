@@ -1,0 +1,1 @@
+ALTER TABLE "chat_favorites" ADD COLUMN "variants_mode" text DEFAULT 'enums.variantsMode.some' NOT NULL;

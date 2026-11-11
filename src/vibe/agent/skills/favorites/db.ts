@@ -30,6 +30,7 @@ import type { MusicGenModelSelection } from "../../music-generation/models";
 import type { SttModelSelection } from "../../speech-to-text/models";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
 import type { VideoGenModelSelection } from "../../video-generation/models";
+import { VariantsMode, VariantsModeDB } from "./enum";
 
 /**
  * Favorites Table
@@ -56,6 +57,14 @@ export const chatFavorites = pgTable(
 
     // Variant reference - null means "no variant / skill default"
     variantId: text("variant_id"),
+
+    // Per (user, companion) coverage flag, mirrored onto every row for that
+    // companion. ALL = user holds every variant of this companion (new variants
+    // introduced later are auto-added); SOME = user picked an explicit subset.
+    // A single explicitly-added favorite defaults to SOME.
+    variantsMode: text("variants_mode", { enum: VariantsModeDB })
+      .notNull()
+      .default(VariantsMode.SOME),
 
     // Custom variant display name (overrides skill variant's default name)
     customVariantName: text("custom_variant_name"),

@@ -58,6 +58,24 @@ while [ $# -gt 0 ]; do case "$1" in
 esac; done
 log(){ printf '%s %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 
+# Archive the OUTGOING app container's logs to the host BEFORE any recreate.
+# Docker's json-file log is wiped on --force-recreate, so without this each
+# recreate loses the prior container's history (we could not retro-triage prod
+# WS/auth errors after a redeploy). Non-fatal; keeps only the newest archives.
+LOG_ARCHIVE_DIR="${LOG_ARCHIVE_DIR:-/unbottled/logs}"
+LOG_ARCHIVE_KEEP="${LOG_ARCHIVE_KEEP:-30}"
+archive_app_logs(){
+  mkdir -p "$LOG_ARCHIVE_DIR" 2>/dev/null || { log "  (log archive: cannot create $LOG_ARCHIVE_DIR, skipping)"; return 0; }
+  if docker inspect next-vibe-app >/dev/null 2>&1; then
+    local ts out; ts="$(date -u +%Y%m%d-%H%M%S)"; out="$LOG_ARCHIVE_DIR/app-${ts}.log"
+    log "  archiving outgoing app logs -> ${out}.gz"
+    docker logs next-vibe-app > "$out" 2>&1 || log "  (log archive: docker logs failed, continuing)"
+    gzip -f "$out" 2>/dev/null || true
+    ls -1t "$LOG_ARCHIVE_DIR"/app-*.log.gz "$LOG_ARCHIVE_DIR"/app-*.log 2>/dev/null \
+      | tail -n +$((LOG_ARCHIVE_KEEP + 1)) | xargs -r rm -f 2>/dev/null || true
+  fi
+}
+
 # ─────────────────────── FAST ROLLBACK (--rollback) ───────────────────────
 if [ "$ROLLBACK" = 1 ]; then
   cd /unbottled
@@ -72,6 +90,7 @@ if [ "$ROLLBACK" = 1 ]; then
   docker image inspect "ghcr.io/techfreaque/next-vibe-app:$ROLLBACK_TAG" >/dev/null 2>&1 \
     || { echo "✗ old image tag :$ROLLBACK_TAG missing — cannot fast-rollback. Old ID was 691b5c115b47."; exit 1; }
   log "   recreate app on OLD image :$ROLLBACK_TAG…"
+  archive_app_logs
   DOCKER_IMAGE_TAG="$ROLLBACK_TAG" $COMPOSE up -d --no-deps --force-recreate app
   log "   health-wait…"; ok=0
   for i in $(seq 1 40); do
@@ -129,6 +148,7 @@ fi
 
 # 4. Recreate the prod app on the new image + new env (⚠STREAM — the one restart).
 log "recreate prod app (new image, s3+redis)…"
+archive_app_logs
 if [ -n "$IMAGE_TAG" ]; then DOCKER_IMAGE_TAG="$IMAGE_TAG" $COMPOSE up -d --no-deps --force-recreate app
 else $COMPOSE up -d --no-deps --force-recreate app; fi
 

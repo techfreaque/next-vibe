@@ -57,6 +57,7 @@ import {
   filterImageGenModels,
   getImageGenModelById,
   type ImageGenModelId,
+  imageGenModelOptions,
   type ImageGenModelSelection,
 } from "./models";
 import { generateWithFalAi } from "./providers/fal-ai";
@@ -647,7 +648,11 @@ export class ImageGenerationRepository {
     },
     requestedModel: string | undefined,
   ): Promise<Partial<ImageGenerationPostRequestInput>> {
-    if (keepsExplicitMediaModel(ctx.platform, requestedModel)) {
+    if (
+      keepsExplicitMediaModel(ctx.platform, requestedModel, (model) =>
+        imageGenModelOptions.some((option) => option.id === model),
+      )
+    ) {
       return {};
     }
     const availability = await getEnvAvailability();

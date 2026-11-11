@@ -19427,7 +19427,6 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: {
         default: {
           prompt: "Upbeat electronic music with a catchy melody",
-          model: "lyria-3",
           duration: "post.duration.medium",
         },
       },
@@ -20622,7 +20621,6 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: {
         default: {
           prompt: "A cinematic shot of a mountain lake at sunset",
-          model: "veo-3-1",
           duration: 5,
         },
       },

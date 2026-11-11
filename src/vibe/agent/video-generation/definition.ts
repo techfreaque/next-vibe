@@ -246,7 +246,6 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A cinematic shot of a mountain lake at sunset",
-        model: VideoGenModelId.VEO_3_1,
         duration: 5,
       },
     },

@@ -48,6 +48,34 @@ if ! $COMPOSE run --rm app \
   exit 1
 fi
 
+# Archive the OUTGOING app container's logs to the host BEFORE recreate.
+# Docker's json-file log lives under /var/lib/docker/containers/<id>/ and is
+# DELETED when the container is recreated below, so without this every deploy
+# wipes the prior container's 6-24h of history (this bit us triaging prod WS +
+# auth 403 errors after a redeploy). Dumping `docker logs` to a host dir makes
+# each outgoing container's history survive the swap. Non-fatal: a failure here
+# never blocks the deploy. Old archives are pruned to the newest LOG_ARCHIVE_KEEP.
+LOG_ARCHIVE_DIR="${LOG_ARCHIVE_DIR:-/unbottled/logs}"
+LOG_ARCHIVE_KEEP="${LOG_ARCHIVE_KEEP:-30}"
+APP_CONTAINER="${APP_CONTAINER_NAME:-next-vibe-app}"
+archive_app_logs() {
+  mkdir -p "$LOG_ARCHIVE_DIR" 2>/dev/null || { echo "  (log archive: cannot create $LOG_ARCHIVE_DIR, skipping)"; return 0; }
+  if docker inspect "$APP_CONTAINER" >/dev/null 2>&1; then
+    local ts out
+    ts="$(date -u +%Y%m%d-%H%M%S)"
+    out="$LOG_ARCHIVE_DIR/app-${ts}.log"
+    echo "Archiving outgoing app logs to ${out} ..."
+    docker logs "$APP_CONTAINER" > "$out" 2>&1 || echo "  (log archive: docker logs failed, continuing)"
+    gzip -f "$out" 2>/dev/null || true
+    # Prune: keep only the newest LOG_ARCHIVE_KEEP archives.
+    ls -1t "$LOG_ARCHIVE_DIR"/app-*.log.gz "$LOG_ARCHIVE_DIR"/app-*.log 2>/dev/null \
+      | tail -n +$((LOG_ARCHIVE_KEEP + 1)) | xargs -r rm -f 2>/dev/null || true
+  else
+    echo "  (log archive: no running $APP_CONTAINER yet, nothing to archive)"
+  fi
+}
+archive_app_logs
+
 # Swap: bring up new app container (replaces old one).
 # --force-recreate is REQUIRED here: the app image is pinned to a fixed tag
 # (":latest") and transferred directly via `docker load` (vibe image-push),

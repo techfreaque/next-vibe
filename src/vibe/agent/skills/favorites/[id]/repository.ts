@@ -42,6 +42,7 @@ import { SkillsRepository } from "../../repository";
 import { FavoritesCreateRepository } from "../create/repository";
 import { chatFavorites } from "../db";
 import { ChatFavoritesRepository } from "../repository";
+import { reconcileVariantsMode } from "../variants-mode";
 import favoriteByIdDefinitions, {
   type FavoriteDeleteResponseOutput,
   type FavoriteDeleteUrlVariablesOutput,
@@ -496,6 +497,38 @@ export class SingleFavoriteRepository {
           favoriteId,
           userId,
         });
+      }
+
+      // Maintain the per-companion variants-mode flag after the edit. Reconcile
+      // the updated skill (its coverage may have changed) and, when the skill
+      // itself changed, the previous skill too (losing a row may drop it below
+      // full coverage). `character` holds the resolved (possibly new) skill.
+      if (character && character.variants.length >= 2) {
+        await reconcileVariantsMode({
+          userId,
+          skillId: updated.skillId,
+          variantIds: character.variants.map((v) => v.id),
+          logger,
+        });
+      }
+      if (existing.skillId !== updated.skillId) {
+        const prevSkillResult = await SkillsRepository.getSkillById(
+          { id: existing.skillId },
+          user,
+          logger,
+          locale,
+        );
+        if (
+          prevSkillResult.success &&
+          prevSkillResult.data.variants.length >= 2
+        ) {
+          await reconcileVariantsMode({
+            userId,
+            skillId: existing.skillId,
+            variantIds: prevSkillResult.data.variants.map((v) => v.id),
+            logger,
+          });
+        }
       }
 
       // This op owns its `favorite-updated` event: the edit config the user

@@ -28,6 +28,7 @@ import { sttModelDefinitions } from "../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../text-to-speech/models";
 import { videoGenModelDefinitions } from "../../video-generation/models";
 import type { Modality } from "../enum";
+import { ApiProvider } from "../models";
 import type { ModelDefinition } from "../models";
 import type { ModelPricesGetResponseOutput } from "./definition";
 import type { ModelPricesT } from "./i18n";
@@ -42,6 +43,7 @@ import { EdenAiPriceFetcher } from "./providers/eden-ai";
 import { ElevenLabsPriceFetcher } from "./providers/elevenlabs";
 import { FalAiPriceFetcher } from "./providers/fal-ai";
 import { FreedomGptPriceFetcher } from "./providers/freedomgpt";
+import { GabAiPriceFetcher } from "./providers/gab-ai";
 import { ModelslabPriceFetcher } from "./providers/modelslab";
 import { NanoGptPriceFetcher } from "./providers/nano-gpt";
 import { OpenAiImagePriceFetcher } from "./providers/openai-images";
@@ -73,6 +75,7 @@ const BASE_FETCHERS: PriceFetcher[] = [
   new ModelslabPriceFetcher(),
   new UncensoredAiPriceFetcher(),
   new FreedomGptPriceFetcher(),
+  new GabAiPriceFetcher(),
   new VenicePriceFetcher(),
   new NanoGptPriceFetcher(),
 ];
@@ -1178,12 +1181,55 @@ export class ModelPricesRepository {
           .map((u) => u.modelId),
       );
 
-      // Disable any model without verified price OR modality (unless enabledWithoutPrice)
+      // Providers whose fetch failed transiently this run (network / non-200 /
+      // timeout / missing key). A model's absence from the update set then
+      // means "we could not check", NOT "genuinely delisted" - so we must not
+      // auto-disable it. Without this guard, one provider outage silently
+      // disabled every model routed through it on the next run.
+      const failedApiProviders = new Set<ApiProvider>(
+        providerResults.flatMap((r) => r.failedApiProviders ?? []),
+      );
+
+      // Map each model to its primary (first non-UNBOTTLED) provider so we can
+      // tell whether that provider could be reached this run.
+      const allDefsForPrimary: Record<
+        string,
+        Record<string, ModelDefinition>
+      > = {
+        chat: { ...chatModelDefinitions },
+        "image-gen": { ...imageGenModelDefinitions },
+        "music-gen": { ...musicGenModelDefinitions },
+        "video-gen": { ...videoGenModelDefinitions },
+        tts: { ...ttsModelDefinitions },
+        stt: { ...sttModelDefinitions },
+      };
+      const primaryApiProviderByModelId = new Map<string, ApiProvider>();
+      for (const defs of Object.values(allDefsForPrimary)) {
+        for (const [modelId, def] of Object.entries(defs)) {
+          const primary = def.providers.find(
+            (p) => p.apiProvider !== ApiProvider.UNBOTTLED,
+          );
+          if (primary) {
+            primaryApiProviderByModelId.set(modelId, primary.apiProvider);
+          }
+        }
+      }
+
+      // A model is UNVERIFIABLE THIS RUN when its primary provider's fetch
+      // failed - skip it entirely (neither disable nor re-enable).
+      const modelIdUnverifiableThisRun = (id: string): boolean => {
+        const primary = primaryApiProviderByModelId.get(id);
+        return primary !== undefined && failedApiProviders.has(primary);
+      };
+
+      // Disable any model without verified price OR modality (unless
+      // enabledWithoutPrice), but never one whose provider just went down.
       const modelIdsToDisable = new Set(
         Object.keys(modelIdToRole).filter(
           (id) =>
-            !modelIdsWithPriceSuccess.has(id) ||
-            !modelIdsWithModalityVerified.has(id),
+            !modelIdUnverifiableThisRun(id) &&
+            (!modelIdsWithPriceSuccess.has(id) ||
+              !modelIdsWithModalityVerified.has(id)),
         ),
       );
 

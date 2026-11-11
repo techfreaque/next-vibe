@@ -50,6 +50,8 @@ export async function getSeedModule(
       return (await import("../../vibe/agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
     case "embeddings":
       return (await import("../../vibe/agent/cortex/embeddings/seeds")) as EnvironmentSeeds;
+    case "favorites":
+      return (await import("../../vibe/agent/skills/favorites/seeds")) as EnvironmentSeeds;
     case "skills":
       return (await import("../../vibe/agent/skills/seeds")) as EnvironmentSeeds;
     case "dataflow":
@@ -87,6 +89,7 @@ export function getAllSeedModuleNames(): string[] {
     "users",
     "[rootFolderId]",
     "embeddings",
+    "favorites",
     "skills",
     "dataflow",
     "pulse",

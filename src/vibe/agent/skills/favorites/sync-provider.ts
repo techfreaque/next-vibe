@@ -55,6 +55,8 @@ import {
   videoGenModelSelectionSchema,
 } from "../../video-generation/models";
 import { chatFavorites } from "./db";
+import type { VariantsModeValue } from "./enum";
+import { VariantsModeDB } from "./enum";
 
 // ─── Wire schema (the full favorite row for cross-instance remote events) ──────
 
@@ -83,6 +85,7 @@ export interface SyncedFavorite {
   slug: string;
   skillId: string;
   variantId: string | null;
+  variantsMode: typeof VariantsModeValue;
   customVariantName: string | null;
   customIcon: IconKey | null;
   voiceModelSelection?: VoiceModelSelection | null;
@@ -111,6 +114,7 @@ export const syncedFavoriteSchema: z.ZodType<SyncedFavorite> = z.object({
   slug: z.string(),
   skillId: z.string(),
   variantId: z.string().nullable(),
+  variantsMode: z.enum(VariantsModeDB),
   customVariantName: z.string().nullable(),
   customIcon: z.enum(IconKeyDB).nullable(),
   voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
@@ -198,6 +202,7 @@ export const favoritesSyncProvider: SyncProvider = {
         slug: r.slug,
         skillId: r.skillId,
         variantId: r.variantId ?? null,
+        variantsMode: r.variantsMode,
         customVariantName: r.customVariantName ?? null,
         customIcon: r.customIcon ?? null,
         voiceModelSelection: r.voiceModelSelection ?? null,
@@ -304,6 +309,7 @@ export const favoritesSyncProvider: SyncProvider = {
               .update(chatFavorites)
               .set({
                 slug: remoteFav.slug,
+                variantsMode: remoteFav.variantsMode,
                 customVariantName: remoteFav.customVariantName,
                 customIcon: remoteFav.customIcon,
                 voiceModelSelection: remoteFav.voiceModelSelection,
@@ -336,6 +342,7 @@ export const favoritesSyncProvider: SyncProvider = {
             slug: remoteFav.slug,
             skillId: remoteFav.skillId,
             variantId: remoteFav.variantId,
+            variantsMode: remoteFav.variantsMode,
             customVariantName: remoteFav.customVariantName,
             customIcon: remoteFav.customIcon,
             voiceModelSelection: remoteFav.voiceModelSelection,

@@ -545,6 +545,10 @@ export const translations: typeof enTranslations = {
       open: "Offen",
       uncensored: "Unzensiert",
     },
+    variantsMode: {
+      all: "Alle Varianten",
+      some: "Einige Varianten",
+    },
   },
   modelSelection: {
     sort: {

@@ -44,6 +44,7 @@ import {
   type FavoriteConfig,
 } from "./db";
 import type { FavoritesListResponseOutput } from "./definition";
+import { reconcileAllFlaggedCompanions } from "./variants-mode";
 import type { FavoriteSummaryItem } from "./favorites-formatter";
 import type { FavoritesT } from "./i18n";
 import reorderDefinitions from "./reorder/definition";
@@ -142,6 +143,26 @@ export class ChatFavoritesRepository {
       logger.debug("Fetching favorites", { userId });
 
       const availability = await getEnvAvailability();
+
+      // Durable "all users get newly-introduced variants": for every companion
+      // this user flagged ALL, back-add any variant introduced since their last
+      // write and keep the flag consistent. Runs on read so it needs no per-deploy
+      // migration. Best-effort — a failure here must never block the list.
+      try {
+        await reconcileAllFlaggedCompanions({
+          userId,
+          logger,
+          variantIdsForSkill: (skillId) =>
+            DEFAULT_SKILLS.find((s) => s.id === skillId)?.variants.map(
+              (v) => v.id,
+            ) ?? [],
+        });
+      } catch (reconcileError) {
+        logger.error(
+          "Variants-mode reconcile failed (continuing)",
+          parseError(reconcileError),
+        );
+      }
 
       // Get active favorite ID from settings
       const settingsResult = await ChatSettingsRepository.getSettings(

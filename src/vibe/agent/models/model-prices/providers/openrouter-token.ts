@@ -88,6 +88,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           updates,
           failures,
           error: `API responded with ${response.status}`,
+          failedApiProviders: [ApiProvider.OPENROUTER],
         };
       }
       const data = (await response.json()) as { data: OpenRouterModel[] };
@@ -101,6 +102,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
         updates,
         failures,
         error: parseError(err).message,
+        failedApiProviders: [ApiProvider.OPENROUTER],
       };
     }
 

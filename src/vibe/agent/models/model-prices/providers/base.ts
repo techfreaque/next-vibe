@@ -116,6 +116,15 @@ export interface ProviderPriceResult {
   providerEntryOps?: ProviderEntryOperation[];
   failures: PriceFailure[];
   error?: string;
+  /**
+   * API providers whose data could NOT be fetched this run (network error,
+   * non-200, timeout). When a fetcher returns an `error`, it lists the
+   * ApiProvider(s) it is responsible for here so the disable logic can tell
+   * a transient outage apart from a model that is genuinely absent upstream.
+   * A model whose primary provider is in this set is NEVER auto-disabled on
+   * this run - its prior verified state is preserved.
+   */
+  failedApiProviders?: ApiProvider[];
 }
 
 export abstract class PriceFetcher {

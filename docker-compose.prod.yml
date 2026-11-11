@@ -8,6 +8,15 @@ services:
     # a container-name clash. Default keeps Server 1 EXACTLY as before.
     container_name: ${PG_CONTAINER_NAME:-prod-postgres}
     restart: unless-stopped
+    # Bound the json-file log on disk so prod can never fill the disk with logs.
+    # These are the EPHEMERAL per-container logs (wiped on recreate); durable
+    # archival of the app's outgoing logs is handled by the deploy scripts, which
+    # dump `docker logs` to the host LOG_ARCHIVE_DIR before every --force-recreate.
+    logging:
+      driver: json-file
+      options:
+        max-size: ${LOG_MAX_SIZE:-20m}
+        max-file: ${LOG_MAX_FILE:-5}
     # HA: logical-replication publisher settings. wal_level=logical is REQUIRED
     # to publish to the Server 2 replica. Default stays "logical" but this only
     # takes effect on a container (re)start — the cutover runbook flags that one
@@ -47,6 +56,12 @@ services:
     image: redis:7-alpine
     container_name: ${REDIS_CONTAINER_NAME:-prod-redis}
     restart: unless-stopped
+    # Bound the json-file log on disk (see postgres note above).
+    logging:
+      driver: json-file
+      options:
+        max-size: ${LOG_MAX_SIZE:-20m}
+        max-file: ${LOG_MAX_FILE:-5}
     # appendonly persistence so queued/last state survives a restart.
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
@@ -73,6 +88,12 @@ services:
     image: cgr.dev/chainguard/minio:latest
     container_name: ${MINIO_CONTAINER_NAME:-prod-minio}
     restart: unless-stopped
+    # Bound the json-file log on disk (see postgres note above).
+    logging:
+      driver: json-file
+      options:
+        max-size: ${LOG_MAX_SIZE:-20m}
+        max-file: ${LOG_MAX_FILE:-5}
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
@@ -136,6 +157,20 @@ services:
     # Server 1 EXACTLY as before.
     container_name: ${APP_CONTAINER_NAME:-next-vibe-app}
     restart: unless-stopped
+    # Bound the EPHEMERAL per-container json-file log so a busy prod box can
+    # never fill the disk with app logs. This is NOT durable on its own: the
+    # json-file lives under /var/lib/docker/containers/<id>/ and is wiped every
+    # time the container is recreated (every deploy). Durable history is handled
+    # by the deploy scripts (install-docker.sh, cutover-prod-to-ha.sh), which
+    # archive `docker logs <app>` to the host LOG_ARCHIVE_DIR (default
+    # /unbottled/logs) BEFORE each --force-recreate, so a redeploy no longer
+    # wipes the outgoing container's history. Override LOG_MAX_SIZE/LOG_MAX_FILE
+    # in .env to tune the live-tail retention.
+    logging:
+      driver: json-file
+      options:
+        max-size: ${LOG_MAX_SIZE:-20m}
+        max-file: ${LOG_MAX_FILE:-5}
     # Graceful-stream-drain (G1): give the app time to finish in-flight AI
     # streams on SIGTERM before Docker SIGKILLs it. Must exceed the app's
     # STREAM_DRAIN_TIMEOUT_MS + margin (vibe start waits drain+15s).

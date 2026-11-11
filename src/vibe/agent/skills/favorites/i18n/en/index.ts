@@ -538,6 +538,10 @@ export const translations = {
       open: "Open",
       uncensored: "Uncensored",
     },
+    variantsMode: {
+      all: "All variants",
+      some: "Some variants",
+    },
   },
   modelSelection: {
     sort: {
