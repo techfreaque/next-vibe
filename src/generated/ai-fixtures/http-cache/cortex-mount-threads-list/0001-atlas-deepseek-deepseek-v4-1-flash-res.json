@@ -1,0 +1,33 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a590a7e1e837d20b-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Wed, 11 Nov 2026 22:15:28 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794435328-WMsSTVTO72LJCngITAKx",
+    "x-openrouter-release": "api;bf48114d-1c64-470e-8e44-8d9b308735ef",
+    "set-cookie": "__cf_bm=r6J.Mt_3X8WUPgkduGqHDfgU0WZHIbgMjhblOGJQwhA-1794435328.3049862-1.0.1.1-Ujzbartyqp0mLAOxq96uANzx_PgprJdOlpF7uamdd9T_dY4ykndvqzBnD9jzqabNR5Zi7kyGdKZjIMdVTyOBLDRANbKqxdxHSJaF.X3TFdlCrIiGTP7Mo9zGJa.cF8sM; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Wed, 11 Nov 2026 22:45:28 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"I'll list the /\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"threads directory now\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\".\\n\\n\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call-f9b1ccc0-f788-4627-9be8-d0f16c3db33d\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\":\\\"cortex-list\\\",\\\"input\\\":{\\\"path\\\":\\\"/threads\\\"}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794435328-WMsSTVTO72LJCngITAKx\",\"object\":\"chat.completion.chunk\",\"created\":1794435328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":7544,\"completion_tokens\":74,\"total_tokens\":7618,\"cost\":0.00102882,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00102882,\"upstream_inference_prompt_cost\":0.00098072,\"upstream_inference_completions_cost\":0.0000481},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

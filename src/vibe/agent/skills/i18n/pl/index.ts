@@ -732,6 +732,8 @@ export const translations: typeof enTranslations = {
       variants: {
         kimi: "Kimi",
         budget: "Budżet",
+        astra: "Astra",
+        sol: "Sol",
       },
     },
     biologist: {
@@ -1141,7 +1143,8 @@ export const translations: typeof enTranslations = {
         techBro: "Tech Bro",
         kimi: "Kimi",
         quick: "Quick",
-        budget: "Budżet",
+        sol: "Sol",
+        astra: "Astra",
       },
     },
     hacker: {

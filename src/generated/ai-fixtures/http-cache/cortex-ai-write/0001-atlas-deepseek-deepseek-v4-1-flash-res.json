@@ -1,0 +1,33 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a590a7bb6ea3d20b-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Wed, 11 Nov 2026 22:15:22 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794435322-kL65839QdXwSD9sg9egb",
+    "x-openrouter-release": "api;bf48114d-1c64-470e-8e44-8d9b308735ef",
+    "set-cookie": "__cf_bm=oVMbFihtMGB9QkqEXWwZfW_l5oVfjXhteDfDBEL_jl8-1794435322.148487-1.0.1.1-_iWrt1hcP.TQCOVZdU.8xpepUSM84L48sUpqMsqnqbCaWxe6jFJ5XLEtbN5ne6QZd618myueJ1YRzcbhSl9eqR4Y6ZUItBzVV_hf02YefkQxdnlsVcgIYXibfm.yfkSz; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Wed, 11 Nov 2026 22:45:22 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"I'll write the file now\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\".\\n\\n\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"chatcmpl-tool-9da4c812ff288225\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\": \\\"cortex-write\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\", \\\"input\\\": {\\\"path\\\": \\\"/documents/ai-test/notes.md\\\", \\\"content\\\": \\\"# AI Test Notes\\\\n\\\\nThis document was created by an AI to test cortex tool integration.\\\\nKey topics: testing, automation, cortex-write verification.\\\\n\\\", \\\"createParents\\\": true}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"system_fingerprint\":\"vllm-0.33.0rc1.dev421+g2b009fc6d-tp2-53b4252c\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794435322-kL65839QdXwSD9sg9egb\",\"object\":\"chat.completion.chunk\",\"created\":1794435322,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Cohere\",\"system_fingerprint\":\"vllm-0.33.0rc1.dev421+g2b009fc6d-tp2-53b4252c\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":7509,\"completion_tokens\":120,\"total_tokens\":7629,\"cost\":0.001543455,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.001543455,\"upstream_inference_prompt_cost\":0.001464255,\"upstream_inference_completions_cost\":0.0000792},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

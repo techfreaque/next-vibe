@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**`cortex-list /threads` succeeded.** 4 root folders returned:\n\n| # | Entry name | Type |\n|---|-----------|------|\n| 1 | `private` | dir |\n| 2 | `shared` | dir |\n| 3 | `public` | dir |\n| 4 | `cron` | dir |\n\nEvery entry name received: **private, shared, public, cron** (all directories, 4 total).\n\nNote: there is no `background` root folder here — background threads appear to live under `private` (the cortex tree shows `threads/ (private: 5 · 41 background)`), which is why it isn't a separate root entry.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/listing-cortex-root-mounts-and-storage-types-30fb1cae-2d52-4d94-b9c8-aedb7361fea9.md\n\n# Listing cortex root mounts and storage types\nFolder: private\nDescription: The user asked for a cortex-list of the root path \"/\" to enumerate all available mounts and directories, then to classify each as a virtual mount or native storage. The call returned 10 entries: memories, documents, skills, threads, favorites, tasks, uploads, searches, gens, and ssh. I listed each e",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/listing--threads-root-folders-142309cb-6d9d-40b5-aff4-8f537388b7e9.md\n\n# Listing /threads root folders\nFolder: private\nDescription: User asked for a cortex-list of the /threads directory and a full enumeration of root folder names. The call succeeded and returned 4 directory entries: private, shared, public, and cron. Also noted that no separate background root exists — background threads are nested under private.",
+    "encoding_format": "float"
+  }
+}

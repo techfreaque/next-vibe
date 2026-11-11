@@ -737,6 +737,8 @@ export const translations = {
       variants: {
         kimi: "Kimi",
         budget: "Budget",
+        astra: "Astra",
+        sol: "Sol",
       },
     },
     biologist: {
@@ -1144,7 +1146,8 @@ export const translations = {
         techBro: "Tech Bro",
         kimi: "Kimi",
         quick: "Quick",
-        budget: "Budget",
+        sol: "Sol",
+        astra: "Astra",
       },
     },
     hacker: {

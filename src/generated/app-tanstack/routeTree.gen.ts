@@ -621,6 +621,7 @@ import { Route as ApiLocaleVibeAgentSkillsIdReportRouteImport } from './routes/a
 import { Route as ApiLocaleVibeAgentSkillsIdVoteRouteImport } from './routes/api.$locale.vibe.agent.skills.$id.vote'
 import { Route as ApiLocaleVibeAgentSkillsFavoritesIdRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.$id'
 import { Route as ApiLocaleVibeAgentSkillsFavoritesCreateRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.create'
+import { Route as ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.delete-batch'
 import { Route as ApiLocaleVibeAgentSkillsFavoritesReorderRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites.reorder'
 import { Route as ApiLocaleVibeDataflowGraphsIdArchiveRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.archive'
 import { Route as ApiLocaleVibeDataflowGraphsIdBacktestRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.backtest'
@@ -4244,6 +4245,12 @@ const ApiLocaleVibeAgentSkillsFavoritesCreateRoute =
     path: '/create',
     getParentRoute: () => ApiLocaleVibeAgentSkillsFavoritesRoute,
   } as any)
+const ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute =
+  ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRouteImport.update({
+    id: '/delete-batch',
+    path: '/delete-batch',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsFavoritesRoute,
+  } as any)
 const ApiLocaleVibeAgentSkillsFavoritesReorderRoute =
   ApiLocaleVibeAgentSkillsFavoritesReorderRouteImport.update({
     id: '/reorder',
@@ -5101,6 +5108,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
   '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
   '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/delete-batch': typeof ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute
   '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
   '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
   '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
@@ -5746,6 +5754,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
   '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
   '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/delete-batch': typeof ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute
   '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
   '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
   '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
@@ -6399,6 +6408,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/skills/$id/vote': typeof ApiLocaleVibeAgentSkillsIdVoteRoute
   '/api/$locale/vibe/agent/skills/favorites/$id': typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
   '/api/$locale/vibe/agent/skills/favorites/create': typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  '/api/$locale/vibe/agent/skills/favorites/delete-batch': typeof ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute
   '/api/$locale/vibe/agent/skills/favorites/reorder': typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
   '/api/$locale/vibe/dataflow/graphs/$id/archive': typeof ApiLocaleVibeDataflowGraphsIdArchiveRoute
   '/api/$locale/vibe/dataflow/graphs/$id/backtest': typeof ApiLocaleVibeDataflowGraphsIdBacktestRoute
@@ -7052,6 +7062,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id/vote'
     | '/api/$locale/vibe/agent/skills/favorites/$id'
     | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/delete-batch'
     | '/api/$locale/vibe/agent/skills/favorites/reorder'
     | '/api/$locale/vibe/dataflow/graphs/$id/archive'
     | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
@@ -7697,6 +7708,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id/vote'
     | '/api/$locale/vibe/agent/skills/favorites/$id'
     | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/delete-batch'
     | '/api/$locale/vibe/agent/skills/favorites/reorder'
     | '/api/$locale/vibe/dataflow/graphs/$id/archive'
     | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
@@ -8349,6 +8361,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id/vote'
     | '/api/$locale/vibe/agent/skills/favorites/$id'
     | '/api/$locale/vibe/agent/skills/favorites/create'
+    | '/api/$locale/vibe/agent/skills/favorites/delete-batch'
     | '/api/$locale/vibe/agent/skills/favorites/reorder'
     | '/api/$locale/vibe/dataflow/graphs/$id/archive'
     | '/api/$locale/vibe/dataflow/graphs/$id/backtest'
@@ -13099,6 +13112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesCreateRouteImport
       parentRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRoute
     }
+    '/api/$locale/vibe/agent/skills/favorites/delete-batch': {
+      id: '/api/$locale/vibe/agent/skills/favorites/delete-batch'
+      path: '/delete-batch'
+      fullPath: '/api/$locale/vibe/agent/skills/favorites/delete-batch'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRoute
+    }
     '/api/$locale/vibe/agent/skills/favorites/reorder': {
       id: '/api/$locale/vibe/agent/skills/favorites/reorder'
       path: '/reorder'
@@ -14147,6 +14167,7 @@ const ApiLocaleVibeAgentSkillsIdRouteWithChildren =
 interface ApiLocaleVibeAgentSkillsFavoritesRouteChildren {
   ApiLocaleVibeAgentSkillsFavoritesIdRoute: typeof ApiLocaleVibeAgentSkillsFavoritesIdRoute
   ApiLocaleVibeAgentSkillsFavoritesCreateRoute: typeof ApiLocaleVibeAgentSkillsFavoritesCreateRoute
+  ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute: typeof ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute
   ApiLocaleVibeAgentSkillsFavoritesReorderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesReorderRoute
 }
 
@@ -14156,6 +14177,8 @@ const ApiLocaleVibeAgentSkillsFavoritesRouteChildren: ApiLocaleVibeAgentSkillsFa
       ApiLocaleVibeAgentSkillsFavoritesIdRoute,
     ApiLocaleVibeAgentSkillsFavoritesCreateRoute:
       ApiLocaleVibeAgentSkillsFavoritesCreateRoute,
+    ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute:
+      ApiLocaleVibeAgentSkillsFavoritesDeleteBatchRoute,
     ApiLocaleVibeAgentSkillsFavoritesReorderRoute:
       ApiLocaleVibeAgentSkillsFavoritesReorderRoute,
   }

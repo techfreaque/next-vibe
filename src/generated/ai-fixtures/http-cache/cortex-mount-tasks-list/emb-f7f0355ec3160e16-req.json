@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "`/tasks` is **not** empty — it contains two scheduled task files:\n\n| File | Size | Last updated |\n|------|------|--------------|\n| `autopilot-b4c22963.md` | 107 B | 2026-11-07 |\n| `dream-b4c22963.md` | 111 B | 2026-11-07 |\n\nI read the first one (`/tasks/autopilot-b4c22963.md`) and confirmed it has valid YAML frontmatter with both required fields:\n\n```\ntaskId: \"autopilot-b4c22963\"\nname: \"Autopilot\"\nstatus: \"pending\"\nenabled: false\ncron: \"0 8 * * 1-5\"\ncreated: \"2026-09-18T22:56:28.727Z\"\n```\n\n- **`taskId`** — present, matches the filename slug\n- **`status`** — present, value `pending` (consistent with `enabled: false`)\n\nThe file also carries `name`, `enabled`, `cron`, and `created`, plus a one-line description body. No errors, no unexpected output.",
+    "encoding_format": "float"
+  }
+}

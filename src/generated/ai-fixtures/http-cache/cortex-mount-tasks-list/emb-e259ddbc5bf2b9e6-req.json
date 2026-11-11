@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/verify--tasks-directory-and-task-frontmatter-81702c9e-2b85-43de-b1de-d537c9f50321.md\n\n# Verify /tasks directory and task frontmatter\nFolder: private\nDescription: Listed the /tasks folder and found two task files: autopilot-b4c22963.md and dream-b4c22963.md. Read the first one and confirmed its YAML frontmatter includes taskId matching the filename slug plus a status field set to pending. No tool errors occurred and the directory is not empty.",
+    "encoding_format": "float"
+  }
+}

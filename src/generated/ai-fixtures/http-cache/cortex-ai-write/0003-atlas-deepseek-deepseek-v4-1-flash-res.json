@@ -1,0 +1,37 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a590a7ce1f77d20b-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Wed, 11 Nov 2026 22:15:25 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794435325-ohKwI2QTOs9C3aeRKecA",
+    "x-openrouter-release": "api;bf48114d-1c64-470e-8e44-8d9b308735ef",
+    "set-cookie": "__cf_bm=byhzZEGxmCXA9sBbwyaDWj_8rvXY8CwuCqyND25VCMo-1794435325.1350584-1.0.1.1-KAknH5s0ddLVm53v8Z2pSCiNFueqQEdIoekQosYoYjpw.NMRlEP9IJ_4xiBmwAIluKfDyOafhyS6FQ.lCeQlPHv.E6o88cYqMfJMteg5DJngsyalbQmAvF3_NgR1zaFL; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Wed, 11 Nov 2026 22:45:25 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"Content\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Content\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" matches\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" matches\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" exactly. Now fire\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" exactly. Now fire\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" rename-th\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" rename-th\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"read with\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"read with\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" endLoop\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" endLoop\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\".\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\".\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call-f016c989-d770-45bb-83d6-07839a269eae\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"endLoop\\\",\\\"input\\\":{\\\"title\\\":\\\"Cortex-write test: AI notes file\\\",\\\"description\\\":\\\"The user asked the AI to create /documents/ai-test/notes.md with exact test content using cortex-write. The write succeeded (file already existed, so it was overwritten, size 145 bytes) and verification via cortex-read confirmed the content matches character-for-character. Task completed successfully.\\\"},\\\"toolName\\\":\\\"rename-thread\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794435325-ohKwI2QTOs9C3aeRKecA\",\"object\":\"chat.completion.chunk\",\"created\":1794435325,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"CoreWeave\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":7979,\"completion_tokens\":168,\"total_tokens\":8147,\"cost\":0.00114647,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00114647,\"upstream_inference_prompt_cost\":0.00103727,\"upstream_inference_completions_cost\":0.0001092},\"completion_tokens_details\":{\"reasoning_tokens\":18,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

@@ -23,6 +23,7 @@ import { IntelligenceLevel, ModelSelectionType } from "../enum";
 import favoriteSingleEndpoint from "./[id]/definition";
 import favoriteCreateEndpoint from "./create/definition";
 import { chatFavorites } from "./db";
+import favoriteDeleteBatchEndpoint from "./delete-batch/definition";
 // ── Definition imports ───────────────────────────────────────────────────────
 import favoritesListEndpoint from "./definition";
 import favoriteReorderEndpoint from "./reorder/definition";
@@ -35,6 +36,7 @@ testEndpoint(favoriteSingleEndpoint.GET);
 testEndpoint(favoriteSingleEndpoint.PATCH);
 testEndpoint(favoriteSingleEndpoint.DELETE);
 testEndpoint(favoriteReorderEndpoint.POST);
+testEndpoint(favoriteDeleteBatchEndpoint.POST);
 
 // ── Part B: CRUD Integration Tests ───────────────────────────────────────────
 

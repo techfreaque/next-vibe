@@ -14,13 +14,11 @@ import { Check } from "next-vibe/ui/components/icons/Check";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { Flame } from "next-vibe/ui/components/icons/Flame";
 import { Heart } from "next-vibe/ui/components/icons/Heart";
-import { Info } from "next-vibe/ui/components/icons/Info";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { PenTool } from "next-vibe/ui/components/icons/PenTool";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Users } from "next-vibe/ui/components/icons/Users";
-import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -96,7 +94,7 @@ const USE_CASE_ICONS: Record<UseCase, UseCaseIcon> = {
 };
 
 const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
-  coding: ["vibe-coder", "coder"],
+  coding: ["vibe-coder", "coder", "hacker"],
   research: ["researcher", "data-analyst"],
   writing: ["writer", "editor"],
   business: ["business-advisor", "financial-advisor"],
@@ -520,22 +518,6 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
             ))}
           </Div>
         </Div>
-
-        {/* Guest note - inline, never blocking */}
-        {user.isPublic && (
-          <Div className="flex items-start gap-2 rounded-lg bg-muted px-3 py-2.5 text-xs text-muted-foreground">
-            <Info className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-            <Span className="leading-relaxed">
-              {t("onboarding.setup.guestNote")}{" "}
-              <Link
-                href={`/${locale}/user/signup`}
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                {t("onboarding.setup.signIn")}
-              </Link>
-            </Span>
-          </Div>
-        )}
 
         {noProviderAvailable && (
           <Div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5">

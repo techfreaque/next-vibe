@@ -268267,6 +268267,72 @@
     "credits": 0
   },
   {
+    "toolName": "favorites-delete-batch",
+    "title": "Remove Favorites",
+    "titleShort": "Remove",
+    "description": "Remove several favorites in one go",
+    "fields": {
+      "type": "container",
+      "layoutType": "stacked",
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "ids": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Favorite IDs",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              },
+              "checks": [{}]
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "string"
+              },
+              "type": "string"
+            }
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "success": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Favorites"],
+    "aliases": ["favorites-delete-batch"],
+    "credits": 0
+  },
+  {
     "toolName": "favorites-reorder",
     "title": "Reorder Favorites",
     "titleShort": "Reorder",

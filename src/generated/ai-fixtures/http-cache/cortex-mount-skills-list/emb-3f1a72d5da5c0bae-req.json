@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/list-skills-folder-and-verify-test-fixture-5c5db013-7bbc-4160-8d07-4c1f8bc9fcf7.md\n\n# List skills folder and verify test fixture\nFolder: private\nDescription: The user asked for a listing of the /skills folder and a confirmation that a skill named cortex-test-skill-fixture.md exists. cortex-list returned 15 skill files, including cortex-test-skill-fixture.md. The count differs from the 10 skills shown in the cortex tree summary, which was noted as a minor",
+    "encoding_format": "float"
+  }
+}

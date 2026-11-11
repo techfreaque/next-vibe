@@ -602,6 +602,27 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
+    signin: {
+      title: "Sichere dein Setup",
+      subtitle: "Einmal anmelden. Alles, was du hier aufbaust, bleibt dir.",
+      benefits: {
+        sync: {
+          title: "Geräteübergreifend synchronisiert",
+          body: "Begleiter, Spezialisten und Chats auf jedem deiner Geräte.",
+        },
+        keep: {
+          title: "Nichts geht verloren",
+          body: "Als Gast bleibt alles nur in diesem Browser. Angemeldet bleibt es dir erhalten.",
+        },
+        private: {
+          title: "Standardmäßig privat",
+          body: "Du bestimmst über deine Daten und dein Filterlevel. Immer.",
+        },
+      },
+      cta: "Anmelden oder Konto erstellen",
+      continueAsGuest: "Als Gast fortfahren",
+      note: "Du kannst dich jederzeit später über das Menü anmelden.",
+    },
     setup: {
       title: "Richte deine KI ein",
       subtitle:
@@ -609,8 +630,6 @@ export const translations: typeof enTranslations = {
       companionLabel: "Dein Begleiter",
       specialistsLabel: "Spezialisten hinzufügen",
       optional: "optional",
-      guestNote: "Gastmodus - dein Setup bleibt nur auf diesem Gerät.",
-      signIn: "Anmelden und synchronisieren",
       start: "Chat starten",
       saving: "Wird eingerichtet...",
       failed:

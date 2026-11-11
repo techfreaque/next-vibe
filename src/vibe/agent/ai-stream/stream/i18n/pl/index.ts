@@ -594,6 +594,27 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
+    signin: {
+      title: "Zachowaj swoją konfigurację",
+      subtitle: "Zaloguj się raz. Wszystko, co tu zbudujesz, zostaje z Tobą.",
+      benefits: {
+        sync: {
+          title: "Synchronizacja na wszystkich urządzeniach",
+          body: "Twój towarzysz, specjaliści i rozmowy na każdym urządzeniu.",
+        },
+        keep: {
+          title: "Nic nie przepada",
+          body: "W trybie gościa wszystko zostaje tylko w tej przeglądarce. Po zalogowaniu zostaje z Tobą.",
+        },
+        private: {
+          title: "Prywatność od początku",
+          body: "Ty decydujesz o swoich danych i poziomie filtrowania. Zawsze.",
+        },
+      },
+      cta: "Zaloguj się lub załóż konto",
+      continueAsGuest: "Kontynuuj jako gość",
+      note: "Możesz zalogować się później z menu w dowolnej chwili.",
+    },
     setup: {
       title: "Skonfiguruj swoje AI",
       subtitle:
@@ -601,8 +622,6 @@ export const translations: typeof enTranslations = {
       companionLabel: "Twój towarzysz",
       specialistsLabel: "Dodaj specjalistów",
       optional: "opcjonalnie",
-      guestNote: "Tryb gościa - konfiguracja zostaje tylko na tym urządzeniu.",
-      signIn: "Zaloguj się, by synchronizować",
       start: "Zacznij rozmowę",
       saving: "Konfiguruję...",
       failed:

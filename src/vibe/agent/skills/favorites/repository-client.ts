@@ -425,6 +425,39 @@ export class ChatFavoritesRepositoryClient {
   }
 
   /**
+   * Batch-delete favorites (mirrors server FavoritesDeleteBatchRepository).
+   *
+   * One read-modify-write removes every id at once. This is the whole point of
+   * the batch op: deleting a multi-variant skill one id at a time raced here,
+   * because concurrent deleteFavorite calls each read the same snapshot and drop
+   * only their own id, so the last write clobbered the rest and all-but-one
+   * variant survived a refresh.
+   */
+  static async deleteFavorites(
+    ids: string[],
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      const idsToRemove = new Set(ids);
+      const currentConfigs = await this.loadAllLocalFavorites();
+      const newConfigs = currentConfigs.filter(
+        (config) => !idsToRemove.has(config.id),
+      );
+      await this.saveAllLocalFavorites(newConfigs);
+      logger.debug("Batch-deleted favorites", { count: ids.length });
+      return success({ success: true });
+    } catch (error) {
+      logger.error("Failed to batch-delete favorites", parseError(error));
+      return fail({
+        message: t("id.delete.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
    * Reorder favorites (mirrors server reorderFavorites)
    */
   static async reorderFavorites(

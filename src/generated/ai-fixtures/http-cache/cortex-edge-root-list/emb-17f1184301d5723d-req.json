@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "## Root Path Listing — `/` (10 entries)\n\n| # | Entry | Type | Category | Notes |\n|---|-------|------|----------|-------|\n| 1 | `/memories` | dir | **Native storage** | Writable. Markdown knowledge files (16 entries) |\n| 2 | `/documents` | dir | **Native storage** | Writable. Working files + `templates/` (5 files) |\n| 3 | `/skills` | dir | **Native storage** | Writable. 10 created skills |\n| 4 | `/threads` | dir | Virtual (DB-backed) | Read-only. 9 private · 41 background |\n| 5 | `/favorites` | dir | Virtual (DB-backed) | Read-only. 11 favorites |\n| 6 | `/tasks` | dir | Virtual (DB-backed) | Read-only. Cron: Autopilot, Dreaming (both disabled) |\n| 7 | `/uploads` | dir | Virtual (DB-backed) | Read-only. User-uploaded files |\n| 8 | `/searches` | dir | Virtual (DB-backed) | Read-only. Search history |\n| 9 | `/gens` | dir | Virtual (DB-backed) | Read-only. Generated media |\n| 10 | `/ssh` | dir | **Virtual mount** | Remote machines/instances (1 machine configured) |\n\n### Summary\n\n- **Native storage (3):** `/memories`, `/documents`, `/skills` — real filesystem, writable, persist as actual files.\n- **Virtual mounts (7):** `/threads`, `/favorites`, `/tasks`, `/uploads`, `/searches`, `/gens` are DB-backed virtual views (read-only), and `/ssh` is a true external mount bridging remote machines.\n\nAll 10 entries returned cleanly with `entryPath`, `nodeType`, and `updatedAt` — no errors, no raw IDs or malformed fields. Total reported as 10, matching the entry count.",
+    "encoding_format": "float"
+  }
+}

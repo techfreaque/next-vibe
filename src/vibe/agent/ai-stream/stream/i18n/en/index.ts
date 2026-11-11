@@ -602,6 +602,27 @@ export const translations = {
     },
   },
   onboarding: {
+    signin: {
+      title: "Keep your setup",
+      subtitle: "Sign in once. Everything you build here follows you.",
+      benefits: {
+        sync: {
+          title: "Synced across devices",
+          body: "Your companion, specialists, and chats on every device you use.",
+        },
+        keep: {
+          title: "Never lose your work",
+          body: "Guest setup lives only in this browser. Sign in and it stays.",
+        },
+        private: {
+          title: "Private by default",
+          body: "You control your data and your filtering level. Always.",
+        },
+      },
+      cta: "Sign in or create account",
+      continueAsGuest: "Continue as guest",
+      note: "You can sign in later from the menu anytime.",
+    },
     setup: {
       title: "Set up your AI",
       subtitle:
@@ -609,8 +630,6 @@ export const translations = {
       companionLabel: "Your companion",
       specialistsLabel: "Add specialists",
       optional: "optional",
-      guestNote: "Guest mode - your setup lives on this device only.",
-      signIn: "Sign in to sync",
       start: "Start chatting",
       saving: "Setting up...",
       failed: "Couldn't save your setup. Check your connection and try again.",

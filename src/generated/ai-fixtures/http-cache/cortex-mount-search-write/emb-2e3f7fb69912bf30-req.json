@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/create-quantum-flux-md-search-test-document-a2f1b232-793a-4313-bef4-ab3a992920f0.md\n\n# Create quantum-flux.md search-test document\nFolder: private\nDescription: Used cortex-write to create /documents/search-test/quantum-flux.md containing a short note on quantum flux resonance, quark entanglement, decoherence boundaries, and Planck-scale interference. Verified the file via cortex-read; content matched exactly at 194 bytes. The file already existed so it was",
+    "encoding_format": "float"
+  }
+}

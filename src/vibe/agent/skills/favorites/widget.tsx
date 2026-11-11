@@ -223,37 +223,66 @@ interface ActionDeps {
   locale: CountryLanguage;
 }
 
-/** Delete favorites by id and drop them from the cached list. */
+/**
+ * Delete favorites by id and drop them from the cached list.
+ *
+ * Uses the batch-delete endpoint - ONE atomic operation for all ids. Firing one
+ * DELETE per id (Promise.all) raced for public (localStorage) users: each DELETE
+ * is a read-modify-write, so concurrent deletes read the same snapshot and each
+ * dropped only its own id, leaving all-but-one variant behind after a refresh.
+ *
+ * The cache is only patched AFTER the server confirms success - never
+ * optimistically. If the mutation fails (or throws) we leave the list as-is and
+ * refetch so the real server state shows, rather than silently hiding a skill
+ * that was never actually deleted.
+ */
 async function removeFavorites(
   ids: string[],
   { logger, user, locale }: ActionDeps,
 ): Promise<void> {
-  const favoriteDetailDefinitions = await import("./[id]/definition");
-  await Promise.all(
-    ids.map((id) =>
-      apiClient.mutate(
-        favoriteDetailDefinitions.default.DELETE,
-        logger,
-        user,
-        undefined,
-        { id },
-        locale,
-      ),
-    ),
-  );
-  const idsToRemove = new Set(ids);
-  apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
-    if (!oldData?.success) {
-      return oldData;
+  const deleteBatchDefinitions = await import("./delete-batch/definition");
+  try {
+    const result = await apiClient.mutate(
+      deleteBatchDefinitions.default.POST,
+      logger,
+      user,
+      { ids },
+      undefined,
+      locale,
+    );
+    if (!result.success) {
+      logger.error("Failed to remove favorites", {
+        errorMessage: result.message,
+        errorType: result.errorType,
+        count: ids.length,
+      });
+      // Server rejected the delete - pull the true list back so nothing is
+      // left hidden in the cache.
+      await apiClient.refetchEndpoint(definition.GET, logger);
+      return;
     }
-    return {
-      success: true,
-      data: {
-        ...oldData.data,
-        favorites: oldData.data.favorites.filter((f) => !idsToRemove.has(f.id)),
-      },
-    };
-  });
+    const idsToRemove = new Set(ids);
+    apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
+      if (!oldData?.success) {
+        return oldData;
+      }
+      return {
+        success: true,
+        data: {
+          ...oldData.data,
+          favorites: oldData.data.favorites.filter(
+            (f) => !idsToRemove.has(f.id),
+          ),
+        },
+      };
+    });
+  } catch (error) {
+    logger.error("Failed to remove favorites", {
+      errorMessage: error instanceof Error ? error.message : String(error),
+      count: ids.length,
+    });
+    await apiClient.refetchEndpoint(definition.GET, logger);
+  }
 }
 
 /** Open the create-favorite form prefilled for another variant of a skill. */
