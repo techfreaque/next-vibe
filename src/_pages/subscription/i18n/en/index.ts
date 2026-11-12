@@ -251,33 +251,24 @@ export const translations = {
     },
   },
   meta: {
-    subscription: {
-      title: "Credits & Subscription - Unbottled AI",
-      description:
-        "Subscribe for {{subCredits}} monthly credits and buy extra packs when needed. Chat with {{modelCount}} uncensored AI models.",
-      category: "Account",
-      imageAlt: "Credits and subscription management for uncensored AI chat",
-      keywords: {
-        subscription: "monthly AI subscription",
-        billing: "AI credits billing",
-        plans: "AI chat plans",
-        pricing: "uncensored AI pricing",
-      },
-    },
+    category: "Pricing",
+    imageAlt: "{{appName}} pricing: credits for every AI model",
+    keywords:
+      "AI chat pricing, uncensored AI pricing, pay per message AI, AI credits, {{appName}}",
     overview: {
-      title: "Subscription Overview - Unbottled AI",
+      title: "Pricing - pay per message, no lock-in | {{appName}}",
       description:
-        "View your credit balance, subscription status, and learn how credits work. Chat with {{modelCount}} uncensored AI models.",
+        "{{freeCredits}} free credits a month. {{subCredits}} credits for {{subPrice}} a month, or buy a pack that never expires. One balance for {{modelCount}} models, mainstream to uncensored.",
     },
     buyCredits: {
-      title: "Buy Credits - Unbottled AI",
+      title: "Buy credits - subscription or packs | {{appName}}",
       description:
-        "Subscribe for {{subCredits}} monthly credits or buy extra credit packs. Access {{modelCount}} uncensored AI models.",
+        "{{subCredits}} credits a month for {{subPrice}}, or credit packs that never expire. Pay by card or crypto. Use them on {{modelCount}} AI models.",
     },
     history: {
-      title: "Transaction History - Unbottled AI",
+      title: "Credit history | {{appName}}",
       description:
-        "View your credit transaction history, purchases, and usage. Manage your AI chat credits.",
+        "Every credit in and out: purchases, monthly grants, referral earnings and what each chat cost.",
     },
   },
   payment: {

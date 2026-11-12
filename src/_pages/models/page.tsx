@@ -10,7 +10,10 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
-import { listModelFacts, type ModelFacts } from "./_shared/model-facts";
+import {
+  countCatalogModels,
+  listAllCatalogEntries,
+} from "./_shared/model-catalog-entries";
 import { MODELS_OG_IMAGE } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { ModelsIndexClient } from "./page-client";
@@ -26,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const count = listModelFacts().filter((facts) => !facts.isLegacy).length;
+  const count = countCatalogModels(listAllCatalogEntries());
   return metadataGenerator(locale, {
     path: "models",
     title: t("meta.index.title", { appName, count }),
@@ -40,14 +43,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export interface ModelsIndexPageData {
   locale: CountryLanguage;
-  models: ModelFacts[];
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<ModelsIndexPageData> {
   const { locale } = await params;
-  return { locale, models: listModelFacts() };
+  return { locale };
 }
 
 export function TanstackPage(data: ModelsIndexPageData): JSX.Element {

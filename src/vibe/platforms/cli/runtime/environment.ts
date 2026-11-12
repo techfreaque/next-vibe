@@ -138,6 +138,8 @@ export function loadEnvironment(): EnvironmentResult {
 
   // Docker prod build: bake placeholder sentinels into NEXT_PUBLIC_* so the
   // image works across instances. Runtime patches the bundle at container start.
+  // Later modules re-write some NEXT_PUBLIC_* (env defaults, agent flags), so
+  // the `next build` spawn re-applies this via withRuntimeEnvPlaceholders.
   if (process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true") {
     for (const key of Object.keys(process.env)) {
       if (key.startsWith("NEXT_PUBLIC_")) {

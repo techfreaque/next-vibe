@@ -20,6 +20,7 @@ import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -27,6 +28,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
+import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -63,12 +65,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   let tagline = "";
   let modelCount = 0;
   if (user) {
+    // Variant URLs (<skill>__<variant>) and legacy aliases resolve like the loader.
     const skillResult = await SkillsRepository.getSkillById(
-      { id: skillId },
+      { id: parseSkillId(skillId).skillId },
       user,
       logger,
       locale,
     );
+    if (
+      !skillResult.success &&
+      skillResult.errorType === ErrorResponseTypes.NOT_FOUND
+    ) {
+      notFound();
+    }
     if (skillResult.success) {
       name = skillResult.data.name ?? "";
       tagline = skillResult.data.tagline ?? "";
@@ -132,6 +141,13 @@ export async function tanstackLoader({
     logger,
     locale,
   );
+  // Unknown or private skill: real 404 instead of an empty 200 landing page.
+  if (
+    !skillResult.success &&
+    skillResult.errorType === ErrorResponseTypes.NOT_FOUND
+  ) {
+    notFound();
+  }
   const initialSkillData = skillResult.success ? skillResult.data : null;
 
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -273,11 +289,11 @@ export async function tanstackLoader({
     const { eq } = await import("drizzle-orm");
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const [skillRow] = uuidRegex.test(skillId)
+    const [skillRow] = uuidRegex.test(baseSkillId)
       ? await db
           .select({ userId: customSkills.userId })
           .from(customSkills)
-          .where(eq(customSkills.id, skillId))
+          .where(eq(customSkills.id, baseSkillId))
           .limit(1)
       : [];
     if (skillRow) {

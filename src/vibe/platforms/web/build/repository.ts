@@ -18,6 +18,7 @@ import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { SeedRepository } from "../../../database/seed/repository";
 import type { EndpointLogger } from "../../../logger/types";
+import { withRuntimeEnvPlaceholders } from "../../cli/runtime/runtime-env-placeholders";
 import { patchPublicUrlPort } from "../public-url";
 
 import { GenerateAllRepository } from "../../../core/generators/repository";
@@ -235,13 +236,15 @@ export class BuildRepository {
           stdio: "inherit",
           cwd: process.cwd(),
           shell: runner.shell,
-          env: {
+          // Docker placeholder build: sentinel every NEXT_PUBLIC_* the child
+          // sees, including ones written after environment.ts ran.
+          env: withRuntimeEnvPlaceholders({
             ...process.env,
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
             NODE_OPTIONS: "--max-old-space-size=10000",
             ...(data.vibeMode ? { NEXT_PUBLIC_VIBE_MODE: data.vibeMode } : {}),
-          },
+          }),
         });
         if (buildResult.status === 0) {
           output.push(t("post.repository.messages.nextjsBuildSuccess"));

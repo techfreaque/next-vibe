@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     index: {
       title: "{{count}} modeli AI - ceny, kontekst, filtry | {{appName}}",
       description:
-        "Wszystkie modele czatu na {{appName}} na jednej liście: Claude, GPT, Gemini, Grok, DeepSeek, modele otwarte i bez cenzury. Cena za wiadomość, okno kontekstu, wejścia. Wybierz i pisz.",
+        "Wszystkie modele na {{appName}} na jednej liście: Claude, GPT, Gemini, Grok, DeepSeek, czat otwarty i bez cenzury, a do tego obraz, głos, muzyka i wideo. Prawdziwa cena za użycie, okno kontekstu, wejścia. Wybierz i działaj.",
       imageAlt: "Katalog modeli AI na {{appName}}",
       keywords:
         "modele AI, porównanie LLM, AI bez cenzury, open source AI, ceny AI, {{appName}}",
@@ -113,10 +113,9 @@ export const translations: typeof enTranslations = {
     eyebrow: "{{count}} modeli",
     title: "Każdy model. Jeden czat.",
     subtitle:
-      "Mainstream, otwarte i bez cenzury. Prawdziwe ceny za wiadomość, prawdziwe rozmiary kontekstu. Filtr wybierasz ty - nie my.",
+      "Mainstream, otwarte i bez cenzury. Prawdziwe ceny za wiadomość, prawdziwe rozmiary kontekstu. Filtr wybierasz ty. Nie my.",
     searchLabel: "Szukaj modeli",
-    searchPlaceholder:
-      "Szukaj po nazwie lub twórcy - Claude, DeepSeek, Venice…",
+    searchPlaceholder: "Szukaj po nazwie lub twórcy: Claude, DeepSeek, Venice…",
     tierCount: "{{count}} modeli",
     noResults: "Żaden model nie pasuje do „{{query}}”.",
     legacyTitle: "Starsze modele",

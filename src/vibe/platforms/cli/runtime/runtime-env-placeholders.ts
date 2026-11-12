@@ -23,6 +23,33 @@ export function runtimeEnvPlaceholder(key: string): string {
   return `${SENTINEL_PREFIX}${key}__`;
 }
 
+/**
+ * The env handed to the `next build` child. In a placeholder build
+ * (VIBE_BUILD_PLACEHOLDER_ENV=true) every NEXT_PUBLIC_* value becomes its
+ * sentinel; otherwise `env` is returned unchanged (local/dev/Hermes builds).
+ *
+ * The early pass in environment.ts is not enough on its own: modules that
+ * evaluate after it write NEXT_PUBLIC_* back into process.env (defineEnv's
+ * writeEnvToProcess turns stripped sentinels into schema defaults such as
+ * NEXT_PUBLIC_APP_URL=http://localhost:3000 and NEXT_PUBLIC_VIBE_MODE=dev;
+ * agent/env.ts writes the NEXT_PUBLIC_AGENT_* flags). Next.js inlines
+ * whatever the child sees, so the sentinels must be applied at the spawn.
+ */
+export function withRuntimeEnvPlaceholders(
+  env: NodeJS.ProcessEnv,
+): NodeJS.ProcessEnv {
+  if (env["VIBE_BUILD_PLACEHOLDER_ENV"] !== "true") {
+    return env;
+  }
+  const out: NodeJS.ProcessEnv = { ...env };
+  for (const key of Object.keys(out)) {
+    if (key.startsWith("NEXT_PUBLIC_")) {
+      out[key] = runtimeEnvPlaceholder(key);
+    }
+  }
+  return out;
+}
+
 /** True when a value is one of the sentinels above - used to exempt exactly those fields from schema validation, never the whole env object. */
 export function isRuntimeEnvPlaceholder(value: string): boolean {
   return value.startsWith(SENTINEL_PREFIX);

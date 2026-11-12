@@ -6,9 +6,11 @@
 
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import type { SkillListResponseOutput } from "next-vibe/agent/skills/definition";
 import { SkillSourceFilter } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -16,10 +18,32 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import type { JSX } from "react";
 
+import { configScopedTranslation } from "@/env/i18n";
+
+import { scopedTranslation } from "./i18n";
 import { SkillsPageClient } from "./page-client";
 
 interface SkillsPageProps {
   params: Promise<{ locale: CountryLanguage }>;
+}
+
+export async function generateMetadata({
+  params,
+}: SkillsPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+  return metadataGenerator(locale, {
+    path: "skills",
+    title: t("meta.title", { appName }),
+    description: t("meta.description"),
+    category: t("meta.category"),
+    image:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
+    imageAlt: t("meta.imageAlt", { appName }),
+    keywords: [t("meta.keywords", { appName })],
+  });
 }
 
 export interface SkillsPageData {

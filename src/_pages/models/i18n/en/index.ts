@@ -4,7 +4,7 @@ export const translations = {
     index: {
       title: "{{count}} AI models - prices, context, filters | {{appName}}",
       description:
-        "Every chat model on {{appName}} in one list: Claude, GPT, Gemini, Grok, DeepSeek, open and uncensored models. Price per message, context window, inputs. Pick one, start chatting.",
+        "Every model on {{appName}} in one list: Claude, GPT, Gemini, Grok, DeepSeek, open and uncensored chat, plus image, voice, music and video. Real price per use, context window, inputs. Pick one, start now.",
       imageAlt: "AI model directory on {{appName}}",
       keywords:
         "AI models, LLM comparison, uncensored AI, open source AI, AI pricing, {{appName}}",
@@ -109,9 +109,9 @@ export const translations = {
     eyebrow: "{{count}} models",
     title: "Every model. One chat.",
     subtitle:
-      "Mainstream, open and uncensored. Real prices per message, real context sizes. You choose the filter - not us.",
+      "Mainstream, open and uncensored. Real prices per message, real context sizes. You choose the filter. Not us.",
     searchLabel: "Search models",
-    searchPlaceholder: "Search by name or lab - Claude, DeepSeek, Venice…",
+    searchPlaceholder: "Search by name or lab: Claude, DeepSeek, Venice…",
     tierCount: "{{count}} models",
     noResults: "No model matches “{{query}}”.",
     legacyTitle: "Legacy models",

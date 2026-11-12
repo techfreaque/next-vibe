@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     index: {
       title: "{{count}} KI-Modelle - Preise, Kontext, Filter | {{appName}}",
       description:
-        "Alle Chat-Modelle auf {{appName}} in einer Liste: Claude, GPT, Gemini, Grok, DeepSeek, offene und unzensierte Modelle. Preis pro Nachricht, Kontextfenster, Eingaben. Modell wählen, loschatten.",
+        "Alle Modelle auf {{appName}} in einer Liste: Claude, GPT, Gemini, Grok, DeepSeek, offene und unzensierte Chat-Modelle, dazu Bild, Stimme, Musik und Video. Echter Preis pro Nutzung, Kontextfenster, Eingaben. Modell wählen, loslegen.",
       imageAlt: "KI-Modellverzeichnis auf {{appName}}",
       keywords:
         "KI-Modelle, LLM-Vergleich, unzensierte KI, Open-Source-KI, KI-Preise, {{appName}}",
@@ -112,9 +112,9 @@ export const translations: typeof enTranslations = {
     eyebrow: "{{count}} Modelle",
     title: "Jedes Modell. Ein Chat.",
     subtitle:
-      "Mainstream, offen und unzensiert. Echte Preise pro Nachricht, echte Kontextgrößen. Den Filter bestimmst du - nicht wir.",
+      "Mainstream, offen und unzensiert. Echte Preise pro Nachricht, echte Kontextgrößen. Den Filter bestimmst du. Nicht wir.",
     searchLabel: "Modelle durchsuchen",
-    searchPlaceholder: "Nach Name oder Lab suchen - Claude, DeepSeek, Venice…",
+    searchPlaceholder: "Nach Name oder Lab suchen: Claude, DeepSeek, Venice…",
     tierCount: "{{count}} Modelle",
     noResults: "Kein Modell passt zu „{{query}}“.",
     legacyTitle: "Veraltete Modelle",

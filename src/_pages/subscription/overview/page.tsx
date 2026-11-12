@@ -1,14 +1,23 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
 
+import { generateSubscriptionMetadata } from "../metadata";
 import { subscriptionLoader } from "../shared-loader";
 import { OverviewPageClient } from "./page-client";
 
 interface PageProps {
   params: Promise<{ locale: CountryLanguage }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return generateSubscriptionMetadata(locale, "overview");
 }
 
 export interface OverviewPageData {

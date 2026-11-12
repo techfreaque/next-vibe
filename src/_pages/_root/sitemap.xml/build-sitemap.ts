@@ -6,8 +6,9 @@
  * App pages (threads, account, admin, tools) are deliberately absent.
  */
 
-import { coreClientEnv } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+
+import { configScopedTranslation } from "@/env/i18n";
 
 import {
   listModelFacts,
@@ -112,9 +113,18 @@ function escapeXml(value: string): string {
     .replaceAll("'", "&apos;");
 }
 
-export function buildSitemapXml(
-  baseUrl: string = coreClientEnv.NEXT_PUBLIC_APP_URL,
-): string {
+/**
+ * Public origin, same source as every page's canonical/hreflang tags
+ * (metadataGenerator). Never NEXT_PUBLIC_APP_URL: Next prerenders this route
+ * at build time, before the runtime env exists, so prod shipped
+ * http://localhost:3000 in every <loc>.
+ */
+function publicBaseUrl(): string {
+  const { t } = configScopedTranslation.scopedT("en-GLOBAL");
+  return t("websiteUrl");
+}
+
+export function buildSitemapXml(baseUrl: string = publicBaseUrl()): string {
   const base = baseUrl.replace(/\/+$/, "");
   const locales = sitemapLocales();
   const defaultLocale = locales.find((locale) => locale.endsWith("-GLOBAL"));

@@ -260,32 +260,24 @@ export const translations: typeof enTranslations = {
     },
   },
   meta: {
-    subscription: {
-      title: "Subskrypcja i kredyty",
-      description: "Zarządzaj swoją subskrypcją, kredytami i rozliczeniami",
-      category: "Konto",
-      imageAlt: "Zarządzanie subskrypcją i kredytami",
-      keywords: {
-        subscription: "subskrypcja",
-        billing: "rozliczenia",
-        plans: "plany",
-        pricing: "cennik",
-      },
-    },
+    category: "Cennik",
+    imageAlt: "Cennik {{appName}}: kredyty na każdy model AI",
+    keywords:
+      "cennik czatu AI, AI bez cenzury cena, płatność za wiadomość AI, kredyty AI, {{appName}}",
     overview: {
-      title: "Przegląd subskrypcji - Unbottled AI",
+      title: "Cennik - płacisz za wiadomość, bez zobowiązań | {{appName}}",
       description:
-        "Zobacz swój stan kredytów, status subskrypcji i dowiedz się, jak działają kredyty. Czatuj z {{modelCount}} niecenzurowanymi modelami AI.",
+        "{{freeCredits}} darmowych kredytów co miesiąc. {{subCredits}} kredytów za {{subPrice}} miesięcznie albo pakiet, który nigdy nie wygasa. Jedno saldo na {{modelCount}} modeli, od mainstreamu po bez cenzury.",
     },
     buyCredits: {
-      title: "Kup kredyty - Unbottled AI",
+      title: "Kup kredyty - subskrypcja lub pakiety | {{appName}}",
       description:
-        "Subskrybuj za {{subCredits}} miesięcznych kredytów lub kup dodatkowe pakiety kredytów. Dostęp do {{modelCount}} niecenzurowanych modeli AI.",
+        "{{subCredits}} kredytów miesięcznie za {{subPrice}} albo pakiety kredytów bez daty ważności. Płać kartą lub kryptowalutą. Do użycia z {{modelCount}} modelami AI.",
     },
     history: {
-      title: "Historia transakcji - Unbottled AI",
+      title: "Historia kredytów | {{appName}}",
       description:
-        "Zobacz historię transakcji kredytowych, zakupy i użycie. Zarządzaj swoimi kredytami czatu AI.",
+        "Każdy kredyt na plus i na minus: zakupy, miesięczne przydziały, prowizje z poleceń i koszt każdego czatu.",
     },
   },
   payment: {

@@ -29,6 +29,11 @@ const loadData = createServerFn({ method: "GET" })
             layout0.generateMetadata({
               params: Promise.resolve(toNextParams(data.params)),
             }),
+          () =>
+            page.generateMetadata({
+              params: Promise.resolve(toNextParams(data.params)),
+              searchParams: Promise.resolve(data.search),
+            }),
         ]),
       ]);
       return { page: pageData, head };

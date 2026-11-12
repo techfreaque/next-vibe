@@ -13,6 +13,7 @@ import {
   CATALOG_TYPE_ORDER,
   type CatalogEntry,
   type CatalogType,
+  countCatalogModels,
   listAllCatalogEntries,
 } from "./_shared/model-catalog-entries";
 import { scopedTranslation } from "./i18n";
@@ -54,11 +55,7 @@ export function ModelsIndexClient({
     return result;
   }, [allEntries, query]);
   const totalCount = useMemo(
-    () =>
-      Object.values(allEntries).reduce(
-        (sum, entries) => sum + entries.filter((e) => !e.isLegacy).length,
-        0,
-      ),
+    () => countCatalogModels(allEntries),
     [allEntries],
   );
 

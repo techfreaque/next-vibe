@@ -166,3 +166,13 @@ export function listAllCatalogEntries(
   }
   return result;
 }
+
+/** Non-legacy models across every catalog type. Same number in meta + hero. */
+export function countCatalogModels(
+  entriesByType: Partial<Record<CatalogType, CatalogEntry[]>>,
+): number {
+  return Object.values(entriesByType).reduce(
+    (sum, entries) => sum + entries.filter((entry) => !entry.isLegacy).length,
+    0,
+  );
+}

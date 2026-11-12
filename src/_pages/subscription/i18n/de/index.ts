@@ -256,32 +256,25 @@ export const translations: typeof enTranslations = {
     },
   },
   meta: {
-    subscription: {
-      title: "Abonnement & Credits",
-      description: "Verwalten Sie Ihr Abonnement, Credits und Abrechnung",
-      category: "Konto",
-      imageAlt: "Abonnement- und Credit-Verwaltung",
-      keywords: {
-        subscription: "Abonnement",
-        billing: "Abrechnung",
-        plans: "Pläne",
-        pricing: "Preise",
-      },
-    },
+    category: "Preise",
+    imageAlt: "{{appName}} Preise: Credits für jedes KI-Modell",
+    keywords:
+      "KI-Chat Preise, unzensierte KI Preise, KI pro Nachricht bezahlen, KI-Credits, {{appName}}",
     overview: {
-      title: "Abonnement-Übersicht - Unbottled AI",
+      title:
+        "Preise - pro Nachricht zahlen, ohne Vertragsbindung | {{appName}}",
       description:
-        "Sehen Sie Ihren Credit-Kontostand, Abonnementstatus und erfahren Sie, wie Credits funktionieren. Chatten Sie mit {{modelCount}} zensurierten KI-Modellen.",
+        "{{freeCredits}} Gratis-Credits pro Monat. {{subCredits}} Credits für {{subPrice}} im Monat oder ein Paket, das nie verfällt. Ein Guthaben für {{modelCount}} Modelle, vom Mainstream bis unzensiert.",
     },
     buyCredits: {
-      title: "Credits kaufen - Unbottled AI",
+      title: "Credits kaufen - Abo oder Pakete | {{appName}}",
       description:
-        "Abonnieren Sie für {{subCredits}} monatliche Credits oder kaufen Sie zusätzliche Credit-Pakete. Zugriff auf {{modelCount}} zensurierte KI-Modelle.",
+        "{{subCredits}} Credits im Monat für {{subPrice}} oder Credit-Pakete ohne Ablaufdatum. Zahlung per Karte oder Krypto. Nutzbar für {{modelCount}} KI-Modelle.",
     },
     history: {
-      title: "Transaktionsverlauf - Unbottled AI",
+      title: "Credit-Verlauf | {{appName}}",
       description:
-        "Sehen Sie Ihren Credit-Transaktionsverlauf, Käufe und Nutzung. Verwalten Sie Ihre KI-Chat-Credits.",
+        "Jeder Credit rein und raus: Käufe, monatliche Gutschriften, Empfehlungsprovisionen und was jeder Chat gekostet hat.",
     },
   },
   payment: {
