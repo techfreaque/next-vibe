@@ -106,6 +106,10 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
     {
       id: "creative",
       variantName: "skills.roleplaySkill.variants.creative" as const,
+      description:
+        "skills.roleplaySkill.variantInfo.creative.description" as const,
+      strength: "skills.roleplaySkill.variantInfo.creative.strength" as const,
+      weakness: "skills.roleplaySkill.variantInfo.creative.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M3,
@@ -131,6 +135,9 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
     {
       id: "deep",
       variantName: "skills.roleplaySkill.variants.deep" as const,
+      description: "skills.roleplaySkill.variantInfo.deep.description" as const,
+      strength: "skills.roleplaySkill.variantInfo.deep.strength" as const,
+      weakness: "skills.roleplaySkill.variantInfo.deep.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -155,6 +162,10 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
     {
       id: "uncensored",
       variantName: "skills.roleplaySkill.variants.uncensored" as const,
+      description:
+        "skills.roleplaySkill.variantInfo.uncensored.description" as const,
+      strength: "skills.roleplaySkill.variantInfo.uncensored.strength" as const,
+      weakness: "skills.roleplaySkill.variantInfo.uncensored.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

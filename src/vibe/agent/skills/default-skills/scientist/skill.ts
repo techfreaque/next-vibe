@@ -88,6 +88,9 @@ export const scientistSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.scientist.variants.elonTusk" as const,
+      description: "skills.scientist.variantInfo.elonTusk.description" as const,
+      strength: "skills.scientist.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.scientist.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -113,6 +116,9 @@ export const scientistSkill: Skill = {
     {
       id: "focused",
       variantName: "skills.scientist.variants.focused" as const,
+      description: "skills.scientist.variantInfo.focused.description" as const,
+      strength: "skills.scientist.variantInfo.focused.strength" as const,
+      weakness: "skills.scientist.variantInfo.focused.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.KIMI_K3,
@@ -137,6 +143,9 @@ export const scientistSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.scientist.variants.budget" as const,
+      description: "skills.scientist.variantInfo.budget.description" as const,
+      strength: "skills.scientist.variantInfo.budget.strength" as const,
+      weakness: "skills.scientist.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_PRO,

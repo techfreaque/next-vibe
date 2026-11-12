@@ -53,6 +53,10 @@ export const devilsAdvocateSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.devilsAdvocate.variants.elonTusk" as const,
+      description:
+        "skills.devilsAdvocate.variantInfo.elonTusk.description" as const,
+      strength: "skills.devilsAdvocate.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.devilsAdvocate.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -78,12 +82,48 @@ export const devilsAdvocateSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.devilsAdvocate.variants.chineseWisdom" as const,
+      description:
+        "skills.devilsAdvocate.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.devilsAdvocate.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.devilsAdvocate.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "uncensored",
+      variantName: "skills.devilsAdvocate.variants.uncensored" as const,
+      description:
+        "skills.devilsAdvocate.variantInfo.uncensored.description" as const,
+      strength:
+        "skills.devilsAdvocate.variantInfo.uncensored.strength" as const,
+      weakness:
+        "skills.devilsAdvocate.variantInfo.uncensored.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
         },
         contentRange: {
           min: ContentLevel.UNCENSORED,

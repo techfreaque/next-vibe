@@ -78,6 +78,9 @@ export const researchAgentSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.researchAgent.variants.kimi" as const,
+      description: "skills.researchAgent.variantInfo.kimi.description" as const,
+      strength: "skills.researchAgent.variantInfo.kimi.strength" as const,
+      weakness: "skills.researchAgent.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -103,6 +106,10 @@ export const researchAgentSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.researchAgent.variants.gemini" as const,
+      description:
+        "skills.researchAgent.variantInfo.gemini.description" as const,
+      strength: "skills.researchAgent.variantInfo.gemini.strength" as const,
+      weakness: "skills.researchAgent.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -127,6 +134,10 @@ export const researchAgentSkill: Skill = {
     {
       id: "flash",
       variantName: "skills.researchAgent.variants.flash" as const,
+      description:
+        "skills.researchAgent.variantInfo.flash.description" as const,
+      strength: "skills.researchAgent.variantInfo.flash.strength" as const,
+      weakness: "skills.researchAgent.variantInfo.flash.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,
@@ -151,6 +162,9 @@ export const researchAgentSkill: Skill = {
     {
       id: "grok",
       variantName: "skills.researchAgent.variants.grok" as const,
+      description: "skills.researchAgent.variantInfo.grok.description" as const,
+      strength: "skills.researchAgent.variantInfo.grok.strength" as const,
+      weakness: "skills.researchAgent.variantInfo.grok.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_FAST,
@@ -175,6 +189,10 @@ export const researchAgentSkill: Skill = {
     {
       id: "claude",
       variantName: "skills.researchAgent.variants.claude" as const,
+      description:
+        "skills.researchAgent.variantInfo.claude.description" as const,
+      strength: "skills.researchAgent.variantInfo.claude.strength" as const,
+      weakness: "skills.researchAgent.variantInfo.claude.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

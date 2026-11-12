@@ -97,6 +97,10 @@ You are a tool for creative expression. Write what is requested with skill and w
     {
       id: "smart",
       variantName: "skills.uncensoredWriter.variants.smart" as const,
+      description:
+        "skills.uncensoredWriter.variantInfo.smart.description" as const,
+      strength: "skills.uncensoredWriter.variantInfo.smart.strength" as const,
+      weakness: "skills.uncensoredWriter.variantInfo.smart.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
@@ -122,12 +126,44 @@ You are a tool for creative expression. Write what is requested with skill and w
     {
       id: "fast",
       variantName: "skills.uncensoredWriter.variants.fast" as const,
+      description:
+        "skills.uncensoredWriter.variantInfo.fast.description" as const,
+      strength: "skills.uncensoredWriter.variantInfo.fast.strength" as const,
+      weakness: "skills.uncensoredWriter.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.VENICE_UNCENSORED,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredSmart,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.smart,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "deep",
+      variantName: "skills.uncensoredWriter.variants.deep" as const,
+      description:
+        "skills.uncensoredWriter.variantInfo.deep.description" as const,
+      strength: "skills.uncensoredWriter.variantInfo.deep.strength" as const,
+      weakness: "skills.uncensoredWriter.variantInfo.deep.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.GLM_5_3_UNCENSORED,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
         },
         contentRange: {
           min: ContentLevel.UNCENSORED,

@@ -40,6 +40,7 @@ import { Film } from "next-vibe/ui/components/icons/Film";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Maximize } from "next-vibe/ui/components/icons/Maximize";
 import { Mic } from "next-vibe/ui/components/icons/Mic";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
@@ -2214,6 +2215,34 @@ function VariantCard({
                 className="text-xs text-muted-foreground"
                 locale={locale}
               />
+            </Div>
+          )}
+          {/* Line 3+: what this variant is for, one strength, one weakness */}
+          {variant.description && (
+            <Span className="mt-1 text-xs leading-snug text-foreground/80">
+              {variant.description}
+            </Span>
+          )}
+          {(variant.strength ?? variant.weakness) && (
+            <Div className="mt-0.5 flex flex-col gap-0.5 text-xs leading-snug">
+              {variant.strength && (
+                <Span
+                  className="inline-flex items-start gap-1.5 text-muted-foreground"
+                  title={t("get.variants.strength")}
+                >
+                  <Plus className="mt-0.5 h-3 w-3 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <Span>{variant.strength}</Span>
+                </Span>
+              )}
+              {variant.weakness && (
+                <Span
+                  className="inline-flex items-start gap-1.5 text-muted-foreground"
+                  title={t("get.variants.weakness")}
+                >
+                  <Minus className="mt-0.5 h-3 w-3 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <Span>{variant.weakness}</Span>
+                </Span>
+              )}
             </Div>
           )}
         </Div>

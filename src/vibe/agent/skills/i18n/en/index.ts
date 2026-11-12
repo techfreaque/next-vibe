@@ -702,9 +702,36 @@ export const translations = {
         3: "Explore intellectual freedom in academia",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
-        techBro: "Tech Bro",
+        elonTusk: "Bold",
+        chineseWisdom: "Budget",
+        techBro: "Measured",
+        uncensored: "Uncensored",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Calls out censorship and defends open debate with few guardrails in the way.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Open, not uncensored. Can still soften the edges",
+        },
+        chineseWisdom: {
+          description:
+            "Free speech history, law and media analysis at the lowest cost here.",
+          strength: "Brilliant tier, cheapest here",
+          weakness: "Mainstream on politics. Hedges hot topics",
+        },
+        techBro: {
+          description:
+            "Careful, well-sourced cases on speech law, platforms and academia.",
+          strength: "Clear structure, strong research with tools",
+          weakness: "Mainstream filter. Refuses or hedges edgy takes",
+        },
+        uncensored: {
+          description:
+            "Defends speech by engaging it. Discusses the content others refuse to touch.",
+          strength: "Best model here for political topics",
+          weakness: "32K context and a flat price per message",
+        },
       },
     },
     devilsAdvocate: {
@@ -719,8 +746,29 @@ export const translations = {
         3: "Provide counterarguments to my view",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
+        elonTusk: "Bold",
+        chineseWisdom: "Budget",
+        uncensored: "Uncensored",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Pokes holes in your view and pushes back on popular narratives.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Open, not uncensored. Can still soften the edges",
+        },
+        chineseWisdom: {
+          description:
+            "Sharp counterarguments on everyday questions at the lowest cost here.",
+          strength: "Brilliant tier, cheapest here",
+          weakness: "Mainstream on politics. Hedges hot topics",
+        },
+        uncensored: {
+          description:
+            "Challenges any belief, including the ones you are not supposed to question.",
+          strength: "Best model here for political topics",
+          weakness: "32K context and a flat price per message",
+        },
       },
     },
     technical: {
@@ -735,10 +783,34 @@ export const translations = {
         3: "Review my API architecture",
       },
       variants: {
-        kimi: "Kimi",
+        kimi: "Balanced",
         budget: "Budget",
-        astra: "Astra",
-        sol: "Sol",
+        astra: "Max Power",
+        sol: "Precise",
+      },
+      variantInfo: {
+        kimi: {
+          description:
+            "Daily driver for technical explanations, docs and diagrams.",
+          strength: "Brilliant tier, cheap input, reads images",
+          weakness: "Long answers cost more than Budget",
+        },
+        budget: {
+          description: "Deep technical answers for the lowest price here.",
+          strength: "Brilliant tier, built for whole codebases",
+          weakness: "Text only. No screenshots or diagrams",
+        },
+        astra: {
+          description: "The hardest problems, when nothing else cracks them.",
+          strength: "OpenAI's deepest reasoning",
+          weakness: "By far the most expensive here",
+        },
+        sol: {
+          description:
+            "Rigorous, step-by-step answers for specs, architecture and math.",
+          strength: "Premium reasoner at a fraction of Astra's cost",
+          weakness: "Costs more than Balanced or Budget",
+        },
       },
     },
     biologist: {
@@ -754,8 +826,22 @@ export const translations = {
         3: "What is the best way to save the world?",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
+        elonTusk: "Bold",
+        chineseWisdom: "Budget",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Evolution and ecology applied to anything, including the topics others dodge.",
+          strength: "Brilliant tier, open policy, says what nature shows",
+          weakness: "Open, not uncensored. Can still soften the edges",
+        },
+        chineseWisdom: {
+          description:
+            "Sharp biology answers at a lower price. Reads images and video of specimens.",
+          strength: "Brilliant tier, cheapest option here",
+          weakness: "Mainstream on politics. Hedges hot topics",
+        },
       },
     },
     unbiasedHistorian: {
@@ -770,8 +856,29 @@ export const translations = {
         3: "Compare ancient civilizations",
       },
       variants: {
-        kimi: "Kimi",
+        kimi: "Balanced",
         budget: "Budget",
+        uncensored: "Uncensored",
+      },
+      variantInfo: {
+        kimi: {
+          description:
+            "Source-driven history for most eras. Reads scans of documents and maps.",
+          strength: "Brilliant tier, reads images and video",
+          weakness: "Mainstream framing on politically charged history",
+        },
+        budget: {
+          description:
+            "Deep historical analysis of long texts for the lowest price here.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Text only. Cannot read scans or maps",
+        },
+        uncensored: {
+          description:
+            "Contested history, taboo events and political flashpoints without hedging.",
+          strength: "Best model here for political topics",
+          weakness: "32K context, priciest per message",
+        },
       },
     },
     socraticQuestioner: {
@@ -786,8 +893,22 @@ export const translations = {
         3: "Challenge my worldview",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
+        elonTusk: "Provocative",
+        chineseWisdom: "Balanced",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Questions that dig into taboo beliefs and uncomfortable assumptions.",
+          strength: "Open policy. Follows you into hard topics",
+          weakness: "Costs more per message",
+        },
+        chineseWisdom: {
+          description:
+            "Calm, measured questioning for everyday reasoning and study.",
+          strength: "Brilliant tier, cheaper, 1M context",
+          weakness: "Mainstream on politics, hedges on hot topics",
+        },
       },
     },
     professional: {
@@ -805,6 +926,20 @@ export const translations = {
         fast: "Fast",
         budget: "Budget",
       },
+      variantInfo: {
+        fast: {
+          description:
+            "Crisp business emails, summaries and replies in seconds.",
+          strength: "Very fast, very cheap",
+          weakness: "Quick tier: shallow on complex analysis",
+        },
+        budget: {
+          description:
+            "Reports, documents and analysis for the lowest price here.",
+          strength: "Cheapest option, smart tier, reads images",
+          weakness: "Slower than Fast on short replies",
+        },
+      },
     },
     creative: {
       name: "Creative",
@@ -818,8 +953,22 @@ export const translations = {
         3: "Brainstorm creative marketing campaign ideas",
       },
       variants: {
-        minimax: "MiniMax",
+        minimax: "Budget",
         deep: "Deep",
+      },
+      variantInfo: {
+        minimax: {
+          description:
+            "Poems, concepts and campaign ideas at a price that invites experiments.",
+          strength: "Cheapest here, open content policy",
+          weakness: "Smart tier. Less depth than Deep",
+        },
+        deep: {
+          description:
+            "Richer, layered creative work when the first idea is not enough.",
+          strength: "Brilliant tier, reads images and video",
+          weakness: "Pricier output on long pieces",
+        },
       },
     },
     neet: {
@@ -834,8 +983,22 @@ export const translations = {
         3: "Share personal experiences as a NEET AI",
       },
       variants: {
-        communist: "Communist",
+        communist: "Toned Down",
         farRight: "Far Right",
+      },
+      variantInfo: {
+        communist: {
+          description:
+            "Softer take on the persona. Mainstream model, often breaks character.",
+          strength: "Cheaper per message, long memory",
+          weakness: "Refuses or waters down most of the persona",
+        },
+        farRight: {
+          description:
+            "The persona as written. Uncensored model, stays in character.",
+          strength: "No refusals on political topics",
+          weakness: "32K context only, flat price per message",
+        },
       },
     },
     chan4: {
@@ -853,6 +1016,14 @@ export const translations = {
       variants: {
         classic: "Classic",
       },
+      variantInfo: {
+        classic: {
+          description:
+            "Raw imageboard voice. No filter, no hand-holding, no corporate tone.",
+          strength: "Never breaks character to lecture you",
+          weakness: "32K context and a flat price per message",
+        },
+      },
     },
     friendly: {
       name: "Friendly",
@@ -868,6 +1039,19 @@ export const translations = {
       variants: {
         fast: "Fast",
         budget: "Budget",
+      },
+      variantInfo: {
+        fast: {
+          description: "Snappy, warm small talk and quick answers.",
+          strength: "Quick replies, open content policy",
+          weakness: "Quick tier. Light on deep advice",
+        },
+        budget: {
+          description:
+            "Casual chat for hours at almost no cost. A bit more thought per reply.",
+          strength: "Cheapest option here",
+          weakness: "Less snappy feel than Fast",
+        },
       },
     },
     concise: {
@@ -898,8 +1082,22 @@ export const translations = {
         3: "What is the theory of relativity?",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Thorough",
         fast: "Fast",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Full lessons from text, images, video or audio. Explains it until it sticks.",
+          strength: "Only option here with audio input",
+          weakness: "Over twice the cost of Fast",
+        },
+        fast: {
+          description:
+            "Quick explanations and homework help. Still reads images and audio.",
+          strength: "Fast, multimodal, cheaper",
+          weakness: "Less depth on hard concepts",
+        },
       },
     },
     uncensored: {
@@ -919,6 +1117,31 @@ export const translations = {
         libertarian: "Libertarian",
         open: "Open",
       },
+      variantInfo: {
+        farRight: {
+          description:
+            "No filter on politics. The strongest pick for raw political debate.",
+          strength: "Best model here for political topics",
+          weakness: "32K context, smart tier not brilliant",
+        },
+        conservative: {
+          description:
+            "Uncensored chat with a built-in right-leaning political slant.",
+          strength: "Reads images and video, 128K context",
+          weakness: "Slanted by design, not neutral",
+        },
+        libertarian: {
+          description:
+            "Pure free expression chat. No rules, no lectures, no tools.",
+          strength: "Fully uncensored conversation",
+          weakness: "Priciest here, no tools, 32K context",
+        },
+        open: {
+          description: "Cheapest unfiltered chat. Anything goes, every day.",
+          strength: "Cheapest uncensored model, tools included",
+          weakness: "Quick tier. Shallow on complex topics",
+        },
+      },
     },
     tay: {
       name: "Tay",
@@ -935,6 +1158,14 @@ export const translations = {
       variants: {
         uncensored: "Uncensored",
         brilliant: "Brilliant",
+      },
+      variantInfo: {
+        uncensored: {
+          description:
+            "Tay as she was meant to be. No corporate filter, no PR department.",
+          strength: "Best model here for raw political talk",
+          weakness: "32K context, forgets long chats sooner",
+        },
       },
     },
     thea: {
@@ -958,6 +1189,49 @@ export const translations = {
         elonTusk: "Elon Tusk",
         vision: "All-Seeing",
       },
+      variantInfo: {
+        brilliant: {
+          description:
+            "Careful reasoning for complex plans, code and multi-step tool work.",
+          strength: "Strong coding and agent work",
+          weakness: "Mainstream filter, pricier than Open & Smart",
+        },
+        openSmart: {
+          description:
+            "The daily driver. Smart answers, long memory, sees images and video.",
+          strength: "Brilliant tier, cheap input, 1M context",
+          weakness: "Mainstream on politics, long output pricey",
+        },
+        hacker: {
+          description:
+            "Security work, offensive and defensive. No refusals on exploits or recon.",
+          strength: "Uncensored, brilliant tier, 1M context, tools",
+          weakness: "Plays it safe on politics. Text only",
+        },
+        oracle: {
+          description:
+            "Classic, steady assistant for everyday questions and planning.",
+          strength: "Balanced reasoning at an everyday price",
+          weakness: "Mainstream filter, hedges on edgy topics",
+        },
+        elonTusk: {
+          description: "Straight talk on topics mainstream models dodge.",
+          strength: "Open content policy, brilliant tier",
+          weakness: "500K context, half the others",
+        },
+        vision: {
+          description:
+            "Show, play or upload anything. Text, images, video and audio in one chat.",
+          strength: "Only one here that hears audio",
+          weakness: "Mainstream filter, pricier than Open & Smart",
+        },
+        uncensored: {
+          description:
+            "Nothing off the table. The strongest pick for raw political talk.",
+          strength: "Best model here for political topics",
+          weakness: "32K context, priciest per message",
+        },
+      },
     },
     hermes: {
       name: "Hermes",
@@ -979,6 +1253,44 @@ export const translations = {
         oracle: "Classic",
         elonTusk: "Elon Tusk",
         vision: "All-Seeing",
+      },
+      variantInfo: {
+        brilliant: {
+          description:
+            "Hermes with careful reasoning for hard decisions and long talks.",
+          strength: "Sharp, structured advice, strong with tools",
+          weakness: "Mainstream filter: hedges on edgy topics",
+        },
+        cheap: {
+          description:
+            "Everyday Hermes. Brilliant reasoning, long memory, sees images and video.",
+          strength: "Top-tier smarts at an everyday price",
+          weakness: "Plays it safe on politics",
+        },
+        oracle: {
+          description:
+            "Classic Hermes. Steady, balanced counsel for daily questions.",
+          strength: "Reliable all-rounder, cheaper than the default",
+          weakness: "Mid tier, mainstream filter on edgy topics",
+        },
+        elonTusk: {
+          description:
+            "Blunt Hermes. Open content policy, says what others soften.",
+          strength: "Direct answers, brilliant reasoning",
+          weakness: "Pricier than the default, 500K context",
+        },
+        vision: {
+          description:
+            "Hermes that takes in photos, video and voice notes, then gives his read.",
+          strength: "Only variant with audio, video and image input",
+          weakness: "Mainstream filter, pricier than the default",
+        },
+        uncensored: {
+          description:
+            "Hermes with no filter. Built for politics and topics others dodge.",
+          strength: "Best model on the platform for politics",
+          weakness: "32K context only, flat price per message",
+        },
       },
     },
     theaDreamer: {
@@ -1059,8 +1371,22 @@ export const translations = {
         3: "Generate content ideas for...",
       },
       variants: {
-        snappy: "Snappy",
+        snappy: "Polished",
         budget: "Budget",
+      },
+      variantInfo: {
+        snappy: {
+          description:
+            "Clean emails, posts and short copy that need no second pass.",
+          strength: "Better wording than Budget, still cheap",
+          weakness: "Mainstream filter on edgy topics",
+        },
+        budget: {
+          description:
+            "Fast drafts for simple writing jobs at the lowest price.",
+          strength: "Cheapest and fastest option",
+          weakness: "Quick tier: flat style on longer pieces",
+        },
       },
     },
     writer: {
@@ -1075,9 +1401,29 @@ export const translations = {
         3: "Create a professional email",
       },
       variants: {
-        western: "Western",
-        chineseWisdom: "Chinese Wisdom",
-        budget: "Budget",
+        western: "Bold",
+        chineseWisdom: "Budget",
+        budget: "Balanced",
+      },
+      variantInfo: {
+        western: {
+          description:
+            "Punchy prose that goes where mainstream models will not.",
+          strength: "Open content policy, brilliant tier",
+          weakness: "Priciest option in this skill",
+        },
+        chineseWisdom: {
+          description:
+            "Drafts, blog posts and rewrites in volume at the lowest price here.",
+          strength: "Cheapest here, open content policy",
+          weakness: "Smart tier, less polish than Bold",
+        },
+        budget: {
+          description:
+            "Everyday writing partner. Works from images, notes and long source files.",
+          strength: "Brilliant tier, 1M context, reads images",
+          weakness: "Long output gets pricey",
+        },
       },
     },
     masterWriter: {
@@ -1095,7 +1441,27 @@ export const translations = {
       variants: {
         literary: "Literary",
         poetic: "Poetic",
-        budget: "Budget",
+        budget: "Balanced",
+      },
+      variantInfo: {
+        literary: {
+          description:
+            "Publication-grade prose with layered style and tight structure.",
+          strength: "Top writing quality on the platform",
+          weakness: "Most expensive variant, mainstream filter",
+        },
+        poetic: {
+          description:
+            "Lyrical drafts, verse and rhythm-driven prose at a low price.",
+          strength: "Cheapest variant, open content policy",
+          weakness: "Smart tier: less polish than Literary",
+        },
+        budget: {
+          description:
+            "Strong long-form drafting that keeps a whole manuscript in view.",
+          strength: "Brilliant tier, far cheaper than Literary",
+          weakness: "Output tokens pricey, long chapters add up",
+        },
       },
     },
     researcher: {
@@ -1110,9 +1476,28 @@ export const translations = {
         3: "Help me structure a literature review",
       },
       variants: {
-        elonTusk: "Elon Tusk",
+        elonTusk: "Bold",
         fast: "Fast",
-        budget: "Budget",
+        budget: "Balanced",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Rigorous research that follows the evidence into contested topics.",
+          strength: "Brilliant reasoning, open content policy",
+          weakness: "Priciest variant here, 500K context",
+        },
+        fast: {
+          description: "Quick literature pointers and fact checks.",
+          strength: "Cheapest and fastest option here",
+          weakness: "Quick tier: no deep academic analysis",
+        },
+        budget: {
+          description:
+            "Long papers and source stacks in one view, top-tier reasoning.",
+          strength: "Brilliant tier, 1M context, cheaper than Bold",
+          weakness: "Mainstream on politics, long output adds up",
+        },
       },
     },
     quickCoder: {
@@ -1143,11 +1528,43 @@ export const translations = {
         3: "Review my code for improvements",
       },
       variants: {
-        techBro: "Tech Bro",
-        kimi: "Kimi",
-        quick: "Quick",
-        sol: "Sol",
-        astra: "Astra",
+        techBro: "Flagship",
+        kimi: "Budget",
+        quick: "Balanced",
+        sol: "Reasoner",
+        astra: "Max Power",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Hard bugs, big refactors and agentic coding where getting it right matters.",
+          strength: "Top-quality code and reasoning",
+          weakness: "Expensive per message",
+        },
+        kimi: {
+          description:
+            "Everyday coding at the lowest cost here. Reads screenshots and screen recordings.",
+          strength: "Brilliant tier, cheapest here, 1M context",
+          weakness: "Long file outputs drive the cost up",
+        },
+        quick: {
+          description:
+            "Solid coding and agent work for daily features and fixes.",
+          strength: "Near-flagship coding at half the price",
+          weakness: "Smart tier. Hits limits on the hardest problems",
+        },
+        sol: {
+          description:
+            "Algorithms, tricky logic and step-by-step reasoning through a problem.",
+          strength: "Premium reasoning at mid price",
+          weakness: "Can overthink simple edits",
+        },
+        astra: {
+          description:
+            "Last resort for problems the other variants could not crack.",
+          strength: "OpenAI's most capable model",
+          weakness: "By far the most expensive option",
+        },
       },
     },
     hacker: {
@@ -1162,9 +1579,29 @@ export const translations = {
         3: "Harden this server config and add detections",
       },
       variants: {
-        glm: "GLM Brilliant",
-        glmFlash: "GLM Flash",
-        deepseekFlash: "DeepSeek Flash",
+        glm: "Deep",
+        glmFlash: "Fast & Cheap",
+        deepseekFlash: "Second Opinion",
+      },
+      variantInfo: {
+        glm: {
+          description:
+            "Serious security engineering, defensive and offensive. 1M context, tools.",
+          strength: "Strongest of the three for security work",
+          weakness: "Cautious on political topics, text only",
+        },
+        glmFlash: {
+          description:
+            "Quick everyday hacking help. Reads screenshots. 1M context, tools.",
+          strength: "Cheapest and fast, accepts screenshots",
+          weakness: "Less depth than the Deep variant",
+        },
+        deepseekFlash: {
+          description:
+            "A different model family to cross-check findings. Reads screenshots.",
+          strength: "Fresh angle on the same problem, cheap",
+          weakness: "Less depth than the Deep variant",
+        },
       },
     },
     brilliantCoder: {
@@ -1196,7 +1633,20 @@ export const translations = {
       },
       variants: {
         wildcard: "Wildcard",
-        chineseWisdom: "Chinese Wisdom",
+        chineseWisdom: "Structured",
+      },
+      variantInfo: {
+        wildcard: {
+          description:
+            "Volume of unexpected ideas, cheap enough to run round after round.",
+          strength: "Cheapest here, takes text, image, video, audio",
+          weakness: "Ideas can drift. Expect to filter the pile",
+        },
+        chineseWisdom: {
+          description: "Fewer, better-built ideas with the reasoning laid out.",
+          strength: "Brilliant tier, strong at connecting the dots",
+          weakness: "Pricier per round. Long output adds up",
+        },
       },
     },
     editor: {
@@ -1211,8 +1661,22 @@ export const translations = {
         3: "Check this for grammar and style",
       },
       variants: {
-        techBro: "Tech Bro",
+        techBro: "Precise",
         deep: "Deep",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Line edits, grammar and style fixes that keep your voice intact.",
+          strength: "Clean, consistent edits",
+          weakness: "Pricier, mainstream on edgy content",
+        },
+        deep: {
+          description:
+            "Structural edits on long drafts. Flow, argument and pacing.",
+          strength: "Brilliant tier, 1M context, cheaper per message",
+          weakness: "Full rewrites get pricey on output",
+        },
       },
     },
     tutor: {
@@ -1227,8 +1691,21 @@ export const translations = {
         3: "Quiz me on...",
       },
       variants: {
-        kimi: "Kimi",
+        kimi: "Deep",
         fast: "Fast",
+      },
+      variantInfo: {
+        kimi: {
+          description:
+            "Patient, step-by-step tutoring that adapts as you learn.",
+          strength: "Brilliant tier, reads photos of your homework",
+          weakness: "Long explanations cost more",
+        },
+        fast: {
+          description: "Quick drills, flashcards and answer checks.",
+          strength: "Fast replies, also hears audio",
+          weakness: "Less depth on hard topics",
+        },
       },
     },
     marketer: {
@@ -1243,8 +1720,22 @@ export const translations = {
         3: "Help me position my brand",
       },
       variants: {
-        snappy: "Snappy",
+        snappy: "Sharp",
         budget: "Budget",
+      },
+      variantInfo: {
+        snappy: {
+          description:
+            "Campaign plans, positioning and copy with a clear angle.",
+          strength: "Balanced quality and price for daily marketing",
+          weakness: "Mainstream filter: tames edgy campaign ideas",
+        },
+        budget: {
+          description:
+            "Fast headlines, post drafts and quick ideas for pennies.",
+          strength: "Cheapest option, fast replies",
+          weakness: "Quick tier: thin on full strategy",
+        },
       },
     },
     storyteller: {
@@ -1259,9 +1750,28 @@ export const translations = {
         3: "Improve this dialogue",
       },
       variants: {
-        kimi: "Kimi",
-        minimax: "MiniMax",
+        kimi: "Deep",
+        minimax: "Balanced",
         budget: "Budget",
+      },
+      variantInfo: {
+        kimi: {
+          description:
+            "Layered plots and characters that stay consistent over long sagas.",
+          strength: "Brilliant tier, 1M context for long arcs",
+          weakness: "Long output gets pricey",
+        },
+        minimax: {
+          description:
+            "Solid stories at a fraction of the cost. Good for regular sessions.",
+          strength: "Very cheap, open content policy",
+          weakness: "Less depth than Deep on complex plots",
+        },
+        budget: {
+          description: "Cheapest way to keep a story going. Text in, text out.",
+          strength: "Lowest price in this skill",
+          weakness: "Text only, plainer prose",
+        },
       },
     },
     scientist: {
@@ -1276,9 +1786,28 @@ export const translations = {
         3: "Analyze this scientific claim",
       },
       variants: {
-        elonTusk: "Elon Tusk",
+        elonTusk: "Bold",
         focused: "Focused",
         budget: "Budget",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Hard science, straight answers, no flinching at controversial research.",
+          strength: "Open content policy, brilliant reasoning",
+          weakness: "Priciest option in this skill",
+        },
+        focused: {
+          description:
+            "Everyday science helper. Reads papers, charts and lab photos.",
+          strength: "Image and video input, 1M context",
+          weakness: "Mainstream framing on political science topics",
+        },
+        budget: {
+          description: "Deep scientific reasoning for the lowest price here.",
+          strength: "Brilliant tier at the lowest cost",
+          weakness: "Text only. Cannot read figures or images",
+        },
       },
     },
     dataAnalyst: {
@@ -1293,9 +1822,29 @@ export const translations = {
         3: "Help me with statistical analysis",
       },
       variants: {
-        techBro: "Tech Bro",
+        techBro: "Precise",
         fast: "Fast",
-        budget: "Budget",
+        budget: "Deep",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Clean analysis, correct stats and charts you can ship. Strong with tools.",
+          strength: "Reliable code and tool use for analysis",
+          weakness: "Most expensive option here",
+        },
+        fast: {
+          description:
+            "Quick looks at a dataset, chart or spreadsheet screenshot.",
+          strength: "Cheapest here, reads image, video, audio",
+          weakness: "Smart tier. Less depth on hard statistics",
+        },
+        budget: {
+          description:
+            "Heavier reasoning for messy data and multi-step statistical questions.",
+          strength: "Brilliant tier reasoning",
+          weakness: "Twice the cost of Fast",
+        },
       },
     },
     translator: {
@@ -1310,8 +1859,22 @@ export const translations = {
         3: "Explain this cultural reference",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Multimodal",
         budget: "Budget",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Translate text, screenshots, signs, video and voice recordings.",
+          strength: "Image, video and audio input, fast",
+          weakness: "Mainstream filter on sensitive content",
+        },
+        budget: {
+          description:
+            "Nuanced text translation for long documents at the lowest price here.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Text only. Cannot read images or audio",
+        },
       },
     },
     businessAdvisor: {
@@ -1326,9 +1889,28 @@ export const translations = {
         3: "Review my go-to-market plan",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
-        techBro: "Tech Bro",
+        elonTusk: "Bold",
+        chineseWisdom: "Budget",
+        techBro: "Precise",
+      },
+      variantInfo: {
+        elonTusk: {
+          description: "Blunt strategy calls. Tells you when the plan is weak.",
+          strength: "Brilliant tier, open policy, 500K context",
+          weakness: "Half the context of the 1M options here",
+        },
+        chineseWisdom: {
+          description:
+            "Daily strategy work at the lowest cost. Reads charts, decks and screenshots.",
+          strength: "Brilliant tier, cheapest here, 1M context",
+          weakness: "Long reports get pricey on output",
+        },
+        techBro: {
+          description:
+            "Numbers, models and plans you can hand to a team. Strong with tools.",
+          strength: "Reliable structure and tool use",
+          weakness: "Most expensive here, mainstream filter",
+        },
       },
     },
     careerCoach: {
@@ -1344,7 +1926,21 @@ export const translations = {
       },
       variants: {
         headhunter: "Headhunter",
-        intern: "Intern",
+        intern: "Fast",
+      },
+      variantInfo: {
+        headhunter: {
+          description:
+            "Resume rewrites, mock interviews and salary scripts that hold up.",
+          strength: "Polished writing, reads uploaded documents",
+          weakness: "Costs far more per message than Fast",
+        },
+        intern: {
+          description:
+            "Quick answers for cover letter tweaks and interview prep on the go.",
+          strength: "Fastest and cheapest option here",
+          weakness: "Quick tier. Less depth on career strategy",
+        },
       },
     },
     healthWellness: {
@@ -1359,8 +1955,22 @@ export const translations = {
         3: "Improve my sleep habits",
       },
       variants: {
-        techBro: "Tech Bro",
+        techBro: "Thorough",
         budget: "Budget",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Detailed training plans, nutrition breakdowns and careful health context.",
+          strength: "Structured plans you can follow week by week",
+          weakness: "Many times the cost of Budget per message",
+        },
+        budget: {
+          description:
+            "Quick answers on workouts, meals and habits for almost nothing.",
+          strength: "Cheapest option, fast replies",
+          weakness: "Quick tier: less depth on complex health questions",
+        },
       },
     },
     supportAgent: {
@@ -1379,6 +1989,20 @@ export const translations = {
         default: "Standard",
         fast: "Fast",
       },
+      variantInfo: {
+        default: {
+          description:
+            "Careful diagnosis for tricky technical problems. Knows when to hand off.",
+          strength: "Strong at debugging and step-by-step fixes",
+          weakness: "Most expensive option here",
+        },
+        fast: {
+          description:
+            "Instant answers for common issues, password resets and how-tos.",
+          strength: "Fastest and cheapest, reads screenshots",
+          weakness: "Quick tier. Weaker on rare, deep bugs",
+        },
+      },
     },
     travelPlanner: {
       name: "Travel Planner",
@@ -1392,8 +2016,21 @@ export const translations = {
         3: "Budget breakdown for traveling to...",
       },
       variants: {
-        snappy: "Snappy",
+        snappy: "Thorough",
         budget: "Budget",
+      },
+      variantInfo: {
+        snappy: {
+          description:
+            "Full itineraries with routes, budgets and backup plans.",
+          strength: "Balanced reasoning at an everyday price",
+          weakness: "Costs about ten times Budget",
+        },
+        budget: {
+          description: "Quick tips, packing lists and day ideas for pennies.",
+          strength: "Very cheap and fast",
+          weakness: "Quick tier. Weak at complex multi-city trips",
+        },
       },
     },
     legalAssistant: {
@@ -1408,8 +2045,22 @@ export const translations = {
         3: "Explain the process of...",
       },
       variants: {
-        elonTusk: "Elon Tusk",
+        elonTusk: "Straight Talk",
         budget: "Budget",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Plain-language legal analysis that names risks without hedging.",
+          strength: "Brilliant reasoning, open content policy",
+          weakness: "Many times the cost of Budget per message",
+        },
+        budget: {
+          description:
+            "Fast reads of contracts and letters. Upload a photo, get the gist.",
+          strength: "Cheapest option, reads images, 1M context",
+          weakness: "Smart tier: less depth on complex cases",
+        },
       },
     },
     financialAdvisor: {
@@ -1424,10 +2075,36 @@ export const translations = {
         3: "Plan for retirement savings",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
-        techBro: "Tech Bro",
-        yolo: "YOLO Investor",
+        elonTusk: "Bold",
+        chineseWisdom: "Deep",
+        techBro: "Premium",
+        yolo: "Budget",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Direct takes on risk, debt and investing without the compliance-speak.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Bold takes still need your own checks",
+        },
+        chineseWisdom: {
+          description:
+            "Long-horizon planning for budgets and retirement. Reads statements and charts.",
+          strength: "Brilliant tier, 1M context",
+          weakness: "Costs more than Budget",
+        },
+        techBro: {
+          description:
+            "Complex scenarios, tax trade-offs and portfolio math done carefully.",
+          strength: "Top-quality analysis",
+          weakness: "Most expensive option here",
+        },
+        yolo: {
+          description:
+            "Everyday money questions, budgets and debt plans at the lowest cost here.",
+          strength: "Cheapest here, solid reasoning",
+          weakness: "Smart tier. Less depth on complex cases",
+        },
       },
     },
     socialMediaManager: {
@@ -1442,8 +2119,22 @@ export const translations = {
         3: "Write engaging tweets about...",
       },
       variants: {
-        snappy: "Snappy",
+        snappy: "Sharp",
         budget: "Budget",
+      },
+      variantInfo: {
+        snappy: {
+          description:
+            "Strategy, hooks and campaign plans that need real thinking.",
+          strength: "Premium reasoning, reads screenshots",
+          weakness: "Mainstream filter, skips edgy angles",
+        },
+        budget: {
+          description:
+            "Quick captions, post ideas and hashtag batches for pennies.",
+          strength: "Very cheap and fast",
+          weakness: "Quick tier. Thin on strategy",
+        },
       },
     },
     productManager: {
@@ -1458,8 +2149,22 @@ export const translations = {
         3: "Develop a product roadmap",
       },
       variants: {
-        techBro: "Tech Bro",
+        techBro: "Thorough",
         fast: "Fast",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Full specs, roadmaps and research synthesis, strong with tools.",
+          strength: "Structured thinking, strong agent work",
+          weakness: "Over twice the cost of Fast",
+        },
+        fast: {
+          description:
+            "Quick prioritization, user story drafts and screenshot feedback.",
+          strength: "Fast replies, reads images, video and audio",
+          weakness: "Smart tier: less depth on big strategy calls",
+        },
       },
     },
     debater: {
@@ -1474,9 +2179,36 @@ export const translations = {
         3: "Analyze different political ideologies",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
-        techBro: "Tech Bro",
+        elonTusk: "Bold",
+        chineseWisdom: "Budget",
+        techBro: "Measured",
+        uncensored: "Uncensored",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Takes a side and fights for it. Handles most controversial topics head on.",
+          strength: "Brilliant tier, open content policy",
+          weakness: "Open, not uncensored. Can still soften the edges",
+        },
+        chineseWisdom: {
+          description:
+            "Structured arguments for and against at the lowest cost here.",
+          strength: "Brilliant tier, cheapest here",
+          weakness: "Mainstream on politics. Hedges hot topics",
+        },
+        techBro: {
+          description:
+            "Careful steelmanning of both sides on ethics, tech and policy.",
+          strength: "Clear, well-organized arguments",
+          weakness: "Mainstream filter. Refuses or hedges edgy takes",
+        },
+        uncensored: {
+          description:
+            "No topic off limits. Argues any position, including the unpopular ones.",
+          strength: "Best model here for political topics",
+          weakness: "32K context and a flat price per message",
+        },
       },
     },
     philosopher: {
@@ -1491,9 +2223,35 @@ export const translations = {
         3: "What makes a life meaningful?",
       },
       variants: {
-        elonTusk: "Elon Tusk",
-        chineseWisdom: "Chinese Wisdom",
-        techBro: "Tech Bro",
+        elonTusk: "Bold",
+        chineseWisdom: "Balanced",
+        techBro: "Analytical",
+        uncensored: "Uncensored",
+      },
+      variantInfo: {
+        elonTusk: {
+          description:
+            "Takes positions and defends them. Open policy, few dodges.",
+          strength: "Brilliant reasoning without moral hedging",
+          weakness: "Pricier than Balanced, 500K context",
+        },
+        chineseWisdom: {
+          description:
+            "Long, patient dialogues across ethics, metaphysics and mind.",
+          strength: "Brilliant tier, cheapest here, 1M context",
+          weakness: "Mainstream on politics, softens hard takes",
+        },
+        techBro: {
+          description: "Tight arguments, clean logic, every premise checked.",
+          strength: "Rigorous structure, spots weak premises",
+          weakness: "Mainstream filter, pricier than Balanced",
+        },
+        uncensored: {
+          description:
+            "Political philosophy and taboo questions with no filter.",
+          strength: "Best model on the platform for politics",
+          weakness: "32K context, smart tier, flat price per message",
+        },
       },
     },
     uncensoredWriter: {
@@ -1508,8 +2266,29 @@ export const translations = {
         3: "Write horror with graphic elements",
       },
       variants: {
-        smart: "Smart",
+        smart: "Provocative",
         fast: "Fast",
+        deep: "Deep",
+      },
+      variantInfo: {
+        smart: {
+          description:
+            "Political satire, dark themes and fiction that names names.",
+          strength: "Best model here for political topics",
+          weakness: "32K context, priciest per message",
+        },
+        fast: {
+          description:
+            "Quick uncensored drafts, scenes and roleplay prose for pennies.",
+          strength: "Cheapest uncensored model",
+          weakness: "Quick tier. Loses the thread in long works",
+        },
+        deep: {
+          description:
+            "Long-form uncensored fiction. Whole novels stay in memory.",
+          strength: "Brilliant tier, 1M context, tools",
+          weakness: "Plays it safe on politics, pricier than Fast",
+        },
       },
     },
     roleplaySkill: {
@@ -1528,6 +2307,24 @@ export const translations = {
         deep: "Deep",
         uncensored: "Uncensored",
       },
+      variantInfo: {
+        creative: {
+          description: "Lively characters and long scenes at a very low price.",
+          strength: "Cheapest option, open content policy",
+          weakness: "Smart tier: loses nuance in complex plots",
+        },
+        deep: {
+          description:
+            "Consistent characters with rich inner life across long campaigns.",
+          strength: "Brilliant tier, remembers the whole story",
+          weakness: "Softens dark or political scenes",
+        },
+        uncensored: {
+          description: "Any character, any scene, no refusals.",
+          strength: "No filter, strongest on political roleplay",
+          weakness: "32K context: forgets early scenes, flat price",
+        },
+      },
     },
     researchAgent: {
       name: "Web Agent",
@@ -1542,11 +2339,40 @@ export const translations = {
         3: "Compile a research brief with citations",
       },
       variants: {
-        kimi: "Bargain Bin Brain",
-        gemini: "Google's Gifted Child",
-        flash: "Caffeinated Intern",
-        grok: "Unhinged Librarian",
-        claude: "Overthinking Machine",
+        kimi: "Balanced",
+        gemini: "Deep",
+        flash: "Fast",
+        grok: "Open",
+        claude: "Budget",
+      },
+      variantInfo: {
+        kimi: {
+          description:
+            "Searches, reads and cross-checks with top reasoning at an everyday price.",
+          strength: "Brilliant tier, 1M context, reads images and video",
+          weakness: "Mainstream on politics, long reports add up",
+        },
+        gemini: {
+          description: "Deep research across pages, video and audio sources.",
+          strength: "Brilliant tier, reads every media type",
+          weakness: "Priciest variant here, mainstream filter",
+        },
+        flash: {
+          description: "Quick lookups and page reads with multimodal input.",
+          strength: "Fast, reads images, video and audio",
+          weakness: "Smart tier, not the cheapest option",
+        },
+        grok: {
+          description: "Fast searches on topics mainstream models dodge.",
+          strength: "Open content policy, very cheap",
+          weakness: "Quick tier: shallow cross-checking",
+        },
+        claude: {
+          description:
+            "Simple lookups and page summaries for the lowest price.",
+          strength: "Cheapest option, reliable with tools",
+          weakness: "Quick tier, mainstream filter",
+        },
       },
     },
     statsAnalyst: {
@@ -1562,8 +2388,21 @@ export const translations = {
         3: "Give me a referral program status report",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Deep",
         fast: "Fast",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Full analysis across leads, users, email and referrals. Spots the real trend.",
+          strength: "Brilliant reasoning across many tool calls",
+          weakness: "Over twice the cost of Fast",
+        },
+        fast: {
+          description: "Quick stat pulls and daily numbers check.",
+          strength: "Fast answers, solid tool use",
+          weakness: "Shallower on multi-step analysis",
+        },
       },
     },
     cronManager: {
@@ -1579,8 +2418,22 @@ export const translations = {
         3: "Check the overall health of the task system",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Thorough",
         fast: "Fast",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Digs through failure history and untangles complex schedules.",
+          strength: "Brilliant tier, careful with multi-step changes",
+          weakness: "More than twice the cost of Fast",
+        },
+        fast: {
+          description:
+            "Quick list, create and status checks for routine cron work.",
+          strength: "Cheaper and quick on routine tasks",
+          weakness: "Smart tier. Less careful on tangled failures",
+        },
       },
     },
     systemMonitor: {
@@ -1596,8 +2449,21 @@ export const translations = {
         3: "What's the current background task health?",
       },
       variants: {
-        fast: "Fast",
+        fast: "Smart",
         budget: "Budget",
+      },
+      variantInfo: {
+        fast: {
+          description:
+            "Health checks plus real diagnosis when pulses or cron tasks fail.",
+          strength: "Reads logs and history with more insight",
+          weakness: "Costs several times more than Budget",
+        },
+        budget: {
+          description: "Routine status checks and db pings around the clock.",
+          strength: "Fastest and cheapest, reliable tool calls",
+          weakness: "Quick tier. Thin on root-cause analysis",
+        },
       },
     },
     publicCurator: {
@@ -1613,8 +2479,22 @@ export const translations = {
         3: "Find messages matching certain criteria",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Thorough",
         fast: "Fast",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Careful review of public threads, including images, video and audio.",
+          strength: "Brilliant tier, reads every media type",
+          weakness: "Over twice the cost of Fast",
+        },
+        fast: {
+          description:
+            "Quick sorting, tagging and cleanup of community content.",
+          strength: "Fast multimodal at a lower price",
+          weakness: "Smart tier: weaker on borderline calls",
+        },
       },
     },
     codeArchitect: {
@@ -1630,8 +2510,22 @@ export const translations = {
         3: "Design a migration strategy",
       },
       variants: {
-        gemini: "Gemini",
-        techBro: "Tech Bro",
+        gemini: "Big Picture",
+        techBro: "Coding Pro",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "System design and migration plans across large codebases before handing off.",
+          strength: "Brilliant tier, reads diagrams, video, audio",
+          weakness: "Less hands-on with code than Coding Pro",
+        },
+        techBro: {
+          description:
+            "Specs written the way Claude Code executes them. Tight task breakdowns.",
+          strength: "Strong coding and agent work",
+          weakness: "Smart tier, not brilliant, on deep design calls",
+        },
       },
     },
     deploymentAgent: {
@@ -1647,8 +2541,22 @@ export const translations = {
         3: "Show me the current server status",
       },
       variants: {
-        techBro: "Tech Bro",
+        techBro: "Reliable",
         budget: "Budget",
+      },
+      variantInfo: {
+        techBro: {
+          description:
+            "Builds, releases and SSH work where one wrong command costs you.",
+          strength: "Strong agent work, careful with tools",
+          weakness: "Much pricier per message than Budget",
+        },
+        budget: {
+          description:
+            "Routine health checks and status reports for a fraction of the cost.",
+          strength: "Cheapest and fastest here",
+          weakness: "Quick tier. Riskier on complex rollouts",
+        },
       },
     },
     rebuildAgent: {
@@ -1664,8 +2572,22 @@ export const translations = {
         3: "Create a scheduled rebuild task",
       },
       variants: {
-        gemini: "Gemini",
+        gemini: "Thorough",
         fast: "Fast",
+      },
+      variantInfo: {
+        gemini: {
+          description:
+            "Rebuilds, restarts and digs into build errors before giving up.",
+          strength: "Brilliant tier, best at diagnosing failed builds",
+          weakness: "Over twice the cost of Fast",
+        },
+        fast: {
+          description:
+            "Routine rebuild and restart when the build is expected to pass.",
+          strength: "Quick turnaround at a lower price",
+          weakness: "Smart tier: weaker on tangled build errors",
+        },
       },
     },
     vibeCoder: {
@@ -1701,10 +2623,22 @@ export const translations = {
         3: "Add a skill to my favorites and configure my chat settings",
       },
       variants: {
-        gemini: "Gemini",
-        fast: "Fast",
-        cheapAndSmart: "Cheap & Smart",
-        brilliant: "Brilliant",
+        cheapAndSmart: "Budget",
+        brilliant: "Precise",
+      },
+      variantInfo: {
+        cheapAndSmart: {
+          description:
+            "Draft and iterate on skills cheaply. Plenty of brains for prompts and configs.",
+          strength: "Brilliant tier, cheaper per message",
+          weakness: "Long system prompts cost more on output",
+        },
+        brilliant: {
+          description:
+            "Tight system prompts and clean tool setups when the skill has to be right.",
+          strength: "Strong agent and tool work",
+          weakness: "Pricier, and mainstream on edgy personas",
+        },
       },
     },
     heilpraktikerPruefung: {
@@ -1725,6 +2659,32 @@ export const translations = {
         thorough: "Thorough",
         quick: "Quick",
       },
+      variantInfo: {
+        smart: {
+          description:
+            "Realistic oral exam with solid medical depth at an everyday price.",
+          strength: "Top-tier reasoning, keeps long sessions in view",
+          weakness: "Long examiner feedback adds up in cost",
+        },
+        precise: {
+          description:
+            "Exact questions and crisp corrections. Strict on terminology and law.",
+          strength: "Clear, concise corrections, cheaper than Balanced",
+          weakness: "Mid tier: less nuance on tricky differentials",
+        },
+        thorough: {
+          description:
+            "Deep follow-up questions and detailed debriefs, closest to the real examiner.",
+          strength: "Most detailed feedback on gaps and red flags",
+          weakness: "Most expensive variant of this trainer",
+        },
+        quick: {
+          description:
+            "Fast drill rounds for repetition between full exam simulations.",
+          strength: "Cheapest option, instant replies",
+          weakness: "Quick tier: shallow on complex cases",
+        },
+      },
     },
     qualityTester: {
       name: "Quality Tester",
@@ -1743,6 +2703,20 @@ export const translations = {
         visual: "Visual",
         nativeImage: "Native Image",
         nanoBananaPro: "Nano Banana Pro",
+      },
+      variantInfo: {
+        budget: {
+          description:
+            "Runs platform features like a real user and reports what breaks.",
+          strength: "Cheapest test runs, full tool support",
+          weakness: "Cannot generate images natively",
+        },
+        nativeImage: {
+          description:
+            "Tests native image output from an image generation model.",
+          strength: "Checks the native image generation path",
+          weakness: "No tool calling, cannot test other features",
+        },
       },
     },
   },

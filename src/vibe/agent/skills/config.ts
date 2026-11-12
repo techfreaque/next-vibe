@@ -67,6 +67,12 @@ export interface SkillVariant {
   id: string;
   /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
   variantName: SkillsTranslationKey;
+  /** One-line "what this variant is for" copy, e.g. "skills.thea.variantInfo.brilliant.description" */
+  description?: SkillsTranslationKey;
+  /** One concrete advantage of this variant's model for this skill */
+  strength?: SkillsTranslationKey;
+  /** One honest disadvantage of this variant's model for this skill */
+  weakness?: SkillsTranslationKey;
   /** Chat model selection for this variant - required, drives model resolution */
   modelSelection: ChatModelSelection;
   /** Which variant is the default when none is specified */

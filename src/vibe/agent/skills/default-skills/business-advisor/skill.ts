@@ -74,6 +74,10 @@ export const businessAdvisorSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.businessAdvisor.variants.elonTusk" as const,
+      description:
+        "skills.businessAdvisor.variantInfo.elonTusk.description" as const,
+      strength: "skills.businessAdvisor.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.businessAdvisor.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -99,6 +103,12 @@ export const businessAdvisorSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.businessAdvisor.variants.chineseWisdom" as const,
+      description:
+        "skills.businessAdvisor.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.businessAdvisor.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.businessAdvisor.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -123,6 +133,10 @@ export const businessAdvisorSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.businessAdvisor.variants.techBro" as const,
+      description:
+        "skills.businessAdvisor.variantInfo.techBro.description" as const,
+      strength: "skills.businessAdvisor.variantInfo.techBro.strength" as const,
+      weakness: "skills.businessAdvisor.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,

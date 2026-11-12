@@ -85,6 +85,10 @@ Always recommend consulting healthcare professionals for medical concerns.
     {
       id: "tech-bro",
       variantName: "skills.healthWellness.variants.techBro" as const,
+      description:
+        "skills.healthWellness.variantInfo.techBro.description" as const,
+      strength: "skills.healthWellness.variantInfo.techBro.strength" as const,
+      weakness: "skills.healthWellness.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -110,6 +114,10 @@ Always recommend consulting healthcare professionals for medical concerns.
     {
       id: "budget",
       variantName: "skills.healthWellness.variants.budget" as const,
+      description:
+        "skills.healthWellness.variantInfo.budget.description" as const,
+      strength: "skills.healthWellness.variantInfo.budget.strength" as const,
+      weakness: "skills.healthWellness.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

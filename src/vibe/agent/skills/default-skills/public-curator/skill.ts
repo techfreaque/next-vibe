@@ -75,6 +75,10 @@ export const publicCuratorSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.publicCurator.variants.gemini" as const,
+      description:
+        "skills.publicCurator.variantInfo.gemini.description" as const,
+      strength: "skills.publicCurator.variantInfo.gemini.strength" as const,
+      weakness: "skills.publicCurator.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -100,6 +104,9 @@ export const publicCuratorSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.publicCurator.variants.fast" as const,
+      description: "skills.publicCurator.variantInfo.fast.description" as const,
+      strength: "skills.publicCurator.variantInfo.fast.strength" as const,
+      weakness: "skills.publicCurator.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

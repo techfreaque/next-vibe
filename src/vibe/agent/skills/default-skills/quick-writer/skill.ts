@@ -56,6 +56,9 @@ export const quickWriterSkill: Skill = {
     {
       id: "snappy",
       variantName: "skills.quickWriter.variants.snappy" as const,
+      description: "skills.quickWriter.variantInfo.snappy.description" as const,
+      strength: "skills.quickWriter.variantInfo.snappy.strength" as const,
+      weakness: "skills.quickWriter.variantInfo.snappy.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -81,6 +84,9 @@ export const quickWriterSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.quickWriter.variants.budget" as const,
+      description: "skills.quickWriter.variantInfo.budget.description" as const,
+      strength: "skills.quickWriter.variantInfo.budget.strength" as const,
+      weakness: "skills.quickWriter.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_LUNA,

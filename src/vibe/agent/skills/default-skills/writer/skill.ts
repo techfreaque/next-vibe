@@ -68,6 +68,9 @@ export const writerSkill: Skill = {
     {
       id: "western",
       variantName: "skills.writer.variants.western" as const,
+      description: "skills.writer.variantInfo.western.description" as const,
+      strength: "skills.writer.variantInfo.western.strength" as const,
+      weakness: "skills.writer.variantInfo.western.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -93,6 +96,10 @@ export const writerSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.writer.variants.chineseWisdom" as const,
+      description:
+        "skills.writer.variantInfo.chineseWisdom.description" as const,
+      strength: "skills.writer.variantInfo.chineseWisdom.strength" as const,
+      weakness: "skills.writer.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M3,
@@ -117,6 +124,9 @@ export const writerSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.writer.variants.budget" as const,
+      description: "skills.writer.variantInfo.budget.description" as const,
+      strength: "skills.writer.variantInfo.budget.strength" as const,
+      weakness: "skills.writer.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

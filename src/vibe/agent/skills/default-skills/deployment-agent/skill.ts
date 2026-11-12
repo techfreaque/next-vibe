@@ -90,6 +90,10 @@ export const deploymentAgentSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.deploymentAgent.variants.techBro" as const,
+      description:
+        "skills.deploymentAgent.variantInfo.techBro.description" as const,
+      strength: "skills.deploymentAgent.variantInfo.techBro.strength" as const,
+      weakness: "skills.deploymentAgent.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -115,6 +119,10 @@ export const deploymentAgentSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.deploymentAgent.variants.budget" as const,
+      description:
+        "skills.deploymentAgent.variantInfo.budget.description" as const,
+      strength: "skills.deploymentAgent.variantInfo.budget.strength" as const,
+      weakness: "skills.deploymentAgent.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

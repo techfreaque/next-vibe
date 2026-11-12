@@ -90,6 +90,10 @@ export const rebuildAgentSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.rebuildAgent.variants.gemini" as const,
+      description:
+        "skills.rebuildAgent.variantInfo.gemini.description" as const,
+      strength: "skills.rebuildAgent.variantInfo.gemini.strength" as const,
+      weakness: "skills.rebuildAgent.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -115,6 +119,9 @@ export const rebuildAgentSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.rebuildAgent.variants.fast" as const,
+      description: "skills.rebuildAgent.variantInfo.fast.description" as const,
+      strength: "skills.rebuildAgent.variantInfo.fast.strength" as const,
+      weakness: "skills.rebuildAgent.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

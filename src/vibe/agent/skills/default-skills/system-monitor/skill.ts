@@ -88,6 +88,9 @@ export const systemMonitorSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.systemMonitor.variants.fast" as const,
+      description: "skills.systemMonitor.variantInfo.fast.description" as const,
+      strength: "skills.systemMonitor.variantInfo.fast.strength" as const,
+      weakness: "skills.systemMonitor.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,
@@ -113,6 +116,10 @@ export const systemMonitorSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.systemMonitor.variants.budget" as const,
+      description:
+        "skills.systemMonitor.variantInfo.budget.description" as const,
+      strength: "skills.systemMonitor.variantInfo.budget.strength" as const,
+      weakness: "skills.systemMonitor.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

@@ -96,6 +96,10 @@ export const philosopherSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.philosopher.variants.elonTusk" as const,
+      description:
+        "skills.philosopher.variantInfo.elonTusk.description" as const,
+      strength: "skills.philosopher.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.philosopher.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -121,6 +125,12 @@ export const philosopherSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.philosopher.variants.chineseWisdom" as const,
+      description:
+        "skills.philosopher.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.philosopher.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.philosopher.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -145,6 +155,10 @@ export const philosopherSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.philosopher.variants.techBro" as const,
+      description:
+        "skills.philosopher.variantInfo.techBro.description" as const,
+      strength: "skills.philosopher.variantInfo.techBro.strength" as const,
+      weakness: "skills.philosopher.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -155,6 +169,34 @@ export const philosopherSkill: Skill = {
         contentRange: {
           min: ContentLevel.MAINSTREAM,
           max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.openCheap,
+      musicGenModelSelection: MUSIC_GEN.openCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "uncensored",
+      variantName: "skills.philosopher.variants.uncensored" as const,
+      description:
+        "skills.philosopher.variantInfo.uncensored.description" as const,
+      strength: "skills.philosopher.variantInfo.uncensored.strength" as const,
+      weakness: "skills.philosopher.variantInfo.uncensored.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

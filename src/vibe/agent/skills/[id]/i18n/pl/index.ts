@@ -62,6 +62,8 @@ export const translations: typeof enTranslations = {
     addAnotherTooltip: "Dodaj kolejną instancję tego skilla do swojej kolekcji",
     variants: {
       title: "Wybierz model",
+      strength: "Mocna strona",
+      weakness: "Słaba strona",
     },
     addToCollection: "Dodaj do swojej kolekcji:",
     addAllToFavorites: "Dodaj wszystkie modele",

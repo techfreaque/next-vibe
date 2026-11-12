@@ -94,6 +94,9 @@ export const cronManagerSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.cronManager.variants.gemini" as const,
+      description: "skills.cronManager.variantInfo.gemini.description" as const,
+      strength: "skills.cronManager.variantInfo.gemini.strength" as const,
+      weakness: "skills.cronManager.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -119,6 +122,9 @@ export const cronManagerSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.cronManager.variants.fast" as const,
+      description: "skills.cronManager.variantInfo.fast.description" as const,
+      strength: "skills.cronManager.variantInfo.fast.strength" as const,
+      weakness: "skills.cronManager.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

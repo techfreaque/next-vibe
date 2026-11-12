@@ -53,6 +53,12 @@ export const socraticQuestionerSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.socraticQuestioner.variants.elonTusk" as const,
+      description:
+        "skills.socraticQuestioner.variantInfo.elonTusk.description" as const,
+      strength:
+        "skills.socraticQuestioner.variantInfo.elonTusk.strength" as const,
+      weakness:
+        "skills.socraticQuestioner.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -78,6 +84,12 @@ export const socraticQuestionerSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.socraticQuestioner.variants.chineseWisdom" as const,
+      description:
+        "skills.socraticQuestioner.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.socraticQuestioner.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.socraticQuestioner.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

@@ -86,6 +86,10 @@ export const travelPlannerSkill: Skill = {
     {
       id: "snappy",
       variantName: "skills.travelPlanner.variants.snappy" as const,
+      description:
+        "skills.travelPlanner.variantInfo.snappy.description" as const,
+      strength: "skills.travelPlanner.variantInfo.snappy.strength" as const,
+      weakness: "skills.travelPlanner.variantInfo.snappy.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -111,6 +115,10 @@ export const travelPlannerSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.travelPlanner.variants.budget" as const,
+      description:
+        "skills.travelPlanner.variantInfo.budget.description" as const,
+      strength: "skills.travelPlanner.variantInfo.budget.strength" as const,
+      weakness: "skills.travelPlanner.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_LUNA,

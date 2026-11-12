@@ -81,6 +81,9 @@ export const storytellerSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.storyteller.variants.kimi" as const,
+      description: "skills.storyteller.variantInfo.kimi.description" as const,
+      strength: "skills.storyteller.variantInfo.kimi.strength" as const,
+      weakness: "skills.storyteller.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -106,6 +109,10 @@ export const storytellerSkill: Skill = {
     {
       id: "minimax",
       variantName: "skills.storyteller.variants.minimax" as const,
+      description:
+        "skills.storyteller.variantInfo.minimax.description" as const,
+      strength: "skills.storyteller.variantInfo.minimax.strength" as const,
+      weakness: "skills.storyteller.variantInfo.minimax.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M3,
@@ -130,6 +137,9 @@ export const storytellerSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.storyteller.variants.budget" as const,
+      description: "skills.storyteller.variantInfo.budget.description" as const,
+      strength: "skills.storyteller.variantInfo.budget.strength" as const,
+      weakness: "skills.storyteller.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GLM_5_3,

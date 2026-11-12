@@ -237,6 +237,12 @@ When asked to review or improve a skill:
     {
       id: "cheap-smart",
       variantName: "skills.skillCreator.variants.cheapAndSmart" as const,
+      description:
+        "skills.skillCreator.variantInfo.cheapAndSmart.description" as const,
+      strength:
+        "skills.skillCreator.variantInfo.cheapAndSmart.strength" as const,
+      weakness:
+        "skills.skillCreator.variantInfo.cheapAndSmart.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -256,6 +262,10 @@ When asked to review or improve a skill:
     {
       id: "brilliant",
       variantName: "skills.skillCreator.variants.brilliant" as const,
+      description:
+        "skills.skillCreator.variantInfo.brilliant.description" as const,
+      strength: "skills.skillCreator.variantInfo.brilliant.strength" as const,
+      weakness: "skills.skillCreator.variantInfo.brilliant.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,

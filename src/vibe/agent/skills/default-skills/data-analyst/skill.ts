@@ -63,6 +63,10 @@ export const dataAnalystSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.dataAnalyst.variants.techBro" as const,
+      description:
+        "skills.dataAnalyst.variantInfo.techBro.description" as const,
+      strength: "skills.dataAnalyst.variantInfo.techBro.strength" as const,
+      weakness: "skills.dataAnalyst.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -88,6 +92,9 @@ export const dataAnalystSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.dataAnalyst.variants.fast" as const,
+      description: "skills.dataAnalyst.variantInfo.fast.description" as const,
+      strength: "skills.dataAnalyst.variantInfo.fast.strength" as const,
+      weakness: "skills.dataAnalyst.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,
@@ -112,6 +119,9 @@ export const dataAnalystSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.dataAnalyst.variants.budget" as const,
+      description: "skills.dataAnalyst.variantInfo.budget.description" as const,
+      strength: "skills.dataAnalyst.variantInfo.budget.strength" as const,
+      weakness: "skills.dataAnalyst.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.QWEN_3_8_MAX,

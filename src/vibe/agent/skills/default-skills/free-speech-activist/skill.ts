@@ -39,6 +39,12 @@ export const freeSpeechActivistSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.freeSpeechActivist.variants.elonTusk" as const,
+      description:
+        "skills.freeSpeechActivist.variantInfo.elonTusk.description" as const,
+      strength:
+        "skills.freeSpeechActivist.variantInfo.elonTusk.strength" as const,
+      weakness:
+        "skills.freeSpeechActivist.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -64,6 +70,12 @@ export const freeSpeechActivistSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.freeSpeechActivist.variants.chineseWisdom" as const,
+      description:
+        "skills.freeSpeechActivist.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.freeSpeechActivist.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.freeSpeechActivist.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -88,6 +100,12 @@ export const freeSpeechActivistSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.freeSpeechActivist.variants.techBro" as const,
+      description:
+        "skills.freeSpeechActivist.variantInfo.techBro.description" as const,
+      strength:
+        "skills.freeSpeechActivist.variantInfo.techBro.strength" as const,
+      weakness:
+        "skills.freeSpeechActivist.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -98,6 +116,36 @@ export const freeSpeechActivistSkill: Skill = {
         contentRange: {
           min: ContentLevel.MAINSTREAM,
           max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.openCheap,
+      musicGenModelSelection: MUSIC_GEN.openCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "uncensored",
+      variantName: "skills.freeSpeechActivist.variants.uncensored" as const,
+      description:
+        "skills.freeSpeechActivist.variantInfo.uncensored.description" as const,
+      strength:
+        "skills.freeSpeechActivist.variantInfo.uncensored.strength" as const,
+      weakness:
+        "skills.freeSpeechActivist.variantInfo.uncensored.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

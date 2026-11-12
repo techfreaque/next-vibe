@@ -38,6 +38,9 @@ export const friendlySkill: Skill = {
     {
       id: "fast",
       variantName: "skills.friendly.variants.fast" as const,
+      description: "skills.friendly.variantInfo.fast.description" as const,
+      strength: "skills.friendly.variantInfo.fast.strength" as const,
+      weakness: "skills.friendly.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_FAST,
@@ -63,6 +66,9 @@ export const friendlySkill: Skill = {
     {
       id: "budget",
       variantName: "skills.friendly.variants.budget" as const,
+      description: "skills.friendly.variantInfo.budget.description" as const,
+      strength: "skills.friendly.variantInfo.budget.strength" as const,
+      weakness: "skills.friendly.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_1_FLASH,

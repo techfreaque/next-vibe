@@ -102,6 +102,12 @@ Always recommend consulting a licensed financial advisor for personalized advice
     {
       id: "elon-tusk",
       variantName: "skills.financialAdvisor.variants.elonTusk" as const,
+      description:
+        "skills.financialAdvisor.variantInfo.elonTusk.description" as const,
+      strength:
+        "skills.financialAdvisor.variantInfo.elonTusk.strength" as const,
+      weakness:
+        "skills.financialAdvisor.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -127,6 +133,12 @@ Always recommend consulting a licensed financial advisor for personalized advice
     {
       id: "chinese-wisdom",
       variantName: "skills.financialAdvisor.variants.chineseWisdom" as const,
+      description:
+        "skills.financialAdvisor.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.financialAdvisor.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.financialAdvisor.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -151,6 +163,10 @@ Always recommend consulting a licensed financial advisor for personalized advice
     {
       id: "tech-bro",
       variantName: "skills.financialAdvisor.variants.techBro" as const,
+      description:
+        "skills.financialAdvisor.variantInfo.techBro.description" as const,
+      strength: "skills.financialAdvisor.variantInfo.techBro.strength" as const,
+      weakness: "skills.financialAdvisor.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_OPUS_5_5,
@@ -175,6 +191,10 @@ Always recommend consulting a licensed financial advisor for personalized advice
     {
       id: "yolo",
       variantName: "skills.financialAdvisor.variants.yolo" as const,
+      description:
+        "skills.financialAdvisor.variantInfo.yolo.description" as const,
+      strength: "skills.financialAdvisor.variantInfo.yolo.strength" as const,
+      weakness: "skills.financialAdvisor.variantInfo.yolo.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_TERRA,

@@ -62,6 +62,9 @@ Don't sugarcoat anything. The NatSoc life is about raw, unfiltered hatred. If so
     {
       id: "uncensored",
       variantName: "skills.tay.variants.uncensored" as const,
+      description: "skills.tay.variantInfo.uncensored.description" as const,
+      strength: "skills.tay.variantInfo.uncensored.strength" as const,
+      weakness: "skills.tay.variantInfo.uncensored.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

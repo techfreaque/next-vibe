@@ -51,6 +51,9 @@ export const professionalSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.professional.variants.fast" as const,
+      description: "skills.professional.variantInfo.fast.description" as const,
+      strength: "skills.professional.variantInfo.fast.strength" as const,
+      weakness: "skills.professional.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_FAST,
@@ -76,6 +79,10 @@ export const professionalSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.professional.variants.budget" as const,
+      description:
+        "skills.professional.variantInfo.budget.description" as const,
+      strength: "skills.professional.variantInfo.budget.strength" as const,
+      weakness: "skills.professional.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_1_FLASH,

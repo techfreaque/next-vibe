@@ -474,6 +474,10 @@ export class SkillsRepository {
                         v.musicGenModelSelection ?? undefined,
                       videoGenModelSelection:
                         v.videoGenModelSelection ?? undefined,
+                      // Custom-skill copy is free text, not a translation key: list items never show it.
+                      description: undefined,
+                      strength: undefined,
+                      weakness: undefined,
                       variantName: (v.displayName ??
                         v.id) as SkillsTranslationKey,
                     })),
@@ -667,6 +671,10 @@ export class SkillsRepository {
                       v.musicGenModelSelection ?? undefined,
                     videoGenModelSelection:
                       v.videoGenModelSelection ?? undefined,
+                    // Custom-skill copy is free text, not a translation key: list items never show it.
+                    description: undefined,
+                    strength: undefined,
+                    weakness: undefined,
                     variantName: (v.displayName ??
                       v.id) as SkillsTranslationKey,
                   })),
@@ -893,6 +901,9 @@ export class SkillsRepository {
           variants: defaultSkill.variants.map((v) => ({
             id: v.id,
             displayName: t(v.variantName),
+            description: v.description ? t(v.description) : undefined,
+            strength: v.strength ? t(v.strength) : undefined,
+            weakness: v.weakness ? t(v.weakness) : undefined,
             modelSelection: v.modelSelection,
             isDefault: v.isDefault,
             voiceModelSelection: v.voiceModelSelection,

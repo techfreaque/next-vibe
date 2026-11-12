@@ -65,6 +65,9 @@ export const hackerSkill: Skill = {
     {
       id: "glm",
       variantName: "skills.hacker.variants.glm" as const,
+      description: "skills.hacker.variantInfo.glm.description" as const,
+      strength: "skills.hacker.variantInfo.glm.strength" as const,
+      weakness: "skills.hacker.variantInfo.glm.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GLM_5_3_UNCENSORED,
@@ -90,6 +93,9 @@ export const hackerSkill: Skill = {
     {
       id: "glm-flash",
       variantName: "skills.hacker.variants.glmFlash" as const,
+      description: "skills.hacker.variantInfo.glmFlash.description" as const,
+      strength: "skills.hacker.variantInfo.glmFlash.strength" as const,
+      weakness: "skills.hacker.variantInfo.glmFlash.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
@@ -114,6 +120,10 @@ export const hackerSkill: Skill = {
     {
       id: "deepseek-flash",
       variantName: "skills.hacker.variants.deepseekFlash" as const,
+      description:
+        "skills.hacker.variantInfo.deepseekFlash.description" as const,
+      strength: "skills.hacker.variantInfo.deepseekFlash.strength" as const,
+      weakness: "skills.hacker.variantInfo.deepseekFlash.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,

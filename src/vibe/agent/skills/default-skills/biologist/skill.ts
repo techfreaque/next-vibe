@@ -50,6 +50,9 @@ export const biologistSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.biologist.variants.elonTusk" as const,
+      description: "skills.biologist.variantInfo.elonTusk.description" as const,
+      strength: "skills.biologist.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.biologist.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -75,6 +78,10 @@ export const biologistSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.biologist.variants.chineseWisdom" as const,
+      description:
+        "skills.biologist.variantInfo.chineseWisdom.description" as const,
+      strength: "skills.biologist.variantInfo.chineseWisdom.strength" as const,
+      weakness: "skills.biologist.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

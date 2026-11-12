@@ -52,6 +52,9 @@ export const creativeSkill: Skill = {
     {
       id: "minimax",
       variantName: "skills.creative.variants.minimax" as const,
+      description: "skills.creative.variantInfo.minimax.description" as const,
+      strength: "skills.creative.variantInfo.minimax.strength" as const,
+      weakness: "skills.creative.variantInfo.minimax.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M3,
@@ -77,6 +80,9 @@ export const creativeSkill: Skill = {
     {
       id: "deep",
       variantName: "skills.creative.variants.deep" as const,
+      description: "skills.creative.variantInfo.deep.description" as const,
+      strength: "skills.creative.variantInfo.deep.strength" as const,
+      weakness: "skills.creative.variantInfo.deep.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

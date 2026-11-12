@@ -66,6 +66,9 @@ export const translatorSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.translator.variants.gemini" as const,
+      description: "skills.translator.variantInfo.gemini.description" as const,
+      strength: "skills.translator.variantInfo.gemini.strength" as const,
+      weakness: "skills.translator.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,
@@ -91,6 +94,9 @@ export const translatorSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.translator.variants.budget" as const,
+      description: "skills.translator.variantInfo.budget.description" as const,
+      strength: "skills.translator.variantInfo.budget.strength" as const,
+      weakness: "skills.translator.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_PRO,

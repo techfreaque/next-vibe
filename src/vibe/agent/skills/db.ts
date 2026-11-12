@@ -329,6 +329,12 @@ export type NewCustomSkill = typeof customSkills.$inferInsert;
 export type SkillVariantData = {
   id: string;
   displayName?: string;
+  /** One-line "what this variant is for" (pre-translated for system skills) */
+  description?: string;
+  /** One concrete advantage of this variant */
+  strength?: string;
+  /** One honest disadvantage of this variant */
+  weakness?: string;
   modelSelection: ChatModelSelection;
   imageGenModelSelection?: ImageGenModelSelection | null;
   musicGenModelSelection?: MusicGenModelSelection | null;
@@ -349,6 +355,9 @@ export const skillVariantSchema: z.ZodType<SkillVariantData> = z.object({
       "Variant ID must be a slug (lowercase letters, numbers, hyphens only)",
     ),
   displayName: z.string().max(50).optional(),
+  description: z.string().max(200).optional(),
+  strength: z.string().max(120).optional(),
+  weakness: z.string().max(120).optional(),
   modelSelection: chatModelSelectionSchema,
   imageGenModelSelection: imageGenModelSelectionSchema.nullable().optional(),
   musicGenModelSelection: musicGenModelSelectionSchema.nullable().optional(),
@@ -389,6 +398,9 @@ export const skillVariantResponseSchema: z.ZodType<SkillVariantData> = z.object(
   {
     id: z.string(),
     displayName: z.string().optional(),
+    description: z.string().optional(),
+    strength: z.string().optional(),
+    weakness: z.string().optional(),
     modelSelection: chatModelSelectionResponseSchema,
     imageGenModelSelection: imageGenModelSelectionSchema
       .nullable()

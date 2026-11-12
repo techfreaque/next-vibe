@@ -71,6 +71,10 @@ export const careerCoachSkill: Skill = {
     {
       id: "headhunter",
       variantName: "skills.careerCoach.variants.headhunter" as const,
+      description:
+        "skills.careerCoach.variantInfo.headhunter.description" as const,
+      strength: "skills.careerCoach.variantInfo.headhunter.strength" as const,
+      weakness: "skills.careerCoach.variantInfo.headhunter.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -96,6 +100,9 @@ export const careerCoachSkill: Skill = {
     {
       id: "intern",
       variantName: "skills.careerCoach.variants.intern" as const,
+      description: "skills.careerCoach.variantInfo.intern.description" as const,
+      strength: "skills.careerCoach.variantInfo.intern.strength" as const,
+      weakness: "skills.careerCoach.variantInfo.intern.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

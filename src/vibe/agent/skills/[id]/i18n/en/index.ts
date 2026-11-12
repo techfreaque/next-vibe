@@ -60,6 +60,8 @@ export const translations = {
     addAnotherTooltip: "Add another instance of this skill to your collection",
     variants: {
       title: "Choose a model",
+      strength: "Strength",
+      weakness: "Weakness",
     },
     addToCollection: "Add to your collection:",
     addAllToFavorites: "Add all models",

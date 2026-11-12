@@ -72,6 +72,10 @@ export const brainstormerSkill: Skill = {
     {
       id: "wildcard",
       variantName: "skills.brainstormer.variants.wildcard" as const,
+      description:
+        "skills.brainstormer.variantInfo.wildcard.description" as const,
+      strength: "skills.brainstormer.variantInfo.wildcard.strength" as const,
+      weakness: "skills.brainstormer.variantInfo.wildcard.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MIMO_V2_6_PRO,
@@ -97,6 +101,12 @@ export const brainstormerSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.brainstormer.variants.chineseWisdom" as const,
+      description:
+        "skills.brainstormer.variantInfo.chineseWisdom.description" as const,
+      strength:
+        "skills.brainstormer.variantInfo.chineseWisdom.strength" as const,
+      weakness:
+        "skills.brainstormer.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

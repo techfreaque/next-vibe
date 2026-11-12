@@ -22,6 +22,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "brilliant",
     variantName: "skills.hermes.variants.brilliant" as const,
+    description: "skills.hermes.variantInfo.brilliant.description" as const,
+    strength: "skills.hermes.variantInfo.brilliant.strength" as const,
+    weakness: "skills.hermes.variantInfo.brilliant.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -40,6 +43,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "cheap",
     variantName: "enums.intelligence.smart" as const,
+    description: "skills.hermes.variantInfo.cheap.description" as const,
+    strength: "skills.hermes.variantInfo.cheap.strength" as const,
+    weakness: "skills.hermes.variantInfo.cheap.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -59,6 +65,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "oracle",
     variantName: "skills.hermes.variants.oracle" as const,
+    description: "skills.hermes.variantInfo.oracle.description" as const,
+    strength: "skills.hermes.variantInfo.oracle.strength" as const,
+    weakness: "skills.hermes.variantInfo.oracle.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -77,6 +86,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "elon-tusk",
     variantName: "skills.hermes.variants.elonTusk" as const,
+    description: "skills.hermes.variantInfo.elonTusk.description" as const,
+    strength: "skills.hermes.variantInfo.elonTusk.strength" as const,
+    weakness: "skills.hermes.variantInfo.elonTusk.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GROK_4_7,
@@ -95,6 +107,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "vision",
     variantName: "skills.hermes.variants.vision" as const,
+    description: "skills.hermes.variantInfo.vision.description" as const,
+    strength: "skills.hermes.variantInfo.vision.strength" as const,
+    weakness: "skills.hermes.variantInfo.vision.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -113,6 +128,9 @@ export const HERMES_VARIANTS: SkillVariant[] = [
   {
     id: "uncensored",
     variantName: "skills.hermes.variants.uncensored" as const,
+    description: "skills.hermes.variantInfo.uncensored.description" as const,
+    strength: "skills.hermes.variantInfo.uncensored.strength" as const,
+    weakness: "skills.hermes.variantInfo.uncensored.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

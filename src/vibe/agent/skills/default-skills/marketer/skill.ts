@@ -79,6 +79,9 @@ export const marketerSkill: Skill = {
     {
       id: "snappy",
       variantName: "skills.marketer.variants.snappy" as const,
+      description: "skills.marketer.variantInfo.snappy.description" as const,
+      strength: "skills.marketer.variantInfo.snappy.strength" as const,
+      weakness: "skills.marketer.variantInfo.snappy.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -104,6 +107,9 @@ export const marketerSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.marketer.variants.budget" as const,
+      description: "skills.marketer.variantInfo.budget.description" as const,
+      strength: "skills.marketer.variantInfo.budget.strength" as const,
+      weakness: "skills.marketer.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_LUNA,

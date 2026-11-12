@@ -81,6 +81,9 @@ export const debaterSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.debater.variants.elonTusk" as const,
+      description: "skills.debater.variantInfo.elonTusk.description" as const,
+      strength: "skills.debater.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.debater.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -106,6 +109,10 @@ export const debaterSkill: Skill = {
     {
       id: "chinese-wisdom",
       variantName: "skills.debater.variants.chineseWisdom" as const,
+      description:
+        "skills.debater.variantInfo.chineseWisdom.description" as const,
+      strength: "skills.debater.variantInfo.chineseWisdom.strength" as const,
+      weakness: "skills.debater.variantInfo.chineseWisdom.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -130,6 +137,9 @@ export const debaterSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.debater.variants.techBro" as const,
+      description: "skills.debater.variantInfo.techBro.description" as const,
+      strength: "skills.debater.variantInfo.techBro.strength" as const,
+      weakness: "skills.debater.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -140,6 +150,33 @@ export const debaterSkill: Skill = {
         contentRange: {
           min: ContentLevel.MAINSTREAM,
           max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "uncensored",
+      variantName: "skills.debater.variants.uncensored" as const,
+      description: "skills.debater.variantInfo.uncensored.description" as const,
+      strength: "skills.debater.variantInfo.uncensored.strength" as const,
+      weakness: "skills.debater.variantInfo.uncensored.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
         },
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,

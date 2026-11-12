@@ -1,4 +1,3 @@
-import { DEFAULT_CHAT_MODEL_ID } from "../../../ai-stream/constants";
 import { ChatModelId } from "../../../ai-stream/models";
 import type { Skill } from "../../config";
 import {
@@ -72,6 +71,10 @@ Then stop and wait - a human supporter will take over.
     {
       id: "default",
       variantName: "skills.supportAgent.variants.default" as const,
+      description:
+        "skills.supportAgent.variantInfo.default.description" as const,
+      strength: "skills.supportAgent.variantInfo.default.strength" as const,
+      weakness: "skills.supportAgent.variantInfo.default.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -99,12 +102,15 @@ Then stop and wait - a human supporter will take over.
     {
       id: "fast",
       variantName: "skills.supportAgent.variants.fast" as const,
+      description: "skills.supportAgent.variantInfo.fast.description" as const,
+      strength: "skills.supportAgent.variantInfo.fast.strength" as const,
+      weakness: "skills.supportAgent.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: DEFAULT_CHAT_MODEL_ID,
+        manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,
         intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
         },
         contentRange: {
           min: ContentLevel.MAINSTREAM,

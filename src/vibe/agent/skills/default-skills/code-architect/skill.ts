@@ -100,6 +100,10 @@ export const codeArchitectSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.codeArchitect.variants.gemini" as const,
+      description:
+        "skills.codeArchitect.variantInfo.gemini.description" as const,
+      strength: "skills.codeArchitect.variantInfo.gemini.strength" as const,
+      weakness: "skills.codeArchitect.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -125,6 +129,10 @@ export const codeArchitectSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.codeArchitect.variants.techBro" as const,
+      description:
+        "skills.codeArchitect.variantInfo.techBro.description" as const,
+      strength: "skills.codeArchitect.variantInfo.techBro.strength" as const,
+      weakness: "skills.codeArchitect.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,

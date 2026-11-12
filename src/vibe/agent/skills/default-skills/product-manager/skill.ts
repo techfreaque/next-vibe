@@ -113,6 +113,10 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     {
       id: "tech-bro",
       variantName: "skills.productManager.variants.techBro" as const,
+      description:
+        "skills.productManager.variantInfo.techBro.description" as const,
+      strength: "skills.productManager.variantInfo.techBro.strength" as const,
+      weakness: "skills.productManager.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -138,6 +142,10 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     {
       id: "fast",
       variantName: "skills.productManager.variants.fast" as const,
+      description:
+        "skills.productManager.variantInfo.fast.description" as const,
+      strength: "skills.productManager.variantInfo.fast.strength" as const,
+      weakness: "skills.productManager.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

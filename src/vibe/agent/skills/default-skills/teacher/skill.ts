@@ -53,6 +53,9 @@ export const teacherSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.teacher.variants.gemini" as const,
+      description: "skills.teacher.variantInfo.gemini.description" as const,
+      strength: "skills.teacher.variantInfo.gemini.strength" as const,
+      weakness: "skills.teacher.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -78,6 +81,9 @@ export const teacherSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.teacher.variants.fast" as const,
+      description: "skills.teacher.variantInfo.fast.description" as const,
+      strength: "skills.teacher.variantInfo.fast.strength" as const,
+      weakness: "skills.teacher.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

@@ -67,6 +67,10 @@ export const masterWriterSkill: Skill = {
     {
       id: "literary",
       variantName: "skills.masterWriter.variants.literary" as const,
+      description:
+        "skills.masterWriter.variantInfo.literary.description" as const,
+      strength: "skills.masterWriter.variantInfo.literary.strength" as const,
+      weakness: "skills.masterWriter.variantInfo.literary.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_OPUS_5_5,
@@ -92,6 +96,10 @@ export const masterWriterSkill: Skill = {
     {
       id: "poetic",
       variantName: "skills.masterWriter.variants.poetic" as const,
+      description:
+        "skills.masterWriter.variantInfo.poetic.description" as const,
+      strength: "skills.masterWriter.variantInfo.poetic.strength" as const,
+      weakness: "skills.masterWriter.variantInfo.poetic.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.MINIMAX_M3,
@@ -116,6 +124,10 @@ export const masterWriterSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.masterWriter.variants.budget" as const,
+      description:
+        "skills.masterWriter.variantInfo.budget.description" as const,
+      strength: "skills.masterWriter.variantInfo.budget.strength" as const,
+      weakness: "skills.masterWriter.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

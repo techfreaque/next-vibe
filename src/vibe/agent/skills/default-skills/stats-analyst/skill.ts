@@ -93,6 +93,10 @@ export const statsAnalystSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.statsAnalyst.variants.gemini" as const,
+      description:
+        "skills.statsAnalyst.variantInfo.gemini.description" as const,
+      strength: "skills.statsAnalyst.variantInfo.gemini.strength" as const,
+      weakness: "skills.statsAnalyst.variantInfo.gemini.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -118,6 +122,9 @@ export const statsAnalystSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.statsAnalyst.variants.fast" as const,
+      description: "skills.statsAnalyst.variantInfo.fast.description" as const,
+      strength: "skills.statsAnalyst.variantInfo.fast.strength" as const,
+      weakness: "skills.statsAnalyst.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

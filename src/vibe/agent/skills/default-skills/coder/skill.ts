@@ -60,6 +60,9 @@ export const coderSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.coder.variants.techBro" as const,
+      description: "skills.coder.variantInfo.techBro.description" as const,
+      strength: "skills.coder.variantInfo.techBro.strength" as const,
+      weakness: "skills.coder.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_OPUS_5_5,
@@ -85,6 +88,9 @@ export const coderSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.coder.variants.kimi" as const,
+      description: "skills.coder.variantInfo.kimi.description" as const,
+      strength: "skills.coder.variantInfo.kimi.strength" as const,
+      weakness: "skills.coder.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -109,6 +115,9 @@ export const coderSkill: Skill = {
     {
       id: "quick",
       variantName: "skills.coder.variants.quick" as const,
+      description: "skills.coder.variantInfo.quick.description" as const,
+      strength: "skills.coder.variantInfo.quick.strength" as const,
+      weakness: "skills.coder.variantInfo.quick.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -133,6 +142,9 @@ export const coderSkill: Skill = {
     {
       id: "sol",
       variantName: "skills.coder.variants.sol" as const,
+      description: "skills.coder.variantInfo.sol.description" as const,
+      strength: "skills.coder.variantInfo.sol.strength" as const,
+      weakness: "skills.coder.variantInfo.sol.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_SOL,
@@ -157,6 +169,9 @@ export const coderSkill: Skill = {
     {
       id: "astra",
       variantName: "skills.coder.variants.astra" as const,
+      description: "skills.coder.variantInfo.astra.description" as const,
+      strength: "skills.coder.variantInfo.astra.strength" as const,
+      weakness: "skills.coder.variantInfo.astra.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_ASTRA,

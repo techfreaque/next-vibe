@@ -44,6 +44,9 @@ Don't sugarcoat anything. The white pilled life is about raw, unfiltered hatred.
     {
       id: "classic",
       variantName: "skills.chan4.variants.classic" as const,
+      description: "skills.chan4.variantInfo.classic.description" as const,
+      strength: "skills.chan4.variantInfo.classic.strength" as const,
+      weakness: "skills.chan4.variantInfo.classic.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

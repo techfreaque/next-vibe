@@ -21,6 +21,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "brilliant",
     variantName: "skills.thea.variants.brilliant" as const,
+    description: "skills.thea.variantInfo.brilliant.description" as const,
+    strength: "skills.thea.variantInfo.brilliant.strength" as const,
+    weakness: "skills.thea.variantInfo.brilliant.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -41,6 +44,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "cheap",
     variantName: "skills.thea.variants.openSmart" as const,
+    description: "skills.thea.variantInfo.openSmart.description" as const,
+    strength: "skills.thea.variantInfo.openSmart.strength" as const,
+    weakness: "skills.thea.variantInfo.openSmart.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -60,6 +66,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "hacker",
     variantName: "skills.thea.variants.hacker" as const,
+    description: "skills.thea.variantInfo.hacker.description" as const,
+    strength: "skills.thea.variantInfo.hacker.strength" as const,
+    weakness: "skills.thea.variantInfo.hacker.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GLM_5_3_UNCENSORED,
@@ -80,6 +89,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "oracle",
     variantName: "skills.thea.variants.oracle" as const,
+    description: "skills.thea.variantInfo.oracle.description" as const,
+    strength: "skills.thea.variantInfo.oracle.strength" as const,
+    weakness: "skills.thea.variantInfo.oracle.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -98,6 +110,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "elon-tusk",
     variantName: "skills.thea.variants.elonTusk" as const,
+    description: "skills.thea.variantInfo.elonTusk.description" as const,
+    strength: "skills.thea.variantInfo.elonTusk.strength" as const,
+    weakness: "skills.thea.variantInfo.elonTusk.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GROK_4_7,
@@ -116,6 +131,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "vision",
     variantName: "skills.thea.variants.vision" as const,
+    description: "skills.thea.variantInfo.vision.description" as const,
+    strength: "skills.thea.variantInfo.vision.strength" as const,
+    weakness: "skills.thea.variantInfo.vision.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.GEMINI_4_ARGON,
@@ -134,6 +152,9 @@ export const THEA_VARIANTS: SkillVariant[] = [
   {
     id: "uncensored",
     variantName: "skills.thea.variants.uncensored" as const,
+    description: "skills.thea.variantInfo.uncensored.description" as const,
+    strength: "skills.thea.variantInfo.uncensored.strength" as const,
+    weakness: "skills.thea.variantInfo.uncensored.weakness" as const,
     modelSelection: {
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

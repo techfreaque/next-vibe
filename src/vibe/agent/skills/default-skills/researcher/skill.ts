@@ -72,6 +72,10 @@ export const researcherSkill: Skill = {
     {
       id: "elon-tusk",
       variantName: "skills.researcher.variants.elonTusk" as const,
+      description:
+        "skills.researcher.variantInfo.elonTusk.description" as const,
+      strength: "skills.researcher.variantInfo.elonTusk.strength" as const,
+      weakness: "skills.researcher.variantInfo.elonTusk.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_7,
@@ -97,6 +101,9 @@ export const researcherSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.researcher.variants.fast" as const,
+      description: "skills.researcher.variantInfo.fast.description" as const,
+      strength: "skills.researcher.variantInfo.fast.strength" as const,
+      weakness: "skills.researcher.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GROK_4_FAST,
@@ -121,6 +128,9 @@ export const researcherSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.researcher.variants.budget" as const,
+      description: "skills.researcher.variantInfo.budget.description" as const,
+      strength: "skills.researcher.variantInfo.budget.strength" as const,
+      weakness: "skills.researcher.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

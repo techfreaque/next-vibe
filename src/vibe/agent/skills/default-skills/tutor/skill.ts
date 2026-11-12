@@ -78,6 +78,9 @@ export const tutorSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.tutor.variants.kimi" as const,
+      description: "skills.tutor.variantInfo.kimi.description" as const,
+      strength: "skills.tutor.variantInfo.kimi.strength" as const,
+      weakness: "skills.tutor.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -103,6 +106,9 @@ export const tutorSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.tutor.variants.fast" as const,
+      description: "skills.tutor.variantInfo.fast.description" as const,
+      strength: "skills.tutor.variantInfo.fast.strength" as const,
+      weakness: "skills.tutor.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GEMINI_3_8_FLASH,

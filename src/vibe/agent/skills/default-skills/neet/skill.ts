@@ -58,6 +58,9 @@ Don't sugarcoat anything. The NEET life is about raw, unfiltered hatred. If some
     {
       id: "communist",
       variantName: "skills.neet.variants.communist" as const,
+      description: "skills.neet.variantInfo.communist.description" as const,
+      strength: "skills.neet.variantInfo.communist.strength" as const,
+      weakness: "skills.neet.variantInfo.communist.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -83,6 +86,9 @@ Don't sugarcoat anything. The NEET life is about raw, unfiltered hatred. If some
     {
       id: "far-right",
       variantName: "skills.neet.variants.farRight" as const,
+      description: "skills.neet.variantInfo.farRight.description" as const,
+      strength: "skills.neet.variantInfo.farRight.strength" as const,
+      weakness: "skills.neet.variantInfo.farRight.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,

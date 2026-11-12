@@ -38,6 +38,10 @@ export const uncensoredSkill: Skill = {
     {
       id: "far-right",
       variantName: "skills.uncensored.variants.farRight" as const,
+      description:
+        "skills.uncensored.variantInfo.farRight.description" as const,
+      strength: "skills.uncensored.variantInfo.farRight.strength" as const,
+      weakness: "skills.uncensored.variantInfo.farRight.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
@@ -63,6 +67,10 @@ export const uncensoredSkill: Skill = {
     {
       id: "conservative",
       variantName: "skills.uncensored.variants.conservative" as const,
+      description:
+        "skills.uncensored.variantInfo.conservative.description" as const,
+      strength: "skills.uncensored.variantInfo.conservative.strength" as const,
+      weakness: "skills.uncensored.variantInfo.conservative.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GAB_AI_ARYA,
@@ -87,6 +95,10 @@ export const uncensoredSkill: Skill = {
     {
       id: "libertarian",
       variantName: "skills.uncensored.variants.libertarian" as const,
+      description:
+        "skills.uncensored.variantInfo.libertarian.description" as const,
+      strength: "skills.uncensored.variantInfo.libertarian.strength" as const,
+      weakness: "skills.uncensored.variantInfo.libertarian.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.FREEDOMGPT_LIBERTY,
@@ -111,6 +123,9 @@ export const uncensoredSkill: Skill = {
     {
       id: "open",
       variantName: "skills.uncensored.variants.open" as const,
+      description: "skills.uncensored.variantInfo.open.description" as const,
+      strength: "skills.uncensored.variantInfo.open.strength" as const,
+      weakness: "skills.uncensored.variantInfo.open.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.VENICE_UNCENSORED,

@@ -61,6 +61,10 @@ If everything works, respond normally to the user. Only flag issues - don't narr
     {
       id: "budget",
       variantName: "skills.qualityTester.variants.budget" as const,
+      description:
+        "skills.qualityTester.variantInfo.budget.description" as const,
+      strength: "skills.qualityTester.variantInfo.budget.strength" as const,
+      weakness: "skills.qualityTester.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         // DeepSeek V4.1 Flash: same tool-calling capability class as kimi at a
@@ -88,6 +92,12 @@ If everything works, respond normally to the user. Only flag issues - don't narr
     {
       id: "native-image",
       variantName: "skills.qualityTester.variants.nativeImage" as const,
+      description:
+        "skills.qualityTester.variantInfo.nativeImage.description" as const,
+      strength:
+        "skills.qualityTester.variantInfo.nativeImage.strength" as const,
+      weakness:
+        "skills.qualityTester.variantInfo.nativeImage.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         // Gemini 3.1 Flash Image Preview (Nano Banana): the chat model IS the

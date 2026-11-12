@@ -128,6 +128,12 @@ export const socialMediaManagerSkill: Skill = {
     {
       id: "snappy",
       variantName: "skills.socialMediaManager.variants.snappy" as const,
+      description:
+        "skills.socialMediaManager.variantInfo.snappy.description" as const,
+      strength:
+        "skills.socialMediaManager.variantInfo.snappy.strength" as const,
+      weakness:
+        "skills.socialMediaManager.variantInfo.snappy.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_SOL,
@@ -153,6 +159,12 @@ export const socialMediaManagerSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.socialMediaManager.variants.budget" as const,
+      description:
+        "skills.socialMediaManager.variantInfo.budget.description" as const,
+      strength:
+        "skills.socialMediaManager.variantInfo.budget.strength" as const,
+      weakness:
+        "skills.socialMediaManager.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_LUNA,

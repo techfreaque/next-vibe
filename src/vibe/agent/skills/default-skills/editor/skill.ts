@@ -73,6 +73,9 @@ export const editorSkill: Skill = {
     {
       id: "tech-bro",
       variantName: "skills.editor.variants.techBro" as const,
+      description: "skills.editor.variantInfo.techBro.description" as const,
+      strength: "skills.editor.variantInfo.techBro.strength" as const,
+      weakness: "skills.editor.variantInfo.techBro.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -98,6 +101,9 @@ export const editorSkill: Skill = {
     {
       id: "deep",
       variantName: "skills.editor.variants.deep" as const,
+      description: "skills.editor.variantInfo.deep.description" as const,
+      strength: "skills.editor.variantInfo.deep.strength" as const,
+      weakness: "skills.editor.variantInfo.deep.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,

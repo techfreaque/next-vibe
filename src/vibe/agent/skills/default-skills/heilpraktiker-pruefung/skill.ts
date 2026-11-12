@@ -235,6 +235,12 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
     {
       id: "smart",
       variantName: "skills.heilpraktikerPruefung.variants.smart" as const,
+      description:
+        "skills.heilpraktikerPruefung.variantInfo.smart.description" as const,
+      strength:
+        "skills.heilpraktikerPruefung.variantInfo.smart.strength" as const,
+      weakness:
+        "skills.heilpraktikerPruefung.variantInfo.smart.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -260,6 +266,12 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
     {
       id: "precise",
       variantName: "skills.heilpraktikerPruefung.variants.precise" as const,
+      description:
+        "skills.heilpraktikerPruefung.variantInfo.precise.description" as const,
+      strength:
+        "skills.heilpraktikerPruefung.variantInfo.precise.strength" as const,
+      weakness:
+        "skills.heilpraktikerPruefung.variantInfo.precise.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_TERRA,
@@ -284,6 +296,12 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
     {
       id: "thorough",
       variantName: "skills.heilpraktikerPruefung.variants.thorough" as const,
+      description:
+        "skills.heilpraktikerPruefung.variantInfo.thorough.description" as const,
+      strength:
+        "skills.heilpraktikerPruefung.variantInfo.thorough.strength" as const,
+      weakness:
+        "skills.heilpraktikerPruefung.variantInfo.thorough.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_SONNET_5_5,
@@ -308,6 +326,12 @@ Nur auf explizites "Prüfung beenden" gibst du eine Gesamtbewertung:
     {
       id: "quick",
       variantName: "skills.heilpraktikerPruefung.variants.quick" as const,
+      description:
+        "skills.heilpraktikerPruefung.variantInfo.quick.description" as const,
+      strength:
+        "skills.heilpraktikerPruefung.variantInfo.quick.strength" as const,
+      weakness:
+        "skills.heilpraktikerPruefung.variantInfo.quick.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.CLAUDE_HAIKU_5_5,

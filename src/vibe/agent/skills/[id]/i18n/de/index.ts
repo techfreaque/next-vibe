@@ -63,6 +63,8 @@ export const translations: typeof enTranslations = {
       "Eine weitere Instanz dieses Skills zu deiner Sammlung hinzufügen",
     variants: {
       title: "Modell wählen",
+      strength: "Stärke",
+      weakness: "Schwäche",
     },
     addToCollection: "Zu deiner Sammlung hinzufügen:",
     addAllToFavorites: "Alle Modelle hinzufügen",

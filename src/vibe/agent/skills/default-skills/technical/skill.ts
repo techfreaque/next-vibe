@@ -50,6 +50,9 @@ export const technicalSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.technical.variants.kimi" as const,
+      description: "skills.technical.variantInfo.kimi.description" as const,
+      strength: "skills.technical.variantInfo.kimi.strength" as const,
+      weakness: "skills.technical.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -75,6 +78,9 @@ export const technicalSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.technical.variants.budget" as const,
+      description: "skills.technical.variantInfo.budget.description" as const,
+      strength: "skills.technical.variantInfo.budget.strength" as const,
+      weakness: "skills.technical.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_PRO,
@@ -99,6 +105,9 @@ export const technicalSkill: Skill = {
     {
       id: "astra",
       variantName: "skills.technical.variants.astra" as const,
+      description: "skills.technical.variantInfo.astra.description" as const,
+      strength: "skills.technical.variantInfo.astra.strength" as const,
+      weakness: "skills.technical.variantInfo.astra.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_ASTRA,
@@ -123,6 +132,9 @@ export const technicalSkill: Skill = {
     {
       id: "sol",
       variantName: "skills.technical.variants.sol" as const,
+      description: "skills.technical.variantInfo.sol.description" as const,
+      strength: "skills.technical.variantInfo.sol.strength" as const,
+      weakness: "skills.technical.variantInfo.sol.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.GPT_6_1_SOL,

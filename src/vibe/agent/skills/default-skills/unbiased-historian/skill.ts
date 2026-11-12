@@ -51,6 +51,10 @@ export const unbiasedHistorianSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.unbiasedHistorian.variants.kimi" as const,
+      description:
+        "skills.unbiasedHistorian.variantInfo.kimi.description" as const,
+      strength: "skills.unbiasedHistorian.variantInfo.kimi.strength" as const,
+      weakness: "skills.unbiasedHistorian.variantInfo.kimi.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: DEFAULT_CHAT_MODEL_ID,
@@ -76,9 +80,43 @@ export const unbiasedHistorianSkill: Skill = {
     {
       id: "budget",
       variantName: "skills.unbiasedHistorian.variants.budget" as const,
+      description:
+        "skills.unbiasedHistorian.variantInfo.budget.description" as const,
+      strength: "skills.unbiasedHistorian.variantInfo.budget.strength" as const,
+      weakness: "skills.unbiasedHistorian.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
         manualModelId: ChatModelId.DEEPSEEK_V4_PRO,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
+      voiceModelSelection: VOICE.neutral,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "uncensored",
+      variantName: "skills.unbiasedHistorian.variants.uncensored" as const,
+      description:
+        "skills.unbiasedHistorian.variantInfo.uncensored.description" as const,
+      strength:
+        "skills.unbiasedHistorian.variantInfo.uncensored.strength" as const,
+      weakness:
+        "skills.unbiasedHistorian.variantInfo.uncensored.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

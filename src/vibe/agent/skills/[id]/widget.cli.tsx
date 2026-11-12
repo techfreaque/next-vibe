@@ -39,10 +39,20 @@ function renderGetCli(value: SkillGetResponseOutput): string {
     lines.push("");
     lines.push(chalk.dim(`  Variants (${String(value.variants.length)}):`));
     for (const v of value.variants) {
+      const name = v.displayName ?? v.id;
       const variantLabel = v.isDefault
-        ? chalk.green("default")
-        : chalk.dim(v.id);
-      lines.push(`    ${variantLabel}`);
+        ? `${chalk.bold(name)} ${chalk.green("default")}`
+        : chalk.bold(name);
+      lines.push(`    ${variantLabel} ${chalk.dim(`(${v.id})`)}`);
+      if (v.description) {
+        lines.push(`      ${v.description}`);
+      }
+      if (v.strength) {
+        lines.push(`      ${chalk.green("+")} ${v.strength}`);
+      }
+      if (v.weakness) {
+        lines.push(`      ${chalk.yellow("-")} ${v.weakness}`);
+      }
     }
   }
   return lines.join("\n");
@@ -55,9 +65,16 @@ function renderGetMcp(value: SkillGetResponseOutput): string {
     lines.push(`Description: ${value.description}`);
   }
   if (value.variants && value.variants.length > 0) {
-    lines.push(
-      `Variants: ${value.variants.map((v) => (v.isDefault ? `default (${v.id})` : v.id)).join(", ")}`,
-    );
+    lines.push("Variants:");
+    for (const v of value.variants) {
+      const head = `- ${v.id}${v.displayName ? ` "${v.displayName}"` : ""}${v.isDefault ? " (default)" : ""}`;
+      const details = [
+        v.description,
+        v.strength ? `+ ${v.strength}` : undefined,
+        v.weakness ? `- ${v.weakness}` : undefined,
+      ].filter((part): part is string => Boolean(part));
+      lines.push(details.length > 0 ? `${head}: ${details.join(" ")}` : head);
+    }
   }
   return lines.join("\n");
 }
