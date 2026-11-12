@@ -50,7 +50,7 @@ s2          IN A     179.198.214.41
 @               IN MX    10 mail.a42.ch.
 @               IN TXT   "v=spf1 mx a:mail.a42.ch ip4:213.167.224.8 ~all"
 _dmarc          IN TXT   "v=DMARC1; p=quarantine; rua=mailto:dmarc@a42.ch"
-dkim._domainkey IN TXT   "v=DKIM1;k=rsa;t=s;s=email;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQEAy5Wp4ilOAMbYtzGV+qxfbxPbL6I/mDyg66BIH7jvt3rRAil6oYWRyKCke0aR7Lo4klBLe1nVTezuiVlehcH2aJ056MBUhp/HDNJhoS51gKelAMztLnyYyYpO/1jucNUAyRo7vkplGFBEnsrpMkkcufTp7jPqgkkE8P4TH15sDGLST55wz5hjkX5eXh6C07BVp5lyZuBelgdbK2Q/q8zoaC1XeZA9A2H4mp6Jg29bIF2ipgaUyRzgHVRZkVFnNZv83tdFQPAg1+Ft/Xs5H4QIdxAIzmrGvJjdxHqRMP9yWquJAETgm5YeitZtjNlY7qYUdFJ7RKpez3xax2KL+hmDHQIDAQAB"
+dkim._domainkey IN TXT   "v=DKIM1;k=rsa;t=s;s=email;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy5Wp4ilOAMbYtzGV+qxfbxPbL6I/mDyg66BIH7jvt3rRAil6oYWRyKCke0aR7Lo4klBLe1nVTezuiVlehcH2aJ056MBUhp/HDNJhoS51gKelAMztLnyYyYpO/1jucNUAyRo7vkplGFBEnsrpMkkcufTp7jPqgkkE8P4TH15sDGLST55wz5" "hjkX5eXh6C07BVp5lyZuBelgdbK2Q/q8zoaC1XeZA9A2H4mp6Jg29bIF2ipgaUyRzgHVRZkVFnNZv83tdFQPAg1+Ft/Xs5H4QIdxAIzmrGvJjdxHqRMP9yWquJAETgm5YeitZtjNlY7qYUdFJ7RKpez3xax2KL+hmDHQIDAQAB"
 autodiscover    IN CNAME mail.a42.ch.
 autoconfig      IN CNAME mail.a42.ch.
-_autodiscover._tcp IN SRV 0 0 443 mail.a42.ch.
+_autodiscover._tcp IN SRV 10 1 443 mail.a42.ch.

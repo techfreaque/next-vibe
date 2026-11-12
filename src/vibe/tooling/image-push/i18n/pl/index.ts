@@ -47,6 +47,11 @@ export const translations: typeof enTranslations = {
         description:
           "user@host do przesłania zbudowanego obrazu bezpośrednio przez SSH zamiast do rejestru (np. root@203.0.113.5) - domyślnie SSH_SERVER, jeśli ustawiony. Używa SSH_SERVER_PWD do uwierzytelniania hasłem, w przeciwnym razie Twojego własnego klucza/konfiguracji SSH. Zostaw puste, aby zamiast tego wysłać do rejestru.",
       },
+      secondary: {
+        title: "Zaktualizuj też Server 2",
+        description:
+          "Gdy Server 1 działa i jest zdrowy, zaktualizuj też drugi węzeł HA (SSH_SERVER2): wczytaj obraz pod SSH_SERVER2_IMAGE_TAG (nigdy :latest), skopiuj .env z Servera 1, uruchom ponownie, sprawdź zdrowie, w razie błędu cofnij automatycznie. Caddy na każdej maszynie w tym czasie obsługuje ruch z drugiej, więc nikt nie zauważy przerwy. Pomijane, gdy brak SSH_SERVER2 albo podano --sshTarget.",
+      },
       success: {
         title: "Sukces",
       },
@@ -121,6 +126,9 @@ export const translations: typeof enTranslations = {
         commitResolved: "📌 Budowanie commita {{sha}} ({{ref}}): {{subject}}",
         dirtyTreeWarning:
           "⚠️ Katalog roboczy ma {{count}} niezatwierdzonych zmian. NIE trafiają do obrazu. Budowany jest tylko commit {{sha}}.",
+        deployedShaRecorded: "📝 Zapisano wdrożony commit {{sha}} w {{path}}",
+        deployedShaRecordFailed:
+          "Wdrożenie się udało, ale zapis {{path}} nie powiódł się: {{error}}",
         exportStart: "📦 Eksport commita {{sha}} do {{dir}} ...",
         exportReused: "📦 Używam wyeksportowanego drzewa {{sha}} w {{dir}}",
         exportFailed: "Eksport commita {{sha}} nie powiódł się: {{error}}",
@@ -136,6 +144,14 @@ export const translations: typeof enTranslations = {
         scriptSyntaxInvalid:
           "bash -n odrzucił {{path}} z commita {{sha}}. Działający skrypt nietknięty.",
         scriptRemoteExit: "Polecenie zdalne zakończyło się kodem {{code}}",
+        secondaryStart:
+          "🔁 Server 1 działa. Aktualizuję Server 2 ({{target}}) ...",
+        secondarySuccess:
+          "🚀 Wdrożono {{refs}} na {{target}} i Server 2 ({{secondary}})",
+        secondaryFailed:
+          "Server 1 ({{target}}) działa NA ŻYWO z nowym obrazem, ale aktualizacja Servera 2 ({{secondary}}) nie powiodła się: {{error}}. Server 2 zachował lub przywrócił poprzedni obraz.",
+        envSyncFailed:
+          "Kopiowanie .env z Servera 1 na Server 2 nie powiodło się: {{error}}",
       },
     },
   },

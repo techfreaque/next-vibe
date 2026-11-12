@@ -35,6 +35,49 @@ export const {
     commented: true,
     sensitive: true,
   },
+  SSH_SERVER2: {
+    schema: z.string().optional(),
+    example: "root@203.0.113.6",
+    comment:
+      "Second HA node. When set, `vibe image-push` rolls it AFTER SSH_SERVER is live and healthy (image under SSH_SERVER2_IMAGE_TAG, Server 1's .env synced, recreate, health-check, auto-rollback). Skipped with --secondary=false or an explicit --sshTarget.",
+    commented: true,
+  },
+  SSH_SERVER2_PWD: {
+    schema: z.string().optional(),
+    example: "REPLACE_WITH_your_ssh_password",
+    comment:
+      "Password for SSH_SERVER2. If unset, the system ssh client's key/agent auth is used. Never logged.",
+    commented: true,
+    sensitive: true,
+  },
+  SSH_SERVER2_IMAGE_TAG: {
+    schema: z.string().default("unbottled"),
+    example: "unbottled",
+    comment:
+      "Tag the app image gets on SSH_SERVER2. Never `latest`: Server 2 co-hosts another site that runs :latest. The previous image moves to :<tag>-rollback.",
+    commented: true,
+  },
+  SSH_SERVER2_DEPLOY_SCRIPT: {
+    schema: z.string().default("/root/unbottled/scripts/deploy-ha-node.sh"),
+    example: "/root/unbottled/scripts/deploy-ha-node.sh",
+    comment:
+      "Script run on SSH_SERVER2 after the image is loaded (synced from the deployed commit first). Set to empty string to transfer only.",
+    commented: true,
+  },
+  SSH_SERVER2_RELAY_ADDR: {
+    schema: z.string().default("10.88.0.2:7799"),
+    example: "10.88.0.2:7799",
+    comment:
+      "Private (WireGuard) host:port on SSH_SERVER2 for the box-to-box image relay from SSH_SERVER. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+    commented: true,
+  },
+  SSH_SERVER_ENV_PATH: {
+    schema: z.string().default("/unbottled/.env"),
+    example: "/unbottled/.env",
+    comment:
+      "Path of the prod .env on SSH_SERVER. image-push copies it to SSH_SERVER2 (server to server through this process, never written locally or logged) so both nodes share identity and keys.",
+    commented: true,
+  },
   SSH_DEPLOY_SCRIPT: {
     schema: z.string().default("/unbottled/scripts/install-docker.sh"),
     example: "/unbottled/scripts/install-docker.sh",

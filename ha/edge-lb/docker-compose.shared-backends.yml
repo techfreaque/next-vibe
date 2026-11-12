@@ -1,3 +1,5 @@
+# SUPERSEDED 2026-11-12 by docker-compose.s2-ha.yml + docker-compose.s2-edge.yml.
+# Kept for history only; the s2app password that used to sit here was rotated.
 # ============================================================================
 # OVERLAY: point the Server-2 unbottled app at the SHARED prod backends on
 # Server 1 over WireGuard — the active-active data topology.
@@ -55,7 +57,7 @@ services:
       S3_REGION: "us-east-1"
       S3_BUCKET: "chat-media"
       # Keep the shared-prod DB override + single-port proxy from earlier layers.
-      DATABASE_URL: "postgres://s2app:35015650ed07d017f6a36f24ecdb81cb78f84138@10.88.0.1:5432/postgres?schema=public"
+      DATABASE_URL: "postgres://s2app:${S2APP_PASSWORD}@10.88.0.1:5432/postgres?schema=public"
       VIBE_DISABLE_PROXY: "false"
       NEXT_PUBLIC_APP_URL: "https://s2.unbottled.ai"
       NEXT_PUBLIC_PROJECT_URL: "https://s2.unbottled.ai"

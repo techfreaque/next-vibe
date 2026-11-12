@@ -1,3 +1,5 @@
+> **DONE 2026-11-12.** Prod runs s3 (prod-minio) + redis (prod-redis), Server 2 is an active peer, edge staged. Current state: `README.md`. Only the registrar NS change remains (`edge-dns/README.md`). This runbook is history.
+
 > ⚠️ **EDGE SECTION SUPERSEDED (2026-11-09).** Phase 6 (keepalived floating IP)
 > does not apply across two datacenters. The real edge is `ha/edge-dns/`
 > (PowerDNS round-robin + fast health-driven failover) + `ha/edge-lb/` (per-box

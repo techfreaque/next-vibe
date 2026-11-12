@@ -145,10 +145,38 @@ export class ImagePushRepository {
         transferTarget,
         logger,
         t,
+        imagePushEnv.SSH_SERVER_PWD,
       );
       if (!transferResult.success) {
         return transferResult;
       }
+
+      // Second HA node: only with the default target (an explicit --sshTarget
+      // is a one-off single-box push). The image is shipped BEFORE Server 1
+      // deploys so the version-skew window between the boxes is just the two
+      // recreates, but its tags only move in the node's own deploy script.
+      const secondaryTarget =
+        data.secondary && !data.sshTarget
+          ? imagePushEnv.SSH_SERVER2
+          : undefined;
+      const secondaryTransfer = secondaryTarget
+        ? imagePushEnv.SSH_SERVER2_RELAY_ADDR
+          ? await ImagePushRepository.relayToSecondary(
+              refs[0] ?? "",
+              transferTarget,
+              secondaryTarget,
+              imagePushEnv.SSH_SERVER2_RELAY_ADDR,
+              t,
+            )
+          : await ImagePushRepository.transferViaSsh(
+              refs,
+              secondaryTarget,
+              logger,
+              t,
+              imagePushEnv.SSH_SERVER2_PWD,
+              ImagePushRepository.secondaryLoadCmd(refs[0] ?? ""),
+            )
+        : undefined;
 
       const deployResult = await ImagePushRepository.runDeployScript(
         transferTarget,
@@ -156,9 +184,46 @@ export class ImagePushRepository {
         shortSha,
         logger,
         t,
+        {
+          script: imagePushEnv.SSH_DEPLOY_SCRIPT,
+          password: imagePushEnv.SSH_SERVER_PWD,
+          envPrefix: "NO_GIT_RESET=1",
+        },
       );
       if (!deployResult.success) {
         return deployResult;
+      }
+      // Server 1 now runs this commit: record it before the secondary roll so
+      // a failing Server 2 never leaves the marker pointing at the old sha.
+      if (imagePushEnv.SSH_DEPLOY_SCRIPT) {
+        ImagePushRepository.recordDeployedSha(sha, shortSha, logger, t);
+      }
+
+      if (secondaryTarget && secondaryTransfer) {
+        const secondaryResult = await ImagePushRepository.rollSecondary(
+          transferTarget,
+          secondaryTarget,
+          secondaryTransfer,
+          refs[0] ?? "",
+          contextDir,
+          shortSha,
+          logger,
+          t,
+        );
+        if (!secondaryResult.success) {
+          return secondaryResult;
+        }
+        return success({
+          success: true,
+          output: t("post.repository.messages.secondarySuccess", {
+            refs: refs.join(", "),
+            target: transferTarget,
+            secondary: secondaryTarget,
+          }),
+          resolvedImage: image,
+          tags,
+          duration: Date.now() - startTime,
+        });
       }
 
       return success({
@@ -209,6 +274,8 @@ export class ImagePushRepository {
     sshTarget: string,
     logger: EndpointLogger,
     t: ImagePushT,
+    password: string | undefined,
+    remoteCmdOverride?: string,
   ): Promise<ResponseType<void>> {
     logger.info(
       t("post.repository.messages.sshTransferStart", {
@@ -241,13 +308,13 @@ export class ImagePushRepository {
       ...new Set([...refs.filter((r) => r !== shaRef), latestRef]),
     ];
     const remoteCmd =
+      remoteCmdOverride ??
       `docker tag ${latestRef} ${rollbackRef} 2>/dev/null; ` +
-      `docker rmi ${shaRef} 2>/dev/null; ` +
-      `gunzip | docker load && ${extraRefs
-        .map((ref) => `docker tag ${shaRef} ${ref}`)
-        .join(" && ")}`;
+        `docker rmi ${shaRef} 2>/dev/null; ` +
+        `gunzip | docker load && ${extraRefs
+          .map((ref) => `docker tag ${shaRef} ${ref}`)
+          .join(" && ")}`;
 
-    const password = imagePushEnv.SSH_SERVER_PWD;
     // Only the shell pipeline survives a large unattended upload (see doc above).
     // It needs a password (for `sshpass -e`) plus the `sshpass` and `gzip`
     // binaries; otherwise fall back to the in-process pipe.
@@ -279,6 +346,7 @@ export class ImagePushRepository {
       sshTarget,
       remoteCmd,
       gzipped,
+      password,
     );
     const saveCode = await saveExit;
 
@@ -386,6 +454,192 @@ export class ImagePushRepository {
     return success(undefined);
   }
 
+  /**
+   * Remote command for the SECOND HA node's transfer: load the image under its
+   * sha ref only. Unlike Server 1 it never touches :latest / :rollback there
+   * (Server 2 co-hosts another site that runs :latest); deploy-ha-node.sh moves
+   * the node's own tag (SSH_SERVER2_IMAGE_TAG) once Server 1 is live.
+   */
+  private static secondaryLoadCmd(shaRef: string): string {
+    const q = ImagePushRepository.shellQuote;
+    return `docker rmi ${q(shaRef)} 2>/dev/null; gunzip | docker load`;
+  }
+
+  /**
+   * Ships the image Server 1 already holds to Server 2 box-to-box over the
+   * private WireGuard link (`nc` listener on Server 2's WG address, `docker
+   * save | gzip | nc` on Server 1), instead of uploading it a second time from
+   * this machine. Datacenter to datacenter is ~30x faster than a home uplink
+   * (564 MB in 20 s vs ~1 h for the 6.5 GB app image). Nothing is exposed
+   * publicly: the listener binds the WG IP only and exits after one stream.
+   */
+  private static async relayToSecondary(
+    shaRef: string,
+    primaryTarget: string,
+    secondaryTarget: string,
+    relayAddr: string,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const q = ImagePushRepository.shellQuote;
+    const [relayHost = "", relayPort = "7799"] = relayAddr.split(":");
+    const listener = ImagePushRepository.runRemote(
+      secondaryTarget,
+      `docker rmi ${q(shaRef)} 2>/dev/null; timeout 3600 sh -c ${q(`nc -l ${relayHost} ${relayPort} | gunzip | docker load`)}`,
+      undefined,
+      imagePushEnv.SSH_SERVER2_PWD,
+    );
+    // Give the listener time to bind before Server 1 connects.
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 4000);
+    });
+    const sender = await ImagePushRepository.runRemote(
+      primaryTarget,
+      `set -o pipefail; docker save ${q(shaRef)} | gzip -1 | nc -N ${q(relayHost)} ${q(relayPort)}`,
+      undefined,
+      imagePushEnv.SSH_SERVER_PWD,
+    );
+    const received = await listener;
+    const failed = [sender, received].find(
+      (r) => r.error !== undefined || r.exitCode !== 0,
+    );
+    if (failed) {
+      return fail({
+        message: t("post.repository.messages.sshTransferFailed", {
+          target: secondaryTarget,
+          error:
+            failed.error ??
+            t("post.repository.messages.scriptRemoteExit", {
+              code: failed.exitCode,
+            }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    return success(undefined);
+  }
+
+  /**
+   * Rolls the second HA node after Server 1 is live: copies Server 1's .env
+   * across, then runs SSH_SERVER2_DEPLOY_SCRIPT (synced from the commit), which
+   * retags, recreates, health-checks and auto-rolls-back on its own.
+   */
+  private static async rollSecondary(
+    primaryTarget: string,
+    secondaryTarget: string,
+    transfer: ResponseType<void>,
+    shaRef: string,
+    contextDir: string,
+    shortSha: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const secondaryFailed = (cause: ResponseType<void>): ResponseType<void> =>
+      fail({
+        message: t("post.repository.messages.secondaryFailed", {
+          target: primaryTarget,
+          secondary: secondaryTarget,
+          error: cause.success ? "" : cause.message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        cause: cause.success ? undefined : cause,
+      });
+
+    if (!transfer.success) {
+      return secondaryFailed(transfer);
+    }
+    logger.info(
+      t("post.repository.messages.secondaryStart", {
+        target: secondaryTarget,
+      }),
+    );
+
+    const script = imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT;
+    if (script) {
+      const envResult = await ImagePushRepository.copyPrimaryEnv(
+        primaryTarget,
+        secondaryTarget,
+        script,
+        t,
+      );
+      if (!envResult.success) {
+        return secondaryFailed(envResult);
+      }
+    }
+
+    const deployResult = await ImagePushRepository.runDeployScript(
+      secondaryTarget,
+      contextDir,
+      shortSha,
+      logger,
+      t,
+      {
+        script,
+        password: imagePushEnv.SSH_SERVER2_PWD,
+        envPrefix: `NO_GIT_RESET=1 HA_IMAGE_TAG=${ImagePushRepository.shellQuote(imagePushEnv.SSH_SERVER2_IMAGE_TAG)} HA_NEW_IMAGE_REF=${ImagePushRepository.shellQuote(shaRef)}`,
+      },
+    );
+    return deployResult.success ? deployResult : secondaryFailed(deployResult);
+  }
+
+  /**
+   * Streams Server 1's prod .env straight into `<project>/.env.from-s1` on
+   * Server 2 (one OS pipeline: ssh S1 cat | ssh S2 cat >). The secrets pass
+   * through this process's pipes only: never written locally, never logged.
+   * deploy-ha-node.sh merges it with the node's own infra overrides.
+   */
+  private static async copyPrimaryEnv(
+    primaryTarget: string,
+    secondaryTarget: string,
+    secondaryScript: string,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const q = ImagePushRepository.shellQuote;
+    const scriptDir = secondaryScript.split("/").slice(0, -1).join("/") || "/";
+    const projectDir = scriptDir.endsWith("/scripts")
+      ? scriptDir.slice(0, -"/scripts".length)
+      : scriptDir;
+    const sshPart = (
+      target: string,
+      passwordVar: string,
+      hasPassword: boolean,
+      cmd: string,
+    ): string => {
+      const { username, host, port } =
+        ImagePushRepository.parseSshTarget(target);
+      const opts = `-oStrictHostKeyChecking=no -oPort=${q(String(port))} ${q(`${username}@${host}`)} ${q(cmd)}`;
+      return hasPassword
+        ? `SSHPASS="$${passwordVar}" sshpass -e ssh ${opts}`
+        : `ssh ${opts}`;
+    };
+    const p1 = imagePushEnv.SSH_SERVER_PWD;
+    const p2 = imagePushEnv.SSH_SERVER2_PWD;
+    const pipeline =
+      `set -o pipefail; ` +
+      `${sshPart(primaryTarget, "HA_P1", Boolean(p1), `cat ${q(imagePushEnv.SSH_SERVER_ENV_PATH)}`)} | ` +
+      `${sshPart(secondaryTarget, "HA_P2", Boolean(p2), `umask 077 && cat > ${q(`${projectDir}/.env.from-s1`)}`)}`;
+
+    const exitCode = await new Promise<number>((resolve) => {
+      const child = spawn("bash", ["-c", pipeline], {
+        // stdout stays a pipe we never read; only stderr reaches the terminal.
+        stdio: ["ignore", "ignore", "inherit"],
+        env: { ...process.env, HA_P1: p1 ?? "", HA_P2: p2 ?? "" },
+      });
+      child.on("error", () => resolve(-1));
+      child.on("close", (code) => resolve(code ?? -1));
+    });
+    if (exitCode !== 0) {
+      return fail({
+        message: t("post.repository.messages.envSyncFailed", {
+          error: t("post.repository.messages.scriptRemoteExit", {
+            code: exitCode,
+          }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    return success(undefined);
+  }
+
   /** Parses `user@host` or `user@host:port` into its parts (defaults: root, port 22) */
   private static parseSshTarget(sshTarget: string): {
     username: string;
@@ -408,10 +662,10 @@ export class ImagePushRepository {
     sshTarget: string,
     remoteCmd: string,
     stdin?: Readable,
+    password: string | undefined = imagePushEnv.SSH_SERVER_PWD,
   ): Promise<{ exitCode: number; error?: string }> {
     const { username, host, port } =
       ImagePushRepository.parseSshTarget(sshTarget);
-    const password = imagePushEnv.SSH_SERVER_PWD;
 
     // Prefer the system `ssh` client for every call. ssh2's app-level keepalive
     // is reset only by INBOUND packets, so a multi-GB `docker save | ssh docker
@@ -518,8 +772,14 @@ export class ImagePushRepository {
     shortSha: string,
     logger: EndpointLogger,
     t: ImagePushT,
+    opts: {
+      script: string;
+      password: string | undefined;
+      /** `KEY=value` pairs prepended to the remote `bash <script>` call. */
+      envPrefix: string;
+    },
   ): Promise<ResponseType<void>> {
-    const script = imagePushEnv.SSH_DEPLOY_SCRIPT;
+    const { script, password, envPrefix } = opts;
     if (!script) {
       return success(undefined);
     }
@@ -531,6 +791,7 @@ export class ImagePushRepository {
       shortSha,
       logger,
       t,
+      password,
     );
     if (!syncResult.success) {
       return syncResult;
@@ -559,9 +820,14 @@ export class ImagePushRepository {
     const projectDir = scriptDir.endsWith("/scripts")
       ? scriptDir.slice(0, -"/scripts".length)
       : scriptDir;
-    const remoteCmd = `cd ${projectDir} && NO_GIT_RESET=1 bash ${script} < /dev/null`;
+    const remoteCmd = `cd ${projectDir} && ${envPrefix} bash ${script} < /dev/null`;
 
-    const result = await ImagePushRepository.runRemote(sshTarget, remoteCmd);
+    const result = await ImagePushRepository.runRemote(
+      sshTarget,
+      remoteCmd,
+      undefined,
+      password,
+    );
 
     if (result.error !== undefined || result.exitCode !== 0) {
       logger.error("Deploy script failed", {
@@ -602,6 +868,7 @@ export class ImagePushRepository {
     shortSha: string,
     logger: EndpointLogger,
     t: ImagePushT,
+    password: string | undefined,
   ): Promise<ResponseType<void>> {
     const scriptName = script.split("/").pop() ?? script;
     const localPath = join(contextDir, "scripts", scriptName);
@@ -635,6 +902,7 @@ export class ImagePushRepository {
       sshTarget,
       remoteCmd,
       createReadStream(localPath),
+      password,
     );
 
     if (result.error !== undefined || result.exitCode !== 0) {
@@ -659,6 +927,39 @@ export class ImagePushRepository {
       }),
     );
     return success(undefined);
+  }
+
+  /**
+   * Writes the full sha of the commit that just went live to
+   * `.tmp/last-deployed-sha`, so tooling (daily-deploy cron, changelog diffs)
+   * knows what prod runs. Best effort: the deploy already succeeded, so a
+   * write failure only warns.
+   */
+  private static recordDeployedSha(
+    sha: string,
+    shortSha: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): void {
+    const tmpDir = join(process.cwd(), ".tmp");
+    const path = join(tmpDir, "last-deployed-sha");
+    try {
+      mkdirSync(tmpDir, { recursive: true });
+      writeFileSync(path, `${sha}\n`);
+      logger.info(
+        t("post.repository.messages.deployedShaRecorded", {
+          sha: shortSha,
+          path,
+        }),
+      );
+    } catch (error) {
+      logger.warn(
+        t("post.repository.messages.deployedShaRecordFailed", {
+          path,
+          error: parseError(error).message,
+        }),
+      );
+    }
   }
 
   /** Runs a read-only git command in the repo, returning trimmed stdout. */

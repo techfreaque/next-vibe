@@ -1,11 +1,33 @@
-> ⚠️ **PARTIALLY SUPERSEDED (2026-11-09).** The EDGE layer here (keepalived
-> floating IP + VRRP) does NOT apply — the two servers are in DIFFERENT
-> datacenters (Düsseldorf + Frankfurt), so an L2 floating IP cannot bridge them.
-> The real edge is **`ha/edge-dns/`** (self-hosted PowerDNS round-robin +
-> health-driven failover) + **`ha/edge-lb/`** (per-box Caddy over N replicas).
-> The Postgres/Redis/MinIO logical-replication design below is also superseded by
-> the shared-prod-DB-over-WireGuard model (see `../memory/ha-buildout-state.md`).
-> Still accurate: the G1 stream-drain deploy model and `scripts/deploy-ha.sh`.
+# unbottled.ai HA: current state (2026-11-12)
+
+Two boxes in two datacenters, both serving unbottled.ai from the same data.
+
+| | Server 1 (72.61.156.49, prod) | Server 2 (179.198.214.41, co-hosts heilpraktiker) |
+|---|---|---|
+| App | `next-vibe-app` (split port 3000 + WS 4000), runs migrations + task runner | `unbottled-app` (single port, `10.88.0.2:3100` WG only), no migrations/seeds/tasks |
+| Caddy | `/caddy/Caddyfile`: local app first, S2 over WG as fallback | caddy-docker-proxy; sites live on the `unbottled-edge` container (`docker-compose.s2-edge.yml`): local app first, S1 over WG as fallback |
+| Postgres | `prod-postgres` primary, slot `s2_replica`, `max_slot_wal_keep_size=20GB` | `unbottled-pg-replica` hot standby streaming over WG (`ha/postgres/s2-streaming-replica.sh status`) |
+| Redis | `prod-redis` (shared pub/sub for both apps) | (local `unbottled-redis` idle, used only after failover) |
+| MinIO | `prod-minio` bucket `chat-media` (shared by both apps) | `unbottled-minio` = replication target of S1 (rule dbp1gq4es4tc78049v6g) |
+| DNS | PowerDNS `ns1` + health daemon | PowerDNS `ns2` + health daemon |
+| Certs | Caddy HTTP-01 | Caddy HTTP-01 |
+
+- **Link:** WireGuard 10.88.0.1 / 10.88.0.2 over wstunnel TCP 8443 (S2 dials, S1 passive).
+- **Edge:** each box's PowerDNS publishes the apex A for every box that passes `GET https://unbottled.ai/robots.txt` (30 s TTL). Live once the registrar delegates to ns1/ns2.unbottled.ai (Max's step, `ha/edge-dns/README.md`). DNS records then live in `ha/edge-dns/zone.unbottled.ai.tmpl` on BOTH boxes (`/root/ha-edge/edge-dns/`); editing the template re-renders the zone within 10 s.
+- **ACME:** Let's Encrypt may reach either box. Each Caddy answers its own HTTP-01 tokens and relays unknown ones once to the peer over WG (`X-HA-Acme-Fwd` loop guard). TLS-ALPN-01 is disabled for these names. Verified by issuing S2's certs while DNS still pointed at S1. acme.sh/hosttech DNS-01 on S2 is retired (timer disabled).
+- **Deploys:** `vibe image-push` deploys Server 1 (migrations), relays the image box to box over WG, then runs `scripts/deploy-ha-node.sh` on Server 2 (tag `:unbottled`, never `:latest`; S1 .env merged with S2 overrides via `ha/scripts/merge-env.py`; health check; auto-rollback to `:unbottled-rollback`). While either app restarts, that box's Caddy serves from the other box. Measured: zero failed requests across the S1 cutover recreate.
+- **S2 env:** `/root/unbottled/.env` = S1's `.env` + S2 overrides; `HA_DATABASE_URL` comes from `/root/unbottled/.ha-database-url` (mode 600).
+
+## Failover when Server 1 is DOWN (manual, never while S1 is alive)
+
+1. On S2: `bash /root/unbottled/ha/s2-streaming-replica.sh promote` (type PROMOTE).
+2. Point S2's app at local backends: in `/root/unbottled/.ha-database-url` use `postgres://s2app:<pw>@pg-replica:5432/postgres?schema=public`; in `docker-compose.s2-ha.yml` set `REDIS_URL=redis://unbottled-redis:6379`, `S3_ENDPOINT=http://unbottled-minio:9000`, and drop `--task-runner=false` so crons run here; then `bash scripts/deploy-ha-node.sh`.
+3. DNS: the S2 health daemon already removed S1 from the apex.
+4. Failback is a planned job: rebuild S1's Postgres as a standby of S2 (or dump/restore), mirror MinIO back, then reverse.
+
+## History
+
+Everything below is the original design. The keepalived/VIP edge and the logical-replication data layer were superseded (two datacenters cannot share an L2 floating IP); the G1 stream-drain notes still apply.
 
 # unbottled.ai — 2-node active-active HA
 

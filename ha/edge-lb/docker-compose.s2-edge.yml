@@ -1,0 +1,74 @@
+# ============================================================================
+# Server 2 Caddy site config for unbottled, carried by a tiny PERSISTENT
+# container so the vhosts survive app recreates (caddy-docker-proxy drops a
+# container's sites the moment that container stops).
+#
+#   cd /root/unbottled && docker compose -p unbottled-edge \
+#     -f docker-compose.s2-edge.yml up -d
+#
+# Sites (label prefix caddy_internal, this box's caddy-docker-proxy):
+#   https://unbottled.ai      local unbottled-app first, Server 1 app over WG as
+#                             fallback (lb_policy first). /ws* falls back to S1's
+#                             split-port WS sidecar :4000.
+#   https://www.unbottled.ai  308 -> apex
+#   https://s2.unbottled.ai   direct test hostname for this node
+#   http://unbottled.ai, http://www.unbottled.ai
+#                             ACME HTTP-01 relay: tokens this Caddy does not
+#                             own go once to Server 1's Caddy (loop guard
+#                             header), so either box can renew no matter which
+#                             IP Let's Encrypt resolves. Rest redirects to https.
+# Certs: Caddy-managed (HTTP-01 only; TLS-ALPN-01 disabled because it cannot be
+# relayed). Server 1's Caddyfile carries the mirror-image config.
+# ============================================================================
+services:
+  unbottled-edge:
+    image: alpine:3.20
+    container_name: unbottled-edge
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
+    networks:
+      - caddy_internal
+    labels:
+      caddy_internal_10: "https://unbottled.ai"
+      caddy_internal_10.tls.issuer: "acme"
+      caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
+      caddy_internal_10.handle_0: "/ws*"
+      caddy_internal_10.handle_0.reverse_proxy: "unbottled-app:3000 10.88.0.1:4000"
+      caddy_internal_10.handle_0.reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_0.reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_0.reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_0.reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_0.reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_1.reverse_proxy: "unbottled-app:3000 10.88.0.1:3000"
+      caddy_internal_10.handle_1.reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_1.reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_1.reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_1.reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_1.reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_1.reverse_proxy.health_uri: "/robots.txt"
+      caddy_internal_10.handle_1.reverse_proxy.health_interval: "5s"
+      caddy_internal_10.handle_1.reverse_proxy.health_timeout: "3s"
+      caddy_internal_10.handle_1.reverse_proxy.health_status: "200"
+
+      caddy_internal_11: "https://www.unbottled.ai"
+      caddy_internal_11.tls.issuer: "acme"
+      caddy_internal_11.tls.issuer.disable_tlsalpn_challenge: ""
+      caddy_internal_11.redir: "https://unbottled.ai{uri} 308"
+
+      caddy_internal_12: "https://s2.unbottled.ai"
+      caddy_internal_12.reverse_proxy: "unbottled-app:3000"
+
+      caddy_internal_13: "http://unbottled.ai, http://www.unbottled.ai"
+      caddy_internal_13.@acme_to_peer.path: "/.well-known/acme-challenge/*"
+      caddy_internal_13.@acme_to_peer.not.header: "X-HA-Acme-Fwd *"
+      caddy_internal_13.handle_0: "@acme_to_peer"
+      caddy_internal_13.handle_0.reverse_proxy: "10.88.0.1:80"
+      caddy_internal_13.handle_0.reverse_proxy.header_up_0: "Host {host}"
+      caddy_internal_13.handle_0.reverse_proxy.header_up_1: "X-HA-Acme-Fwd 1"
+      caddy_internal_13.handle_1: "/.well-known/acme-challenge/*"
+      caddy_internal_13.handle_1.respond: "404"
+      caddy_internal_13.handle_2.redir: "https://{host}{uri} 308"
+
+networks:
+  caddy_internal:
+    external: true

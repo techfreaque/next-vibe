@@ -45,6 +45,11 @@ export const translations = {
         description:
           "user@host to transfer the built image to directly over SSH instead of a registry (e.g. root@203.0.113.5) - defaults to SSH_SERVER if set. Uses SSH_SERVER_PWD for password auth when set, otherwise your own SSH key/config. Leave empty to push to the registry instead.",
       },
+      secondary: {
+        title: "Roll Server 2",
+        description:
+          "After Server 1 is live and healthy, also roll the second HA node (SSH_SERVER2): load the image under SSH_SERVER2_IMAGE_TAG (never :latest), sync Server 1's .env, recreate, health-check, auto-rollback. Each box's Caddy serves from the other box meanwhile, so nobody sees a gap. Ignored when SSH_SERVER2 is unset or --sshTarget is given.",
+      },
       success: {
         title: "Success",
       },
@@ -118,6 +123,9 @@ export const translations = {
         commitResolved: "📌 Building commit {{sha}} ({{ref}}): {{subject}}",
         dirtyTreeWarning:
           "⚠️ Working tree has {{count}} uncommitted change(s). They are EXCLUDED from the image. Only commit {{sha}} is built.",
+        deployedShaRecorded: "📝 Recorded deployed commit {{sha}} in {{path}}",
+        deployedShaRecordFailed:
+          "Deploy succeeded, but writing {{path}} failed: {{error}}",
         exportStart: "📦 Exporting commit {{sha}} to {{dir}} ...",
         exportReused: "📦 Reusing exported tree for {{sha}} at {{dir}}",
         exportFailed: "Exporting commit {{sha}} failed: {{error}}",
@@ -131,6 +139,12 @@ export const translations = {
         scriptSyntaxInvalid:
           "bash -n rejected {{path}} from commit {{sha}}. Live script untouched.",
         scriptRemoteExit: "remote command exited with code {{code}}",
+        secondaryStart: "🔁 Server 1 live. Rolling Server 2 ({{target}}) ...",
+        secondarySuccess:
+          "🚀 Rolled {{refs}} to {{target}} and Server 2 ({{secondary}})",
+        secondaryFailed:
+          "Server 1 ({{target}}) is LIVE on the new image, but rolling Server 2 ({{secondary}}) failed: {{error}}. Server 2 kept or restored its previous image.",
+        envSyncFailed: "Copying Server 1's .env to Server 2 failed: {{error}}",
       },
     },
   },

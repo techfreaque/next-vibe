@@ -47,6 +47,11 @@ export const translations: typeof enTranslations = {
         description:
           "user@host, um das gebaute Image direkt per SSH statt über eine Registry zu übertragen (z.B. root@203.0.113.5) - standardmäßig SSH_SERVER, falls gesetzt. Nutzt SSH_SERVER_PWD für Passwort-Auth, sonst deinen eigenen SSH-Schlüssel/-Konfiguration. Leer lassen, um stattdessen in die Registry zu pushen.",
       },
+      secondary: {
+        title: "Server 2 mitrollen",
+        description:
+          "Sobald Server 1 live und gesund ist, auch den zweiten HA-Knoten (SSH_SERVER2) aktualisieren: Image unter SSH_SERVER2_IMAGE_TAG laden (nie :latest), .env von Server 1 übernehmen, neu starten, Health-Check, automatischer Rollback. Caddy auf jeder Box bedient solange von der anderen Box aus, also merkt niemand eine Lücke. Ignoriert, wenn SSH_SERVER2 fehlt oder --sshTarget gesetzt ist.",
+      },
       success: {
         title: "Erfolg",
       },
@@ -121,6 +126,9 @@ export const translations: typeof enTranslations = {
         commitResolved: "📌 Baue Commit {{sha}} ({{ref}}): {{subject}}",
         dirtyTreeWarning:
           "⚠️ Arbeitsverzeichnis hat {{count}} uncommittete Änderung(en). Sie sind NICHT im Image. Gebaut wird nur Commit {{sha}}.",
+        deployedShaRecorded: "📝 Deployten Commit {{sha}} in {{path}} vermerkt",
+        deployedShaRecordFailed:
+          "Deploy erfolgreich, aber {{path}} konnte nicht geschrieben werden: {{error}}",
         exportStart: "📦 Exportiere Commit {{sha}} nach {{dir}} ...",
         exportReused: "📦 Nutze exportierten Stand von {{sha}} in {{dir}}",
         exportFailed: "Export von Commit {{sha}} fehlgeschlagen: {{error}}",
@@ -136,6 +144,13 @@ export const translations: typeof enTranslations = {
         scriptSyntaxInvalid:
           "bash -n lehnt {{path}} aus Commit {{sha}} ab. Live-Skript unverändert.",
         scriptRemoteExit: "Remote-Befehl mit Code {{code}} beendet",
+        secondaryStart: "🔁 Server 1 läuft. Rolle Server 2 ({{target}}) ...",
+        secondarySuccess:
+          "🚀 {{refs}} auf {{target}} und Server 2 ({{secondary}}) ausgerollt",
+        secondaryFailed:
+          "Server 1 ({{target}}) läuft LIVE mit dem neuen Image, aber Server 2 ({{secondary}}) ist fehlgeschlagen: {{error}}. Server 2 hat sein vorheriges Image behalten oder wiederhergestellt.",
+        envSyncFailed:
+          "Kopieren der .env von Server 1 auf Server 2 fehlgeschlagen: {{error}}",
       },
     },
   },

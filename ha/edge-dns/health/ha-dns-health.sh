@@ -96,7 +96,9 @@ render(){ # render the healthy A set into the zone; bump serial + rewrite only o
   # canonical healthy set for change-detection (sorted, space-joined)
   newset="$(for ip in $ips; do echo "$ip"; done | sort | tr '\n' ' ')"
   oldset="$(grep -E '^@[[:space:]]+[0-9]+[[:space:]]+IN[[:space:]]+A' "$ZONE_FILE" 2>/dev/null | awk '{print $NF}' | sort | tr '\n' ' ')"
-  [ "$newset" = "$oldset" ] && return 0   # unchanged → leave zone (and serial) alone
+  # unchanged set AND template not edited since the last render → leave zone
+  # (and serial) alone. Editing the template (static records) re-renders.
+  [ "$newset" = "$oldset" ] && [ ! "$ZONE_TMPL" -nt "$ZONE_FILE" ] && return 0
 
   # Build the apex A block (PowerDNS BIND parser accepts "name TTL IN A ip").
   apex=""
