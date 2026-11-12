@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
     billing: "Kredyty i rozliczenia",
     limits: "Limity zapytań",
     errors: "Błędy",
+    codingTools: "Narzędzia do kodowania",
   },
   hero: {
     badge: "API zgodne z OpenAI",
@@ -182,6 +183,17 @@ export const translations: typeof enTranslations = {
     },
     streamNote:
       "Błędy w trakcie streamu przychodzą jako zdarzenie data: z tym samym obiektem błędu, po którym następuje data: [DONE].",
+  },
+  codingTools: {
+    title: "Użyj w swoim agencie kodującym",
+    intro:
+      "Ten sam bazowy URL, ten sam klucz. OpenCode i Continue łączą się bezpośrednio. Do konfiguracji wpisz dowolne ID z GET /v1/models.",
+    opencodeTitle: "OpenCode",
+    continueTitle: "Continue",
+    bridgeTitle: "Codex CLI i Claude Code",
+    bridgeBody:
+      "Codex mówi tylko Responses API, Claude Code tylko Anthropic Messages API. Oba działają przez lokalny most LiteLLM, który tłumaczy na chat completions. Przewodnik ma sprawdzone konfiguracje dla wszystkich czterech narzędzi.",
+    guide: "Przeczytaj przewodnik po narzędziach",
   },
   cta: {
     title: "Buduj na każdym modelu.",

@@ -11,7 +11,11 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type {
+  JWTPublicPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -123,8 +127,8 @@ async function completionsCall(
   return out.response;
 }
 
-function ApiKeyAuthAnonymous(): { isPublic: true; leadId: string; roles: ["PUBLIC"] } {
-  return { isPublic: true, leadId: "", roles: ["PUBLIC"] };
+function ApiKeyAuthAnonymous(): JWTPublicPayloadType {
+  return { isPublic: true, leadId: "", roles: [UserPermissionRole.PUBLIC] };
 }
 
 describe("OpenAI-compatible API", () => {
@@ -246,6 +250,9 @@ describe("OpenAI-compatible API", () => {
       expect(body.data.length).toBeGreaterThan(0);
       expect(body.data.every((m) => m.object === "model")).toBe(true);
       expect(body.data.some((m) => m.id === modelId)).toBe(true);
+      // One entry per id, even when a model has several provider routes.
+      const ids = body.data.map((m) => m.id);
+      expect(new Set(ids).size).toBe(ids.length);
     });
 
     it("401 with OpenAI error body for a bad key", async () => {
@@ -399,6 +406,8 @@ describe("OpenAI-compatible API", () => {
       },
     };
     let captured: InferenceRequest | undefined;
+    // Read through a getter: TS narrows a closure-assigned `let` to never.
+    const capturedRequest = (): InferenceRequest | undefined => captured;
     const toolRunner: InferenceRunner = {
       generate: (request) => {
         captured = request;
@@ -442,8 +451,8 @@ describe("OpenAI-compatible API", () => {
       expect(body.choices[0]?.message.tool_calls).toEqual([
         { id: "call_1", type: "function", function: { name: "get_weather", arguments: '{"city":"Berlin"}' } },
       ]);
-      expect(captured?.tools?.[0]?.name).toBe("get_weather");
-      expect(captured?.toolChoice).toBe("required");
+      expect(capturedRequest()?.tools?.[0]?.name).toBe("get_weather");
+      expect(capturedRequest()?.toolChoice).toBe("required");
     });
 
     it("stream: emits tool_calls deltas by index and finishes with tool_calls", async () => {
@@ -512,7 +521,7 @@ describe("OpenAI-compatible API", () => {
         },
         toolRunner,
       );
-      const messages = captured?.messages ?? [];
+      const messages = capturedRequest()?.messages ?? [];
       expect(messages[1]).toMatchObject({
         role: "assistant",
         content: [{ type: "tool-call", toolCallId: "call_1", toolName: "get_weather", input: { city: "Berlin" } }],

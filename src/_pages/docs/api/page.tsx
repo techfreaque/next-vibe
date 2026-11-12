@@ -10,6 +10,7 @@ import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Key } from "next-vibe/ui/components/icons/Key";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
@@ -27,6 +28,7 @@ import {
   StepList,
 } from "../../story/_shared/marketing";
 import { scopedTranslation } from "./i18n";
+import { buildCodingToolSnippets } from "../../story/blog/unbottled-api-in-coding-tools/snippets";
 import { buildDocsSnippets } from "./snippets";
 
 export interface ApiDocsPageData {
@@ -203,6 +205,7 @@ export function TanstackPage({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const snippets = buildDocsSnippets(baseUrl);
+  const toolSnippets = buildCodingToolSnippets(baseUrl);
 
   return (
     <Div className="min-h-screen bg-background">
@@ -500,6 +503,44 @@ export function TanstackPage({
           <Callout icon={AlertTriangle} tone="neutral">
             {t("errors.streamNote")}
           </Callout>
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="coding-tools"
+        label={t("nav.codingTools")}
+        title={t("codingTools.title")}
+        intro={t("codingTools.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("codingTools.opencodeTitle")}>
+            <Code
+              code={toolSnippets.opencode}
+              language="json"
+              filename="opencode.json"
+            />
+          </Block>
+          <Block title={t("codingTools.continueTitle")}>
+            <Code
+              code={toolSnippets.continueConfig}
+              language="yaml"
+              filename="config.yaml"
+            />
+          </Block>
+          <Callout icon={Terminal} tone="neutral">
+            <Span className="font-semibold">
+              {t("codingTools.bridgeTitle")}.{" "}
+            </Span>
+            {t("codingTools.bridgeBody")}
+          </Callout>
+          <Div>
+            <Cta
+              href={`/${locale}/story/blog/unbottled-api-in-coding-tools`}
+              label={t("codingTools.guide")}
+              icon={BookOpen}
+              variant="secondary"
+            />
+          </Div>
         </Div>
       </PageSection>
 

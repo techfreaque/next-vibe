@@ -39,6 +39,28 @@ export function listUserChatModels(
 }
 
 /**
+ * One entry per model id, as GET /v1/models must list it. The pool holds one
+ * option per provider route, so the same id can appear several times; each id
+ * is reported as the variant a request with that id actually runs on.
+ */
+export function listUserCallableModels(
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): ChatModelOption[] {
+  const seen = new Set<string>();
+  const models: ChatModelOption[] = [];
+  for (const candidate of listUserChatModels(user, availability)) {
+    if (seen.has(candidate.id)) {
+      continue;
+    }
+    seen.add(candidate.id);
+    const served = resolveRequestedModel(candidate.id, user, availability);
+    models.push(served?.id === candidate.id ? served : candidate);
+  }
+  return models;
+}
+
+/**
  * Strict resolution of the `model` string from a request: exact id (legacy ids
  * map to their successor). Returns undefined when the model is unknown or not
  * servable for this user - never silently swaps to a different model.

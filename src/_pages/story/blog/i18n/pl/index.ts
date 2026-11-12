@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    codingTools: {
+      title: "Jeden klucz. Każdy model. Prosto w twoim agencie.",
+      category: "Przewodnik dla programistów",
+      excerpt:
+        "OpenCode, Continue, Codex CLI i Claude Code na jednym kluczu API, modele niecenzurowane w zestawie. Sprawdzone konfiguracje, most, którego potrzebują dwa z nich, i pułapki, na które wpadliśmy.",
+      readTime: "9 min czytania",
+    },
     uncensoredGuide: {
       title: "Modele niecenzurowane, jeden po drugim.",
       category: "Przewodnik po modelach",
@@ -63,7 +70,7 @@ export const translations: typeof enTranslations = {
       title: "Cortex. Dreamer. Autopilot. Twoja AI w koncu pamieta.",
       category: "Aktualizacja produktu",
       excerpt:
-        "Trwala pamiec, nocna refleksja, automatyczne dzialanie. Do tego generowanie mediow i {{credits}} kredytow — pelny miesiac gratis — za szczere opinie.",
+        "Trwala pamiec, nocna refleksja, automatyczne dzialanie. Do tego generowanie mediow i {{credits}} kredytow, pelny miesiac gratis, za szczere opinie.",
       readTime: "6 min czytania",
     },
     whatsNewApril2026: {

@@ -187,15 +187,17 @@ export function buildMissingKeyMessage(
 
 /**
  * Full instance availability — env flags plus live connections-DB inference
- * state. Server-only: reads the executor's routing state. Client surfaces get
+ * state. Server-only: reads the connections table. Client surfaces get
  * this value passed down from the page into AgentAvailabilityProvider.
  */
 export async function getEnvAvailability(): Promise<AgentEnvAvailability> {
   try {
-    const { ExecuteToolRouting } =
-      await import("next-vibe/remote-connection/routing");
-    const { hasSystem, forceSystem } =
-      await ExecuteToolRouting.getInstanceInferenceState();
+    // Lean module on purpose — see inference-state.ts. Never route this
+    // through remote-connection/routing: the root layout calls it on every
+    // page, and that graph bundles every endpoint widget into the client.
+    const { getInstanceInferenceState } =
+      await import("next-vibe/remote-connection/inference-state");
+    const { hasSystem, forceSystem } = await getInstanceInferenceState();
     return {
       ...envAvailability,
       unbottledSystem: hasSystem,

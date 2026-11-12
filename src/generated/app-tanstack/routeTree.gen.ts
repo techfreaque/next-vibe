@@ -57,6 +57,7 @@ import { Route as LocaleStoryFrameworkIndexRouteImport } from './routes/$locale.
 import { Route as LocaleStoryImprintIndexRouteImport } from './routes/$locale.story.imprint.index'
 import { Route as LocaleStoryInvestIndexRouteImport } from './routes/$locale.story.invest.index'
 import { Route as LocaleStoryNewsletterIndexRouteImport } from './routes/$locale.story.newsletter.index'
+import { Route as LocaleStoryPartnersIndexRouteImport } from './routes/$locale.story.partners.index'
 import { Route as LocaleStoryPrivacyPolicyIndexRouteImport } from './routes/$locale.story.privacy-policy.index'
 import { Route as LocaleStoryRefusalIndexIndexRouteImport } from './routes/$locale.story.refusal-index.index'
 import { Route as LocaleStorySelfHostIndexRouteImport } from './routes/$locale.story.self-host.index'
@@ -149,6 +150,7 @@ import { Route as ApiLocalePaymentRefundRouteImport } from './routes/api.$locale
 import { Route as ApiLocalePosDashboardRouteImport } from './routes/api.$locale.pos.dashboard'
 import { Route as ApiLocalePosProductLookupRouteImport } from './routes/api.$locale.pos.product-lookup'
 import { Route as ApiLocalePurchasingDashboardRouteImport } from './routes/api.$locale.purchasing.dashboard'
+import { Route as ApiLocaleReferralLinksRouteImport } from './routes/api.$locale.referral.links'
 import { Route as ApiLocaleReferralPayoutRouteImport } from './routes/api.$locale.referral.payout'
 import { Route as ApiLocaleReferralStatsRouteImport } from './routes/api.$locale.referral.stats'
 import { Route as ApiLocaleSubscriptionCancelRouteImport } from './routes/api.$locale.subscription.cancel'
@@ -176,6 +178,7 @@ import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
 import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './routes/$locale.story.blog.skill-sharing-economy.index'
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
+import { Route as LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport } from './routes/$locale.story.blog.unbottled-api-in-coding-tools.index'
 import { Route as LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport } from './routes/$locale.story.blog.uncensored-models-what-each-is-good-at.index'
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
@@ -302,6 +305,10 @@ import { Route as ApiLocaleLeadsLifecycleBackfillRouteImport } from './routes/ap
 import { Route as ApiLocaleLeadsLifecycleOverviewRouteImport } from './routes/api.$locale.leads.lifecycle.overview'
 import { Route as ApiLocaleLeadsLifecycleRunRouteImport } from './routes/api.$locale.leads.lifecycle.run'
 import { Route as ApiLocaleLeadsLifecycleSettingsRouteImport } from './routes/api.$locale.leads.lifecycle.settings'
+import { Route as ApiLocaleLeadsOutreachContactRouteImport } from './routes/api.$locale.leads.outreach.contact'
+import { Route as ApiLocaleLeadsOutreachCrmRouteImport } from './routes/api.$locale.leads.outreach.crm'
+import { Route as ApiLocaleLeadsOutreachDealRouteImport } from './routes/api.$locale.leads.outreach.deal'
+import { Route as ApiLocaleLeadsOutreachImportRouteImport } from './routes/api.$locale.leads.outreach.import'
 import { Route as ApiLocaleLeadsTrackingPixelRouteImport } from './routes/api.$locale.leads.tracking.pixel'
 import { Route as ApiLocaleMessengerAccountsCreateRouteImport } from './routes/api.$locale.messenger.accounts.create'
 import { Route as ApiLocaleMessengerAccountsListRouteImport } from './routes/api.$locale.messenger.accounts.list'
@@ -907,6 +914,12 @@ const LocaleStoryNewsletterIndexRoute =
     path: '/newsletter/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryPartnersIndexRoute =
+  LocaleStoryPartnersIndexRouteImport.update({
+    id: '/partners/',
+    path: '/partners/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryPrivacyPolicyIndexRoute =
   LocaleStoryPrivacyPolicyIndexRouteImport.update({
     id: '/privacy-policy/',
@@ -1427,6 +1440,11 @@ const ApiLocalePurchasingDashboardRoute =
     path: '/api/$locale/purchasing/dashboard',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleReferralLinksRoute = ApiLocaleReferralLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
+  getParentRoute: () => ApiLocaleReferralRoute,
+} as any)
 const ApiLocaleReferralPayoutRoute = ApiLocaleReferralPayoutRouteImport.update({
   id: '/payout',
   path: '/payout',
@@ -1578,6 +1596,12 @@ const LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute =
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport.update({
     id: '/blog/type-checker-made-ai-stop-lying/',
     path: '/blog/type-checker-made-ai-stop-lying/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute =
+  LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport.update({
+    id: '/blog/unbottled-api-in-coding-tools/',
+    path: '/blog/unbottled-api-in-coding-tools/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute =
@@ -2334,6 +2358,30 @@ const ApiLocaleLeadsLifecycleSettingsRoute =
   ApiLocaleLeadsLifecycleSettingsRouteImport.update({
     id: '/api/$locale/leads/lifecycle/settings',
     path: '/api/$locale/leads/lifecycle/settings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsOutreachContactRoute =
+  ApiLocaleLeadsOutreachContactRouteImport.update({
+    id: '/api/$locale/leads/outreach/contact',
+    path: '/api/$locale/leads/outreach/contact',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsOutreachCrmRoute =
+  ApiLocaleLeadsOutreachCrmRouteImport.update({
+    id: '/api/$locale/leads/outreach/crm',
+    path: '/api/$locale/leads/outreach/crm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsOutreachDealRoute =
+  ApiLocaleLeadsOutreachDealRouteImport.update({
+    id: '/api/$locale/leads/outreach/deal',
+    path: '/api/$locale/leads/outreach/deal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsOutreachImportRoute =
+  ApiLocaleLeadsOutreachImportRouteImport.update({
+    id: '/api/$locale/leads/outreach/import',
+    path: '/api/$locale/leads/outreach/import',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleLeadsTrackingPixelRoute =
@@ -4613,6 +4661,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
+  '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
@@ -4643,6 +4692,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/imprint/': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter/': typeof LocaleStoryNewsletterIndexRoute
+  '/$locale/story/partners/': typeof LocaleStoryPartnersIndexRoute
   '/$locale/story/privacy-policy/': typeof LocaleStoryPrivacyPolicyIndexRoute
   '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
@@ -4766,6 +4816,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
   '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
   '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
+  '/api/$locale/leads/outreach/contact': typeof ApiLocaleLeadsOutreachContactRoute
+  '/api/$locale/leads/outreach/crm': typeof ApiLocaleLeadsOutreachCrmRoute
+  '/api/$locale/leads/outreach/deal': typeof ApiLocaleLeadsOutreachDealRoute
+  '/api/$locale/leads/outreach/import': typeof ApiLocaleLeadsOutreachImportRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -4904,6 +4958,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -5259,6 +5314,7 @@ export interface FileRoutesByTo {
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
+  '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
@@ -5289,6 +5345,7 @@ export interface FileRoutesByTo {
   '/$locale/story/imprint': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter': typeof LocaleStoryNewsletterIndexRoute
+  '/$locale/story/partners': typeof LocaleStoryPartnersIndexRoute
   '/$locale/story/privacy-policy': typeof LocaleStoryPrivacyPolicyIndexRoute
   '/$locale/story/refusal-index': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host': typeof LocaleStorySelfHostIndexRoute
@@ -5412,6 +5469,10 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
   '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
   '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
+  '/api/$locale/leads/outreach/contact': typeof ApiLocaleLeadsOutreachContactRoute
+  '/api/$locale/leads/outreach/crm': typeof ApiLocaleLeadsOutreachCrmRoute
+  '/api/$locale/leads/outreach/deal': typeof ApiLocaleLeadsOutreachDealRoute
+  '/api/$locale/leads/outreach/import': typeof ApiLocaleLeadsOutreachImportRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -5550,6 +5611,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/unbottled-api-in-coding-tools': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -5913,6 +5975,7 @@ export interface FileRoutesById {
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
+  '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
@@ -5943,6 +6006,7 @@ export interface FileRoutesById {
   '/$locale/story/imprint/': typeof LocaleStoryImprintIndexRoute
   '/$locale/story/invest/': typeof LocaleStoryInvestIndexRoute
   '/$locale/story/newsletter/': typeof LocaleStoryNewsletterIndexRoute
+  '/$locale/story/partners/': typeof LocaleStoryPartnersIndexRoute
   '/$locale/story/privacy-policy/': typeof LocaleStoryPrivacyPolicyIndexRoute
   '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
@@ -6066,6 +6130,10 @@ export interface FileRoutesById {
   '/api/$locale/leads/lifecycle/overview': typeof ApiLocaleLeadsLifecycleOverviewRoute
   '/api/$locale/leads/lifecycle/run': typeof ApiLocaleLeadsLifecycleRunRoute
   '/api/$locale/leads/lifecycle/settings': typeof ApiLocaleLeadsLifecycleSettingsRoute
+  '/api/$locale/leads/outreach/contact': typeof ApiLocaleLeadsOutreachContactRoute
+  '/api/$locale/leads/outreach/crm': typeof ApiLocaleLeadsOutreachCrmRoute
+  '/api/$locale/leads/outreach/deal': typeof ApiLocaleLeadsOutreachDealRoute
+  '/api/$locale/leads/outreach/import': typeof ApiLocaleLeadsOutreachImportRoute
   '/api/$locale/leads/tracking/pixel': typeof ApiLocaleLeadsTrackingPixelRoute
   '/api/$locale/messenger/accounts/create': typeof ApiLocaleMessengerAccountsCreateRoute
   '/api/$locale/messenger/accounts/list': typeof ApiLocaleMessengerAccountsListRoute
@@ -6204,6 +6272,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -6567,6 +6636,7 @@ export interface FileRouteTypes {
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
+    | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/subscription/cancel'
@@ -6597,6 +6667,7 @@ export interface FileRouteTypes {
     | '/$locale/story/imprint/'
     | '/$locale/story/invest/'
     | '/$locale/story/newsletter/'
+    | '/$locale/story/partners/'
     | '/$locale/story/privacy-policy/'
     | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
@@ -6720,6 +6791,10 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/lifecycle/overview'
     | '/api/$locale/leads/lifecycle/run'
     | '/api/$locale/leads/lifecycle/settings'
+    | '/api/$locale/leads/outreach/contact'
+    | '/api/$locale/leads/outreach/crm'
+    | '/api/$locale/leads/outreach/deal'
+    | '/api/$locale/leads/outreach/import'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -6858,6 +6933,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
@@ -7213,6 +7289,7 @@ export interface FileRouteTypes {
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
+    | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/subscription/cancel'
@@ -7243,6 +7320,7 @@ export interface FileRouteTypes {
     | '/$locale/story/imprint'
     | '/$locale/story/invest'
     | '/$locale/story/newsletter'
+    | '/$locale/story/partners'
     | '/$locale/story/privacy-policy'
     | '/$locale/story/refusal-index'
     | '/$locale/story/self-host'
@@ -7366,6 +7444,10 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/lifecycle/overview'
     | '/api/$locale/leads/lifecycle/run'
     | '/api/$locale/leads/lifecycle/settings'
+    | '/api/$locale/leads/outreach/contact'
+    | '/api/$locale/leads/outreach/crm'
+    | '/api/$locale/leads/outreach/deal'
+    | '/api/$locale/leads/outreach/import'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -7504,6 +7586,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers'
     | '/$locale/story/blog/skill-sharing-economy'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
+    | '/$locale/story/blog/unbottled-api-in-coding-tools'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at'
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
@@ -7866,6 +7949,7 @@ export interface FileRouteTypes {
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
+    | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/subscription/cancel'
@@ -7896,6 +7980,7 @@ export interface FileRouteTypes {
     | '/$locale/story/imprint/'
     | '/$locale/story/invest/'
     | '/$locale/story/newsletter/'
+    | '/$locale/story/partners/'
     | '/$locale/story/privacy-policy/'
     | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
@@ -8019,6 +8104,10 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/lifecycle/overview'
     | '/api/$locale/leads/lifecycle/run'
     | '/api/$locale/leads/lifecycle/settings'
+    | '/api/$locale/leads/outreach/contact'
+    | '/api/$locale/leads/outreach/crm'
+    | '/api/$locale/leads/outreach/deal'
+    | '/api/$locale/leads/outreach/import'
     | '/api/$locale/leads/tracking/pixel'
     | '/api/$locale/messenger/accounts/create'
     | '/api/$locale/messenger/accounts/list'
@@ -8157,6 +8246,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
@@ -8610,6 +8700,10 @@ export interface RootRouteChildren {
   ApiLocaleLeadsLifecycleOverviewRoute: typeof ApiLocaleLeadsLifecycleOverviewRoute
   ApiLocaleLeadsLifecycleRunRoute: typeof ApiLocaleLeadsLifecycleRunRoute
   ApiLocaleLeadsLifecycleSettingsRoute: typeof ApiLocaleLeadsLifecycleSettingsRoute
+  ApiLocaleLeadsOutreachContactRoute: typeof ApiLocaleLeadsOutreachContactRoute
+  ApiLocaleLeadsOutreachCrmRoute: typeof ApiLocaleLeadsOutreachCrmRoute
+  ApiLocaleLeadsOutreachDealRoute: typeof ApiLocaleLeadsOutreachDealRoute
+  ApiLocaleLeadsOutreachImportRoute: typeof ApiLocaleLeadsOutreachImportRoute
   ApiLocaleMessengerAccountsCreateRoute: typeof ApiLocaleMessengerAccountsCreateRoute
   ApiLocaleMessengerAccountsListRoute: typeof ApiLocaleMessengerAccountsListRoute
   ApiLocaleMessengerDataSourcesMessengerBouncedRoute: typeof ApiLocaleMessengerDataSourcesMessengerBouncedRoute
@@ -9162,6 +9256,13 @@ declare module '@tanstack/react-router' {
       path: '/newsletter'
       fullPath: '/$locale/story/newsletter/'
       preLoaderRoute: typeof LocaleStoryNewsletterIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/partners/': {
+      id: '/$locale/story/partners/'
+      path: '/partners'
+      fullPath: '/$locale/story/partners/'
+      preLoaderRoute: typeof LocaleStoryPartnersIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/privacy-policy/': {
@@ -9808,6 +9909,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePurchasingDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/referral/links': {
+      id: '/api/$locale/referral/links'
+      path: '/links'
+      fullPath: '/api/$locale/referral/links'
+      preLoaderRoute: typeof ApiLocaleReferralLinksRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
     '/api/$locale/referral/payout': {
       id: '/api/$locale/referral/payout'
       path: '/payout'
@@ -9995,6 +10103,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/type-checker-made-ai-stop-lying'
       fullPath: '/$locale/story/blog/type-checker-made-ai-stop-lying/'
       preLoaderRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/unbottled-api-in-coding-tools/': {
+      id: '/$locale/story/blog/unbottled-api-in-coding-tools/'
+      path: '/blog/unbottled-api-in-coding-tools'
+      fullPath: '/$locale/story/blog/unbottled-api-in-coding-tools/'
+      preLoaderRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/uncensored-models-what-each-is-good-at/': {
@@ -10877,6 +10992,34 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/leads/lifecycle/settings'
       fullPath: '/api/$locale/leads/lifecycle/settings'
       preLoaderRoute: typeof ApiLocaleLeadsLifecycleSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/outreach/contact': {
+      id: '/api/$locale/leads/outreach/contact'
+      path: '/api/$locale/leads/outreach/contact'
+      fullPath: '/api/$locale/leads/outreach/contact'
+      preLoaderRoute: typeof ApiLocaleLeadsOutreachContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/outreach/crm': {
+      id: '/api/$locale/leads/outreach/crm'
+      path: '/api/$locale/leads/outreach/crm'
+      fullPath: '/api/$locale/leads/outreach/crm'
+      preLoaderRoute: typeof ApiLocaleLeadsOutreachCrmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/outreach/deal': {
+      id: '/api/$locale/leads/outreach/deal'
+      path: '/api/$locale/leads/outreach/deal'
+      fullPath: '/api/$locale/leads/outreach/deal'
+      preLoaderRoute: typeof ApiLocaleLeadsOutreachDealRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/outreach/import': {
+      id: '/api/$locale/leads/outreach/import'
+      path: '/api/$locale/leads/outreach/import'
+      fullPath: '/api/$locale/leads/outreach/import'
+      preLoaderRoute: typeof ApiLocaleLeadsOutreachImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/leads/tracking/pixel': {
@@ -13439,6 +13582,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryImprintIndexRoute: typeof LocaleStoryImprintIndexRoute
   LocaleStoryInvestIndexRoute: typeof LocaleStoryInvestIndexRoute
   LocaleStoryNewsletterIndexRoute: typeof LocaleStoryNewsletterIndexRoute
+  LocaleStoryPartnersIndexRoute: typeof LocaleStoryPartnersIndexRoute
   LocaleStoryPrivacyPolicyIndexRoute: typeof LocaleStoryPrivacyPolicyIndexRoute
   LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
@@ -13455,6 +13599,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   LocaleStoryBlogSkillSharingEconomyIndexRoute: typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -13476,6 +13621,7 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryImprintIndexRoute: LocaleStoryImprintIndexRoute,
   LocaleStoryInvestIndexRoute: LocaleStoryInvestIndexRoute,
   LocaleStoryNewsletterIndexRoute: LocaleStoryNewsletterIndexRoute,
+  LocaleStoryPartnersIndexRoute: LocaleStoryPartnersIndexRoute,
   LocaleStoryPrivacyPolicyIndexRoute: LocaleStoryPrivacyPolicyIndexRoute,
   LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
@@ -13504,6 +13650,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogSkillSharingEconomyIndexRoute,
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute:
     LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute,
+  LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute:
+    LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute,
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute:
     LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute,
   LocaleStoryBlogWhatsNewApril2026IndexRoute:
@@ -13822,6 +13970,7 @@ const ApiLocalePaymentRouteWithChildren =
   ApiLocalePaymentRoute._addFileChildren(ApiLocalePaymentRouteChildren)
 
 interface ApiLocaleReferralRouteChildren {
+  ApiLocaleReferralLinksRoute: typeof ApiLocaleReferralLinksRoute
   ApiLocaleReferralPayoutRoute: typeof ApiLocaleReferralPayoutRoute
   ApiLocaleReferralStatsRoute: typeof ApiLocaleReferralStatsRoute
   ApiLocaleReferralAdminPayoutsRoute: typeof ApiLocaleReferralAdminPayoutsRoute
@@ -13838,6 +13987,7 @@ interface ApiLocaleReferralRouteChildren {
 }
 
 const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
+  ApiLocaleReferralLinksRoute: ApiLocaleReferralLinksRoute,
   ApiLocaleReferralPayoutRoute: ApiLocaleReferralPayoutRoute,
   ApiLocaleReferralStatsRoute: ApiLocaleReferralStatsRoute,
   ApiLocaleReferralAdminPayoutsRoute: ApiLocaleReferralAdminPayoutsRoute,
@@ -14797,6 +14947,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadsLifecycleOverviewRoute: ApiLocaleLeadsLifecycleOverviewRoute,
   ApiLocaleLeadsLifecycleRunRoute: ApiLocaleLeadsLifecycleRunRoute,
   ApiLocaleLeadsLifecycleSettingsRoute: ApiLocaleLeadsLifecycleSettingsRoute,
+  ApiLocaleLeadsOutreachContactRoute: ApiLocaleLeadsOutreachContactRoute,
+  ApiLocaleLeadsOutreachCrmRoute: ApiLocaleLeadsOutreachCrmRoute,
+  ApiLocaleLeadsOutreachDealRoute: ApiLocaleLeadsOutreachDealRoute,
+  ApiLocaleLeadsOutreachImportRoute: ApiLocaleLeadsOutreachImportRoute,
   ApiLocaleMessengerAccountsCreateRoute: ApiLocaleMessengerAccountsCreateRoute,
   ApiLocaleMessengerAccountsListRoute: ApiLocaleMessengerAccountsListRoute,
   ApiLocaleMessengerDataSourcesMessengerBouncedRoute:

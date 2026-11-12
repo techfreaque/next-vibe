@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    codingTools: {
+      title: "One key. Every model. Inside your coding agent.",
+      category: "Developer Guide",
+      excerpt:
+        "Run OpenCode, Continue, Codex CLI and Claude Code on one API key, uncensored models included. Tested configs, the bridge two of them need, and the gotchas we hit.",
+      readTime: "9 min read",
+    },
     uncensoredGuide: {
       title: "The uncensored models, one by one.",
       category: "Model Guide",
@@ -60,7 +67,7 @@ export const translations = {
       title: "Cortex. Dreamer. Autopilot. Your AI remembers now.",
       category: "Product Update",
       excerpt:
-        "Persistent memory, nightly reflection, background execution. Plus media generation and {{credits}} credits — a full month free — for telling us what's broken.",
+        "Persistent memory, nightly reflection, background execution. Plus media generation and {{credits}} credits, a full month free, for telling us what's broken.",
       readTime: "6 min read",
     },
     whatsNewApril2026: {

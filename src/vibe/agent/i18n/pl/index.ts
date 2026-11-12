@@ -1388,110 +1388,110 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "UncensoredLM v1.2 - Model rozumujący od Uncensored.ai, destylat DeepSeek-R1 na bazie Qwen 14B. Myśli na głos, odpowiada wprost, korzysta z narzędzi. Kontekst 32K. Eksperymentalny i nie do kodu.",
+          "Model rozumujący od Uncensored.ai, destylat DeepSeek-R1 na bazie Qwen 14B. Myśli na głos, odpowiada wprost, wywołuje narzędzia. 32K kontekstu. Eksperymentalny i nie do kodu. Z tym lepiej i taniej poradzi sobie GLM 5.3 Uncensored.",
         freedomgptLiberty:
-          "FreedomGPT Liberty - Flagowy model Age of AI i chatbot wolności słowa, od którego zaczęła się cała kategoria. Zbudowany na otwartych wagach, nastawiony na szczere odpowiedzi bez morałów. Szybki i bystry, kontekst 32K. Słabszy w narzędziach, kodowaniu i głębokiej analizie.",
+          "Flagowy model bez cenzury od Age of AI, czatbot wolności słowa, od którego zaczęła się cała kategoria. Zbudowany na otwartych wagach, nastawiony na dosadne odpowiedzi bez moralizowania. Szybki i błyskotliwy, 32K kontekstu. Słabszy w narzędziach, kodzie i głębokiej analizie. Do tego lepiej sprawdzi się Qwen 3.6 Plus Uncensored.",
         gabAiArya:
-          "Gab AI Arya - Niecenzurowany asystent Gab, świadomie ustawiony po prawej stronie przez swojego twórcę i zaprojektowany tak, by odpowiadać bez typowych barier. Bystry, kontekst 131K, korzysta z narzędzi. Celowo inny punkt widzenia w katalogu. Słabszy w kodowaniu, model bazowy nieujawniony.",
+          "Asystent Gab bez cenzury, przez samego twórcę umieszczony po prawej stronie sceny politycznej i zbudowany tak, by odpowiadać bez zwykłych barierek. Bystry, 131K kontekstu, czyta obrazy i wideo, wywołuje narzędzia. Celowo inny punkt widzenia w katalogu. Słabszy w kodowaniu, a model bazowy nie został ujawniony.",
         gemini31ProPreviewCustomTools:
-          "Gemini 3.1 Pro Preview (Custom Tools) - Wariant Gemini 3.1 Pro z ulepszoną selekcją narzędzi dla agentów kodowania i złożonych przepływów wielonarzędziowych",
+          "Wersja preview Gemini 3.1 Pro z dopiskiem custom tools, dostrojona tak, by wywoływała zdefiniowane przez ciebie narzędzia zamiast uciekać do basha. Stworzona dla agentów kodujących i przepływów z wieloma narzędziami, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. To wciąż preview. Gemini 4 Argon to nowsza klasa Pro w podobnej cenie.",
         gemini31FlashImagePreview:
-          "Gemini 3.1 Flash Image Preview - Multimodalny model Google generujący obrazy bezpośrednio z promptów tekstowych przez czat, obsługujący tekst i obraz w tej samej rozmowie",
+          "Gemini 3.1 Flash Image od Google, wciąż w wersji preview. Generuje i edytuje obrazy prosto w czacie, tekst i grafika w jednej odpowiedzi. Najtańszy model obrazowy w katalogu. Filtry mainstreamowe, bez wywołań narzędzi, 64K kontekstu. Przy złożonych promptach i czytelniejszym tekście na obrazach Nano Banana Pro kosztuje więcej, ale daje więcej.",
         gemini31FlashLitePreview:
-          "Gemini 3.1 Flash Lite Preview - Wysokowydajny model Google zoptymalizowany dla dużych wolumenów z ulepszeniami w audio, rankingu RAG, tłumaczeniu i uzupełnianiu kodu",
+          "Budżetowy model Google do dużych wolumenów, wciąż w wersji preview: tłumaczenia, ranking, ekstrakcja i szybki czat w kontekście 1M, przyjmuje tekst, obraz, wideo i audio. Tani i szybki, ale nie do trudnego rozumowania. Nadal kosztuje mniej niż następca, Gemini 3.5 Flash Lite.",
         gemini3Pro:
           "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstowym i potężnymi możliwościami rozumowania",
         gemini35Flash:
-          "Gemini 3.5 Flash - Możliwości bliskie Pro przy koszcie Flash. Obsługuje tekst, obrazy, wideo, audio i PDF. Wbudowane równoległe pętle agentów. Poziomy myślenia od minimalnego do wysokiego dla precyzyjnej kontroli kosztów i wydajności.",
+          "Model Flash od Google reklamowany jako bliski poziomowi Pro w kodowaniu i rozumowaniu. Regulowane poziomy myślenia, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Solidny, ale Gemini 3.8 Flash jest nowszy i kosztuje mniej więcej połowę, więc warto zmienić.",
         gemini3Flash:
-          "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany dla szybkich odpowiedzi",
+          "Pierwszy Gemini 3 Flash od Google: szybki, radzi sobie z kodem i codziennym rozumowaniem, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Wciąż opłacalny i tańszy niż następca. Kto chce najnowszego Flasha, wybiera Gemini 3.8 Flash.",
         deepseekV32:
-          "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
+          "Model open-weight od DeepSeek z końca 2025 z rzadką uwagą (sparse attention), która obniża koszt pracy z długim kontekstem. Mieszanka ekspertów z 671B parametrów, dobra w kodzie i analizie za bardzo małe pieniądze, tylko tekst. DeepSeek V4.1 Flash jest nowszy i jeszcze tańszy.",
         deepseekV4Pro:
-          "DeepSeek V4 Pro - 1,6T parametrów MoE z kontekstem 1M. Do analizy całych baz kodu, złożonego rozumowania i wieloetapowych agentów.",
+          "Flagowiec DeepSeek o otwartych wagach: mixture-of-experts z 1.6T parametrów, z czego 49B aktywnych, licencja MIT. Głębokie rozumowanie, poważny kod, analiza całych repozytoriów i wieloetapowa praca agentowa, 1M kontekstu, wywołuje narzędzia. Tylko tekst. Ułamek ceny Claude Opus 5.5. Do taniej i szybkiej pracy na co dzień jest DeepSeek V4.1 Flash.",
         deepseekV4Flash:
-          "DeepSeek V4 Flash - 284B MoE za grosze. Kontekst 1M, szybka inferecja, solidne kodowanie. Wydajny wybór do zadań wymagających wysokiej przepustowości.",
+          "Model Flash od DeepSeek, mieszanka ekspertów z 284B parametrów: 1M kontekstu, szybki, mocny w kodzie, prawie darmowy za wiadomość. Tylko tekst. Następca, DeepSeek V4.1 Flash, kosztuje tyle samo, więc lepiej się przesiąść, chyba że potrzebujesz dokładnie tej wersji.",
         gpt55:
-          "GPT-5.5 - Frontier model OpenAI dla złożonych profesjonalnych zadań. Silniejsze rozumowanie, wyższa niezawodność, lepsza wydajność tokenów. Kontekst 1M+ z obsługą tekstu i obrazów.",
+          "Dawny topowy model OpenAI: mocne rozumowanie, kodowanie i analiza w kontekście 1M, przyjmuje tekst i obrazy. Wciąż sprawny, ale drogi. GPT-6.1 Sol robi dziś to samo znacznie taniej. Słaby w roleplayu.",
         gpt55Pro:
-          "GPT-5.5 Pro - Najwydajniejszy model OpenAI do głębokiego rozumowania w złożonych, wysokostawkowych zadaniach. Kontekst 1M+, długohoryzontowe rozwiązywanie problemów, agentyczne kodowanie, precyzyjne wykonanie wieloetapowe.",
+          "Wersja Pro modelu GPT-5.5 z wydłużonym rozumowaniem, która zużywa znacznie więcej mocy na trudne problemy o wysoką stawkę. Jeden z najdroższych modeli w katalogu, opłaca się tylko wtedy, gdy błędna odpowiedź kosztuje więcej niż wiadomość. Nowszy wybór to GPT-6 Astra, za mniej więcej jedną trzecią ceny.",
         gpt54Pro:
-          "GPT-5.4 Pro - Najbardziej zaawansowany model OpenAI z ulepszonym rozumowaniem, oknem kontekstu 1M+ i doskonałą wydajnością dla złożonych zadań",
+          "Wersja Pro modelu GPT-5.4 z maksymalną mocą obliczeniową do trudnego rozumowania, researchu i krytycznych analiz w kontekście 1M. Powolna i jedna z najdroższych tutaj. GPT-6 Astra robi to samo za mniej więcej jedną trzecią ceny.",
         gpt54:
-          "GPT-5.4 - Najnowszy model frontier OpenAI łączący Codex i GPT, z oknem kontekstu 1M+ dla wielokontekstowego rozumowania i kodowania",
+          "Model OpenAI, który wniósł kodowanie na poziomie Codex do głównej linii GPT. 1M kontekstu i obsługa obrazów. Solidny przy długich dokumentach, kodzie i analizie. GPT-6.1 Sol jest nowszy, oceniany o poziom wyżej i tańszy za wiadomość, więc warto się przesiąść.",
         gpt53Codex:
-          "GPT-5.3-Codex - Najbardziej zaawansowany model agentyczny OpenAI do kodowania, zoptymalizowany dla długich przepływów z narzędziami i złożonych zadań deweloperskich",
+          "Specjalista OpenAI od agentowego kodowania: długie sesje programistyczne z narzędziami, refaktoryzacja i debugowanie, 400K kontekstu. Mocny w kodzie, słaby w pisaniu twórczym i roleplayu. GPT-6.1 Sol koduje dziś w podobnej cenie i umie więcej.",
         gpt53Chat:
           "GPT-5.3 Chat - Zaktualizowany model konwersacyjny ChatGPT z dokładniejszymi odpowiedziami i znacznie mniejszą liczbą zbędnych odmów",
         gpt52Pro:
-          "GPT-5.2 Pro - Zaawansowany model OpenAI z ulepszonymi możliwościami rozumowania i kodowania",
+          "GPT-5.2 z wydłużonym rozumowaniem na najtrudniejsze problemy: głęboki research, podchwytliwa matematyka, staranny code review. Wolny i bardzo drogi. GPT-6 Astra to obecna klasa Pro i kosztuje znacznie mniej niż połowę.",
         gpt52:
-          "GPT-5.2 - Wysokowydajny model OpenAI do złożonych zadań i analizy",
+          "Koń roboczy OpenAI z końca 2025 roku do zadań zawodowych: kod, długie dokumenty i uporządkowana analiza, 400K kontekstu, obrazy na wejściu. Niezawodny, ale to już nie najlepszy stosunek ceny do jakości. GPT-6.1 Sol kosztuje mniej więcej tyle samo i jest nowszy.",
         gpt52_chat:
-          "GPT-5.2 Chat - Zoptymalizowany model OpenAI dla interakcji konwersacyjnych",
+          "Szybka, czatowa wersja GPT-5.2 w stylu ChatGPT: odpowiada od razu, bez długiego myślenia, 128K kontekstu. Dobra do codziennych rozmów i szkiców. Mniejszy kontekst niż u rodzeństwa, a GPT-6.1 Terra robi to dziś za mniej więcej połowę ceny.",
         dolphin3_0_r1_mistral_24b:
           "Dolphin 3.0 R1 Mistral 24B - Niecenzurowany duży model językowy oparty na Mistral",
         dolphinLlama3_70B:
           "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
         veniceUncensored:
-          "Venice Uncensored 1.2 - Dolphin Mistral 24B w edycji Venice. Najmniej odmów na rynku. Roleplay, fikcja, rozmowa bez filtrów. Rozumie obrazy, kontekst 128K.",
+          "Własny model Venice bez cenzury, czyli Dolphin Mistral 24B w edycji Venice. Jeden z najniższych wskaźników odmów na rynku: roleplay, fikcja, swobodne rozmowy bez filtra. Czyta obrazy, 128K kontekstu, tani. Słaby w kodzie i cięższej analizie. Do tego weź Qwen 3.6 Plus Uncensored.",
         veniceUncensoredRoleplay:
-          "Venice Role Play Uncensored - Model 24B dla postaci, które nie wychodzą z roli. Mroczne sceny, fikcja dla dorosłych, długie kampanie. Bez moralizowania w środku historii.",
+          "Model Venice 24B dostrojony do roleplayu. Postacie trzymają swój głos przez długie kampanie, w mrocznych scenach i fikcji dla dorosłych, bez moralnych przerw w połowie historii. Czyta obrazy, 128K kontekstu. To narrator, nie asystent, więc do analizy i kodu się nie nadaje. Venice Uncensored to tańszy wybór na co dzień.",
         gemma4Uncensored:
-          "Gemma 4 26B Uncensored - Gemma 4 26B MoE od Google bez filtra. Szybka, tania, rozumie obrazy. Kontekst 256K.",
+          "Gemma 4 26B od Google w architekturze mixture-of-experts, z usuniętym filtrem, dostarczana przez Venice. Szybka, tania, czyta obrazy, wywołuje narzędzia, 256K kontekstu. Odpowiada błyskawicznie, ale głęboko nie myśli. Do trudniejszego rozumowania bez odmów weź GLM 5.3 Flash Uncensored: trochę droższy, ale sięga dalej.",
         qwen36PlusUncensored:
-          "Qwen 3.6 Plus Uncensored - Model rozumujący Alibaby bez odmów. Mocny w kodzie i analizie. Rozumie obrazy.",
+          "Model rozumujący Qwen 3.6 Plus od Alibaby bez odmów, dostarczany przez Venice. Jeden z najmocniejszych programistów i analityków wśród modeli bez cenzury. Czyta obrazy, wywołuje narzędzia, 256K kontekstu. Droższy od modeli flash. Drugi ciężki zawodnik to GLM 5.3 Uncensored: 1M kontekstu, ale tylko tekst.",
         glm47FlashHeretic:
-          "GLM 4.7 Flash Heretic - GLM 4.7 Flash po abliteracji. Grosze za wiadomość, szybkie odpowiedzi, zero pouczania.",
+          "Zabliterowany GLM 4.7 Flash: odmowy usunięte, więc odpowiada zamiast prawić kazania. Grosze za wiadomość, szybki, obsługuje narzędzia, dobry do niefiltrowanych rozmów i pisania twórczego. Słaby w głębokiej analizie. GLM 5.3 Flash Uncensored to nowszy i bystrzejszy wybór bez cenzury, trochę droższy.",
         glm53Abliterated:
           "GLM 5.3 Abliterated - Pełny GLM-5.3, któremu Abliteration.ai wycięło odmowy prosto z wag. Czołowe rozumowanie, narzędzia, kontekst 1M. Najcięższy kaliber.",
         deepseekV41FlashAbliterated:
           "DeepSeek V4.1 Flash Abliterated - DeepSeek V4.1 Flash bez odmów od Abliteration.ai. MoE 552B, mocne rozumowanie, rozumie obrazy, używa narzędzi. Kontekst 1M.",
         mimoV26FlashAbliterated:
-          "MiMo V2.6 Flash Abliterated - szybki multimodalny model Xiaomi z wyciętym kierunkiem odmów. Tani, rozumie obrazy, używa narzędzi. Kontekst 1M.",
+          "MiMo V2.6 Flash od Xiaomi z wyciętym kierunkiem odmów (abliteracja). Szybki, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Dobry do dużych ilości pracy bez filtra, ale głębię oddaje za szybkość. Kosztuje ponad dwa razy więcej niż GLM 5.3 Flash Uncensored, który robi podobne rzeczy.",
         glm53Uncensored:
-          "GLM 5.3 Uncensored - Pełny model rozumujący GLM 5.3 bez cenzury. Kod, teksty i narzędzia na czołowym poziomie za ułamek ceny GLM 5.3 Abliterated. Eksperymentalny.",
+          "Pełny model rozumujący GLM 5.3 od Z.AI, bez cenzury. Najcięższy zawodnik wśród modeli bez cenzury: kod, długie teksty, analiza i narzędzia bez odmów, 1M kontekstu. Tylko tekst, wolniejszy od modeli flash i wciąż oznaczony jako eksperymentalny. Na co dzień taniej i szybciej wyjdzie GLM 5.3 Flash Uncensored.",
         glm53FlashUncensored:
-          "GLM 5.3 Flash Uncensored - MoE 320B bez cenzury. Szybki, tani, rozumie obrazy, kontekst 1M. Codzienne narzędzie do pracy bez filtrów.",
+          "GLM 5.3 Flash od Z.AI bez cenzury: mixture-of-experts z 320B parametrów. Szybki, tani, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Model na co dzień do pracy bez filtra. Do najtrudniejszego rozumowania przesiądź się na pełny GLM 5.3 Uncensored.",
         veniceLustifyV8:
-          "Lustify v8 - Checkpoint SDXL do fotorealistycznych obrazów dla dorosłych. Bez rozmycia, bez odmów. Jeden cent za obraz.",
+          "Checkpoint SDXL dostrojony do fotorealistycznych treści dla dorosłych, udostępniany przez Venice.ai. Bez cenzury: bez rozmycia, bez odmów. Jeden z najtańszych modeli obrazów w ofercie. Stworzony do ciał i skóry, nie do tekstu na obrazie, złożonych scen czy stylów artystycznych; Chroma ma szerszy zakres artystyczny.",
         veniceChroma:
-          "Chroma - Niecenzurowany otwarty model klasy Flux. Długie prompty, szeroki zakres artystyczny, bez rozmycia. Jeden cent za obraz.",
+          "Model z otwartymi wagami zbudowany na FLUX.1 schnell i dotrenowany bez filtrowania treści, udostępniany przez Venice.ai. Radzi sobie z długimi promptami i szeroką gamą stylów, także z treściami dosadnymi. Tani na obraz. W fotorealistycznej nagości mniej wyspecjalizowany niż Lustify v8, a na wejściu przyjmuje tylko tekst, więc do przeróbki gotowego obrazu użyj Qwen Edit Uncensored.",
         veniceQwenEdit:
-          "Qwen Edit Uncensored - Podaj obraz referencyjny i prompt, odbierz gotową edycję. Podmieniaj elementy, zmieniaj styl, przebudowuj sceny. Bez rozmycia, bez odmów.",
+          "Edycja obrazów bez cenzury oparta na modelu edycyjnym Qwen od Alibaby, udostępniana przez Venice.ai. Wrzuć obraz referencyjny i polecenie: podmień elementy, zmień styl, przebierz postać, przebuduj scenę. Bez rozmycia, bez odmów. Droższa niż Chroma czy Lustify v8, które generują tylko z tekstu.",
         veniceFireredImageEdit:
-          "FireRed Image Edit - Edycja obrazu sterowana promptem. Zmienia to, co opiszesz, resztę zostawia. Szybka, niecenzurowana, na obrazie referencyjnym.",
+          "Edytor obrazów sterowany promptem, udostępniany przez Venice.ai. Opisz zmianę, a on wprowadzi dokładnie ją i nie ruszy reszty obrazu. Poziom uncensored bez odmów, choć w przeciwieństwie do Qwen Edit Uncensored nie jest oznaczony do treści dosadnych. Ta sama cena co Qwen Edit; przy trudnych edycjach sprawdź oba.",
         claudeOpus45:
-          "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
+          "Opus od Anthropic z listopada 2025, w swoim czasie jeden z najlepszych modeli do kodu i agentów i pierwszy Opus z wyraźnie obniżoną ceną. Świetny w starannym pisaniu i złożonym kodzie, 200K kontekstu. Ostrożny przy kontrowersyjnych tematach. Claude Opus 5.5 jest nowszy i tańszy.",
         claudeOpus46:
-          "Claude Opus 4.6 - Potężny model Claude z wyjątkowymi możliwościami rozumowania i kreatywnymi",
+          "Opus od Anthropic z lutego 2026, pierwszy Opus z oknem kontekstu 1M. Mocny w długim kodowaniu agentowym, głębokiej analizie i starannym pisaniu. Cena premium, filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach. Claude Opus 5.5 jest nowszy i tańszy.",
         claudeOpus47:
-          "Claude Opus 4.7 - Poprzednia generacja Opus. Zastąpiony przez 4.8.",
+          "Wydanie Opusa z 2026 roku, pomiędzy 4.6 a 4.8: głębokie rozumowanie, złożony kod i długie teksty w kontekście 1M. Drogi i ostrożny przy kontrowersyjnych tematach. Claude Opus 5.5 go zastępuje i kosztuje mniej za wiadomość.",
         claudeOpus48:
-          "Claude Opus 4.8 - Najpotężniejszy ogólnodostępny model Opus od Anthropic. Stworzony do długotrwałych zadań agentowych, złożonego programowania i wieloetapowego rozumowania przy bardzo długich wynikach. Okno kontekstu 1M tokenów. Obsługuje tekst, obrazy i pliki.",
+          "Ostatnie wydanie Opusa 4, zbudowane do długiej pracy agentowej, złożonego kodu i bardzo długich odpowiedzi w kontekście 1M, z obsługą obrazów. Cena premium, filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach. Claude Opus 5.5 jest nowszy i tańszy.",
         claudeSonnet46:
-          "Claude Sonnet 4.6 - Najpotężniejszy model Sonnet od Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy profesjonalnej",
+          "Sonnet od Anthropic z początku 2026, ulepszenie względem 4.5 w kodowaniu, pracy agentowej i zadaniach biurowych, kontekst 1M. Filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach. Claude Sonnet 5.5 go zastępuje i kosztuje mniej za wiadomość.",
         claudeHaiku45:
-          "Claude Haiku 4.5 - Szybki i wydajny model Claude zoptymalizowany pod kątem szybkości i opłacalności",
+          "Mały model Anthropic z października 2025: szybki, dobry w codziennym kodowaniu i czytaniu obrazów, 200K kontekstu. Filtry mainstreamowe, ostrożny przy drażliwych tematach. Claude Haiku 5.5 kosztuje dziś mniej więcej jedną dziesiątą, więc zmiana to formalność.",
         glm5_1:
-          "GLM-5.1 - model kodowania nowej generacji Z.AI stworzony do zadań długoterminowych. Pracuje autonomicznie ponad 8 godzin nad jednym zadaniem - planuje, wykonuje i doskonali się, aż dostarczy wyniki klasy inżynieryjnej.",
-        glm5: "GLM-5 - flagowy model open-source Z.AI zaprojektowany do projektowania złożonych systemów i długoterminowych przepływów agentów, dorównujący wiodącym modelom zamkniętym",
+          "Model Z.AI do kodowania, zbudowany do długich zadań i reklamowany jako zdolny pracować nad jednym problemem godzinami. Mocny w planowaniu, kodzie i wieloetapowych przebiegach agentów, 200K kontekstu, tylko tekst, luźniejsze filtry. GLM-5.3 jest nowszy i kosztuje ułamek ceny, ale jest o poziom niżej. Mocniejszy obecny otwarty wybór to Kimi K3.",
+        glm5: "Otwarty flagowiec Z.AI z początku 2026, zbudowany do projektowania systemów i długich przepływów agentowych. Mocne rozumowanie i kodowanie, luźniejsze filtry, 200K kontekstu, tylko tekst. GLM-5.3 jest nowszy i dużo tańszy, ale o poziom niżej pod względem inteligencji. Mocniejsza otwarta alternatywa to Kimi K3.",
         glm5Turbo:
-          "GLM-5 Turbo - model nowej generacji Z.AI głęboko zoptymalizowany dla środowisk agentycznych z szybką inferencją, ulepszoną dekompozycją instrukcji i stabilnością długich zadań",
+          "Szybszy GLM-5 dostrojony do pętli agentowych: sprawne wnioskowanie, porządny podział zadań i stabilne długie przebiegi. Dobry do automatyzacji z wieloma narzędziami, 200K kontekstu, tylko tekst, luźniejsze filtry. GLM-5.3 robi dziś podobną robotę za ułamek ceny.",
         glm46:
-          "GLM-4 6B - Wydajny dwujęzyczny model AI chińsko-angielski z silnymi ogólnymi możliwościami",
+          "Wydanie Z.AI z września 2025, które podniosło kontekst do 200K i poprawiło kodowanie oraz pracę agentową. Nadal przyzwoity dwujęzyczny model do wszystkiego, luźniejsze filtry, tylko tekst. GLM-5.3 jest nowszy i tańszy.",
         glm47:
-          "GLM-4 7B - Zaawansowany dwujęzyczny model chińsko-angielski z ulepszonymi możliwościami rozumowania i kodowania",
+          "Wydanie Z.AI z grudnia 2025, solidny dwujęzyczny model chińsko-angielski z lepszym kodowaniem i rozumowaniem niż 4.6. Dobry do rozmów, analizy i zadań agentowych, 200K kontekstu, tylko tekst, luźniejsze filtry. GLM-5.3 jest nowszy i kosztuje mniej więcej jedną czwartą.",
         glm47Flash:
-          "GLM-4 7B Flash - Ultraszybki model chińsko-angielski zoptymalizowany dla szybkich odpowiedzi",
+          "Mały, szybki GLM 4.7 i jeden z najtańszych modeli tutaj. Dobry do szybkich rozmów, prostych wywołań narzędzi i masowej pracy z tekstem, 200K kontekstu. Słaby w głębokim rozumowaniu. GLM-5.3 Flash jest nowszy, ale kosztuje mniej więcej dwa razy tyle.",
         kimiK2:
-          "Kimi K2 - Potężny chiński model AI z doskonałym zrozumieniem kontekstu",
+          "Model open-weight od Moonshot AI z lipca 2025, mieszanka ekspertów z 1T parametrów, która zasłynęła agentowym używaniem narzędzi i kodowaniem. Szybki, luźniejsze filtry, 262K kontekstu, tylko tekst. Bez trybu myślenia. Kimi K3 to nowszy flagowiec za mniej więcej dwukrotną cenę.",
         kimiK2_5:
-          "Kimi K2.5 - Poprzednia generacja modelu Moonshot AI z silnym rozumowaniem w długim kontekście i możliwościami kodowania",
+          "Kimi od Moonshot ze stycznia 2026, natywnie multimodalny, z obsługą obrazów. Mocny w kodowaniu z długim kontekstem, zamianie zrzutów ekranu na kod i pisaniu twórczym, luźniejsze filtry, 262K kontekstu. Kimi K3 jest nowszy, ale kosztuje mniej więcej dwa razy tyle.",
         kimiK2_6:
-          "Kimi K2.6 - Model multimodalny nowej generacji Moonshot AI do długoterminowego kodowania, generowania UI/UX z promptów i obrazów oraz orkiestracji wielu agentów z architekturą roju agentów skalującą do setek równoległych podsystemów",
+          "Kimi K2.6 od Moonshot, nastawiony na długie kodowanie, budowanie interfejsów z promptów lub zrzutów ekranu i równoległą pracę wielu subagentów. Szybki i bystry, obrazy na wejściu, 262K kontekstu, luźniejsze filtry. Kimi K3 jest nowszy, ale droższy.",
         claudeSonnet45:
-          "Claude Sonnet 4.5 - Poprzednia generacja modelu Sonnet od Anthropic z silnymi możliwościami kodowania i analizy",
+          "Sonnet od Anthropic z września 2025, znany z mocnego kodowania i długich, samodzielnych sesji agentowych. Nadal dobry do kodu i tekstów, tutaj z kontekstem 1M. Ostrożny przy kontrowersyjnych tematach, słaby w roleplayu. Claude Sonnet 5.5 jest nowszy i tańszy za wiadomość.",
         claudeAgentSonnet:
           "Claude Agent Sonnet - Autonomiczny agent AI z Claude Sonnet przez Anthropic Agent SDK. Samodzielnie wykonuje narzędzia z wbudowanym rozumowaniem.",
         claudeAgentHaiku:
@@ -1499,57 +1499,58 @@ export const translations: typeof enTranslations = {
         claudeAgentOpus:
           "Claude Agent Opus - Najpotężniejszy autonomiczny agent AI z Claude Opus przez Anthropic Agent SDK. Maksymalna inteligencja z wykonywaniem narzędzi.",
         grok4:
-          "Grok 4 - Flagowy model rozumowania xAI z możliwościami wizji i wyszukiwania w sieci",
+          "Flagowiec xAI z lipca 2025, model rozumujący, który zawsze myśli przed odpowiedzią. Mocny w matematyce, naukach ścisłych i analizie, z luźniejszymi filtrami treści niż większość modeli mainstreamowych. Wolniejszy od zwykłych modeli czatowych. Obecny Grok to Grok 4.7, droższy.",
         grok4Fast:
-          "Grok 4 Fast - Szybki model xAI z kontekstem 2M tokenów zoptymalizowany dla szybkich odpowiedzi",
+          "Szybka odmiana Groka od xAI. Błyskawiczne odpowiedzi, czyta obrazy, wywołuje narzędzia, 1M kontekstu, grosze za wiadomość. Otwarta polityka treści, więc mniej odmów niż u głównych laboratoriów. Do trudnego rozumowania sięgnij po Grok 4.7, a do jeszcze tańszego czatu po DeepSeek V4.1 Flash.",
         grok43:
-          "Grok 4.3 - Model rozumowania xAI z kontekstem 1M tokenów, wysoką dokładnością faktograficzną i stałym trybem rozumowania dla agentycznych przepływów pracy i głębokich badań",
+          "Późniejsze wydanie Groka 4 z zawsze włączonym rozumowaniem i kontekstem 1M, nastawione na przepływy agentowe i głęboki research. Luźniejsze filtry, obsługa narzędzi, obrazy na wejściu. Ta sama cena co Grok 4 i taniej niż Grok 4.7, nowszy wybór dla tych, którzy chcą najświeższego.",
         grok420Beta:
-          "Grok 4.20 (Legacy) - Poprzedni flagowy model xAI z agentycznym wywoływaniem narzędzi, niskim wskaźnikiem halucynacji i kontekstem 2M tokenów",
+          "Dawny flagowiec xAI z oknem kontekstu 2M, agentowym wywoływaniem narzędzi i obrazami na wejściu. Dobry do ogromnych dokumentów i długich przebiegów agentów przy luźniejszych filtrach. Grok 4.7 jest nowszy, ale droższy.",
         gpt5Pro:
-          "GPT-5 Pro - Premium model OpenAI z najwyższym poziomem rozumowania i zaawansowanymi możliwościami kodowania",
+          "GPT-5 z wydłużonym rozumowaniem, odpowiedź OpenAI z 2025 roku na najtrudniejsze pytania. Dokładny, ale wolny i bardzo drogi jak na starszą generację. GPT-6 Astra to obecny wybór klasy Pro i kosztuje mniej.",
         gpt5Codex:
           "GPT-5 Codex - Wyspecjalizowany model kodowania OpenAI z wyjątkowymi możliwościami programistycznymi i technicznymi",
         gpt51Codex:
-          "GPT 5.1 Codex - Zaktualizowany model kodowania OpenAI z ulepszonymi możliwościami kreatywnymi i programistycznymi",
+          "GPT-5.1 dostrojony do agentowego kodowania w Codex od OpenAI: długie pętle edycji, uruchamiania i poprawek w prawdziwych repozytoriach, 400K kontekstu. Przy tej cenie uczciwy wybór do kodu. Słabszy w swobodnej rozmowie i pisaniu, a nowszy GPT-6.1 Sol poszedł już dalej.",
         gpt51:
-          "GPT 5.1 - Wydajny model ogólnego przeznaczenia OpenAI z silnym rozumowaniem i analizą",
-        gpt5: "GPT-5 - Flagowy model OpenAI z szeroką inteligencją i wszechstronnymi możliwościami",
+          "Aktualizacja GPT-5 od OpenAI z listopada 2025: adaptacyjne rozumowanie, które myśli dłużej tylko przy trudnych pytaniach, i cieplejszy ton rozmowy. Nadal rozsądny model ogólny z 400K kontekstu i obsługą obrazów. GPT-6.1 Sol jest nowszy i bystrzejszy, ale nieco droższy.",
+        gpt5: "Flagowiec OpenAI z sierpnia 2025, który połączył szybkie odpowiedzi i głębokie rozumowanie w jednym modelu. Nadal sprawny do wszystkiego: rozmowa, teksty, kod, 400K kontekstu i obrazy na wejściu. Obecny wybór od OpenAI to GPT-6.1 Sol: nowszy i mocniejszy, odrobinę droższy za wiadomość.",
         gpt54Mini:
-          "GPT-5.4 Mini - Wydajny wariant GPT-5.4 OpenAI zoptymalizowany dla dużej przepustowości z silnym rozumowaniem, kodowaniem i użyciem narzędzi przy niższym koszcie",
+          "Mniejszy GPT-5.4: przyzwoite rozumowanie, kodowanie i obsługa narzędzi w niższej cenie, 400K kontekstu i obrazy na wejściu. Dobry do dużej liczby rozmów i pracy jako subagent. GPT-6 Luna jest nowszy i dużo tańszy za wiadomość, ale nastawiony bardziej na szybkość niż na głębię.",
         gpt54Nano:
-          "GPT-5.4 Nano - Najlżejszy i najbardziej ekonomiczny model OpenAI zoptymalizowany dla krytycznych pod względem szybkości zadań takich jak klasyfikacja, ekstrakcja danych i wykonywanie sub-agentów",
-        gpt5Mini: "GPT-5 Mini - Lekki szybki model OpenAI do codziennych zadań",
+          "Najmniejszy GPT-5.4, stworzony do klasyfikacji, wyciągania danych i szybkich wywołań subagentów. Tani, szybki, obsługuje narzędzia i obrazy. Za płytki na poważną analizę. GPT-6 Luna to nowsza opcja budżetowa, i to jeszcze tańsza.",
+        gpt5Mini:
+          "Kompaktowy GPT-5 do szybkich codziennych zadań: krótkie odpowiedzi, streszczenia, proste wywołania narzędzi, 400K kontekstu. Tani i szybki, ale płytki przy głębszej analizie. GPT-6 Luna jest nowszy i kosztuje około jednej trzeciej.",
         gpt5Nano:
-          "GPT-5 Nano - Najmniejszy i najbardziej przystępny cenowo model OpenAI do prostych rozmów",
+          "Najmniejszy GPT-5 i wciąż jeden z najtańszych modeli tutaj. Nadaje się do klasyfikacji, tagowania i krótkich odpowiedzi w dużej skali. Nie do kodu ani poważnej analizy. GPT-6 Luna to nowszy model budżetowy, trochę droższy.",
         gptOss120b:
-          "GPT-OSS 120B - Model open-source OpenAI z 120B parametrami z silnymi możliwościami kodowania",
+          "Model OpenAI o otwartych wagach: 117B parametrów łącznie, mixture-of-experts, licencja Apache 2.0. Sprawnie rozumuje i koduje za grosze, wywołuje narzędzia, 131K kontekstu. Tylko tekst. Filtry luźniejsze niż w serii GPT-6, ale to nie jest model bez cenzury. GLM-5.3 kosztuje podobnie i daje 1M kontekstu.",
         kimiK2Thinking:
-          "Kimi K2 Thinking - Model Kimi skoncentrowany na rozumowaniu z ulepszoną analizą krok po kroku",
+          "Rozumująca wersja Kimi K2 z listopada 2025, zbudowana tak, by myśleć przez setki połączonych wywołań narzędzi i nie gubić wątku. Dobra do researchu i wieloetapowej pracy agentowej za niewielką cenę, luźniejsze filtry. Tylko tekst i wolniejsza od zwykłego K2. Nowszy wybór to Kimi K3.",
         minimaxM27:
-          "MiniMax M2.7 - Agentyczny model nowej generacji MiniMax przeznaczony do autonomicznej produktywności, współpracy wielu agentów i przepływów produkcyjnych w tym debugowania kodu, modelowania finansowego i generowania dokumentów",
+          "Model MiniMax nastawiony na agentów i praktyczną robotę: debugowanie, modele finansowe, generowanie dokumentów i przebiegi wielu agentów. Bystry i tani, 196K kontekstu, tylko tekst, luźniejsze filtry. MiniMax M3 to nowsza wersja, nieco droższa.",
         mimoV2Pro:
-          "MiMo V2 Pro - Flagowy model Xiaomi z 1T+ parametrami i kontekstem 1M, głęboko zoptymalizowany do orkiestracji agentów, automatyzacji złożonych przepływów i zadań inżynieryjnych",
+          "Flagowiec Xiaomi z linii MiMo V2, zbudowany do orkiestracji agentów i długich przepływów inżynierskich, kontekst 1M. Mocne rozumowanie i kodowanie w niskiej cenie, tylko tekst, luźniejsze filtry. MiMo V2.6 Pro jest nowszy i trochę tańszy.",
         glm45Air:
-          "GLM 4.5 AIR - Ultraszybki lekki model Z.AI do szybkich interakcji konwersacyjnych",
+          "Lekki GLM 4.5, mieszanka ekspertów z 106B parametrów, z których aktywnych jest tylko 12B, więc odpowiedzi są szybkie i tanie. Dobry do luźnych rozmów i prostych zadań, 128K kontekstu, tylko tekst. Przestarzałe rozumowanie. GLM-5.3 Flash jest nowszy i tańszy.",
         glm45v:
-          "GLM 4.5v - Model wizyjny Z.AI z rozumieniem obrazów i możliwościami czatu",
+          "Model wizyjny Z.AI zbudowany na GLM-4.5-Air, mieszance ekspertów o 106B parametrów. Czyta zrzuty ekranu, wykresy i zdjęcia, rozmawia i wywołuje narzędzia. Tylko 64K kontekstu i przestarzałe rozumowanie. GLM-5.3 Flash to nowszy i tańszy wybór od Z.AI.",
         geminiFlash25Lite:
-          "Gemini 2.5 Flash Lite - Podstawowy model Gemini Google z dużym kontekstem i szybkimi odpowiedziami",
+          "Najtańszy Gemini od Google z 2025 roku: grosze za wiadomość, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Świetny do masowego tagowania, tłumaczeń i krótkich odpowiedzi, płytki w rozumowaniu. Gemini 3.5 Flash Lite jest nowszy, ale kosztuje prawie cztery razy więcej, więc ten model wciąż ma sens.",
         geminiFlash25Flash:
-          "Gemini 2.5 Flash - Wydajny multimodalny model Google z kontekstem 1M tokenów dla szybkich zadań",
+          "Hybrydowy Flash od Google z 2025 roku z regulowanym budżetem myślenia, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Nadal tania i szybka opcja do streszczeń i codziennego czatu. Gemini 3.8 Flash jest nowszy i bystrzejszy, ale kosztuje mniej więcej dwa razy tyle.",
         geminiFlash25Pro:
-          "Gemini 2.5 Pro - Poprzedni model Pro Google z dużym kontekstem i silnym rozumowaniem",
+          "Myślący model Google z 2025 roku z kontekstem 1M, jak na swoje czasy mocny w analizie długich dokumentów i kodzie. Dziś wyraźnie o generację w tyle. Gemini 4 Argon to obecna klasa Pro, nieco droższa.",
         deepseekV31:
-          "DeepSeek V3.1 - Poprzednia generacja modelu DeepSeek z silnymi możliwościami kodowania i analizy",
+          "Hybrydowy model DeepSeek z sierpnia 2025, który przełącza się między szybkimi odpowiedziami a myśleniem krok po kroku. Sprawny i tani w kodowaniu, oparty na otwartej mieszance ekspertów z 671B parametrów, tylko tekst. DeepSeek V4.1 Flash jest nowszy i kosztuje mniej więcej jedną trzecią.",
         deepseekR1:
-          "DeepSeek R1 - Model DeepSeek skoncentrowany na rozumowaniu z zaawansowanym rozwiązywaniem problemów krok po kroku",
+          "Otwarty model rozumujący ze stycznia 2025, który pokazał, że widoczne myślenie może być tanie. Nadal solidny w matematyce i logice, ale wolny, rozwlekły i powściągliwy w tematach politycznie drażliwych dla Chin. DeepSeek V4.1 Flash jest nowszy i kosztuje ułamek tej ceny.",
         qwen3235bFree:
-          "Qwen3 235B - Duży otwarty model Alibaby z 235B parametrami do złożonych zadań kodowania i rozumowania",
+          "Qwen3 235B od Alibaby to model o otwartych wagach typu mixture-of-experts z 22B aktywnych parametrów. Solidny w kodzie i rozumowaniu za niewielkie pieniądze, wywołuje narzędzia, 131K kontekstu. Tylko tekst i o generację starszy: Qwen 3.8 Flash jest nowszy, czyta obrazy i kosztuje mniej więcej tyle samo.",
         deepseekR1Distill:
           "DeepSeek R1 Distill - Kompaktowa zdestylowana wersja DeepSeek R1 z wydajnymi możliwościami rozumowania",
         qwen257b:
-          "Qwen 2.5 7B - Kompaktowy model 7B Alibaby do szybkich i niedrogich zadań konwersacyjnych",
+          "Mały, otwarty model Alibaby z 7B parametrów z 2024 roku. Tani i szybki do prostych rozmów, krótkich przeróbek tekstu i podstawowych tłumaczeń, 32K kontekstu. Jak na dzisiejsze standardy słaby w kodzie i analizie. Qwen 3.8 Flash to nowszy wybór od Alibaby, bystrzejszy i trochę droższy.",
         dallE3:
           "DALL-E 3 - Model generowania obrazów OpenAI tworzący wysokiej jakości, szczegółowe obrazy z opisów tekstowych",
         gptImage1:
@@ -1557,9 +1558,9 @@ export const translations: typeof enTranslations = {
         fluxSchnell:
           "Flux Schnell - Szybki model generowania obrazów Black Forest Labs, zoptymalizowany pod kątem szybkości",
         fluxPro:
-          "Flux Pro 1.1 - Profesjonalny model generowania obrazów Black Forest Labs z doskonałą jakością",
+          "Sprawdzony koń roboczy Black Forest Labs z generacji FLUX.1, do zamiany tekstu na obraz. Czysta kompozycja, rzetelne trzymanie się promptu, szybki wynik. Na wejściu tylko tekst, bez edycji obrazu referencyjnego. FLUX.2 Pro kosztuje mniej więcej połowę i przyjmuje obrazy referencyjne, więc ten model sprawdzi się głównie przy promptach już pod niego dopracowanych.",
         flux2Max:
-          "FLUX.2 Max - Flagowy model obrazów Black Forest Labs z najwyższą jakością obrazu, rozumieniem promptów i spójnością edycji",
+          "Najwyższy poziom rodziny FLUX.2 od Black Forest Labs. Generuje z tekstu albo edytuje na podstawie obrazów referencyjnych, z największą szczegółowością i spójnością w całej linii. Cena premium, kilka razy wyższa niż FLUX.2 Pro. Zostaw go na kluczowe ujęcia i trudne edycje z wieloma referencjami; na co dzień FLUX.2 Pro da ci prawie to samo za mniej.",
         flux2Klein4b:
           "FLUX.2 Klein 4B - Najszybszy i najbardziej opłacalny model obrazów Black Forest Labs, zoptymalizowany pod kątem wysokiej przepustowości",
         riverflowV2Pro:
@@ -1575,34 +1576,34 @@ export const translations: typeof enTranslations = {
         flux2Flex:
           "FLUX.2 Flex - Model obrazów Black Forest Labs doskonały w renderowaniu złożonego tekstu, typografii i edycji wielu referencji w jednolitej architekturze",
         flux2Pro:
-          "FLUX.2 Pro - Zaawansowany model generowania i edycji obrazów Black Forest Labs z wysoką jakością wizualną, silną zgodnością z promptem i spójną reprodukcją postaci",
+          "Koń roboczy FLUX.2 od Black Forest Labs do generowania i edycji. Przyjmuje tekst i obrazy referencyjne, utrzymuje spójność postaci i produktów między ujęciami, dobrze radzi sobie z długimi promptami. Średnia półka cenowa. Poziom open: łagodniejsze filtry niż Imagen 4, ale bez treści dosadnych; do tego są Chroma albo Lustify v8. Po FLUX.2 Max sięgaj tylko, gdy liczy się każdy detal.",
         gemini3ProImagePreview:
-          "Nano Banana Pro (Gemini 3 Pro Image Preview) - Najbardziej zaawansowany model generowania obrazów Google z ulepszonym rozumowaniem multimodalnym, gruntowaniem w rzeczywistości i wiodącym renderowaniem tekstu",
+          "Gemini 3 Pro Image od Google, w wersji preview. Mocniejsze Nano Banana: wierniej trzyma się złożonych promptów, wstawia czytelny tekst do obrazów i edytuje wgrane zdjęcia. Filtry mainstreamowe, bez wywołań narzędzi, 64K kontekstu. Kosztuje kilka razy więcej niż Nano Banana, więc zostaw go na zadania, gdzie liczy się jakość obrazu.",
         gpt5ImageMini:
-          "GPT-5 Image Mini - Wydajny multimodalny model generowania obrazów OpenAI łączący możliwości językowe GPT-5 Mini z szybką i przystępną cenowo generacją obrazów",
+          "GPT-5 Image Mini od OpenAI: językowe możliwości GPT-5 Mini plus generowanie i edycja obrazów w tym samym czacie. Czyta obrazy, 400K kontekstu. Filtry mainstreamowe, bez wywołań narzędzi. Droższy od Nano Banana i cenowo blisko Nano Banana Pro, więc porównaj oba na własnym prompcie.",
         gpt5Image:
-          "GPT-5 Image - Flagowy multimodalny model OpenAI łączący możliwości językowe GPT-5 z najnowocześniejszym generowaniem i edytowaniem obrazów",
+          "GPT-5 połączony z generatorem obrazów OpenAI: rozmawiasz, a potem w tej samej rozmowie tworzysz lub edytujesz obrazy, także na podstawie wgranych zdjęć. Dobry do dopracowywania grafik zwykłymi słowami. Bez wywołań narzędzi i drogi za wiadomość. GPT-5 Image Mini jest tańszy, warto też porównać z Nano Banana Pro.",
         gpt54Image2:
-          "GPT-5.4 Image 2 - Multimodalny model nowej generacji OpenAI łączący rozumowanie GPT-5.4 z generowaniem GPT Image 2. Płynnie przechodzi między kodowaniem, analizą i tworzeniem wizualnym w jednej rozmowie.",
+          "Rozumowanie GPT-5.4 połączone z generowaniem GPT Image 2, więc jedna rozmowa może przejść od analizy czy kodu do gotowych obrazów. Czyta też obrazy. Bez wywołań narzędzi i drogi. GPT-5 Image Mini kosztuje dużo mniej, a Nano Banana i Nano Banana Pro to pozostałe aktualne modele do obrazów.",
         seedream45:
-          "Seedream 4.5 - Najnowszy model generowania obrazów ByteDance z kompleksowymi ulepszeniami spójności edycji, retuszu portretów i kompozycji wielu obrazów",
+          "Model obrazów od ByteDance, który generuje i edytuje w jednym. Mocny w portretach, w utrzymaniu spójności postaci i w łączeniu kilku obrazów wejściowych w jedną scenę. Średnia półka cenowa, blisko FLUX.2 Pro. Poziom open: łagodniejsze filtry niż w modelach mainstreamowych, ale bez treści dosadnych. Dobra druga opinia, gdy FLUX.2 Pro nie trafia w klimat.",
         sdxl: "Stable Diffusion XL - Wysokiej jakości otwarty model generowania obrazów Stability AI",
         cassetteMusic:
           "CassetteAI Music - szybkie generowanie muzyki z tekstu przez Fal.ai, klipy do trzech minut",
         musicgenStereo:
-          "MusicGen Stereo - Open-source'owy stereofoniczny model generowania muzyki Meta via Replicate",
+          "Otwartoźródłowy MusicGen od Meta w wersji stereo. Muzyka instrumentalna z promptu: gatunek, nastrój, instrumenty. Bez wokalu i tekstów. Tani. Dobry na podkłady i pętle; po piosenki z wokalem sięgnij po ElevenLabs Music albo Sonauto Song.",
         stableAudio:
           "Stable Audio - Model generowania muzyki i dźwięku Stability AI dla wysokiej jakości klipów",
         udioV2:
           "Udio v2 - Wysokiej jakości generowanie muzyki AI z wokalem i pełną jakością produkcji",
         modelsLabMusicGen:
-          "ModelsLab Music Gen - Generowanie muzyki AI z opisów tekstowych, obsługuje MP3/WAV/FLAC",
+          "Własny model ModelsLab do zamiany tekstu na muzykę, z wyjściem w MP3, WAV albo FLAC. Utwory z promptu na podkłady i dżingle. Kosztuje kilka razy więcej niż Lyria 3 czy MusicGen Stereo, a model bazowy nie jest udokumentowany. Najpierw spróbuj Lyria 3: jakość za niższą cenę.",
         modelsLabElevenlabsMusic:
-          "ElevenLabs Music - Wysokiej jakości generowanie muzyki z ElevenLabs przez ModelsLab",
+          "Model muzyczny ElevenLabs. Pełne utwory z wokalem i tekstem w kilku językach albo instrumentalne, sterowane promptem. Obowiązują filtry mainstream. Wyższa półka cenowa wśród modeli muzycznych. Mocny w dopracowanych piosenkach brzmiących jak z radia; tańsze pełne utwory z wokalem da Sonauto Song.",
         modelsLabSonautoSong:
-          "Sonauto Song - Pełne generowanie piosenek z wokalem, różne gatunki do 4:45 min",
+          "Generator piosenek Sonauto. Pełne utwory z wokalem i tekstem w wielu gatunkach, tanio jak na całe kawałki. Poziom open, łagodniejsze filtry niż w ElevenLabs. Jakość produkcji bywa nierówna; po czystszy miks dopłać do ElevenLabs Music albo Lyria 3 Pro Preview.",
         modelsLabLyria3:
-          "Lyria 3 - Zaawansowany model Google do generowania oryginalnych 30-sekundowych utworów z tekstu",
+          "Lyria 3 od Google. Oryginalne utwory około 30 sekund z promptu, w wysokiej jakości produkcji. Bardzo tani jak na to, co daje. Mainstream: obowiązują filtry Google. Za krótki na pełne piosenki; pełną długość ogarnia Lyria 3 Pro Preview.",
         modelsLabCogVideoX:
           "CogVideoX - Model tekst-na-wideo ModelsLab do generowania krótkich klipów",
         modelsLabWanx: "Wanx - Model generowania wideo z tekstu ModelsLab",
@@ -1615,13 +1616,13 @@ export const translations: typeof enTranslations = {
         modelsLabWan25I2V:
           "Wan 2.5 I2V - Model obraz-na-wideo Wan 2.5 ModelsLab",
         modelsLabWan27T2V:
-          "Wan 2.7 T2V - Najnowszy model tekst-na-wideo Wan 2.7 od Alibaba z elastycznymi proporcjami i wyjściem 1080p",
+          "Model wideo Wan 2.7 od Alibaby. Klipy do 10 sekund (przez ModelsLab do 15) w rozdzielczości do 1080p, wiele proporcji obrazu, natywny dźwięk i opcjonalna pierwsza i ostatnia klatka do sterowania ujęciem. Średnia cena za sekundę. Elastyczny wszechstronny model; do tańszych testów Seedance 1.5 Pro, do najwyższego realizmu Veo 3.1.",
         modelsLabWan26T2V:
           "Wan 2.6 T2V - Model tekst-na-wideo Wan 2.6 ModelsLab",
         modelsLabWan26I2V:
-          "Wan 2.6 I2V - Model obraz-na-wideo Wan 2.6 ModelsLab",
+          "Model Wan 2.6 od Alibaby do zamiany obrazu w wideo: dajesz klatkę startową, on ożywia scenę, z natywnym dźwiękiem. Klipy 5 lub 10 sekund w 720p albo 1080p, poziomo lub pionowo. Tańszy niż Wan 2.7. Wybierz Wan 2.7 T2V, gdy chcesz też wyznaczyć klatkę końcową albo potrzebujesz więcej proporcji.",
         modelsLabWan26I2VFlash:
-          "Wan 2.6 I2V Flash - Szybki model obraz-na-wideo Wan 2.6 ModelsLab",
+          "Szybka odmiana Wan 2.6 do zamiany obrazu w wideo. Robi ze zdjęcia klip 5 lub 10 sekund w 1080p przy krótszym czekaniu. Za sekundę nie jest tańsza od standardowego Wan 2.6 I2V, często nawet trochę droższa, więc opłaca się tylko, gdy liczy się czas. Natywny dźwięk nie jest podany dla tej wersji; standardowy model go ma.",
         modelsLabSeedanceT2V: "Seedance T2V - Model tekst-na-wideo BytePlus",
         modelsLabSeedanceI2V: "Seedance I2V - Model obraz-na-wideo BytePlus",
         modelsLabOmnihuman:
@@ -1633,9 +1634,9 @@ export const translations: typeof enTranslations = {
         modelsLabSeedance1ProFastT2V:
           "Seedance 1.0 Pro Fast T2V - Szybki profesjonalny model tekst-na-wideo BytePlus",
         modelsLabOmnihuman15:
-          "Omnihuman 1.5 - Ulepszony model generowania wideo z ludźmi BytePlus",
+          "OmniHuman 1.5 od ByteDance ożywia osobę z jednego zdjęcia, prowadzony ścieżką audio: gadające głowy, śpiew, gesty. Specjalista od awatarów i dubbingu, a nie ogólny model tekst na wideo. Za sekundę droższy niż większość modeli wideo ze średniej półki. Do scen bez mówiącej postaci wybierz Kling 3.0 albo Wan 2.7.",
         modelsLabSeedance15Pro:
-          "Seedance 1.5 Pro - Zaawansowany model generowania wideo BytePlus",
+          "Seedance 1.5 Pro od ByteDance, sprzedawany przez chmurę BytePlus. Natywny dźwięk, klipy od 4 do 12 sekund w rozdzielczości od 480p do 1080p, kontrola pierwszej i ostatniej klatki, dużo proporcji obrazu. Jeden z najtańszych modeli wideo tutaj w przeliczeniu na klip. Świetny do testowania pomysłów i produkcji na ilość; Seedance 2.0 to krok wyżej po spójność i 4K.",
         modelsLabVeo2:
           "Veo 2 - Wysokiej jakości model generowania wideo Google via ModelsLab",
         modelsLabVeo3:
@@ -1645,85 +1646,85 @@ export const translations: typeof enTranslations = {
         modelsLabVeo3FastPreview:
           "Veo 3 Fast Preview - Szybki model generowania wideo preview Google via ModelsLab",
         modelsLabVeo31:
-          "Veo 3.1 - Ulepszony model generowania wideo Veo 3 Google via ModelsLab",
+          "Flagowy model wideo Google. Filmowy realizm, natywny dźwięk z dialogami i efektami, klipy od 4 do 8 sekund do 4K, kontrola pierwszej i ostatniej klatki. Najdroższy model wideo w katalogu. Wart swojej ceny przy finalnych ujęciach; szkice rób na Veo 3.1 Fast za ułamek kwoty.",
         modelsLabVeo31Fast:
-          "Veo 3.1 Fast - Szybki model generowania wideo Veo 3.1 Google via ModelsLab",
+          "Szybsza i tańsza wersja Veo 3.1 od Google. Te same klipy od 4 do 8 sekund, natywny dźwięk, do 4K i kontrola klatek, za mniej więcej jedną trzecią do połowy ceny pełnego Veo 3.1. Przy wymagających ujęciach oddaje trochę jakości. Złoty środek dla większości pracy z Veo; Veo 3.1 Lite jest jeszcze tańszy.",
         modelsLabKlingV21I2V:
           "Kling V2.1 I2V - Model obraz-na-wideo Kling AI wersja 2.1",
         modelsLabKlingV25TurboI2V:
-          "Kling V2.5 Turbo I2V - Turbo model obraz-na-wideo Kling AI wersja 2.5",
+          "Kling 2.5 Turbo do zamiany obrazu w wideo: ożywia zdjęcie w krótkim klipie. Tani w przeliczeniu na klip i szybki, z żywym ruchem typowym dla Klinga. Natywny dźwięk nie jest podany. Kling 3.0 dokłada dźwięk i ujęcia do 15 sekund, ale kosztuje więcej.",
         modelsLabKlingV25TurboT2V:
-          "Kling V2.5 Turbo T2V - Turbo model tekst-na-wideo Kling AI wersja 2.5",
+          "Kling 2.5 Turbo z tekstu. Klipy 5 lub 10 sekund w 16:9, 9:16 albo 1:1, jedne z najtańszych w katalogu w przeliczeniu na klip. Jak na tę cenę mocny ruch, ale bez natywnego dźwięku. Po dźwięk i klipy do 15 sekund przejdź na Kling 3.0 T2V.",
         modelsLabKlingV2MasterT2V:
           "Kling V2 Master T2V - Model tekst-na-wideo najwyższej jakości Kling AI",
         modelsLabKlingV2MasterI2V:
           "Kling V2 Master I2V - Model obraz-na-wideo najwyższej jakości Kling AI",
         modelsLabKlingV21MasterT2V:
-          "Kling V2.1 Master T2V - Model tekst-na-wideo najwyższej jakości Kling AI v2.1",
+          "Kling 2.1 Master, wersja premium generacji 2.1 Klinga. Klipy 5 lub 10 sekund z tekstu, w wysokiej jakości obrazu. Cena blisko szczytu katalogu, około trzy razy wyższa niż Kling 3.0 T2V, który jest nowszy i ma natywny dźwięk. Opłaca się głównie przy promptach, które już tu dobrze działają.",
         modelsLabKlingV21MasterI2V:
-          "Kling V2.1 Master I2V - Model obraz-na-wideo najwyższej jakości Kling AI v2.1",
+          "Kling 2.1 Master do zamiany obrazu w wideo: ożywia zdjęcie w klipie 5 lub 10 sekund w wysokiej jakości. Cena blisko szczytu katalogu, około trzy razy wyższa niż nowszy Kling 3.0, który daje też dźwięk. Wybierz go tylko, gdy potrzebujesz dokładnie tego wyglądu; tanią alternatywą jest Kling V2.5 Turbo I2V.",
         modelsLabKlingV16MultiI2V:
           "Kling V1.6 Multi I2V - Model multi-obraz-na-wideo Kling AI wersja 1.6",
         modelsLabKling30T2V:
-          "Kling 3.0 T2V - Model tekst-na-wideo Kling AI wersja 3.0",
+          "Kling 3.0 Pro od Kuaishou. Natywny dźwięk, klipy od 3 do 15 sekund w 720p, kontrola pierwszej i ostatniej klatki, 16:9, 9:16 albo 1:1. Żywy, przekonujący ruch w średniej cenie. 720p to sufit; po 1080p i więcej sięgnij po Veo 3.1 Fast albo Hailuo 3. Tańszą wersją jest Kling 3.0 Std.",
         modelsLabLtx2ProT2V:
-          "LTX 2 PRO T2V - Profesjonalny model tekst-na-wideo LTX",
+          "LTX-2 Pro od Lightricks. Tekst na wideo w 2K albo 4K, klipy mniej więcej od 6 do 10 sekund. Jak na tę rozdzielczość średnia cena, więc to budżetowa droga do 4K obok Veo 3.1. Natywny dźwięk nie jest tu podany; po 4K z dźwiękiem sięgnij po Veo 3.1 Fast.",
         modelsLabLtx2ProI2V:
           "LTX 2 PRO I2V - Profesjonalny model obraz-na-wideo LTX",
         modelsLabLtx23ProI2V:
-          "LTX 2.3 Pro I2V - Ulepszony profesjonalny model obraz-na-wideo LTX",
+          "LTX 2.3 Pro od Lightricks do zamiany obrazu w wideo: ożywia zdjęcie w 2K albo 4K, w klipach od 6 do 10 sekund. Nowszy niż LTX 2 Pro i nieco droższy. Wybór na sytuacje, gdy obraz w wysokiej rozdzielczości ma zostać ostry także w ruchu. Natywny dźwięk nie jest podany.",
         modelsLabHailuo23T2V:
-          "Hailuo 2.3 T2V - Model tekst-na-wideo MiniMax wersja 2.3",
+          "Hailuo 2.3 od MiniMax z tekstu, znany z żywego, fizycznego ruchu, jak taniec i akcja. Klipy 6 lub 10 sekund w 1080p w proporcji 16:9. Bez natywnego dźwięku. Średnia półka cenowa. Hailuo 3 dokłada dźwięk, 2K i kontrolę klatek za mniej więcej dwa razy wyższą cenę.",
         modelsLabHailuo02T2V: "Hailuo 02 T2V - Model tekst-na-wideo MiniMax 02",
         modelsLabHailuo23I2V:
-          "Hailuo 2.3 I2V - Model obraz-na-wideo MiniMax wersja 2.3",
+          "Hailuo 2.3 od MiniMax do zamiany obrazu w wideo. Ożywia zdjęcie w klipie 6 lub 10 sekund, z ekspresyjnym, fizycznym ruchem. Bez natywnego dźwięku. Hailuo 2.3 Fast I2V robi to samo za mniej więcej połowę ceny, choć z mniejszym szlifem.",
         modelsLabHailuo23FastI2V:
-          "Hailuo 2.3 Fast I2V - Szybki model obraz-na-wideo MiniMax wersja 2.3",
+          "Szybka i tania wersja Hailuo 2.3 do zamiany obrazu w wideo. Klipy 6 lub 10 sekund ze zdjęcia za około połowę ceny standardowego Hailuo 2.3 I2V. Dobra do szkiców i produkcji na ilość, kosztem detali. Bez natywnego dźwięku.",
         modelsLabHailuo02I2V: "Hailuo 02 I2V - Model obraz-na-wideo MiniMax 02",
         modelsLabHailuo02StartEnd:
           "Hailuo 02 Start/End - Model generowania wideo z klatkami początkowymi/końcowymi MiniMax",
         modelsLabSora2:
-          "Sora 2 - Model generowania wideo Sora 2 OpenAI via ModelsLab",
+          "Sora 2 od OpenAI. Wiarygodna fizyka, zsynchronizowany dźwięk i dialogi, klipy do 12 sekund. W tej konfiguracji tylko 16:9. Cena średnia do wysokiej. Sora 2 Pro robi 20 sekund i 1080p za mniej więcej dwa do trzech razy więcej.",
         modelsLabSora2Pro:
-          "Sora 2 Pro - Model generowania wideo Sora 2 Pro OpenAI via ModelsLab",
+          "Wersja premium Sora 2 od OpenAI. Zsynchronizowany dźwięk, klipy do 20 sekund, 720p albo 1080p, poziomo lub pionowo. Jeden z najdroższych modeli wideo w katalogu. Wart tego przy długich, dopracowanych ujęciach; szkice zrobisz na Sora 2 za mniej niż połowę ceny.",
         modelsLabGen4Aleph:
-          "Gen4 Aleph - Model generowania wideo Gen4 Aleph Runway via ModelsLab",
+          "Aleph od Runway to bardziej edytor wideo niż generator: dajesz mu gotowy materiał, a on dodaje lub usuwa obiekty, zmienia styl, światło albo kąt kamery. Wiele proporcji obrazu, także szerokie formaty kinowe. Droższy niż większość generatorów. Do nowych klipów z promptu użyj Veo 3.1 Fast albo Kling 3.0.",
         modelsLabLipsync2:
-          "Lipsync 2 - Model synchronizacji ust Sync do generowania wideo",
+          "lipsync-2 od Sync dopasowuje ruch ust w istniejącym wideo do nowej ścieżki dźwiękowej. Stworzony do dubbingu, tłumaczonych lektorów i poprawiania dialogów. Edytuje gotowy materiał, nie wymyśla scen. Do mówiącej postaci z jednego zdjęcia użyj Omnihuman 1.5.",
         modelsLabGrokT2V:
-          "Grok T2V - Model tekst-na-wideo Grok xAI via ModelsLab",
+          "Grok Imagine od xAI, wideo z tekstu. Klipy od 1 do 15 sekund w 480p albo 720p, z opcjonalną pierwszą klatką. Średnia cena, szybko i swobodnie. Poziom open, więc filtry łagodniejsze niż w Veo czy Sorze, ale bez treści dosadnych. Grok Imagine Video 1.5 dokłada 1080p.",
         modelsLabGrokI2V:
-          "Grok I2V - Model obraz-na-wideo Grok xAI via ModelsLab",
+          "Grok Imagine od xAI do zamiany obrazu w wideo. Ożywia zdjęcie w klipie HD do 15 sekund. Trochę tańszy niż Grok T2V. Dobry do szybkiego ożywiania zdjęć; po wyższą rozdzielczość sięgnij po Grok Imagine Video 1.5.",
         klingV30Std:
-          "Kling 3.0 Standard – standardowy model wideo Kuaishou z T2V i I2V via OpenRouter",
+          "Standardowa wersja Kling 3.0 od Kuaishou. Te same klipy od 3 do 15 sekund z natywnym dźwiękiem i kontrolą klatek co Kling 3.0 T2V, czyli wersja Pro, ale taniej za sekundę. Wyjście w 720p. Najlepszy stosunek ceny do jakości w linii Kling 3; po Pro sięgnij, gdy liczą się drobne detale.",
         klingVideoO1:
-          "Kling Video O1 – model generowania wideo Kuaishou z rozumowaniem via OpenRouter",
+          "Zunifikowany multimodalny model wideo Klinga, stworzony do generowania klipów i ich edycji na podstawie referencji w jednym modelu. Natywny dźwięk, 5 lub 10 sekund w 720p, kontrola pierwszej i ostatniej klatki. Cena na poziomie Kling 3.0 Pro. Wybierz go do pracy opartej na referencjach; do zwykłego tekstu na wideo tańszy jest Kling 3.0 Std.",
         veo31Lite:
-          "Veo 3.1 Lite – ekonomiczny model wideo Google do generowania na dużą skalę via OpenRouter",
+          "Budżetowa wersja Veo 3.1 od Google. Natywny dźwięk, klipy od 4 do 8 sekund w 720p albo 1080p, kontrola pierwszej i ostatniej klatki. Najtańsze wejście w Veo, ale bez 4K. Dobra do dużej liczby klipów na social media; gdy liczy się jakość, przejdź na Veo 3.1 Fast.",
         seedance2:
-          "Seedance 2.0 – model wideo ByteDance ze spójnością postaci i wideo z referencji via OpenRouter",
+          "Seedance 2.0 od ByteDance. Natywny dźwięk, klipy od 4 do 15 sekund w rozdzielczości od 480p do 4K, pierwsza i ostatnia klatka oraz referencje, które trzymają spójność postaci. Wyższa półka cenowa. Mocny wybór do ujęć fabularnych z powracającymi postaciami; Seedance 2.0 Fast jest tańszy do szkiców do 720p.",
         seedance2Fast:
-          "Seedance 2.0 Fast – szybki model generowania wideo ByteDance via OpenRouter",
+          "Szybsza i tańsza wersja Seedance 2.0 od ByteDance. Natywny dźwięk, klipy do 15 sekund i kontrola klatek, ale maksymalnie 720p. Około 60 procent ceny pełnego modelu. Dobra do szkiców i klipów na social media; po 1080p albo 4K sięgnij po pełny Seedance 2.0.",
         happyhorse11:
-          "HappyHorse 1.1 – model wideo Alibaba z obsługą T2V, I2V i obrazu referencyjnego via OpenRouter",
+          "Druga wersja modelu wideo HappyHorse od Alibaby, który generuje obraz i zsynchronizowany dźwięk w jednym przebiegu. Tekst na wideo, obraz na wideo i obrazy referencyjne, do 15 sekund w 720p albo 1080p. Ta sama cena co HappyHorse 1.0, a według Alibaby lepszy ruch i spójność, więc to domyślny wybór z tej dwójki. Średnia półka cenowa.",
         happyhorse10:
-          "HappyHorse 1.0 – model wideo Alibaba z obsługą T2V, I2V i obrazu referencyjnego via OpenRouter",
+          "Pierwsza wersja modelu wideo HappyHorse od Alibaby, który generuje obraz i zsynchronizowany dźwięk w jednym przebiegu. Tekst na wideo, obraz na wideo i obrazy referencyjne, do 15 sekund w 720p albo 1080p. Kosztuje tyle samo co HappyHorse 1.1, więc nowsza wersja zwykle wypada lepiej. Przydaje się przy promptach dopracowanych pod 1.0.",
         modelsLabGen4T2ITurbo:
-          "Gen4 T2I Turbo - Szybki model tekst-na-obraz Runway via ModelsLab",
+          "Szybsza i tańsza wersja modelu obrazów Gen-4 od Runway. Tekst na wejściu, obraz na wyjściu, za mniej niż jedną trzecią ceny Gen4 Image. Dobra do szybkich szkiców i dopracowywania filmowego stylu Runway. Bez edycji obrazów referencyjnych; do tego weź FLUX.2 Pro albo Seedream 4.5.",
         modelsLabGen4Image:
-          "Gen4 Image - Model tekst-na-obraz Runway Gen4 via ModelsLab",
+          "Model obrazów Gen-4 od Runway, znany z filmowego wyglądu, jak kadr z planu. Tekst na wejściu, obraz na wyjściu. Jedna z droższych opcji w katalogu, więc warto po nią sięgać, gdy zależy ci właśnie na estetyce Runway. Do taniego testowania zacznij od Gen4 T2I Turbo, do edycji z obrazem referencyjnym wybierz FLUX.2 Pro.",
         modelsLabWan27T2I:
-          "Wan 2.7 T2I - Model tekst-na-obraz Alibaba Wan 2.7 via ModelsLab",
+          "Model obrazów Wan 2.7 od Alibaby, z tej samej rodziny co modele wideo Wan. Tekst na wejściu, obraz na wyjściu, w dolnej części średniej półki cenowej. Solidny wybór do ilustracji i scen. Nie przyjmuje obrazów referencyjnych; do edycji użyj Qwen Image 3 albo Seedream 4.5.",
         modelsLabGrokT2I:
-          "Grok Imagine T2I - Model tekst-na-obraz xAI Grok via ModelsLab",
+          "Generator obrazów Grok Imagine od xAI. Tekst na wejściu, obraz na wyjściu, tani w użyciu. Poziom open, więc filtry łagodniejsze niż w Imagen 4, choć bez treści dosadnych. Dobry do szybkich, wyrazistych obrazów; do edycji z obrazem referencyjnym i nowszej generacji jest Grok Imagine Image 2.0, nieco droższy.",
         modelsLabZImageBase:
-          "Z Image Base - Szybki i tani model tekst-na-obraz ModelsLab",
+          "Pełna, niedestylowana wersja bazowa Z-Image, modelu obrazów z otwartymi wagami z laboratorium Tongyi Alibaby. Jedne z najtańszych obrazów w katalogu. Większa różnorodność niż Z Image Turbo, za to wolniej na obraz. Dobry do taniej masówki i eksperymentów; do dopracowanych prac końcowych przejdź na FLUX.2 Pro.",
         modelsLabZImageTurbo:
-          "Z Image Turbo - Ultraszybki model tekst-na-obraz ModelsLab",
+          "Destylowana, podkręcona pod szybkość wersja Z-Image, modelu z otwartymi wagami z laboratorium Tongyi Alibaby. Obraz w kilku krokach, cena na samym dole katalogu. Jak na tę cenę dobre zdjęciowe efekty i czytelny tekst na obrazie. Mniej różnorodności niż Z Image Base, przy trudnych promptach odstaje od FLUX.2 Pro.",
         modelsLabFlux2MaxT2I:
           "Flux 2 Max T2I - Black Forest Labs Flux 2 Max tekst-na-obraz via ModelsLab",
         modelsLabFluxPro11Ultra:
-          "Flux Pro 1.1 Ultra - Black Forest Labs Flux Pro Ultra via ModelsLab",
+          "Tryb wysokiej rozdzielczości Flux Pro 1.1, stworzony do obrazów około 4 megapikseli. Na wejściu tylko tekst. Jeden z droższych modeli obrazów w katalogu. Wybierz go do dużych grafik gotowych do druku; do edycji i pracy z wieloma referencjami FLUX.2 Pro jest tańszy i elastyczniejszy.",
         modelsLabFluxPro11:
           "Flux Pro 1.1 - Black Forest Labs Flux Pro 1.1 tekst-na-obraz via ModelsLab",
         modelsLabFlux2ProT2I:
@@ -1739,140 +1740,140 @@ export const translations: typeof enTranslations = {
         modelsLabSeedreamT2I:
           "Seedream T2I - ByteDance Seedream tekst-na-obraz via ModelsLab",
         modelsLabImagen4Ultra:
-          "Imagen 4 Ultra - Najwyższa jakość generowania obrazów Google via ModelsLab",
+          "Najwyższy poziom Imagen 4 od Google. Najdokładniej trzyma się promptu w całej rodzinie i czysto, czytelnie renderuje tekst na obrazie. Mainstream: filtry Google działają w pełni. Mniej więcej trzy razy droższy od Imagen 4 Fast, więc zostaw go na finalne rendery. Mniej ograniczeń daje FLUX.2 Pro, treści dosadne Chroma.",
         modelsLabImagen4:
-          "Imagen 4 - Google Imagen 4 tekst-na-obraz via ModelsLab",
+          "Standardowy Imagen 4 od Google. Zdjęciowe detale, dobra typografia i rzetelne trzymanie się promptu w średniej cenie. Mainstream: obowiązują filtry Google, więc przy odważniejszych promptach licz się z odmową. Imagen 4 Fast kosztuje około połowy i nada się do szkiców, Imagen 4 Ultra do szlifu na koniec.",
         modelsLabImagen4Fast:
-          "Imagen 4 Fast - Szybki Google Imagen 4 tekst-na-obraz via ModelsLab",
+          "Szybka wersja Imagen 4 od Google. Najtańszy Imagen, szybkie wyniki, dobry do szkiców i dużych serii. Oddaje trochę detali i precyzji względem Imagen 4 i Ultra. Obowiązują filtry mainstream. Jeszcze taniej i z łagodniejszymi filtrami wyjdzie Z Image Turbo.",
         modelsLabImagen3:
           "Imagen 3 - Google Imagen 3 tekst-na-obraz via ModelsLab",
         modelsLabNanoBananaPro:
           "Nano Banana Pro - Wysokiej jakości generowanie obrazów via ModelsLab",
         modelsLabNanoBanana: "Nano Banana - Generowanie obrazów via ModelsLab",
         modelsLabQwenT2I:
-          "Qwen T2I - Alibaba Qwen tekst-na-obraz via ModelsLab",
+          "Model Qwen od Alibaby do zamiany tekstu na obraz. Linia Qwen wyróżnia się renderowaniem tekstu na obrazie, także chińskich znaków, więc świetnie pasuje do plakatów, szyldów i makiet. Cena na samym dole katalogu. Na wejściu tylko tekst; do edycji wybierz Qwen Image 3.",
         modelsLabRealtimeT2I:
-          "Realtime T2I - Ultraszybki model tekst-na-obraz ModelsLab w czasie rzeczywistym",
+          "Endpoint czasu rzeczywistego od ModelsLab, nastawiony na szybkość, nie na szlif. Szybkie obrazy w najniższym progu cenowym katalogu. Do burzy mózgów, miniatur i testowania promptów, zanim wydasz więcej na FLUX.2 Pro albo Imagen 4. Nie do finalnych prac ani złożonych scen.",
         claudeSonnet5:
-          "Claude Sonnet 5 - Zrównoważony model Anthropic klasy Sonnet z mocnym działaniem w programowaniu, agentach i analizie. Kontekst 1M tokenów.",
+          "Pierwszy Sonnet 5 od Anthropic: zrównoważony w kodzie, pracy agentowej i analizie, kontekst 1M, obrazy na wejściu. Filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach, słaby w roleplayu. Claude Sonnet 5.5 kosztuje tyle samo i jest nowszy, więc nie ma powodu zostawać.",
         claudeOpus5:
-          "Claude Opus 5 - Flagowy model Anthropic do najbardziej wymagających zadań agentowych i analitycznych. Kontekst 1M tokenów.",
+          "Pierwszy Opus 5 od Anthropic, przeznaczony do najtrudniejszych zadań agentowych i analitycznych, kontekst 1M i obrazy na wejściu. Cena premium, filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach. Claude Opus 5.5 jest nowszy i tańszy.",
         claudeOpus5Fast:
           "Claude Opus 5 Fast - Wariant Claude Opus 5 zoptymalizowany pod kątem wysokiej przepustowości i niskich opóźnień. Kontekst 1M tokenów.",
         claudeFable5:
-          "Claude Fable 5 - Najnowszy model graniczny Anthropic łączący głęboki reasoning, syntezę twórczą i planowanie długoterminowe. Kontekst 1M tokenów.",
+          "Pierwszy Fable od Anthropic, czołowy model rozumujący do głębokiej syntezy, twórczej głębi i planowania na długą metę, kontekst 1M i obrazy na wejściu. Jeden z najdroższych modeli tutaj, z filtrami mainstreamowymi. Claude Fable 5.2 jest nowszy i tańszy. Do kodu lepiej wybrać Claude Opus 5.5.",
         grok45:
-          "Grok 4.5 - Wydajny model reasoning xAI z obsługą obrazów i otwartą polityką treści. Kontekst 500K tokenów.",
+          "Rozumujący Grok 4.5 od xAI: mocny w analizie i kodowaniu, czyta obrazy, 500K kontekstu, z luźniejszą polityką treści Groka. Grok 4.7 jest nowszy w tej samej cenie, więc warto zmienić, chyba że potrzebujesz dokładnie tej wersji.",
         grok46:
-          "Grok 4.6 - Najnowszy model Grok od xAI z lepszym reasoningiem i programowaniem. Kontekst 500K tokenów.",
+          "Grok 4.6 poprawił rozumowanie i kodowanie względem 4.5, z obrazami na wejściu, 500K kontekstu i luźniejszymi filtrami xAI. Nadal sprawny model z lekką filtracją. Grok 4.7 kosztuje tyle samo i go zastępuje.",
         gpt56Luna:
-          "GPT-5.6 Luna - Lekki, szybki model OpenAI do codziennych zadań. Bardzo oszczędny. Kontekst 1,05M tokenów.",
+          "Szybki i tani poziom linii GPT-5.6 od OpenAI, do codziennych rozmów i krótkich zadań, 1M kontekstu i obrazy na wejściu. Nie do głębokiej analizy. GPT-6 Luna jest nowszy i kosztuje mniej więcej połowę.",
         gpt56LunaPro:
-          "GPT-5.6 Luna Pro - Ulepszona wersja Luna z lepszym programowaniem i śledzeniem instrukcji. Kontekst 1,05M tokenów.",
+          "Luna z lepszym kodowaniem i dokładniejszym trzymaniem się instrukcji, w tej samej niskiej cenie co zwykła Luna. Dobra do taniej pomocy przy kodzie i uporządkowanych zadań w kontekście 1M. GPT-6 Luna jest nowszy i kosztuje mniej więcej połowę.",
         gpt56Terra:
-          "GPT-5.6 Terra - Model średniej klasy OpenAI łączący możliwości i koszty. Kontekst 1,05M tokenów.",
+          "Średni poziom linii GPT-5.6 od OpenAI: solidne kodowanie, analiza i rozmowa w kontekście 1M, obrazy na wejściu. Słaby w roleplayu. GPT-6.1 Terra jest nowszy i kosztuje mniej więcej połowę.",
         gpt56TerraPro:
-          "GPT-5.6 Terra Pro - Zaawansowana wersja Terra z głębszym reasoningiem i analizą. Kontekst 1,05M tokenów.",
+          "Terra z głębszym rozumowaniem do pracy pełnej analiz, w tej samej cenie co zwykła Terra, kontekst 1M. Słaba w roleplayu. GPT-6.1 Terra jest nowszy i kosztuje mniej więcej połowę. Po więcej głębi sięgnij po GPT-6.1 Sol.",
         gpt56Sol:
-          "GPT-5.6 Sol - Premium model reasoning OpenAI do złożonych zadań. Najwyższa wydajność. Kontekst 1,05M tokenów.",
+          "Najwyższy poziom linii GPT-5.6 od OpenAI: złożone rozumowanie, kod, pisanie i analiza w kontekście 1M, obrazy na wejściu. Cena premium, filtry mainstreamowe. GPT-6.1 Sol jest nowszy i kosztuje mniej więcej połowę.",
         gpt56SolPro:
-          "GPT-5.6 Sol Pro - Topowy model GPT łączący zaawansowany reasoning z kreatywnością i głębią analityczną. Kontekst 1,05M tokenów.",
+          "Sol z dodatkowym wysiłkiem rozumowania na najtrudniejsze problemy, w tej samej cenie co zwykły Sol, kontekst 1M. Słaby w roleplayu, filtry mainstreamowe. GPT-6.1 Sol jest nowszy i kosztuje połowę. Po maksymalną głębię sięgnij po GPT-6 Astra.",
         gemini36Flash:
-          "Gemini 3.6 Flash - Wydajny model Flash Google z multimodalnymi wejściami i mocnym programowaniem. Kontekst 1M tokenów.",
+          "Gemini 3.6 Flash od Google: szybki i dobry w kodowaniu, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Nadal rozsądna cena do codziennej pracy. Gemini 3.8 Flash jest nowszy i tylko trochę droższy.",
         gemini35FlashLite:
-          "Gemini 3.5 Flash Lite - Najtańszy szybki model Google do prostych zadań. Kontekst 1M tokenów.",
+          "Najlżejsze Gemini od Google. Przyjmuje tekst, obrazy, wideo i audio, wywołuje narzędzia, 1M kontekstu. Dobre do prostych zadań w dużej skali: streszczeń, tagowania, szybkich odpowiedzi. Filtry mainstreamowe i brak poważnego rozumowania. Jak na model lite zaskakująco drogie: GPT-6 Luna i Claude Haiku 5.5 kosztują mniej.",
         gemini37Flash:
-          "Gemini 3.7 Flash - Najnowszy model serii Flash od Google z ulepszonym reasoningiem i możliwościami multimodalnymi. Kontekst 1,05M tokenów.",
+          "Gemini 3.7 Flash wniósł do linii Flash lepsze rozumowanie i analizę, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Dobry model na co dzień w uczciwej cenie. Gemini 3.8 Flash go zastępuje i jest tylko nieco droższy.",
         kimiK3:
-          "Kimi K3 - Najnowszy model graniczny Moonshot AI z multimodalnym reasoningiem długokontekstowym i możliwościami agentowymi. Kontekst 1,05M tokenów.",
+          "Kimi K3 od Moonshot AI, model z najwyższej półki. Mocny w kodzie, analizie, pisaniu kreatywnym i długich zadaniach agentowych, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Kimi K3.1 Pro to nowsza, mocniejsza wersja za prawie dwa razy wyższą cenę.",
         glm52:
-          "GLM-5.2 - Nowa generacja modelu bazowego Z.AI z mocnym reasoningiem i szybką inferencją. Kontekst 1,05M tokenów.",
+          "GLM-5.2 od Z.AI: mocne rozumowanie, szybkie wnioskowanie i 1M kontekstu. Dobry do kodu i analizy długich materiałów, tylko tekst, luźniejsze filtry. GLM-5.3 jest nowszy i kosztuje mniej więcej jedną trzecią.",
         minimaxM3:
-          "MiniMax M3 - Flagowy model MiniMax z mocnym programowaniem i reasoningiem w konkurencyjnej cenie. Kontekst 1,05M tokenów.",
+          "Flagowy model MiniMax. Dobry w kodzie, rozumowaniu i analizie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu, grosze za wiadomość. Luźniejsze filtry niż u głównych laboratoriów. Stopień poniżej najwyższej półki. Do trudniejszych zadań wciąż tanio: MiMo V2.6 Pro kosztuje niewiele więcej.",
         qwen37Flash:
-          "Qwen 3.7 Flash - Ultraszybki model budżetowy Alibaba do zadań masowych. Kontekst 1M tokenów.",
+          "Ultratani model Flash od Alibaby i jedna z najtańszych opcji w katalogu: 1M kontekstu, przyjmuje tekst, obraz i wideo, wywołuje narzędzia. Świetny do masowych zadań i szybkich rozmów, płytki przy trudnym rozumowaniu. Qwen 3.8 Flash jest nowszy i bystrzejszy, ale kosztuje kilka razy więcej.",
         qwen38Max:
-          "Qwen 3.8 Max - Topowy model reasoning Alibaba z granicznymi wynikami. Kontekst 1M tokenów.",
+          "Najmocniejszy Qwen od Alibaby. Rozumowanie, kod i analiza na najwyższym poziomie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Drogi jak na otwarty model: DeepSeek V4 Pro osiąga tę samą klasę za dużo mniej niż połowę ceny, jeśli wystarczy ci sam tekst.",
         mimoV25:
-          "MiMo V2.5 - Wydajny model reasoning Xiaomi z mocnymi umiejętnościami programistycznymi. Kontekst 1,05M tokenów.",
+          "Wydajne MiMo V2.5 od Xiaomi: szybkie i dobre w kodowaniu, 1M kontekstu, przyjmuje tekst, obraz, wideo i audio. Luźniejsze filtry. MiMo V2.6 Flash jest nowszy i kosztuje mniej niż jedną trzecią.",
         mimoV25Pro:
-          "MiMo V2.5 Pro - Premium model reasoning Xiaomi z głębią analityczną i programistyczną. Kontekst 1,05M tokenów.",
+          "MiMo V2.5 Pro od Xiaomi, model do głębokiego rozumowania i kodowania z kontekstem 1M w niskiej cenie. Tylko tekst, luźniejsze filtry. Nadal tańszy niż następca MiMo V2.6 Pro, który jest nowszym wyborem.",
         metaMuseSpark12:
-          "Meta Muse Spark 1.2 - Multimodalny model reasoning Meta z wejściami obrazowymi, audio i wideo. Kontekst 1,05M tokenów.",
+          "Muse Spark 1.2 od Meta, multimodalny model rozumujący, który czyta tekst, obrazy i wideo w kontekście 1M. Dobry w analizie łączącej różne media, luźniejsze filtry. Nie jest nastawiony na kodowanie. Meta Muse Spark 1.3 kosztuje tyle samo i jest nowszy.",
         mistralMedium35:
-          "Mistral Medium 3.5 - Wydajny model klasy średniej Mistral AI z obsługą obrazów. Kontekst 262K tokenów.",
+          "Mistral Medium 3.5, model średniej klasy z francuskiego laboratorium Mistral AI: kodowanie, analiza i obrazy na wejściu, 262K kontekstu. Filtry mainstreamowe. Mistral Large 4 jest nowszy i kosztuje mniej niż połowę.",
         claudeOpus55:
-          "Claude Opus 5.5 - Najmocniejszy model Anthropic. Najtrudniejsze zadania agentowe, kod i analiza, o 20% taniej niż Opus 5. Kontekst 1M tokenów.",
+          "Najmocniejszy Claude od Anthropic do ciężkiej codziennej pracy. Wybór na najtrudniejszy kod, długie zadania agentowe i staranną analizę, do tego świetnie pisze. Czyta obrazy, wywołuje narzędzia, 1M kontekstu. Cena premium i filtry mainstreamowe: odmawia przy drażliwych prośbach i słabo sprawdza się w roleplayu. Claude Sonnet 5.5 ogarnie większość codziennej pracy za połowę ceny.",
         claudeSonnet55:
-          "Claude Sonnet 5.5 - Koń pociągowy Anthropic. Kod i agenci prawie na poziomie Opus w cenie Sonneta. Kontekst 1M tokenów.",
+          "Koń pociągowy wśród modeli Claude. Mocny w kodzie, pracy agentowej, analizie i pisaniu za połowę ceny Opus 5.5. Czyta obrazy, wywołuje narzędzia, 1M kontekstu. Filtry mainstreamowe, więc nie do roleplayu ani kontrowersyjnych tematów. Kosztuje tyle co GPT-6.1 Sol i Gemini 4 Argon, czyli jego naturalni rywale.",
         claudeHaiku55:
-          "Claude Haiku 5.5 - Najszybszy model Anthropic. Obrazy, narzędzia i kontekst 1M za dziesiątą część ceny Haiku 4.5.",
+          "Najszybszy i najtańszy Claude od Anthropic. Szybki czat, lekkie kodowanie, rozumienie obrazów i narzędzia, 1M kontekstu, grosze za wiadomość. Filtry mainstreamowe, słaby w roleplayu i drażliwych tematach. Ta sama cena co GPT-6 Luna. Gdy zadanie wymaga prawdziwej głębi, przesiądź się na Claude Sonnet 5.5.",
         claudeFable51:
-          "Claude Fable 5.1 - Graniczny model rozumujący Anthropic. Głęboka synteza, planowanie długoterminowe, ostrzejszy niż Fable 5. Kontekst 1M tokenów.",
+          "Fable 5.1 od Anthropic, czołowy model rozumujący do głębokiej syntezy, planowania na długą metę i starannego pisania w kontekście 1M. Cena premium, filtry mainstreamowe, ostrożny przy kontrowersyjnych tematach i słaby w roleplayu. Claude Fable 5.2 go zastępuje i kosztuje mniej. Do kodu lepiej pasuje Claude Opus 5.5.",
         claudeFable52:
-          "Claude Fable 5.2 - Graniczny model rozumujący Anthropic. Głębsza synteza i pewniejsze planowanie długoterminowe niż Fable 5.1, w niższej cenie. Kontekst 1M tokenów.",
+          "Czołowy model rozumujący od Anthropic i najdroższy Claude. Stworzony do głębokiej syntezy, researchu i planowania na długim dystansie, do tego świetnie pisze. Czyta obrazy, wywołuje narzędzia, 1M kontekstu. Około dwa razy droższy od Opus 5.5, z filtrami mainstreamowymi. Do kodu lepszy stosunek ceny do jakości ma Claude Opus 5.5.",
         gpt6Astra:
-          "GPT-6 Astra - Najpotężniejszy model OpenAI. Maksymalna głębia rozumowania na najtrudniejsze problemy. Kontekst 1,05M tokenów.",
+          "Najpotężniejszy model OpenAI, zbudowany do maksymalnej głębi rozumowania przy najtrudniejszych problemach. Kod, analiza i pisanie, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Najdroższy model w katalogu, z filtrami mainstreamowymi. GPT-6.1 Sol gra w tej samej lidze za mniej więcej jedną piątą ceny, więc sprawdź go najpierw.",
         gpt6AstraPro:
           "GPT-6 Astra Pro - GPT-6 Astra z rozszerzonym rozumowaniem. Wolniej, ale dokładniej. Kontekst 1,05M tokenów.",
         gpt61Sol:
-          "GPT-6.1 Sol - Premium model rozumujący OpenAI. Najwyższa wydajność za ułamek ceny GPT-5.6 Sol. Kontekst 1,05M tokenów.",
+          "Model rozumujący premium od OpenAI i rozsądny wybór z najwyższej półki. Mocny w kodzie, analizie i pisaniu, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Filtry mainstreamowe, nie do roleplayu. Około jednej piątej ceny GPT-6 Astra i tyle samo co Claude Sonnet 5.5 czy Gemini 4 Argon.",
         gpt61SolPro:
           "GPT-6.1 Sol Pro - GPT-6.1 Sol z rozszerzonym rozumowaniem do złożonej analizy i kodu. Kontekst 1,05M tokenów.",
         gpt61Terra:
-          "GPT-6.1 Terra - Zrównoważona średnia półka OpenAI. Mocny kod i rozumowanie w codziennej cenie. Kontekst 1,05M tokenów.",
+          "Zrównoważona średnia półka od OpenAI. Dobry w kodzie, analizie i codziennym czacie, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Połowa ceny GPT-6.1 Sol. Filtry mainstreamowe, słaby w roleplayu. Jeśli pasują ci luźniejsze filtry, DeepSeek V4 Pro da wyższą klasę za mniej.",
         gpt61TerraPro:
           "GPT-6.1 Terra Pro - GPT-6.1 Terra z głębszym rozumowaniem do pracy analitycznej. Kontekst 1,05M tokenów.",
         gpt6Luna:
-          "GPT-6 Luna - Lekki model OpenAI. Szybkie odpowiedzi za grosze. Kontekst 1,05M tokenów.",
+          "Lekki GPT-6 od OpenAI. Szybkie odpowiedzi za grosze, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Dobry do krótkich pytań i prostych zadań, nie do głębokiego rozumowania ani roleplayu. Ta sama cena co Claude Haiku 5.5. DeepSeek V4.1 Flash jest jeszcze tańszy i ma luźniejsze filtry.",
         gpt6LunaPro:
           "GPT-6 Luna Pro - GPT-6 Luna z dodatkowym rozumowaniem. Lepszy kod i wykonywanie poleceń w tej samej niskiej cenie. Kontekst 1,05M tokenów.",
         gemini4Argon:
-          "Gemini 4 Argon - Nowy flagowiec Google. Tekst, obraz, wideo i audio na wejściu, najwyższe rozumowanie na wyjściu. Kontekst 1M tokenów.",
+          "Flagowe Gemini od Google. Przyjmuje tekst, obrazy, wideo i audio, a potem rozumuje, koduje i analizuje na najwyższym poziomie. Wywołuje narzędzia, 1M kontekstu. Świetny wybór, gdy na wejściu masz nagranie, wideo albo stos zrzutów ekranu. Filtry mainstreamowe. Kosztuje tyle co Claude Sonnet 5.5 i GPT-6.1 Sol.",
         gemini38Flash:
-          "Gemini 3.8 Flash - Najnowszy Flash od Google. Szybki model multimodalny z mocnym kodem. Kontekst 1M tokenów.",
+          "Aktualne Gemini Flash od Google. Szybkie, dobre w kodzie i analizie, przyjmuje tekst, obrazy, wideo i audio, wywołuje narzędzia, 1M kontekstu. Filtry mainstreamowe. Średnia półka cenowa: sporo poniżej połowy Gemini 4 Argon, ale wyraźnie drożej niż otwarte szybkie modele, jak Qwen 3.8 Flash.",
         grok47:
-          "Grok 4.7 - Najnowszy Grok od xAI. Ostrzejsze rozumowanie i kod, otwarta polityka treści, obrazy. Kontekst 500K tokenów.",
+          "Najnowszy Grok od xAI. Ostre rozumowanie i mocny kod, czyta obrazy, wywołuje narzędzia, 500K kontekstu, czyli połowa tego, co oferuje większość flagowców tutaj. Otwarta polityka treści: odpowiada na więcej niż modele głównych laboratoriów, choć nie jest całkiem bez cenzury. Cenowo jak Qwen 3.8 Max. Grok 4 Fast to tani i szybki brat.",
         kimiK31Pro:
-          "Kimi K3.1 Pro - Najmocniejszy model Moonshot AI. Rozumowanie multimodalne i długie przebiegi agentów. Kontekst 1M tokenów.",
+          "Najmocniejsze Kimi od Moonshot AI. Rozumowanie, kod, pisanie kreatywne i długie zadania agentowe na najwyższym poziomie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Kosztuje tyle co Claude Sonnet 5.5. Kimi K3 jest blisko za nieco ponad połowę ceny.",
         deepseekV41Flash:
-          "DeepSeek V4.1 Flash - Szybki otwarty model DeepSeek, teraz z obsługą obrazów. Poważny kod prawie za darmo. Kontekst 1M tokenów.",
+          "Szybki model DeepSeek, teraz także z rozumieniem obrazów. Poważne kodowanie i analiza prawie za darmo: najtańszy model w katalogu. Wywołuje narzędzia, 1M kontekstu, luźniejsze filtry. Nie myśli głęboko. Do trudnych problemów weź DeepSeek V4 Pro, a bez odmów DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:
-          "Qwen 3.8 Flash - Szybki model multimodalny Alibaby. Tekst, obraz i wideo w budżetowej cenie. Kontekst 1M tokenów.",
+          "Szybki Qwen od Alibaby. Na wejściu tekst, obrazy i wideo, na wyjściu szybkie odpowiedzi, przyzwoity w kodzie, wywołuje narzędzia, 1M kontekstu. Budżetowa cena, luźniejsze filtry. Model na co dzień, nie do głębokiego myślenia. Trudne problemy zostaw dla Qwen 3.8 Max.",
         glm53:
-          "GLM-5.3 - Najnowszy model bazowy Z.AI. Mocne rozumowanie i kod w agresywnej cenie. Kontekst 1M tokenów.",
+          "Model bazowy GLM-5.3 od Z.AI. Mocne rozumowanie i kod za grosze, wywołuje narzędzia, 1M kontekstu. Tylko tekst, luźniejsze filtry. Jeden z najtańszych bystrych modeli w katalogu. Chcesz zero odmów? GLM 5.3 Uncensored to wersja bez filtra.",
         glm53Flash:
-          "GLM-5.3 Flash - Szybki model multimodalny Z.AI. Tekst, obraz i wideo do pracy na dużą skalę. Kontekst 1M tokenów.",
+          "Szybki GLM od Z.AI. Czyta tekst, obrazy i wideo, koduje, wywołuje narzędzia, 1M kontekstu. Stworzony do pracy na dużą skalę w budżetowej cenie, z luźniejszymi filtrami. Słabiej rozumuje niż GLM-5.3, który kosztuje tyle samo, więc wybierz Flash, gdy liczą się multimedia i szybkość.",
         mimoV26Pro:
-          "MiMo V2.6 Pro - Premium model rozumujący Xiaomi. Tekst, obraz, wideo i audio na wejściu, głęboka analiza na wyjściu. Kontekst 1,05M tokenów.",
+          "Najmocniejsze MiMo od Xiaomi. Rozumowanie, kod i analiza na najwyższym poziomie, przyjmuje tekst, obrazy, wideo i audio. Wywołuje narzędzia, 1M kontekstu, luźniejsze filtry. Najtańszy model z najwyższej półki inteligencji w katalogu, ułamek ceny Gemini 4 Argon przy podobnym zakresie wejść. To nowsza marka, więc sprawdź go na własnych promptach.",
         mimoV26Flash:
-          "MiMo V2.6 Flash - Szybki model multimodalny Xiaomi. Bardzo tani, solidny w kodzie. Kontekst 1,05M tokenów.",
+          "Szybkie MiMo od Xiaomi. Przyjmuje tekst, obrazy, wideo i audio, jak na swoją cenę dobrze koduje, wywołuje narzędzia, 1M kontekstu. Bardzo tanie, luźniejsze filtry. Głębię oddaje za szybkość. Krok wyżej jest MiMo V2.6 Pro, a MiMo V2.6 Flash Abliterated nie odmawia.",
         metaMuseSpark13:
-          "Meta Muse Spark 1.3 - Multimodalny model rozumujący Meta. Analiza tekstu, obrazu i wideo naraz. Kontekst 1M tokenów.",
+          "Muse ze średniej półki od Meta. Rozumuje i analizuje tekst, obrazy i wideo, wywołuje narzędzia, 1M kontekstu, luźniejsze filtry. Nie jest stworzony do kodu. W tej cenie Kimi K3 sięga wyższej klasy, a flagowcem Meta jest Meta Muse Wonder.",
         metaMuseWonder:
-          "Meta Muse Wonder - Flagowiec Meta. Najwyższe rozumowanie, kod i praca twórcza we wszystkich modalnościach. Kontekst 1M tokenów.",
+          "Flagowy Muse od Meta. Rozumowanie, kod, analiza i praca twórcza na najwyższym poziomie, przyjmuje tekst, obrazy, wideo i audio. Wywołuje narzędzia, 1M kontekstu, luźniejsze filtry niż u głównych laboratoriów. Premium, cenowo jak Claude Opus 5.5. Kimi K3.1 Pro i Gemini 4 Argon grają w tej samej lidze za połowę ceny.",
         mistralLarge4:
-          "Mistral Large 4 - Nowy flagowiec Mistral AI. Europejski, rozumie obrazy, mocny w kodzie, tańszy niż Medium 3.5. Kontekst 1M tokenów.",
+          "Flagowiec Mistral AI, europejskiego laboratorium. Dobry w kodzie i analizie, czyta obrazy, wywołuje narzędzia, 1M kontekstu, w umiarkowanej cenie. Filtry mainstreamowe. To jeszcze nie najwyższa półka: DeepSeek V4 Pro kosztuje odrobinę więcej i rozumuje głębiej.",
         veniceDeepseekV41FlashUncensored:
-          "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash bez odmów, serwowany przez Venice.ai. Prawdziwe możliwości, zero moralizowania, z narzędziami. Kontekst 1M tokenów.",
+          "DeepSeek V4.1 Flash bez odmów, dostarczany przez Venice. Prawdziwe kodowanie i analiza, a do tego fikcja i roleplay, bez pouczania. Czyta obrazy, wywołuje narzędzia, 1M kontekstu, tani. Mniej więcej cztery razy droższy niż zwykły DeepSeek V4.1 Flash. Tańszą alternatywą bez filtra jest GLM 5.3 Flash Uncensored.",
         grokImagineImage2:
-          "Grok Imagine Image 2.0 - Najnowszy model generowania obrazów xAI z lepszą wiernością i jakością.",
+          "Druga generacja modelu obrazów Grok Imagine od xAI. Przyjmuje tekst albo obraz referencyjny, więc ogarnia edycje i nowe obrazy. Średnia półka cenowa. Poziom open: łagodniejsze filtry niż mainstream, bez treści dosadnych. Krok wyżej od Grok Imagine T2I, gdy potrzebujesz edycji albo wierniejszego trzymania się promptu.",
         qwenImage3:
-          "Qwen Image 3 - Szybki model generowania obrazów Alibaba w niskiej cenie.",
+          "Szybka wersja Qwen Image 3 od Alibaby. Generuje z tekstu i edytuje obraz referencyjny, a przy tym jest tania. Dobra do szybkich poprawek, grafik z dużą ilością tekstu i iteracji. Qwen Image 3 Pro daje więcej detali za niewiele wyższą cenę; do edycji bez cenzury jest Qwen Edit Uncensored.",
         qwenImage3Pro:
-          "Qwen Image 3 Pro - Premium model generowania obrazów Alibaba z ulepszoną jakością.",
+          "Wyższa jakościowo wersja Qwen Image 3 od Alibaby. Tekst albo obraz referencyjny na wejściu, więcej detali i szlifu niż w podstawowym Qwen Image 3 za niewielką dopłatą. Mocny w edycji i tekście na obrazie. Poziom open, więc bez treści dosadnych; do tego jest Qwen Edit Uncensored.",
         hailuo3:
-          "Hailuo 3 - Najnowszy model generowania wideo MiniMax z kinematyczną jakością i płynnością ruchu.",
+          "Hailuo 3 od MiniMax. Natywny dźwięk, wyjście w 2K, klipy do 15 sekund, kontrola pierwszej i ostatniej klatki. Na papierze wyraźny skok względem Hailuo 2.3, za mniej więcej dwa razy wyższą cenę. Wyższa półka cenowa; tańsze 1080p bez dźwięku da ci Hailuo 2.3 T2V.",
         seedance25:
-          "Seedance 2.5 - Ulepszony model generowania wideo ByteDance z lepszym ruchem i wiernością wizualną.",
+          "Seedance 2.5 od ByteDance. Główny atut to długość: klipy do 30 sekund z natywnym dźwiękiem i kontrolą klatek, w 480p albo 720p. Najdroższy Seedance w przeliczeniu na klip. Wybierz go do długich, ciągłych ujęć; ostrzejsze krótkie klipy da Seedance 2.0, aż do 4K.",
         flux3Video:
           "Flux 3 Video - Flagowy model generowania wideo Black Forest Labs z wyjątkową jakością.",
         grokImagineVideo15:
-          "Grok Imagine Video 1.5 - Zaktualizowany model generowania wideo xAI z lepszą spójnością czasową.",
+          "Grok Imagine Video 1.5 od xAI. Klipy do 15 sekund w 480p, 720p albo 1080p, z opcjonalną pierwszą klatką. Krok wyżej od Grok T2V pod względem rozdzielczości, za mniej więcej dwa razy wyższą cenę. Poziom open: łagodniejsze filtry niż w Veo czy Sorze, bez treści dosadnych.",
         lyria3ProPreview:
-          "Lyria 3 Pro Preview - Premium model generowania muzyki Google do pełnych piosenek w jakości produkcyjnej.",
+          "Wersja premium Lyria 3 od Google, wciąż w fazie preview. Stworzona do pełnometrażowych piosenek w wysokiej jakości produkcji. Mainstream: obowiązują filtry Google. Mniej więcej półtora raza droższa niż Lyria 3. Status preview oznacza, że działanie i dostępność mogą się jeszcze zmienić.",
         lyria3ClipPreview:
-          "Lyria 3 Clip Preview - Szybki generator klipów muzycznych Google do krótkich treści audio.",
+          "Lyria 3 Clip od Google do krótkich form, w fazie preview. Szybkie i tanie klipy muzyczne na intra, przerywniki i posty w social media. Obowiązują filtry mainstream. Tylko krótkie długości; do dłuższych utworów użyj Lyria 3 albo Lyria 3 Pro Preview.",
       },
     },
     modelUtilities: {
@@ -2390,7 +2391,8 @@ export const translations: typeof enTranslations = {
     },
     models: {
       descriptions: {
-        openaiWhisper: "OpenAI Whisper",
+        openaiWhisper:
+          "Rozpoznawanie mowy Whisper od OpenAI, trenowane na 99 językach. Transkrybuje wywiady, notatki głosowe i spotkania, dobrze radzi sobie z akcentami i hałasem w tle. Tanie w użyciu. Nie oznacza mówców, a przy długiej ciszy potrafi zmyślić tekst. Nowszą opcją od OpenAI jest GPT-4o Mini Transcribe.",
         deepgramNova2: "Deepgram Nova-2",
         whisperLargeV3:
           "Whisper Large V3 - Otwarty model OpenAI, 99 języków, znacznie tańszy niż whisper-1.",
@@ -2504,9 +2506,12 @@ export const translations: typeof enTranslations = {
     },
     models: {
       descriptions: {
-        openaiAlloy: "OpenAI Alloy",
-        openaiNova: "OpenAI Nova",
-        openaiOnyx: "OpenAI Onyx",
+        openaiAlloy:
+          "Głos Alloy od OpenAI. Wyważony i neutralny, ani wyraźnie męski, ani kobiecy, w spokojnym tempie. Pasuje do narracji, materiałów objaśniających i treści profesjonalnych, w których głos ma nie odciągać uwagi. Kosztuje ułamki centa. Mniej ciepła niż Nova, mniej powagi niż Onyx.",
+        openaiNova:
+          "Głos Nova od OpenAI. Jasny, ciepły i przyjazny, o kobiecej barwie. Pasuje do asystentów, aplikacji konwersacyjnych i pogodnych tekstów. Bardzo tani. Gorzej sprawdza się w poważnych czy formalnych treściach; tam lepiej wypada Onyx.",
+        openaiOnyx:
+          "Głos Onyx od OpenAI. Niski, spokojny męski głos z autorytetem. Pasuje do dokumentów, formalnej narracji i komunikatów. Bardzo tani. W luźnej rozmowie potrafi brzmieć zbyt ciężko; lżejszy i bardziej przyjazny jest Nova.",
         openaiEcho: "OpenAI Echo",
         openaiShimmer: "OpenAI Shimmer",
         openaiFable: "OpenAI Fable",

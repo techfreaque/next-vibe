@@ -29,7 +29,6 @@ import type { FC } from "react";
 import { useCallback, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
-import meEndpoints from "@/user/private/me/definition";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;
@@ -68,20 +67,27 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
     (newLocale: CountryLanguage) => {
       // Fire-and-forget: sync the new locale to the backend via POST /me.
       // Non-fatal - locale will re-sync on next explicit profile update.
-      void executeMutation({
-        endpoint: meEndpoints.POST,
-        logger,
-        requestData: {},
-        pathParams: undefined,
-        locale: newLocale,
-        user,
-      }).catch((error: Error) => {
-        logger.error("Locale sync to profile threw", error, {
-          component: "CountrySelector",
-          operation: "syncLocale",
-          locale: newLocale,
+      // The /me definition is loaded on demand: this selector sits in the
+      // navbar of every public page, and a static import put the definition
+      // + skills enum + all skills i18n into every page's initial JS.
+      void import("@/user/private/me/definition")
+        .then(({ default: meEndpoints }) =>
+          executeMutation({
+            endpoint: meEndpoints.POST,
+            logger,
+            requestData: {},
+            pathParams: undefined,
+            locale: newLocale,
+            user,
+          }),
+        )
+        .catch((error: Error) => {
+          logger.error("Locale sync to profile threw", error, {
+            component: "CountrySelector",
+            operation: "syncLocale",
+            locale: newLocale,
+          });
         });
-      });
     },
     [user, logger],
   );

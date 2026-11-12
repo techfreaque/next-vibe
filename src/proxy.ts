@@ -70,8 +70,12 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
  */
 export const config = {
   matcher: [
-    // Match all paths except static files and specific API routes
+    // Match all paths except static files and specific API routes.
+    // Every bare-root file in public/ MUST be listed here: middleware runs
+    // before public/ serving and 404s bare-root paths with an extension, so an
+    // unlisted public file (was: logo.png, og-image.jpg — the OG image and
+    // structured-data logo) is unreachable.
     "/",
-    "/((?!_next/static|_next/image|image|images|favicon\\.ico|favicon\\.png|favicon\\.svg|robots\\.txt|sitemap\\.xml|vibe-frame|api/[^/]+/manifest|_serverFn).*)",
+    "/((?!_next/static|_next/image|image|images|favicon\\.ico|favicon\\.png|favicon\\.svg|logo\\.png|og-image\\.jpg|robots\\.txt|sitemap\\.xml|vibe-frame|api/[^/]+/manifest|_serverFn).*)",
   ],
 };

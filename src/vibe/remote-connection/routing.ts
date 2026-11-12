@@ -17,6 +17,11 @@ import { and, desc, eq } from "drizzle-orm";
 
 import { db } from "../database";
 import { remoteConnections } from "./db";
+import {
+  getInstanceInferenceState,
+  type InstanceInferenceState,
+  invalidateInstanceInferenceState,
+} from "./inference-state";
 import { RemoteConnectionRepository } from "./repository";
 import type {
   RemoteConnectionRow,
@@ -26,19 +31,9 @@ import type {
 } from "./types";
 
 export class ExecuteToolRouting {
-  /**
-   * Unbottled availability cache — instance-global: tracks whether any active
-   * connection provides inference. Invalidated on connection mutations;
-   * refreshes after 30s TTL otherwise.
-   */
-  private static unbottledCache: {
-    value: { hasSystem: boolean; forceSystem: boolean };
-    expiresAt: number;
-  } | null = null;
-
   /** Call after any connection create/update/delete. */
   static invalidateUnbottledCache(): void {
-    ExecuteToolRouting.unbottledCache = null;
+    invalidateInstanceInferenceState();
   }
 
   /**
@@ -172,40 +167,11 @@ export class ExecuteToolRouting {
 
   /**
    * Returns { hasSystem, forceSystem } for all active non-reverse connections.
-   * hasSystem — any connection has isInferenceProvider or forceSystemProvider.
-   * forceSystem — any connection has forceSystemProvider (overrides all user model choices).
-   * Instance-global cache with 30s TTL — invalidated on connection mutations.
-   * Use invalidateUnbottledCache() after any connection create/update/delete.
+   * Lives in ./inference-state (lean module, importable from the root layout
+   * without pulling the routing graph); re-exposed here for routing callers.
    */
-  static async getInstanceInferenceState(): Promise<{
-    hasSystem: boolean;
-    forceSystem: boolean;
-  }> {
-    const now = Date.now();
-    const cached = ExecuteToolRouting.unbottledCache;
-    if (cached !== null && now < cached.expiresAt) {
-      return cached.value;
-    }
-    const rows = await db
-      .select({
-        forceSystemProvider: remoteConnections.forceSystemProvider,
-        isInferenceProvider: remoteConnections.isInferenceProvider,
-      })
-      .from(remoteConnections)
-      .where(
-        and(
-          eq(remoteConnections.isActive, true),
-          eq(remoteConnections.isReverseEntry, false),
-        ),
-      );
-    const value = {
-      hasSystem: rows.some(
-        (r) => r.forceSystemProvider || r.isInferenceProvider,
-      ),
-      forceSystem: rows.some((r) => r.forceSystemProvider),
-    };
-    ExecuteToolRouting.unbottledCache = { value, expiresAt: now + 30_000 };
-    return value;
+  static async getInstanceInferenceState(): Promise<InstanceInferenceState> {
+    return getInstanceInferenceState();
   }
 
   private static async loadActiveConnections(

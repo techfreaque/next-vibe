@@ -10,7 +10,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import type { V1T } from "../i18n";
 import { gateApiKeyRequest } from "../shared/gate";
-import { listUserChatModels } from "../shared/models";
+import { listUserCallableModels } from "../shared/models";
 import { MODEL_CREATED_AT, openAiJson } from "../shared/openai";
 
 export class V1ModelsRepository {
@@ -23,7 +23,10 @@ export class V1ModelsRepository {
     if (!gate.ok) {
       return gate.response;
     }
-    const models = listUserChatModels(gate.user, await getEnvAvailability());
+    const models = listUserCallableModels(
+      gate.user,
+      await getEnvAvailability(),
+    );
     return openAiJson({
       object: "list",
       data: models.map((m) => ({

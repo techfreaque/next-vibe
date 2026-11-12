@@ -7,6 +7,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "unbottled-api-in-coding-tools": "2026-11-12",
   "uncensored-models-what-each-is-good-at": "2026-11-09",
   "model-refresh-uncensored-providers": "2026-11-07",
   "whats-new-november-2026": "2026-11-06",
