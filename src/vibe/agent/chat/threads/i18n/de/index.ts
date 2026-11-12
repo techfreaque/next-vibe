@@ -352,7 +352,6 @@ export const translations: typeof enTranslations = {
       },
     },
     suggestedPrompts: {
-      tryOne: "Probier's aus",
       starters: {
         explain: {
           label: "Einfach erklärt",
@@ -374,25 +373,103 @@ export const translations: typeof enTranslations = {
             "Gib mir die stärksten Argumente für und gegen Krypto. Ohne Ausflüchte, ohne Disclaimer.",
         },
       },
-      switchHint:
-        "Andere KI gewünscht? Tipp auf ihren Namen unter dem Eingabefeld.",
       takeTour: "Kurze Tour starten (1 Minute)",
-      title: "Wie kann ich helfen?",
-      privateTitle: "Ihr privater KI-Assistent",
-      privateDescription:
-        "Gespräche werden in Ihrem Konto gespeichert und auf allen Geräten synchronisiert.",
-      sharedTitle: "Mit KI zusammenarbeiten",
-      sharedDescription:
-        "Erstellen Sie Gespräche und teilen Sie sie mit Teammitgliedern über sichere Links.",
-      publicTitle: "Dem öffentlichen KI-Forum beitreten",
-      publicDescription:
-        "Öffentliche Gespräche für alle sichtbar. Teilen Sie Ideen und engagieren Sie sich.",
-      incognitoTitle: "Anonymer KI-Chat",
-      incognitoDescription:
-        "Nur in Ihrem Browser gespeichert. Nie in Ihrem Konto gespeichert oder synchronisiert.",
       backgroundTitle: "Deine KI-Agenten arbeiten",
       backgroundDescription:
         "Subagenten und autonome Hintergrundagenten erledigen Aufgaben hier, während du dich um anderes kümmern kannst. Ergebnisse landen automatisch hier.",
+    },
+    emptyState: {
+      changeCompanion: "Begleiter oder Modell wechseln. Aktuell: {{name}}",
+      folder: {
+        private: { label: "Privat", note: "In deinem Konto, auf jedem Gerät." },
+        incognito: {
+          label: "Inkognito",
+          note: "Nur in diesem Browser gespeichert.",
+        },
+        shared: { label: "Geteilt", note: "Lesbar für alle mit dem Link." },
+        public: { label: "Öffentlich", note: "Für alle sichtbar." },
+        cron: {
+          label: "Hintergrund",
+          note: "Hier arbeiten Agenten selbstständig.",
+        },
+        remote: {
+          label: "Remote",
+          note: "Läuft auf deiner verbundenen Instanz.",
+        },
+      },
+      use: {
+        everyday: {
+          good: "Recherche, Texte und tägliche Aufgaben",
+          weak: "Bei Politik vorsichtig",
+        },
+        politics: {
+          good: "Klare Antworten zu Politik und Tabuthemen",
+          weak: "Nur Text, schwächer bei komplexen Aufgaben",
+        },
+        security: {
+          good: "Offensive und defensive Security-Arbeit",
+          weak: "Bei Politik vorsichtig",
+        },
+        writing: {
+          good: "Sorgfältige Texte, Code und Analysen",
+          weak: "Weicht bei heiklen Themen aus oder blockt",
+        },
+        images: {
+          good: "Liest Screenshots, Fotos und Videos",
+          weak: "Vorsichtig bei heiklen Themen",
+        },
+        classic: {
+          good: "Zuverlässiger Allrounder für Code und Planung",
+          weak: "Vorsichtig bei heiklen Themen",
+        },
+        bold: {
+          good: "Direkte Antworten mit Meinung",
+          weak: "Nicht die Wahl für Politik",
+        },
+        general: {
+          good: "Allgemeine Fragen",
+          weak: "Nicht die Wahl für Politik",
+        },
+      },
+      mode: {
+        autoModel: "Automatisch gewählt",
+        goodAt: "Stark bei:",
+        weakAt: "Schwach bei:",
+      },
+      spotlight: {
+        title: "Wähl, wie {{name}} arbeitet.",
+        subtitle:
+          "Jeder Modus nutzt ein anderes Modell. Oder schreib einfach los.",
+        now: "Aktueller Modus",
+        runsOn: "Läuft auf",
+        allModes: "Alle Modi",
+        more: "Weitere Modi",
+        fix: {
+          politics: "Politik? Wechsel zu {{mode}}",
+          complex: "Komplexe Aufgabe? Wechsel zu {{mode}}",
+        },
+      },
+      single: {
+        title: "{{name}} nutzt ein einziges Modell.",
+        action: "Zu {{companion}} wechseln, für mehr Modi",
+      },
+      companion: {
+        title: "Wer soll antworten?",
+        subtitle:
+          "Jeder Begleiter hat eine eigene Persönlichkeit und Modelle für verschiedene Aufgaben.",
+        skip: "Oder schreib einfach los, ganz ohne Begleiter.",
+        skipModel:
+          "Oder schreib einfach los. {{model}} antwortet, ohne Persona.",
+        about: {
+          thea: "Warm und nachdenklich. Denkt mit dir.",
+          hermes: "Direkt und schnell. Erledigt, was ansteht.",
+        },
+      },
+      custom: {
+        title: "Dein eigener Skill ist startklar.",
+        subtitle:
+          "Skill oder Modell wechselst du im Auswahlfeld unter dem Eingabefeld.",
+      },
     },
   },
   publicFeed: {

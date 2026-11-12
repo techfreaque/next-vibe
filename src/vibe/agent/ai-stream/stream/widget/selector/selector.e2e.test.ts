@@ -104,18 +104,12 @@ describe("E2E: chat selector + empty state", () => {
   );
 
   e2e.it(
-    "empty chat: no forced tour, starters fill the composer",
+    "empty chat: no forced tour, the tour is one click away",
     async ({ page, gotoReady }) => {
       await openChat(page, gotoReady);
       // Tour no longer auto-starts and blocks the page
       await page.waitForTimeout(1500);
       expect(await page.locator("#react-joyride-portal").count()).toBe(0);
-
-      const starter = page.locator('[data-starter="0"]');
-      const starterText = (await starter.innerText()).trim();
-      await starter.click();
-      const composer = page.locator('textarea[name="prompt"]').first();
-      expect(await composer.inputValue()).toBe(starterText);
 
       // The tour is still one click away
       await page

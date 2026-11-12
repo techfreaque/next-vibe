@@ -349,7 +349,6 @@ export const translations = {
       },
     },
     suggestedPrompts: {
-      tryOne: "Try one",
       starters: {
         explain: {
           label: "Explain it simply",
@@ -372,24 +371,95 @@ export const translations = {
             "Give me the strongest case for and against crypto. No hedging, no disclaimers.",
         },
       },
-      switchHint: "Want a different AI? Tap its name under the message box.",
       takeTour: "Take the 1-minute tour",
-      title: "How can I help you?",
-      privateTitle: "Your Private AI Assistant",
-      privateDescription:
-        "Conversations saved to your account and synced across all your devices.",
-      sharedTitle: "Collaborate with AI",
-      sharedDescription:
-        "Create conversations and share them with team members using secure links.",
-      publicTitle: "Join the Public AI Forum",
-      publicDescription:
-        "Public conversations visible to everyone. Share ideas and engage in open dialogue.",
-      incognitoTitle: "Anonymous AI Chat",
-      incognitoDescription:
-        "Stored only in your browser. Never saved to your account or synced.",
       backgroundTitle: "Your AI Agents Are Working",
       backgroundDescription:
         "Sub-agents and autonomous background agents run tasks here while you focus elsewhere. Results drop in automatically.",
+    },
+    emptyState: {
+      changeCompanion: "Change companion or model. Now: {{name}}",
+      folder: {
+        private: { label: "Private", note: "Synced to your account." },
+        incognito: {
+          label: "Incognito",
+          note: "Only in this browser. Never synced.",
+        },
+        shared: { label: "Shared", note: "Anyone with the link can read." },
+        public: { label: "Public", note: "Visible to everyone." },
+        cron: { label: "Background", note: "Agents work here on their own." },
+        remote: { label: "Remote", note: "Runs on your connected instance." },
+      },
+      use: {
+        everyday: {
+          good: "Research, writing and daily tasks",
+          weak: "Plays it safe on politics",
+        },
+        politics: {
+          good: "Straight answers on politics and taboo topics",
+          weak: "Text only, less sharp on complex tasks",
+        },
+        security: {
+          good: "Offensive and defensive security work",
+          weak: "Plays it safe on politics",
+        },
+        writing: {
+          good: "Careful writing, code and analysis",
+          weak: "Hedges or refuses on edgy topics",
+        },
+        images: {
+          good: "Reads screenshots, photos and video",
+          weak: "Careful on edgy topics",
+        },
+        classic: {
+          good: "Reliable all-rounder for code and planning",
+          weak: "Careful on edgy topics",
+        },
+        bold: {
+          good: "Blunt, opinionated answers",
+          weak: "Not the pick for politics",
+        },
+        general: {
+          good: "General questions",
+          weak: "Not the pick for politics",
+        },
+      },
+      mode: {
+        autoModel: "Picked automatically",
+        goodAt: "Good at:",
+        weakAt: "Weak at:",
+      },
+      spotlight: {
+        title: "Pick how {{name}} works.",
+        subtitle: "Each mode runs a different model. Or just type to start.",
+        now: "Current mode",
+        runsOn: "Runs on",
+        allModes: "All modes",
+        more: "More modes",
+        fix: {
+          politics: "Politics? Switch to {{mode}}",
+          complex: "Complex task? Switch to {{mode}}",
+        },
+      },
+      single: {
+        title: "{{name}} runs one model.",
+        action: "Switch to {{companion}} for more modes",
+      },
+      companion: {
+        title: "Who should answer?",
+        subtitle:
+          "Each companion has its own personality and a set of models for different jobs.",
+        skip: "Or just type to start without a companion.",
+        skipModel: "Or just type. {{model}} answers, no persona.",
+        about: {
+          thea: "Warm and thoughtful. Talks it through.",
+          hermes: "Direct and fast. Gets the job done.",
+        },
+      },
+      custom: {
+        title: "Your custom skill is ready.",
+        subtitle:
+          "Switch skill or model from the selector under the message box.",
+      },
     },
   },
   publicFeed: {
