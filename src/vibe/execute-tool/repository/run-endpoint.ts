@@ -15,6 +15,7 @@ import {
   type ToolExecutionContext,
 } from "next-vibe/core/execution-context";
 
+import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { GenericHandlerReturnType } from "../../core/route/handler";
@@ -33,7 +34,6 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
-import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
 
 export async function runEndpoint<TDef extends CreateApiEndpointAny>(
   params: {
@@ -42,7 +42,7 @@ export async function runEndpoint<TDef extends CreateApiEndpointAny>(
     handler: GenericHandlerReturnType<TDef>;
     user: JwtPayloadType;
     locale: CountryLanguage;
-    logger?: EndpointLogger;
+    logger: EndpointLogger;
     toolExecutionContext?: ToolExecutionContext;
     platform: Platform;
   } & (TDef["types"]["RequestOutput"] extends never

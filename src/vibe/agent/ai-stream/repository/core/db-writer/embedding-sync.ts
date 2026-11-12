@@ -16,6 +16,7 @@ import {
   DefaultFolderId,
   type ToolExecutionContext,
 } from "../../../../../core/execution-context";
+import type { EndpointLogger } from "../../../../../logger/types";
 import { buildThinThreadContent, getMimeTypeFolder } from "./shared";
 
 /**
@@ -28,6 +29,7 @@ export async function syncUploadEmbedding(
   threadId: string,
   attachments: Array<{ filename: string; mimeType: string }>,
   toolExecutionContext: ToolExecutionContext,
+  logger: EndpointLogger,
 ): Promise<void> {
   if (attachments.length === 0) {
     return;
@@ -69,6 +71,7 @@ export async function syncUploadEmbedding(
         path,
         result.content,
         toolExecutionContext,
+        logger,
       ).catch(() => undefined);
     }
   }
@@ -83,6 +86,7 @@ export async function syncUploadEmbedding(
 export async function syncThreadEmbedding(
   lastThreadId: string | null,
   toolExecutionContext: ToolExecutionContext,
+  logger: EndpointLogger,
 ): Promise<void> {
   if (!lastThreadId) {
     return;
@@ -126,5 +130,6 @@ export async function syncThreadEmbedding(
     `/threads/${thread.rootFolderId}/${slug}-${thread.id}.md`,
     content,
     toolExecutionContext,
+    logger,
   );
 }

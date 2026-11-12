@@ -24,7 +24,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { ContactRequest } from "@/contact/definition";
 import { useUser } from "@/user/private/me/hooks";
@@ -41,6 +41,15 @@ import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { useErrorRetry } from "./error-retry-context";
 import { MessageActionButton } from "./message-action-button";
+
+/**
+ * Error bubbles already reported this page session - a bubble re-mounts on
+ * every scroll/branch switch, report it once.
+ */
+const reportedErrorMessageIds = new Set<string>();
+
+/** Only report errors that just happened - old error rows in history are already known. */
+const ERROR_REPORT_MAX_AGE_MS = 10 * 60 * 1000;
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
@@ -74,6 +83,64 @@ export function ErrorMessageBubble({
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
+
+  // Report a freshly-rendered error bubble once - the user is looking at it.
+  useEffect(() => {
+    // STREAM_INTERRUPTED = user pressed stop - a user-initiated cancel, not a fault
+    if (
+      reportedErrorMessageIds.has(message.id) ||
+      message.errorType === StreamErrorType.STREAM_INTERRUPTED
+    ) {
+      return;
+    }
+    const ageMs = Date.now() - new Date(message.createdAt).getTime();
+    if (!(ageMs <= ERROR_REPORT_MAX_AGE_MS)) {
+      return;
+    }
+    reportedErrorMessageIds.add(message.id);
+    let structuredErrorCode: number | undefined;
+    let structuredErrorKey: string | undefined;
+    try {
+      const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
+      if (parsed && typeof parsed === "object") {
+        structuredErrorCode = parsed.errorType?.errorCode;
+        structuredErrorKey = parsed.errorType?.errorKey;
+      }
+    } catch {
+      // Plain-text error content - no structured error type to extract
+    }
+    // Credit refusal (402) is an expected outcome rendered as a top-up card
+    const isCreditRefusal = isOutOfCreditsErrorCode(structuredErrorCode);
+    (isCreditRefusal ? logger.warn : logger.error).bind(logger)(
+      "Chat: Error message bubble shown to user",
+      {
+        component: "ErrorMessageBubble",
+        messageId: message.id,
+        threadId: message.threadId,
+        parentId: message.parentId,
+        rootFolderId,
+        model: message.model,
+        skill: message.skill,
+        errorType: message.errorType,
+        errorCode: message.errorCode,
+        structuredErrorCode,
+        structuredErrorKey,
+        ageMs,
+      },
+    );
+  }, [
+    logger,
+    message.id,
+    message.createdAt,
+    message.threadId,
+    message.parentId,
+    message.model,
+    message.skill,
+    message.errorType,
+    message.errorCode,
+    message.content,
+    rootFolderId,
+  ]);
 
   // User-cancelled streams get a compact "stopped" indicator, not an error bubble
   if (message.errorType === StreamErrorType.STREAM_INTERRUPTED) {
@@ -157,6 +224,7 @@ export function ErrorMessageBubble({
       displayContent = message.content ?? "";
     }
   } catch {
+    // Plain-text error content (e.g. a network failure message) - shown as-is
     displayContent = message.content ?? "";
   }
 
@@ -332,6 +400,7 @@ export function ErrorMessageBubble({
               </Div>
             ) : (
               <EndpointsPage
+                logger={logger}
                 endpoint={{ POST: contactEndpoint }}
                 locale={locale}
                 user={user}

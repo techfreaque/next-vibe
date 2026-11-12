@@ -696,7 +696,9 @@ export class VibeSenseRepository {
         to: new Date(data.rangeTo),
       };
 
-      const result = await runGraph(graph.id, graph.config, range);
+      const result = await runGraph(graph.id, graph.config, range, undefined, {
+        graphSlug: graph.slug,
+      });
 
       return success({
         nodeCount: result.series.size + result.signals.size,
@@ -821,6 +823,7 @@ export class VibeSenseRepository {
       const result = await runGraph(graph.id, graph.config, range, undefined, {
         readOnly: true,
         displayResolution: data.resolution,
+        graphSlug: graph.slug,
       });
 
       const series = [...result.series.entries()].map(([nodeId, points]) => ({

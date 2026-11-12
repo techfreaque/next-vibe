@@ -25,7 +25,20 @@ export async function loadMessageAttachments(
           return base64ToFile(att.data, att.filename, att.mimeType);
         }
         if (att.url) {
-          return await urlToFile(att.url, att.filename, att.mimeType);
+          const file = await urlToFile(att.url, att.filename, att.mimeType);
+          if (!file) {
+            // urlToFile swallows fetch/HTTP errors - the attachment is dropped
+            // from the edited/branched message, so report it.
+            logger.warn("Failed to download message attachment", {
+              operation: "loadMessageAttachments",
+              messageId: message.id,
+              threadId: message.threadId,
+              attachmentId: att.id,
+              mimeType: att.mimeType,
+              size: att.size,
+            });
+          }
+          return file;
         }
         return null;
       }),

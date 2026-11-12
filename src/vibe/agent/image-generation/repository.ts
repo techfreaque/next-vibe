@@ -52,6 +52,12 @@ import {
   type ImageGenerationPostRequestOutput,
   type ImageGenerationPostResponseOutput,
 } from "./definition";
+import {
+  ImageQuality,
+  type ImageQualityValue,
+  ImageSize,
+  type ImageSizeValue,
+} from "./enum";
 import type { ImageGenerationT } from "./i18n";
 import {
   filterImageGenModels,
@@ -98,6 +104,19 @@ function calculateImageCreditCost(
   const rounded = Math.round(withMarkup * 10) / 10;
   return rounded % 1 === 0 ? Math.round(rounded) : rounded;
 }
+
+/** Plain-language size hint for token-based (headless) image models. */
+const HEADLESS_SIZE_HINT: Record<typeof ImageSizeValue, string> = {
+  [ImageSize.SQUARE_1024]: "square 1024x1024",
+  [ImageSize.LANDSCAPE_1792]: "landscape 1792x1024",
+  [ImageSize.PORTRAIT_1792]: "portrait 1024x1792",
+};
+
+/** Plain-language quality hint for token-based (headless) image models. */
+const HEADLESS_QUALITY_HINT: Record<typeof ImageQualityValue, string> = {
+  [ImageQuality.STANDARD]: "standard",
+  [ImageQuality.HD]: "high detail",
+};
 
 export class ImageGenerationRepository {
   /**
@@ -454,6 +473,7 @@ export class ImageGenerationRepository {
                   path,
                   result.content,
                   toolExecutionContext,
+                  logger,
                 ),
             )
             .catch(() => undefined);
@@ -488,8 +508,14 @@ export class ImageGenerationRepository {
 
     const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(locale);
 
-    const sizeHint = data.size ? ` Output size: ${data.size}.` : "";
-    const qualityHint = data.quality ? ` Quality: ${data.quality}.` : "";
+    // data.size / data.quality are i18n enum keys ("post.size.square1024") -
+    // never put those in the model prompt; map them to plain-language hints.
+    const sizeHint = data.size
+      ? ` Output size: ${HEADLESS_SIZE_HINT[data.size]}.`
+      : "";
+    const qualityHint = data.quality
+      ? ` Quality: ${HEADLESS_QUALITY_HINT[data.quality]}.`
+      : "";
     const refHint = data.inputMediaUrl
       ? ` Use this image as reference: ${data.inputMediaUrl}`
       : "";
@@ -572,6 +598,20 @@ export class ImageGenerationRepository {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
+      // No image and no provider error: the model answered with text (a
+      // refusal, a description of the image) or nothing. Log what it did say
+      // so the next "did not generate an image" names the model and reply.
+      logger.error("[ImageGen] Headless model produced no image", {
+        imageModel: data.model,
+        chatModel: syntheticData.model,
+        size: data.size,
+        quality: data.quality,
+        hasReference: Boolean(data.inputMediaUrl),
+        promptLength: data.prompt.length,
+        replyTextLength: result.data.lastAiMessageContent?.length ?? 0,
+        replyTextSample: result.data.lastAiMessageContent?.slice(0, 300),
+        creditsDeducted: result.data.totalCreditsDeducted,
+      });
       return fail({
         message: t("post.errors.noImageGenerated"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

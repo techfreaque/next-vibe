@@ -153,6 +153,7 @@ export class BraveSearchRepository {
                   path,
                   result.content,
                   toolExecutionContext,
+                  logger,
                 ),
             )
             .catch(() => undefined);

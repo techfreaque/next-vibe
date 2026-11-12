@@ -9,3 +9,7 @@ export function getScreenHeight(_logger: EndpointLogger): number {
   void _logger;
   return 0; // use useWindowDimensions() hook instead
 }
+
+export function getViewportLabel(): string | null {
+  return null; // use useWindowDimensions() hook instead
+}

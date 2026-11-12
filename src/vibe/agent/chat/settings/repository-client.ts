@@ -48,7 +48,7 @@ export class ChatSettingsRepositoryClient {
     availability: AgentEnvAvailability,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     try {
-      const settings = await this.loadLocalSettings(user, availability);
+      const settings = await this.loadLocalSettings(user, availability, logger);
       logger.debug("Loaded settings from localStorage");
       return success(settings);
     } catch (error) {
@@ -70,7 +70,7 @@ export class ChatSettingsRepositoryClient {
     availability: AgentEnvAvailability,
   ): Promise<ResponseType<never>> {
     try {
-      await this.updateLocalSettings(data, user, availability);
+      await this.updateLocalSettings(data, user, availability, logger);
       return success();
     } catch (error) {
       logger.error(
@@ -129,12 +129,13 @@ export class ChatSettingsRepositoryClient {
   static async loadLocalSettings(
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
+    logger: EndpointLogger,
   ): Promise<ChatSettingsGetResponseOutput> {
     if (typeof window === "undefined") {
       return this.getDefaults(user, availability);
     }
 
-    const stored = await storage.getItem(STORAGE_KEY);
+    const stored = await storage.getItem(STORAGE_KEY, logger);
     if (!stored) {
       return this.getDefaults(user, availability);
     }
@@ -205,7 +206,15 @@ export class ChatSettingsRepositoryClient {
         dreamerTaskId: null,
         autopilotTaskId: null,
       };
-    } catch {
+    } catch (error) {
+      // Corrupt localStorage - settings reset to defaults for this session
+      logger.warn("Failed to parse local chat settings - using defaults", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "ChatSettingsRepositoryClient",
+        operation: "loadLocalSettings",
+        storageKey: STORAGE_KEY,
+        storedLength: stored.length,
+      });
       return this.getDefaults(user, availability);
     }
   }
@@ -217,6 +226,7 @@ export class ChatSettingsRepositoryClient {
     settings: ChatSettingsGetResponseOutput,
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
+    logger: EndpointLogger,
   ): Promise<void> {
     if (typeof window === "undefined") {
       return;
@@ -285,9 +295,9 @@ export class ChatSettingsRepositoryClient {
     }
 
     if (Object.keys(overrides).length === 0) {
-      await storage.removeItem(STORAGE_KEY);
+      await storage.removeItem(STORAGE_KEY, logger);
     } else {
-      await storage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+      await storage.setItem(STORAGE_KEY, JSON.stringify(overrides), logger);
     }
   }
 
@@ -298,8 +308,9 @@ export class ChatSettingsRepositoryClient {
     updates: Partial<ChatSettingsUpdateRequestOutput>,
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
+    logger: EndpointLogger,
   ): Promise<ChatSettingsGetResponseOutput> {
-    const current = await this.loadLocalSettings(user, availability);
+    const current = await this.loadLocalSettings(user, availability, logger);
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
       selectedSkill: updates.selectedSkill ?? current.selectedSkill,
@@ -377,7 +388,7 @@ export class ChatSettingsRepositoryClient {
       autopilotTaskId: current.autopilotTaskId,
     };
 
-    await this.saveLocalSettings(updated, user, availability);
+    await this.saveLocalSettings(updated, user, availability, logger);
     return updated;
   }
 

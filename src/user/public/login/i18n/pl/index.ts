@@ -315,7 +315,8 @@ export const translations: typeof enTranslations = {
     accountLocked: "Konto jest zablokowane",
     accountLockedDescription:
       "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną.",
-    invalid_credentials: "Nieprawidłowy e-mail lub hasło",
+    invalid_credentials:
+      "Błędny e-mail lub hasło. Nie masz jeszcze konta? Najpierw się zarejestruj.",
     two_factor_required: "Wymagana dwuskładnikowa autoryzacja",
     invalid_two_factor_code: "Nieprawidłowy kod uwierzytelniający",
     auth_error: "Logowanie dla {{email}} nie powiodło się: {{error}}",

@@ -44,7 +44,7 @@ export class ChatMessageByIdRepositoryClient {
   ): Promise<ResponseType<MessageGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const messages = await getMessagesForThread(threadId);
+      const messages = await getMessagesForThread(threadId, logger);
       const message = messages.find((m) => m.id === messageId);
 
       if (!message) {
@@ -85,7 +85,7 @@ export class ChatMessageByIdRepositoryClient {
   ): Promise<ResponseType<MessagePatchResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const messages = await getMessagesForThread(threadId);
+      const messages = await getMessagesForThread(threadId, logger);
       const existing = messages.find((m) => m.id === messageId);
 
       if (!existing) {
@@ -105,7 +105,7 @@ export class ChatMessageByIdRepositoryClient {
         >[1]["role"];
       }
 
-      await updateIncognitoMessage(messageId, updates);
+      await updateIncognitoMessage(messageId, updates, logger);
 
       logger.debug("Client: updated incognito message", { messageId });
 
@@ -135,7 +135,7 @@ export class ChatMessageByIdRepositoryClient {
   ): Promise<ResponseType<MessageDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const messages = await getMessagesForThread(threadId);
+      const messages = await getMessagesForThread(threadId, logger);
       const message = messages.find((m) => m.id === messageId);
 
       if (!message) {
@@ -145,7 +145,7 @@ export class ChatMessageByIdRepositoryClient {
         });
       }
 
-      await deleteMessage(messageId);
+      await deleteMessage(messageId, logger);
       logger.debug("Client: deleted incognito message", { messageId });
 
       return success({

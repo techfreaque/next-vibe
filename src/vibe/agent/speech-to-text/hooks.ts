@@ -10,7 +10,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { downloadBinaryFile } from "next-vibe/ui/lib/download";
-import { getMicrophoneStream, getUserAgent } from "next-vibe/ui/lib/media";
+import {
+  getMicrophoneDiagnostics,
+  getUserAgent,
+  requestMicrophoneStream,
+} from "next-vibe/ui/lib/media";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
@@ -20,9 +24,18 @@ import {
 } from "../chat/i18n";
 import speechToTextDefinitions from "./definition";
 
+/** Machine-readable context for a user-visible STT failure (for logging). */
+export interface SttErrorDetails {
+  /** getUserMedia rejection name (NotAllowedError, NotFoundError, ...) */
+  errorName: string | null;
+  permissionState?: string | null;
+  audioInputCount?: number | null;
+  isSecureContext?: boolean;
+}
+
 interface UseEdenAISpeechOptions {
   onTranscript?: (text: string) => void;
-  onError?: (error: string) => void;
+  onError?: (error: string, details?: SttErrorDetails) => void;
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -89,12 +102,7 @@ function getDevicePlatform():
 /**
  * Map getUserMedia errors to device-specific, actionable i18n messages
  */
-function getMicrophoneErrorMessage(
-  err: DOMException | Error,
-  t: ChatT,
-): string {
-  const name = err.name;
-
+function getMicrophoneErrorMessage(name: string, t: ChatT): string {
   switch (name) {
     case "NotAllowedError":
     case "PermissionDeniedError": {
@@ -358,6 +366,12 @@ export function useEdenAISpeech({
       const allChunks = sealedChunksRef.current;
 
       if (allChunks.every((f) => f.size < 500)) {
+        logger.warn("STT: Recording too short - discarded", {
+          operation: "processRecording",
+          chunkCount: allChunks.length,
+          totalBytes: allChunks.reduce((sum, f) => sum + f.size, 0),
+          mimeType: allChunks[0]?.type ?? null,
+        });
         const errorMsg = t("hooks.stt.audio-too-short");
         setError(errorMsg);
         onError?.(errorMsg);
@@ -439,12 +453,50 @@ export function useEdenAISpeech({
       audioChunksRef.current = [];
       silenceStartRef.current = null;
 
+      // Permission already granted (so the device list is trustworthy) but no
+      // input device at all: say so without opening a getUserMedia prompt
+      // that can only fail. Pre-permission lists are unreliable (Safari hides
+      // devices), so only this one case short-circuits.
+      const preDiagnostics = await getMicrophoneDiagnostics();
+      const knownNoDevice =
+        preDiagnostics.permissionState === "granted" &&
+        preDiagnostics.audioInputCount === 0;
+
       logger.debug("STT: Requesting microphone access");
-      const stream = await getMicrophoneStream();
+      const micResult = knownNoDevice
+        ? {
+            stream: null,
+            errorName: "NotFoundError",
+            errorMessage: "no audioinput device (pre-check)",
+          }
+        : await requestMicrophoneStream();
+      const stream = micResult.stream;
       if (!stream) {
-        const errorMsg = t("hooks.stt.no-microphone");
+        // Map the REAL rejection (permission denied / no device / mic busy /
+        // insecure context) to its own message - this used to always say
+        // "No microphone found".
+        const errorName = micResult.errorName ?? "UnknownError";
+        const diagnostics = knownNoDevice
+          ? preDiagnostics
+          : await getMicrophoneDiagnostics();
+        logger.warn("STT: Microphone stream unavailable", {
+          operation: "startRecording",
+          errorName,
+          errorMessage: micResult.errorMessage,
+          skippedPrompt: knownNoDevice,
+          permissionState: diagnostics.permissionState,
+          audioInputCount: diagnostics.audioInputCount,
+          isSecureContext: diagnostics.isSecureContext,
+          hasMediaDevices: diagnostics.hasMediaDevices,
+        });
+        const errorMsg = getMicrophoneErrorMessage(errorName, t);
         setError(errorMsg);
-        onError?.(errorMsg);
+        onError?.(errorMsg, {
+          errorName,
+          permissionState: diagnostics.permissionState,
+          audioInputCount: diagnostics.audioInputCount,
+          isSecureContext: diagnostics.isSecureContext,
+        });
         return;
       }
       streamRef.current = stream;
@@ -509,6 +561,15 @@ export function useEdenAISpeech({
             audioChunksRef.current.push(event.data);
           }
         };
+
+        rec.addEventListener("error", (event): void => {
+          logger.error("STT: MediaRecorder error", {
+            operation: "startChunkRecorder",
+            eventType: event.type,
+            mimeType: rec.mimeType,
+            recorderState: rec.state,
+          });
+        });
 
         rec.onstop = (): void => {
           // Only seal if this stop was a mid-recording chunk cycle (not the final stop).
@@ -591,13 +652,16 @@ export function useEdenAISpeech({
     } catch (err) {
       const errorMsg =
         err instanceof DOMException || err instanceof Error
-          ? getMicrophoneErrorMessage(err, t)
+          ? getMicrophoneErrorMessage(err.name, t)
           : t("hooks.stt.failed-to-start");
+      const errorName =
+        err instanceof DOMException || err instanceof Error ? err.name : null;
       logger.error("STT: Failed to start recording", {
         error: parseError(err).message,
+        errorName,
       });
       setError(errorMsg);
-      onError?.(errorMsg);
+      onError?.(errorMsg, { errorName });
       cleanup();
     }
   }, [logger, t, onError, cleanup, processRecording, sealCurrentChunk]);

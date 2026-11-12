@@ -14,7 +14,7 @@ import { success } from "../../core/route/response.schema";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { ReactHooksTranslationKey } from "./i18n";
-import { executeQuery } from "./query-executor";
+import { executeQuery, isQueryRequestValid } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import {
   deserializeQueryParams,
@@ -131,7 +131,16 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     () => hasRequiredPathParams(endpoint.path, urlPathParams),
     [endpoint, urlPathParams],
   );
-  const enabled = enabledOption && hasAllPathParams;
+  // Same for request fields: a GET whose required inputs are still empty or
+  // half-typed (a tool page opened without its userId, an email being typed)
+  // can only fail executeQuery's request validation. Hold the automatic fetch
+  // until the inputs are valid; an explicit submit still validates and shows
+  // the error.
+  const hasValidRequest = useMemo(
+    () => isQueryRequestValid(endpoint, requestData),
+    [endpoint, requestData],
+  );
+  const enabled = enabledOption && hasAllPathParams && hasValidRequest;
 
   // State key: endpoint.path + endpoint.method + urlPathParams + includeInCacheKey fields
   // Shared across all calls with same urlPathParams + cacheKey request data

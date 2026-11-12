@@ -55,9 +55,14 @@ export function addDocumentListener<K extends keyof DocumentEventMap>(
 export function addWindowListener<K extends keyof WindowEventMap>(
   event: K,
   handler: (e: WindowEventMap[K]) => void,
+  options?: boolean | AddEventListenerOptions,
 ): () => void {
-  window.addEventListener(event, handler);
-  return (): void => window.removeEventListener(event, handler);
+  window.addEventListener(event, handler, options);
+  return (): void => window.removeEventListener(event, handler, options);
+}
+
+export function getVisibilityState(): DocumentVisibilityState {
+  return document.visibilityState;
 }
 
 export function getReadyState(): DocumentReadyState {

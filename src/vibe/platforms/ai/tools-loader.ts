@@ -100,13 +100,29 @@ function createToolFromEndpoint(
   const schemaObj = jsonSchemaObject as JSONSchema7 & {
     properties?: Record<string, JSONSchema7>;
   };
+  const blockedModes = new Set(
+    FOLDER_BLOCKED_CALLBACK_MODES[context.toolExecutionContext.rootFolderId] ??
+      [],
+  );
+  // execute-tool's callbackMode is a native definition field - its generated
+  // enum still lists every mode. Narrow it to what this folder allows and say
+  // so in the description, otherwise the model picks e.g. wakeUp in incognito
+  // and only learns at execution time that the mode is blocked.
+  const nativeCallbackMode = schemaObj.properties?.callbackMode;
+  if (
+    toolName === EXECUTE_TOOL_ALIAS &&
+    blockedModes.size > 0 &&
+    nativeCallbackMode &&
+    Array.isArray(nativeCallbackMode.enum)
+  ) {
+    nativeCallbackMode.enum = nativeCallbackMode.enum.filter(
+      (m) => typeof m !== "string" || !blockedModes.has(m),
+    );
+    nativeCallbackMode.description =
+      `${nativeCallbackMode.description ?? ""} Not available in this conversation: ${[...blockedModes].join(", ")}.`.trim();
+  }
   if (toolName !== "await-task" && toolName !== EXECUTE_TOOL_ALIAS) {
     // Filter out callback modes blocked for this folder type.
-    const blockedModes = new Set(
-      FOLDER_BLOCKED_CALLBACK_MODES[
-        context.toolExecutionContext.rootFolderId
-      ] ?? [],
-    );
     const allowedModes = allCallbackModes.filter((m) => !blockedModes.has(m));
 
     if (!schemaObj.properties) {

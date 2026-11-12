@@ -5,6 +5,7 @@ import { useQueryPrefill } from "next-vibe/agent/ai-stream/stream/hooks/use-quer
 import { ChatBootProvider } from "next-vibe/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "next-vibe/agent/chat/hooks/use-chat-navigation-store";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -30,6 +31,7 @@ export function ThreadsPageClient({
   initialFolderContentsData,
   initialSubFolderContentsData,
 }: ThreadsPathPageData & { user: JwtPayloadType }): JSX.Element {
+  const logger = useLogger();
   // ?q=<text>&model=<id> pre-fill the composer / pick the model once
   // (model pages, shared prompt links)
   useQueryPrefill({
@@ -66,6 +68,7 @@ export function ThreadsPageClient({
         initialSubFolderId={initialSubFolderId}
       >
         <EndpointsPage
+          logger={logger}
           endpoint={aiStreamDefinition}
           locale={locale}
           user={user}

@@ -12,12 +12,15 @@
  */
 
 import {
+  isBrowserNetworkLossMessage,
   isErrorResponseType,
   parseError,
 } from "next-vibe/core/utils/parse-error";
 import { preWarmChannel } from "next-vibe/realtime/client/client";
 import { buildWsChannel } from "next-vibe/realtime/core/channel";
 import { toast } from "next-vibe/ui/hooks/use-toast";
+import { getVisibilityState } from "next-vibe/ui/lib/dom";
+import { isOnline } from "next-vibe/ui/lib/media";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -85,7 +88,7 @@ export function useAIStream(): UseAIStreamReturn {
       const threadId = data.threadId ?? "";
 
       // Reset audio queue to prevent old audio from playing
-      const audioQueue = getAudioQueue();
+      const audioQueue = getAudioQueue(logger);
       audioQueue.stop();
 
       // Incognito content exists ONLY in localStorage and arrives ONLY via WS
@@ -147,33 +150,41 @@ export function useAIStream(): UseAIStreamReturn {
         if (isIncognitoStream) {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
-        // mutateAsync throws the full ErrorResponseType on non-success responses
+        // mutateAsync throws the full ErrorResponseType on non-success
+        // responses - BOTH a server-returned failure (403, 402, 500 ...) AND a
+        // browser-level fetch failure (callApi wraps those as an
+        // INTERNAL_ERROR "Request to ... failed: Failed to fetch").
         const parsedErr = parseError(err);
         const failMessage = parsedErr.message;
-        // Distinct name from the non-success branch below: this is a thrown
-        // exception (network drop, timeout, abort) with no server response at
-        // all, not a server-returned failure - keep them separately traceable.
+        const errorType = isErrorResponseType(err) ? err.errorType : null;
         // Browser-level connectivity loss ("Load failed" on Safari, "Failed
         // to fetch" on Chrome, Firefox's NetworkError) is most likely the
         // user's network (a server outage looks the same) - warn. Anything
-        // else (timeout, malformed response) stays an error.
-        const isBrowserNetworkLoss =
-          /load failed|failed to fetch|networkerror|network connection was lost/i.test(
-            failMessage,
-          );
+        // else (timeout, malformed response, server rejection) stays an error.
+        const isBrowserNetworkLoss = isBrowserNetworkLossMessage(failMessage);
         // Credit refusal (402) is an expected outcome, shown as a card below.
         const isCreditRefusal =
-          isErrorResponseType(err) &&
-          isOutOfCreditsErrorCode(err.errorType.errorCode);
+          errorType !== null && isOutOfCreditsErrorCode(errorType.errorCode);
+        // Only a request that never got a response is a "network error"; a
+        // server answer (4xx/5xx) is labelled as such with its status.
+        const label = isBrowserNetworkLoss
+          ? "Stream request network error"
+          : errorType !== null
+            ? "Stream request rejected by server"
+            : "Stream request failed (no server response)";
         (isBrowserNetworkLoss || isCreditRefusal
           ? logger.warn
           : logger.error
-        ).bind(logger)("Stream request network error", {
+        ).bind(logger)(label, {
           message: failMessage,
-          errorType: Reflect.get(parsedErr, "errorType"),
+          errorKey: errorType?.errorKey ?? null,
+          errorCode: errorType?.errorCode ?? null,
+          errorName: parsedErr.name,
           operation: data.operation,
           model: data.model,
           threadId: data.threadId,
+          rootFolderId: data.rootFolderId,
+          online: isOnline(),
         });
 
         const activeThreadId = data.threadId;
@@ -285,7 +296,7 @@ export function useAIStream(): UseAIStreamReturn {
       logger.info("Cancel stream requested by user", { threadId });
 
       // Stop audio immediately
-      getAudioQueue().stop();
+      getAudioQueue(logger).stop();
 
       // Set aborting - shows spinner on stop button until stream-finished arrives
       storeSetAborting(threadId, true);
@@ -296,7 +307,13 @@ export function useAIStream(): UseAIStreamReturn {
       // lost: "pending" = the cancel POST itself hung, "cancelled" = the
       // stream was signalled but never emitted stream-finished, "idle" = the
       // server saw no live stream (the finish event was lost on the WS).
+      // "cancelled" with no stream-finished is what a stream orphaned by a
+      // server restart looks like; the cancel endpoint now reaps those after
+      // 8s and emits stream-finished, so a timeout here with cancelOutcome
+      // "cancelled" means that event was lost on the WS too.
       let cancelOutcome: "pending" | "cancelled" | "idle" = "pending";
+      const cancelStartedAt = Date.now();
+      let cancelAckMs: number | null = null;
       const safetyTimeout = setTimeout(() => {
         if (useAIStreamStore.getState().isAborting(threadId)) {
           logger.warn(
@@ -304,6 +321,11 @@ export function useAIStream(): UseAIStreamReturn {
             {
               threadId,
               cancelOutcome,
+              cancelAckMs,
+              elapsedMs: Date.now() - cancelStartedAt,
+              isPending: useAIStreamStore.getState().isPending(threadId),
+              online: isOnline(),
+              visibilityState: getVisibilityState(),
             },
           );
           storeClearThread(threadId);
@@ -324,6 +346,7 @@ export function useAIStream(): UseAIStreamReturn {
         const result = await cancelMutation.mutateAsync({
           requestData: { threadId },
         });
+        cancelAckMs = Date.now() - cancelStartedAt;
 
         if (result.success) {
           cancelOutcome = result.data.cancelled ? "cancelled" : "idle";

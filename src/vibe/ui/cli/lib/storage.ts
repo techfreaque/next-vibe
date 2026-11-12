@@ -12,6 +12,11 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
+import {
+  reportStorageFailure,
+  type StorageOperation,
+} from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
 import type { Storage } from "../../web/lib/storage";
 
 function storageDir(): string {
@@ -31,90 +36,126 @@ function ensureDir(): void {
   }
 }
 
-export const storage: Storage = {
-  getItem: (key: string): Promise<string | null> => {
-    try {
-      const path = keyPath(key);
-      if (!existsSync(path)) {
-        return Promise.resolve(null);
-      }
-      const raw = readFileSync(path, "utf-8");
-      const parsed = JSON.parse(raw) as { value: string };
-      return Promise.resolve(parsed.value);
-    } catch {
-      return Promise.resolve(null);
-    }
-  },
+function report(
+  logger: EndpointLogger,
+  operation: StorageOperation,
+  key: string,
+  error: Error | string,
+  valueLength?: number,
+): void {
+  reportStorageFailure(logger, {
+    platform: "cli",
+    area: "file",
+    operation,
+    key,
+    error,
+    valueLength,
+  });
+}
 
-  setItem: (key: string, value: string): Promise<void> => {
-    try {
-      ensureDir();
-      writeFileSync(keyPath(key), JSON.stringify({ value }), "utf-8");
-    } catch {
-      // Silent
-    }
+export const storage: Storage = {
+  getItem: (key: string, logger: EndpointLogger): Promise<string | null> =>
+    Promise.resolve(getLocalItem(key, logger)),
+
+  setItem: (
+    key: string,
+    value: string,
+    logger: EndpointLogger,
+  ): Promise<void> => {
+    setLocalItem(key, value, logger);
     return Promise.resolve();
   },
 
-  removeItem: (key: string): Promise<void> => {
-    try {
-      const path = keyPath(key);
-      if (existsSync(path)) {
-        unlinkSync(path);
-      }
-    } catch {
-      // Silent
-    }
+  removeItem: (key: string, logger: EndpointLogger): Promise<void> => {
+    removeLocalItem(key, logger);
     return Promise.resolve();
   },
 };
 
 // ─── Sync localStorage helpers (CLI: file-backed) ─────────────────────────────
 
-export function getLocalItem(key: string): string | null {
+export function getLocalItem(
+  key: string,
+  logger: EndpointLogger,
+): string | null {
+  const path = keyPath(key);
+  if (!existsSync(path)) {
+    return null;
+  }
+  let raw: string;
   try {
-    const path = keyPath(key);
-    if (!existsSync(path)) {
-      return null;
-    }
-    const raw = readFileSync(path, "utf-8");
+    raw = readFileSync(path, "utf-8");
+  } catch (error) {
+    report(logger, "get", key, error instanceof Error ? error : String(error));
+    return null;
+  }
+  try {
     const parsed = JSON.parse(raw) as { value: string };
     return parsed.value;
-  } catch {
+  } catch (error) {
+    // Corrupt/hand-edited file: treated as absent, but reported
+    report(
+      logger,
+      "parse",
+      key,
+      error instanceof Error ? error : String(error),
+    );
     return null;
   }
 }
 
-export function setLocalItem(key: string, value: string): void {
+export function setLocalItem(
+  key: string,
+  value: string,
+  logger: EndpointLogger,
+): void {
   try {
     ensureDir();
     writeFileSync(keyPath(key), JSON.stringify({ value }), "utf-8");
-  } catch {
-    // Silent
+  } catch (error) {
+    report(
+      logger,
+      "set",
+      key,
+      error instanceof Error ? error : String(error),
+      value.length,
+    );
   }
 }
 
-export function removeLocalItem(key: string): void {
+export function removeLocalItem(key: string, logger: EndpointLogger): void {
   try {
     const path = keyPath(key);
     if (existsSync(path)) {
       unlinkSync(path);
     }
-  } catch {
-    // Silent
+  } catch (error) {
+    report(
+      logger,
+      "remove",
+      key,
+      error instanceof Error ? error : String(error),
+    );
   }
 }
 
 // ─── Sync sessionStorage helpers (CLI: same as local, no true session concept) ─
 
-export function getSessionItem(key: string): string | null {
-  return getLocalItem(key);
+export function getSessionItem(
+  key: string,
+  logger: EndpointLogger,
+): string | null {
+  return getLocalItem(key, logger);
 }
 
-export function setSessionItem(key: string, value: string): void {
-  setLocalItem(key, value);
+export function setSessionItem(
+  key: string,
+  value: string,
+  logger: EndpointLogger,
+): void {
+  setLocalItem(key, value, logger);
 }
 
-export function removeSessionItem(key: string): void {
-  removeLocalItem(key);
+export function removeSessionItem(key: string, logger: EndpointLogger): void {
+  removeLocalItem(key, logger);
 }

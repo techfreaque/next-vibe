@@ -10,6 +10,7 @@ import type {
   ResponseType,
 } from "../../core/route/response.schema";
 import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
@@ -44,6 +45,82 @@ interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
 async function loadCallApi(): Promise<typeof CallApiFn> {
   const mod = await import("./call-api");
   return mod.callApi;
+}
+
+/**
+ * Compact, PII-safe description of request-validation issues: the failing
+ * field path, zod code and message, plus the shape (type/length) of the value
+ * that was sent - never the value itself (it may be an email or a secret).
+ */
+export function describeRequestIssues(
+  error: z.ZodError,
+  requestData: WidgetData,
+): string[] {
+  return error.issues.map((issue) => {
+    let value: WidgetData = requestData;
+    for (const key of issue.path) {
+      if (Array.isArray(value) && typeof key === "number") {
+        value = value[key];
+      } else if (
+        value !== null &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        !(value instanceof Date) &&
+        typeof key === "string"
+      ) {
+        value = value[key];
+      } else {
+        value = undefined;
+      }
+    }
+    const shape =
+      value === undefined
+        ? "undefined"
+        : value === null
+          ? "null"
+          : typeof value === "string"
+            ? `string(len ${value.length})`
+            : Array.isArray(value)
+              ? `array(len ${value.length})`
+              : typeof value;
+    return `${issue.path.join(".") || "(root)"}: ${issue.code} - ${issue.message} [got ${shape}]`;
+  });
+}
+
+/** JSON round-trip into the canonical payload type (drops functions). */
+function toWidgetData<T>(value: T): WidgetData {
+  if (value === undefined) {
+    return undefined;
+  }
+  const parsed: WidgetData = JSON.parse(JSON.stringify(value));
+  return parsed;
+}
+
+/**
+ * Whether requestData passes the endpoint's request schema, after the same
+ * undefined/empty-object normalisation executeQuery applies. Used to hold
+ * automatic fetches until the inputs a query depends on are complete.
+ */
+export function isQueryRequestValid<TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint,
+  requestData: TEndpoint["types"]["RequestOutput"],
+): boolean {
+  const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
+  if (requestSchema instanceof z.ZodNever) {
+    return true;
+  }
+  const isUndefinedSchema =
+    requestSchema.safeParse(undefined).success &&
+    !requestSchema.safeParse({}).success;
+  if (isUndefinedSchema) {
+    return true;
+  }
+  const isEmptyObjectSchema =
+    requestSchema instanceof z.ZodObject &&
+    Object.keys(requestSchema.shape || {}).length === 0;
+  const normalized =
+    isEmptyObjectSchema && requestData === undefined ? {} : requestData;
+  return requestSchema.safeParse(normalized).success;
 }
 
 export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
@@ -100,9 +177,22 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     const requestValidation = requestSchema.safeParse(requestData);
 
     if (!requestValidation.success) {
+      // No request was sent: the caller handed executeQuery input its own
+      // endpoint rejects. Say which endpoint, which fields and why, (the
+      // client logger adds the route) - the raw zod dump alone was unreadable.
       logger.error("executeQuery: request validation failed", {
         endpointPath: endpoint.path.join("/"),
-        error: requestValidation.error.message,
+        method: endpoint.method,
+        alias: endpoint.aliases?.[0],
+        issues: describeRequestIssues(
+          requestValidation.error,
+          toWidgetData(requestData),
+        ).join("; "),
+        requestKeys:
+          requestData !== null && typeof requestData === "object"
+            ? Object.keys(requestData).join(", ")
+            : typeof requestData,
+        hasPathParams: pathParams !== undefined && pathParams !== null,
       });
 
       const validationErrorConfig =

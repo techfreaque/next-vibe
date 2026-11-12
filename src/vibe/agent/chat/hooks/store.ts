@@ -5,6 +5,7 @@
 
 import { create } from "zustand";
 
+import type { EndpointLogger } from "../../../logger/types";
 import type { ChatFolder, ChatThread } from "../db";
 import { saveThread as saveIncognitoThread } from "../incognito/storage";
 
@@ -38,9 +39,13 @@ interface ChatState {
   threadLoadMode: Record<string, "full" | "partial">;
 
   // Thread actions
-  addThread: (thread: ChatThread) => void;
-  updateThread: (threadId: string, updates: Partial<ChatThread>) => void;
-  deleteThread: (threadId: string) => void;
+  addThread: (thread: ChatThread, logger: EndpointLogger) => void;
+  updateThread: (
+    threadId: string,
+    updates: Partial<ChatThread>,
+    logger: EndpointLogger,
+  ) => void;
+  deleteThread: (threadId: string, logger: EndpointLogger) => void;
 
   // Folder actions
   addFolder: (folder: ChatFolder) => void;
@@ -70,7 +75,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   pendingNewThreadIds: new Set<string>(),
 
   // Thread actions
-  addThread: (thread: ChatThread): void => {
+  addThread: (thread: ChatThread, logger: EndpointLogger): void => {
     set((state) => ({
       threads: {
         ...state.threads,
@@ -80,11 +85,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     // Only save to localStorage for incognito threads
     if (thread.rootFolderId === "incognito") {
-      void saveIncognitoThread(thread);
+      void saveIncognitoThread(thread, logger);
     }
   },
 
-  updateThread: (threadId: string, updates: Partial<ChatThread>): void =>
+  updateThread: (
+    threadId: string,
+    updates: Partial<ChatThread>,
+    logger: EndpointLogger,
+  ): void =>
     set((state) => {
       const thread = state.threads[threadId];
       if (!thread) {
@@ -99,7 +108,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
       // Only save to localStorage for incognito threads
       if (updatedThread.rootFolderId === "incognito") {
-        void saveIncognitoThread(updatedThread);
+        void saveIncognitoThread(updatedThread, logger);
       }
 
       return {
@@ -110,7 +119,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
-  deleteThread: (threadId: string): void =>
+  deleteThread: (threadId: string, logger: EndpointLogger): void =>
     set((state) => {
       const thread = state.threads[threadId];
 
@@ -118,10 +127,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
       if (thread?.rootFolderId === "incognito") {
         void import("../incognito/storage")
           .then(({ deleteThread }) => {
-            return deleteThread(threadId);
+            return deleteThread(threadId, logger);
           })
-          .catch(() => {
-            // Silently fail - localStorage cleanup is not critical
+          .catch((error: Error) => {
+            // Not critical (the in-memory thread is gone), but never silent
+            logger.warn("[incognito] thread localStorage cleanup failed", {
+              threadId,
+              errorName: error instanceof Error ? error.name : "UnknownError",
+              errorMessage:
+                error instanceof Error ? error.message : String(error),
+            });
           });
       }
 

@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import type { EndpointLogger } from "../../../logger/types";
 
 function openSystemUrl(url: string): void {
   try {
@@ -47,7 +48,8 @@ export function openUrl(url: string): void {
   openSystemUrl(url);
 }
 
-export function openInNewTab(url: string): void {
+export function openInNewTab(url: string, logger: EndpointLogger): void {
+  void logger;
   openSystemUrl(url);
 }
 
@@ -75,7 +77,12 @@ export function replaceUrl(url: string): void {
   openSystemUrl(url);
 }
 
-export function openWithTarget(url: string, target: string): void {
+export function openWithTarget(
+  url: string,
+  target: string,
+  logger: EndpointLogger,
+): void {
   void target;
+  void logger;
   openSystemUrl(url);
 }

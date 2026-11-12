@@ -18,6 +18,7 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -53,6 +54,7 @@ export function LeadCreateContainer({
   const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const logger = useWidgetLogger();
   const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
 
   const createdLeadId = data?.lead?.summary?.id;
@@ -97,8 +99,8 @@ export function LeadCreateContainer({
     if (!createdLeadId) {
       return;
     }
-    void copyToClipboard(createdLeadId);
-  }, [createdLeadId]);
+    void copyToClipboard(createdLeadId, logger);
+  }, [createdLeadId, logger]);
 
   // Auto-navigate to lead detail on successful creation
   useEffect(() => {

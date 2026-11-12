@@ -16,6 +16,7 @@ import remarkGfm from "remark-gfm";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
+import { useLogger } from "../hooks/use-logger";
 import { scopedTranslation } from "../i18n";
 import type { StyleType } from "../utils/style-type";
 
@@ -554,15 +555,23 @@ export const CodeBlock = memo(function CodeBlock({
   const { locale } = useTranslation();
   const { t } = scopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
+  // Nullable: markdown also renders outside LoggerProvider (CLI/MCP trees)
+  const logger = useLogger();
 
   const handleCopy = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Silently fail - copying is a nice-to-have feature
+    } catch (error) {
       // The UI won't show copied state, which indicates failure to the user
+      logger.warn("Code block copy failed", {
+        component: "CodeBlock",
+        operation: "copyCode",
+        language,
+        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : undefined,
+      });
     }
   };
 
@@ -647,14 +656,22 @@ export const CodeSnippet = memo(function CodeSnippet({
   const { locale } = useTranslation();
   const { t } = scopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
+  // Nullable: markdown also renders outside LoggerProvider (CLI/MCP trees)
+  const logger = useLogger();
 
   const handleCopy = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // ignore
+    } catch (error) {
+      logger.warn("Code block copy failed", {
+        component: "CodeSnippet",
+        operation: "copyCode",
+        language,
+        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : undefined,
+      });
     }
   };
 

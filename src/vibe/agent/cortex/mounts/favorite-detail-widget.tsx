@@ -8,6 +8,7 @@
 
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -34,6 +35,7 @@ function extractFavoriteId(path: string): string | null {
 export function FavoriteDetailWidget({
   path,
 }: FavoriteDetailWidgetProps): React.JSX.Element | null {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -46,6 +48,7 @@ export function FavoriteDetailWidget({
 
   return (
     <EndpointsPage
+      logger={logger}
       endpoint={favoriteDefinitions}
       locale={locale}
       user={user}

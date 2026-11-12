@@ -426,7 +426,7 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } = await import("../incognito/storage");
-        await updateIncognitoThread(item.id, { title: item.title });
+        await updateIncognitoThread(item.id, { title: item.title }, ctx.logger);
       },
     },
     "streaming-state-changed": {
@@ -441,9 +441,13 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } = await import("../incognito/storage");
-        await updateIncognitoThread(item.id, {
-          streamingState: item.streamingState,
-        });
+        await updateIncognitoThread(
+          item.id,
+          {
+            streamingState: item.streamingState,
+          },
+          ctx.logger,
+        );
       },
     },
     "stream-finished": {
@@ -460,11 +464,15 @@ const { GET } = createEndpoint({
           return;
         }
         const { updateIncognitoThread } = await import("../incognito/storage");
-        await updateIncognitoThread(item.id, {
-          streamingState: item.streamingState,
-          description: item.description,
-          updatedAt: item.updatedAt,
-        });
+        await updateIncognitoThread(
+          item.id,
+          {
+            streamingState: item.streamingState,
+            description: item.description,
+            updatedAt: item.updatedAt,
+          },
+          ctx.logger,
+        );
       },
     },
   },

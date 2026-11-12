@@ -48,6 +48,7 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
@@ -68,6 +69,7 @@ import {
 } from "@/products/platform-products";
 
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
+import subscriptionDefinitions from "../definition";
 import { useSubscription } from "../hooks";
 import type definition from "./definition";
 
@@ -155,7 +157,34 @@ export function SubscriptionCreateContainer(): JSX.Element {
   }, [subValue?.checkoutUrl]);
 
   const handleSubscribe = (): void => {
-    setIsSubProviderModalOpen(true);
+    // The button only shows when the cached subscription read says "none",
+    // but that read can be stale or failed (prod: a user subscribed on Nov 7,
+    // got "already subscribed" from checkout on Nov 8). Re-check before
+    // opening checkout; an active subscription flips the card to the
+    // "already subscribed" state instead of a doomed checkout.
+    void executeQuery({
+      endpoint: subscriptionDefinitions.GET,
+      logger,
+      user,
+      locale,
+      requestData: undefined,
+      pathParams: undefined,
+    }).then((fresh) => {
+      if (fresh.success && fresh.data.status === SubscriptionStatus.ACTIVE) {
+        // Recovered: the cached read was stale and showed a subscribe button
+        // to an already-subscribed user.
+        logger.warn("Subscribe clicked with stale subscription cache", {
+          component: "SubscriptionCreateContainer",
+          operation: "handleSubscribe",
+          freshStatus: fresh.data.status,
+        });
+        // Sync the cached read so the card switches to "already subscribed".
+        void subscriptionEndpoint.read?.refetch();
+        return undefined;
+      }
+      setIsSubProviderModalOpen(true);
+      return undefined;
+    });
   };
 
   const handleSubProviderSelect = (

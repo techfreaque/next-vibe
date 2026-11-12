@@ -214,6 +214,8 @@ export const translations = {
       invalidRequestData: "Invalid request data ({{issue}})",
       modelAdminOnly:
         "{{model}} is not available on your account. Pick another model.",
+      threadPostForbidden:
+        "No posting rights in this thread. Start a new chat to keep going.",
       fileTypeNotAllowed: "File type not allowed: {{fileType}}",
       uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
       openrouterApiKeyMissing: "OpenRouter API key not configured",

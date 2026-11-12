@@ -34,6 +34,7 @@ export function ThreadPermissionsDialog({
   threadTitle,
   locale,
   user,
+  logger,
 }: ThreadPermissionsDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const platform = useWidgetPlatform();
@@ -71,6 +72,7 @@ export function ThreadPermissionsDialog({
         </DialogHeader>
 
         <EndpointsPage
+          logger={logger}
           endpoint={threadPermissionsDefinitions}
           locale={locale}
           user={user}

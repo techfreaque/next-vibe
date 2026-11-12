@@ -800,7 +800,18 @@ export function ToolCallRenderer({
       payload.error = toolCall.error;
     }
     const text = JSON.stringify(payload, null, 2);
-    void copyToClipboard(text).then(() => {
+    void copyToClipboard(text, logger).then((copiedOk) => {
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "ToolCallRenderer",
+          operation: "copyToolCallJson",
+          toolName: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          messageId,
+          textLength: text.length,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;
@@ -1510,6 +1521,7 @@ export function ToolCallRenderer({
                         Real API is NOT called - confirm goes through sendMessage. */}
                     {isGetConfirmation ? (
                       <EndpointsPage
+                        logger={logger}
                         endpoint={{ GET: definition }}
                         locale={locale}
                         user={user}

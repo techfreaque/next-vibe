@@ -1910,7 +1910,7 @@ export function GraphChartView(): React.JSX.Element {
     }
     // Overlay localStorage toggles (user clicked eye without saving)
     try {
-      const stored = getLocalItem(`vs-hidden-${graph.id}`);
+      const stored = getLocalItem(`vs-hidden-${graph.id}`, logger);
       if (stored !== null) {
         const parsed = JSON.parse(stored) as string[];
         if (Array.isArray(parsed)) {
@@ -1921,8 +1921,14 @@ export function GraphChartView(): React.JSX.Element {
           }
         }
       }
-    } catch {
-      // ignore malformed localStorage
+    } catch (error) {
+      // Recovered: malformed localStorage, falls back to server visibility
+      logger.warn("Graph chart: hidden-series localStorage is malformed", {
+        component: "GraphChartView",
+        operation: "restoreHiddenSeries",
+        graphId: graph.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
     // Apply after the effect body (localStorage is client-only, so this
     // cannot be derived during render without a hydration mismatch)
@@ -1935,7 +1941,7 @@ export function GraphChartView(): React.JSX.Element {
     return (): void => {
       active = false;
     };
-  }, [graph]);
+  }, [graph, logger]);
 
   // ── Versions endpoint: DB ancestor chain for prev/next version nav ─────────
   const versionsOptions = useMemo(
@@ -2231,11 +2237,15 @@ export function GraphChartView(): React.JSX.Element {
           next.add(nodeId);
         }
         // Persist to localStorage keyed to graph ID so it survives reload
-        setLocalItem(`vs-hidden-${graph.id}`, JSON.stringify([...next]));
+        setLocalItem(
+          `vs-hidden-${graph.id}`,
+          JSON.stringify([...next]),
+          logger,
+        );
         return next;
       });
     },
-    [graph],
+    [graph, logger],
   );
 
   const handlePaneCollapse = useCallback((paneNum: number): void => {

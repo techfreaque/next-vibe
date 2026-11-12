@@ -16,6 +16,7 @@ import { NextResponse } from "next-vibe/ui/lib/request";
 import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
+  REQUEST_ID_HEADER_NAME,
 } from "@/env/constants";
 
 import { createEndpointLogger } from "../../logger/server";
@@ -80,6 +81,22 @@ function validateCsrf(
   return { valid: true };
 }
 
+/** Client-minted ids are uuids; accept any short token, never arbitrary text. */
+const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+
+/**
+ * Correlation id for this request: the browser's x-request-id when present
+ * and well-formed (so its error report and these rows match), else minted
+ * here so server-only rows of one request still group together.
+ */
+export function resolveRequestId(request: NextRequest): string {
+  const fromClient = request.headers.get(REQUEST_ID_HEADER_NAME);
+  if (fromClient && REQUEST_ID_PATTERN.test(fromClient)) {
+    return fromClient;
+  }
+  return crypto.randomUUID();
+}
+
 /**
  * API handler return type
  * Supports:
@@ -127,7 +144,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     // Extract Next.js-specific data
     const { locale, ...resolvedParams } = await params;
     const urlPathParams = resolvedParams as T["types"]["UrlVariablesOutput"];
-    const logger = createEndpointLogger(false, locale);
+    const requestId = resolveRequestId(request);
+    const logger = createEndpointLogger(false, locale, { requestId });
 
     try {
       // CSRF double-submit validation for mutating browser requests
@@ -145,6 +163,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           }),
           logger,
           locale,
+          endpoint,
+          request,
         );
       }
 
@@ -236,7 +256,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle errors - wrap in NextResponse
       if (!result.success) {
-        return wrapErrorResponse(result, logger, locale, endpoint);
+        return wrapErrorResponse(result, logger, locale, endpoint, request);
       }
 
       // Wrap validated success result in NextResponse
@@ -250,7 +270,13 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger.debug("ErrorResponseError caught", {
           errorType: error.errorResponse.errorType,
         });
-        return wrapErrorResponse(error.errorResponse, logger, locale);
+        return wrapErrorResponse(
+          error.errorResponse,
+          logger,
+          locale,
+          endpoint,
+          request,
+        );
       }
 
       // Handle unexpected errors
@@ -267,6 +293,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         }),
         logger,
         locale,
+        endpoint,
+        request,
       );
     }
   };

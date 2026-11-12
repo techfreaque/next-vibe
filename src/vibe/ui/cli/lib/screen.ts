@@ -20,3 +20,7 @@ export function getScreenHeight(_logger: EndpointLogger): number {
   void _logger;
   return process.stdout.rows ?? 24;
 }
+
+export function getViewportLabel(): string | null {
+  return `${process.stdout.columns ?? 80}x${process.stdout.rows ?? 24}`;
+}

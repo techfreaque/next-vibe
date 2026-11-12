@@ -9,6 +9,17 @@ import { create } from "zustand";
 import type { StorageValue } from "zustand/middleware";
 import { persist } from "zustand/middleware";
 
+import { defaultLocale } from "../../core/i18n/core/config";
+import { createClientLogger } from "../../logger/client";
+import { reportStorageFailure } from "../../logger/storage-failure";
+
+/**
+ * zustand's persist storage runs outside React (hydrate + every set), so it
+ * cannot reach the LoggerProvider - a module-level client logger reports
+ * storage failures instead of swallowing them.
+ */
+const tourStorageLogger = createClientLogger(false, defaultLocale);
+
 interface TourState {
   isActive: boolean;
   modelSelectorOpen: boolean;
@@ -88,29 +99,43 @@ export const useTourState = create<TourState>()(
       }),
       storage: {
         getItem: (key: string): StorageValue<TourState> | null => {
+          const raw = getLocalItem(key, tourStorageLogger);
+          if (!raw) {
+            return null;
+          }
           try {
-            const raw = getLocalItem(key);
-            if (!raw) {
-              return null;
-            }
             return JSON.parse(raw) as StorageValue<TourState>;
-          } catch {
+          } catch (error) {
+            reportStorageFailure(tourStorageLogger, {
+              platform: "web",
+              area: "localStorage",
+              operation: "parse",
+              key,
+              error: error instanceof Error ? error : String(error),
+              valueLength: raw.length,
+            });
             return null;
           }
         },
         setItem: (key: string, value: StorageValue<TourState>): void => {
+          let serialized: string;
           try {
-            setLocalItem(key, JSON.stringify(value));
-          } catch {
-            // ignore
+            serialized = JSON.stringify(value);
+          } catch (error) {
+            reportStorageFailure(tourStorageLogger, {
+              platform: "web",
+              area: "localStorage",
+              operation: "set",
+              key,
+              error: error instanceof Error ? error : String(error),
+            });
+            return;
           }
+          // setLocalItem reports its own quota/security failures
+          setLocalItem(key, serialized, tourStorageLogger);
         },
         removeItem: (key: string): void => {
-          try {
-            removeLocalItem(key);
-          } catch {
-            // ignore
-          }
+          removeLocalItem(key, tourStorageLogger);
         },
       },
     },

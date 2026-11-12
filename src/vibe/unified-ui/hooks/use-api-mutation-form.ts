@@ -19,6 +19,10 @@ import type { EndpointLogger } from "../../logger/types";
 import { extractSchemaDefaults } from "../_shared/utils";
 import { containsFile } from "./api-utils-shared";
 import { scopedTranslation as hooksTranslation } from "./i18n";
+import {
+  describeFormErrors,
+  serializeFormErrors,
+} from "./serialize-form-errors";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import { splitFormValues } from "./split-form-values";
 import { useApiStore } from "./store";
@@ -191,7 +195,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     void (async (): Promise<void> => {
       try {
         // Clear from storage
-        await storage.removeItem(storageKey);
+        await storage.removeItem(storageKey, logger);
         // Reset the form to merged default values (schema + provided)
         formMethods.reset(mergedDefaultValues);
       } catch (error) {
@@ -211,7 +215,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
     void (async (): Promise<void> => {
       try {
-        const savedFormData = await storage.getItem(storageKey);
+        const savedFormData = await storage.getItem(storageKey, logger);
         if (savedFormData) {
           const parsedData = JSON.parse(
             savedFormData,
@@ -228,7 +232,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
                 .map((i) => `${i.path.join(".")}: ${i.message}`)
                 .join("; "),
             });
-            await storage.removeItem(storageKey);
+            await storage.removeItem(storageKey, logger);
             return;
           }
 
@@ -274,7 +278,11 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           debounceTimer = setTimeout(() => {
             void (async (): Promise<void> => {
               try {
-                await storage.setItem(storageKey, JSON.stringify(formValues));
+                await storage.setItem(
+                  storageKey,
+                  JSON.stringify(formValues),
+                  logger,
+                );
               } catch (error) {
                 logger.error(
                   "Error saving form data to storage:",
@@ -380,8 +388,18 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           // (error-monitor/client-log/repository.ts) already prepends it to
           // every forwarded client log; adding it here doubled up as
           // "[client] [client] Error in submitForm".
+          const errorType = isErrorResponseType(error)
+            ? error.errorType
+            : undefined;
           const logMeta = {
             endpoint: endpoint.path.join("/"),
+            method: endpoint.method,
+            alias: endpoint.aliases?.[0],
+            // Which failure class: errors.* key + HTTP-ish code. 4xx = the
+            // server answered and refused (bad input, auth, conflict); 5xx or
+            // no key = server failure or the request never arrived.
+            errorKey: errorType?.errorKey,
+            errorCode: errorType?.errorCode,
             fieldKeys: Object.keys(formSnapshot).join(", "),
             hasFiles: containsFile(formSnapshot),
           };
@@ -420,9 +438,12 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         }
       };
       void formMethods.handleSubmit(_submitForm, (errors) => {
+        // Field path + rule + message only: refs are circular DOM/fiber
+        // objects (JSON.stringify threw here) and values may be secrets.
         logger.error("Form validation errors", {
           endpoint: [...endpoint.path].join("/"),
-          errors: JSON.stringify(errors),
+          errors: serializeFormErrors(errors),
+          fields: describeFormErrors(errors),
         });
 
         // The `.title` key renders generically elsewhere, so the field errors
@@ -431,7 +452,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           message: hooksTranslation
             .scopedT(locale)
             .t("mutationForm.post.errors.validation_error.detail", {
-              errors: JSON.stringify(errors),
+              errors: describeFormErrors(errors),
             }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });

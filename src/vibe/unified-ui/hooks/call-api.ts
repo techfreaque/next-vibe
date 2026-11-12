@@ -5,6 +5,7 @@ import {
   BEARER_LEAD_ID_SEPARATOR,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
+  REQUEST_ID_HEADER_NAME,
 } from "@/env/constants";
 
 import { validateData } from "../../core/core-utils/validation";
@@ -13,6 +14,7 @@ import { Methods } from "../../core/definition/enums";
 import { coreClientEnv as envClient, platform } from "../../core/env-client";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
+  type ErrorResponseType,
   ErrorResponseTypes,
   fail,
   type ResponseType,
@@ -22,7 +24,9 @@ import { parseError } from "../../core/utils/parse-error";
 import { scopedTranslation as authScopedTranslation } from "../../identity/auth/i18n";
 import { AuthClientRepository } from "../../identity/auth/repository-client";
 import type { JwtPayloadType } from "../../identity/auth/types";
+import { CLIENT_LOG_PATH } from "../../logger/error-monitor/client-log/constants";
 import type { EndpointLogger } from "../../logger/types";
+import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
 import { containsFile, objectToFormData } from "./api-utils-shared";
 import { scopedTranslation as hooksTranslation } from "./i18n";
@@ -34,8 +38,8 @@ const MUTATING_METHODS = new Set([
   Methods.PATCH,
 ]);
 
-async function getCsrfToken(): Promise<string | null> {
-  return (await getCookie(CSRF_TOKEN_COOKIE_NAME)) ?? null;
+async function getCsrfToken(logger: EndpointLogger): Promise<string | null> {
+  return (await getCookie(CSRF_TOKEN_COOKIE_NAME, logger)) ?? null;
 }
 
 function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
@@ -156,6 +160,110 @@ function buildBody<TEndpoint extends CreateApiEndpointAny>(
   return JSON.stringify(requestData);
 }
 
+/**
+ * What happened on the wire, filled in by callApiInner so the central failure
+ * report can say more than the ErrorResponseType carries.
+ */
+interface CallDiagnostics {
+  status?: number;
+  transport?: "http" | "client-route";
+  redirected?: boolean;
+  thrown?: Error;
+  /** The failure was already logged with full detail at its origin. */
+  alreadyLogged?: boolean;
+  /** Sent as x-request-id; the server stamps it on its rows for this call. */
+  requestId: string;
+}
+
+const CLIENT_LOG_ENDPOINT_PATH = CLIENT_LOG_PATH.join("/");
+
+/**
+ * Auth/permission denials a logged-out visitor gets by design (the client
+ * probes /me and role-gated endpoints on public pages). The server marks these
+ * `expected` and logs them at debug; mirror that so every anonymous page view
+ * doesn't become an error row. A logged-IN user getting one is a real auth
+ * drop and IS reported.
+ */
+const PUBLIC_EXPECTED_ERROR_KEYS = new Set<string>([
+  ErrorResponseTypes.AUTH_ERROR.errorKey,
+  ErrorResponseTypes.UNAUTHORIZED.errorKey,
+  ErrorResponseTypes.FORBIDDEN.errorKey,
+]);
+
+/**
+ * Central report for EVERY failed endpoint call made from a widget/hook
+ * (useEndpoint, executeQuery, executeMutation all land here), so no caller
+ * that just toasts or ignores `success === false` can hide a failure.
+ * 5xx / network / unknown -> error; 4xx -> warn.
+ */
+function reportApiFailure(
+  endpoint: CreateApiEndpointAny,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+  response: ErrorResponseType,
+  diag: CallDiagnostics,
+  durationMs: number,
+): void {
+  const endpointPath = endpoint.path.join("/");
+  if (diag.alreadyLogged || endpointPath === CLIENT_LOG_ENDPOINT_PATH) {
+    return;
+  }
+  // Wire responses aren't re-validated: a non-2xx body can be
+  // {success:false, message} with no errorType at all.
+  const errorType: ErrorResponseType["errorType"] | undefined =
+    response.errorType;
+  const errorKey = errorType?.errorKey ?? "errorTypes.unknown_error";
+  const errorCode = errorType?.errorCode ?? diag.status ?? 500;
+  // TWO_FACTOR_REQUIRED is a 202 login step, not a failure
+  if (errorKey === ErrorResponseTypes.TWO_FACTOR_REQUIRED.errorKey) {
+    return;
+  }
+  if (user.isPublic && PUBLIC_EXPECTED_ERROR_KEYS.has(errorKey)) {
+    logger.debug("callApi: expected public-user denial", {
+      endpoint: endpointPath,
+      errorKey,
+    });
+    return;
+  }
+  const status = diag.status ?? null;
+  const isAbort = diag.thrown?.name === "AbortError";
+  const isServerSide =
+    !isAbort &&
+    (diag.thrown !== undefined ||
+      (status !== null && status >= 500) ||
+      errorCode >= 500);
+  const context = {
+    endpoint: `${endpointPath}/${endpoint.method}`,
+    alias: endpoint.aliases?.[0] ?? null,
+    method: endpoint.method,
+    status,
+    errorKey,
+    errorCode,
+    // Translated, display-ready text (field list for validation errors)
+    errorMessage: String(response.message).slice(0, 500),
+    causeKey: response.cause?.errorType?.errorKey ?? null,
+    transport: diag.transport ?? "http",
+    redirected: diag.redirected ?? null,
+    durationMs,
+    isPublicUser: user.isPublic,
+    // Match against the server's error_logs rows for the same request
+    requestId: diag.requestId,
+  };
+  if (isServerSide) {
+    logger.error(
+      `Endpoint call failed: ${endpointPath}/${endpoint.method}`,
+      diag.thrown ?? context,
+      ...(diag.thrown ? [context] : []),
+    );
+    return;
+  }
+  logger.warn(
+    `Endpoint call rejected: ${endpointPath}/${endpoint.method}`,
+    context,
+    ...(diag.thrown ? [diag.thrown] : []),
+  );
+}
+
 export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
@@ -163,6 +271,48 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
+  const requestId = mintRequestId();
+  const diag: CallDiagnostics = { requestId };
+  const startedAt = Date.now();
+  // Every log line of this call (non-JSON body, schema mismatch, central
+  // failure report, client-route handler logs) carries the request id.
+  const callLogger = withLogContext(logger, { requestId });
+  const result = await callApiInner(
+    endpoint,
+    callLogger,
+    user,
+    locale,
+    requestData,
+    pathParams,
+    diag,
+  );
+  if (!result.success) {
+    try {
+      reportApiFailure(
+        endpoint,
+        // Plain logger: the context record already carries requestId
+        logger,
+        user,
+        result,
+        diag,
+        Date.now() - startedAt,
+      );
+    } catch {
+      // Reporting must never turn a handled failure into a thrown one
+    }
+  }
+  return result;
+}
+
+async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+  locale: CountryLanguage,
+  requestData: TEndpoint["types"]["RequestOutput"],
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+  diag: CallDiagnostics,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   logger.debug("callApi", {
     endpoint: endpoint.path.join("/"),
@@ -211,6 +361,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     const pathKey = endpointToToolName(endpoint);
     const handlerObject = await getClientRouteHandler(pathKey);
     if (handlerObject?.handler) {
+      diag.transport = "client-route";
       return handlerObject.handler({
         data: requestData,
         urlPathParams: pathParams,
@@ -233,6 +384,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     logger,
   );
   if (missingParam) {
+    // buildUrl already logged it with caller stack + page path
+    diag.alreadyLogged = true;
     return fail({
       message: hooksTranslation
         .scopedT(locale)
@@ -252,8 +405,10 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         ? {}
         : { "Content-Type": "application/json" };
 
+    headers[REQUEST_ID_HEADER_NAME] = diag.requestId;
+
     if (MUTATING_METHODS.has(endpoint.method)) {
-      const csrfToken = await getCsrfToken();
+      const csrfToken = await getCsrfToken(logger);
       if (csrfToken) {
         headers[CSRF_TOKEN_HEADER_NAME] = csrfToken;
       }
@@ -289,6 +444,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // oxlint-disable-next-line restricted/no-raw-fetch
     const response = await fetch(url, options);
+    diag.status = response.status;
+    diag.redirected = response.redirected;
     // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
     // body — report the HTTP status, not a JSON parse error.
     const isJsonBody = (response.headers.get("content-type") ?? "").includes(
@@ -306,6 +463,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         redirected: response.redirected,
         finalUrl: response.redirected ? response.url : null,
       });
+      diag.alreadyLogged = true;
       return fail({
         message: hooksTranslation
           .scopedT(locale)
@@ -349,6 +507,16 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         locale,
       );
       if (!validationResponse.success) {
+        // validateData logged the failing paths; add the HTTP side + route
+        logger.error(
+          `callApi: response failed schema validation: ${endpoint.path.join("/")}/${endpoint.method}`,
+          {
+            endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+            status: response.status,
+            errorMessage: String(validationResponse.message).slice(0, 500),
+          },
+        );
+        diag.alreadyLogged = true;
         return fail({
           message: hooksTranslation
             .scopedT(locale)
@@ -372,6 +540,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   } catch (error) {
+    // Network failure, timeout, CORS, aborted request or JSON parse error -
+    // reported by callApi() with the Error itself (name + stack).
+    diag.thrown = error instanceof Error ? error : new Error(String(error));
     return fail({
       message: hooksTranslation
         .scopedT(locale)

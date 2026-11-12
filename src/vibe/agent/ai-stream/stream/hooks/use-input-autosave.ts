@@ -43,7 +43,7 @@ export async function loadDraft(
   logger: EndpointLogger,
 ): Promise<string> {
   try {
-    const savedDraft = await storage.getItem(storageKey);
+    const savedDraft = await storage.getItem(storageKey, logger);
     if (savedDraft) {
       return savedDraft;
     }
@@ -68,10 +68,10 @@ export async function saveDraft(
 ): Promise<void> {
   try {
     if (input.trim()) {
-      await storage.setItem(storageKey, input);
+      await storage.setItem(storageKey, input, logger);
     } else {
       // Remove empty drafts to keep storage clean
-      await storage.removeItem(storageKey);
+      await storage.removeItem(storageKey, logger);
     }
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to save draft", {
@@ -89,7 +89,7 @@ export async function clearDraft(
   logger: EndpointLogger,
 ): Promise<void> {
   try {
-    await storage.removeItem(storageKey);
+    await storage.removeItem(storageKey, logger);
     await clearDraftAttachments(storageKey, logger);
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to clear draft", {
@@ -157,7 +157,7 @@ export async function saveDraftAttachments(
     const attachmentKey = `${storageKey}-attachments`;
 
     if (files.length === 0) {
-      await storage.removeItem(attachmentKey);
+      await storage.removeItem(attachmentKey, logger);
       logger.debug("Chat Input Autosave", "Removed empty draft attachments", {
         storageKey,
       });
@@ -175,7 +175,11 @@ export async function saveDraftAttachments(
       })),
     );
 
-    await storage.setItem(attachmentKey, JSON.stringify(serializableFiles));
+    await storage.setItem(
+      attachmentKey,
+      JSON.stringify(serializableFiles),
+      logger,
+    );
     logger.debug("Chat Input Autosave", "Saved draft attachments", {
       storageKey,
       fileCount: files.length,
@@ -197,7 +201,7 @@ export async function loadDraftAttachments(
 ): Promise<File[]> {
   try {
     const attachmentKey = `${storageKey}-attachments`;
-    const saved = await storage.getItem(attachmentKey);
+    const saved = await storage.getItem(attachmentKey, logger);
 
     if (!saved) {
       return [];
@@ -230,7 +234,7 @@ export async function clearDraftAttachments(
 ): Promise<void> {
   try {
     const attachmentKey = `${storageKey}-attachments`;
-    await storage.removeItem(attachmentKey);
+    await storage.removeItem(attachmentKey, logger);
     logger.debug("Chat Input Autosave", "Cleared draft attachments", {
       storageKey,
     });

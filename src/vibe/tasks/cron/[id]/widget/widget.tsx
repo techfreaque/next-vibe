@@ -251,6 +251,7 @@ function TaskInputViewSection({
   taskInput: Record<string, WidgetData>;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -294,6 +295,7 @@ function TaskInputViewSection({
 
       {definition && (
         <EndpointsPage
+          logger={logger}
           endpoint={{
             [definition.method]: definition,
           }}
@@ -330,6 +332,7 @@ function TaskInputEditSection({
 }: {
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.PUT>>;
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -393,6 +396,7 @@ function TaskInputEditSection({
         {t("widget.taskInput.editTitle")}
       </Div>
       <EndpointsPage
+        logger={logger}
         endpoint={{ [method]: definition }}
         locale={locale}
         user={user}

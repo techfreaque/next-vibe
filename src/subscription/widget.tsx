@@ -130,6 +130,13 @@ export function SubscriptionOverviewContainer(_props: {
       onSuccess: ({ responseData }) => {
         if (responseData.customerPortalUrl) {
           assignUrl(responseData.customerPortalUrl);
+        } else {
+          // Click did nothing for the user - no URL to send them to
+          logger.error("Customer portal response had no URL", undefined, {
+            component: "SubscriptionOverviewContainer",
+            operation: "manageSubscription",
+            provider: subscription.provider ?? null,
+          });
         }
       },
       onError: ({ error }) => {

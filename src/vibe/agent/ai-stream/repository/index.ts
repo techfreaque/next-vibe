@@ -1812,6 +1812,15 @@ export class AiStreamRepository {
                 aiMessageId,
                 resolvedLastAiMessageId: lastCommitted?.id ?? null,
                 threadId: threadResultThreadId,
+                // Why nothing was written: the upstream error part (if any)
+                // plus which model/provider produced it, and the caller chain
+                // (parentThreadId = the thread whose tool spawned this run).
+                providerError: ctx.lastProviderErrorText,
+                model: data.model,
+                apiProvider: modelConfig.apiProvider,
+                providerModel: modelConfig.providerModel,
+                isIncognito,
+                parentThreadId: parentThreadId ?? null,
               },
             );
           }

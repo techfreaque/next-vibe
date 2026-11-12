@@ -34,6 +34,7 @@ export function FolderProjectDialog({
   folderName,
   locale,
   user,
+  logger,
 }: FolderProjectDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const platform = useWidgetPlatform();
@@ -66,6 +67,7 @@ export function FolderProjectDialog({
         </DialogHeader>
 
         <EndpointsPage
+          logger={logger}
           endpoint={folderProjectDefinitions}
           locale={locale}
           user={user}

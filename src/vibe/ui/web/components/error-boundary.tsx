@@ -6,6 +6,10 @@ import { Component } from "react";
 import { coreClientEnv } from "../../../core/env-client";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { Environment } from "../../../env/env-util";
+import { createClientLogger } from "../../../logger/client";
+import { reportRenderError } from "../../../logger/report-render-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { LoggerContext } from "../hooks/logger-provider";
 import {
   Accordion,
   AccordionContent,
@@ -182,6 +186,9 @@ export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
+  static contextType = LoggerContext;
+  declare context: EndpointLogger | null;
+
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -211,6 +218,16 @@ export class ErrorBoundary extends Component<
     console.error("Component stack:", errorInfo.componentStack);
 
     this.setState({ errorInfo });
+
+    // Persist to the error log (before the dev re-throw below). Deduped per
+    // Error object, so the re-throw reaching window "error" isn't a 2nd row.
+    reportRenderError({
+      // Outside a LoggerProvider (rare) a fresh client logger still reports
+      logger: this.context ?? createClientLogger(false, this.props.locale),
+      boundary: "ErrorBoundary",
+      error,
+      componentStack: errorInfo.componentStack,
+    });
 
     if (this.props.onError) {
       this.props.onError(error, errorInfo);

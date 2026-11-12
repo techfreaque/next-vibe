@@ -294,6 +294,7 @@ export class MusicGenerationRepository {
                   path,
                   result.content,
                   toolExecutionContext,
+                  logger,
                 ),
             )
             .catch(() => undefined);

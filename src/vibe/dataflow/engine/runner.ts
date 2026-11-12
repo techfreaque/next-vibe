@@ -132,7 +132,12 @@ export async function runGraph(
   config: GraphConfig,
   range: TimeRange,
   backtestRunId?: string,
-  options?: { readOnly?: boolean; displayResolution?: Resolution },
+  options?: {
+    readOnly?: boolean;
+    displayResolution?: Resolution;
+    /** Graph slug for log labels (e.g. failed endpoint calls). */
+    graphSlug?: string;
+  },
 ): Promise<GraphRunResult> {
   const readOnly = options?.readOnly ?? false;
   const logger = createEndpointLogger(false, defaultLocale);
@@ -155,6 +160,7 @@ export async function runGraph(
     requestedRange: range,
     nodeRanges,
     graphId,
+    graphSlug: options?.graphSlug,
     graphNodes: config.nodes,
     graphEdges: config.edges,
     resolvedSeries: new Map(),

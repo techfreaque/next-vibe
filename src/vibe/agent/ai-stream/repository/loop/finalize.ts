@@ -310,9 +310,14 @@ export async function complete(
     // Neither is a bug of ours - only an unexplained empty stream is an error.
     const explained =
       finishReason === "error" || finishReason === "content-filter";
+    // providerError carries the error part that preceded the empty stream
+    // (if any) so this line is self-explanatory without correlating rows.
     const emptyStreamMeta = {
       threadId,
       model,
+      apiProvider: modelConfig.apiProvider,
+      providerModel: modelConfig.providerModel,
+      providerError: ctx.lastProviderErrorText,
       totalTokens: usage.totalTokens,
       finishReason: finishReason ?? null,
     };

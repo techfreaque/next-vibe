@@ -125,13 +125,16 @@ const { POST } = createEndpoint({
           .string({
             error: "fields.email.validation.required",
           })
+          // Normalise BEFORE the checks: a pasted " Name@Mail.com " must
+          // validate and match the stored lowercase email.
+          .trim()
+          .toLowerCase()
           .min(1, {
             message: "fields.email.validation.required",
           })
           .email({
             message: "fields.email.validation.invalid",
-          })
-          .transform((val) => val.toLowerCase().trim()),
+          }),
       }),
 
       password: requestField(scopedTranslation, {

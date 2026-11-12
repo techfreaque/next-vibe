@@ -1806,6 +1806,9 @@ export function EditFavBeforeAddButton({
     } catch (error) {
       logger.error("Failed to edit skill", {
         error: error instanceof Error ? error.message : String(error),
+        component: "SkillsWidget",
+        operation: "editSkill",
+        skillId: char.skillId,
       });
     } finally {
       setIsLoading(false);
@@ -1985,6 +1988,10 @@ export function SkillFavoriteActions({
     } catch (error) {
       logger.error("Failed to activate favorite", {
         error: error instanceof Error ? error.message : String(error),
+        component: "SkillsWidget",
+        operation: "activateSingleFavorite",
+        favoriteId: favoriteIds[0],
+        skillId: char.skillId,
       });
     } finally {
       setIsActivating(false);
@@ -2043,6 +2050,10 @@ export function SkillFavoriteActions({
     } catch (error) {
       logger.error("Failed to activate favorite", {
         error: error instanceof Error ? error.message : String(error),
+        component: "SkillsWidget",
+        operation: "activateFavorite",
+        favoriteId,
+        skillId: char.skillId,
       });
     } finally {
       setIsActivating(false);

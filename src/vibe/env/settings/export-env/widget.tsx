@@ -17,6 +17,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import {
+  useWidgetLogger,
   useWidgetTranslation,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
@@ -25,6 +26,7 @@ import type endpoints from "./definition";
 export function ExportEnvWidget(): JSX.Element {
   const value = useWidgetValue<typeof endpoints.GET>();
   const t = useWidgetTranslation<typeof endpoints.GET>();
+  const logger = useWidgetLogger();
   const [copied, setCopied] = useState(false);
 
   if (!value?.content) {
@@ -32,7 +34,7 @@ export function ExportEnvWidget(): JSX.Element {
   }
 
   const handleCopy = (): void => {
-    void copyToClipboard(value.content).then(() => {
+    void copyToClipboard(value.content, logger).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;

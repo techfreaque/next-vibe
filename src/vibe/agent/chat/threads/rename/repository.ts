@@ -193,7 +193,7 @@ export class ThreadRenameRepository {
       if (!user.isPublic) {
         void import("../../../ai-stream/repository/core/db-writer/embedding-sync")
           .then(({ syncThreadEmbedding }) =>
-            syncThreadEmbedding(updatedThread.id, toolExecutionContext),
+            syncThreadEmbedding(updatedThread.id, toolExecutionContext, logger),
           )
           .catch(() => undefined);
       }

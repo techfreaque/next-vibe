@@ -431,7 +431,7 @@ export function useMessageOperations(
         try {
           const { deleteMessage: deleteIncognitoMessage } =
             await import("../../../../incognito/storage");
-          deleteIncognitoMessage(messageId);
+          await deleteIncognitoMessage(messageId, logger);
           logger.debug(
             "Message operations: Deleted incognito message from localStorage",
             {
@@ -607,7 +607,7 @@ export function useMessageOperations(
     if (typeof window !== "undefined") {
       void import("../../../../../ai-stream/stream/hooks/audio-queue")
         .then(({ getAudioQueue }) => {
-          const audioQueue = getAudioQueue();
+          const audioQueue = getAudioQueue(logger);
           audioQueue.stop();
           logger.debug("Message operations: TTS playback stopped");
           return undefined;

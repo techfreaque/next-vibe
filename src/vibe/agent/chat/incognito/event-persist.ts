@@ -38,21 +38,26 @@ export async function persistMessageIfIncognito(
   const msgs = getCachedMessages(threadId, rootFolderId, logger);
   const msg = msgs.find((m) => m.id === msgId);
   if (msg && !(skipOptimistic && msg.metadata?.isOptimistic)) {
-    await saveMessage(msg);
+    await saveMessage(msg, logger);
   }
 }
 
 export async function finishIncognitoThreadIfIncognito(
   threadId: string,
   rootFolderId: string,
+  logger: EndpointLogger,
 ): Promise<void> {
   if (rootFolderId !== DefaultFolderId.INCOGNITO) {
     return;
   }
   const { updateIncognitoThread } = await import("./storage");
-  await updateIncognitoThread(threadId, {
-    streamingState: ThreadStreamingState.IDLE,
-  });
+  await updateIncognitoThread(
+    threadId,
+    {
+      streamingState: ThreadStreamingState.IDLE,
+    },
+    logger,
+  );
 }
 
 // ─── onEvent factory helpers ──────────────────────────────────────────────────
@@ -107,6 +112,7 @@ export function onEventUpdateIncognitoThread<
   >;
   requestData: { rootFolderId?: string | null };
   urlPathParams: { rootFolderId?: string | null };
+  logger: EndpointLogger;
 }) => Promise<void> {
   return async (ctx) => {
     const rootFolderId =
@@ -122,7 +128,7 @@ export function onEventUpdateIncognitoThread<
       const patch: Pick<ChatThread, TKey> = Object.fromEntries(
         opts.pick.map((key) => [key, item[key]]),
       ) as Pick<ChatThread, TKey>;
-      await updateIncognitoThread(item.id, patch);
+      await updateIncognitoThread(item.id, patch, ctx.logger);
     }
   };
 }
@@ -134,6 +140,7 @@ export function onEventDeleteIncognitoThread<TArrayField extends string>(opts: {
   responseData: Record<TArrayField, ReadonlyArray<{ id: string }>>;
   requestData: { rootFolderId?: string | null };
   urlPathParams: { rootFolderId?: string | null };
+  logger: EndpointLogger;
 }) => Promise<void> {
   return async (ctx) => {
     const rootFolderId =
@@ -146,7 +153,7 @@ export function onEventDeleteIncognitoThread<TArrayField extends string>(opts: {
     const items = ctx.responseData[opts.arrayField];
     const { deleteThread } = await import("./storage");
     for (const item of items) {
-      await deleteThread(item.id);
+      await deleteThread(item.id, ctx.logger);
     }
   };
 }
@@ -164,6 +171,7 @@ export function onEventUpdateIncognitoFolder<
   >;
   requestData: { rootFolderId?: string | null };
   urlPathParams: { rootFolderId?: string | null };
+  logger: EndpointLogger;
 }) => Promise<void> {
   return async (ctx) => {
     const rootFolderId =
@@ -177,7 +185,7 @@ export function onEventUpdateIncognitoFolder<
       const patch: Pick<ChatFolder, TKey> = Object.fromEntries(
         opts.pick.map((key) => [key, item[key]]),
       ) as Pick<ChatFolder, TKey>;
-      await updateIncognitoFolder(item.id, patch);
+      await updateIncognitoFolder(item.id, patch, ctx.logger);
     }
   };
 }
@@ -188,6 +196,7 @@ export function onEventDeleteIncognitoFolder<TArrayField extends string>(opts: {
   responseData: Record<TArrayField, ReadonlyArray<{ id: string }>>;
   requestData: { rootFolderId?: string | null };
   urlPathParams: { rootFolderId?: string | null };
+  logger: EndpointLogger;
 }) => Promise<void> {
   return async (ctx) => {
     const rootFolderId =
@@ -198,7 +207,7 @@ export function onEventDeleteIncognitoFolder<TArrayField extends string>(opts: {
     const items = ctx.responseData[opts.arrayField];
     const { deleteFolder } = await import("./storage");
     for (const item of items) {
-      await deleteFolder(item.id);
+      await deleteFolder(item.id, ctx.logger);
     }
   };
 }

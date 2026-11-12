@@ -172,6 +172,7 @@ export class OrderConvertToBillRepository {
       // --- AP_BILL journal entry (best-effort, never blocks conversion) ---
       try {
         await autoPostJournalEntry({
+          logger,
           companyId: po.companyId,
           date: now,
           description: `AP Bill: ${billNumber}`,

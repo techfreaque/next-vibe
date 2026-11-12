@@ -1,6 +1,7 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { setCookie } from "next-vibe/ui/lib/cookies";
@@ -88,6 +89,7 @@ export function TranslationProvider({
   const pathname = usePathname();
   const router = useRouter();
   const mounted = useIsMounted();
+  const logger = useLogger();
 
   // Extract language and country from current locale (from route)
   const currentLanguage =
@@ -114,8 +116,8 @@ export function TranslationProvider({
     const newLocale = `${lang}-${country}`;
 
     // Save to storage
-    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
-    await setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale, logger);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Update URL to reflect language change
     if (pathname) {
@@ -140,8 +142,8 @@ export function TranslationProvider({
     const newLocale = `${language}-${newCountry}`;
 
     // Save to storage
-    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
-    await setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale, logger);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Update URL to reflect country change
     if (pathname) {
@@ -167,8 +169,8 @@ export function TranslationProvider({
     const newLocale = `${countryInfo.language}-${newCountry}`;
 
     // Save to storage (single write, no intermediate states)
-    await storage.setItem(LOCALE_COOKIE_NAME, newLocale);
-    await setCookie(LOCALE_COOKIE_NAME, newLocale);
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale, logger);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Single navigation - replace the locale segment in the path
     if (pathname) {
@@ -191,10 +193,10 @@ export function TranslationProvider({
     }
     async function initializeLocale(): Promise<void> {
       // Only save to localStorage if no preference exists (respect existing localStorage)
-      const savedLocale = await storage.getItem(LOCALE_COOKIE_NAME);
+      const savedLocale = await storage.getItem(LOCALE_COOKIE_NAME, logger);
       if (!savedLocale && currentLocale) {
-        await storage.setItem(LOCALE_COOKIE_NAME, currentLocale);
-        await setCookie(LOCALE_COOKIE_NAME, currentLocale);
+        await storage.setItem(LOCALE_COOKIE_NAME, currentLocale, logger);
+        await setCookie(LOCALE_COOKIE_NAME, currentLocale, logger);
       }
 
       // Update document language for accessibility (web only)
@@ -204,7 +206,7 @@ export function TranslationProvider({
       }
     }
     void initializeLocale();
-  }, [currentLocale]);
+  }, [currentLocale, logger]);
 
   return (
     <TranslationContext.Provider

@@ -43,7 +43,7 @@ export class MessagePathRepositoryClient {
   ): Promise<ResponseType<PathGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const allMessages = await getMessagesForThread(threadId);
+      const allMessages = await getMessagesForThread(threadId, logger);
 
       if (allMessages.length === 0) {
         return success({

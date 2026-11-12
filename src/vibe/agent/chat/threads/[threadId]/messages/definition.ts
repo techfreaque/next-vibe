@@ -375,7 +375,7 @@ const { GET } = createEndpoint({
         }
         const { getAudioQueue } =
           await import("../../../../ai-stream/stream/hooks/audio-queue");
-        getAudioQueue().enqueue(audioData, chunkIndex, logger);
+        getAudioQueue(logger).enqueue(audioData, chunkIndex, logger);
       },
     },
 
@@ -463,7 +463,11 @@ const { GET } = createEndpoint({
           typeof ctx.requestData["rootFolderId"] === "string"
             ? ctx.requestData["rootFolderId"]
             : "";
-        await finishIncognitoThreadIfIncognito(threadId, rootFolderId);
+        await finishIncognitoThreadIfIncognito(
+          threadId,
+          rootFolderId,
+          ctx.logger,
+        );
       },
     },
 

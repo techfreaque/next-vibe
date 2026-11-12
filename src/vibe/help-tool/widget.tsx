@@ -243,11 +243,20 @@ function _subscribeSidebarEntry(
   entry.listeners.add(listener);
   if (!entry.initialized) {
     entry.initialized = true;
-    void storage.getItem(storageId).then((stored) => {
-      const v =
-        stored !== null
-          ? (JSON.parse(stored) as boolean)
-          : getScreenWidth(logger) < 930;
+    void storage.getItem(storageId, logger).then((stored) => {
+      let v = getScreenWidth(logger) < 930;
+      if (stored !== null) {
+        try {
+          v = JSON.parse(stored) as boolean;
+        } catch (error) {
+          logger.warn("[storage] help sidebar state unparseable", {
+            key: storageId,
+            valueLength: stored.length,
+            errorMessage:
+              error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
       entry.collapsed = v;
       for (const l of entry.listeners) {
         l(v);
@@ -261,10 +270,14 @@ function _subscribeSidebarEntry(
 }
 
 /** Write a sidebar entry's collapsed value, persist it, and notify listeners. */
-function _setSidebarEntryCollapsed(storageId: string, value: boolean): void {
+function _setSidebarEntryCollapsed(
+  storageId: string,
+  value: boolean,
+  logger: ReturnType<typeof useLogger>,
+): void {
   const entry = _getOrCreateSidebarEntry(storageId);
   entry.collapsed = value;
-  void storage.setItem(storageId, JSON.stringify(value));
+  void storage.setItem(storageId, JSON.stringify(value), logger);
   for (const l of entry.listeners) {
     l(value);
   }
@@ -291,9 +304,9 @@ function useSidebarCollapsed(
   const setCollapsed = useCallback(
     (value: boolean): void => {
       setLocalCollapsed(value);
-      _setSidebarEntryCollapsed(storageId, value);
+      _setSidebarEntryCollapsed(storageId, value, logger);
     },
-    [storageId],
+    [storageId, logger],
   );
 
   return [collapsed, setCollapsed];
@@ -2711,6 +2724,7 @@ export function HelpToolsWidget(): JSX.Element {
         {selectedAdminEndpoint ? (
           <HelpAdminLayoutActiveContext.Provider value={true}>
             <EndpointsPage
+              logger={logger}
               key={selectedToolId ?? "tool"}
               endpoint={{
                 [selectedAdminEndpoint.method]: selectedAdminEndpoint,

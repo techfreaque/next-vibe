@@ -340,6 +340,7 @@ export class CronTasksRepository {
               `/tasks/${task.id}.md`,
               embeddingContent,
               rootlessToolExecutionContext(),
+              logger,
             );
           })
           .catch(() => {

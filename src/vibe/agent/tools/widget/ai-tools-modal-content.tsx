@@ -13,6 +13,7 @@ import {
 import { Maximize } from "next-vibe/ui/components/icons/Maximize";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Link } from "next-vibe/ui/components/link";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -34,6 +35,7 @@ export function AIToolsModalContent({
   user,
   platform,
 }: AIToolsModalContentProps): JSX.Element {
+  const logger = useWidgetLogger();
   const { t: toolsT } = scopedTranslation.scopedT(locale);
 
   return (
@@ -55,6 +57,7 @@ export function AIToolsModalContent({
       </DialogHeader>
 
       <EndpointsPage
+        logger={logger}
         endpoint={helpDefinitions}
         locale={locale}
         user={user}

@@ -13,6 +13,9 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
+import { reportStorageFailure } from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
+
 function cookiesDir(): string {
   return join(process.cwd(), ".tmp", "cookies");
 }
@@ -29,7 +32,10 @@ function ensureDir(): void {
   }
 }
 
-export async function getCookie(name: string): Promise<string | null> {
+export async function getCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<string | null> {
   try {
     const path = keyPath(name);
     if (!existsSync(path)) {
@@ -38,32 +44,61 @@ export async function getCookie(name: string): Promise<string | null> {
     const raw = readFileSync(path, "utf-8");
     const parsed = JSON.parse(raw) as { value: string };
     return parsed.value;
-  } catch {
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "cli",
+      area: "file",
+      operation: "get",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
     return null;
   }
 }
 
-export async function setCookie(name: string, value: string): Promise<void> {
+export async function setCookie(
+  name: string,
+  value: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     ensureDir();
     writeFileSync(keyPath(name), JSON.stringify({ value }), "utf-8");
-  } catch {
-    // Silent
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "cli",
+      area: "file",
+      operation: "set",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+      valueLength: value.length,
+    });
   }
 }
 
-export async function deleteCookie(name: string): Promise<void> {
+export async function deleteCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     const path = keyPath(name);
     if (existsSync(path)) {
       unlinkSync(path);
     }
-  } catch {
-    // Silent
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "cli",
+      area: "file",
+      operation: "remove",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
   }
 }
 
-export async function getAllCookies(): Promise<Record<string, string>> {
+export async function getAllCookies(
+  logger: EndpointLogger,
+): Promise<Record<string, string>> {
   try {
     const dir = cookiesDir();
     if (!existsSync(dir)) {
@@ -78,12 +113,26 @@ export async function getAllCookies(): Promise<Record<string, string>> {
         const parsed = JSON.parse(raw) as { value: string };
         const key = file.replace(/\.json$/, "");
         cookies[key] = parsed.value;
-      } catch {
-        // Skip corrupt file
+      } catch (error) {
+        // Skip corrupt file - but say which one
+        reportStorageFailure(logger, {
+          platform: "cli",
+          area: "file",
+          operation: "parse",
+          key: file,
+          error: error instanceof Error ? error : String(error),
+        });
       }
     }
     return cookies;
-  } catch {
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "cli",
+      area: "file",
+      operation: "list",
+      key: null,
+      error: error instanceof Error ? error : String(error),
+    });
     return {};
   }
 }

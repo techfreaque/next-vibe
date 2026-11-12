@@ -22,6 +22,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -62,6 +63,7 @@ export function UserCreateContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
 
   const [idCopied, setIdCopied] = useState(false);
 
@@ -88,7 +90,7 @@ export function UserCreateContainer({
 
   const handleCopyId = (userId: string): void => {
     void (async (): Promise<void> => {
-      await copyToClipboard(userId);
+      await copyToClipboard(userId, logger);
       setIdCopied(true);
       setTimeout(() => {
         setIdCopied(false);

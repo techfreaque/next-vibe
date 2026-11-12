@@ -110,7 +110,7 @@ export async function createAndSendUserMessage(
       // Load incognito thread messages and walk up parent chain
       const { getMessagesForThread } =
         await import("../../../chat/incognito/storage");
-      const threadMessages = await getMessagesForThread(threadId);
+      const threadMessages = await getMessagesForThread(threadId, logger);
 
       // Walk up parent chain to get only messages in this branch
       messageHistory = [];
@@ -138,7 +138,7 @@ export async function createAndSendUserMessage(
     if (currentRootFolderId === DefaultFolderId.INCOGNITO && threadId) {
       const { getIncognitoThread } =
         await import("../../../chat/incognito/storage");
-      const incognitoThread = await getIncognitoThread(threadId);
+      const incognitoThread = await getIncognitoThread(threadId, logger);
       incognitoThreadTitle = incognitoThread?.title ?? null;
       incognitoThreadDescription = incognitoThread?.description ?? null;
     }
@@ -219,7 +219,7 @@ export async function createAndSendUserMessage(
       // transcription, which arrives through the echo.
       if (currentRootFolderId === DefaultFolderId.INCOGNITO && !audioInput) {
         const { saveMessage } = await import("../../../chat/incognito/storage");
-        await saveMessage(optimisticUserMessage);
+        await saveMessage(optimisticUserMessage, logger);
       }
 
       // Immediately switch the visible branch to the new message.

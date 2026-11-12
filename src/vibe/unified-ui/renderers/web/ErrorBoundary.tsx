@@ -14,6 +14,10 @@ import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Pre } from "next-vibe/ui/components/pre";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
+import { createClientLogger } from "../../../logger/client";
+import { reportRenderError } from "../../../logger/report-render-error";
+import type { EndpointLogger } from "../../../logger/types";
+import { LoggerContext } from "next-vibe/ui/hooks/logger-provider";
 import { type WidgetErrorBoundaryProps } from "../../_shared/react-types";
 import { scopedTranslation } from "../../hooks/i18n";
 /**
@@ -33,6 +37,9 @@ export class WidgetErrorBoundary extends Component<
   WidgetErrorBoundaryProps,
   WidgetErrorBoundaryState
 > {
+  static contextType = LoggerContext;
+  declare context: EndpointLogger | null;
+
   constructor(props: WidgetErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -60,6 +67,15 @@ export class WidgetErrorBoundary extends Component<
     // console.error is the standard and appropriate way to log in React ErrorBoundaries
     // eslint-disable-next-line no-console -- ErrorBoundary requires console.error for client-side error visibility
     console.error("Widget rendering error:", error, errorInfo);
+
+    // Persist: the widget shows a fallback card, the user sees a broken panel.
+    reportRenderError({
+      // Outside a LoggerProvider (rare) a fresh client logger still reports
+      logger: this.context ?? createClientLogger(false, this.props.locale),
+      boundary: "WidgetErrorBoundary",
+      error,
+      componentStack: errorInfo.componentStack,
+    });
 
     // Call error callback if provided for custom handling (error reporting services, etc.)
     if (this.props.onError) {

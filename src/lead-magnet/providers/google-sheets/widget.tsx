@@ -1,5 +1,6 @@
 "use client";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
@@ -68,12 +69,19 @@ export function GoogleSheetsWidget(): JSX.Element {
       newUrl.searchParams.delete("gs_connected");
       silentReplaceState(newUrl.toString());
     }
-    if (params.get("gs_error")) {
+    const oauthError = params.get("gs_error");
+    if (oauthError) {
+      // OAuth callback bounced back with an error - user stays disconnected
+      logger.warn("Google Sheets OAuth returned an error", {
+        component: "GoogleSheetsWidget",
+        operation: "oauthCallback",
+        oauthError: oauthError.slice(0, 200),
+      });
       const newUrl = new URL(getCurrentUrl());
       newUrl.searchParams.delete("gs_error");
       silentReplaceState(newUrl.toString());
     }
-  }, []);
+  }, [logger]);
 
   const fetchSheets = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -145,7 +153,11 @@ export function GoogleSheetsWidget(): JSX.Element {
           locale,
         );
         endpointMutations?.read?.refetch?.();
-      } catch {
+      } catch (error) {
+        logger.error("Google Sheets save threw", parseError(error), {
+          component: "GoogleSheetsWidget",
+          operation: "saveSheetConfig",
+        });
         setSaveError(t("providers.googleSheets.widget.saveFailed"));
       } finally {
         setSaving(false);

@@ -16,7 +16,10 @@ import { Image } from "next-vibe/ui/components/image";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { Video } from "next-vibe/ui/components/video";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -98,6 +101,8 @@ export function FileAttachments({
 function createBlobUrlFromBase64(
   data: string,
   mimeType: string,
+  logger: EndpointLogger,
+  attachmentId: string,
 ): string | null {
   try {
     const byteString = atob(data);
@@ -108,8 +113,19 @@ function createBlobUrlFromBase64(
     }
     const blob = new Blob([ab], { type: mimeType });
     return URL.createObjectURL(blob);
-  } catch {
-    // Failed to generate blob URL
+  } catch (error) {
+    // Failed to generate blob URL - attachment falls back to generic card
+    logger.error(
+      "Chat: Failed to decode inline attachment to blob URL",
+      parseError(error),
+      {
+        component: "FileAttachmentItem",
+        operation: "createBlobUrlFromBase64",
+        attachmentId,
+        mimeType,
+        base64Length: data.length,
+      },
+    );
     return null;
   }
 }
@@ -122,6 +138,7 @@ function FileAttachmentItem({
 }: {
   attachment: FileAttachment;
 }): JSX.Element {
+  const logger = useWidgetLogger();
   const [displayUrl, setDisplayUrl] = useState<string | null>(
     attachment.url || null,
   );
@@ -140,7 +157,12 @@ function FileAttachmentItem({
       if (cancelled) {
         return;
       }
-      blobUrl = createBlobUrlFromBase64(data, attachment.mimeType);
+      blobUrl = createBlobUrlFromBase64(
+        data,
+        attachment.mimeType,
+        logger,
+        attachment.id,
+      );
       if (blobUrl) {
         setDisplayUrl(blobUrl);
       }
@@ -152,7 +174,13 @@ function FileAttachmentItem({
         URL.revokeObjectURL(blobUrl);
       }
     };
-  }, [attachment.data, attachment.url, attachment.mimeType]);
+  }, [
+    attachment.data,
+    attachment.url,
+    attachment.mimeType,
+    attachment.id,
+    logger,
+  ]);
 
   if (!displayUrl) {
     return <GenericAttachment attachment={attachment} displayUrl={null} />;

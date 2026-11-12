@@ -39,7 +39,7 @@ type ResultProps = Parameters<typeof handleToolResult>[0];
 
 function makeIncomingProps(
   overrides: Pick<IncomingProps, "requestData" | "payload"> & {
-    logger?: ReturnType<typeof createEndpointLogger>;
+    logger: ReturnType<typeof createEndpointLogger>;
   },
 ): IncomingProps {
   return {
@@ -58,7 +58,7 @@ function makeIncomingProps(
 
 function makeResultProps(
   overrides: Pick<ResultProps, "responseData"> & {
-    logger?: ReturnType<typeof createEndpointLogger>;
+    logger: ReturnType<typeof createEndpointLogger>;
   },
 ): ResultProps {
   return {

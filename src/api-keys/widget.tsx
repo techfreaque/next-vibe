@@ -55,6 +55,7 @@ function CopyBlock({
   copiedLabel: string;
 }): JSX.Element {
   const [copied, setCopied] = useState(false);
+  const logger = useWidgetLogger();
   return (
     <Div className="flex items-start gap-2 rounded-lg border bg-muted/40 p-3">
       <Span className="min-w-0 flex-1 whitespace-pre-wrap break-all font-mono text-xs">
@@ -67,7 +68,7 @@ function CopyBlock({
         className="h-9 shrink-0 gap-1.5"
         onClick={(): void => {
           void (async (): Promise<void> => {
-            setCopied(await copyToClipboard(text));
+            setCopied(await copyToClipboard(text, logger));
           })();
         }}
       >

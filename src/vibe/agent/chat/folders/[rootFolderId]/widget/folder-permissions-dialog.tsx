@@ -34,6 +34,7 @@ export function FolderPermissionsDialog({
   folderName,
   locale,
   user,
+  logger,
 }: FolderPermissionsDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const platform = useWidgetPlatform();
@@ -66,6 +67,7 @@ export function FolderPermissionsDialog({
         </DialogHeader>
 
         <EndpointsPage
+          logger={logger}
           endpoint={folderPermissionsDefinitions}
           locale={locale}
           user={user}

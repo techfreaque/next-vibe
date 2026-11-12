@@ -35,7 +35,7 @@ export class VoteRepositoryClient {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const messages = await getMessagesForThread(threadId);
+      const messages = await getMessagesForThread(threadId, logger);
       const message = messages.find((m) => m.id === messageId);
 
       if (!message) {
@@ -99,14 +99,18 @@ export class VoteRepositoryClient {
         (message.downvotes ?? 0) + downvotesDelta,
       );
 
-      await updateIncognitoMessage(messageId, {
-        upvotes: newUpvotes,
-        downvotes: newDownvotes,
-        metadata: {
-          ...message.metadata,
-          voteDetails: currentVoteDetails,
+      await updateIncognitoMessage(
+        messageId,
+        {
+          upvotes: newUpvotes,
+          downvotes: newDownvotes,
+          metadata: {
+            ...message.metadata,
+            voteDetails: currentVoteDetails,
+          },
         },
-      });
+        logger,
+      );
 
       logger.debug("Vote client: vote stored in localStorage", {
         messageId,

@@ -11,6 +11,7 @@ import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -31,6 +32,7 @@ export function SettingsPageClient({
   user,
   platform,
 }: SettingsPageClientProps): JSX.Element {
+  const logger = useLogger();
   const { t } = pageT.scopedT(locale);
 
   if (!isAuthenticated) {
@@ -80,6 +82,7 @@ export function SettingsPageClient({
           </P>
         </Div>
         <EndpointsPage
+          logger={logger}
           endpoint={meDefinition}
           forceMethod="POST"
           user={user}

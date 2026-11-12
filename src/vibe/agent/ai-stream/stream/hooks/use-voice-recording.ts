@@ -9,7 +9,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
-import { useEdenAISpeech } from "../../../speech-to-text/hooks";
+import {
+  type SttErrorDetails,
+  useEdenAISpeech,
+} from "../../../speech-to-text/hooks";
 
 /** Recording submit mode - determines what happens after recording stops */
 type RecordingSubmitMode = "toInput" | "directSubmit" | "transcribeAndSubmit";
@@ -113,11 +116,19 @@ export function useVoiceRecording({
   );
 
   const onError = useCallback(
-    (err: string) => {
-      // Every STT failure shown to the user (incl. "recording too short",
-      // which the hook does not log itself). Genuine failures are ALSO logged
-      // at error with full context inside the STT hook.
-      logger.warn("Voice input error", { error: err });
+    (err: string, details?: SttErrorDetails) => {
+      // Every STT failure shown to the user (incl. "recording too short").
+      // Genuine failures are ALSO logged at error with full context inside
+      // the STT hook. Mic failures carry errorName (NotFoundError = no device,
+      // NotAllowedError = permission denied, NotReadableError = mic busy),
+      // permission state, device count and secure-context flag.
+      logger.warn("Voice input error", {
+        error: err,
+        errorName: details?.errorName ?? null,
+        permissionState: details?.permissionState ?? null,
+        audioInputCount: details?.audioInputCount ?? null,
+        isSecureContext: details?.isSecureContext ?? null,
+      });
     },
     [logger],
   );

@@ -97,6 +97,14 @@ export const CSRF_TOKEN_COOKIE_NAME = `csrf_token${PORT_SUFFIX}`;
 export const CSRF_TOKEN_HEADER_NAME = "x-csrf-token";
 
 /**
+ * Per-call correlation id. The browser mints one per endpoint call
+ * (unified-ui/hooks/call-api.ts), the Next handler stamps it on every server
+ * log row of that request, and the client puts it on its own failure report -
+ * so client and server error_logs rows for one failure can be matched.
+ */
+export const REQUEST_ID_HEADER_NAME = "x-request-id";
+
+/**
  * Separator used in the Bearer token to embed leadId alongside the JWT.
  * Format: "Authorization: Bearer <jwtToken>####<leadId>"
  * For public (unauthenticated) callers: "Bearer ####<leadId>"

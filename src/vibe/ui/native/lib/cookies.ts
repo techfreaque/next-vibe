@@ -5,15 +5,28 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { reportStorageFailure } from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
+
 /**
  * Get a cookie value by name (uses AsyncStorage for native)
  * @param name - The cookie name
  * @returns Promise resolving to the value or null if not found
  */
-export async function getCookie(name: string): Promise<string | null> {
+export async function getCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<string | null> {
   try {
     return await AsyncStorage.getItem(name);
-  } catch {
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "native",
+      area: "asyncStorage",
+      operation: "get",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
     return null;
   }
 }
@@ -23,11 +36,22 @@ export async function getCookie(name: string): Promise<string | null> {
  * @param name - The cookie name
  * @param value - The value to set
  */
-export async function setCookie(name: string, value: string): Promise<void> {
+export async function setCookie(
+  name: string,
+  value: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     await AsyncStorage.setItem(name, value);
-  } catch {
-    // Silent error handling
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "native",
+      area: "asyncStorage",
+      operation: "set",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+      valueLength: value.length,
+    });
   }
 }
 
@@ -35,11 +59,20 @@ export async function setCookie(name: string, value: string): Promise<void> {
  * Delete a cookie (uses AsyncStorage for native)
  * @param name - The cookie name to remove
  */
-export async function deleteCookie(name: string): Promise<void> {
+export async function deleteCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     await AsyncStorage.removeItem(name);
-  } catch {
-    // Silent error handling
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "native",
+      area: "asyncStorage",
+      operation: "remove",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
   }
 }
 
@@ -47,7 +80,9 @@ export async function deleteCookie(name: string): Promise<void> {
  * Get all cookies as an object (uses AsyncStorage for native)
  * @returns Promise resolving to an object with names and values
  */
-export async function getAllCookies(): Promise<Record<string, string>> {
+export async function getAllCookies(
+  logger: EndpointLogger,
+): Promise<Record<string, string>> {
   try {
     const keys = await AsyncStorage.getAllKeys();
     const cookies: Record<string, string> = {};
@@ -60,7 +95,14 @@ export async function getAllCookies(): Promise<Record<string, string>> {
     }
 
     return cookies;
-  } catch {
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "native",
+      area: "asyncStorage",
+      operation: "list",
+      key: null,
+      error: error instanceof Error ? error : String(error),
+    });
     return {};
   }
 }

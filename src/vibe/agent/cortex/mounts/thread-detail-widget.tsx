@@ -10,6 +10,7 @@
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -70,6 +71,7 @@ function extractThreadInfo(path: string): ThreadPathInfo | null {
 export function ThreadDetailWidget({
   path,
 }: ThreadDetailWidgetProps): React.JSX.Element | null {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -82,6 +84,7 @@ export function ThreadDetailWidget({
 
   return (
     <EndpointsPage
+      logger={logger}
       endpoint={messagesDefinitions}
       locale={locale}
       user={user}

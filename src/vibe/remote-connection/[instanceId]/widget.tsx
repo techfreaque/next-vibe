@@ -409,6 +409,7 @@ function ViewWidget({
             <P>✓ {t("widget.notConnected.benefit3")}</P>
           </Div>
           <EndpointsPage
+            logger={logger}
             endpoint={connectDefinitions}
             locale={locale}
             user={user}

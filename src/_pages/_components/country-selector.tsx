@@ -75,7 +75,13 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
         pathParams: undefined,
         locale: newLocale,
         user,
-      }).catch(() => undefined);
+      }).catch((error: Error) => {
+        logger.error("Locale sync to profile threw", error, {
+          component: "CountrySelector",
+          operation: "syncLocale",
+          locale: newLocale,
+        });
+      });
     },
     [user, logger],
   );

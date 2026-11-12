@@ -9,6 +9,11 @@
 
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import {
+  classifyPlayRejection,
+  describeAudioElement,
+} from "../../../text-to-speech/audio-diagnostics";
+
 /** How many seconds before the current chunk ends to start preloading the next */
 const PREFETCH_LEAD_TIME_S = 5;
 
@@ -31,6 +36,12 @@ export class AudioQueueManager {
   private prefetchTriggered = false;
   /** Cleanup function for listeners attached to the currently-playing audio element */
   private currentAudioCleanup: (() => void) | null = null;
+  /** Logger from the most recent enqueue() - used by paths without a logger arg (stop, prefetch) */
+  private logger: EndpointLogger;
+
+  constructor(logger: EndpointLogger) {
+    this.logger = logger;
+  }
 
   /**
    * Update voice mode store with playback state
@@ -41,8 +52,14 @@ export class AudioQueueManager {
         useVoiceModeStore.getState().setSpeaking(isPlaying);
         return undefined;
       })
-      .catch(() => {
-        // Silently fail - voice mode store not available
+      .catch((error: Error) => {
+        // Voice mode store chunk failed to load - speaking indicator goes stale
+        this.logger.warn("[TTS-PLAY] Failed to load voice mode store", {
+          error: error.message,
+          component: "AudioQueueManager",
+          operation: "updateVoiceModeStore",
+          isPlaying,
+        });
       });
   }
 
@@ -50,6 +67,7 @@ export class AudioQueueManager {
    * Add audio chunk to queue
    */
   enqueue(audioData: string, chunkIndex: number, logger: EndpointLogger): void {
+    this.logger = logger;
     this.queue.push({ audioData, chunkIndex });
     // Sort by chunk index to ensure correct order
     this.queue.sort((a, b) => a.chunkIndex - b.chunkIndex);
@@ -104,6 +122,15 @@ export class AudioQueueManager {
       await loadPromise;
     } catch {
       // Preload failed - will fall back to direct play
+      this.logger.warn("[TTS-PLAY] Audio chunk preload failed", {
+        component: "AudioQueueManager",
+        operation: "preloadAudio",
+        chunkIndex,
+        mediaErrorCode: audio.error?.code ?? null,
+        mediaErrorMessage: audio.error?.message ?? null,
+        audioDataLength: audioData.length,
+        mimePrefix: audioData.slice(0, audioData.indexOf(",") + 1).slice(0, 40),
+      });
     }
   }
 
@@ -130,7 +157,8 @@ export class AudioQueueManager {
       await this.playAudio(next.audioData, next.chunkIndex, logger);
       this.nextExpectedChunk = next.chunkIndex + 1;
     } catch {
-      // Playback failed - continue with next chunk
+      // Playback failed - continue with next chunk. The failure itself is
+      // already logged in playAudio (media error / play() rejection).
     }
 
     // Check if there are more chunks to play
@@ -285,6 +313,15 @@ export class AudioQueueManager {
       };
 
       const onError = (e: Event): void => {
+        logger.error("[TTS-PLAY] Audio chunk playback error", {
+          ...describeAudioElement(audio),
+          component: "AudioQueueManager",
+          operation: "playAudio",
+          chunkIndex,
+          mediaErrorCode: audio.error?.code ?? null,
+          mediaErrorMessage: audio.error?.message ?? null,
+          audioDataLength: audioData.length,
+        });
         audio.removeEventListener("ended", onEnded);
         audio.removeEventListener("error", onError);
         this.clearPrefetchTimer();
@@ -299,16 +336,28 @@ export class AudioQueueManager {
       // If audio is already loaded (preloaded case), play immediately
       // Otherwise wait for canplaythrough before playing
       if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        audio.play().catch((e) => {
-          logger.error("[TTS-PLAY] play() failed", e);
+        audio.play().catch((e: Error) => {
+          logger.error("[TTS-PLAY] play() failed", e, {
+            ...describeAudioElement(audio),
+            component: "AudioQueueManager",
+            chunkIndex,
+            failureKind: classifyPlayRejection(e),
+            audioDataLength: audioData.length,
+          });
           reject(e);
         });
       } else {
         const onCanPlay = (): void => {
           audio.removeEventListener("canplaythrough", onCanPlay);
 
-          audio.play().catch((e) => {
-            logger.error("[TTS-PLAY] play() failed", e);
+          audio.play().catch((e: Error) => {
+            logger.error("[TTS-PLAY] play() failed", e, {
+              ...describeAudioElement(audio),
+              component: "AudioQueueManager",
+              chunkIndex,
+              failureKind: classifyPlayRejection(e),
+              audioDataLength: audioData.length,
+            });
             reject(e);
           });
         };
@@ -376,9 +425,9 @@ export class AudioQueueManager {
 // Singleton instance for global access
 let audioQueueInstance: AudioQueueManager | null = null;
 
-export function getAudioQueue(): AudioQueueManager {
+export function getAudioQueue(logger: EndpointLogger): AudioQueueManager {
   if (!audioQueueInstance) {
-    audioQueueInstance = new AudioQueueManager();
+    audioQueueInstance = new AudioQueueManager(logger);
   }
   return audioQueueInstance;
 }

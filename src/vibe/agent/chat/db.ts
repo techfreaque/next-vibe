@@ -210,6 +210,12 @@ export type MessageMetadata = {
   /** Client-only: marks an optimistic placeholder added before server confirms */
   isOptimistic?: boolean;
   /**
+   * Client-only: the message exists only in this browser's cache (e.g. the
+   * error bubble addErrorMessageToChat inserts when a send fails before the
+   * server committed anything). Never a valid server parentId.
+   */
+  isLocalOnly?: boolean;
+  /**
    * Provider-issued reasoning replay data (e.g. Anthropic extended-thinking
    * signature / redacted-thinking payload). Required alongside the <think>
    * text to re-send a valid reasoning block as history on the next turn.

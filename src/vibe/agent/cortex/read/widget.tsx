@@ -15,6 +15,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
   useWidgetDisabled,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -41,11 +42,23 @@ export function CortexReadWidget({
   const t = useWidgetTranslation<typeof definition.GET>();
   const isDisabled = useWidgetDisabled();
   const navigation = useWidgetNavigation();
+  const logger = useWidgetLogger();
   const isPushed = navigation.canGoBack;
 
   const handleCopy = (): void => {
     if (value?.content) {
-      void copyToClipboard(value.content);
+      const textLength = value.content.length;
+      void copyToClipboard(value.content, logger).then((copiedOk) => {
+        if (!copiedOk) {
+          logger.warn("Clipboard write failed", {
+            component: "CortexReadWidget",
+            operation: "copyContent",
+            textLength,
+            isSecureContext: globalThis.isSecureContext,
+          });
+        }
+        return undefined;
+      });
     }
   };
 

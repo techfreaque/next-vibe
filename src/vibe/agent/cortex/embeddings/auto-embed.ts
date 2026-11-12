@@ -35,7 +35,7 @@ export interface EmbedOptions {
   /** Locale for credit translation strings (only needed when billCredits) */
   locale?: CountryLanguage;
   /** Logger for credit deduction (only needed when billCredits) */
-  logger?: EndpointLogger;
+  logger: EndpointLogger;
   /** Feature name for usage history */
   feature?: CortexCreditFeatureValue;
   /** Fixture chain of the triggering execution — binds the embedding call. */

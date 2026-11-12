@@ -4,6 +4,7 @@
 
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import {
   Collapsible,
@@ -833,12 +834,21 @@ export function SkillViewContainer({
     if (!prompt) {
       return;
     }
-    void copyToClipboard(prompt).then(() => {
+    void copyToClipboard(prompt, logger).then((copiedOk) => {
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "SkillDetailWidget",
+          operation: "copySystemPrompt",
+          skillId,
+          textLength: prompt.length,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setPromptCopied(true);
       setTimeout(() => setPromptCopied(false), 2000);
       return undefined;
     });
-  }, [skillData?.systemPrompt]);
+  }, [skillData?.systemPrompt, skillId, logger]);
 
   // System prompt collapsible section (shared across modes)
   const SystemPromptSection = (
@@ -2643,8 +2653,17 @@ function CreatorOtherSkills({
           );
           setSkills(filtered.slice(0, 6));
         }
-      } catch {
-        // Silent fail - optional section
+      } catch (error) {
+        // Optional section - stays hidden, but the failure is reported
+        logger.warn(
+          "Failed to load related community skills",
+          parseError(error),
+          {
+            component: "RelatedSkills",
+            operation: "loadRelatedSkills",
+            currentSkillId,
+          },
+        );
       }
       setLoaded(true);
     })();

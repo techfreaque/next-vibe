@@ -54,7 +54,7 @@ export class AuthClientRepository {
       }
 
       // Use platform-agnostic storage (localStorage for web, AsyncStorage for React Native)
-      const token = await storage.getItem(AUTH_TOKEN_STORAGE_KEY);
+      const token = await storage.getItem(AUTH_TOKEN_STORAGE_KEY, logger);
       logger.debug("Auth token retrieved", {
         hasToken: !!token,
         platform: platform.isReactNative ? "React Native" : "Web",
@@ -93,7 +93,7 @@ export class AuthClientRepository {
       }
 
       // Use platform-agnostic storage (localStorage for web, AsyncStorage for React Native)
-      await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+      await storage.removeItem(AUTH_TOKEN_STORAGE_KEY, logger);
       logger.debug("Auth token removed successfully", {
         platform: platform.isReactNative ? "React Native" : "Web",
       });

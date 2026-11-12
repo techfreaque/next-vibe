@@ -22,7 +22,10 @@ import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-fiel
 import { z } from "zod";
 
 import type { ChatModelSelection } from "../ai-stream/models";
-import { chatModelSelectionSchema } from "../ai-stream/models";
+import {
+  chatModelSelectionResponseSchema,
+  chatModelSelectionSchema,
+} from "../ai-stream/models";
 import type {
   AudioVisionModelSelection,
   ImageVisionModelSelection,
@@ -374,3 +377,55 @@ export const skillVariantSchema: z.ZodType<SkillVariantData> = z.object({
  */
 export const skillVariantsSchema: z.ZodType<SkillVariantData[]> =
   z.array(skillVariantSchema);
+
+/**
+ * RESPONSE-side variant: tolerant of model ids this bundle does not know (a tab
+ * running a bundle from before a model-catalog refresh, reading a skill whose
+ * variants point at newer models). Unknown chat picks degrade to auto
+ * selection, unknown per-modality picks to null (cascade to settings) - instead
+ * of failing validation of the whole skill. Never use for request fields.
+ */
+export const skillVariantResponseSchema: z.ZodType<SkillVariantData> = z.object(
+  {
+    id: z.string(),
+    displayName: z.string().optional(),
+    modelSelection: chatModelSelectionResponseSchema,
+    imageGenModelSelection: imageGenModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    musicGenModelSelection: musicGenModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    videoGenModelSelection: videoGenModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    voiceModelSelection: voiceModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    sttModelSelection: sttModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    imageVisionModelSelection: imageVisionModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    videoVisionModelSelection: videoVisionModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    audioVisionModelSelection: audioVisionModelSelectionSchema
+      .nullable()
+      .optional()
+      .catch(null),
+    isDefault: z.boolean().optional(),
+  },
+);
+
+/** Pre-typed array of response-side variants (see skillVariantResponseSchema). */
+export const skillVariantsResponseSchema: z.ZodType<SkillVariantData[]> =
+  z.array(skillVariantResponseSchema);

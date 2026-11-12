@@ -272,6 +272,37 @@ export const chatModelSelectionSchema: z.ZodType<
   filtersSelectionSchema,
 ]);
 
+/**
+ * A MANUAL pick whose id this bundle does not know. Happens when a browser tab
+ * still runs a bundle from before a model-catalog refresh and the server
+ * returns a newer id. Degrades to filter-based auto-selection with the same
+ * filter/sort props instead of failing the whole response.
+ */
+const unknownManualChatModelSelectionSchema = z
+  .object({
+    selectionType: z.literal(ModelSelectionType.MANUAL),
+    manualModelId: z.string(),
+  })
+  .merge(sharedFilterPropsSchema)
+  .transform((selection): FiltersModelSelection => ({
+    selectionType: ModelSelectionType.FILTERS,
+    intelligenceRange: selection.intelligenceRange,
+    priceRange: selection.priceRange,
+    contentRange: selection.contentRange,
+    sortBy: selection.sortBy,
+    sortDirection: selection.sortDirection,
+    sortBy2: selection.sortBy2,
+    sortDirection2: selection.sortDirection2,
+  }));
+
+/**
+ * RESPONSE-side chat model selection: strict schema first, then the unknown-id
+ * fallback above. Never use for request fields - an unknown id sent TO the
+ * server is a real error, not version skew.
+ */
+export const chatModelSelectionResponseSchema: z.ZodType<ChatModelSelection> =
+  z.union([chatModelSelectionSchema, unknownManualChatModelSelectionSchema]);
+
 // ============================================================
 // LEGACY → SUCCESSOR RESOLUTION
 // ============================================================

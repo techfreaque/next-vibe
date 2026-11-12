@@ -60,7 +60,7 @@ export async function branchMessage(
   if (!message && currentRootFolderId === DefaultFolderId.INCOGNITO) {
     const { getMessagesForThread } =
       await import("../../../chat/incognito/storage");
-    const msgs = await getMessagesForThread(activeThreadId);
+    const msgs = await getMessagesForThread(activeThreadId, logger);
     message = msgs.find((m) => m.id === messageId);
   }
 

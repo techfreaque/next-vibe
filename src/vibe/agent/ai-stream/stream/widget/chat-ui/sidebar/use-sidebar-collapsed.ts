@@ -12,7 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { getScreenWidth } from "next-vibe/ui/lib/screen";
 import { getLocalItem, setLocalItem } from "next-vibe/ui/lib/storage";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { create } from "zustand";
 
 const STORAGE_KEY = "sidebar-collapsed";
@@ -25,7 +25,7 @@ interface SidebarState {
   /** Whether the storage/screen-size check has completed */
   ready: boolean;
   /** Toggle or set collapsed state. Persists to storage. */
-  setCollapsed: (collapsed: boolean) => void;
+  setCollapsed: (collapsed: boolean, logger: EndpointLogger) => void;
   /** Load initial state from storage or screen size. Called once on mount. */
   initialize: (logger: EndpointLogger) => void;
 }
@@ -35,9 +35,9 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
   initialized: false,
   ready: false,
 
-  setCollapsed: (collapsed): void => {
+  setCollapsed: (collapsed, logger): void => {
     set({ collapsed, ready: true });
-    setLocalItem(STORAGE_KEY, String(collapsed));
+    setLocalItem(STORAGE_KEY, String(collapsed), logger);
   },
 
   initialize: (logger): void => {
@@ -45,7 +45,7 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
       return;
     }
     // Synchronous read on mount: state and UI agree before anyone can tap the toggle
-    const stored = getLocalItem(STORAGE_KEY);
+    const stored = getLocalItem(STORAGE_KEY, logger);
     set({
       initialized: true,
       ready: true,
@@ -64,7 +64,7 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
  */
 export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   const collapsed = useSidebarStore((s) => s.collapsed);
-  const setCollapsed = useSidebarStore((s) => s.setCollapsed);
+  const setCollapsedInStore = useSidebarStore((s) => s.setCollapsed);
   const initialize = useSidebarStore((s) => s.initialize);
   const logger = useLogger();
 
@@ -77,6 +77,11 @@ export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   useEffect(() => {
     initialize(logger);
   }, [initialize, logger]);
+
+  const setCollapsed = useCallback(
+    (next: boolean): void => setCollapsedInStore(next, logger),
+    [setCollapsedInStore, logger],
+  );
 
   return [collapsed, setCollapsed];
 }

@@ -9,6 +9,9 @@
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { storage } from "next-vibe/ui/lib/storage";
 
+import { reportStorageFailure } from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
+
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import {
   ThreadModerationStatus,
@@ -43,16 +46,32 @@ export interface IncognitoState {
 /**
  * Get item from storage with error handling
  */
-async function getItem<T>(key: string, defaultValue: T): Promise<T> {
+async function getItem<T>(
+  key: string,
+  defaultValue: T,
+  logger: EndpointLogger,
+): Promise<T> {
   if (typeof window === "undefined") {
     return defaultValue;
   }
 
+  // storage.getItem reports its own read failures
+  const item = await storage.getItem(key, logger);
+  if (!item) {
+    return defaultValue;
+  }
   try {
-    const item = await storage.getItem(key);
-    return item ? (JSON.parse(item) as T) : defaultValue;
-  } catch {
-    // Silent fail - return default value
+    return JSON.parse(item) as T;
+  } catch (error) {
+    // Corrupt incognito blob: the user's local threads/messages look empty
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "localStorage",
+      operation: "parse",
+      key: `incognito:${key}`,
+      error: error instanceof Error ? error : String(error),
+      valueLength: item.length,
+    });
     return defaultValue;
   }
 }
@@ -60,45 +79,71 @@ async function getItem<T>(key: string, defaultValue: T): Promise<T> {
 /**
  * Set item in storage with error handling
  */
-async function setItem<T>(key: string, value: T): Promise<void> {
+async function setItem<T>(
+  key: string,
+  value: T,
+  logger: EndpointLogger,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
 
+  let serialized: string;
   try {
-    await storage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Silent fail - storage might be full or disabled
+    serialized = JSON.stringify(value);
+  } catch (error) {
+    // Circular/BigInt value - the incognito write is lost
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "localStorage",
+      operation: "set",
+      key: `incognito:${key}`,
+      error: error instanceof Error ? error : String(error),
+    });
+    return;
   }
+  // storage.setItem reports quota/security failures with the key + size
+  await storage.setItem(key, serialized, logger);
 }
 
 /**
  * Load all incognito state from storage
  */
-export async function loadIncognitoState(): Promise<IncognitoState> {
+export async function loadIncognitoState(
+  logger: EndpointLogger,
+): Promise<IncognitoState> {
   return {
-    threads: await getItem(STORAGE_KEYS.THREADS, {}),
-    messages: await getItem(STORAGE_KEYS.MESSAGES, {}),
-    folders: await getItem(STORAGE_KEYS.FOLDERS, {}),
-    activeThreadId: await getItem(STORAGE_KEYS.ACTIVE_THREAD, null),
+    threads: await getItem(STORAGE_KEYS.THREADS, {}, logger),
+    messages: await getItem(STORAGE_KEYS.MESSAGES, {}, logger),
+    folders: await getItem(STORAGE_KEYS.FOLDERS, {}, logger),
+    activeThreadId: await getItem(STORAGE_KEYS.ACTIVE_THREAD, null, logger),
     currentRootFolderId: await getItem(
       STORAGE_KEYS.CURRENT_ROOT_FOLDER,
       "incognito",
+      logger,
     ),
-    currentSubFolderId: await getItem(STORAGE_KEYS.CURRENT_SUB_FOLDER, null),
+    currentSubFolderId: await getItem(
+      STORAGE_KEYS.CURRENT_SUB_FOLDER,
+      null,
+      logger,
+    ),
   };
 }
 
 /**
  * Save thread to storage
  */
-export async function saveThread(thread: ChatThread): Promise<void> {
+export async function saveThread(
+  thread: ChatThread,
+  logger: EndpointLogger,
+): Promise<void> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
   threads[thread.id] = thread;
-  await setItem(STORAGE_KEYS.THREADS, threads);
+  await setItem(STORAGE_KEYS.THREADS, threads, logger);
 }
 
 /**
@@ -110,7 +155,10 @@ let messageSaveQueue: Promise<void> = Promise.resolve();
  * Save message to storage
  * Uses a queue to prevent concurrent writes from causing race conditions
  */
-export async function saveMessage(message: ChatMessage): Promise<void> {
+export async function saveMessage(
+  message: ChatMessage,
+  logger: EndpointLogger,
+): Promise<void> {
   // Never persist optimistic placeholders - they are ephemeral UI state and
   // would show as orphaned branches on reload.
   if (message.metadata?.isOptimistic) {
@@ -118,16 +166,25 @@ export async function saveMessage(message: ChatMessage): Promise<void> {
   }
 
   // Chain this save operation after the previous one completes.
-  // .catch(() => {}) ensures a failed predecessor doesn't break the chain.
+  // The catch keeps a failed predecessor from breaking the chain.
   messageSaveQueue = messageSaveQueue
-    .catch(() => undefined)
+    .catch((error: Error) => {
+      logger.warn("[incognito] previous queued message save failed", {
+        nextMessageId: message.id,
+        threadId: message.threadId,
+        errorName: error instanceof Error ? error.name : "UnknownError",
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
+      return undefined;
+    })
     .then(async () => {
       const messages = await getItem<Record<string, ChatMessage>>(
         STORAGE_KEYS.MESSAGES,
         {},
+        logger,
       );
       messages[message.id] = message;
-      await setItem(STORAGE_KEYS.MESSAGES, messages);
+      await setItem(STORAGE_KEYS.MESSAGES, messages, logger);
       return undefined;
     });
 
@@ -141,10 +198,12 @@ export async function saveMessage(message: ChatMessage): Promise<void> {
 export async function updateIncognitoFolder(
   folderId: string,
   updates: Partial<ChatFolder>,
+  logger: EndpointLogger,
 ): Promise<void> {
   const folders = await getItem<Record<string, ChatFolder>>(
     STORAGE_KEYS.FOLDERS,
     {},
+    logger,
   );
   const folder = folders[folderId];
 
@@ -154,60 +213,74 @@ export async function updateIncognitoFolder(
       ...updates,
       updatedAt: new Date(),
     };
-    await setItem(STORAGE_KEYS.FOLDERS, folders);
+    await setItem(STORAGE_KEYS.FOLDERS, folders, logger);
   }
 }
 
 /**
  * Delete thread from storage
  */
-export async function deleteThread(threadId: string): Promise<void> {
+export async function deleteThread(
+  threadId: string,
+  logger: EndpointLogger,
+): Promise<void> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
   delete threads[threadId];
-  await setItem(STORAGE_KEYS.THREADS, threads);
+  await setItem(STORAGE_KEYS.THREADS, threads, logger);
 
   // Also delete all messages in this thread
   const messages = await getItem<Record<string, ChatMessage>>(
     STORAGE_KEYS.MESSAGES,
     {},
+    logger,
   );
   const updatedMessages = Object.fromEntries(
     Object.entries(messages).filter(([, msg]) => msg.threadId !== threadId),
   );
-  await setItem(STORAGE_KEYS.MESSAGES, updatedMessages);
+  await setItem(STORAGE_KEYS.MESSAGES, updatedMessages, logger);
 }
 
 /**
  * Delete message from storage
  */
-export async function deleteMessage(messageId: string): Promise<void> {
+export async function deleteMessage(
+  messageId: string,
+  logger: EndpointLogger,
+): Promise<void> {
   const messages = await getItem<Record<string, ChatMessage>>(
     STORAGE_KEYS.MESSAGES,
     {},
+    logger,
   );
   delete messages[messageId];
-  await setItem(STORAGE_KEYS.MESSAGES, messages);
+  await setItem(STORAGE_KEYS.MESSAGES, messages, logger);
 }
 
 /**
  * Delete folder from storage
  * Also deletes all threads and messages inside the folder
  */
-export async function deleteFolder(folderId: string): Promise<void> {
+export async function deleteFolder(
+  folderId: string,
+  logger: EndpointLogger,
+): Promise<void> {
   const folders = await getItem<Record<string, ChatFolder>>(
     STORAGE_KEYS.FOLDERS,
     {},
+    logger,
   );
   delete folders[folderId];
-  await setItem(STORAGE_KEYS.FOLDERS, folders);
+  await setItem(STORAGE_KEYS.FOLDERS, folders, logger);
 
   // Delete all threads in this folder
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
   const threadsToDelete = Object.entries(threads)
     .filter(([, thread]) => thread.folderId === folderId)
@@ -215,7 +288,7 @@ export async function deleteFolder(folderId: string): Promise<void> {
 
   // Delete each thread (which will also delete its messages)
   for (const threadId of threadsToDelete) {
-    await deleteThread(threadId);
+    await deleteThread(threadId, logger);
   }
 }
 
@@ -225,10 +298,12 @@ export async function deleteFolder(folderId: string): Promise<void> {
 export async function getThreadsForFolder(
   rootFolderId: DefaultFolderId,
   subFolderId: string | null,
+  logger: EndpointLogger,
 ): Promise<ChatThread[]> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
 
   return Object.values(threads).filter(
@@ -242,10 +317,12 @@ export async function getThreadsForFolder(
  */
 export async function getFoldersForRoot(
   rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
 ): Promise<ChatFolder[]> {
   const folders = await getItem<Record<string, ChatFolder>>(
     STORAGE_KEYS.FOLDERS,
     {},
+    logger,
   );
 
   return Object.values(folders).filter(
@@ -302,10 +379,12 @@ function parseMessage(message: ChatMessage): ChatMessage {
  */
 export async function getIncognitoThread(
   threadId: string,
+  logger: EndpointLogger,
 ): Promise<ChatThread | null> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
   return threads[threadId] ?? null;
 }
@@ -315,10 +394,12 @@ export async function getIncognitoThread(
  */
 export async function getMessagesForThread(
   threadId: string,
+  logger: EndpointLogger,
 ): Promise<ChatMessage[]> {
   const messages = await getItem<Record<string, ChatMessage>>(
     STORAGE_KEYS.MESSAGES,
     {},
+    logger,
   );
 
   return Object.values(messages)
@@ -335,6 +416,7 @@ export async function createIncognitoThread(
   rootFolderId: DefaultFolderId,
   subFolderId: string | null,
   threadId: string,
+  logger: EndpointLogger,
 ): Promise<ChatThread> {
   const thread: ChatThread = {
     id: threadId,
@@ -379,7 +461,7 @@ export async function createIncognitoThread(
     searchVector: null,
   };
 
-  await saveThread(thread);
+  await saveThread(thread, logger);
   return thread;
 }
 
@@ -395,6 +477,7 @@ export async function createIncognitoMessage(
   character: string | null = null,
   metadata: ChatMessage["metadata"] = {},
   userMessageId: string,
+  logger: EndpointLogger,
 ): Promise<ChatMessage> {
   const message: ChatMessage = {
     id: userMessageId,
@@ -418,7 +501,7 @@ export async function createIncognitoMessage(
     updatedAt: new Date(),
   };
 
-  await saveMessage(message);
+  await saveMessage(message, logger);
   return message;
 }
 
@@ -428,10 +511,12 @@ export async function createIncognitoMessage(
 export async function updateIncognitoThread(
   threadId: string,
   updates: Partial<ChatThread>,
+  logger: EndpointLogger,
 ): Promise<void> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
+    logger,
   );
   const thread = threads[threadId];
 
@@ -441,7 +526,7 @@ export async function updateIncognitoThread(
       ...updates,
       updatedAt: new Date(),
     };
-    await setItem(STORAGE_KEYS.THREADS, threads);
+    await setItem(STORAGE_KEYS.THREADS, threads, logger);
   }
 }
 
@@ -451,10 +536,12 @@ export async function updateIncognitoThread(
 export async function updateIncognitoMessage(
   messageId: string,
   updates: Partial<ChatMessage>,
+  logger: EndpointLogger,
 ): Promise<void> {
   const messages = await getItem<Record<string, ChatMessage>>(
     STORAGE_KEYS.MESSAGES,
     {},
+    logger,
   );
   const message = messages[messageId];
 
@@ -464,6 +551,6 @@ export async function updateIncognitoMessage(
       ...updates,
       updatedAt: new Date(),
     };
-    await setItem(STORAGE_KEYS.MESSAGES, messages);
+    await setItem(STORAGE_KEYS.MESSAGES, messages, logger);
   }
 }

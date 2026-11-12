@@ -310,7 +310,8 @@ export const translations = {
     accountLocked: "Account is locked",
     accountLockedDescription:
       "Your account has been locked. Please contact support.",
-    invalid_credentials: "Invalid email or password",
+    invalid_credentials:
+      "Wrong email or password. No account yet? Sign up first.",
     two_factor_required: "Two-factor authentication required",
     invalid_two_factor_code: "Invalid authentication code",
     auth_error: "Authentication failed for {{email}}: {{error}}",

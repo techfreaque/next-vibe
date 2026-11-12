@@ -398,6 +398,12 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
         logger.error(
           "Onboarding: failed to add favorite",
           e instanceof Error ? e.message : String(e),
+          {
+            component: "SelectorOnboardingSetupStep",
+            operation: "addFavorite",
+            companionId,
+            selectedCount: selected.size,
+          },
         );
         return null;
       }
@@ -445,12 +451,24 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
         logger.error(
           "Failed to set active favorite after onboarding",
           e instanceof Error ? e.message : String(e),
+          {
+            component: "SelectorOnboardingSetupStep",
+            operation: "setActiveFavorite",
+            companionId,
+            selectedCount: selected.size,
+          },
         );
       }
     } catch (e) {
       logger.error(
         "Onboarding seeding failed",
         e instanceof Error ? e.message : String(e),
+        {
+          component: "SelectorOnboardingSetupStep",
+          operation: "seedFavorites",
+          companionId,
+          selectedCount: selected.size,
+        },
       );
       setSeedFailed(true);
     } finally {

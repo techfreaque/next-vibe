@@ -6,18 +6,37 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  isBrowserNetworkLossMessage,
+  parseError,
+} from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { getVisibilityState } from "next-vibe/ui/lib/dom";
+import { isOnline } from "next-vibe/ui/lib/media";
 import { useEndpointCreate } from "next-vibe/unified-ui/hooks/use-endpoint-create";
 import { useCallback } from "react";
 
 import { scopedTranslation as chatScopedTranslation } from "../chat/i18n";
+import {
+  classifyPlayRejection,
+  describeAudioElement,
+} from "./audio-diagnostics";
 import { chunkTextForTTS } from "./chunking";
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import textToSpeechDefinitions from "./definition";
 import { type TtsModelId } from "./models";
 import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";
+
+/** One retry for a browser-level network failure, after a short pause. */
+const TTS_MAX_ATTEMPTS = 2;
+const TTS_RETRY_DELAY_MS = 1500;
+
+interface ChunkFetchResult {
+  audio: HTMLAudioElement | null;
+  /** Display message when the fetch failed; null on success or cancel. */
+  error: string | null;
+}
 
 interface UseTTSAudioOptions {
   text: string;
@@ -133,22 +152,29 @@ export function useTTSAudio({
     setStore(messageId, { isPlaying: false });
   }, [logger, messageId, setStore]);
 
-  // Fetch audio for a specific chunk
+  // Fetch audio for a specific chunk. A browser-level fetch failure ("Failed
+  // to fetch" / NetworkError - connection blip, tab backgrounded on mobile,
+  // proxy drop) is retried once while online; anything else fails at once.
+  // Named function expression so the retry can recurse without reading the
+  // binding during its own initialization.
   const fetchChunkAudio = useCallback(
-    (
+    function fetchChunk(
       chunkIndex: number,
       chunkText: string,
-    ): Promise<HTMLAudioElement | null> => {
+      attempt = 1,
+    ): Promise<ChunkFetchResult> {
       if (!ttsForm) {
-        return Promise.resolve(null);
+        return Promise.resolve({ audio: null, error: null });
       }
 
       const refs = getTtsRefs(messageId);
+      const startedAt = Date.now();
 
       logger.debug(
         `TTS: Fetching chunk ${chunkIndex + 1}/${refs.chunks.length}`,
         {
           chunkLength: chunkText.length,
+          attempt,
         },
       );
 
@@ -166,29 +192,63 @@ export function useTTSAudio({
             const audioDataUrl = responseData.audioUrl;
             logger.debug(`TTS: Got audio for chunk ${chunkIndex + 1}`, {
               urlLength: audioDataUrl.length,
+              attempt,
             });
 
             const audio = new Audio(audioDataUrl);
-            resolve(audio);
+            resolve({ audio, error: null });
           },
           onError: ({ error: endpointError }) => {
             const refs2 = getTtsRefs(messageId);
             // Check if this was an abort
             if (refs2.abortController?.signal.aborted) {
               logger.debug(`TTS: Chunk ${chunkIndex + 1} was cancelled`);
-              resolve(null);
+              resolve({ audio: null, error: null });
+              return;
+            }
+
+            const isNetworkLoss = isBrowserNetworkLossMessage(
+              endpointError.message,
+            );
+            const online = isOnline();
+            if (isNetworkLoss && attempt < TTS_MAX_ATTEMPTS && online) {
+              logger.debug(
+                `TTS: Network loss on chunk ${chunkIndex + 1}, retrying once`,
+                { elapsedMs: Date.now() - startedAt },
+              );
+              setTimeout(() => {
+                // Cancelled (stop/cancelLoading reset the refs) meanwhile
+                if (!getTtsRefs(messageId).isProcessing) {
+                  resolve({ audio: null, error: null });
+                  return;
+                }
+                void fetchChunk(chunkIndex, chunkText, attempt + 1).then(
+                  resolve,
+                );
+              }, TTS_RETRY_DELAY_MS);
               return;
             }
 
             logger.error(`TTS: Failed to fetch chunk ${chunkIndex + 1}`, {
               errorType: endpointError.errorType,
               errorMessage: endpointError.message,
+              isNetworkLoss,
+              attempt,
+              chunkIndex,
+              chunkLength: chunkText.length,
+              totalChunks: refs2.chunks.length,
+              elapsedMs: Date.now() - startedAt,
+              voiceId: voicePreference,
+              // Network-loss triage: offline -> user connectivity; hidden ->
+              // backgrounded tab; online + visible -> server/proxy drop.
+              online,
+              visibilityState: getVisibilityState(),
             });
             const errorMsg =
               endpointError.message || t("hooks.tts.failed-to-generate");
             setStore(messageId, { error: errorMsg });
             onError?.(errorMsg);
-            resolve(null);
+            resolve({ audio: null, error: errorMsg });
           },
         });
       });
@@ -240,7 +300,7 @@ export function useTTSAudio({
             void fetchChunkAudio(
               nextFetchIndex,
               currentRefs.chunks[nextFetchIndex]!,
-            ).then((nextAudio) => {
+            ).then(({ audio: nextAudio, error: prefetchError }) => {
               if (nextAudio) {
                 const r = getTtsRefs(messageId);
                 r.audioQueue[nextFetchIndex] = nextAudio;
@@ -253,9 +313,24 @@ export function useTTSAudio({
                   playQueuedChunk();
                 }
               } else {
-                logger.error(
-                  `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
-                );
+                const r = getTtsRefs(messageId);
+                // error null = cancelled, not a failure
+                if (prefetchError !== null) {
+                  logger.error(
+                    `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
+                    {
+                      error: prefetchError,
+                      chunkIndex: nextFetchIndex,
+                      totalChunks: r.chunks.length,
+                      currentPlayingIndex: r.currentPlayingIndex,
+                      voiceId: voicePreference,
+                    },
+                  );
+                } else {
+                  logger.debug(
+                    `TTS: Prefetch of chunk ${nextFetchIndex + 1} cancelled`,
+                  );
+                }
               }
               return undefined;
             });
@@ -304,6 +379,14 @@ export function useTTSAudio({
         logger.error(
           `TTS: Chunk ${nextIndex + 1} playback error`,
           parseError(audioError),
+          {
+            ...describeAudioElement(audio),
+            // network vs decode vs unsupported source, from audio.error.code
+            chunkIndex: nextIndex,
+            totalChunks: getTtsRefs(messageId).chunks.length,
+            voiceId: voicePreference,
+            messageId,
+          },
         );
 
         setStore(messageId, {
@@ -337,12 +420,26 @@ export function useTTSAudio({
             logger.warn(
               `TTS: Autoplay blocked by browser for chunk ${nextIndex + 1}`,
               {
+                ...describeAudioElement(audio),
                 error: errMsg,
+                failureKind: classifyPlayRejection(err),
+                errorName: err instanceof Error ? err.name : null,
+                chunkIndex: nextIndex,
+                totalChunks: getTtsRefs(messageId).chunks.length,
+                voiceId: voicePreference,
+                messageId,
               },
             );
           } else {
             logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
+              ...describeAudioElement(audio),
               error: errMsg,
+              failureKind: classifyPlayRejection(err),
+              errorName: err instanceof Error ? err.name : null,
+              chunkIndex: nextIndex,
+              totalChunks: getTtsRefs(messageId).chunks.length,
+              voiceId: voicePreference,
+              messageId,
             });
           }
 
@@ -359,7 +456,7 @@ export function useTTSAudio({
           refs2.isProcessing = false;
         });
     },
-    [logger, messageId, t, fetchChunkAudio, setStore],
+    [logger, messageId, t, fetchChunkAudio, setStore, voicePreference],
   );
 
   // Main play audio function
@@ -414,10 +511,19 @@ export function useTTSAudio({
       refs.currentPlayingIndex = 0;
       refs.currentFetchingIndex = 1;
 
-      const firstAudio = await fetchChunkAudio(0, chunks[0]!);
+      const { audio: firstAudio, error: firstError } = await fetchChunkAudio(
+        0,
+        chunks[0]!,
+      );
 
       if (!firstAudio) {
-        logger.error("TTS: Failed to fetch first chunk");
+        if (firstError !== null) {
+          logger.error("TTS: Failed to fetch first chunk", {
+            error: firstError,
+            totalChunks: chunks.length,
+            voiceId: voicePreference,
+          });
+        }
         refs.isProcessing = false;
         setStore(messageId, { isLoading: false });
         return;
@@ -450,6 +556,7 @@ export function useTTSAudio({
     fetchChunkAudio,
     playNextChunk,
     setStore,
+    voicePreference,
   ]);
 
   return {

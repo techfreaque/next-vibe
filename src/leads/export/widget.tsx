@@ -26,6 +26,7 @@ import { downloadBinaryFile } from "next-vibe/ui/lib/download";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -63,6 +64,7 @@ export function LeadsExportContainer({
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const logger = useWidgetLogger();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
@@ -93,14 +95,14 @@ export function LeadsExportContainer({
       return;
     }
     const text = atob(data.fileContent);
-    void copyToClipboard(text).then(() => {
+    void copyToClipboard(text, logger).then(() => {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);
       }, 2000);
       return undefined;
     });
-  }, [data]);
+  }, [data, logger]);
 
   const handleViewList = useCallback((): void => {
     void (async (): Promise<void> => {

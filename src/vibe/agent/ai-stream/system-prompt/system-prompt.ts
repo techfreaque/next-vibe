@@ -17,6 +17,7 @@ import {
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import { DefaultFolderId } from "../../../core/execution-context";
+import { FOLDER_BLOCKED_CALLBACK_MODES } from "../../chat/config";
 import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
 import { chatSettings } from "../../chat/settings/db";
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";
@@ -368,20 +369,44 @@ export const toolExecutionControlFragment: SystemPromptFragment = {
   id: "tool-execution-control",
   placement: "leading",
   priority: 70,
-  build: async () => `## Tool Execution
+  build: async (params) => {
+    // Restricted folders (incognito, public) cannot run async tasks - never
+    // advertise those modes there, or the model picks one and the tool call
+    // is rejected at execution time.
+    const blockedModes = new Set(
+      FOLDER_BLOCKED_CALLBACK_MODES[params.rootFolderId] ?? [],
+    );
+    const callbackModeLines = [
+      "- *(field left out)* (default) — synchronous, result inline, loop continues",
+      blockedModes.has("detach")
+        ? null
+        : '- **`"detach"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed',
+      blockedModes.has("wakeUp")
+        ? null
+        : '- **`"wakeUp"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`',
+      '- **`"wait"`** — block for a remote task',
+      '- **`"endLoop"`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don\'t need. Not while other work is pending',
+      '- **`"approve"`** — pause for user confirmation',
+      blockedModes.size > 0
+        ? `- Not available in this ${params.rootFolderId} conversation: ${[
+            ...blockedModes,
+          ]
+            .map((m) => `"${m}"`)
+            .join(", ")}`
+        : null,
+    ]
+      .filter((line): line is string => line !== null)
+      .join("\n");
+    return `## Tool Execution
 
 **Schema first:** Call \`tool-help(toolName="<name>")\` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.
 
 **callbackMode** (optional on every tool). Leave the field OUT for the default - never send "omit", "none" or "sync" as a value:
 
-- *(field left out)* (default) — synchronous, result inline, loop continues
-- **\`"detach"\`** — fire-and-forget, returns \`{taskId}\`, use \`await-task\` later if needed
-- **\`"wakeUp"\`** — fire-and-forget, result auto-injected when ready, do NOT call \`await-task\`
-- **\`"wait"\`** — block for a remote task
-- **\`"endLoop"\`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending
-- **\`"approve"\`** — pause for user confirmation
+${callbackModeLines}
 
-Fast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.`,
+Fast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.`;
+  },
 };
 
 export const mediaCapabilitiesFragment: SystemPromptFragment = {

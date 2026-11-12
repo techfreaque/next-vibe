@@ -315,7 +315,7 @@ RouteExecuteRepository.runInProcessTyped({
   input,             // typed from definition.types.RequestOutput
   urlPathParams?,    // typed from definition.types.UrlVariablesOutput
   user, locale,
-  logger?, toolExecutionContext?, platform?,
+  logger, toolExecutionContext?, platform?,
   instanceId?, callbackMode?,
 })
 ```

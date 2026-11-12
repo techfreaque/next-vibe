@@ -21,6 +21,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
+  useWidgetLogger,
   useWidgetSelector,
   useWidgetTranslation,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -89,6 +90,7 @@ function LinkGenerator({
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const [urlInput, setUrlInput] = useState("");
+  const logger = useWidgetLogger();
   const [copiedLinkGen, setCopiedLinkGen] = useState(false);
 
   const generatedPath = extractPath(urlInput);
@@ -99,12 +101,12 @@ function LinkGenerator({
       return;
     }
     const trackUrl = `${getCurrentOrigin()}/track?ref=${code}&url=${encodeURIComponent(generatedPath)}`;
-    await copyToClipboard(trackUrl);
+    await copyToClipboard(trackUrl, logger);
     setCopiedLinkGen(true);
     setTimeout(() => {
       setCopiedLinkGen(false);
     }, 2000);
-  }, [code, generatedPath, hasInput]);
+  }, [code, generatedPath, hasInput, logger]);
 
   return (
     <Div className="flex items-center gap-2">
@@ -150,9 +152,10 @@ export function ReferralCodesListContainer(): React.JSX.Element {
   );
   const t = useWidgetTranslation<typeof definition.GET>();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const logger = useWidgetLogger();
 
   const handleCopy = async (code: string, index: number): Promise<void> => {
-    await copyToClipboard(`${getCurrentOrigin()}/track?ref=${code}`);
+    await copyToClipboard(`${getCurrentOrigin()}/track?ref=${code}`, logger);
     setCopiedIndex(index);
     setTimeout(() => {
       setCopiedIndex(null);

@@ -20,6 +20,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
@@ -48,6 +49,7 @@ export function TwoFactorWidget({ field }: TwoFactorWidgetProps): JSX.Element {
   const submitting = useWidgetIsSubmitting() ?? false;
   const navigation = useWidgetNavigation();
   const platform = useWidgetPlatform();
+  const logger = useWidgetLogger();
   const isWeb = platform !== Platform.CLI && platform !== Platform.MCP;
 
   const res = data !== undefined && "enabled" in data ? data : undefined;
@@ -164,7 +166,7 @@ export function TwoFactorWidget({ field }: TwoFactorWidgetProps): JSX.Element {
             type="button"
             variant="outline"
             onClick={(): void => {
-              void copyToClipboard(codes.join("\n")).then(() =>
+              void copyToClipboard(codes.join("\n"), logger).then(() =>
                 setCopied(true),
               );
             }}

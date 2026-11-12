@@ -10,6 +10,7 @@ import { ClientLogRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale }) => ClientLogRepository.log(data, locale),
+    handler: ({ data, locale, user }) =>
+      ClientLogRepository.log(data, locale, user),
   },
 });

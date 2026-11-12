@@ -46,7 +46,10 @@ export class ChatFoldersRepositoryClient {
   ): Promise<ResponseType<FolderListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const folders = await getFoldersForRoot(urlPathParams.rootFolderId);
+      const folders = await getFoldersForRoot(
+        urlPathParams.rootFolderId,
+        logger,
+      );
 
       logger.debug("Client: incognito folders", { count: folders.length });
 
@@ -104,7 +107,7 @@ export class ChatFoldersRepositoryClient {
   ): Promise<ResponseType<{ success: string }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      await updateIncognitoFolder(folderId, updates);
+      await updateIncognitoFolder(folderId, updates, logger);
 
       logger.debug("Client: updated incognito folder", { folderId });
 
@@ -159,7 +162,7 @@ export class ChatFoldersRepositoryClient {
   ): Promise<ResponseType<never>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      await deleteFolder(folderId);
+      await deleteFolder(folderId, logger);
 
       logger.debug("Client: deleted incognito folder", { folderId });
 

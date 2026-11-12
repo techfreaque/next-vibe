@@ -113,12 +113,14 @@ export function LoginForm({
   devSeedUsers,
   platform,
 }: LoginFormProps): React.JSX.Element {
+  const logger = useLogger();
   const formRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
       <Div ref={formRef}>
         <EndpointsPage
+          logger={logger}
           endpoint={loginEndpoints}
           locale={locale}
           user={user}

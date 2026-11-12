@@ -12,6 +12,7 @@ import {
 import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { Maximize } from "next-vibe/ui/components/icons/Maximize";
 import { Link } from "next-vibe/ui/components/link";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -30,6 +31,7 @@ export function CortexModalContent({
   user,
   platform,
 }: CortexModalContentProps): JSX.Element {
+  const logger = useWidgetLogger();
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
@@ -51,6 +53,7 @@ export function CortexModalContent({
       </DialogHeader>
 
       <EndpointsPage
+        logger={logger}
         endpoint={cortexListDefinitions}
         locale={locale}
         user={user}

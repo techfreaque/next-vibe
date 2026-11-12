@@ -584,6 +584,7 @@ export class MessageDbWriter {
       threadId,
       attachments,
       this.toolExecutionContext,
+      this.deps.logger,
     );
   }
 

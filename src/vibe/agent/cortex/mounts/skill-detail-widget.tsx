@@ -9,6 +9,7 @@
 
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetPlatform,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -41,6 +42,7 @@ function extractSkillId(path: string): string | null {
 export function SkillDetailWidget({
   path,
 }: SkillDetailWidgetProps): React.JSX.Element | null {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -53,6 +55,7 @@ export function SkillDetailWidget({
 
   return (
     <EndpointsPage
+      logger={logger}
       endpoint={skillDefinitions}
       locale={locale}
       user={user}

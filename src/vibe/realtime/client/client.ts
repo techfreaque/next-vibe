@@ -17,7 +17,8 @@
  * `preWarmChannel` opens the socket early (e.g. just before a stream POST).
  */
 
-import { addDocumentListener } from "next-vibe/ui/lib/dom";
+import { addDocumentListener, addWindowListener } from "next-vibe/ui/lib/dom";
+import { isOnline } from "next-vibe/ui/lib/media";
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -64,6 +65,15 @@ let reconnectPaused = false;
 // Virtual channel subscriptions: channel → ChannelState
 const channels = new Map<string, ChannelState>();
 
+// Last real logger handed to connect(): the visibility-restore reconnect has
+// no caller of its own, and a no-op logger there hid every failure after it.
+let lastLogger: EndpointLogger | null = null;
+// When the socket last went down - reported with the recovery so a flaky
+// connection shows how long live updates were missing.
+let disconnectedAt: number | null = null;
+// Navigation/close tears the socket down on purpose - not a reportable drop.
+let pageUnloading = false;
+
 function sendToServer(msg: WsClientMessage): void {
   if (sharedWs?.readyState === WebSocket.OPEN) {
     sharedWs.send(JSON.stringify(msg));
@@ -71,6 +81,14 @@ function sendToServer(msg: WsClientMessage): void {
 }
 
 function handleOpen(): void {
+  if (disconnectedAt !== null && reconnectAttempts > 0) {
+    lastLogger?.warn("[WS Client] Reconnected after disconnect", {
+      attempts: reconnectAttempts,
+      offlineMs: Date.now() - disconnectedAt,
+      channelCount: channels.size,
+    });
+  }
+  disconnectedAt = null;
   reconnectAttempts = 0;
   // Re-subscribe to all active channels after reconnect.
   for (const [channel, state] of channels.entries()) {
@@ -83,11 +101,22 @@ function handleOpen(): void {
   }
 }
 
-function dispatch(msg: WsWireMessage): void {
+function dispatch(msg: WsWireMessage, logger: EndpointLogger): void {
   const handlers = channels.get(msg.channel)?.listeners.get(msg.event);
   if (handlers) {
     for (const handler of handlers) {
-      handler(msg.data);
+      try {
+        handler(msg.data);
+      } catch (error) {
+        // One broken applier used to abort the loop, so the remaining
+        // handlers (other widgets on the same channel) silently missed the
+        // event too. Report it and keep delivering.
+        logger.error(
+          "[WS Client] Event handler threw",
+          error instanceof Error ? error : String(error),
+          { channel: msg.channel, event: msg.event },
+        );
+      }
     }
   }
 }
@@ -111,6 +140,7 @@ function connect(logger: EndpointLogger): void {
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
   const url = `${protocol}//${getCurrentHost()}/ws`;
 
+  lastLogger = logger;
   const ws = new WebSocket(url);
   sharedWs = ws;
 
@@ -128,23 +158,43 @@ function connect(logger: EndpointLogger): void {
     }
     if ("type" in frame) {
       for (const msg of frame.events) {
-        dispatch(msg);
+        dispatch(msg, logger);
       }
     } else {
-      dispatch(frame);
+      dispatch(frame, logger);
     }
   };
 
-  const handleClose = (): void => {
+  const handleClose = (event: CloseEvent): void => {
     sharedWs = null;
     if (channels.size === 0) {
       return;
+    }
+    // Live updates (streaming tokens, task status, credits) stop for the user
+    // until a reconnect lands - report the drop once, not every retry.
+    if (disconnectedAt === null && !pageUnloading) {
+      disconnectedAt = Date.now();
+      logger.warn("[WS Client] Connection lost", {
+        code: event.code,
+        reason: event.reason.slice(0, 200),
+        wasClean: event.wasClean,
+        channelCount: channels.size,
+        online: isOnline(),
+      });
     }
     // After 6 consecutive failures (~63s total), pause the loop and wait for
     // a page focus/visibility event — persistent failures are likely a stale
     // or missing cookie that only a page navigation will fix.
     if (reconnectAttempts >= 6) {
       reconnectPaused = true;
+      logger.error("[WS Client] Reconnect gave up - live updates paused", {
+        attempts: reconnectAttempts,
+        lastCode: event.code,
+        lastReason: event.reason.slice(0, 200),
+        offlineMs: disconnectedAt === null ? null : Date.now() - disconnectedAt,
+        channelCount: channels.size,
+        online: isOnline(),
+      });
       return;
     }
     // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s
@@ -167,22 +217,23 @@ function connect(logger: EndpointLogger): void {
 // Guard: this module is also loaded during SSR (TanStack/Vite), where `document`
 // doesn't exist. Only register the listener in a real browser context.
 if (typeof document !== "undefined") {
+  addWindowListener("pagehide", () => {
+    pageUnloading = true;
+  });
+  addWindowListener("pageshow", () => {
+    pageUnloading = false;
+  });
   addDocumentListener("visibilitychange", (event) => {
     const target = event.target as Document | null;
     if (target?.visibilityState === "visible" && reconnectPaused) {
       reconnectPaused = false;
       reconnectAttempts = 0;
       if (channels.size > 0 && !sharedWs) {
-        // Logger isn't available here; borrow a no-op fallback.
-        // The next subscribe/preWarm call will provide a real one.
-        connect({
-          debug: () => undefined,
-          info: () => undefined,
-          warn: () => undefined,
-          error: () => undefined,
-          vibe: () => undefined,
-          isDebugEnabled: false,
-        });
+        // No caller here: reuse the logger of the last connect(). Channels
+        // exist only after a subscribe, which always connects with a logger.
+        if (lastLogger) {
+          connect(lastLogger);
+        }
       }
     }
   });

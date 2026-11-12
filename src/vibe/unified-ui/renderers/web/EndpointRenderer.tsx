@@ -250,9 +250,23 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // Wrap onSubmit for widgets - widgets trigger submission without data parameter
   const handleWidgetSubmit = useCallback((): void => {
     if (onSubmit) {
-      void form.handleSubmit(onSubmit)();
+      void form.handleSubmit(onSubmit, (errors) => {
+        // The user sees field errors and nothing is sent - previously silent.
+        // Field name + rule + message only, never the entered values.
+        logger.warn("Form validation blocked submit", {
+          endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+          alias: endpoint.aliases?.[0] ?? null,
+          fields: Object.entries(errors)
+            .map(
+              ([field, fieldError]) =>
+                `${field}: ${String(fieldError?.type ?? "invalid")} - ${String(fieldError?.message ?? "")}`,
+            )
+            .join("; ")
+            .slice(0, 1000),
+        });
+      })();
     }
-  }, [form, onSubmit]);
+  }, [form, onSubmit, logger, endpoint]);
 
   const handleWidgetSubmitOrUndefined = onSubmit
     ? handleWidgetSubmit

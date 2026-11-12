@@ -21,6 +21,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
+import type { DefaultFolderId } from "../../../core/execution-context";
 import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
 import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
@@ -37,6 +38,10 @@ import type {
   AiStreamCancelPostResponseOutput,
 } from "./definition";
 import type { AiStreamCancelT } from "./i18n";
+
+/** How long a cancelled stream gets to finalize itself before the cancel
+ *  path treats it as orphaned. Below the client's 15s safety timeout. */
+const ORPHAN_REAP_DELAY_MS = 8000;
 
 export class cancelRepository {
   /**
@@ -58,6 +63,76 @@ export class cancelRepository {
     return false;
   }
 
+  /**
+   * After a cancel was delivered to a 'streaming' thread, verify a live stream
+   * actually finalized it. Still ABORTING with the SAME run claim after
+   * ORPHAN_REAP_DELAY_MS means no process owns the stream any more: clear the
+   * state (owner-guarded, so a newer stream's claim is never clobbered) and
+   * emit stream-finished so every client unlocks.
+   */
+  private static scheduleOrphanReap(params: {
+    threadId: string;
+    rootFolderId: DefaultFolderId;
+    runId: string | null;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+  }): void {
+    const { threadId, rootFolderId, runId, user, logger } = params;
+    const cancelledAt = Date.now();
+    setTimeout(() => {
+      void (async (): Promise<void> => {
+        try {
+          const [current] = await db
+            .select({
+              streamingState: chatThreads.streamingState,
+              streamingRunId: chatThreads.streamingRunId,
+            })
+            .from(chatThreads)
+            .where(eq(chatThreads.id, threadId))
+            .limit(1);
+          if (
+            !current ||
+            current.streamingState !== ThreadStreamingState.ABORTING ||
+            current.streamingRunId !== runId
+          ) {
+            // Finalized normally (or a newer stream took over) - nothing to do.
+            return;
+          }
+          logger.warn(
+            "[Cancel] No live stream finalized the cancel - clearing orphaned streaming state",
+            {
+              threadId,
+              runId,
+              elapsedMs: Date.now() - cancelledAt,
+              reapDelayMs: ORPHAN_REAP_DELAY_MS,
+            },
+          );
+          const cleared = await clearStreamingState(
+            threadId,
+            logger,
+            user,
+            runId ?? undefined,
+          );
+          if (cleared.superseded) {
+            return;
+          }
+          createMessagesEmitter(logger, user, {
+            threadId,
+            rootFolderId,
+          })("stream-finished", {
+            responseData: { streamingState: cleared.state },
+          });
+        } catch (error) {
+          logger.error("[Cancel] Orphaned-stream reap failed", {
+            threadId,
+            runId,
+            error: parseError(error).message,
+          });
+        }
+      })();
+    }, ORPHAN_REAP_DELAY_MS);
+  }
+
   static async cancelStream(
     data: AiStreamCancelPostRequestOutput,
     user: JwtPayloadType,
@@ -77,6 +152,8 @@ export class cancelRepository {
           leadId: chatThreads.leadId,
           rootFolderId: chatThreads.rootFolderId,
           streamingState: chatThreads.streamingState,
+          streamingRunId: chatThreads.streamingRunId,
+          loopInstanceId: chatThreads.loopInstanceId,
         })
         .from(chatThreads)
         .where(eq(chatThreads.id, threadId))
@@ -130,6 +207,20 @@ export class cancelRepository {
         logger.info("[Cancel] Stream cancelled via control channel", {
           threadId,
         });
+        // The control signal is fire-and-forget: if the process that owned
+        // the stream died (deploy/restart mid-turn) the DB still says
+        // 'streaming' but nothing reacts, no stream-finished is ever emitted
+        // and the stop button hangs until the client's 15s safety timeout.
+        // Locally-looped threads only - a remote loop answers via the relay.
+        if (thread.loopInstanceId === null) {
+          cancelRepository.scheduleOrphanReap({
+            threadId,
+            rootFolderId: thread.rootFolderId,
+            runId: thread.streamingRunId,
+            user,
+            logger,
+          });
+        }
         // The abort triggers AbortErrorHandler which handles:
         // - Credit deduction for partial results
         // - DB content save

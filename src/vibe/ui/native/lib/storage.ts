@@ -2,46 +2,60 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import cross-platform storage interface from web (source of truth)
+import { reportStorageFailure } from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
 import type { Storage } from "../../web/lib/storage";
-
-// Simple logger for storage errors
-// eslint-disable-next-line restricted/restricted-syntax
-const logStorageError = (operation: string, error: unknown): void => {
-  // __DEV__ is a React Native global variable that exists at runtime
-  if (
-    "__DEV__" in globalThis &&
-    (globalThis as { __DEV__?: boolean }).__DEV__
-  ) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    // eslint-disable-next-line i18next/no-literal-string, no-console -- Intentional dev-mode error logging
-    console.error(`[Storage] Error ${operation}:`, errorMsg);
-  }
-};
 
 // Storage implementation matching web localStorage API
 export const storage: Storage = {
-  getItem: async (key: string): Promise<string | null> => {
+  getItem: async (
+    key: string,
+    logger: EndpointLogger,
+  ): Promise<string | null> => {
     try {
       return await AsyncStorage.getItem(key);
     } catch (error) {
-      logStorageError("reading from storage", error);
+      reportStorageFailure(logger, {
+        platform: "native",
+        area: "asyncStorage",
+        operation: "get",
+        key,
+        error: error instanceof Error ? error : String(error),
+      });
       return null;
     }
   },
 
-  setItem: async (key: string, value: string): Promise<void> => {
+  setItem: async (
+    key: string,
+    value: string,
+    logger: EndpointLogger,
+  ): Promise<void> => {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      logStorageError("writing to storage", error);
+      reportStorageFailure(logger, {
+        platform: "native",
+        area: "asyncStorage",
+        operation: "set",
+        key,
+        error: error instanceof Error ? error : String(error),
+        valueLength: value.length,
+      });
     }
   },
 
-  removeItem: async (key: string): Promise<void> => {
+  removeItem: async (key: string, logger: EndpointLogger): Promise<void> => {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      logStorageError("removing from storage", error);
+      reportStorageFailure(logger, {
+        platform: "native",
+        area: "asyncStorage",
+        operation: "remove",
+        key,
+        error: error instanceof Error ? error : String(error),
+      });
     }
   },
 };
@@ -59,32 +73,52 @@ export const syncStorage = {
 
 // ─── Sync localStorage helpers (Native: no-op, use AsyncStorage instead) ─────
 
-export function getLocalItem(key: string): string | null {
+export function getLocalItem(
+  key: string,
+  logger: EndpointLogger,
+): string | null {
   void key;
+  void logger;
   return null;
 }
 
-export function setLocalItem(key: string, value: string): void {
+export function setLocalItem(
+  key: string,
+  value: string,
+  logger: EndpointLogger,
+): void {
   void key;
   void value;
+  void logger;
 }
 
-export function removeLocalItem(key: string): void {
+export function removeLocalItem(key: string, logger: EndpointLogger): void {
   void key;
+  void logger;
 }
 
 // ─── Sync sessionStorage helpers (Native: no-op) ──────────────────────────────
 
-export function getSessionItem(key: string): string | null {
+export function getSessionItem(
+  key: string,
+  logger: EndpointLogger,
+): string | null {
   void key;
+  void logger;
   return null;
 }
 
-export function setSessionItem(key: string, value: string): void {
+export function setSessionItem(
+  key: string,
+  value: string,
+  logger: EndpointLogger,
+): void {
   void key;
   void value;
+  void logger;
 }
 
-export function removeSessionItem(key: string): void {
+export function removeSessionItem(key: string, logger: EndpointLogger): void {
   void key;
+  void logger;
 }

@@ -15,6 +15,7 @@ export const dynamic = "force-dynamic";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import type { JSX } from "react";
@@ -59,6 +60,8 @@ export async function tanstackLoader({
   const authToken =
     typeof search.authToken === "string" ? search.authToken : undefined;
 
+  const logger = createEndpointLogger(false, locale);
+
   let urlPathParams: Record<string, string> = {};
   if (typeof search.urlPathParams === "string") {
     try {
@@ -66,8 +69,14 @@ export async function tanstackLoader({
         string,
         string
       >;
-    } catch {
-      // Ignore parse errors
+    } catch (error) {
+      // Ignore parse errors - frame renders with no path params
+      logger.warn("Frame urlPathParams query param is not valid JSON", {
+        page: "frame",
+        operation: "parseUrlPathParams",
+        endpointPath: path.join("/"),
+        error: parseError(error).message,
+      });
     }
   }
 
@@ -75,13 +84,18 @@ export async function tanstackLoader({
   if (typeof search.data === "string") {
     try {
       data = JSON.parse(search.data) as Record<string, string>;
-    } catch {
-      // Ignore parse errors
+    } catch (error) {
+      // Ignore parse errors - frame renders with no prefilled data
+      logger.warn("Frame data query param is not valid JSON", {
+        page: "frame",
+        operation: "parseData",
+        endpointPath: path.join("/"),
+        error: parseError(error).message,
+      });
     }
   }
 
   // Resolve user from session cookies (creates lead if needed)
-  const logger = createEndpointLogger(false, locale);
   const user: JwtPayloadType = await AuthRepository.getAuthMinimalUser(
     [],
     { platform: Platform.NEXT_PAGE, locale },

@@ -142,7 +142,14 @@ export class LoginRepository {
       // user enumeration (non-existent users get a dummy hash and take the
       // same ~500ms as real users with a wrong password).
       const userRow = await db
-        .select({ password: users.password, id: users.id })
+        .select({
+          password: users.password,
+          id: users.id,
+          emailVerified: users.emailVerified,
+          isBanned: users.isBanned,
+          isActive: users.isActive,
+          createdAt: users.createdAt,
+        })
         .from(users)
         .where(eq(users.email, email))
         .then((rows) => rows[0]);
@@ -155,6 +162,25 @@ export class LoginRepository {
 
       if (!userRow || !isPasswordValid) {
         logger.debug("Login failed: Invalid credentials", { email });
+        // Server-side only (never in the response - that stays generic to
+        // prevent account enumeration). Tells a typo'd password apart from
+        // "tried to log in before signing up" (most failures on prod) and from
+        // accounts that can't log in (banned/inactive). Email is masked.
+        const [emailLocal = "", emailDomain = ""] = email.split("@");
+        logger.warn("Login failed: invalid credentials", {
+          reason: userRow ? "wrong_password" : "no_account",
+          email: `${emailLocal.slice(0, 2)}***@${emailDomain}`,
+          emailVerified: userRow?.emailVerified ?? null,
+          isBanned: userRow?.isBanned ?? null,
+          isActive: userRow?.isActive ?? null,
+          accountAgeDays: userRow
+            ? Math.floor(
+                (Date.now() - userRow.createdAt.getTime()) / 86_400_000,
+              )
+            : null,
+          locale,
+          platform,
+        });
         await this.recordAttemptDb(email, ipAddress, false, false);
         return fail({
           message: t("errors.invalid_credentials"),

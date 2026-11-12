@@ -70,10 +70,11 @@ export class AuthRepository {
         Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
       );
 
-      await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
+      await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token, logger);
       await storage.setItem(
         AUTH_EXPIRES_AT_STORAGE_KEY,
         expiresAt.toISOString(),
+        logger,
       );
 
       return success();
@@ -91,8 +92,8 @@ export class AuthRepository {
     t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
-      await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-      await storage.removeItem(AUTH_EXPIRES_AT_STORAGE_KEY);
+      await storage.removeItem(AUTH_TOKEN_STORAGE_KEY, logger);
+      await storage.removeItem(AUTH_EXPIRES_AT_STORAGE_KEY, logger);
 
       return success();
     } catch (error) {

@@ -1,5 +1,6 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Code } from "next-vibe/ui/components/icons/Code";
@@ -9,6 +10,7 @@ import { Markdown } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
@@ -39,6 +41,7 @@ interface DebugProps {
  */
 export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
   const [copied, setCopied] = useState(false);
   const [showMarkdown, setShowMarkdown] = useState(true);
 
@@ -53,13 +56,24 @@ export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
 
   const handleCopy = useCallback(async () => {
     try {
-      await copyToClipboard(fullText);
+      const copiedOk = await copyToClipboard(fullText, logger);
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "DebugSystemPrompt",
+          operation: "copySystemPrompt",
+          textLength: fullText.length,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // clipboard write failed - ignore silently
+    } catch (error) {
+      logger.warn("Clipboard write failed", parseError(error), {
+        component: "DebugSystemPrompt",
+        operation: "copySystemPrompt",
+      });
     }
-  }, [fullText]);
+  }, [fullText, logger]);
 
   return (
     <Div className={cn(chatAnimations.slideIn, "mb-4")}>

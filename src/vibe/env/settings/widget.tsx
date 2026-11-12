@@ -389,7 +389,10 @@ export function SystemSettingsWidget(): JSX.Element {
       return;
     }
     void (async (): Promise<void> => {
-      const dismissed = !!(await storage.getItem("vibe-wizard-dismissed"));
+      const dismissed = !!(await storage.getItem(
+        "vibe-wizard-dismissed",
+        logger,
+      ));
       const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
         issue.toLowerCase().includes("default"),
       );
@@ -397,7 +400,7 @@ export function SystemSettingsWidget(): JSX.Element {
         setShowWizard(true);
       }
     })();
-  }, [value]);
+  }, [value, logger]);
 
   const modules = value?.modules ?? [];
   const isWritable = value?.isWritable ?? false;
@@ -490,7 +493,7 @@ export function SystemSettingsWidget(): JSX.Element {
             size="sm"
             onClick={(): void => {
               if (showWizard) {
-                void storage.setItem("vibe-wizard-dismissed", "1");
+                void storage.setItem("vibe-wizard-dismissed", "1", logger);
                 setShowWizard(false);
                 setShowExport(false);
               } else {
@@ -511,6 +514,7 @@ export function SystemSettingsWidget(): JSX.Element {
       {showExport && (
         <Div className="border-b">
           <EndpointsPage
+            logger={logger}
             endpoint={exportEnvEndpoints}
             locale={locale}
             user={user}

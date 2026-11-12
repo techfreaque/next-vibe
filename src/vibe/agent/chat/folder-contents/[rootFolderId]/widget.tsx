@@ -1622,6 +1622,7 @@ function FolderRow({
       {isExpanded && (
         <Div className="pl-3">
           <EndpointsPage
+            logger={logger}
             endpoint={definitions}
             locale={locale}
             user={user}
@@ -1652,6 +1653,7 @@ function FolderRow({
             <DialogTitle>{t("widget.renameFolder.title")}</DialogTitle>
           </DialogHeader>
           <EndpointsPage
+            logger={logger}
             endpoint={renameDefinitions}
             locale={locale}
             user={user}
@@ -1688,6 +1690,7 @@ function FolderRow({
             <DialogTitle>{t("widget.folderList.newSubfolder")}</DialogTitle>
           </DialogHeader>
           <EndpointsPage
+            logger={logger}
             endpoint={{ POST: createFolderDefinition.POST }}
             locale={locale}
             user={user}

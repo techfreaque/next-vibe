@@ -29,21 +29,23 @@ export function RootProviders({
 }): JSX.Element {
   return (
     <QueryProvider isolateServerRender>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme={theme ?? "dark"}
-        enableSystem={false}
-      >
-        <TranslationProvider currentLocale={locale}>
-          <LoggerProvider locale={locale}>
+      {/* Logger outermost (after the query cache): the theme cookie/storage
+          sync needs it to report storage failures. */}
+      <LoggerProvider locale={locale}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme={theme ?? "dark"}
+          enableSystem={false}
+        >
+          <TranslationProvider currentLocale={locale}>
             <AgentAvailabilityProvider availability={availability}>
               <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
               <LeadTrackingProvider />
               <Toaster />
             </AgentAvailabilityProvider>
-          </LoggerProvider>
-        </TranslationProvider>
-      </ThemeProvider>
+          </TranslationProvider>
+        </ThemeProvider>
+      </LoggerProvider>
     </QueryProvider>
   );
 }

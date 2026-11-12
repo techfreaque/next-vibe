@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import * as React from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { useLogger } from "../hooks/use-logger";
 import type { StyleType } from "../utils/style-type";
 
 export type AudioWaveformProps = {
@@ -40,6 +41,8 @@ export function AudioWaveform({
   const allSamplesRef = React.useRef<number[]>([]); // All amplitude samples ever captured
   const maxAmplitudeRef = React.useRef<number>(0); // Track max for smoothing
   const isPausedRef = React.useRef(isPaused);
+  // Nullable: waveform may render outside LoggerProvider
+  const logger = useLogger();
 
   // Reset displayed levels when the stream goes away (adjusted during render)
   const [prevDeps, setPrevDeps] = React.useState({ stream, barCount });
@@ -169,7 +172,14 @@ export function AudioWaveform({
       };
 
       updateWaveform();
-    } catch {
+    } catch (error) {
+      // Recovered with a fake waveform - the real input level is not shown
+      logger.warn("Audio waveform: Web Audio API failed, using fallback", {
+        component: "AudioWaveform",
+        operation: "setupAnalyser",
+        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : undefined,
+      });
       // Fallback: simple animated pattern when Web Audio API fails
       const fallbackInterval = setInterval(() => {
         // Skip when paused
@@ -237,7 +247,7 @@ export function AudioWaveform({
         void audioContextRef.current?.close();
       }
     };
-  }, [stream, barCount]);
+  }, [stream, barCount, logger]);
 
   return (
     <div

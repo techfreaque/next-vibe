@@ -318,6 +318,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
         {/* Tool result rendered via its own endpoint UI */}
         {toolEndpoint && toolMethod && (
           <EndpointsPage
+            logger={logger}
             endpoint={{ [toolMethod]: toolEndpoint }}
             locale={locale}
             user={user}
@@ -380,6 +381,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
             </Span>
           </Div>
           <EndpointsPage
+            logger={logger}
             endpoint={{ [toolMethod]: toolEndpoint } as EndpointMethods}
             locale={locale}
             user={user}

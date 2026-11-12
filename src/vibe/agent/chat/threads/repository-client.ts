@@ -46,6 +46,7 @@ export class ChatThreadsRepositoryClient {
       const allThreads = await getThreadsForFolder(
         data.rootFolderId,
         data.subFolderId ?? null,
+        logger,
       );
 
       // Apply search filter
@@ -127,7 +128,7 @@ export class ChatThreadsRepositoryClient {
   ): Promise<ResponseType<{ success: string }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      await updateIncognitoThread(threadId, updates);
+      await updateIncognitoThread(threadId, updates, logger);
       logger.debug("Client: updated incognito thread", { threadId });
 
       return success({
@@ -152,7 +153,7 @@ export class ChatThreadsRepositoryClient {
   ): Promise<ResponseType<never>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      await deleteThread(threadId);
+      await deleteThread(threadId, logger);
       logger.debug("Client: deleted incognito thread", { threadId });
 
       return success();

@@ -56,7 +56,7 @@ function addCorsHeaders(
   );
   response.headers.set(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-CSRF-Token",
+    "Content-Type, Authorization, X-CSRF-Token, X-Request-Id",
   );
   response.headers.set("Access-Control-Allow-Credentials", "true");
 }
@@ -133,7 +133,7 @@ export async function middleware(
         "Access-Control-Allow-Methods":
           "GET, POST, PUT, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, X-CSRF-Token, Cookie",
+          "Content-Type, Authorization, X-CSRF-Token, X-Request-Id, Cookie",
         "Access-Control-Max-Age": "86400",
       },
     });

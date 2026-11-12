@@ -231,6 +231,7 @@ function AiStreamChatArea(): JSX.Element {
             <Div className="flex flex-col flex-1 min-w-0 min-h-0">
               {threadIdToRender ? (
                 <EndpointsPage<MessagesGetEndpoint>
+                  logger={logger}
                   key={threadIdToRender}
                   endpoint={{ GET: messagesDefinition.GET }}
                   endpointOptions={messagesEndpointOptions}
@@ -390,6 +391,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
             <ErrorBoundary locale={locale}>
               {isPublicFeed ? (
                 <EndpointsPage
+                  logger={logger}
                   key="public-feed"
                   endpoint={publicFeedDefinition}
                   locale={locale}

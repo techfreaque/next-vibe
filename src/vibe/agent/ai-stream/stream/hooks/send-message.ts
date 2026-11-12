@@ -24,6 +24,14 @@ import type { ChatModelId } from "../../models";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
 
+/**
+ * Client-only rows (optimistic placeholders, local error bubbles from a failed
+ * send) were never committed server-side and must never become a parent.
+ */
+function isClientOnly(m: ChatMessage): boolean {
+  return m.metadata?.isOptimistic === true || m.metadata?.isLocalOnly === true;
+}
+
 export interface SendMessageParams {
   content: string;
   threadId?: string;
@@ -109,7 +117,7 @@ export async function sendMessage(
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { getMessagesForThread } =
           await import("../../../chat/incognito/storage");
-        threadMessages = await getMessagesForThread(threadIdToUse);
+        threadMessages = await getMessagesForThread(threadIdToUse, logger);
       } else {
         // Read from apiClient cache
         const cached = apiClient.getEndpointData(
@@ -129,9 +137,14 @@ export async function sendMessage(
         // Walk DOWN from leafMessageId following the latest child at each level.
         // leafMessageId is kept up-to-date by auto-switch (including wakeUp revival chains),
         // so it always points to the current branch's true leaf.
-        const byId = new Map(threadMessages.map((m) => [m.id, m]));
+        // Client-only rows (optimistic placeholders, local error bubbles from a
+        // failed send) were never committed server-side - chaining off one makes
+        // the server re-parent the message ("parent not committed"). Resolve the
+        // parent over server-known messages only.
+        const allById = new Map(threadMessages.map((m) => [m.id, m]));
+        const serverMessages = threadMessages.filter((m) => !isClientOnly(m));
         const childrenByParent = new Map<string | null, ChatMessage[]>();
-        for (const msg of threadMessages) {
+        for (const msg of serverMessages) {
           const key = msg.parentId ?? null;
           const arr = childrenByParent.get(key) ?? [];
           arr.push(msg);
@@ -148,11 +161,23 @@ export async function sendMessage(
           );
         }
 
-        // Start from leafMessageId if present, otherwise last by createdAt
-        const startMsg = leafMessageId ? byId.get(leafMessageId) : null;
+        // Start from leafMessageId if present (climbing out of a client-only
+        // leaf to its nearest server-known ancestor), otherwise last by createdAt
+        let startMsg = leafMessageId ? allById.get(leafMessageId) : undefined;
+        const visited = new Set<string>();
+        while (
+          startMsg &&
+          isClientOnly(startMsg) &&
+          !visited.has(startMsg.id)
+        ) {
+          visited.add(startMsg.id);
+          startMsg = startMsg.parentId
+            ? allById.get(startMsg.parentId)
+            : undefined;
+        }
         const startId = startMsg
           ? startMsg.id
-          : (threadMessages.toSorted(
+          : (serverMessages.toSorted(
               (a, b) =>
                 new Date(b.createdAt).getTime() -
                 new Date(a.createdAt).getTime(),
@@ -236,6 +261,7 @@ export async function sendMessage(
           currentRootFolderId,
           currentSubFolderId,
           createdThreadIdForNewThread,
+          logger,
         );
       }
       // Optimistically add new thread to sidebar cache.

@@ -12,6 +12,7 @@ import { LogIn } from "next-vibe/ui/components/icons/LogIn";
 import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
 import { Link } from "next-vibe/ui/components/link";
 import { H1, H3, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -28,6 +29,7 @@ export function CortexPageClient({
   user,
   platform,
 }: CortexPageClientProps): JSX.Element {
+  const logger = useLogger();
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
@@ -82,6 +84,7 @@ export function CortexPageClient({
         ) : (
           <Div className="rounded-xl border bg-card overflow-hidden shadow-sm">
             <EndpointsPage
+              logger={logger}
               endpoint={cortexListDefinitions}
               locale={locale}
               user={user}

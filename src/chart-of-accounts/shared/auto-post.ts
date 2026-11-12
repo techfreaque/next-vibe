@@ -42,7 +42,7 @@ export interface AutoPostParams {
   sourceType: (typeof JournalSourceTypeDB)[number];
   sourceId: string;
   lines: AutoPostLine[];
-  logger?: EndpointLogger;
+  logger: EndpointLogger;
 }
 
 /**
@@ -169,7 +169,7 @@ export async function autoPostJournalEntry(
     return entry.id;
   } catch (error) {
     // Best-effort — log but never propagate
-    logger?.error("[autoPostJournalEntry] Failed to post journal entry", {
+    logger.error("[autoPostJournalEntry] Failed to post journal entry", {
       error: error instanceof Error ? error.message : String(error),
     });
     return null;

@@ -1246,6 +1246,7 @@ const NodeInspector = React.memo(function NodeInspector({
 }): React.JSX.Element {
   const visuals = getVisuals(category);
   const isConfirmingDelete = deleteConfirmNodeId === nodeId;
+  const logger = useWidgetLogger();
 
   const { paramFields, outputFields } = endpointInfo;
 
@@ -1360,7 +1361,7 @@ const NodeInspector = React.memo(function NodeInspector({
                 size="sm"
                 className="h-6 w-6 p-0 shrink-0"
                 onClick={() => {
-                  void copyToClipboard(nodeConfig.endpointPath ?? "");
+                  void copyToClipboard(nodeConfig.endpointPath ?? "", logger);
                 }}
                 title="Copy path"
               >

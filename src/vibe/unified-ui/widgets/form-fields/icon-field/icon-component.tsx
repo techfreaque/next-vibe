@@ -7,7 +7,9 @@
  * on platform themselves.
  */
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Span } from "next-vibe/ui/components/span";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
@@ -64,6 +66,9 @@ export const Icon: React.FC<{
   } | null>(null);
 
   const registryValue = ICON_REGISTRY[icon];
+  // Nullable on purpose: Icon also renders in shells mounted outside
+  // LoggerProvider (root error pages), where useLogger() would throw.
+  const logger = useLogger();
 
   // Load icon component from library
   useEffect(() => {
@@ -76,17 +81,30 @@ export const Icon: React.FC<{
       try {
         const iconModule = await loadIcon(registryValue);
         const IconComp = iconModule[registryValue as IconLibraryName];
+        if (!IconComp) {
+          logger.warn("Icon library has no export for registered icon", {
+            component: "Icon",
+            operation: "loadIcon",
+            icon: registryValue,
+          });
+        }
         setLoaded({
           name: registryValue,
           Component: IconComp
             ? (IconComp as IconComponent)
             : MissingIconFallback,
         });
-      } catch {
+      } catch (error) {
+        logger.warn("Icon library chunk failed to load", {
+          component: "Icon",
+          operation: "loadIcon",
+          icon: registryValue,
+          error: parseError(error).message,
+        });
         setLoaded({ name: registryValue, Component: ErrorIconFallback });
       }
     })();
-  }, [registryValue]);
+  }, [registryValue, logger]);
 
   // Handle component from registry (emoji or special)
   if (registryValue && typeof registryValue !== "string") {

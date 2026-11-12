@@ -237,6 +237,7 @@ export function useAddToFavorites({
         void FavClient.setLastAttributedSkillId(
           plainSkillId,
           charData.name ?? null,
+          logger,
         );
 
         void (async (): Promise<void> => {

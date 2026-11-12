@@ -796,7 +796,24 @@ export class StreamLoop implements StreamLoopState {
       // timeouts) are outside our control and already shown to the user as an
       // error bubble - warn, so the error log stays for actual bugs.
       const transient = isTransientErrorText(errorText);
-      const errorMeta = { error: errorText, model, threadId, transient };
+      // Mid-stream error parts are NOT retried (the AI SDK's maxRetries only
+      // covers the initial request) - the turn ends with an error bubble.
+      // Record which upstream served it and how far the stream got so an
+      // idle-timeout / outage is attributable to the provider at a glance.
+      const errorMeta = {
+        error: errorText,
+        model,
+        apiProvider: this.p.modelConfig.apiProvider,
+        providerModel: this.p.modelConfig.providerModel,
+        threadId,
+        transient,
+        retried: false,
+        elapsedMs:
+          this.p.ctx.requestStartTime === null
+            ? null
+            : Date.now() - this.p.ctx.requestStartTime,
+        partialOutputChars: this.p.ctx.currentAssistantContent.length,
+      };
       this.p.ctx.lastProviderErrorText = errorText;
       if (transient) {
         logger.warn(

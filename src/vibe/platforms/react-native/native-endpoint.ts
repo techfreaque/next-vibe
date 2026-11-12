@@ -184,7 +184,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     // Get auth token from native storage and include in request
     try {
       const { storage } = await import("next-vibe/ui/lib/storage");
-      const token = await storage.getItem("@auth/token");
+      const token = await storage.getItem("@auth/token", logger);
       // TODO requires leadid
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;

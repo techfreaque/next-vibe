@@ -47,6 +47,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
   useWidgetContext,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetPlatform,
   useWidgetTranslation,
@@ -108,6 +109,7 @@ export function UserViewContainer({
   const locale = useWidgetLocale();
   const { user } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
+  const logger = useWidgetLogger();
   const data = useWidgetValue<typeof definition.GET>();
   const children = field.children;
 
@@ -184,12 +186,12 @@ export function UserViewContainer({
     if (!userId) {
       return;
     }
-    await copyToClipboard(userId);
+    await copyToClipboard(userId, logger);
     setCopyIdSuccess(true);
     setTimeout(() => {
       setCopyIdSuccess(false);
     }, 2000);
-  }, [userId]);
+  }, [userId, logger]);
 
   // Memoize endpoint options for embedded EndpointsPage components
   const creditsEndpointOptions = useMemo(
@@ -1062,6 +1064,7 @@ function CreditHistoryTab({
     };
   };
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
   const platform = useWidgetPlatform();
 
@@ -1076,6 +1079,7 @@ function CreditHistoryTab({
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
+        logger={logger}
         endpoint={def}
         locale={locale}
         user={user}
@@ -1104,6 +1108,7 @@ function ReferralCodesTab({
     };
   };
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
   const platform = useWidgetPlatform();
 
@@ -1118,6 +1123,7 @@ function ReferralCodesTab({
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
+        logger={logger}
         endpoint={def}
         locale={locale}
         user={user}
@@ -1148,6 +1154,7 @@ function ReferralEarningsTab({
     };
   };
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
   const platform = useWidgetPlatform();
 
@@ -1162,6 +1169,7 @@ function ReferralEarningsTab({
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
+        logger={logger}
         endpoint={def}
         locale={locale}
         user={user}
@@ -1190,6 +1198,7 @@ function FavoritesTab({
     };
   };
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
   const platform = useWidgetPlatform();
 
@@ -1204,6 +1213,7 @@ function FavoritesTab({
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
+        logger={logger}
         endpoint={def}
         locale={locale}
         user={user}
@@ -1232,6 +1242,7 @@ function SkillsTab({
     };
   };
 }): React.JSX.Element {
+  const logger = useWidgetLogger();
   const [def, setDef] = useState<{ GET: CreateApiEndpointAny } | null>(null);
   const platform = useWidgetPlatform();
 
@@ -1246,6 +1257,7 @@ function SkillsTab({
   return (
     <Div className="border rounded-lg overflow-hidden">
       <EndpointsPage
+        logger={logger}
         endpoint={def}
         locale={locale}
         user={user}

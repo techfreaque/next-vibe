@@ -18,6 +18,11 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { extractSchemaDefaults } from "../_shared/utils";
 import { scopedTranslation as hooksScopedTranslation } from "./i18n";
+import { isQueryRequestValid } from "./query-executor";
+import {
+  describeFormErrors,
+  serializeFormErrors,
+} from "./serialize-form-errors";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";
 import { deserializeQueryParams, useApiStore } from "./store";
@@ -335,7 +340,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     void (async (): Promise<void> => {
       try {
         // Clear from storage
-        await storage.removeItem(storageKey);
+        await storage.removeItem(storageKey, logger);
         // Reset the form to default values if available, otherwise empty
         const resetData: TEndpoint["types"]["RequestOutput"] =
           (restFormOptions.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
@@ -343,12 +348,22 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         formMethods.reset(resetData);
         // Update query params with reset data
         setQueryParams(resetData);
-      } catch {
-        // Handle error silently - we don't want to break the UI for storage errors
-        // In a production app, this would use a proper error logging service
+      } catch (error) {
+        // Never break the UI for storage errors - but never hide them either
+        logger.warn("Query form: clearing saved form data failed", {
+          // storageKey is built from the endpoint path
+          storageKey,
+          error: parseError(error).message,
+        });
       }
     })();
-  }, [storageKey, setQueryParams, restFormOptions.defaultValues, formMethods]);
+  }, [
+    storageKey,
+    setQueryParams,
+    restFormOptions.defaultValues,
+    formMethods,
+    logger,
+  ]);
 
   // Sync form default values to store on mount AND whenever mergedDefaultValues changes.
   // This ensures the queryFn always picks up the correct initial values
@@ -381,7 +396,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
     void (async (): Promise<void> => {
       try {
-        const savedFormData = await storage.getItem(storageKey);
+        const savedFormData = await storage.getItem(storageKey, logger);
         if (savedFormData) {
           const parsedData = JSON.parse(
             savedFormData,
@@ -393,12 +408,17 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           // Update query params with merged data
           setQueryParams(mergedData);
         }
-      } catch {
-        // Handle error silently - we don't want to break the UI for storage errors
-        // In a production app, this would use a proper error logging service
+      } catch (error) {
+        // Never break the UI for storage errors - but never hide them either
+        logger.warn("Query form: restoring saved form data failed", {
+          // storageKey is built from the endpoint path
+          storageKey,
+          error: parseError(error).message,
+        });
       }
     })();
   }, [
+    logger,
     storageKey,
     persistForm,
     setQueryParams,
@@ -428,10 +448,16 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           persistDebounceTimer = setTimeout(() => {
             void (async (): Promise<void> => {
               try {
-                await storage.setItem(storageKey, JSON.stringify(formValues));
-              } catch {
-                // Handle error silently - we don't want to break the UI for storage errors
-                // In a production app, this would use a proper error logging service
+                await storage.setItem(
+                  storageKey,
+                  JSON.stringify(formValues),
+                  logger,
+                );
+              } catch (error) {
+                logger.warn("Query form: persisting form data failed", {
+                  storageKey,
+                  error: parseError(error).message,
+                });
               }
             })();
           }, persistDebounceMs);
@@ -445,7 +471,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         clearTimeout(persistDebounceTimer);
       }
     };
-  }, [storageKey, persistForm, subscribe]);
+  }, [storageKey, persistForm, subscribe, logger]);
 
   // Error management functions
   const clearFormError = useCallback(
@@ -607,13 +633,28 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // double-fetching on SSR hydration, but it also blocks filter-driven refetches.
         // Skip when staleTime is Infinity - the caller explicitly opted out of refetching
         // (e.g. optimistically pre-seeded messages cache for a new thread).
-        if (!query.isLoading && queryOptions.staleTime !== Infinity) {
+        // refetch() bypasses React Query's `enabled`, so re-check it here: a
+        // disabled query (e.g. newsletter status while the email is still
+        // being typed) must not fire on every param change, and neither may
+        // a query whose params don't pass the request schema yet.
+        if (
+          !query.isLoading &&
+          queryOptions.staleTime !== Infinity &&
+          queryOptions.enabled !== false &&
+          isQueryRequestValid(endpoint, queryParams)
+        ) {
           void query.refetch();
         }
       }
     }
     prevQueryParamsRef.current = queryParams;
-  }, [queryParams, query, queryOptions.staleTime]);
+  }, [
+    queryParams,
+    query,
+    queryOptions.staleTime,
+    queryOptions.enabled,
+    endpoint,
+  ]);
 
   // Watch for form changes and update query params (debounced)
   useEffect(() => {
@@ -784,6 +825,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           const errorMessage = parseError(error).message;
           logger.error("Error in submitForm", {
             endpoint: endpoint.path.join("/"),
+            method: endpoint.method,
+            alias: endpoint.aliases?.[0],
             error: errorMessage,
           });
 
@@ -822,11 +865,20 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         _submitForm,
         // Error handler - form is invalid
         (errors) => {
+          // Was silent unless the caller passed onError. Field names, rule
+          // and message only - never the values (may be an email/secret).
+          logger.warn("Query form validation failed", {
+            endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+            alias: endpoint.aliases?.[0] ?? null,
+            formId,
+            // Nested paths (address.city, items.1.name) included; refs dropped
+            fields: describeFormErrors(errors),
+          });
           if (options.onError) {
             const errorResponse = fail({
               message: hooksT("queryForm.errors.validationFailedDetail", {
                 formId,
-                error: JSON.stringify(errors),
+                error: serializeFormErrors(errors),
               }),
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
             });

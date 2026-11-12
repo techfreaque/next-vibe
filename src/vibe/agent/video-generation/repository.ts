@@ -457,6 +457,7 @@ export class VideoGenerationRepository {
                   path,
                   result.content,
                   toolExecutionContext,
+                  logger,
                 ),
             )
             .catch(() => undefined);

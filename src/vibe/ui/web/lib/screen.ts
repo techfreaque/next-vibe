@@ -15,3 +15,11 @@ export function getScreenHeight(logger: EndpointLogger): number {
   logger.warn("getScreenHeight should not be called outside the browser");
   return 1000;
 }
+
+/** "WIDTHxHEIGHT" of the viewport, for diagnostics; null outside a browser. */
+export function getViewportLabel(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return `${window.innerWidth}x${window.innerHeight}`;
+}

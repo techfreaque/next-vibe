@@ -60,6 +60,7 @@ function ProviderForm({
   loadingLabel: string;
   prefillData: Record<string, string | boolean | null | undefined>;
 }): JSX.Element {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -94,6 +95,7 @@ function ProviderForm({
 
   return (
     <EndpointsPage
+      logger={logger}
       endpoint={endpointDef}
       locale={locale}
       user={user}
@@ -330,6 +332,7 @@ function CapturedLeadsSection({
   platform: ReturnType<typeof useWidgetPlatform>;
   capturedLeadsLabel: string;
 }): JSX.Element {
+  const logger = useWidgetLogger();
   const [capturesDef, setCapturesDef] = React.useState<{
     GET: CreateApiEndpointAny;
   } | null>(null);
@@ -353,6 +356,7 @@ function CapturedLeadsSection({
       <Div className="h-px bg-border" />
       <Span className="text-sm font-semibold px-1">{capturedLeadsLabel}</Span>
       <EndpointsPage
+        logger={logger}
         endpoint={capturesDef}
         locale={locale}
         user={user}

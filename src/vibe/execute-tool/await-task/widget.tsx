@@ -13,6 +13,7 @@ import type { WidgetData } from "../../core/utils/json";
 import {
   useWidgetDisabled,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
@@ -37,6 +38,7 @@ function toRecord(
 }
 
 export function AwaitTaskWidget(): JSX.Element {
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const platform = useWidgetPlatform();
@@ -144,6 +146,7 @@ export function AwaitTaskWidget(): JSX.Element {
       )}
       {resolvedEndpoint && (
         <EndpointsPage
+          logger={logger}
           key={originalToolName}
           endpoint={{ [resolvedMethod]: resolvedEndpoint }}
           locale={locale}

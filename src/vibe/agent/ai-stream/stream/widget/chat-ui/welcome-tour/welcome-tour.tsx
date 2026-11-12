@@ -10,6 +10,7 @@ import {
   STATUS,
 } from "next-vibe/ui/components/joyride";
 import { H3, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { querySelector } from "next-vibe/ui/lib/dom";
@@ -91,6 +92,7 @@ export function WelcomeTour({
   totalModelCount,
 }: WelcomeTourProps): React.ReactElement | null {
   const { t } = scopedTranslation.scopedT(locale);
+  const logger = useLogger();
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [steps, setSteps] = useState<TourStepConfig[]>([]);
@@ -170,10 +172,10 @@ export function WelcomeTour({
       // Check if tour was already completed or skipped
       const [tourCompleted, tourSkipped, tourInProgress, lastStep] =
         await Promise.all([
-          storage.getItem(TOUR_STORAGE_KEY),
-          storage.getItem(TOUR_SKIPPED_KEY),
-          storage.getItem(TOUR_IN_PROGRESS_KEY),
-          storage.getItem(TOUR_LAST_STEP_KEY),
+          storage.getItem(TOUR_STORAGE_KEY, logger),
+          storage.getItem(TOUR_SKIPPED_KEY, logger),
+          storage.getItem(TOUR_IN_PROGRESS_KEY, logger),
+          storage.getItem(TOUR_LAST_STEP_KEY, logger),
         ]);
 
       if (tourCompleted === "true" || tourSkipped === "true") {
@@ -230,13 +232,14 @@ export function WelcomeTour({
         setSteps(tourSteps);
         setStepIndex(0);
         setTourActive(true);
-        void storage.setItem(TOUR_IN_PROGRESS_KEY, "true");
-        void storage.setItem(TOUR_LAST_STEP_KEY, "0");
+        void storage.setItem(TOUR_IN_PROGRESS_KEY, "true", logger);
+        void storage.setItem(TOUR_LAST_STEP_KEY, "0", logger);
         // Small delay to ensure DOM is ready
         setTimeout(() => setRun(true), 500);
       }
     })();
   }, [
+    logger,
     tourSteps,
     setModelSelectorOpen,
     ensureSidebarOpen,
@@ -262,10 +265,11 @@ export function WelcomeTour({
     setSteps(tourSteps);
     setStepIndex(0);
     setTourActive(true);
-    void storage.setItem(TOUR_IN_PROGRESS_KEY, "true");
-    void storage.setItem(TOUR_LAST_STEP_KEY, "0");
+    void storage.setItem(TOUR_IN_PROGRESS_KEY, "true", logger);
+    void storage.setItem(TOUR_LAST_STEP_KEY, "0", logger);
     setTimeout(() => setRun(true), 300);
   }, [
+    logger,
     isMobile,
     setSidebarCollapsed,
     setSteps,
@@ -289,9 +293,9 @@ export function WelcomeTour({
     const nextIndex = stepIndex + 1;
     if (nextIndex < steps.length) {
       setStepIndex(nextIndex);
-      void storage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
+      void storage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString(), logger);
     }
-  }, [stepIndex, steps.length, setStepIndex]);
+  }, [stepIndex, steps.length, setStepIndex, logger]);
 
   // Register advanceTour callback so Selector can call it
   useEffect(() => {
@@ -404,6 +408,7 @@ export function WelcomeTour({
         void storage.setItem(
           TOUR_LAST_STEP_KEY,
           pendingStepIndexRef.current!.toString(),
+          logger,
         );
         pendingStepIndexRef.current = null;
         setWaitingForBottomSheet(false);
@@ -412,7 +417,7 @@ export function WelcomeTour({
 
       return (): void => clearTimeout(timer);
     }
-  }, [waitingForBottomSheet]);
+  }, [waitingForBottomSheet, logger]);
 
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
@@ -587,14 +592,22 @@ export function WelcomeTour({
             if (needsSidebarChange) {
               setRun(false);
               setStepIndex(nextIndex);
-              void storage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
+              void storage.setItem(
+                TOUR_LAST_STEP_KEY,
+                nextIndex.toString(),
+                logger,
+              );
               setTimeout(() => setRun(true), 400);
               return;
             }
           }
 
           setStepIndex(nextIndex);
-          void storage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
+          void storage.setItem(
+            TOUR_LAST_STEP_KEY,
+            nextIndex.toString(),
+            logger,
+          );
         } else if (action === ACTIONS.PREV) {
           const prevIndex = index - 1;
           const prevStep = steps[prevIndex];
@@ -631,13 +644,21 @@ export function WelcomeTour({
             setModelSelectorOpen(true);
             setRun(false);
             setStepIndex(prevIndex);
-            void storage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
+            void storage.setItem(
+              TOUR_LAST_STEP_KEY,
+              prevIndex.toString(),
+              logger,
+            );
             setTimeout(() => setRun(true), 900);
             return;
           }
 
           setStepIndex(prevIndex);
-          void storage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
+          void storage.setItem(
+            TOUR_LAST_STEP_KEY,
+            prevIndex.toString(),
+            logger,
+          );
         }
       }
 
@@ -647,11 +668,11 @@ export function WelcomeTour({
         setTourActive(false);
         setModelSelectorOpen(false);
         setBottomSheetExpanded(false);
-        void storage.setItem(TOUR_STORAGE_KEY, "true");
-        void storage.removeItem(TOUR_AUTH_PENDING_KEY);
-        void storage.removeItem(TOUR_LAST_STEP_KEY);
-        void storage.removeItem(TOUR_IN_PROGRESS_KEY);
-        void storage.removeItem(TOUR_SKIPPED_KEY);
+        void storage.setItem(TOUR_STORAGE_KEY, "true", logger);
+        void storage.removeItem(TOUR_AUTH_PENDING_KEY, logger);
+        void storage.removeItem(TOUR_LAST_STEP_KEY, logger);
+        void storage.removeItem(TOUR_IN_PROGRESS_KEY, logger);
+        void storage.removeItem(TOUR_SKIPPED_KEY, logger);
 
         const targetFolder = isAuthenticated
           ? DefaultFolderId.PRIVATE
@@ -671,14 +692,15 @@ export function WelcomeTour({
         setTourActive(false);
         setModelSelectorOpen(false);
         setBottomSheetExpanded(false);
-        void storage.setItem(TOUR_SKIPPED_KEY, "true");
-        void storage.removeItem(TOUR_AUTH_PENDING_KEY);
-        void storage.removeItem(TOUR_LAST_STEP_KEY);
-        void storage.removeItem(TOUR_IN_PROGRESS_KEY);
-        void storage.removeItem(TOUR_STORAGE_KEY);
+        void storage.setItem(TOUR_SKIPPED_KEY, "true", logger);
+        void storage.removeItem(TOUR_AUTH_PENDING_KEY, logger);
+        void storage.removeItem(TOUR_LAST_STEP_KEY, logger);
+        void storage.removeItem(TOUR_IN_PROGRESS_KEY, logger);
+        void storage.removeItem(TOUR_STORAGE_KEY, logger);
       }
     },
     [
+      logger,
       steps,
       locale,
       isAuthenticated,
@@ -765,27 +787,28 @@ export function useWelcomeTour(): {
   resetTour: () => void;
 } {
   const [hasSeenTour, setHasSeenTour] = useState(true);
+  const logger = useLogger();
 
   useEffect(() => {
     void (async (): Promise<void> => {
-      const tourCompleted = await storage.getItem(TOUR_STORAGE_KEY);
+      const tourCompleted = await storage.getItem(TOUR_STORAGE_KEY, logger);
       setHasSeenTour(tourCompleted === "true");
     })();
-  }, []);
+  }, [logger]);
 
   const markTourComplete = useCallback((): void => {
-    void storage.setItem(TOUR_STORAGE_KEY, "true");
+    void storage.setItem(TOUR_STORAGE_KEY, "true", logger);
     setHasSeenTour(true);
-  }, []);
+  }, [logger]);
 
   const resetTour = useCallback((): void => {
-    void storage.removeItem(TOUR_STORAGE_KEY);
-    void storage.removeItem(TOUR_SKIPPED_KEY);
-    void storage.removeItem(TOUR_AUTH_PENDING_KEY);
-    void storage.removeItem(TOUR_LAST_STEP_KEY);
-    void storage.removeItem(TOUR_IN_PROGRESS_KEY);
+    void storage.removeItem(TOUR_STORAGE_KEY, logger);
+    void storage.removeItem(TOUR_SKIPPED_KEY, logger);
+    void storage.removeItem(TOUR_AUTH_PENDING_KEY, logger);
+    void storage.removeItem(TOUR_LAST_STEP_KEY, logger);
+    void storage.removeItem(TOUR_IN_PROGRESS_KEY, logger);
     setHasSeenTour(false);
-  }, []);
+  }, [logger]);
 
   return {
     hasSeenTour,

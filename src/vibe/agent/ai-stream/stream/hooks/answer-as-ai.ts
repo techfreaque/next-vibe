@@ -72,7 +72,7 @@ export async function answerAsAI(
   ) {
     const { getMessagesForThread } =
       await import("../../../chat/incognito/storage");
-    allMessages = await getMessagesForThread(activeThreadId);
+    allMessages = await getMessagesForThread(activeThreadId, logger);
   }
 
   const message = allMessages.find((m) => m.id === messageId);
@@ -100,7 +100,7 @@ export async function answerAsAI(
       // title/description so the server-side rename prompt fragment sees them.
       const { getIncognitoThread } =
         await import("../../../chat/incognito/storage");
-      const incognitoThread = await getIncognitoThread(activeThreadId);
+      const incognitoThread = await getIncognitoThread(activeThreadId, logger);
       incognitoThreadTitle = incognitoThread?.title ?? null;
       incognitoThreadDescription = incognitoThread?.description ?? null;
     }

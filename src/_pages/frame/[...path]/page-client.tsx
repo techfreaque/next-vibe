@@ -10,6 +10,7 @@
 import { useTheme } from "next-themes";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import type {
@@ -18,6 +19,7 @@ import type {
 } from "next-vibe/platforms/vibe-frame/types";
 import { useFrameBridge } from "next-vibe/platforms/vibe-frame/use-bridge";
 import { Div } from "next-vibe/ui/components/div";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { setRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { getDocumentScrollHeight } from "next-vibe/ui/lib/dom";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -65,6 +67,7 @@ export function VibeFramePageClient({
   const lastHeightRef = useRef(0);
 
   const bridge = useFrameBridge(frameId);
+  const logger = useLogger();
 
   // Apply initial theme from parent
   useEffect(() => {
@@ -112,6 +115,12 @@ export function VibeFramePageClient({
             endpointId,
           });
           setError(notFoundMessage);
+          logger.warn("Frame endpoint not found", {
+            component: "FramePageClient",
+            operation: "loadEndpoint",
+            endpointId,
+            frameId,
+          });
           bridge.send({
             type: "vf:error",
             frameId,
@@ -128,6 +137,16 @@ export function VibeFramePageClient({
           err instanceof Error
             ? err.message
             : t("pages.frame.endpointLoadFailed");
+        logger.error(
+          "Frame endpoint definition failed to load",
+          parseError(err),
+          {
+            component: "FramePageClient",
+            operation: "loadEndpoint",
+            endpointId,
+            frameId,
+          },
+        );
         setError(message);
         bridge.send({
           type: "vf:error",
@@ -140,7 +159,7 @@ export function VibeFramePageClient({
     }
 
     void load();
-  }, [endpointId, frameId, bridge, t]);
+  }, [endpointId, frameId, bridge, t, logger]);
 
   // ResizeObserver for auto-sizing
   useEffect(() => {
@@ -209,6 +228,7 @@ export function VibeFramePageClient({
   return (
     <Div ref={rootRef}>
       <EndpointsPage
+        logger={logger}
         endpoint={wrappedEndpoint}
         locale={locale}
         user={user}

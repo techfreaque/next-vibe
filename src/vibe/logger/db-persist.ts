@@ -78,12 +78,38 @@ function extractMessage(
  * Uses the full metadata content so errors with different context
  * (different endpoint, feature, schedule, etc.) get separate rows.
  */
-function serializeMetaForFingerprint(allMeta: LoggerMetadata[]): string {
+function serializeMetaForFingerprint(
+  allMeta: LoggerMetadata[],
+  ignoreKeys: ReadonlySet<string> | undefined,
+): string {
   if (allMeta.length === 0) {
     return "";
   }
+  const stable =
+    ignoreKeys && ignoreKeys.size > 0
+      ? allMeta.flatMap((m): LoggerMetadata[] => {
+          if (
+            m === null ||
+            typeof m !== "object" ||
+            m instanceof Error ||
+            m instanceof Date ||
+            Array.isArray(m)
+          ) {
+            return [m];
+          }
+          const out: Record<string, LoggerMetadata> = {};
+          for (const [k, v] of Object.entries(m)) {
+            if (!ignoreKeys.has(k)) {
+              out[k] = v;
+            }
+          }
+          // A record made only of ignored keys (tabId, occurrences, ...) must
+          // vanish entirely, or its presence alone would split the row.
+          return Object.keys(out).length > 0 ? [out] : [];
+        })
+      : allMeta;
   try {
-    return JSON.stringify(allMeta);
+    return JSON.stringify(stable);
   } catch {
     return String(allMeta.length);
   }
@@ -95,8 +121,9 @@ function computeFingerprint(
   errorType: string | null | undefined,
   message: string,
   allMeta: LoggerMetadata[],
+  ignoreKeys: ReadonlySet<string> | undefined,
 ): string {
-  const metaStr = serializeMetaForFingerprint(allMeta);
+  const metaStr = serializeMetaForFingerprint(allMeta, ignoreKeys);
   const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}:${metaStr}`;
   return createHash("sha256").update(key).digest("base64url").slice(0, 16);
 }
@@ -107,12 +134,46 @@ function computeFingerprint(
  * of pending async operations in the event loop, each holding DB context.
  */
 const MAX_INFLIGHT = 8;
+/**
+ * Writes that arrive while MAX_INFLIGHT are busy wait here instead of being
+ * dropped - a burst of distinct first occurrences (e.g. a broken release where
+ * every page errors) must still land. Bounded so a storm can't become an OOM
+ * vector; only beyond this cap is a write dropped.
+ */
+const MAX_QUEUED = 500;
 let inflightCount = 0;
+const pendingWrites: Array<() => Promise<void>> = [];
+
+function runWrite(write: () => Promise<void>): void {
+  inflightCount++;
+  void write().finally(() => {
+    inflightCount--;
+    const next = pendingWrites.shift();
+    if (next) {
+      runWrite(next);
+    }
+  });
+}
+
+/** Optional overrides for rows whose error didn't originate in this process. */
+export interface PersistErrorLogOptions {
+  /** Add this many occurrences at once (client-side dedup flushes a count). */
+  occurrences?: number;
+  /** Stack trace captured elsewhere (e.g. the browser), used when `error` has none. */
+  stackTrace?: string;
+  /** Error class name captured elsewhere, used when `error` yields none. */
+  errorType?: string;
+  /**
+   * Metadata keys that vary per occurrence (tab id, viewport, occurrence
+   * count, ...) and must not split one error into many fingerprint rows.
+   */
+  fingerprintIgnoreKeys?: ReadonlySet<string>;
+}
 
 /**
  * Persist an error log to the database (fire-and-forget).
  * Never throws - all errors are silently caught.
- * Drops writes silently when MAX_INFLIGHT concurrent writes are already in progress.
+ * Queues writes when MAX_INFLIGHT are in progress; drops only past MAX_QUEUED.
  */
 export function persistErrorLog(
   level: ErrorLogLevel,
@@ -120,80 +181,103 @@ export function persistErrorLog(
   error: LoggerMetadata | undefined,
   extraMeta: LoggerMetadata[],
   locale: CountryLanguage,
+  options?: PersistErrorLogOptions,
 ): void {
-  if (inflightCount >= MAX_INFLIGHT) {
-    // Drop - best-effort logging must never become an OOM vector
+  const write = (): Promise<void> =>
+    writeErrorLog(level, message, error, extraMeta, locale, options);
+  if (inflightCount < MAX_INFLIGHT) {
+    runWrite(write);
     return;
   }
-  inflightCount++;
-  // Fire-and-forget - do not await
-  void (async (): Promise<void> => {
-    try {
-      // Dynamic import to avoid circular dependencies and module-level DB init
-      const { db } = await import("../database");
+  if (pendingWrites.length < MAX_QUEUED) {
+    pendingWrites.push(write);
+  }
+  // else: drop - best-effort logging must never become an OOM vector
+}
 
-      const { sql } = await import("drizzle-orm");
+async function writeErrorLog(
+  level: ErrorLogLevel,
+  message: string,
+  error: LoggerMetadata | undefined,
+  extraMeta: LoggerMetadata[],
+  locale: CountryLanguage,
+  options: PersistErrorLogOptions | undefined,
+): Promise<void> {
+  try {
+    // Dynamic import to avoid circular dependencies and module-level DB init
+    const { db } = await import("../database");
 
-      const errorType = extractErrorType(error) ?? null;
-      const truncatedMessage = extractMessage(message, error);
+    const { sql } = await import("drizzle-orm");
 
-      // Collect all metadata: include the error object itself when it's a plain
-      // object (not an Error instance) so structured context isn't lost.
-      // Error instances are captured via stackTrace/message - no need to duplicate.
-      const allMeta: LoggerMetadata[] = [{ locale }];
-      if (
-        error !== null &&
-        error !== undefined &&
-        !(error instanceof Error) &&
-        typeof error === "object" &&
-        !(error instanceof Date) &&
-        !Array.isArray(error)
-      ) {
-        allMeta.push(error);
-      }
-      allMeta.push(...extraMeta);
+    const errorType = extractErrorType(error) ?? options?.errorType ?? null;
+    const truncatedMessage = extractMessage(message, error);
 
-      // Fingerprint now includes stable context from metadata so the same error
-      // from different code paths (e.g. different endpoints) gets separate rows.
-      const fingerprint = computeFingerprint(
-        level,
-        errorType,
-        truncatedMessage,
-        allMeta,
-      );
-
-      // jsonb would store nested Errors as `{}` - keep message/stack/cause.
-      const serializedMeta = allMeta.map(serializeLogValue);
-
-      const row: NewErrorLog = {
-        message: truncatedMessage,
-        errorType,
-        stackTrace: extractStack(error) ?? null,
-        metadata: serializedMeta,
-        fingerprint,
-        occurrences: 1,
-        resolved: false,
-        level,
-      };
-
-      // Upsert: if same fingerprint exists, increment occurrences and update timestamp
-      await db
-        .insert(errorLogs)
-        .values(row)
-        .onConflictDoUpdate({
-          target: errorLogs.fingerprint,
-          set: {
-            occurrences: sql`${errorLogs.occurrences} + 1`,
-            stackTrace: row.stackTrace,
-            metadata: serializedMeta,
-            resolved: false,
-            createdAt: sql`now()`,
-          },
-        });
-    } catch {
-      // Silently swallow - logging persistence must never cascade
-    } finally {
-      inflightCount--;
+    // Collect all metadata: include the error object itself when it's a plain
+    // object (not an Error instance) so structured context isn't lost.
+    // Error instances are captured via stackTrace/message - no need to duplicate.
+    const allMeta: LoggerMetadata[] = [{ locale }];
+    if (
+      error !== null &&
+      error !== undefined &&
+      !(error instanceof Error) &&
+      typeof error === "object" &&
+      !(error instanceof Date) &&
+      !Array.isArray(error)
+    ) {
+      allMeta.push(error);
     }
-  })();
+    allMeta.push(...extraMeta);
+
+    // Fingerprint now includes stable context from metadata so the same error
+    // from different code paths (e.g. different endpoints) gets separate rows.
+    const fingerprint = computeFingerprint(
+      level,
+      errorType,
+      truncatedMessage,
+      allMeta,
+      options?.fingerprintIgnoreKeys,
+    );
+
+    const occurrences =
+      options?.occurrences !== undefined &&
+      Number.isInteger(options.occurrences) &&
+      options.occurrences > 0
+        ? options.occurrences
+        : 1;
+
+    // jsonb would store nested Errors as `{}` - keep message/stack/cause.
+    const serializedMeta = allMeta.map(serializeLogValue);
+
+    const row: NewErrorLog = {
+      message: truncatedMessage,
+      errorType,
+      stackTrace:
+        extractStack(error) ??
+        (options?.stackTrace
+          ? truncate(options.stackTrace, MAX_STACK_LENGTH)
+          : null),
+      metadata: serializedMeta,
+      fingerprint,
+      occurrences,
+      resolved: false,
+      level,
+    };
+
+    // Upsert: if same fingerprint exists, increment occurrences and update timestamp
+    await db
+      .insert(errorLogs)
+      .values(row)
+      .onConflictDoUpdate({
+        target: errorLogs.fingerprint,
+        set: {
+          occurrences: sql`${errorLogs.occurrences} + ${occurrences}`,
+          stackTrace: row.stackTrace,
+          metadata: serializedMeta,
+          resolved: false,
+          createdAt: sql`now()`,
+        },
+      });
+  } catch {
+    // Silently swallow - logging persistence must never cascade
+  }
 }

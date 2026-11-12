@@ -77,7 +77,9 @@ export async function runDueGraphs(
       const from = lastRun?.finishedAt ?? lastRun?.startedAt ?? dayAgo(now);
 
       logger.debug(`[sense] Running graph ${graph.slug} (${graph.id})`);
-      await runGraph(graph.id, config, { from, to: now });
+      await runGraph(graph.id, config, { from, to: now }, undefined, {
+        graphSlug: graph.slug,
+      });
       ran.push(graph.slug);
       executed++;
     } catch (error) {

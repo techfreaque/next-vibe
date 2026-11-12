@@ -6,13 +6,18 @@ import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 
 import { coreClientEnv as envClient, platform } from "../../../core/env-client";
 import { Environment } from "../../../env/env-util";
+import { reportStorageFailure } from "../../../logger/storage-failure";
+import type { EndpointLogger } from "../../../logger/types";
 
 /**
  * Get a cookie value by name (async for platform consistency)
  * @param name - The cookie name
  * @returns Promise resolving to the value or null if not found
  */
-export async function getCookie(name: string): Promise<string | null> {
+export async function getCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<string | null> {
   try {
     if (platform.isServer || typeof document === "undefined") {
       return null;
@@ -28,7 +33,15 @@ export async function getCookie(name: string): Promise<string | null> {
     }
 
     return null;
-  } catch {
+  } catch (error) {
+    // decodeURIComponent URIError on a malformed value, or a SecurityError
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "cookie",
+      operation: "get",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
     return null;
   }
 }
@@ -38,7 +51,11 @@ export async function getCookie(name: string): Promise<string | null> {
  * @param name - The cookie name
  * @param value - The value to set
  */
-export async function setCookie(name: string, value: string): Promise<void> {
+export async function setCookie(
+  name: string,
+  value: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     if (platform.isServer || typeof document === "undefined") {
       return;
@@ -84,8 +101,15 @@ export async function setCookie(name: string, value: string): Promise<void> {
     cookieString += `; samesite=${options.sameSite}`;
 
     document.cookie = cookieString;
-  } catch {
-    // Silent error handling
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "cookie",
+      operation: "set",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+      valueLength: value.length,
+    });
   }
 }
 
@@ -93,7 +117,10 @@ export async function setCookie(name: string, value: string): Promise<void> {
  * Delete a cookie (async for platform consistency)
  * @param name - The cookie name to delete
  */
-export async function deleteCookie(name: string): Promise<void> {
+export async function deleteCookie(
+  name: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     if (platform.isServer || typeof document === "undefined") {
       return;
@@ -130,8 +157,14 @@ export async function deleteCookie(name: string): Promise<void> {
     }
 
     document.cookie = cookieString;
-  } catch {
-    // Silent error handling
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "cookie",
+      operation: "remove",
+      key: name,
+      error: error instanceof Error ? error : String(error),
+    });
   }
 }
 
@@ -139,7 +172,9 @@ export async function deleteCookie(name: string): Promise<void> {
  * Get all cookies as an object (async for platform consistency)
  * @returns Promise resolving to an object with cookie names and values
  */
-export async function getAllCookies(): Promise<Record<string, string>> {
+export async function getAllCookies(
+  logger: EndpointLogger,
+): Promise<Record<string, string>> {
   try {
     if (platform.isServer || typeof document === "undefined") {
       return {};
@@ -158,7 +193,14 @@ export async function getAllCookies(): Promise<Record<string, string>> {
     }
 
     return cookies;
-  } catch {
+  } catch (error) {
+    reportStorageFailure(logger, {
+      platform: "web",
+      area: "cookie",
+      operation: "list",
+      key: null,
+      error: error instanceof Error ? error : String(error),
+    });
     return {};
   }
 }

@@ -41,6 +41,21 @@ export function isErrorResponseType(
 }
 
 /**
+ * True when a failure message is the browser's own "the request never got a
+ * response" text: Chrome "Failed to fetch", Safari "Load failed" / "The
+ * network connection was lost", Firefox "NetworkError when attempting to
+ * fetch resource". callApi wraps these as `Request to <path> failed: <text>`,
+ * so match anywhere in the message. Causes: offline, page navigated/closed
+ * mid-request, or the server/proxy dropped the connection - pair with
+ * navigator.onLine + document.visibilityState to tell them apart.
+ */
+export function isBrowserNetworkLossMessage(message: string): boolean {
+  return /load failed|failed to fetch|networkerror|network connection was lost/i.test(
+    message,
+  );
+}
+
+/**
  * Possible error input types for error checking and parsing
  */
 

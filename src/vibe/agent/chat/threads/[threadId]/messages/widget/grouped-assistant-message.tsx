@@ -21,6 +21,7 @@ import {
 } from "next-vibe/ui/lib/clipboard";
 import { downloadFromUrl } from "next-vibe/ui/lib/download";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import {
   type JSX,
   memo,
@@ -227,23 +228,36 @@ function MediaActions({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const logger = useWidgetLogger();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback((): void => {
+    const reportCopyFailure = (copiedOk: boolean): void => {
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "MediaActions",
+          operation: type === "image" ? "copyImage" : "copyMediaUrl",
+          mediaType: type,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
+    };
     if (type === "image") {
-      void copyImageToClipboard(url).then(() => {
+      void copyImageToClipboard(url, logger).then((copiedOk) => {
+        reportCopyFailure(copiedOk);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         return undefined;
       });
     } else {
-      void copyToClipboard(url).then(() => {
+      void copyToClipboard(url, logger).then((copiedOk) => {
+        reportCopyFailure(copiedOk);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         return undefined;
       });
     }
-  }, [url, type]);
+  }, [url, type, logger]);
 
   const handleDownload = useCallback((): void => {
     const ext = type === "image" ? "jpg" : type === "audio" ? "mp3" : "mp4";

@@ -156,12 +156,20 @@ export function SpeechToTextContainer(): JSX.Element {
     if (!text) {
       return;
     }
-    void copyToClipboard(text).then(() => {
+    void copyToClipboard(text, logger).then((copiedOk) => {
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "SpeechToTextWidget",
+          operation: "copyTranscript",
+          textLength: text.length,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;
     });
-  }, [result?.response?.text]);
+  }, [result?.response?.text, logger]);
 
   const selectedFiles = form?.watch("fileUpload.files") as File[] | undefined;
   const hasFile = selectedFiles && selectedFiles.length > 0;

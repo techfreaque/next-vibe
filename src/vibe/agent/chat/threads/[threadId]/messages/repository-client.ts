@@ -43,7 +43,7 @@ export class ChatMessagesRepositoryClient {
   ): Promise<ResponseType<MessageListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const messages = await getMessagesForThread(threadId);
+      const messages = await getMessagesForThread(threadId, logger);
 
       logger.debug("Client: incognito messages", {
         threadId,
@@ -105,6 +105,7 @@ export class ChatMessagesRepositoryClient {
         data.skill ?? null,
         data.metadata ?? {},
         messageId,
+        logger,
       );
 
       logger.debug("Client: created incognito message", {

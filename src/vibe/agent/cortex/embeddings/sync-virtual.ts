@@ -8,6 +8,7 @@ import type { ToolExecutionContext } from "next-vibe/core/execution-context";
  * Uses content hashing to skip redundant embedding API calls.
  */
 import { db } from "next-vibe/database";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
@@ -44,6 +45,7 @@ export async function syncVirtualNodeToEmbedding(
   /** Fixture chain of the triggering execution — binds the embedding call so
    *  it records/replays like every other AI/media call. Required explicit. */
   toolExecutionContext: ToolExecutionContext,
+  logger: EndpointLogger,
 ): Promise<void> {
   // /ssh and /favorites are never embedded (live/volatile/sensitive).
   if (!isEmbeddableMount(path) && !isNativePath(path)) {
@@ -84,7 +86,7 @@ export async function syncVirtualNodeToEmbedding(
   }
 
   // queueEmbedding takes content directly — no need for the column.
-  queueEmbedding(row.id, path, content, { toolExecutionContext });
+  queueEmbedding(row.id, path, content, { toolExecutionContext, logger });
 }
 
 /**

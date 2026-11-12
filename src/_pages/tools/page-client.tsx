@@ -56,6 +56,7 @@ export function ToolsPageClient({
   return (
     <Div className="flex flex-col h-dvh w-full">
       <EndpointsPage
+        logger={logger}
         endpoint={helpDefinitions}
         locale={locale}
         user={user}

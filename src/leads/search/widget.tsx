@@ -27,6 +27,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -171,11 +172,12 @@ function CopyEmail({
 }): React.JSX.Element {
   const [copied, setCopied] = useState(false);
   const isTouch = useTouchDevice();
+  const logger = useWidgetLogger();
 
   const handleCopy = useCallback(
     (e: ButtonMouseEvent): void => {
       e.stopPropagation();
-      void copyToClipboard(email).then(() => {
+      void copyToClipboard(email, logger).then(() => {
         setCopied(true);
         setTimeout(() => {
           setCopied(false);
@@ -183,7 +185,7 @@ function CopyEmail({
         return undefined;
       });
     },
-    [email],
+    [email, logger],
   );
 
   return (

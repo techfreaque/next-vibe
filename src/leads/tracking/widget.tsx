@@ -20,6 +20,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetUser,
@@ -345,14 +346,15 @@ export function LeadClickTrackingContainer({
     })();
   }, [navigate]);
 
+  const logger = useWidgetLogger();
   const redirectUrl = data?.redirectUrl;
   const handleOpenRedirectUrl = useCallback((): void => {
     if (!redirectUrl) {
       return;
     }
-    openInNewTab(redirectUrl);
+    openInNewTab(redirectUrl, logger);
     return undefined;
-  }, [redirectUrl]);
+  }, [redirectUrl, logger]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">

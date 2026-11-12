@@ -56,6 +56,8 @@ export interface ExecutionContext {
   nodeRanges: Map<string, TimeRange>;
   logger: ReturnType<typeof createEndpointLogger>;
   graphId: string;
+  /** Graph slug, when the caller has it — only used to label log lines. */
+  graphSlug?: string;
   graphNodes: Record<string, GraphNodeConfig>;
   graphEdges: GraphEdge[];
   /**
@@ -156,7 +158,7 @@ export async function executeNode(
     nodeConfig.endpointPath,
     inputs,
     nodeId,
-    ctx.logger,
+    ctx,
   );
   if (response === null) {
     return;
@@ -325,8 +327,9 @@ async function callEndpoint(
   endpointId: string,
   input: Record<string, MappedValue>,
   nodeId: string,
-  logger: ReturnType<typeof createEndpointLogger>,
+  ctx: ExecutionContext,
 ): Promise<Record<string, WidgetData> | null> {
+  const { logger } = ctx;
   const toolName = endpointId;
 
   const data: Record<string, WidgetData> = {};
@@ -361,6 +364,8 @@ async function callEndpoint(
         ? result.errorType.errorCode
         : undefined,
     nodeId,
+    graphId: ctx.graphId,
+    graphSlug: ctx.graphSlug,
     inputKeys: Object.keys(data).join(", "),
     inputSample: JSON.stringify(data).slice(0, 500),
   });

@@ -146,6 +146,7 @@ export const messageMetadataSchema: z.ZodType<MessageMetadata> = z.object({
   isReasoning: tolerant(z.boolean()),
   isStreaming: tolerant(z.boolean()),
   isOptimistic: tolerant(z.boolean()),
+  isLocalOnly: tolerant(z.boolean()),
   isTranscribing: tolerant(z.boolean()),
   isUploadingAttachments: tolerant(z.boolean()),
 

@@ -233,15 +233,17 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     if (!user.isPublic || !activeFavoriteId) {
       return;
     }
-    void ChatFavoritesRepositoryClient.loadLocalFavorite(activeFavoriteId).then(
-      (stored) =>
-        setLoadedFavoriteConfig(
-          stored
-            ? ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored)
-            : null,
-        ),
+    void ChatFavoritesRepositoryClient.loadLocalFavorite(
+      activeFavoriteId,
+      logger,
+    ).then((stored) =>
+      setLoadedFavoriteConfig(
+        stored
+          ? ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored)
+          : null,
+      ),
     );
-  }, [user.isPublic, activeFavoriteId]);
+  }, [user.isPublic, activeFavoriteId, logger]);
 
   // Resolve voiceId from favoriteConfig for TTS playback
   const resolvedVoiceId = useMemo((): TtsModelId | undefined => {

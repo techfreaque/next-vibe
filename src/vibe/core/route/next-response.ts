@@ -4,7 +4,10 @@
  * All validation is handled by genericHandler
  */
 
+import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
+
+import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
 
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
@@ -62,6 +65,69 @@ function buildErrorChain(error: ErrorResponseType): {
   };
 }
 
+/** Coarse browser/client family from a User-Agent - never the raw string. */
+function userAgentFamily(userAgent: string | null): string {
+  if (!userAgent) {
+    return "none";
+  }
+  const family = /bot|crawl|spider|slurp|preview|headless/i.test(userAgent)
+    ? "bot"
+    : /curl|wget|python|node|bun|undici|axios|go-http|okhttp/i.test(userAgent)
+      ? "script"
+      : /Edg\//.test(userAgent)
+        ? "edge"
+        : /OPR\//.test(userAgent)
+          ? "opera"
+          : /Firefox\//.test(userAgent)
+            ? "firefox"
+            : /Chrome\/|Chromium\//.test(userAgent)
+              ? "chrome"
+              : /Safari\//.test(userAgent)
+                ? "safari"
+                : "other";
+  return /Mobile|Android|iPhone|iPad/.test(userAgent)
+    ? `${family}-mobile`
+    : family;
+}
+
+/** origin + pathname only - query strings can carry tokens. */
+function stripQuery(url: string | null): string | null {
+  if (!url) {
+    return null;
+  }
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return url.split(/[?#]/)[0] ?? null;
+  }
+}
+
+/**
+ * Request context for an API error log line: enough to find the caller (which
+ * page fired it, logged in or not, which client) without secrets - no query
+ * strings, no body, no cookie/token values.
+ */
+function describeRequestForLog(request: NextRequest): {
+  method: string;
+  path: string;
+  referer: string | null;
+  auth: "bearer" | "cookie" | "none";
+  client: string;
+} {
+  return {
+    method: request.method,
+    path: request.nextUrl.pathname,
+    referer: stripQuery(request.headers.get("referer")),
+    auth: request.headers.get("authorization")
+      ? "bearer"
+      : request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value
+        ? "cookie"
+        : "none",
+    client: userAgentFamily(request.headers.get("user-agent")),
+  };
+}
+
 /**
  * Wraps an error response in NextResponse
  * Builds clean error chains. Messages arrive already translated and, for
@@ -72,6 +138,8 @@ export function wrapErrorResponse(
   logger: EndpointLogger,
   locale: CountryLanguage,
   endpoint?: CreateApiEndpointAny | null,
+  /** The incoming request - adds caller context (page, auth, client) to the log. */
+  request?: NextRequest | null,
 ): NextResponse<ErrorResponseType> {
   // Build clean error chain
   const { logChain } = buildErrorChain(error);
@@ -85,6 +153,7 @@ export function wrapErrorResponse(
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
     errorKey: error.errorType.errorKey,
     errorCode,
+    ...(request ? describeRequestForLog(request) : {}),
   };
   if (error.expected) {
     // A benign, expected 4xx - a logged-out visitor's /me probe, or a public

@@ -36,13 +36,13 @@ import { CLI_BYPASS_USER_ID } from "../../platforms/cli/auth/cli-bypass-user";
 import { Platform } from "../../platforms/platforms";
 import { cronTaskExecutions, cronTasks } from "../../tasks/cron/db";
 import type { CronTaskStatusDB } from "../../tasks/enum";
-import { RunningTaskRegistry } from "../../tasks/watchdog/registry";
 import {
   CronTaskPriority,
   CronTaskStatus,
   TaskCategory,
   TaskOutputMode,
 } from "../../tasks/enum";
+import { RunningTaskRegistry } from "../../tasks/watchdog/registry";
 import {
   CallbackMode,
   type CallbackModeValue,
@@ -741,7 +741,7 @@ export class LocalExecutionAsync {
     finalStatus: (typeof CronTaskStatusDB)[number];
     finalResult: Record<string, WidgetData> | null;
     triggeredBy: string;
-    logger?: RouteExecuteContext["logger"];
+    logger: RouteExecuteContext["logger"];
   }): Promise<void> {
     const {
       taskId,
@@ -767,7 +767,7 @@ export class LocalExecutionAsync {
         config: {},
       });
     } catch (execInsertErr) {
-      params.logger?.warn(
+      params.logger.warn(
         "[execute-tool] Failed to insert execution history (parent deleted?)",
         {
           taskId,

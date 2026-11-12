@@ -16,7 +16,10 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getElementById } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  useWidgetLogger,
+  useWidgetNavigation,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
 import { FEATURE_COSTS } from "@/products/repository-client";
@@ -88,6 +91,7 @@ export function ThreadedMessageActions({
   const { t } = scopedTranslation.scopedT(locale);
   const { groupHover } = useMessageGroupName();
   const { push: navigate } = useWidgetNavigation();
+  const logger = useWidgetLogger();
   const rootFolderId = useChatNavigationStore(
     (s: ChatNavigationState) => s.currentRootFolderId,
   );
@@ -316,7 +320,21 @@ export function ThreadedMessageActions({
             behavior: "smooth",
             block: "center",
           });
-          void copyToClipboard(`${getCurrentUrl()}#thread-msg-${message.id}`);
+          void copyToClipboard(
+            `${getCurrentUrl()}#thread-msg-${message.id}`,
+            logger,
+          ).then((copiedOk) => {
+            if (!copiedOk) {
+              logger.warn("Clipboard write failed", {
+                component: "ThreadedMessageActions",
+                operation: "copyPermalink",
+                messageId: message.id,
+                threadId: message.threadId,
+                isSecureContext: globalThis.isSecureContext,
+              });
+            }
+            return undefined;
+          });
         }}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
         title={t("widget.threadedView.actions.copyPermalink")}

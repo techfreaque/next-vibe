@@ -4,6 +4,7 @@ import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes"
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import React, { type JSX, useEffect, useSyncExternalStore } from "react";
 
+import { useLogger } from "../hooks/use-logger";
 import { setCookie } from "../lib/cookies";
 import { storage } from "../lib/storage";
 import type { StyleType } from "../utils/style-type";
@@ -14,9 +15,10 @@ export const THEME_COOKIE_NAME = "theme_v2";
  *  Cookie is the single source of truth; localStorage is kept in sync. */
 function ThemeCookieSync(): null {
   const { resolvedTheme, setTheme } = useTheme();
+  const logger = useLogger();
   useEffect(() => {
     // Sanitize legacy "system" value in localStorage
-    void storage.getItem("theme_v2").then((stored) => {
+    void storage.getItem("theme_v2", logger).then((stored) => {
       if (stored !== null && stored !== "light" && stored !== "dark") {
         setTheme("dark");
       }
@@ -26,9 +28,9 @@ function ThemeCookieSync(): null {
       return;
     }
     // Keep cookie and localStorage in sync - cookie wins on SSR, localStorage is just next-themes' internal state
-    void setCookie(THEME_COOKIE_NAME, resolvedTheme);
-    void storage.setItem("theme_v2", resolvedTheme);
-  }, [resolvedTheme, setTheme]);
+    void setCookie(THEME_COOKIE_NAME, resolvedTheme, logger);
+    void storage.setItem("theme_v2", resolvedTheme, logger);
+  }, [resolvedTheme, setTheme, logger]);
   return null;
 }
 

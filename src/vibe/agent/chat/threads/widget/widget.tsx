@@ -712,20 +712,23 @@ export function ThreadsList({
   isLoading?: boolean;
   showEmptyMessage?: boolean;
 }): React.JSX.Element {
-  const { locale } = useWidgetContext();
+  const { locale, logger } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
 
   // Sync threads into Zustand store so useLazyBranchLoader can look up rootFolderId
   const addThread = useChatStore((s) => s.addThread);
   useEffect(() => {
     for (const thread of threads) {
-      addThread({
-        ...(thread as ChatThread),
-        createdAt: new Date(thread.createdAt),
-        updatedAt: new Date(thread.updatedAt),
-      });
+      addThread(
+        {
+          ...(thread as ChatThread),
+          createdAt: new Date(thread.createdAt),
+          updatedAt: new Date(thread.updatedAt),
+        },
+        logger,
+      );
     }
-  }, [threads, addThread]);
+  }, [threads, addThread, logger]);
 
   const sorted = useMemo(
     () =>

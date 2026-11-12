@@ -5,6 +5,7 @@
  */
 
 "use client";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -647,8 +648,13 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         if (result.success && result.data) {
           handleEdit(key, result.data.key);
         }
-      } catch {
-        // ignore
+      } catch (error) {
+        // Generate button did nothing for the user - report why
+        logger.error("Env wizard: key generation threw", parseError(error), {
+          component: "SettingsWizard",
+          operation: "generateKey",
+          envKey: key,
+        });
       }
     },
     [user, logger, locale, handleEdit],
@@ -694,9 +700,9 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
       setCurrentStep((s) => s + 1);
     } else {
       setDone(true);
-      await storage.setItem("vibe-wizard-dismissed", "1");
+      await storage.setItem("vibe-wizard-dismissed", "1", logger);
     }
-  }, [saveCurrentStep, currentStep, totalSteps]);
+  }, [saveCurrentStep, currentStep, totalSteps, logger]);
 
   const handleBack = useCallback((): void => {
     setCurrentStep((s) => Math.max(0, s - 1));
@@ -707,9 +713,9 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
       setCurrentStep((s) => s + 1);
     } else {
       setDone(true);
-      await storage.setItem("vibe-wizard-dismissed", "1");
+      await storage.setItem("vibe-wizard-dismissed", "1", logger);
     }
-  }, [currentStep, totalSteps]);
+  }, [currentStep, totalSteps, logger]);
 
   // Pre-fill auto-generated keys that are already configured
   useEffect(() => {
@@ -760,7 +766,7 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
             size="sm"
             className="text-xs h-7"
             onClick={async (): Promise<void> => {
-              await storage.setItem("vibe-wizard-dismissed", "1");
+              await storage.setItem("vibe-wizard-dismissed", "1", logger);
               onDone();
             }}
           >

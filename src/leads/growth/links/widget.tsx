@@ -27,6 +27,7 @@ import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetEndpointMutations,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -53,6 +54,7 @@ function CopyButton({
   copiedLabel: string;
 }): JSX.Element {
   const [copied, setCopied] = useState(false);
+  const logger = useWidgetLogger();
   return (
     <Button
       type="button"
@@ -62,7 +64,7 @@ function CopyButton({
       onClick={(e) => {
         e.stopPropagation();
         void (async (): Promise<void> => {
-          const ok = await copyToClipboard(url);
+          const ok = await copyToClipboard(url, logger);
           setCopied(ok);
           if (ok) {
             setTimeout(() => setCopied(false), 1500);

@@ -93,6 +93,7 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -230,15 +231,16 @@ function CopyButton({
   label?: string;
 }): React.JSX.Element {
   const [copied, setCopied] = useState(false);
+  const logger = useWidgetLogger();
   const handleCopy = useCallback((): void => {
-    void copyToClipboard(text).then(() => {
+    void copyToClipboard(text, logger).then(() => {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);
       }, 1500);
       return undefined;
     });
-  }, [text]);
+  }, [text, logger]);
   return (
     <Button
       type="button"

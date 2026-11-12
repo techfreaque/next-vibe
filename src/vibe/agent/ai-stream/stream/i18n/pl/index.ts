@@ -500,6 +500,8 @@ export const translations: typeof enTranslations = {
       invalidRequestData: "Nieprawidłowe dane żądania ({{issue}})",
       modelAdminOnly:
         "{{model}} nie jest dostępny na Twoim koncie. Wybierz inny model.",
+      threadPostForbidden:
+        "Nie masz uprawnień do pisania w tym czacie. Zacznij nowy czat, żeby kontynuować.",
       fileTypeNotAllowed: "Niedozwolony typ pliku: {{fileType}}",
       uncensoredApiKeyMissing:
         "Klucz API Uncensored.ai nie został skonfigurowany",

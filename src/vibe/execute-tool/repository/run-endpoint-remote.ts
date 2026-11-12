@@ -39,7 +39,7 @@ export async function runEndpointRemote<TDef extends CreateApiEndpointAny>(
     callbackMode?: CallbackModeValue;
     user: JwtPayloadType;
     locale: CountryLanguage;
-    logger?: EndpointLogger;
+    logger: EndpointLogger;
     toolExecutionContext?: ToolExecutionContext;
     platform: Platform;
   } & (TDef["types"]["RequestOutput"] extends never

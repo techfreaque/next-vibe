@@ -19,6 +19,7 @@ import { Users } from "next-vibe/ui/components/icons/Users";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, H3, Muted, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
@@ -103,6 +104,7 @@ export function ReferralPageClient({
   user: JwtPayloadType;
   platform: Platform;
 }): JSX.Element {
+  const logger = useLogger();
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const commissionRows = buildCommissionRows(locale, t);
@@ -311,12 +313,14 @@ export function ReferralPageClient({
                 <Muted className="block">{t("manage.codesSubtitle")}</Muted>
               </Div>
               <EndpointsPage
+                logger={logger}
                 endpoint={referralCodesListDefinition}
                 user={user}
                 locale={locale}
                 platform={platform}
               />
               <EndpointsPage
+                logger={logger}
                 endpoint={referralDefinition}
                 user={user}
                 locale={locale}
@@ -330,12 +334,14 @@ export function ReferralPageClient({
                 <Muted className="block">{t("overview.subtitle")}</Muted>
               </Div>
               <EndpointsPage
+                logger={logger}
                 endpoint={referralStatsDefinition}
                 user={user}
                 locale={locale}
                 platform={platform}
               />
               <EndpointsPage
+                logger={logger}
                 endpoint={referralPayoutDefinition}
                 user={user}
                 locale={locale}

@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { P } from "next-vibe/ui/components/typography";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useMemo, useState } from "react";
 
 import type { NavigationStackEntry } from "../../../core/definition/endpoint";
@@ -116,10 +115,10 @@ interface EndpointsPagePropsBase<
    */
   platform: Platform;
   /**
-   * Logger override. When provided, used instead of useLogger() context.
-   * Required for CLI/MCP contexts that don't have LoggerProvider.
+   * Logger for all endpoint calls. Required so CLI/MCP contexts without a
+   * LoggerProvider work the same as web.
    */
-  logger?: EndpointLogger;
+  logger: EndpointLogger;
 }
 
 /**
@@ -193,6 +192,7 @@ function EndpointsPageInternal<
   disabled,
   responseOnly,
   platform,
+  logger,
 }: EndpointsPagePropsInternal<T>): React.JSX.Element {
   // Check finalNavigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
@@ -276,9 +276,6 @@ function EndpointsPageInternal<
     endpoint.DELETE;
 
   // Read configuration from endpoint definition with fallbacks
-  // useLoggerOptional returns null when LoggerProvider is absent (CLI/MCP context)
-  // In that case loggerProp must be supplied
-  const logger = useLogger();
 
   // Use finalNavigation (override-aware) for mutation success handlers.
   // Raw Zustand refs (navigationPop, etc.) would bypass the URL-synced override.
@@ -851,6 +848,7 @@ function EndpointsPageInternal<
             modalOpenState={modalOpenState}
             setModalOpenState={setModalOpenState}
             finalNavigation={finalNavigation}
+            logger={logger}
           />
         ))}
     </>
@@ -968,13 +966,14 @@ function CliPickerSelect({
   pickerCallbackWithPop,
   locale,
   user,
+  logger,
 }: {
   entry: NavigationStackEntry;
   pickerCallbackWithPop: ((value: WidgetData) => void) | undefined;
   locale: CountryLanguage;
   user: JwtPayloadType;
+  logger: EndpointLogger;
 }): React.JSX.Element {
-  const logger = useLogger();
   const endpointInstance = useEndpoint(
     { GET: entry.endpoint },
     {
@@ -1082,6 +1081,7 @@ function StackEntryLayer({
   modalOpenState,
   setModalOpenState,
   finalNavigation,
+  logger,
 }: {
   entry: NavigationStackEntry;
   index: number;
@@ -1098,6 +1098,7 @@ function StackEntryLayer({
       | ((prev: Record<number, boolean>) => Record<number, boolean>),
   ) => void;
   finalNavigation: ReturnType<typeof useNavigationStack>;
+  logger: EndpointLogger;
 }): React.JSX.Element | null {
   const isTopEntry = index === finalNavigation.stack.length - 1;
   const topEntry = finalNavigation.stack[finalNavigation.stack.length - 1];
@@ -1194,6 +1195,7 @@ function StackEntryLayer({
         pickerCallbackWithPop={pickerCallbackWithPop}
         locale={locale}
         user={user}
+        logger={logger}
       />
     );
   }
@@ -1217,6 +1219,7 @@ function StackEntryLayer({
           finalNavigation={finalNavigation}
         >
           <EndpointsPageInternal
+            logger={logger}
             endpoint={{ GET: entry.endpoint }}
             locale={locale}
             className={className}
@@ -1251,6 +1254,7 @@ function StackEntryLayer({
           finalNavigation={finalNavigation}
         >
           <EndpointsPageInternal
+            logger={logger}
             user={user}
             platform={platform}
             endpoint={{ POST: entry.endpoint }}
@@ -1286,6 +1290,7 @@ function StackEntryLayer({
           finalNavigation={finalNavigation}
         >
           <EndpointsPageInternal
+            logger={logger}
             user={user}
             platform={platform}
             endpoint={{ GET: entry.getEndpoint, PATCH: entry.endpoint }}
@@ -1330,6 +1335,7 @@ function StackEntryLayer({
           finalNavigation={finalNavigation}
         >
           <EndpointsPageInternal
+            logger={logger}
             user={user}
             platform={platform}
             endpoint={{ PATCH: entry.endpoint }}
@@ -1366,6 +1372,7 @@ function StackEntryLayer({
           finalNavigation={finalNavigation}
         >
           <EndpointsPageInternal
+            logger={logger}
             user={user}
             platform={platform}
             endpoint={{ DELETE: entry.endpoint }}
@@ -1423,6 +1430,7 @@ function StackEntryLayer({
         finalNavigation={finalNavigation}
       >
         <EndpointsPageInternal
+          logger={logger}
           user={user}
           platform={platform}
           endpoint={endpointConfig}

@@ -1,4 +1,5 @@
 "use client";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { Div } from "next-vibe/ui/components/div";
 import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
 import { Markdown } from "next-vibe/ui/components/markdown";
@@ -18,7 +19,7 @@ import { chatAnimations, chatShadows } from "@/_pages/chat/lib/design-tokens";
 import { useChatInputStore } from "../../../../../../ai-stream/stream/hooks/input-store";
 import debugDefinition from "../../../../../../ai-stream/system-prompt/debug/definition";
 import type { ChatMessage } from "../../../../../db";
-import { ChatMessageRole } from "../../../../../enum";
+import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../../enum";
 import { scopedTranslation } from "../../i18n";
 import type { DebugSystemPromptParts } from "../debug-component";
 import { DebugSystemPrompt, DebugTrailingContext } from "../debug-component";
@@ -92,6 +93,19 @@ export const DebugLinearMessageView = React.memo(
       };
     }, [rawUserMessage]);
 
+    // Only scope the preview to a thread the server actually has. Incognito
+    // threads live client-side only, "new" is the composer placeholder, and a
+    // freshly created thread is client-side until its first turn persists
+    // (an assistant message only exists once the server wrote the thread).
+    // Sending any of those ids made the debug endpoint 404 on every refetch;
+    // thread-less is the correct preview for them anyway.
+    const hasServerThread =
+      threadId !== null &&
+      threadId !== NEW_MESSAGE_ID &&
+      rootFolderId !== DefaultFolderId.INCOGNITO &&
+      messages.some((m) => m.role === ChatMessageRole.ASSISTANT);
+    const debugThreadId = hasServerThread ? threadId : undefined;
+
     const debugOptions = useMemo(
       () => ({
         read: {
@@ -104,11 +118,11 @@ export const DebugLinearMessageView = React.memo(
             userMessage: userMessage || undefined,
             subFolderId: subFolderId ?? undefined,
             skillId: selectedSkill ?? undefined,
-            threadId: threadId ?? undefined,
+            threadId: debugThreadId,
           },
         },
       }),
-      [rootFolderId, userMessage, subFolderId, selectedSkill, threadId],
+      [rootFolderId, userMessage, subFolderId, selectedSkill, debugThreadId],
     );
 
     const debugEndpoint = useEndpoint(

@@ -53,12 +53,20 @@ import type {
   TypedBridgeCall,
   TypedBridgeResponse,
 } from "./types";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { createLogger } from "../../logger/create-logger";
 import {
   FREQUENCY_KEY_PREFIX,
   isBridgeCall,
   isFrameMessage,
   isVibeFrameMessage,
 } from "./types";
+
+/**
+ * The bridge runs on third-party host pages, where our error-log endpoint is
+ * not reachable same-origin - a console-only logger (no DB persist).
+ */
+const bridgeLogger = createLogger(false, defaultLocale);
 
 // ─── Action Implementations ───────────────────────────────────────────────────
 
@@ -147,9 +155,9 @@ function getAllCookiesAction(): CookieData[] {
 function getStorageAction(payload: PayloadFor<"getStorage">): string | null {
   try {
     if (payload.type === "session") {
-      return getSessionItem(payload.key);
+      return getSessionItem(payload.key, bridgeLogger);
     }
-    return getLocalItem(payload.key);
+    return getLocalItem(payload.key, bridgeLogger);
   } catch {
     return null;
   }
@@ -158,9 +166,9 @@ function getStorageAction(payload: PayloadFor<"getStorage">): string | null {
 function setStorageAction(payload: PayloadFor<"setStorage">): boolean {
   try {
     if (payload.type === "session") {
-      setSessionItem(payload.key, payload.value);
+      setSessionItem(payload.key, payload.value, bridgeLogger);
     } else {
-      setLocalItem(payload.key, payload.value);
+      setLocalItem(payload.key, payload.value, bridgeLogger);
     }
     return true;
   } catch {
@@ -171,9 +179,9 @@ function setStorageAction(payload: PayloadFor<"setStorage">): boolean {
 function removeStorageAction(payload: PayloadFor<"removeStorage">): boolean {
   try {
     if (payload.type === "session") {
-      removeSessionItem(payload.key);
+      removeSessionItem(payload.key, bridgeLogger);
     } else {
-      removeLocalItem(payload.key);
+      removeLocalItem(payload.key, bridgeLogger);
     }
     return true;
   } catch {
@@ -240,7 +248,7 @@ function getUrlAction(): string {
 function navigateAction(payload: PayloadFor<"navigate">): boolean {
   try {
     if (payload.target) {
-      openWithTarget(payload.url, payload.target);
+      openWithTarget(payload.url, payload.target, bridgeLogger);
     } else if (payload.replace) {
       replaceUrl(payload.url);
     } else {
@@ -507,21 +515,21 @@ export function checkDisplayFrequency(
   switch (frequency) {
     case "once-per-session": {
       try {
-        return !getSessionItem(key);
+        return !getSessionItem(key, bridgeLogger);
       } catch {
         return true;
       }
     }
     case "once-per-user": {
       try {
-        return !getLocalItem(key);
+        return !getLocalItem(key, bridgeLogger);
       } catch {
         return true;
       }
     }
     case "once-per-day": {
       try {
-        const lastShown = getLocalItem(key);
+        const lastShown = getLocalItem(key, bridgeLogger);
         if (!lastShown) {
           return true;
         }
@@ -532,7 +540,7 @@ export function checkDisplayFrequency(
     }
     case "once-per-week": {
       try {
-        const lastShown = getLocalItem(key);
+        const lastShown = getLocalItem(key, bridgeLogger);
         if (!lastShown) {
           return true;
         }
@@ -563,7 +571,7 @@ export function recordDisplay(
   switch (frequency) {
     case "once-per-session":
       try {
-        setSessionItem(key, now);
+        setSessionItem(key, now, bridgeLogger);
       } catch {
         /* ignore */
       }
@@ -572,7 +580,7 @@ export function recordDisplay(
     case "once-per-day":
     case "once-per-week":
       try {
-        setLocalItem(key, now);
+        setLocalItem(key, now, bridgeLogger);
       } catch {
         /* ignore */
       }

@@ -7,6 +7,7 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
@@ -170,7 +171,12 @@ function SharePanel({
         // Repository messages arrive translated (e.g. "code already exists")
         setCreateError(result.message || t("get.share.createFailed"));
       }
-    } catch {
+    } catch (error) {
+      logger.error("Failed to create referral share code", parseError(error), {
+        component: "ShareSkill",
+        operation: "createReferralCode",
+        skillId,
+      });
       setCreateError(t("get.share.createFailed"));
     } finally {
       setCreating(false);
@@ -185,7 +191,15 @@ function SharePanel({
     if (!shareUrl) {
       return;
     }
-    await copyToClipboard(shareUrl);
+    const copiedOk = await copyToClipboard(shareUrl, logger);
+    if (!copiedOk) {
+      logger.warn("Clipboard write failed", {
+        component: "ShareSkill",
+        operation: "copyShareUrl",
+        skillId,
+        isSecureContext: globalThis.isSecureContext,
+      });
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

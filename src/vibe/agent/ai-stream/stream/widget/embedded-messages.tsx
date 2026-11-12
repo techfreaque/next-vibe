@@ -4,6 +4,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
+import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-types";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
@@ -42,6 +43,7 @@ export function EmbeddedMessagesView({
   refetchInterval?: number | false;
   initialData?: typeof messagesDefinition.GET.types.ResponseOutput;
 }): JSX.Element {
+  const logger = useWidgetLogger();
   const endpointOptions = useMemo(
     (): UseEndpointOptions<MessagesEndpoint> => ({
       read: {
@@ -60,6 +62,7 @@ export function EmbeddedMessagesView({
   return (
     <Div className={className}>
       <EndpointsPage
+        logger={logger}
         endpoint={messagesEndpoint}
         endpointOptions={endpointOptions}
         locale={locale}

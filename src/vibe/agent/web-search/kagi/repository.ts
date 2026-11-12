@@ -116,6 +116,7 @@ export class KagiSearchRepository {
                   path,
                   result.content,
                   toolExecutionContext,
+                  logger,
                 ),
             )
             .catch(() => undefined);

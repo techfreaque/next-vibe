@@ -9,6 +9,7 @@ import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { Link } from "next-vibe/ui/components/link";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { openUrl } from "next-vibe/ui/lib/location";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
@@ -42,6 +43,7 @@ export default function HelpPageClient({
   packPrice,
   packCredits,
 }: HelpPageClientProps): JSX.Element {
+  const logger = useLogger();
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
@@ -59,6 +61,7 @@ export default function HelpPageClient({
 
       <Div className="grid md:grid-cols-2 gap-12 mb-16">
         <EndpointsPage
+          logger={logger}
           endpoint={contactDefinitions}
           locale={locale}
           user={user}

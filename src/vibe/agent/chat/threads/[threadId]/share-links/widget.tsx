@@ -76,12 +76,20 @@ export function ThreadShareDialog({
   /* eslint-enable i18next/no-literal-string */
 
   const handleCopy = useCallback((): void => {
-    void copyToClipboard(threadUrl).then(() => {
+    void copyToClipboard(threadUrl, logger).then((copiedOk) => {
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "ShareLinksWidget",
+          operation: "copyThreadUrl",
+          threadId,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       return undefined;
     });
-  }, [threadUrl]);
+  }, [threadUrl, logger, threadId]);
 
   const handleSendEmail = useCallback((): void => {
     const emails = emailInput.trim();
@@ -91,10 +99,10 @@ export function ThreadShareDialog({
     /* eslint-disable i18next/no-literal-string */
     const subject = encodeURIComponent(threadTitle);
     const body = encodeURIComponent(threadUrl);
-    openInNewTab(`mailto:${emails}?subject=${subject}&body=${body}`);
+    openInNewTab(`mailto:${emails}?subject=${subject}&body=${body}`, logger);
     /* eslint-enable i18next/no-literal-string */
     setEmailInput("");
-  }, [emailInput, threadTitle, threadUrl]);
+  }, [emailInput, threadTitle, threadUrl, logger]);
 
   const handleTogglePublic = useCallback(async (): Promise<void> => {
     const targetPublic = !isPublic;

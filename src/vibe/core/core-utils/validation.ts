@@ -53,7 +53,9 @@ export function validateData<TSchema extends z.ZodType>(
   const { t } = sharedScopedTranslation.scopedT(locale);
 
   try {
-    const result = schema.safeParse(data);
+    // reportInput puts the offending value on each issue, so the log says WHAT
+    // was rejected (e.g. which model id) - summarizeIssueForLog redacts it.
+    const result = schema.safeParse(data, { reportInput: true });
 
     if (!result.success) {
       const issues = result.error.issues ?? [];
@@ -74,11 +76,12 @@ export function validateData<TSchema extends z.ZodType>(
       logValidationDetails("Validation error details", {
         endpoint: endpointPath,
         errorCount,
-        errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
-          path: e.path.join("."),
-          message: e.message,
-          code: e.code,
-        })),
+        // Compact one-liners for EVERY failing path (path, code, received
+        // value, allowed-value count) - the full Zod message for an enum
+        // lists every option and drowned the actual failing paths.
+        errors: issues
+          .slice(0, MAX_LOGGED_ISSUES)
+          .map((e: ZodIssue) => summarizeIssueForLog(e)),
         formattedErrors,
         payload: truncatedPayload,
       });
@@ -136,8 +139,64 @@ function formatZodErrors(zodError: ZodError): string[] {
     return ["error.general.unknown_validation_error"];
   }
   return zodError.issues.map(
-    (err: ZodIssue) => `${err.path.join(".")}: ${err.message}`,
+    (err: ZodIssue) => `${err.path.join(".")}: ${compactIssueMessage(err)}`,
   );
+}
+
+/** Max issues summarized in the "Validation error details" log. */
+const MAX_LOGGED_ISSUES = 20;
+
+/** Enum issues listing more allowed values than this are collapsed to a count. */
+const MAX_LISTED_ENUM_VALUES = 8;
+
+/** Path segments whose received value must never reach the logs. */
+const SENSITIVE_PATH_PATTERN =
+  /pass(word)?|secret|token|api[-_]?key|otp|credential|cookie|authorization/i;
+
+/** Zod's message, minus the full option list on large enums (e.g. every model id). */
+function compactIssueMessage(issue: ZodIssue): string {
+  if (
+    issue.code === "invalid_value" &&
+    issue.values.length > MAX_LISTED_ENUM_VALUES
+  ) {
+    return `Invalid option: not one of the ${issue.values.length} allowed values`;
+  }
+  return issue.message;
+}
+
+/**
+ * One log line per issue: path, code, compact message and the received value
+ * (primitives verbatim and truncated, objects/arrays as shape only, sensitive
+ * paths redacted). Needs the issue parsed with `reportInput: true`.
+ */
+function summarizeIssueForLog(issue: ZodIssue): string {
+  const path = issue.path.join(".") || "(root)";
+  const input = issue.input;
+  let received: string;
+  if (SENSITIVE_PATH_PATTERN.test(path)) {
+    received = "[redacted]";
+  } else if (input === undefined) {
+    received = "undefined";
+  } else if (typeof input === "string") {
+    received = JSON.stringify(
+      input.length > 80 ? `${input.slice(0, 77)}...` : input,
+    );
+  } else if (
+    input === null ||
+    typeof input === "number" ||
+    typeof input === "boolean" ||
+    typeof input === "bigint"
+  ) {
+    received = String(input);
+  } else if (Array.isArray(input)) {
+    received = `array(${input.length})`;
+  } else if (typeof input === "object") {
+    const keys = Object.keys(input);
+    received = `object{${keys.slice(0, 8).join(",")}${keys.length > 8 ? ",..." : ""}}`;
+  } else {
+    received = typeof input;
+  }
+  return `${path}: [${issue.code}] ${compactIssueMessage(issue)} (received ${received})`;
 }
 
 /**

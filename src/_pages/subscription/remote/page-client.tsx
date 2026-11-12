@@ -6,6 +6,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import remoteConnectionListDefinition from "next-vibe/remote-connection/list/definition";
 import { Container } from "next-vibe/ui/components/container";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
@@ -28,6 +29,7 @@ export function RemotePageClient({
   user,
   platform,
 }: Props): JSX.Element {
+  const logger = useLogger();
   const router = useRouter();
 
   const navigationOverride = useMemo(
@@ -52,6 +54,7 @@ export function RemotePageClient({
   return (
     <Container className="max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
       <EndpointsPage
+        logger={logger}
         endpoint={remoteConnectionListDefinition}
         user={user}
         locale={locale}

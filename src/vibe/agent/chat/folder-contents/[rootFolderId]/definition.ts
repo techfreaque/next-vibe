@@ -483,9 +483,13 @@ const { GET } = createEndpoint({
           await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await updateIncognitoThread(item.id, {
-              title: item.title ?? undefined,
-            });
+            await updateIncognitoThread(
+              item.id,
+              {
+                title: item.title ?? undefined,
+              },
+              ctx.logger,
+            );
           }
         }
       },
@@ -512,9 +516,13 @@ const { GET } = createEndpoint({
           await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await updateIncognitoThread(item.id, {
-              streamingState: item.streamingState,
-            });
+            await updateIncognitoThread(
+              item.id,
+              {
+                streamingState: item.streamingState,
+              },
+              ctx.logger,
+            );
           }
         }
       },
@@ -540,11 +548,15 @@ const { GET } = createEndpoint({
           await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await updateIncognitoThread(item.id, {
-              streamingState: item.streamingState,
-              description: item.description,
-              updatedAt: item.updatedAt,
-            });
+            await updateIncognitoThread(
+              item.id,
+              {
+                streamingState: item.streamingState,
+                description: item.description,
+                updatedAt: item.updatedAt,
+              },
+              ctx.logger,
+            );
           }
         }
       },
@@ -618,11 +630,15 @@ const { GET } = createEndpoint({
           await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await updateIncognitoThread(item.id, {
-              title: item.title ?? undefined,
-              folderId: item.folderId,
-              description: item.description,
-            });
+            await updateIncognitoThread(
+              item.id,
+              {
+                title: item.title ?? undefined,
+                folderId: item.folderId,
+                description: item.description,
+              },
+              ctx.logger,
+            );
           }
         }
       },
@@ -638,7 +654,7 @@ const { GET } = createEndpoint({
         const { deleteThread } = await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await deleteThread(item.id);
+            await deleteThread(item.id, ctx.logger);
           }
         }
       },
@@ -828,12 +844,16 @@ const { GET } = createEndpoint({
           await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await updateIncognitoFolder(item.id, {
-              name: item.name ?? undefined,
-              icon: item.icon ?? undefined,
-              color: item.color ?? undefined,
-              sortOrder: item.sortOrder,
-            });
+            await updateIncognitoFolder(
+              item.id,
+              {
+                name: item.name ?? undefined,
+                icon: item.icon ?? undefined,
+                color: item.color ?? undefined,
+                sortOrder: item.sortOrder,
+              },
+              ctx.logger,
+            );
           }
         }
       },
@@ -850,7 +870,7 @@ const { GET } = createEndpoint({
         const { deleteFolder } = await import("../../incognito/storage");
         for (const item of ctx.responseData.items ?? []) {
           if (item?.id) {
-            await deleteFolder(item.id);
+            await deleteFolder(item.id, ctx.logger);
           }
         }
       },

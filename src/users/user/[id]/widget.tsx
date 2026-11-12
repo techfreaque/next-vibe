@@ -29,6 +29,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -73,6 +74,7 @@ export function UserDetailContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
+  const logger = useWidgetLogger();
   const isLoading = !data;
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLeadId, setCopiedLeadId] = useState(false);
@@ -157,26 +159,26 @@ export function UserDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await copyToClipboard(userId);
+      await copyToClipboard(userId, logger);
       setCopiedId(true);
       setTimeout((): void => {
         setCopiedId(false);
       }, 2000);
     })();
-  }, [userId]);
+  }, [userId, logger]);
 
   const handleCopyLeadId = useCallback((): void => {
     if (!leadId) {
       return;
     }
     void (async (): Promise<void> => {
-      await copyToClipboard(leadId);
+      await copyToClipboard(leadId, logger);
       setCopiedLeadId(true);
       setTimeout((): void => {
         setCopiedLeadId(false);
       }, 2000);
     })();
-  }, [leadId]);
+  }, [leadId, logger]);
 
   if (isLoading) {
     return (
@@ -482,6 +484,7 @@ export function UserEditContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
+  const logger = useWidgetLogger();
   const isLoading = data === null || data === undefined;
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLeadId, setCopiedLeadId] = useState(false);
@@ -508,22 +511,22 @@ export function UserEditContainer({
       return;
     }
     void (async (): Promise<void> => {
-      await copyToClipboard(userId);
+      await copyToClipboard(userId, logger);
       setCopiedId(true);
       setTimeout((): void => setCopiedId(false), 2000);
     })();
-  }, [userId]);
+  }, [userId, logger]);
 
   const handleCopyLeadId = useCallback((): void => {
     if (!leadId) {
       return;
     }
     void (async (): Promise<void> => {
-      await copyToClipboard(leadId);
+      await copyToClipboard(leadId, logger);
       setCopiedLeadId(true);
       setTimeout((): void => setCopiedLeadId(false), 2000);
     })();
-  }, [leadId]);
+  }, [leadId, logger]);
 
   const handleViewLead = useCallback((): void => {
     if (!leadId) {

@@ -74,6 +74,7 @@ function WidgetSidebar({
   return (
     <Div className="flex flex-col h-full bg-background overflow-hidden">
       <EndpointsPage
+        logger={logger}
         key={currentRootFolderId}
         endpoint={foldersDefinition}
         locale={locale}

@@ -4,6 +4,7 @@
 
 "use client";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   Card,
   CardContent,
@@ -56,6 +57,7 @@ import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/pa
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { PasswordMatchIndicator } from "./password-match-indicator";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 import type definition from "../definition";
@@ -137,13 +139,19 @@ export function SignupFormContainer({
   useEffect(() => {
     void (async (): Promise<void> => {
       const initial =
-        await ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution();
+        await ChatFavoritesRepositoryClient.getLocalUuidSkillsForAttribution(
+          logger,
+        );
       setUuidSkills(initial);
 
       const missing = initial.filter((s) => !s.name);
       if (missing.length === 0) {
         return;
       }
+      // Skills the server 404s (deleted, unpublished, made private) can't be
+      // attributed - drop them from the selector and prune the dead local
+      // favorites so the next render doesn't re-request them.
+      const goneSkillIds = new Set<string>();
       const resolved = await Promise.allSettled(
         missing.map(async (s) => {
           const response = await executeQuery({
@@ -155,6 +163,9 @@ export function SignupFormContainer({
             pathParams: { id: s.skillId },
           });
           if (!response.success) {
+            if (response.errorType?.errorCode === 404) {
+              goneSkillIds.add(s.skillId);
+            }
             return s;
           }
           return { skillId: s.skillId, name: response.data.name ?? null };
@@ -164,15 +175,30 @@ export function SignupFormContainer({
       for (const r of resolved) {
         if (r.status === "fulfilled") {
           updates.set(r.value.skillId, r.value.name);
+        } else {
+          // Skill name stays blank in the creator-support selector
+          logger.warn("Signup: resolving local skill name threw", {
+            component: "SignupFormContainer",
+            operation: "resolveUuidSkillNames",
+            error: parseError(r.reason).message,
+          });
         }
       }
-      if (updates.size > 0) {
+      if (goneSkillIds.size > 0) {
+        await ChatFavoritesRepositoryClient.pruneUnavailableLocalSkills(
+          goneSkillIds,
+          logger,
+        );
+      }
+      if (updates.size > 0 || goneSkillIds.size > 0) {
         setUuidSkills((prev) =>
-          prev.map((s) =>
-            updates.has(s.skillId)
-              ? { ...s, name: updates.get(s.skillId) ?? null }
-              : s,
-          ),
+          prev
+            .filter((s) => !goneSkillIds.has(s.skillId))
+            .map((s) =>
+              updates.has(s.skillId)
+                ? { ...s, name: updates.get(s.skillId) ?? null }
+                : s,
+            ),
         );
       }
     })();
@@ -211,6 +237,7 @@ export function SignupFormContainer({
           fieldName="confirmPassword"
           field={children.confirmPassword}
         />
+        <PasswordMatchIndicator />
 
         {/* Checkboxes */}
         <BooleanFieldWidget

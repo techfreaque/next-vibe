@@ -14,6 +14,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { reportStorageFailure } from "next-vibe/logger/storage-failure";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { getLocalItem, storage } from "next-vibe/ui/lib/storage";
 import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
@@ -132,18 +133,19 @@ export class ChatFavoritesRepositoryClient {
       const settings = await ChatSettingsRepositoryClient.loadLocalSettings(
         user,
         availability,
+        logger,
       );
       const activeFavoriteId = settings.activeFavoriteId;
 
       // Load stored minimal configs
-      const storedConfigs = await this.loadAllLocalFavorites();
+      const allStoredConfigs = await this.loadAllLocalFavorites(logger);
 
       // Batch-fetch UUID skills (custom/community) from the public API
       const uuidRe =
         /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
       const uuidSkillIds = [
         ...new Set(
-          storedConfigs
+          allStoredConfigs
             .map((c) => parseSkillId(c.skillId).skillId)
             .filter((id) => uuidRe.test(id)),
         ),
@@ -158,6 +160,9 @@ export class ChatFavoritesRepositoryClient {
       }
 
       const fetchedSkillMap = new Map<string, FetchedSkill>();
+      // Skills the server no longer serves to this user (deleted, unpublished
+      // or made private) - their favorites are dead and get pruned below.
+      const goneSkillIds = new Set<string>();
       if (uuidSkillIds.length > 0) {
         const results = await Promise.allSettled(
           uuidSkillIds.map(async (skillId) => {
@@ -170,6 +175,9 @@ export class ChatFavoritesRepositoryClient {
               pathParams: { id: skillId },
             });
             if (!response.success) {
+              if (response.errorType?.errorCode === 404) {
+                goneSkillIds.add(skillId);
+              }
               return;
             }
             const { icon, name, tagline, description, variants } =
@@ -192,6 +200,16 @@ export class ChatFavoritesRepositoryClient {
           }
         }
       }
+
+      if (goneSkillIds.size > 0) {
+        logger.info("Pruning local favorites of unavailable skills", {
+          skillIds: [...goneSkillIds].join(","),
+        });
+        await this.pruneUnavailableLocalSkills(goneSkillIds, logger);
+      }
+      const storedConfigs = allStoredConfigs.filter(
+        (c) => !goneSkillIds.has(parseSkillId(c.skillId).skillId),
+      );
 
       // For PUBLIC users (localStorage), get character data from DEFAULT_SKILLS
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
@@ -271,7 +289,7 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const currentConfigs = await this.loadAllLocalFavorites();
+      const currentConfigs = await this.loadAllLocalFavorites(logger);
 
       // Generate a slug-based ID for localStorage favorites
       const { skillId: plainSkillId, variantId: parsedVariantId } =
@@ -303,7 +321,7 @@ export class ChatFavoritesRepositoryClient {
         position: currentConfigs.length,
       };
 
-      await this.saveAllLocalFavorites([...currentConfigs, newConfig]);
+      await this.saveAllLocalFavorites([...currentConfigs, newConfig], logger);
       logger.debug("Created favorite", { id });
 
       return success({
@@ -329,7 +347,7 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<FavoriteGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const config = await this.loadLocalFavorite(id);
+      const config = await this.loadLocalFavorite(id, logger);
       if (!config) {
         return fail({
           message: t("id.get.errors.notFound.title"),
@@ -359,7 +377,7 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<FavoriteUpdateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const existing = await this.loadLocalFavorite(id);
+      const existing = await this.loadLocalFavorite(id, logger);
       if (!existing) {
         return fail({
           message: t("id.patch.errors.notFound.title"),
@@ -387,7 +405,7 @@ export class ChatFavoritesRepositoryClient {
         modelSelection: data.modelSelection,
       };
 
-      await this.updateLocalFavorite(id, updated);
+      await this.updateLocalFavorite(id, updated, logger);
       logger.debug("Updated favorite", { id });
 
       return success({
@@ -412,7 +430,7 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<never>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      await this.deleteLocalFavorite(id);
+      await this.deleteLocalFavorite(id, logger);
       logger.debug("Deleted favorite", { id });
       return success();
     } catch (error) {
@@ -441,11 +459,11 @@ export class ChatFavoritesRepositoryClient {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const idsToRemove = new Set(ids);
-      const currentConfigs = await this.loadAllLocalFavorites();
+      const currentConfigs = await this.loadAllLocalFavorites(logger);
       const newConfigs = currentConfigs.filter(
         (config) => !idsToRemove.has(config.id),
       );
-      await this.saveAllLocalFavorites(newConfigs);
+      await this.saveAllLocalFavorites(newConfigs, logger);
       logger.debug("Batch-deleted favorites", { count: ids.length });
       return success({ success: true });
     } catch (error) {
@@ -467,7 +485,7 @@ export class ChatFavoritesRepositoryClient {
   ): Promise<ResponseType<{ success: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const allFavorites = await this.loadAllLocalFavorites();
+      const allFavorites = await this.loadAllLocalFavorites(logger);
 
       // Update positions
       data.positions.forEach(({ id, position }) => {
@@ -477,7 +495,7 @@ export class ChatFavoritesRepositoryClient {
         }
       });
 
-      await this.saveAllLocalFavorites(allFavorites);
+      await this.saveAllLocalFavorites(allFavorites, logger);
       logger.debug("Reordered favorites");
 
       return success({ success: true });
@@ -617,55 +635,92 @@ export class ChatFavoritesRepositoryClient {
     };
   }
 
-  private static loadAllLocalFavoritesSync(): StoredLocalFavorite[] {
-    try {
-      const stored = getLocalItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
-      if (!stored) {
-        return [];
-      }
-      return JSON.parse(stored) as StoredLocalFavorite[];
-    } catch {
-      return [];
-    }
-  }
-
-  static loadLocalFavoriteSync(id: string): StoredLocalFavorite | null {
-    return this.loadAllLocalFavoritesSync().find((c) => c.id === id) ?? null;
-  }
-
-  private static async loadAllLocalFavorites(): Promise<StoredLocalFavorite[]> {
-    const stored = await storage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
+  private static loadAllLocalFavoritesSync(
+    logger: EndpointLogger,
+  ): StoredLocalFavorite[] {
+    const stored = getLocalItem(STORAGE_KEYS.FAVORITE_CHARACTERS, logger);
     if (!stored) {
       return [];
     }
     try {
       return JSON.parse(stored) as StoredLocalFavorite[];
-    } catch {
+    } catch (error) {
+      reportStorageFailure(logger, {
+        platform: "web",
+        area: "localStorage",
+        operation: "parse",
+        key: STORAGE_KEYS.FAVORITE_CHARACTERS,
+        error: error instanceof Error ? error : String(error),
+        valueLength: stored.length,
+      });
+      return [];
+    }
+  }
+
+  static loadLocalFavoriteSync(
+    id: string,
+    logger: EndpointLogger,
+  ): StoredLocalFavorite | null {
+    return (
+      this.loadAllLocalFavoritesSync(logger).find((c) => c.id === id) ?? null
+    );
+  }
+
+  private static async loadAllLocalFavorites(
+    logger: EndpointLogger,
+  ): Promise<StoredLocalFavorite[]> {
+    const stored = await storage.getItem(
+      STORAGE_KEYS.FAVORITE_CHARACTERS,
+      logger,
+    );
+    if (!stored) {
+      return [];
+    }
+    try {
+      return JSON.parse(stored) as StoredLocalFavorite[];
+    } catch (error) {
+      reportStorageFailure(logger, {
+        platform: "web",
+        area: "localStorage",
+        operation: "parse",
+        key: STORAGE_KEYS.FAVORITE_CHARACTERS,
+        error: error instanceof Error ? error : String(error),
+        valueLength: stored.length,
+      });
       return [];
     }
   }
 
   private static async saveAllLocalFavorites(
     configs: StoredLocalFavorite[],
+    logger: EndpointLogger,
   ): Promise<void> {
     await storage.setItem(
       STORAGE_KEYS.FAVORITE_CHARACTERS,
       JSON.stringify(configs),
+      logger,
     );
   }
 
   static async setLastAttributedSkillId(
     skillId: string,
-    name?: string | null,
+    name: string | null | undefined,
+    logger: EndpointLogger,
   ): Promise<void> {
     await storage.setItem(
       STORAGE_KEYS.LAST_ATTRIBUTED_SKILL,
       JSON.stringify({ skillId, name: name ?? null }),
+      logger,
     );
   }
 
-  static async getLastAttributedSkillId(): Promise<string | null> {
-    const raw = await storage.getItem(STORAGE_KEYS.LAST_ATTRIBUTED_SKILL);
+  static async getLastAttributedSkillId(
+    logger: EndpointLogger,
+  ): Promise<string | null> {
+    const raw = await storage.getItem(
+      STORAGE_KEYS.LAST_ATTRIBUTED_SKILL,
+      logger,
+    );
     if (!raw) {
       return null;
     }
@@ -677,13 +732,16 @@ export class ChatFavoritesRepositoryClient {
     }
   }
 
-  static async getLocalUuidSkillsForAttribution(): Promise<
-    Array<{ skillId: string; name: string | null }>
-  > {
+  static async getLocalUuidSkillsForAttribution(
+    logger: EndpointLogger,
+  ): Promise<Array<{ skillId: string; name: string | null }>> {
     const uuidRe = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
 
     const nameMap = new Map<string, string | null>();
-    const raw = await storage.getItem(STORAGE_KEYS.LAST_ATTRIBUTED_SKILL);
+    const raw = await storage.getItem(
+      STORAGE_KEYS.LAST_ATTRIBUTED_SKILL,
+      logger,
+    );
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as {
@@ -693,20 +751,53 @@ export class ChatFavoritesRepositoryClient {
         if (parsed.skillId) {
           nameMap.set(parsed.skillId, parsed.name ?? null);
         }
-      } catch {
-        // ignore
+      } catch (error) {
+        reportStorageFailure(logger, {
+          platform: "web",
+          area: "localStorage",
+          operation: "parse",
+          key: STORAGE_KEYS.LAST_ATTRIBUTED_SKILL,
+          error: error instanceof Error ? error : String(error),
+          valueLength: raw.length,
+        });
       }
     }
 
-    const all = await this.loadAllLocalFavorites();
+    const all = await this.loadAllLocalFavorites(logger);
+    // skillId is stored merged ("<uuid>__<variant>") - attribute the base skill
     return all
-      .filter((f) => uuidRe.test(f.skillId))
-      .map((f) => f.skillId)
+      .map((f) => parseSkillId(f.skillId).skillId)
+      .filter((id) => uuidRe.test(id))
       .filter((id, idx, arr) => arr.indexOf(id) === idx)
       .map((skillId) => ({ skillId, name: nameMap.get(skillId) ?? null }));
   }
 
-  static async getLocalFavoritesForMigration(): Promise<
+  /**
+   * Drop every local favorite of skills the server answered 404 for (deleted,
+   * unpublished or made private), and forget them as the last attributed
+   * skill - otherwise each favorites load / signup render re-requests them.
+   */
+  static async pruneUnavailableLocalSkills(
+    skillIds: ReadonlySet<string>,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    if (skillIds.size === 0) {
+      return;
+    }
+    const all = await this.loadAllLocalFavorites(logger);
+    const kept = all.filter(
+      (f) => !skillIds.has(parseSkillId(f.skillId).skillId),
+    );
+    if (kept.length !== all.length) {
+      await this.saveAllLocalFavorites(kept, logger);
+    }
+    const lastAttributed = await this.getLastAttributedSkillId(logger);
+    if (lastAttributed !== null && skillIds.has(lastAttributed)) {
+      await storage.removeItem(STORAGE_KEYS.LAST_ATTRIBUTED_SKILL, logger);
+    }
+  }
+
+  static async getLocalFavoritesForMigration(logger: EndpointLogger): Promise<
     Array<{
       skillId: string;
       customVariantName: string | null | undefined;
@@ -714,7 +805,7 @@ export class ChatFavoritesRepositoryClient {
       voiceModelSelection: StoredLocalFavorite["voiceModelSelection"];
     }>
   > {
-    const all = await this.loadAllLocalFavorites();
+    const all = await this.loadAllLocalFavorites(logger);
     return all.map((f) => ({
       skillId: f.skillId,
       customVariantName: f.customVariantName,
@@ -725,25 +816,30 @@ export class ChatFavoritesRepositoryClient {
 
   static async loadLocalFavorite(
     id: string,
+    logger: EndpointLogger,
   ): Promise<StoredLocalFavorite | null> {
-    const configs = await this.loadAllLocalFavorites();
+    const configs = await this.loadAllLocalFavorites(logger);
     return configs.find((config) => config.id === id) ?? null;
   }
 
   private static async updateLocalFavorite(
     id: string,
     updated: StoredLocalFavorite,
+    logger: EndpointLogger,
   ): Promise<void> {
-    const currentConfigs = await this.loadAllLocalFavorites();
+    const currentConfigs = await this.loadAllLocalFavorites(logger);
     const updatedConfigs = currentConfigs.map((config) =>
       config.id === id ? updated : config,
     );
-    await this.saveAllLocalFavorites(updatedConfigs);
+    await this.saveAllLocalFavorites(updatedConfigs, logger);
   }
 
-  private static async deleteLocalFavorite(id: string): Promise<void> {
-    const currentConfigs = await this.loadAllLocalFavorites();
+  private static async deleteLocalFavorite(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const currentConfigs = await this.loadAllLocalFavorites(logger);
     const newConfigs = currentConfigs.filter((config) => config.id !== id);
-    await this.saveAllLocalFavorites(newConfigs);
+    await this.saveAllLocalFavorites(newConfigs, logger);
   }
 }

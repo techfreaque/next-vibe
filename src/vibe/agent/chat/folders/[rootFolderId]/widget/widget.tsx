@@ -547,6 +547,7 @@ export function FoldersListContainer(): React.JSX.Element {
             ) : searchThreadIds.length > 0 ? (
               <Div className="px-1 py-1">
                 <EndpointsPage
+                  logger={logger}
                   key={searchThreadIds.join(",")}
                   endpoint={folderContentsDefinition}
                   locale={locale}
@@ -582,6 +583,7 @@ export function FoldersListContainer(): React.JSX.Element {
           ) : (
             <Div className="px-1 py-1">
               <EndpointsPage
+                logger={logger}
                 endpoint={folderContentsDefinition}
                 locale={locale}
                 user={user}
@@ -613,6 +615,7 @@ export function FoldersListContainer(): React.JSX.Element {
             <DialogTitle>{t("widget.newFolder.title")}</DialogTitle>
           </DialogHeader>
           <EndpointsPage
+            logger={logger}
             endpoint={{ POST: createFolderDefinition.POST }}
             locale={locale}
             user={user}

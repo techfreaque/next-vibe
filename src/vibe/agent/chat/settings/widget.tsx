@@ -757,6 +757,7 @@ function PulseFavSlot({
             hideChrome
           >
             <EndpointsPage
+              logger={logger}
               endpoint={favoritesEndpoint}
               locale={locale}
               user={user}

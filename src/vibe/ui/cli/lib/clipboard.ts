@@ -1,6 +1,11 @@
 import { execSync } from "node:child_process";
 
-export async function copyToClipboard(text: string): Promise<boolean> {
+import type { EndpointLogger } from "../../../logger/types";
+
+export async function copyToClipboard(
+  text: string,
+  logger: EndpointLogger,
+): Promise<boolean> {
   try {
     const platform = process.platform;
     if (platform === "darwin") {
@@ -13,13 +18,23 @@ export async function copyToClipboard(text: string): Promise<boolean> {
       });
     }
     return true;
-  } catch {
+  } catch (error) {
+    logger.warn("Clipboard write failed", {
+      operation: "copyToClipboard",
+      platform: process.platform,
+      error: error instanceof Error ? error.message : String(error),
+      textLength: text.length,
+    });
     return false;
   }
 }
 
-export async function copyImageToClipboard(url: string): Promise<boolean> {
+export async function copyImageToClipboard(
+  url: string,
+  logger: EndpointLogger,
+): Promise<boolean> {
   void url;
+  void logger;
   return false;
 }
 

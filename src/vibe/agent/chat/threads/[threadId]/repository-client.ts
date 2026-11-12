@@ -44,7 +44,7 @@ export class ChatThreadByIdRepositoryClient {
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const state = await loadIncognitoState();
+      const state = await loadIncognitoState(logger);
       const thread = state.threads[threadId];
 
       if (!thread) {
@@ -114,7 +114,7 @@ export class ChatThreadByIdRepositoryClient {
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const state = await loadIncognitoState();
+      const state = await loadIncognitoState(logger);
       if (!state.threads[threadId]) {
         return fail({
           message: t("patch.errors.notFound.title"),
@@ -139,7 +139,7 @@ export class ChatThreadByIdRepositoryClient {
         updates.tags = data.tags;
       }
 
-      await updateIncognitoThread(threadId, updates);
+      await updateIncognitoThread(threadId, updates, logger);
       logger.debug("Client: updated incognito thread", { threadId });
 
       return success({ updatedAt: new Date() });
@@ -162,7 +162,7 @@ export class ChatThreadByIdRepositoryClient {
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const state = await loadIncognitoState();
+      const state = await loadIncognitoState(logger);
       const thread = state.threads[threadId];
 
       if (!thread) {
@@ -172,7 +172,7 @@ export class ChatThreadByIdRepositoryClient {
         });
       }
 
-      await deleteThread(threadId);
+      await deleteThread(threadId, logger);
       logger.debug("Client: deleted incognito thread", { threadId });
 
       return success({

@@ -437,7 +437,18 @@ export const FlatMessage = memo(function FlatMessage({
           size="unset"
           className="text-primary hover:text-primary/80 text-xs font-semibold cursor-pointer hover:underline"
           onClick={(): void => {
-            void copyToClipboard(`>>${postNum}`);
+            void copyToClipboard(`>>${postNum}`, logger).then((copiedOk) => {
+              if (!copiedOk) {
+                logger.warn("Clipboard write failed", {
+                  component: "FlatMessage",
+                  operation: "copyPostNumber",
+                  messageId: message.id,
+                  threadId: message.threadId,
+                  isSecureContext: globalThis.isSecureContext,
+                });
+              }
+              return undefined;
+            });
           }}
           title={t("widget.flatView.clickToCopyRef")}
         >
@@ -860,7 +871,20 @@ export const FlatMessage = memo(function FlatMessage({
               variant="ghost"
               size="unset"
               onClick={(): void => {
-                void copyToClipboard(`>>${postNum}`);
+                void copyToClipboard(`>>${postNum}`, logger).then(
+                  (copiedOk) => {
+                    if (!copiedOk) {
+                      logger.warn("Clipboard write failed", {
+                        component: "FlatMessage",
+                        operation: "copyReference",
+                        messageId: message.id,
+                        threadId: message.threadId,
+                        isSecureContext: globalThis.isSecureContext,
+                      });
+                    }
+                    return undefined;
+                  },
+                );
               }}
               className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
               title={t("widget.flatView.actions.copyReference")}

@@ -218,6 +218,7 @@ const STEP_DIALOG = `// auto-renders form from definition - works anywhere
   endpoint={greetDefinitions}
   locale={locale}
   user={user}
+  logger={logger}
 />`;
 
 function ReactUiPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
@@ -597,6 +598,7 @@ const user = await requireAdminUser(locale, redirect);
   endpoint={greetDefinitions}
   locale={locale}
   user={user}
+  logger={logger}
 />`;
 
 function AdminPanelPanel({ locale }: { locale: CountryLanguage }): JSX.Element {

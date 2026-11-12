@@ -48,13 +48,17 @@ export class FolderContentsRepositoryClient {
       const subFolderId = data.subFolderId ?? null;
 
       // Fetch folders at this level
-      const allFolders = await getFoldersForRoot(rootFolderId);
+      const allFolders = await getFoldersForRoot(rootFolderId, logger);
       const levelFolders = allFolders.filter(
         (f) => (f.parentId ?? null) === subFolderId,
       );
 
       // Fetch threads at this level
-      const threads = await getThreadsForFolder(rootFolderId, subFolderId);
+      const threads = await getThreadsForFolder(
+        rootFolderId,
+        subFolderId,
+        logger,
+      );
 
       logger.debug("Client: incognito folder contents", {
         folders: levelFolders.length,

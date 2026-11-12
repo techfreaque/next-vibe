@@ -78,11 +78,12 @@ async function seed(configs: StoredFavorite[]): Promise<void> {
   await storage.setItem(
     STORAGE_KEYS.FAVORITE_CHARACTERS,
     JSON.stringify(configs),
+    logger,
   );
 }
 
 async function remainingIds(): Promise<string[]> {
-  const raw = await storage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
+  const raw = await storage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS, logger);
   if (!raw) {
     return [];
   }
@@ -91,10 +92,10 @@ async function remainingIds(): Promise<string[]> {
 
 describe("public-user multi-variant group delete", () => {
   beforeEach(async () => {
-    await storage.removeItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
+    await storage.removeItem(STORAGE_KEYS.FAVORITE_CHARACTERS, logger);
   });
   afterEach(async () => {
-    await storage.removeItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
+    await storage.removeItem(STORAGE_KEYS.FAVORITE_CHARACTERS, logger);
   });
 
   it("batch delete removes EVERY variant of the skill", async () => {

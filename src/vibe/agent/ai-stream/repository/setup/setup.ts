@@ -735,10 +735,17 @@ export async function setupAiStream(params: {
       message: threadResult.message,
       errorType: threadResult.errorType,
       threadId: effectiveThreadId,
+      userId: userId ?? null,
+      isPublic: user.isPublic,
+      rootFolderId: data.rootFolderId,
+      subFolderId: data.subFolderId ?? null,
+      operation: data.operation,
+      model: data.model,
     });
     if (threadResult.errorType === ErrorResponseTypes.FORBIDDEN) {
+      // A bare "Forbidden" toast told the user nothing - say what to do.
       return fail({
-        message: aiStreamT("post.errors.forbidden.title"),
+        message: aiStreamT("route.errors.threadPostForbidden"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }

@@ -11,6 +11,7 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Link } from "next-vibe/ui/components/link";
 import { MotionDiv } from "next-vibe/ui/components/motion";
 import { Span } from "next-vibe/ui/components/span";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
@@ -34,6 +35,7 @@ export default function ResetPasswordConfirmForm({
   user,
   platform,
 }: ResetPasswordConfirmFormProps): JSX.Element {
+  const logger = useLogger();
   const { t } = scopedTranslation.scopedT(locale);
   const router = useRouter();
   // Extract token validation status
@@ -79,6 +81,7 @@ export default function ResetPasswordConfirmForm({
       transition={{ duration: 0.5 }}
     >
       <EndpointsPage
+        logger={logger}
         endpoint={resetConfirmDefinitions}
         locale={locale}
         user={user}

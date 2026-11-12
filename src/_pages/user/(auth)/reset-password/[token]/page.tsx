@@ -119,6 +119,32 @@ export async function tanstackLoader({
     locale,
   );
 
+  // User lands on the "invalid/expired link" state - report the reason
+  // (never the token itself; it is a live credential until it expires).
+  if (!tokenValidationResponse.success) {
+    logger.warn("Password reset link rejected", {
+      page: "reset-password/[token]",
+      operation: "verifyResetToken",
+      errorType: tokenValidationResponse.errorType.errorKey,
+      reason: tokenValidationResponse.message,
+    });
+  } else if (!tokenValidationResponse.data?.response?.valid) {
+    logger.warn("Password reset link reported invalid", {
+      page: "reset-password/[token]",
+      operation: "verifyResetToken",
+      reason: tokenValidationResponse.data?.response?.message ?? null,
+    });
+  }
+  if (!user) {
+    logger.warn("Reset password page could not resolve a session user", {
+      page: "reset-password/[token]",
+      operation: "getUserByAuth",
+      reason: verifiedUserResponse.success
+        ? "empty user"
+        : verifiedUserResponse.message,
+    });
+  }
+
   return {
     locale,
     token,

@@ -227,9 +227,15 @@ export function addErrorMessageToChat(
   logger: EndpointLogger,
 ): void {
   const msgs = getCachedMessages(threadId, rootFolderId, logger);
-  const sorted = [...msgs].toSorted(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  // The leaf is the newest REAL message: the optimistic assistant placeholder
+  // is removed below, so anchoring on it would leave the error bubble (and the
+  // unsent user message) hanging off a vanished id.
+  const sorted = msgs
+    .filter((m) => !m.metadata?.isOptimistic)
+    .toSorted(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   const leafMsg = sorted[0];
 
   if (leafMsg?.role === ChatMessageRole.ERROR) {
@@ -269,7 +275,9 @@ export function addErrorMessageToChat(
     errorType,
     errorMessage: content,
     errorCode,
-    metadata: {},
+    // Never committed server-side: the next send must not chain off this id
+    // (send-message skips local-only messages when resolving the parent).
+    metadata: { isLocalOnly: true },
     upvotes: 0,
     downvotes: 0,
     createdAt: new Date(),

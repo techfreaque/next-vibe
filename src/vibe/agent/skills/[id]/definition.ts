@@ -41,7 +41,7 @@ import {
   SKILL_GET_ALIAS,
   SKILL_UPDATE_ALIAS,
 } from "../constants";
-import { skillVariantsSchema } from "../db";
+import { skillVariantsResponseSchema, skillVariantsSchema } from "../db";
 import type { SkillListResponseOutput } from "../definition";
 import {
   CategoryOptions,
@@ -1027,7 +1027,7 @@ const { GET } = createEndpoint({
       variants: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: skillVariantsSchema,
+        schema: skillVariantsResponseSchema,
       }),
 
       // === CREATOR ECONOMY FIELDS ===

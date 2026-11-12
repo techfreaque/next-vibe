@@ -21,6 +21,7 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
@@ -32,6 +33,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
 import { tierName } from "@/_pages/models/_shared/model-format";
 
+import {
+  classifyPlayRejection,
+  describeAudioElement,
+} from "./audio-diagnostics";
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
 import type definition from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -99,6 +104,7 @@ export function TextToSpeechContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
   const { t } = scopedTranslation.scopedT(locale);
 
   const currentText = form?.watch("text") ?? "";
@@ -106,6 +112,11 @@ export function TextToSpeechContainer({
 
   // Audio player state
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Voice in effect for the current audio - read by the async error handlers
+  const currentVoiceIdRef = useRef(currentVoiceId);
+  useEffect(() => {
+    currentVoiceIdRef.current = currentVoiceId;
+  }, [currentVoiceId]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -141,6 +152,14 @@ export function TextToSpeechContainer({
     });
     audio.addEventListener("error", () => {
       setIsPlaying(false);
+      // network vs decode vs unsupported source, from audio.error.code
+      logger.error("TTS widget: audio element error", {
+        ...describeAudioElement(audio),
+        voiceId: currentVoiceIdRef.current,
+        chunkIndex: 0,
+        totalChunks: 1,
+        phase: "load",
+      });
     });
 
     void audio
@@ -149,10 +168,29 @@ export function TextToSpeechContainer({
         setIsPlaying(true);
         return undefined;
       })
-      .catch(() => {
-        // Autoplay blocked — user will click play
+      .catch((error: Error) => {
+        const failureKind = classifyPlayRejection(error);
+        const context = {
+          ...describeAudioElement(audio),
+          failureKind,
+          errorName: error instanceof Error ? error.name : "UnknownError",
+          errorMessage: error instanceof Error ? error.message : String(error),
+          voiceId: currentVoiceIdRef.current,
+          chunkIndex: 0,
+          totalChunks: 1,
+          phase: "autoplay",
+        };
+        // Autoplay blocked is expected (user clicks play) - still recorded
+        if (
+          failureKind === "autoplay-policy" ||
+          failureKind === "interrupted"
+        ) {
+          logger.warn("TTS widget: autoplay did not start", context);
+          return;
+        }
+        logger.error("TTS widget: autoplay failed", context);
       });
-  }, [currentAudioUrl]);
+  }, [currentAudioUrl, logger]);
 
   const togglePlay = useCallback((): void => {
     const audio = audioRef.current;
@@ -164,12 +202,29 @@ export function TextToSpeechContainer({
       audio.pause();
       setIsPlaying(false);
     } else {
-      void audio.play().then(() => {
-        setIsPlaying(true);
-        return undefined;
-      });
+      void audio
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          return undefined;
+        })
+        .catch((error: Error) => {
+          // User pressed play and nothing happened - always an error row
+          setIsPlaying(false);
+          logger.error("TTS widget: play() rejected", {
+            ...describeAudioElement(audio),
+            failureKind: classifyPlayRejection(error),
+            errorName: error instanceof Error ? error.name : "UnknownError",
+            errorMessage:
+              error instanceof Error ? error.message : String(error),
+            voiceId: currentVoiceIdRef.current,
+            chunkIndex: 0,
+            totalChunks: 1,
+            phase: "user-play",
+          });
+        });
     }
-  }, [isPlaying]);
+  }, [isPlaying, logger]);
 
   const stopAudio = useCallback((): void => {
     const audio = audioRef.current;

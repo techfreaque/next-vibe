@@ -278,13 +278,15 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     if (!activeFavId) {
       return null;
     }
-    const stored =
-      ChatFavoritesRepositoryClient.loadLocalFavoriteSync(activeFavId);
+    const stored = ChatFavoritesRepositoryClient.loadLocalFavoriteSync(
+      activeFavId,
+      logger,
+    );
     if (!stored) {
       return null;
     }
     return ChatFavoritesRepositoryClient.buildLocalFavoriteConfig(stored);
-  }, [user.isPublic, effectiveSettings.activeFavoriteId]);
+  }, [user.isPublic, effectiveSettings.activeFavoriteId, logger]);
 
   const messageOpsDeps = useMemo(() => {
     return {

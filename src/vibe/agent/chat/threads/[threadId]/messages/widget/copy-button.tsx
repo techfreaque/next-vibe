@@ -62,7 +62,16 @@ export function CopyButton({
         textToCopy = content || "";
       }
 
-      await copyToClipboard(textToCopy);
+      const copiedOk = await copyToClipboard(textToCopy, logger);
+      if (!copiedOk) {
+        logger.warn("Clipboard write failed", {
+          component: "CopyButton",
+          operation: "copyMessageContent",
+          format,
+          textLength: textToCopy.length,
+          isSecureContext: globalThis.isSecureContext,
+        });
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), TIMING.COPY_FEEDBACK_DURATION);
     } catch (error) {

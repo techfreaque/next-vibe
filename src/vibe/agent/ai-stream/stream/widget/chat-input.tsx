@@ -288,7 +288,7 @@ export function WidgetChatInput({
                       className="h-8 w-8 @sm:h-9 @sm:w-9"
                       title={t("actions.openThread")}
                       onClick={() => {
-                        openInNewTab(threadHref);
+                        openInNewTab(threadHref, logger);
                       }}
                     >
                       <ExternalLink className="h-4 w-4" />

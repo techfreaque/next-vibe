@@ -93,6 +93,7 @@ export class InvoiceRecordPaymentRepository {
       if (invoice.companyId) {
         try {
           await autoPostJournalEntry({
+            logger,
             companyId: invoice.companyId,
             date: paidAt,
             description: `AR Payment: Invoice ${urlPathParams.invoiceId}`,

@@ -316,7 +316,8 @@ export const translations: typeof enTranslations = {
     accountLocked: "Konto ist gesperrt",
     accountLockedDescription:
       "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
-    invalid_credentials: "Ungültige E-Mail oder Passwort",
+    invalid_credentials:
+      "E-Mail oder Passwort falsch. Noch kein Konto? Erst registrieren.",
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
     invalid_two_factor_code: "Ungültiger Authentifizierungscode",
     auth_error: "Anmeldung für {{email}} fehlgeschlagen: {{error}}",

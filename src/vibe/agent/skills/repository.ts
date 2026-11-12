@@ -1264,6 +1264,7 @@ export class SkillsRepository {
             embeddingContent,
             // Caller's stream/fixture context — records/replays in fixture runs.
             toolExecutionContext,
+            logger,
           );
         })().catch(() => {
           // Best-effort embedding sync
@@ -1573,6 +1574,7 @@ export class SkillsRepository {
           embeddingContent,
           // Caller's stream/fixture context — records/replays in fixture runs.
           toolExecutionContext,
+          logger,
         );
       })().catch(() => {
         // Best-effort embedding sync

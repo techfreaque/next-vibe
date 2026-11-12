@@ -426,6 +426,7 @@ export async function writeSkillPath(
       path,
       content,
       ctx.toolExecutionContext,
+      ctx.logger,
     );
   })().catch(() => {
     // Best-effort embedding sync
@@ -566,6 +567,7 @@ export async function moveSkillPath(
         toPath,
         readResult.content,
         ctx.toolExecutionContext,
+        ctx.logger,
       );
     }
   })().catch(() => {

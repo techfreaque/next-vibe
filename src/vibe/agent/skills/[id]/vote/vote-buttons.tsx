@@ -93,6 +93,8 @@ export function SkillVoteButtons({
         setVoteCount(prevCount);
         logger.error("SkillVoteButtons.submit failed", {
           error: String(error),
+          skillId,
+          direction,
         });
       } finally {
         setPending(false);

@@ -111,7 +111,14 @@ export async function tanstackLoader({
       skillIdFromUrl,
       false,
       logger,
-    );
+    ).catch((error: Error) => {
+      logger.error("Signup page: storing lead skillId threw", error, {
+        page: "signup",
+        operation: "updateLeadSkillId",
+        leadId,
+        skillId: skillIdFromUrl,
+      });
+    });
   }
 
   // Link referral code from URL param if present
@@ -121,7 +128,33 @@ export async function tanstackLoader({
       refFromUrl,
       logger,
       locale,
-    );
+    )
+      .then((linkResult) => {
+        if (!linkResult.success) {
+          // Lost referral attribution - the referrer never gets credited
+          logger.warn("Signup page: linking referral code to lead failed", {
+            page: "signup",
+            operation: "linkReferralToLead",
+            leadId,
+            referralCode: refFromUrl,
+            errorType: linkResult.errorType.errorKey,
+            reason: linkResult.message,
+          });
+        }
+        return undefined;
+      })
+      .catch((error: Error) => {
+        logger.error(
+          "Signup page: linking referral code to lead threw",
+          error,
+          {
+            page: "signup",
+            operation: "linkReferralToLead",
+            leadId,
+            referralCode: refFromUrl,
+          },
+        );
+      });
   }
 
   // Get the latest referral code for the lead (URL ref takes priority over DB)

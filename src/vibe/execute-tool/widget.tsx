@@ -426,6 +426,7 @@ export function ExecuteToolWidget(): JSX.Element {
       {/* Local tool: render via EndpointsPage */}
       {!isRemoteTool && resolvedEndpoint && method && !resultData && (
         <EndpointsPage
+          logger={logger}
           endpoint={{ [method]: resolvedEndpoint }}
           locale={locale}
           user={user}
@@ -454,6 +455,7 @@ export function ExecuteToolWidget(): JSX.Element {
           />
         ) : (
           <EndpointsPage
+            logger={logger}
             endpoint={{ [method]: resolvedEndpoint }}
             locale={locale}
             user={user}
