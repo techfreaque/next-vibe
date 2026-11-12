@@ -130,4 +130,73 @@ describe("isCronTaskDue - catch-up semantics", () => {
       ).toBe(false);
     });
   });
+
+  describe("runOnce (anchored on createdAt) - fire at schedule, never at boot", () => {
+    const DAILY_8AM = "0 8 * * *";
+    // Real prod incident: newsletter-nov-2026-blast row created at boot
+    // 2026-11-09T22:05:53Z with schedule 08:00 UTC fired 10s later.
+    const created = new Date("2026-11-09T22:05:53Z");
+
+    it("REGRESSION: is NOT due right after boot/creation", () => {
+      expect(
+        isCronTaskDue(
+          logger,
+          DAILY_8AM,
+          new Date("2026-11-09T22:06:03Z"),
+          null,
+          created,
+        ),
+      ).toBe(false);
+    });
+
+    it("stays not due until the next scheduled occurrence", () => {
+      expect(
+        isCronTaskDue(
+          logger,
+          DAILY_8AM,
+          new Date("2026-11-10T07:59:30Z"),
+          null,
+          created,
+        ),
+      ).toBe(false);
+    });
+
+    it("is due once the first occurrence after creation has elapsed", () => {
+      expect(
+        isCronTaskDue(
+          logger,
+          DAILY_8AM,
+          new Date("2026-11-10T08:00:20Z"),
+          null,
+          created,
+        ),
+      ).toBe(true);
+      // Pulse drift / downtime past the slot still catches up.
+      expect(
+        isCronTaskDue(
+          logger,
+          DAILY_8AM,
+          new Date("2026-11-10T13:00:00Z"),
+          null,
+          created,
+        ),
+      ).toBe(true);
+    });
+
+    it("every-minute one-shot (import jobs) still fires within a minute", () => {
+      const at = new Date("2026-11-09T14:00:30Z");
+      expect(
+        isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:00:45Z"), null, at),
+      ).toBe(false);
+      expect(
+        isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:01:05Z"), null, at),
+      ).toBe(true);
+    });
+
+    it("unanchored never-ran tasks keep startup catch-up", () => {
+      expect(
+        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-09T22:06:03Z"), null, null),
+      ).toBe(true);
+    });
+  });
 });

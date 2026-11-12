@@ -20,7 +20,10 @@ import { db } from "next-vibe/database";
 import { Environment } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { emailJourneyVariants, leads } from "next-vibe/identity/lead/db";
-import type { EmailCampaignStageValue } from "next-vibe/identity/lead/enum";
+import type {
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
+} from "next-vibe/identity/lead/enum";
 import {
   EmailCampaignStage as EmailCampaignStageEnum,
   EmailProvider,
@@ -37,6 +40,9 @@ import { messengerAccounts } from "@/messenger/accounts/db";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
+import { CampaignType } from "@/messenger/accounts/enum";
+
+import { emailService } from "../emails";
 import { emailRendererService } from "../emails/services/renderer";
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import type {
@@ -71,6 +77,8 @@ const ENABLED_STAGES = [
 interface StageProcessOptions {
   batchSize: number;
   dryRun: boolean;
+  /** Only dispatch rows of this journey (one-off newsletter send). */
+  journeyVariant?: typeof EmailJourneyVariantValue;
 }
 
 const EMAIL_CAMPAIGNS_TASK_ID = "email-campaigns";
@@ -393,6 +401,7 @@ export class EmailCampaignsRepository {
       const pendingEmails = await campaignSchedulerService.getPendingEmails(
         options.batchSize,
         logger,
+        options.journeyVariant,
       );
 
       result.leadsProcessed = pendingEmails.length;
@@ -466,6 +475,32 @@ export class EmailCampaignsRepository {
             continue;
           }
 
+          // Send-time consent gate: a newsletter row is only mailed if its
+          // recipient is in the consented audience right now (verified +
+          // opted in, never unsubscribed/bounced). Rows enqueued under an
+          // older gate, or whose recipient opted out since, are cancelled.
+          if (
+            campaign.campaignType === CampaignType.NEWSLETTER &&
+            !(await campaignSchedulerService.isConsentedNewsletterRecipient(
+              resolvedEmail,
+            ))
+          ) {
+            await campaignSchedulerService.haltCampaign(
+              campaign.leadId,
+              logger,
+              {
+                campaignType: CampaignType.NEWSLETTER,
+                reason: "consent_gate:not_in_audience",
+              },
+            );
+            logger.info("campaign.process.consent_gate_skip", {
+              campaignId: campaign.id,
+              leadId: campaign.leadId,
+              journeyVariant: campaign.journeyVariant,
+            });
+            continue;
+          }
+
           const leadWithEmail: LeadWithEmailType = {
             ...fullLead,
             email: resolvedEmail,
@@ -502,6 +537,12 @@ export class EmailCampaignsRepository {
             contactClientRepository.getSupportEmail(leadLocale);
           const emailBaseUrl =
             accountRow?.emailDomain ?? coreEnv.NEXT_PUBLIC_APP_URL;
+          const unsubscribeUrl = emailService.generateUnsubscribeUrl(
+            emailBaseUrl,
+            campaign.leadId,
+            resolvedEmail,
+            leadLocale,
+          );
 
           const rendered = await emailRendererService.renderEmail(
             leadWithEmail,
@@ -512,7 +553,7 @@ export class EmailCampaignsRepository {
               companyName: variantCompanyName,
               companyEmail: variantCompanyEmail,
               campaignId: campaign.id,
-              unsubscribeUrl: `${emailBaseUrl}/${leadLocale}/story/newsletter/unsubscribe/${encodeURIComponent(resolvedEmail)}?id=${encodeURIComponent(campaign.leadId)}`,
+              unsubscribeUrl,
               trackingUrl: emailBaseUrl,
               baseUrl: emailBaseUrl,
             },
@@ -531,6 +572,9 @@ export class EmailCampaignsRepository {
           }
 
           const html = await render(rendered.jsx);
+          // Always ship a text/plain part: HTML-only bulk mail scores worse.
+          const text =
+            rendered.text ?? (await render(rendered.jsx, { plainText: true }));
 
           const smtpT = smtpScopedTranslation.scopedT(leadLocale).t;
           const sendResult = await SmtpSendingRepository.sendEmail(
@@ -539,9 +583,11 @@ export class EmailCampaignsRepository {
               toName: campaign.lead.businessName || undefined,
               subject: rendered.subject,
               html,
-              text: rendered.text,
+              text,
               senderName: variantSenderName,
               replyTo: contactClientRepository.getSupportEmail(leadLocale),
+              // Marketing mail: adds RFC 8058 one-click List-Unsubscribe headers.
+              unsubscribeUrl,
               selectionCriteria: {
                 campaignType: campaign.campaignType,
                 emailJourneyVariant: campaign.journeyVariant,

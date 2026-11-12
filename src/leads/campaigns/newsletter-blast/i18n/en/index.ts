@@ -4,27 +4,38 @@ export const translations = {
     title: "Newsletter Blast",
     titleShort: "Blast",
     description:
-      "Enqueue a one-off, consent-filtered newsletter to confirmed opt-ins. The email-campaigns dispatcher sends the enqueued rows.",
+      "Send a one-off newsletter to confirmed opt-ins only. Dry run shows counts per locale. Send mails this newsletter right away, nothing else.",
     container: {
       title: "Newsletter blast",
-      description: "Consent-filtered one-off newsletter enqueue",
+      description: "Confirmed opt-ins only. Count, queue, send.",
     },
     fields: {
       dryRun: {
         label: "Dry run",
         description:
-          "Count the consented audience without enqueuing any emails.",
+          "Count the consented audience per locale. Writes nothing, sends nothing.",
+      },
+      send: {
+        label: "Send now",
+        description:
+          "Mail this newsletter to the consented audience right away. Other pending campaigns are left alone.",
       },
     },
     response: {
-      scheduled: "Enqueued",
-      skipped: "Skipped",
+      audience: "Consented audience",
+      byLocale: "Recipients per locale",
+      scheduled: "Newly enqueued",
+      alreadyPending: "Already queued",
+      cancelled: "Cancelled (no consent)",
+      skipped: "Skipped (already sent)",
       errors: "Errors",
+      sent: "Sent",
+      sendFailed: "Send failed",
     },
     success: {
       title: "Newsletter blast enqueued",
       description:
-        "Consent-filtered recipients were enqueued for the next dispatcher run.",
+        "Consented recipients are queued. With Send now on, they are mailed in this run.",
     },
   },
   errors: {

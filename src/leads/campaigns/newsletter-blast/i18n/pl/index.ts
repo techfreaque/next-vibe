@@ -6,27 +6,39 @@ export const translations: typeof enTranslations = {
     title: "Wysyłka newslettera",
     titleShort: "Wysyłka",
     description:
-      "Kolejkuje jednorazowy newsletter filtrowany zgodą do potwierdzonych subskrybentów. Dispatcher email-campaigns wysyła zakolejkowane wiersze.",
+      "Wyślij jednorazowy newsletter tylko do potwierdzonych subskrybentów. Próbny przebieg pokazuje liczby według języka. Wyślij teraz wysyła tylko ten newsletter, nic więcej.",
     container: {
       title: "Wysyłka newslettera",
-      description: "Jednorazowe kolejkowanie filtrowane zgodą",
+      description:
+        "Tylko potwierdzeni subskrybenci. Policz, zakolejkuj, wyślij.",
     },
     fields: {
       dryRun: {
         label: "Próbny przebieg",
         description:
-          "Policz odbiorców, którzy wyrazili zgodę, bez kolejkowania e-maili.",
+          "Policz odbiorców ze zgodą według języka. Nic nie zapisuje, nic nie wysyła.",
+      },
+      send: {
+        label: "Wyślij teraz",
+        description:
+          "Wyślij ten newsletter od razu do wszystkich odbiorców ze zgodą. Inne oczekujące kampanie zostają nietknięte.",
       },
     },
     response: {
-      scheduled: "Zakolejkowane",
-      skipped: "Pominięte",
+      audience: "Odbiorcy ze zgodą",
+      byLocale: "Odbiorcy według języka",
+      scheduled: "Nowo zakolejkowane",
+      alreadyPending: "Już w kolejce",
+      cancelled: "Anulowane (brak zgody)",
+      skipped: "Pominięte (już wysłane)",
       errors: "Błędy",
+      sent: "Wysłane",
+      sendFailed: "Wysyłka nieudana",
     },
     success: {
       title: "Newsletter zakolejkowany",
       description:
-        "Odbiorcy filtrowani zgodą zostali zakolejkowani do następnego przebiegu dispatchera.",
+        "Odbiorcy ze zgodą są w kolejce. Z opcją Wyślij teraz maile wychodzą w tym przebiegu.",
     },
   },
   errors: {

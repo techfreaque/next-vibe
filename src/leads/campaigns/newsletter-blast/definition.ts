@@ -1,8 +1,9 @@
 /**
  * Newsletter Blast API Definition
- * POST: enqueue a one-off, consent-filtered newsletter to confirmed opt-ins.
- * Runs as a one-shot cron task (see task.ts); the email-campaigns dispatcher
- * then sends the enqueued rows on its normal schedule.
+ * POST: enqueue a one-off, consent-filtered newsletter to confirmed opt-ins,
+ * cancel pending rows that fall outside the audience, and (send=true) dispatch
+ * exactly this newsletter's rows right away. dryRun reports counts per locale
+ * and writes nothing.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -53,10 +54,38 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.boolean().default(false),
       }),
+      send: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.send.label",
+        description: "post.fields.send.description",
+        columns: 12,
+        schema: z.boolean().default(false),
+      }),
 
+      audience: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.audience",
+        schema: z.number(),
+      }),
+      byLocale: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.byLocale",
+        schema: z.string(),
+      }),
       scheduled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.scheduled",
+        schema: z.number(),
+      }),
+      alreadyPending: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.alreadyPending",
+        schema: z.number(),
+      }),
+      cancelled: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.cancelled",
         schema: z.number(),
       }),
       skipped: responseField(scopedTranslation, {
@@ -67,6 +96,16 @@ const { POST } = createEndpoint({
       errors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.errors",
+        schema: z.number(),
+      }),
+      sent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.sent",
+        schema: z.number(),
+      }),
+      sendFailed: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.sendFailed",
         schema: z.number(),
       }),
     },
@@ -80,9 +119,33 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    requests: { default: { dryRun: false } },
+    requests: {
+      default: { dryRun: true, send: false },
+      send: { dryRun: false, send: true },
+    },
     responses: {
-      default: { scheduled: 0, skipped: 0, errors: 0 },
+      default: {
+        audience: 7,
+        byLocale: "en-US: 4, en-GLOBAL: 3",
+        scheduled: 6,
+        alreadyPending: 1,
+        cancelled: 193,
+        skipped: 0,
+        errors: 0,
+        sent: 0,
+        sendFailed: 0,
+      },
+      send: {
+        audience: 7,
+        byLocale: "en-US: 4, en-GLOBAL: 3",
+        scheduled: 6,
+        alreadyPending: 1,
+        cancelled: 193,
+        skipped: 0,
+        errors: 0,
+        sent: 7,
+        sendFailed: 0,
+      },
     },
   },
 });

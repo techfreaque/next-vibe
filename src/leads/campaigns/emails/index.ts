@@ -148,7 +148,7 @@ export class EmailService {
       leadId,
     });
     // eslint-disable-next-line i18next/no-literal-string
-    return `${baseUrl}/${locale}/newsletter/unsubscribe/${encodedEmail}?${params.toString()}`;
+    return `${baseUrl}/${locale}/story/newsletter/unsubscribe/${encodedEmail}?${params.toString()}`;
   }
 
   /**

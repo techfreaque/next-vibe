@@ -137,9 +137,12 @@ export class TestEmailRepository {
         });
       }
 
-      const unsubscribeUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/${emailLocale}/newsletter/unsubscribe/${encodeURIComponent(
+      const unsubscribeUrl = emailService.generateUnsubscribeUrl(
+        coreEnv.NEXT_PUBLIC_APP_URL,
+        mockLead.id,
         data.testEmail,
-      )}`;
+        emailLocale,
+      );
 
       const selectionCriteria = {
         campaignType: data.campaignType || CampaignType.LEAD_CAMPAIGN,
@@ -153,6 +156,9 @@ export class TestEmailRepository {
       try {
         // Render JSX to HTML for SMTP service
         const html = await render(emailContent.jsx);
+        const text =
+          emailContent.text ??
+          (await render(emailContent.jsx, { plainText: true }));
 
         const smtpT = smtpScopedTranslation.scopedT(emailLocale).t;
         const emailResponse = await SmtpSendingRepository.sendEmail(
@@ -161,6 +167,7 @@ export class TestEmailRepository {
             toName: data.testEmail,
             subject: emailContent.subject,
             html,
+            text,
             replyTo: contactClientRepository.getSupportEmail(emailLocale),
             unsubscribeUrl,
             senderName: configLocalT("appName"),

@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
       footer: {
         needHelp: "Brauchen Sie Hilfe?",
         helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
-        unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
+        unsubscribeText: "Du willst diese E-Mails nicht mehr bekommen?",
         unsubscribeLink: "Abmelden",
         copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
         visitWebsite: "Website besuchen",

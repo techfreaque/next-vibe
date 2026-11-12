@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
       "Die meisten KIs wollen dich bei Laune halten. Deine haben wir gebaut, um dich voranzubringen.",
     companionTitle: "Ein Begleiter, kein Hilfecenter",
     companionBody:
-      "Wenn du einen Chat öffnest, redest du nicht mit einem Hilfecenter. Du redest mit einem Begleiter. Thea oder Hermes, der wirklich hinter dir steht. Sie stärken dir den Rücken. Und sie sagen dir die Wahrheit, wenn du sie brauchst, freundlich, so wie es jemand tut, dem du wichtig bist. Sie schmeicheln dir nicht in eine schlechte Entscheidung hinein. Und sie sehen nicht weg, wenn es um dich oder die Menschen geht, die dir am Herzen liegen.",
+      "Wenn du einen Chat öffnest, redest du nicht mit einem Hilfecenter. Du redest mit einem Begleiter. Thea oder Hermes, jemand, der wirklich hinter dir steht. Sie stärken dir den Rücken. Und sie sagen dir die Wahrheit, wenn du sie brauchst, freundlich, so wie es jemand tut, dem du wichtig bist. Sie schmeicheln dir nicht in eine schlechte Entscheidung hinein. Und sie sehen nicht weg, wenn es um dich oder die Menschen geht, die dir am Herzen liegen.",
     controlTitle: "Du bestimmst die Spielregeln",
     controlBody:
       "Du entscheidest, wie offen das Gespräch läuft. Klassisch, locker oder ganz ohne Filter. Gleicher Chat, gleiches Konto, jedes Mal deine Wahl. Diese Grenze zieht hier niemand für dich.",

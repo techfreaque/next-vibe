@@ -1,9 +1,11 @@
 /**
  * Newsletter blast cron task (one-shot).
  *
- * Fires once at the next 08:00 UTC (09:00 Europe/Vienna) after deploy, enqueues
- * the consent-filtered November 2026 newsletter, then disables itself (runOnce).
- * The already-enabled email-campaigns dispatcher sends the enqueued rows.
+ * Fires once at the next 08:00 UTC after the task row is created (runOnce is
+ * anchored on createdAt, never at boot), enqueues the consent-filtered
+ * November 2026 newsletter and disables itself. It only ENQUEUES: to mail the
+ * rows, run the endpoint with send=true (`vibe newsletter-blast --send=true`)
+ * or enable the email-campaigns dispatcher.
  *
  * To re-arm for a future issue: bump BLAST_JOURNEY_VARIANT in repository.ts,
  * change this task id, and set enabled: true again.
@@ -34,7 +36,7 @@ const newsletterBlastTask = createCronTask(definitions.POST, tools.POST, {
   priority: CronTaskPriority.MEDIUM,
   timeout: TASK_TIMEOUTS.LONG,
   runOnce: true,
-  taskInput: { dryRun: false },
+  taskInput: { dryRun: false, send: false },
 });
 /* eslint-enable i18next/no-literal-string */
 

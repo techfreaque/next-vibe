@@ -526,12 +526,18 @@ export function validateCronSchedule(
  * - `lastExecutedAt` null (never ran) → due now: catch-up on first boot / after
  *   a task is created, exactly once (the run stamps `lastExecutedAt`).
  * - Within the same scheduled period after a run → not due (no double-fire).
+ * - `firstRunAnchor` set (runOnce tasks pass their `createdAt`) and never ran →
+ *   due only once a scheduled occurrence has elapsed AFTER the anchor. A
+ *   runOnce task means "fire once at the next scheduled time", so it must not
+ *   take the never-ran catch-up path: that fired the one-shot newsletter blast
+ *   10s after boot instead of at its 08:00 UTC slot.
  */
 export function isCronTaskDue(
   logger: EndpointLogger,
   schedule: string,
   currentDate?: Date,
   lastExecutedAt?: Date | null,
+  firstRunAnchor?: Date | null,
 ): boolean {
   if (schedule === "manual") {
     return false;
@@ -546,8 +552,12 @@ export function isCronTaskDue(
     // Most recent scheduled fire time at or before `now`.
     const prevExecution = interval.prev().toDate();
 
-    // Never executed: fire on the next pulse (catch-up on startup / new task).
+    // Never executed: recurring tasks catch up on the next pulse. One-shot
+    // (anchored) tasks wait for the first occurrence after they were created.
     if (!lastExecutedAt) {
+      if (firstRunAnchor) {
+        return prevExecution.getTime() > firstRunAnchor.getTime();
+      }
       return true;
     }
 

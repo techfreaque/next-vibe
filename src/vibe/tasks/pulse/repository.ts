@@ -293,7 +293,14 @@ export class PulseHealthRepository {
 
           const isDue =
             options.force ||
-            isCronTaskDue(logger, dbTask.schedule, now, dbTask.lastExecutedAt);
+            isCronTaskDue(
+              logger,
+              dbTask.schedule,
+              now,
+              dbTask.lastExecutedAt,
+              // runOnce = "fire once at the next scheduled time", never at boot.
+              dbTask.runOnce ? dbTask.createdAt : null,
+            );
           if (!isDue) {
             tasksSkipped.push(dbTask.displayName);
             continue;

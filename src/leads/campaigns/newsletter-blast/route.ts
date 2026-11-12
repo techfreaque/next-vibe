@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, t }) =>
-      NewsletterBlastRepository.run(data, logger, t),
+    handler: ({ data, locale, logger, t }) =>
+      NewsletterBlastRepository.run(data, locale, logger, t),
   },
 });

@@ -6,27 +6,38 @@ export const translations: typeof enTranslations = {
     title: "Newsletter-Versand",
     titleShort: "Versand",
     description:
-      "Einmaligen, einwilligungsgefilterten Newsletter an bestätigte Abonnenten einreihen. Der email-campaigns-Dispatcher versendet die eingereihten Zeilen.",
+      "Einmaligen Newsletter nur an bestätigte Abonnenten senden. Der Testlauf zeigt die Empfänger pro Sprache. Jetzt senden verschickt genau diesen Newsletter, sonst nichts.",
     container: {
       title: "Newsletter-Versand",
-      description: "Einwilligungsgefiltertes einmaliges Einreihen",
+      description: "Nur bestätigte Abonnenten. Zählen, einreihen, senden.",
     },
     fields: {
       dryRun: {
         label: "Testlauf",
         description:
-          "Die einwilligende Zielgruppe zählen, ohne E-Mails einzureihen.",
+          "Einwilligende Empfänger pro Sprache zählen. Schreibt nichts, sendet nichts.",
+      },
+      send: {
+        label: "Jetzt senden",
+        description:
+          "Diesen Newsletter sofort an alle einwilligenden Empfänger schicken. Andere wartende Kampagnen bleiben unberührt.",
       },
     },
     response: {
-      scheduled: "Eingereiht",
-      skipped: "Übersprungen",
+      audience: "Einwilligende Empfänger",
+      byLocale: "Empfänger pro Sprache",
+      scheduled: "Neu eingereiht",
+      alreadyPending: "Bereits eingereiht",
+      cancelled: "Storniert (keine Einwilligung)",
+      skipped: "Übersprungen (bereits gesendet)",
       errors: "Fehler",
+      sent: "Gesendet",
+      sendFailed: "Versand fehlgeschlagen",
     },
     success: {
       title: "Newsletter-Versand eingereiht",
       description:
-        "Einwilligungsgefilterte Empfänger wurden für den nächsten Dispatcher-Lauf eingereiht.",
+        "Einwilligende Empfänger sind eingereiht. Mit Jetzt senden gehen die Mails in diesem Lauf raus.",
     },
   },
   errors: {
