@@ -15,9 +15,12 @@ export const translations = {
           "© {{currentYear}} {{appName}}. All rights reserved.",
         feedbackHook: "Got something to say? Reply - we actually read it.",
         feedbackBody:
-          "Report a bug, request a feature, or tell us what's missing. Useful feedback earns you {{credits}} credits — a full month on us.",
+          "Report a bug, request a feature, or tell us what's missing. Useful feedback earns you {{credits}} credits. That's a full month on us.",
         feedbackLink: "Reply with feedback →",
         footerSeparator: " · ",
+        legalOperator: "{{companyName}} is operated by {{owner}}, {{address}}.",
+        legalContact: "Contact",
+        legalNotice: "Legal notice",
       },
     },
     post: {

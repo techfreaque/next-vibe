@@ -2,7 +2,9 @@
  * Campaign Email Layout
  * Minimal layout for lead outreach campaigns.
  * No branding header - looks like a plain personal email.
- * Footer contains only the legally required unsubscribe link and a plain copyright.
+ * Footer contains the legally required unsubscribe link and sender identification
+ * (operator, postal address, contact, imprint link) as German/EU rules expect for
+ * marketing mail. Identity comes from the same config the imprint page renders.
  */
 
 import {
@@ -15,6 +17,9 @@ import {
 } from "@react-email/components";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
+
+import { contactClientRepository } from "@/contact/repository-client";
+import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";
@@ -37,6 +42,11 @@ export function CampaignEmailLayout({
   tracking,
 }: CampaignEmailLayoutProps): JSX.Element {
   const { t: st } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const supportEmail = contactClientRepository.getSupportEmail(locale);
+  // Relative: TrackedLink resolves it against the campaign baseUrl.
+  const imprintUrl = `/${locale}/story/imprint`;
+  const linkStyle = { color: "#9ca3af", textDecoration: "underline" };
   return (
     <Html lang={locale.split("-")[0]}>
       <Head />
@@ -69,7 +79,7 @@ export function CampaignEmailLayout({
             {children}
           </Section>
 
-          {/* Minimal legal footer - unsubscribe only */}
+          {/* Legal footer - unsubscribe + sender identification (imprint) */}
           <Section
             style={{
               borderTop: "1px solid #e5e7eb",
@@ -93,6 +103,36 @@ export function CampaignEmailLayout({
                 }}
               >
                 {st("components.email.footer.unsubscribeLink")}
+              </TrackedLink>
+            </div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#9ca3af",
+                marginTop: "12px",
+              }}
+            >
+              {st("components.email.footer.legalOperator", {
+                companyName: configT("group.name"),
+                owner: configT("group.responsiblePerson.name"),
+                address: configT("group.address.addressIn1Line"),
+              })}
+              <br />
+              {st("components.email.footer.legalContact")}:{" "}
+              <TrackedLink
+                href={`mailto:${supportEmail}`}
+                tracking={tracking}
+                style={linkStyle}
+              >
+                {supportEmail}
+              </TrackedLink>
+              {st("components.email.footer.footerSeparator")}
+              <TrackedLink
+                href={imprintUrl}
+                tracking={tracking}
+                style={linkStyle}
+              >
+                {st("components.email.footer.legalNotice")}
               </TrackedLink>
             </div>
           </Section>

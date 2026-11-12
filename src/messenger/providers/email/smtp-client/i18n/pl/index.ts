@@ -18,9 +18,13 @@ export const translations: typeof enTranslations = {
         feedbackHook:
           "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
         feedbackBody:
-          "Zglos blad, popros o funkcje albo napisz, czego brakuje. Za przydatna opinie dostajesz {{credits}} kredytow — pelny miesiac za darmo.",
+          "Zgłoś błąd, poproś o funkcję albo napisz, czego brakuje. Za przydatną opinię dostajesz {{credits}} kredytów. Pełny miesiąc za darmo.",
         feedbackLink: "Wyślij opinię →",
         footerSeparator: " · ",
+        legalOperator:
+          "Operatorem {{companyName}} jest {{owner}}, {{address}}.",
+        legalContact: "Kontakt",
+        legalNotice: "Nota prawna",
       },
     },
     post: {

@@ -17,9 +17,13 @@ export const translations: typeof enTranslations = {
           "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
         feedbackHook: "Etwas zu sagen? Antworten - wir lesen es wirklich.",
         feedbackBody:
-          "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nuetzliches Feedback bringt dir {{credits}} Credits — ein ganzer Monat gratis.",
+          "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nützliches Feedback bringt dir {{credits}} Credits. Ein ganzer Monat gratis.",
         feedbackLink: "Feedback senden →",
         footerSeparator: " · ",
+        legalOperator:
+          "{{companyName}} wird betrieben von {{owner}}, {{address}}.",
+        legalContact: "Kontakt",
+        legalNotice: "Impressum",
       },
     },
     post: {
