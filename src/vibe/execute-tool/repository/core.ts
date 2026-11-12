@@ -99,6 +99,17 @@ export class RouteExecutionExecutor {
               handlerResult = await getRouteHandler(hyphenatedToolName);
               effectiveToolName = hyphenatedToolName;
             }
+            // Canonical ids stored before the framework moved under src/vibe/
+            // (graph nodes, skill tool lists) lack the "vibe_" segment, e.g.
+            // "agent_chat_data-sources_chat-downvotes-total_POST". Resolve
+            // them to the moved endpoint instead of failing the call.
+            const legacyVibeToolName = `vibe_${trimmedToolName}`;
+            if (!handlerResult && !trimmedToolName.startsWith("vibe_")) {
+              handlerResult = await getRouteHandler(legacyVibeToolName);
+              if (handlerResult) {
+                effectiveToolName = legacyVibeToolName;
+              }
+            }
             break;
           } catch (importError) {
             if (attempt === 7) {

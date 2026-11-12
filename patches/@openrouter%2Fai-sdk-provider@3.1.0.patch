@@ -1,0 +1,34 @@
+diff --git a/dist/index.js b/dist/index.js
+index 00ced03ce48e0a77fff23e5969cf3b92c4e107f7..5c4bcf5887c429a37059ddf5c7f3eb868b0ce39e 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -3424,7 +3424,11 @@ function withStreamErrorHandling(source, onError) {
+       }
+     },
+     cancel(reason) {
+-      reader.cancel(reason);
++      // Patched (next-vibe): the source is usually already errored by the
++      // abort, so reader.cancel() rejects; unawaited it surfaced as an
++      // unhandledRejection on every user cancel under Node.
++      return reader.cancel(reason).catch(() => {
++      });
+     }
+   });
+ }
+diff --git a/dist/internal/index.js b/dist/internal/index.js
+index 5598f8d295ea0d3759d1b3ce31c4e651fa01b08e..3f84dfd41510b79f7ef758261c85ca63c09e6350 100644
+--- a/dist/internal/index.js
++++ b/dist/internal/index.js
+@@ -3348,7 +3348,11 @@ function withStreamErrorHandling(source, onError) {
+       }
+     },
+     cancel(reason) {
+-      reader.cancel(reason);
++      // Patched (next-vibe): the source is usually already errored by the
++      // abort, so reader.cancel() rejects; unawaited it surfaced as an
++      // unhandledRejection on every user cancel under Node.
++      return reader.cancel(reason).catch(() => {
++      });
+     }
+   });
+ }

@@ -20,15 +20,20 @@ export const translations = {
         description:
           "Registry + image name to build and push. Defaults to DOCKER_IMAGE_NAME from your .env.",
       },
+      commit: {
+        title: "Commit",
+        description:
+          "Commit to build: a sha, tag or branch name. Defaults to HEAD of the current branch. Only committed code ships. Uncommitted changes in the working tree are never included.",
+      },
       tag: {
         title: "Tag",
         description:
-          "Image tag. Defaults to the current short git commit SHA. 'latest' is always additionally tagged and pushed.",
+          "Image tag. Defaults to the short sha of the built commit. The short sha and 'latest' are always tagged as well.",
       },
       push: {
         title: "Push",
         description:
-          "Push to the registry after building. Disable to build locally only - requires 'docker login' beforehand to push.",
+          "Push to the registry (or transfer to the SSH target) after building. Disable to build locally only: no push, no SSH transfer, no deploy.",
       },
       platform: {
         title: "Platform",
@@ -107,12 +112,25 @@ export const translations = {
         buildExitCode: "docker buildx exited with code {{code}}",
         buildKilled: "docker buildx was killed by signal {{signal}}",
         dockerBuildFailed: "Docker build failed: {{error}}",
-        gitShaFailed: "Could not resolve the current git commit SHA",
-        gitShaFailedDetail:
-          "Could not resolve the current git commit SHA: {{error}}",
+        commitResolveFailed: "Could not resolve commit '{{ref}}'",
+        commitResolveFailedDetail:
+          "Could not resolve commit '{{ref}}': {{error}}",
+        commitResolved: "📌 Building commit {{sha}} ({{ref}}): {{subject}}",
+        dirtyTreeWarning:
+          "⚠️ Working tree has {{count}} uncommitted change(s). They are EXCLUDED from the image. Only commit {{sha}} is built.",
+        exportStart: "📦 Exporting commit {{sha}} to {{dir}} ...",
+        exportReused: "📦 Reusing exported tree for {{sha}} at {{dir}}",
+        exportFailed: "Exporting commit {{sha}} failed: {{error}}",
         sshTransferStart: "📡 Transferring {{refs}} to {{target}} via ssh ...",
         sshTransferSuccess: "🚀 Transferred {{refs}} to {{target}} via ssh",
         sshTransferFailed: "ssh transfer to {{target}} failed: {{error}}",
+        scriptSynced: "📜 Synced {{script}} on {{target}} from commit {{sha}}",
+        scriptSyncFailed:
+          "Syncing {{script}} to {{target}} failed, deploy aborted: {{error}}",
+        scriptMissing: "{{path}} is missing from commit {{sha}}",
+        scriptSyntaxInvalid:
+          "bash -n rejected {{path}} from commit {{sha}}. Live script untouched.",
+        scriptRemoteExit: "remote command exited with code {{code}}",
       },
     },
   },

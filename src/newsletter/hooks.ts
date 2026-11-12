@@ -17,11 +17,14 @@ import {
 } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
+import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
+
+const newsletterEmailSchema = z.email();
 
 /****************************
  * TYPED STATE KEYS
@@ -113,11 +116,14 @@ export function useNewsletterManager(
   // Use user email if logged in (and private user), otherwise use manual input
   const email: string = userEmail || manualEmail;
 
-  // Improved email validation
-  const isValidEmail = useCallback((emailToValidate: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailToValidate.length > 0 && emailRegex.test(emailToValidate);
-  }, []);
+  // Same validator as the status/subscribe request schemas. A looser regex
+  // let half-typed addresses ("max@gmail.c") fire the status query, which then
+  // failed request validation on every keystroke.
+  const isValidEmail = useCallback(
+    (emailToValidate: string): boolean =>
+      newsletterEmailSchema.safeParse(emailToValidate).success,
+    [],
+  );
 
   const isCurrentEmailValid = email ? isValidEmail(email) : false;
 

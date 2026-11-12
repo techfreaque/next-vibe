@@ -50,7 +50,11 @@ import type {
 } from "./db";
 import { pulseExecutions, pulseHealth } from "./db";
 import { TaskGuard } from "../watchdog/guard";
-import { decideRetry, type RetryDecision } from "../watchdog/policy";
+import {
+  decideRetry,
+  isInsufficientCreditsFailure,
+  type RetryDecision,
+} from "../watchdog/policy";
 import { RunningTaskRegistry } from "../watchdog/registry";
 import { TaskIncidentType } from "../watchdog/enum";
 import { resolveTaskDisplayName } from "./i18n-utils";
@@ -450,6 +454,12 @@ export class PulseHealthRepository {
               let finalMessage: string | null = null;
               let finalDurationMs = 0;
               let didLogHistory = false;
+              // Owner's wallet cannot pay for the run: SKIPPED, not FAILED.
+              let skippedForCredits = false;
+              // Already skipped for credits last run: stay quiet (no history
+              // row, debug log) until the owner tops up.
+              const wasSkippedBefore =
+                dbTask.lastExecutionStatus === CronTaskStatus.SKIPPED;
 
               for (let attempt = 0; ; attempt++) {
                 const attemptStart = Date.now();
@@ -555,22 +565,29 @@ export class PulseHealthRepository {
                 }
 
                 const attemptDuration = Date.now() - attemptStart;
+                const creditSkip =
+                  !typedResult.success &&
+                  cancelReason === null &&
+                  isInsufficientCreditsFailure(typedResult.errorType.errorKey);
                 const attemptStatus: typeof CronTaskStatusValue =
                   typedResult.success
                     ? CronTaskStatus.COMPLETED
-                    : finalStatus === CronTaskStatus.TIMEOUT
-                      ? CronTaskStatus.TIMEOUT
-                      : finalStatus === CronTaskStatus.CANCELLED
-                        ? CronTaskStatus.CANCELLED
-                        : CronTaskStatus.FAILED;
+                    : creditSkip
+                      ? CronTaskStatus.SKIPPED
+                      : finalStatus === CronTaskStatus.TIMEOUT
+                        ? CronTaskStatus.TIMEOUT
+                        : finalStatus === CronTaskStatus.CANCELLED
+                          ? CronTaskStatus.CANCELLED
+                          : CronTaskStatus.FAILED;
 
                 // History throttle: skip logging successful runs when within historyInterval
-                const shouldLogHistory =
-                  !typedResult.success ||
-                  !dbTask.historyInterval ||
-                  !dbTask.lastHistoryLoggedAt ||
-                  Date.now() - dbTask.lastHistoryLoggedAt.getTime() >=
-                    dbTask.historyInterval;
+                const shouldLogHistory = creditSkip
+                  ? !wasSkippedBefore
+                  : !typedResult.success ||
+                    !dbTask.historyInterval ||
+                    !dbTask.lastHistoryLoggedAt ||
+                    Date.now() - dbTask.lastHistoryLoggedAt.getTime() >=
+                      dbTask.historyInterval;
 
                 // Record execution for this attempt (unless throttled)
                 if (shouldLogHistory) {
@@ -620,6 +637,18 @@ export class PulseHealthRepository {
                 // Already fully interpolated by the failing handler's `t()` call,
                 // so there are no `{{param}}` placeholders left to substitute.
                 const logMessage = finalMessage;
+
+                if (creditSkip) {
+                  // Never retried, never counted as a failure. Logged once per
+                  // empty-wallet streak; the next due run after a top-up
+                  // simply succeeds.
+                  skippedForCredits = true;
+                  (wasSkippedBefore ? logger.debug : logger.info).bind(logger)(
+                    `Pulse: task "${resolvedTaskName}" skipped - insufficient credits or budget cap reached`,
+                    { message: logMessage, taskId: dbTask.id },
+                  );
+                  break;
+                }
 
                 // Retry only TRANSIENT failures (provider 5xx / rate limit /
                 // network), with capped exponential backoff. Validation,
@@ -685,14 +714,20 @@ export class PulseHealthRepository {
 
               if (taskSucceeded) {
                 tasksSucceeded.push(dbTask.displayName);
+              } else if (skippedForCredits) {
+                tasksSkipped.push(dbTask.displayName);
               } else {
                 tasksFailed.push(dbTask.displayName);
               }
 
-              // Update task stats (once, after all attempts)
+              // Update task stats (once, after all attempts). A credit skip
+              // leaves the failure streak and counters untouched; only
+              // lastExecutedAt moves so the task is not re-run every pulse.
               const newConsecutiveFailures = taskSucceeded
                 ? 0
-                : (dbTask.consecutiveFailures ?? 0) + 1;
+                : skippedForCredits
+                  ? (dbTask.consecutiveFailures ?? 0)
+                  : (dbTask.consecutiveFailures ?? 0) + 1;
 
               // Use atomic SQL increments to avoid lost updates across instances
               await db
@@ -702,13 +737,19 @@ export class PulseHealthRepository {
                   lastExecutionStatus: finalStatus,
                   lastExecutionDuration: finalDurationMs,
                   runStartedAt: null,
-                  executionCount: sql`${cronTasksTable.executionCount} + 1`,
                   consecutiveFailures: newConsecutiveFailures,
-                  ...(taskSucceeded
-                    ? {
-                        successCount: sql`${cronTasksTable.successCount} + 1`,
-                      }
-                    : { errorCount: sql`${cronTasksTable.errorCount} + 1` }),
+                  ...(skippedForCredits
+                    ? {}
+                    : {
+                        executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                        ...(taskSucceeded
+                          ? {
+                              successCount: sql`${cronTasksTable.successCount} + 1`,
+                            }
+                          : {
+                              errorCount: sql`${cronTasksTable.errorCount} + 1`,
+                            }),
+                      }),
                   ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
                   updatedAt: new Date(),
                 })

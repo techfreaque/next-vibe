@@ -34,7 +34,8 @@ import {
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { ApiProvider } from "../../../models/models";
-import { getChatModelById } from "../../models";
+import { getEnvAvailability } from "../../../env-availability";
+import { getChatModelForUser } from "../../models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -210,12 +211,16 @@ export async function runRelayBranch(
       );
   }
 
+  // Same per-user provider the local setup phase would pick: an admin's
+  // Claude Code model stays local, a public user's goes to its public provider.
+  const relayModelInfo = data.model
+    ? getChatModelForUser(data.model, user, await getEnvAvailability())
+    : undefined;
+
   let remoteTarget = await ExecuteToolRouting.resolveTarget({
     userId,
     loopInstanceId: effectiveLoopInstanceId ?? undefined,
-    modelProvider: data.model
-      ? getChatModelById(data.model)?.apiProvider
-      : undefined,
+    modelProvider: relayModelInfo?.apiProvider,
     locale,
     logger,
   });
@@ -226,16 +231,13 @@ export async function runRelayBranch(
   const viaLoopRouting = remoteTarget !== null;
 
   const isIncognito = data.rootFolderId === DefaultFolderId.INCOGNITO;
-  const modelIsUnbottled = data.model
-    ? getChatModelById(data.model)?.apiProvider === ApiProvider.UNBOTTLED
-    : false;
+  const modelIsUnbottled =
+    relayModelInfo?.apiProvider === ApiProvider.UNBOTTLED;
 
   if (!remoteTarget && (modelIsUnbottled || !isIncognito)) {
     const inferenceTarget = await ExecuteToolRouting.resolveInferenceProvider({
       userId,
-      modelProvider: data.model
-        ? getChatModelById(data.model)?.apiProvider
-        : undefined,
+      modelProvider: relayModelInfo?.apiProvider,
       logger,
     });
     if (inferenceTarget) {
@@ -249,7 +251,6 @@ export async function runRelayBranch(
     return null;
   }
 
-  const relayModelInfo = data.model ? getChatModelById(data.model) : undefined;
   // Cost of THIS originator's markup, captured from validation and deducted after a
   // successful inference-provider relay (see below). null when there is no model.
   let originatorModelCost: number | null = null;

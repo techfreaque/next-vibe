@@ -22,15 +22,20 @@ export const translations: typeof enTranslations = {
         description:
           "Rejestr + nazwa obrazu do zbudowania i wysłania. Domyślnie DOCKER_IMAGE_NAME z pliku .env.",
       },
+      commit: {
+        title: "Commit",
+        description:
+          "Commit do zbudowania: SHA, tag lub nazwa gałęzi. Domyślnie HEAD bieżącej gałęzi. Wysyłany jest tylko zatwierdzony kod. Niezatwierdzone zmiany w katalogu roboczym nigdy nie trafiają do obrazu.",
+      },
       tag: {
         title: "Tag",
         description:
-          "Tag obrazu. Domyślnie krótki SHA bieżącego commita Git. 'latest' jest zawsze dodatkowo tagowany i wysyłany.",
+          "Tag obrazu. Domyślnie krótki SHA budowanego commita. Krótki SHA i 'latest' są zawsze tagowane dodatkowo.",
       },
       push: {
         title: "Wyślij",
         description:
-          "Wyślij do rejestru po zbudowaniu. Wyłącz, aby zbudować tylko lokalnie - wysyłka wymaga wcześniejszego 'docker login'.",
+          "Wyślij do rejestru (lub prześlij na cel SSH) po zbudowaniu. Wyłącz, aby zbudować tylko lokalnie: bez wysyłki, bez SSH, bez wdrożenia.",
       },
       platform: {
         title: "Platforma",
@@ -110,13 +115,27 @@ export const translations: typeof enTranslations = {
         buildKilled: "docker buildx został zabity sygnałem {{signal}}",
         dockerBuildFailed:
           "Budowanie obrazu Docker nie powiodło się: {{error}}",
-        gitShaFailed: "Nie udało się ustalić bieżącego SHA commita Git",
-        gitShaFailedDetail:
-          "Nie udało się ustalić bieżącego SHA commita Git: {{error}}",
+        commitResolveFailed: "Nie udało się ustalić commita '{{ref}}'",
+        commitResolveFailedDetail:
+          "Nie udało się ustalić commita '{{ref}}': {{error}}",
+        commitResolved: "📌 Budowanie commita {{sha}} ({{ref}}): {{subject}}",
+        dirtyTreeWarning:
+          "⚠️ Katalog roboczy ma {{count}} niezatwierdzonych zmian. NIE trafiają do obrazu. Budowany jest tylko commit {{sha}}.",
+        exportStart: "📦 Eksport commita {{sha}} do {{dir}} ...",
+        exportReused: "📦 Używam wyeksportowanego drzewa {{sha}} w {{dir}}",
+        exportFailed: "Eksport commita {{sha}} nie powiódł się: {{error}}",
         sshTransferStart: "📡 Przesyłanie {{refs}} do {{target}} przez ssh ...",
         sshTransferSuccess: "🚀 Przesłano {{refs}} do {{target}} przez ssh",
         sshTransferFailed:
           "Przesyłanie ssh do {{target}} nie powiodło się: {{error}}",
+        scriptSynced:
+          "📜 Zsynchronizowano {{script}} na {{target}} z commita {{sha}}",
+        scriptSyncFailed:
+          "Synchronizacja {{script}} na {{target}} nie powiodła się, deploy przerwany: {{error}}",
+        scriptMissing: "Brak {{path}} w commicie {{sha}}",
+        scriptSyntaxInvalid:
+          "bash -n odrzucił {{path}} z commita {{sha}}. Działający skrypt nietknięty.",
+        scriptRemoteExit: "Polecenie zdalne zakończyło się kodem {{code}}",
       },
     },
   },

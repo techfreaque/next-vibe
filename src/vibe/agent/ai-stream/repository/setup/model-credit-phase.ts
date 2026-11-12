@@ -15,9 +15,12 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../../env";
-import { buildMissingKeyMessage } from "../../../env-availability";
+import {
+  type AgentEnvAvailability,
+  buildMissingKeyMessage,
+} from "../../../env-availability";
 import { ApiProvider } from "../../../models/models";
-import { type ChatModelOption, getChatModelById } from "../../models";
+import { type ChatModelOption, getChatModelForUser } from "../../models";
 import { type AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";
 import { CreditValidatorHandler } from "../core/credit-validator-handler";
@@ -92,6 +95,7 @@ export async function runModelCreditPhase(params: {
   locale: CountryLanguage;
   logger: EndpointLogger;
   aiStreamT: AiStreamT;
+  availability: AgentEnvAvailability;
 }): Promise<ResponseType<ModelCreditPhaseResult>> {
   const {
     data,
@@ -103,6 +107,7 @@ export async function runModelCreditPhase(params: {
     locale,
     logger,
     aiStreamT,
+    availability,
   } = params;
 
   if (!userId && !leadId && !isIncognito) {
@@ -114,7 +119,9 @@ export async function runModelCreditPhase(params: {
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
-  const modelConfig = getChatModelById(data.model);
+  // Per-user provider: admins may get an admin-only provider (Claude Code)
+  // when it is enabled here; everyone else gets the cheapest public one.
+  const modelConfig = getChatModelForUser(data.model, user, availability);
 
   // Guard: TTS/STT models are dispatched via their own handlers, not the LLM stream pipeline.
   if (
@@ -130,7 +137,9 @@ export async function runModelCreditPhase(params: {
       provider: modelConfig.apiProvider,
     });
     return fail({
-      message: aiStreamT("route.errors.invalidRequestData"),
+      message: aiStreamT("route.errors.invalidRequestData", {
+        issue: data.model,
+      }),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -145,9 +154,12 @@ export async function runModelCreditPhase(params: {
   ) {
     logger.warn("[Setup] Non-admin user attempted to use Agent SDK model", {
       model: data.model,
+      providerModel: modelConfig.providerModel,
     });
     return fail({
-      message: aiStreamT("route.errors.invalidRequestData"),
+      message: aiStreamT("route.errors.modelAdminOnly", {
+        model: modelConfig.name,
+      }),
       errorType: ErrorResponseTypes.FORBIDDEN,
     });
   }

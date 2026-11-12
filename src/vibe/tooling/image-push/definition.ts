@@ -61,6 +61,14 @@ const { POST } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
+      commit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.commit.title",
+        description: "post.fields.commit.description",
+        schema: z.string().min(1).default("HEAD"),
+      }),
+
       tag: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -186,6 +194,10 @@ const { POST } = createEndpoint({
       viaSsh: {
         sshTarget: "root@203.0.113.5",
       },
+      specificCommit: {
+        commit: "a1b2c3d",
+        push: false,
+      },
     },
     responses: {
       default: {
@@ -211,6 +223,14 @@ const { POST } = createEndpoint({
         resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
         tags: ["a1b2c3d", "latest"],
         duration: 150000,
+      },
+      specificCommit: {
+        success: true,
+        output:
+          "✅ Built ghcr.io/techfreaque/next-vibe-app:a1b2c3d, ghcr.io/techfreaque/next-vibe-app:latest (not pushed)",
+        resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
+        tags: ["a1b2c3d", "latest"],
+        duration: 90000,
       },
     },
   },

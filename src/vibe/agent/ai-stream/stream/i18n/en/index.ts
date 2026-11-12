@@ -212,6 +212,8 @@ export const translations = {
     errors: {
       invalidJson: "Invalid JSON in request body",
       invalidRequestData: "Invalid request data ({{issue}})",
+      modelAdminOnly:
+        "{{model}} is not available on your account. Pick another model.",
       fileTypeNotAllowed: "File type not allowed: {{fileType}}",
       uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
       openrouterApiKeyMissing: "OpenRouter API key not configured",

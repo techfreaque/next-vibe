@@ -164,6 +164,8 @@ export interface CreateAiStreamParams {
   toolsContext?: ToolExecutionContext;
   /** Parent stream's abort signal - sub-stream aborts when parent does. */
   parentAbortSignal?: AbortSignal;
+  /** Set when a scheduled task runs this stream (log-level decisions only). */
+  cronTaskId?: string;
   /**
    * Per-tool confirmation requirements injected by the relay target
    * (ws-provider) — the remote loop has no favorite of its own, so these
@@ -649,6 +651,7 @@ export class AiStreamRepository {
         // child's own identity.
         parentThreadId: toolExecutionContext.threadId,
         fixtureScopeId: toolExecutionContext.fixtureScopeId,
+        cronTaskId: toolExecutionContext.cronTaskId,
       });
 
       if (!streamResult.success) {
@@ -802,6 +805,7 @@ export class AiStreamRepository {
     explicitParentMessageId,
     parentThreadId,
     fixtureScopeId,
+    cronTaskId,
   }: CreateAiStreamParams & {
     awaitResult?: boolean;
   }): Promise<
@@ -1022,9 +1026,20 @@ export class AiStreamRepository {
 
     if (!setupResult.success) {
       // Auth/billing failures (4xx) are expected user-facing outcomes - the
-      // client gets the error event; warn keeps them visible.
+      // client gets the error event; warn keeps them visible. A scheduled
+      // task on an empty wallet is reported once by the pulse scheduler
+      // (recorded as SKIPPED), so it stays at debug here.
       const errorCode = setupResult.errorType?.errorCode ?? 500;
-      const logFn = errorCode >= 500 ? logger.error : logger.warn;
+      const isCronCreditSkip =
+        Boolean(cronTaskId) &&
+        setupResult.errorType?.errorKey ===
+          ErrorResponseTypes.PAYMENT_REQUIRED.errorKey;
+      const logFn =
+        errorCode >= 500
+          ? logger.error
+          : isCronCreditSkip
+            ? logger.debug
+            : logger.warn;
       logFn("[AiStream] Setup failed", {
         errorType: errorCode,
         message: setupResult.message,

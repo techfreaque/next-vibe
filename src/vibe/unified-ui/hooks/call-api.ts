@@ -1,4 +1,5 @@
 import { getCookie } from "next-vibe/ui/lib/cookies";
+import { getCurrentPathname } from "next-vibe/ui/lib/location";
 
 import {
   BEARER_LEAD_ID_SEPARATOR,
@@ -82,6 +83,9 @@ function buildUrl<TEndpoint extends CreateApiEndpointAny>(
             paramValue === undefined ? "undefined" : JSON.stringify(paramValue),
           // Which widget fired the call - the bug is always in the caller.
           callerStack: new Error().stack?.slice(0, 800),
+          // Minified prod stacks rarely name the widget; the page does.
+          pagePath: platform.isBrowser ? getCurrentPathname() : null,
+          method: endpoint.method,
         });
         return { url, missingParam: paramName };
       }
@@ -290,7 +294,18 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     const isJsonBody = (response.headers.get("content-type") ?? "").includes(
       "application/json",
     );
-    if (!response.ok && !isJsonBody) {
+    if (!isJsonBody) {
+      // Also covers a 200 HTML page: fetch follows redirects, so a request
+      // bounced to a page (or a proxy maintenance page served as 200) used to
+      // surface only as "Unexpected token '<' ... is not valid JSON". Record
+      // where it actually landed so the next one is traceable.
+      logger.error("callApi: non-JSON response", {
+        endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+        status: response.status,
+        contentType: response.headers.get("content-type"),
+        redirected: response.redirected,
+        finalUrl: response.redirected ? response.url : null,
+      });
       return fail({
         message: hooksTranslation
           .scopedT(locale)

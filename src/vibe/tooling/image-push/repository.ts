@@ -10,6 +10,14 @@
 import "server-only";
 
 import { spawn, spawnSync } from "node:child_process";
+import {
+  createReadStream,
+  existsSync,
+  mkdirSync,
+  renameSync,
+  writeFileSync,
+} from "node:fs";
+import { join } from "node:path";
 import type { Readable } from "node:stream";
 import { createGzip } from "node:zlib";
 
@@ -38,14 +46,42 @@ export class ImagePushRepository {
     const image = data.image ?? imagePushEnv.DOCKER_IMAGE_NAME;
     const sshTarget = data.sshTarget ?? imagePushEnv.SSH_SERVER;
 
-    const shaResult = ImagePushRepository.resolveTag(data.tag, logger, t);
-    if (!shaResult.success) {
-      return shaResult;
+    // Build a COMMIT, never the working tree: resolve the ref, export that
+    // commit's tree with `git archive` into .tmp/image-build/<sha>/ and use it
+    // as the docker build context. The working tree is only read, never
+    // touched (no stash/checkout/reset), and nothing uncommitted or ignored
+    // (.env, data.db, .vibe.session, local WIP) can reach the image.
+    const commitResult = ImagePushRepository.resolveCommit(
+      data.commit,
+      logger,
+      t,
+    );
+    if (!commitResult.success) {
+      return commitResult;
     }
-    const tag = shaResult.data;
+    const { sha, shortSha } = commitResult.data;
 
-    const tags = [...new Set([tag, "latest"])];
+    ImagePushRepository.warnIfDirty(shortSha, logger, t);
+
+    const exportResult = ImagePushRepository.exportCommit(
+      sha,
+      shortSha,
+      logger,
+      t,
+    );
+    if (!exportResult.success) {
+      return exportResult;
+    }
+    const contextDir = exportResult.data;
+
+    const tag = data.tag ?? shortSha;
+    // First ref is the one `docker save`d for the ssh transfer; the short sha
+    // is always tagged too so every pushed image maps back to its commit.
+    const tags = [...new Set([tag, shortSha, "latest"])];
     const refs = tags.map((tagName) => `${image}:${tagName}`);
+    // push=false means build-only: no registry push AND no ssh transfer or
+    // deploy, even when SSH_SERVER is set in .env.
+    const transferTarget = data.push ? sshTarget : undefined;
 
     logger.info(t("post.repository.messages.buildStart", { image, tag }));
 
@@ -59,10 +95,10 @@ export class ImagePushRepository {
       data.platform,
       "--network=host",
       "-f",
-      "Dockerfile",
+      join(contextDir, "Dockerfile"),
       ...refs.flatMap((ref) => ["-t", ref]),
-      sshTarget || !data.push ? "--load" : "--push",
-      ".",
+      transferTarget || !data.push ? "--load" : "--push",
+      contextDir,
     ];
 
     const buildResult = spawnSync("docker", args, {
@@ -103,10 +139,10 @@ export class ImagePushRepository {
       });
     }
 
-    if (sshTarget) {
+    if (transferTarget) {
       const transferResult = await ImagePushRepository.transferViaSsh(
         refs,
-        sshTarget,
+        transferTarget,
         logger,
         t,
       );
@@ -115,7 +151,9 @@ export class ImagePushRepository {
       }
 
       const deployResult = await ImagePushRepository.runDeployScript(
-        sshTarget,
+        transferTarget,
+        contextDir,
+        shortSha,
         logger,
         t,
       );
@@ -127,7 +165,7 @@ export class ImagePushRepository {
         success: true,
         output: t("post.repository.messages.sshTransferSuccess", {
           refs: refs.join(", "),
-          target: sshTarget,
+          target: transferTarget,
         }),
         resolvedImage: image,
         tags,
@@ -197,10 +235,17 @@ export class ImagePushRepository {
     //      dangling <none>); leave :latest and :rollback intact.
     // The compose app service is recreated by the deploy script, not here, so
     // this step only manages tags and never touches the running container.
+    // Every other ref (the short commit sha when --tag overrides the first
+    // one, plus :latest) is re-pointed at the loaded image after load.
+    const extraRefs = [
+      ...new Set([...refs.filter((r) => r !== shaRef), latestRef]),
+    ];
     const remoteCmd =
       `docker tag ${latestRef} ${rollbackRef} 2>/dev/null; ` +
       `docker rmi ${shaRef} 2>/dev/null; ` +
-      `gunzip | docker load && docker tag ${shaRef} ${latestRef}`;
+      `gunzip | docker load && ${extraRefs
+        .map((ref) => `docker tag ${shaRef} ${ref}`)
+        .join(" && ")}`;
 
     const password = imagePushEnv.SSH_SERVER_PWD;
     // Only the shell pipeline survives a large unattended upload (see doc above).
@@ -463,16 +508,32 @@ export class ImagePushRepository {
 
   /**
    * Runs the deploy script on the SSH target after the image is available there.
-   * Skipped when SSH_DEPLOY_SCRIPT is empty.
+   * Skipped when SSH_DEPLOY_SCRIPT is empty. The script is first synced from
+   * the exported commit tree (see syncDeployScript), so the server always runs
+   * the deploy script of the commit being deployed.
    */
   private static async runDeployScript(
     sshTarget: string,
+    contextDir: string,
+    shortSha: string,
     logger: EndpointLogger,
     t: ImagePushT,
   ): Promise<ResponseType<void>> {
     const script = imagePushEnv.SSH_DEPLOY_SCRIPT;
     if (!script) {
       return success(undefined);
+    }
+
+    const syncResult = await ImagePushRepository.syncDeployScript(
+      sshTarget,
+      script,
+      contextDir,
+      shortSha,
+      logger,
+      t,
+    );
+    if (!syncResult.success) {
+      return syncResult;
     }
 
     logger.info("Running deploy script on remote server", {
@@ -524,39 +585,256 @@ export class ImagePushRepository {
     return success(undefined);
   }
 
-  /** Uses the request tag override, or resolves the current short git commit SHA */
-  private static resolveTag(
-    tagOverride: string | undefined,
+  /**
+   * Uploads the deploy script from the EXPORTED COMMIT TREE (never the working
+   * tree) to the server before it runs. NO_GIT_RESET=1 means the server checkout
+   * never updates, so without this any change to scripts/install-docker.sh in
+   * the repo would silently never reach the server. The upload is atomic and
+   * syntax-checked: written to `<script>.incoming`, `bash -n` checked, then
+   * `mv`'d over the live script - a broken script never replaces the good one
+   * and aborts the deploy. Only the script is synced: docker-compose.prod.yml on
+   * the server has intentionally drifted and is left alone.
+   */
+  private static async syncDeployScript(
+    sshTarget: string,
+    script: string,
+    contextDir: string,
+    shortSha: string,
     logger: EndpointLogger,
     t: ImagePushT,
-  ): ResponseType<string> {
-    if (tagOverride) {
-      return success(tagOverride);
-    }
-
-    try {
-      const result = spawnSync("git", ["rev-parse", "--short", "HEAD"], {
-        cwd: process.cwd(),
-        encoding: "utf-8",
-      });
-      const sha = result.stdout.trim();
-      if (result.status !== 0 || !sha) {
-        return fail({
-          message: t("post.repository.messages.gitShaFailed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-      return success(sha);
-    } catch (error) {
-      logger.error("Failed to resolve git SHA", parseError(error));
-      // The success-path branch above reports gitShaFailed without a cause, so
-      // the variant carrying the thrown error needs its own key.
+  ): Promise<ResponseType<void>> {
+    const scriptName = script.split("/").pop() ?? script;
+    const localPath = join(contextDir, "scripts", scriptName);
+    const syncFailed = (error: string): ResponseType<void> => {
+      logger.error("Deploy script sync failed", { sshTarget, script, error });
       return fail({
-        message: t("post.repository.messages.gitShaFailedDetail", {
-          error: parseError(error).message,
+        message: t("post.repository.messages.scriptSyncFailed", {
+          script,
+          target: sshTarget,
+          error,
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    };
+
+    if (!existsSync(localPath)) {
+      return syncFailed(
+        t("post.repository.messages.scriptMissing", {
+          path: `scripts/${scriptName}`,
+          sha: shortSha,
+        }),
+      );
     }
+
+    const incoming = `${script}.incoming`;
+    const remoteCmd =
+      `cat > ${incoming} && ` +
+      `{ bash -n ${incoming} || { rm -f ${incoming}; exit 3; }; } && ` +
+      `mv ${incoming} ${script}`;
+    const result = await ImagePushRepository.runRemote(
+      sshTarget,
+      remoteCmd,
+      createReadStream(localPath),
+    );
+
+    if (result.error !== undefined || result.exitCode !== 0) {
+      return syncFailed(
+        result.error ??
+          (result.exitCode === 3
+            ? t("post.repository.messages.scriptSyntaxInvalid", {
+                path: `scripts/${scriptName}`,
+                sha: shortSha,
+              })
+            : t("post.repository.messages.scriptRemoteExit", {
+                code: result.exitCode,
+              })),
+      );
+    }
+
+    logger.info(
+      t("post.repository.messages.scriptSynced", {
+        script,
+        target: sshTarget,
+        sha: shortSha,
+      }),
+    );
+    return success(undefined);
+  }
+
+  /** Runs a read-only git command in the repo, returning trimmed stdout. */
+  private static git(args: string[]): {
+    ok: boolean;
+    stdout: string;
+    stderr: string;
+  } {
+    const result = spawnSync("git", args, {
+      cwd: process.cwd(),
+      encoding: "utf-8",
+    });
+    return {
+      ok: result.status === 0 && !result.error,
+      stdout: (result.stdout ?? "").trim(),
+      stderr: (result.stderr ?? "").trim() || (result.error?.message ?? ""),
+    };
+  }
+
+  /** Resolves a sha/tag/branch to a full + short commit sha (read-only git). */
+  private static resolveCommit(
+    ref: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): ResponseType<{ sha: string; shortSha: string }> {
+    const resolved = ImagePushRepository.git([
+      "rev-parse",
+      "--verify",
+      "--quiet",
+      `${ref}^{commit}`,
+    ]);
+    if (!resolved.ok || !resolved.stdout) {
+      logger.error("Failed to resolve commit", {
+        ref,
+        stderr: resolved.stderr,
+      });
+      return fail({
+        message: resolved.stderr
+          ? t("post.repository.messages.commitResolveFailedDetail", {
+              ref,
+              error: resolved.stderr,
+            })
+          : t("post.repository.messages.commitResolveFailed", { ref }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+    const sha = resolved.stdout;
+    const short = ImagePushRepository.git(["rev-parse", "--short", sha]);
+    const shortSha = short.ok && short.stdout ? short.stdout : sha.slice(0, 7);
+    const subject = ImagePushRepository.git([
+      "log",
+      "-1",
+      "--format=%s",
+      sha,
+    ]).stdout;
+    logger.info(
+      t("post.repository.messages.commitResolved", {
+        sha: shortSha,
+        ref,
+        subject,
+      }),
+    );
+    return success({ sha, shortSha });
+  }
+
+  /** Logs a warning when the working tree has changes that will NOT ship. */
+  private static warnIfDirty(
+    shortSha: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): void {
+    const status = ImagePushRepository.git(["status", "--porcelain"]);
+    if (!status.ok || !status.stdout) {
+      return;
+    }
+    const count = status.stdout.split("\n").length;
+    logger.warn(
+      t("post.repository.messages.dirtyTreeWarning", {
+        count,
+        sha: shortSha,
+      }),
+    );
+  }
+
+  /**
+   * Exports the commit's tree into `.tmp/image-build/<sha>/` via
+   * `git archive <sha> | tar -x`. A finished export is marked by a sibling
+   * `<sha>.done` file (outside the build context) and reused as-is; a partial
+   * one (dir without marker) is moved to `.tmp/todelete/` and re-exported.
+   * Returns the absolute context directory.
+   */
+  private static exportCommit(
+    sha: string,
+    shortSha: string,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): ResponseType<string> {
+    const top = ImagePushRepository.git(["rev-parse", "--show-toplevel"]);
+    const repoRoot = top.ok && top.stdout ? top.stdout : process.cwd();
+    const buildRoot = join(repoRoot, ".tmp", "image-build");
+    const dir = join(buildRoot, sha);
+    const doneMarker = join(buildRoot, `${sha}.done`);
+
+    if (existsSync(dir) && existsSync(doneMarker)) {
+      logger.info(
+        t("post.repository.messages.exportReused", { sha: shortSha, dir }),
+      );
+      return success(dir);
+    }
+
+    const exportFail = (error: string): ResponseType<string> => {
+      logger.error("Commit export failed", { sha, dir, error });
+      return fail({
+        message: t("post.repository.messages.exportFailed", {
+          sha: shortSha,
+          error,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    };
+
+    try {
+      if (existsSync(dir)) {
+        // Leftover from an interrupted export - never rm, park it instead.
+        const parked = join(
+          repoRoot,
+          ".tmp",
+          "todelete",
+          `image-build-${sha}-${Date.now()}`,
+        );
+        mkdirSync(join(parked, ".."), { recursive: true });
+        renameSync(dir, parked);
+      }
+      mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      return exportFail(parseError(error).message);
+    }
+
+    logger.info(
+      t("post.repository.messages.exportStart", { sha: shortSha, dir }),
+    );
+
+    // One OS-level pipeline (bash pipefail so a git-archive failure is not
+    // masked by tar's exit 0). Wiring git's stdout into tar's stdin through
+    // Node streams hit EPIPE under Bun on the ~400 MB archive. sha and dir
+    // are passed as positional args, never interpolated into the script.
+    const extract = spawnSync(
+      "bash",
+      [
+        "-o",
+        "pipefail",
+        "-c",
+        'git archive --format=tar "$1" | tar -x -C "$2"',
+        "image-push-export",
+        sha,
+        dir,
+      ],
+      { stdio: ["ignore", "inherit", "inherit"], cwd: repoRoot },
+    );
+    if (extract.error) {
+      return exportFail(extract.error.message);
+    }
+    if (extract.status !== 0) {
+      return exportFail(
+        `git archive | tar exited with code ${String(extract.status ?? -1)}`,
+      );
+    }
+    if (!existsSync(join(dir, "Dockerfile"))) {
+      return exportFail("Dockerfile missing from exported tree");
+    }
+
+    try {
+      writeFileSync(doneMarker, `${new Date().toISOString()}\n`);
+    } catch (error) {
+      return exportFail(parseError(error).message);
+    }
+    return success(dir);
   }
 }

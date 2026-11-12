@@ -5,6 +5,7 @@
  */
 
 import { isTransientErrorText } from "../../agent/ai-stream/repository/errors/transient";
+import { ErrorResponseTypes } from "../../core/route/response.schema";
 import { TASK_WATCHDOG_CONFIG } from "./config";
 import { BudgetScope as BudgetScopeEnum, type BudgetScopeValue } from "./enum";
 
@@ -70,6 +71,16 @@ export function isTransientFailure(failure: TaskFailure): boolean {
     return true;
   }
   return isTransientErrorText(failure.message);
+}
+
+/**
+ * The run cannot be paid for (owner's wallet empty, or a task budget cap from
+ * TaskGuard, which also answers 402). Not a task failure: the
+ * scheduler records the run as SKIPPED, keeps the failure streak untouched and
+ * picks the task up again by itself once the owner tops up.
+ */
+export function isInsufficientCreditsFailure(errorKey: string | null): boolean {
+  return errorKey === ErrorResponseTypes.PAYMENT_REQUIRED.errorKey;
 }
 
 // ─── Retry with exponential backoff ─────────────────────────────────────────

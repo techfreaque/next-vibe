@@ -23,6 +23,13 @@ function resolveClaudeCodeEnabled(): boolean {
   if (raw === "false") {
     return false;
   }
+  // The provider runs the Agent SDK with bypassPermissions, which the Claude
+  // Code CLI refuses under root ("--dangerously-skip-permissions cannot be
+  // used with root/sudo privileges"). Root is how the prod Docker image runs,
+  // so auto-detection there would advertise a provider that fails every call.
+  if (process.getuid?.() === 0) {
+    return false;
+  }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { execSync } = require("node:child_process") as {

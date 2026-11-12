@@ -1663,6 +1663,14 @@ class ViteCompiler {
       // so the fetch gets a genuine 404 that nitro renders as the app's
       // not-found page. See `ssr-clear-on-hmr`'s handleHotUpdate below.
       let nitroFullReloadTimer: ReturnType<typeof setTimeout> | undefined;
+      // Files changed since the last nitro reload signal fired. Each entry is
+      // sent to the worker as a `full-reload` with `triggeredBy` set, so the
+      // worker's scoped `invalidateFile(file)` path runs (drop only that file
+      // and its importers) instead of a full `evaluatedModules.clear()`. A
+      // structural change (a file whose closure exceeds SSR_EVICT_LIMIT, or an
+      // added/removed module) sets `nitroReloadAll` to force the full clear.
+      const nitroPendingFiles = new Set<string>();
+      let nitroReloadAll = false;
 
       // The nitro dev worker is a separate Bun child process whose srvx
       // listener is a raw `Bun.serve` without an idleTimeout — Bun aborts any
@@ -2308,20 +2316,65 @@ class ViteCompiler {
                   env.runner.evaluatedModules.clear();
                   continue;
                 }
-                // Debounced: see nitroFullReloadTimer's declaration above.
-                // invalidateAll() itself stays immediate (each edit's modules
-                // must be marked stale right away); only the actual reload
-                // signal to the worker is coalesced, so a worker mid-reimport
-                // is never yanked out from under itself by the next edit.
-                env.moduleGraph.invalidateAll();
+                // Scoped nitro invalidation. The nitro dev worker is the
+                // process that SSRs real page loads (and the reload-AFTER-edit
+                // the user feels). Its reload() takes a scoped path when the
+                // `full-reload` message carries `triggeredBy`: it drops only
+                // that file and its importers (`invalidateFile`) and keeps the
+                // rest of the evaluated graph warm, so the next page render
+                // re-evaluates a small closure instead of the whole app cold
+                // (a bare `full-reload` with no `triggeredBy` makes the worker
+                // `evaluatedModules.clear()` everything — the slow path that
+                // turned every edit into a 25-96s cold reload).
+                //
+                // Mirror that scoping on the host graph: invalidate only the
+                // changed modules' importer closure (bounded by
+                // SSR_EVICT_LIMIT) so stale transforms aren't re-served, and
+                // fall back to a full clear + bare full-reload only when the
+                // closure is too large (an edit to a project-wide hub, where a
+                // clear is equivalent and cheaper than walking the graph).
+                const nitroVisited = new Set<string>();
+                let nitroScoped = true;
+                for (const mod of nonCssModules) {
+                  if (mod.id) {
+                    nitroPendingFiles.add(mod.id);
+                    if (
+                      !invalidateWithImporters(
+                        env.moduleGraph,
+                        mod.id,
+                        nitroVisited,
+                      )
+                    ) {
+                      nitroScoped = false;
+                      break;
+                    }
+                  }
+                }
+                if (!nitroScoped) {
+                  nitroReloadAll = true;
+                  env.moduleGraph.invalidateAll();
+                }
                 if (nitroFullReloadTimer) {
                   clearTimeout(nitroFullReloadTimer);
                 }
                 nitroFullReloadTimer = setTimeout(() => {
                   nitroFullReloadTimer = undefined;
-                  env.hot.send({ type: "full-reload" });
+                  if (nitroReloadAll || nitroPendingFiles.size === 0) {
+                    nitroReloadAll = false;
+                    nitroPendingFiles.clear();
+                    env.hot.send({ type: "full-reload" });
+                    serverFileLog(
+                      `[ssr-evict] ${envName}: fetchable, sent full-reload (full clear)`,
+                    );
+                    return;
+                  }
+                  const files = [...nitroPendingFiles];
+                  nitroPendingFiles.clear();
+                  for (const file of files) {
+                    env.hot.send({ type: "full-reload", triggeredBy: file });
+                  }
                   serverFileLog(
-                    `[ssr-evict] ${envName}: fetchable, sent full-reload`,
+                    `[ssr-evict] ${envName}: fetchable, sent scoped reload for ${files.length} file(s)`,
                   );
                 }, 150);
               }

@@ -3576,10 +3576,16 @@ export class CreditRepository {
       );
 
       if (!result.success) {
+        // deductCredits has several silent fail paths (invalid amount, missing
+        // identifier, pool/wallet lookup failures inside the transaction);
+        // without the underlying reason this warning is not diagnosable.
         logger.warn(`Model usage: Credit deduction failed`, {
           ...identifier,
           requestedCost: cost,
           model,
+          reason: result.message,
+          errorType: result.errorType.errorKey,
+          cause: result.cause?.message ?? null,
         });
         return fail({
           message: t("errors.deductionFailed", { cost }),

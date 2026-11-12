@@ -25092,6 +25092,7 @@ export const endpointsMeta: EndpointMeta[] = [
           tag: "v3.3.3",
         },
         viaSsh: { sshTarget: "root@203.0.113.5" },
+        specificCommit: { commit: "a1b2c3d", push: false },
       },
       responses: {
         default: {
@@ -25117,6 +25118,14 @@ export const endpointsMeta: EndpointMeta[] = [
           resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
           tags: ["a1b2c3d", "latest"],
           duration: 150000,
+        },
+        specificCommit: {
+          success: true,
+          output:
+            "✅ Built ghcr.io/techfreaque/next-vibe-app:a1b2c3d, ghcr.io/techfreaque/next-vibe-app:latest (not pushed)",
+          resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
+          tags: ["a1b2c3d", "latest"],
+          duration: 90000,
         },
       },
     },

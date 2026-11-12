@@ -1,4 +1,5 @@
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "../env-availability";
@@ -6,6 +7,7 @@ import {
   ApiProvider,
   filterRoleModels,
   getProviderPrice,
+  isModelProviderAvailable,
   type ModelDefinition,
   type ModelOptionBase,
   type ModelOptionCreditBased,
@@ -110,8 +112,16 @@ function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
     if (!def) {
       continue;
     }
+    // Public providers before admin-only ones, cheapest first within each
+    // group. Price alone is not enough: Claude Code is listed at the same
+    // token price as OpenRouter, so a price-only sort let the admin-only
+    // provider become the primary option and every non-admin request for
+    // that model was rejected as FORBIDDEN. Admins get their admin-only
+    // provider through getChatModelForUser instead.
     const sortedProviders = [...def.providers].toSorted(
-      (a, b) => getProviderPrice(a) - getProviderPrice(b),
+      (a, b) =>
+        Number(a.adminOnly === true) - Number(b.adminOnly === true) ||
+        getProviderPrice(a) - getProviderPrice(b),
     );
     for (const provider of sortedProviders) {
       if (
@@ -198,6 +208,30 @@ export function getChatModelById(
   return (
     chatModelOptionsIndex[modelId] ??
     chatModelOptionsIndex[ChatModelId.KIMI_K2]!
+  );
+}
+
+/**
+ * The provider option that serves `modelId` for this user on this instance:
+ * the cheapest provider the user may use (admin-only providers such as Claude
+ * Code are skipped for non-admins) whose API provider is configured here.
+ * Falls back to the static primary option when none qualifies, so the
+ * missing-key and admin-only guards still report against the model itself.
+ */
+export function getChatModelForUser(
+  modelId: ChatModelId,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): ChatModelOption {
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  return (
+    chatModelOptionsPool.find(
+      (option) =>
+        option.id === modelId &&
+        (option.adminOnly !== true || isAdmin) &&
+        isModelProviderAvailable(option, availability),
+    ) ?? getChatModelById(modelId)
   );
 }
 

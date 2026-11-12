@@ -17,6 +17,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Copy lockfile + manifests first so the install layer is only invalidated when
 # dependencies actually change, not on every source edit.
 COPY package.json bun.lock ./
+# bun applies patchedDependencies (package.json) during install - the patch
+# files must exist before `bun install --frozen-lockfile` runs.
+COPY patches ./patches
 
 ENV NODE_ENV=production
 

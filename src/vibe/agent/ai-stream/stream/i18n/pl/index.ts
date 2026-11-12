@@ -498,6 +498,8 @@ export const translations: typeof enTranslations = {
     errors: {
       invalidJson: "Nieprawidłowy JSON w treści żądania",
       invalidRequestData: "Nieprawidłowe dane żądania ({{issue}})",
+      modelAdminOnly:
+        "{{model}} nie jest dostępny na Twoim koncie. Wybierz inny model.",
       fileTypeNotAllowed: "Niedozwolony typ pliku: {{fileType}}",
       uncensoredApiKeyMissing:
         "Klucz API Uncensored.ai nie został skonfigurowany",

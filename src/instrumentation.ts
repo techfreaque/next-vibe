@@ -1,3 +1,49 @@
+import type { Instrumentation } from "next";
+
+/**
+ * Persist server render errors to the error log.
+ *
+ * Production React replaces a Server Components render error with the opaque
+ * "Minified React error #441" on the client; only its digest reaches the
+ * browser error report. The real message and stack exist only here, on the
+ * server, and used to live only in docker stdout (lost on every restart).
+ * Logging them with the same digest makes the client report traceable.
+ * API routes are skipped: endpointsHandler logs its own failures.
+ */
+export const onRequestError: Instrumentation.onRequestError = async (
+  error,
+  request,
+  context,
+) => {
+  if (
+    process.env["NEXT_RUNTIME"] !== "nodejs" ||
+    context.routeType === "route"
+  ) {
+    return;
+  }
+  const { createEndpointLogger } = await import("@/vibe/logger/server");
+  const { defaultLocale } = await import("@/vibe/core/i18n/core/config");
+  const logger = createEndpointLogger(false, defaultLocale);
+  const digest =
+    error instanceof Error &&
+    "digest" in error &&
+    typeof error.digest === "string"
+      ? error.digest
+      : null;
+  logger.error(
+    "[Next] Server render error",
+    error instanceof Error ? error : String(error),
+    {
+      digest,
+      path: request.path,
+      method: request.method,
+      routePath: context.routePath,
+      routeType: context.routeType,
+      renderSource: context.renderSource ?? null,
+    },
+  );
+};
+
 /**
  * Next.js server-init hook (runs once in the Node server runtime).
  *

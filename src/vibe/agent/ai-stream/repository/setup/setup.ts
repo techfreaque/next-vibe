@@ -668,6 +668,7 @@ export async function setupAiStream(params: {
     locale,
     logger,
     aiStreamT,
+    availability,
   });
   if (!modelCreditResult.success) {
     return modelCreditResult;

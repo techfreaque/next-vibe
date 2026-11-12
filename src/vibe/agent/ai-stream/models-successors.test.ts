@@ -31,6 +31,8 @@ import {
   filterChatModels,
   filterRoleModelsWithSuccessor,
   getBestChatModel,
+  getChatModelById,
+  getChatModelForUser,
   isLegacyChatModel,
   resolveChatModelForUser,
   resolveChatModelSuccessor,
@@ -322,5 +324,61 @@ describe("model browser", () => {
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(false);
     }
+  });
+});
+
+describe("per-user provider resolution", () => {
+  const customerUser: JwtPrivatePayloadType = {
+    isPublic: false,
+    id: "00000000-0000-4000-8000-000000000003",
+    leadId: LEAD_ID,
+    roles: [UserPermissionRole.CUSTOMER],
+  };
+  const openRouterAndClaudeCode: AgentEnvAvailability = {
+    ...openRouterOnly,
+    claudeCode: true,
+  };
+
+  it("never makes an admin-only provider the primary option when a public one exists", () => {
+    // Regression: Claude Code is priced like OpenRouter for the Claude 5.x
+    // models, so a price-only sort made it the primary option and every
+    // non-admin Sonnet request was rejected as FORBIDDEN.
+    for (const id of allChatIds) {
+      const hasPublicProvider = chatModelDefinitions[id].providers.some(
+        (provider) => provider.adminOnly !== true,
+      );
+      if (hasPublicProvider) {
+        expect(getChatModelById(id).adminOnly, id).not.toBe(true);
+      }
+    }
+  });
+
+  it("serves Sonnet 5.5 to non-admins through OpenRouter", () => {
+    for (const user of [customerUser, publicUser]) {
+      const option = getChatModelForUser(
+        ChatModelId.CLAUDE_SONNET_5_5,
+        user,
+        openRouterAndClaudeCode,
+      );
+      expect(option.apiProvider).toBe(ApiProvider.OPENROUTER);
+      expect(option.adminOnly).not.toBe(true);
+    }
+  });
+
+  it("gives admins Claude Code only when it is enabled on the instance", () => {
+    expect(
+      getChatModelForUser(
+        ChatModelId.CLAUDE_SONNET_5_5,
+        adminUser,
+        openRouterAndClaudeCode,
+      ).apiProvider,
+    ).toBe(ApiProvider.CLAUDE_CODE);
+    expect(
+      getChatModelForUser(
+        ChatModelId.CLAUDE_SONNET_5_5,
+        adminUser,
+        openRouterOnly,
+      ).apiProvider,
+    ).toBe(ApiProvider.OPENROUTER);
   });
 });

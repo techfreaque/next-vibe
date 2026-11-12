@@ -421,14 +421,14 @@ export const KeyedRemoteSignal = {
     // in a non-hub process the loopback POST hands it to the hub, which
     // re-publishes through the adapter (reaching WS clients + in-hub inline subs).
     if (getLocalBroadcast()) {
-      logger.warn("[KeyedRemoteSignal] deliver: co-located adapter publish", {
+      logger.debug("[KeyedRemoteSignal] deliver: co-located adapter publish", {
         channel,
         event: ref.eventName,
       });
       getPubSubAdapter().publish(channel, ref.eventName, envelope);
     } else {
       const broadcastUrl = localBroadcastUrl();
-      logger.warn("[KeyedRemoteSignal] deliver: loopback POST", {
+      logger.debug("[KeyedRemoteSignal] deliver: loopback POST", {
         channel,
         event: ref.eventName,
         broadcastUrl,
@@ -442,10 +442,17 @@ export const KeyedRemoteSignal = {
         body: JSON.stringify({ channel, event: ref.eventName, data: envelope }),
       })
         .then((res) => {
-          logger.warn("[KeyedRemoteSignal] loopback publish response", {
-            channel,
-            status: res.status,
-          });
+          // Every signal delivery passes here (each stream cancel, each tool
+          // control event): a 2xx is the normal path, only a rejection by the
+          // hub is worth a warning.
+          (res.ok ? logger.debug : logger.warn).bind(logger)(
+            "[KeyedRemoteSignal] loopback publish response",
+            {
+              channel,
+              status: res.status,
+              broadcastUrl,
+            },
+          );
           return undefined;
         })
         .catch((err: Error) => {

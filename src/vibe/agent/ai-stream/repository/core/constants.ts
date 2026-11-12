@@ -71,13 +71,18 @@ export enum AbortReason {
 /**
  * Typed error for stream aborts - no string matching needed.
  * Use `instanceof StreamAbortError` to check, then `.reason` for the enum.
+ *
+ * `name` is "AbortError" on purpose: the AI SDK and provider packages detect
+ * aborts by name (`isAbortError`). Any other name makes them wrap our cancel
+ * as `AI_APICallError: Failed to process successful response` and take the
+ * error path instead of the clean abort path.
  */
 export class StreamAbortError extends Error {
   readonly reason: AbortReason;
 
   constructor(reason: AbortReason) {
     super(reason);
-    this.name = "StreamAbortError";
+    this.name = "AbortError";
     this.reason = reason;
   }
 

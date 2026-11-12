@@ -505,6 +505,8 @@ export const translations: typeof enTranslations = {
     errors: {
       invalidJson: "Ungültiges JSON im Anforderungstext",
       invalidRequestData: "Ungültige Anforderungsdaten ({{issue}})",
+      modelAdminOnly:
+        "{{model}} ist für dein Konto nicht freigeschaltet. Wähle ein anderes Modell.",
       fileTypeNotAllowed: "Dateityp nicht zulässig: {{fileType}}",
       uncensoredApiKeyMissing: "Uncensored.ai API-Schlüssel nicht konfiguriert",
       openrouterApiKeyMissing: "OpenRouter API-Schlüssel nicht konfiguriert",

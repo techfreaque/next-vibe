@@ -22,15 +22,20 @@ export const translations: typeof enTranslations = {
         description:
           "Registry + Image-Name zum Bauen und Pushen. Standard: DOCKER_IMAGE_NAME aus deiner .env.",
       },
+      commit: {
+        title: "Commit",
+        description:
+          "Zu bauender Commit: SHA, Tag oder Branch-Name. Standard ist HEAD des aktuellen Branches. Ausgeliefert wird nur committeter Code. Uncommittete Änderungen im Arbeitsverzeichnis landen nie im Image.",
+      },
       tag: {
         title: "Tag",
         description:
-          "Image-Tag. Standardmäßig der aktuelle kurze Git-Commit-SHA. 'latest' wird immer zusätzlich getaggt und gepusht.",
+          "Image-Tag. Standard ist der kurze SHA des gebauten Commits. Kurz-SHA und 'latest' werden immer zusätzlich getaggt.",
       },
       push: {
         title: "Pushen",
         description:
-          "Nach dem Bauen in die Registry pushen. Deaktivieren für einen rein lokalen Build - Pushen erfordert vorher 'docker login'.",
+          "Nach dem Bauen in die Registry pushen (bzw. per SSH übertragen). Deaktivieren für einen rein lokalen Build: kein Push, keine SSH-Übertragung, kein Deploy.",
       },
       platform: {
         title: "Plattform",
@@ -110,14 +115,27 @@ export const translations: typeof enTranslations = {
         buildExitCode: "docker buildx wurde mit Code {{code}} beendet",
         buildKilled: "docker buildx wurde durch Signal {{signal}} beendet",
         dockerBuildFailed: "Docker-Build fehlgeschlagen: {{error}}",
-        gitShaFailed:
-          "Der aktuelle Git-Commit-SHA konnte nicht ermittelt werden",
-        gitShaFailedDetail:
-          "Der aktuelle Git-Commit-SHA konnte nicht ermittelt werden: {{error}}",
+        commitResolveFailed: "Commit '{{ref}}' konnte nicht aufgelöst werden",
+        commitResolveFailedDetail:
+          "Commit '{{ref}}' konnte nicht aufgelöst werden: {{error}}",
+        commitResolved: "📌 Baue Commit {{sha}} ({{ref}}): {{subject}}",
+        dirtyTreeWarning:
+          "⚠️ Arbeitsverzeichnis hat {{count}} uncommittete Änderung(en). Sie sind NICHT im Image. Gebaut wird nur Commit {{sha}}.",
+        exportStart: "📦 Exportiere Commit {{sha}} nach {{dir}} ...",
+        exportReused: "📦 Nutze exportierten Stand von {{sha}} in {{dir}}",
+        exportFailed: "Export von Commit {{sha}} fehlgeschlagen: {{error}}",
         sshTransferStart: "📡 Übertrage {{refs}} per ssh an {{target}} ...",
         sshTransferSuccess: "🚀 {{refs}} per ssh an {{target}} übertragen",
         sshTransferFailed:
           "ssh-Übertragung an {{target}} fehlgeschlagen: {{error}}",
+        scriptSynced:
+          "📜 {{script}} auf {{target}} aus Commit {{sha}} synchronisiert",
+        scriptSyncFailed:
+          "Synchronisierung von {{script}} auf {{target}} fehlgeschlagen, Deploy abgebrochen: {{error}}",
+        scriptMissing: "{{path}} fehlt in Commit {{sha}}",
+        scriptSyntaxInvalid:
+          "bash -n lehnt {{path}} aus Commit {{sha}} ab. Live-Skript unverändert.",
+        scriptRemoteExit: "Remote-Befehl mit Code {{code}} beendet",
       },
     },
   },

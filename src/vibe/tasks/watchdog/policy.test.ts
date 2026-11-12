@@ -15,6 +15,7 @@ import {
   detectErrorLoop,
   evaluateBudget,
   evaluateRunLimits,
+  isInsufficientCreditsFailure,
   isTransientFailure,
   normalizeErrorMessage,
   resolveApplicableCaps,
@@ -87,6 +88,23 @@ describe("isTransientFailure", () => {
         failure(ErrorResponseTypes.INTERNAL_ERROR, "TASK_TIMEOUT", true),
       ),
     ).toBe(false);
+  });
+});
+
+describe("insufficient credits", () => {
+  it("classifies only payment-required as a credit skip", () => {
+    expect(
+      isInsufficientCreditsFailure(
+        ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,
+      ),
+    ).toBe(true);
+    expect(
+      isInsufficientCreditsFailure(ErrorResponseTypes.INTERNAL_ERROR.errorKey),
+    ).toBe(false);
+    expect(
+      isInsufficientCreditsFailure(ErrorResponseTypes.FORBIDDEN.errorKey),
+    ).toBe(false);
+    expect(isInsufficientCreditsFailure(null)).toBe(false);
   });
 });
 

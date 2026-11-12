@@ -72,24 +72,55 @@ export function ensureGlobals(): void {
 // to fire them all.
 const _lazyWidgetRegistry: Array<() => Promise<void>> = [];
 
-// Single-flight queue for SERVER-side widget factory imports — the same
-// pattern as the generated endpoint/route registries: widget modules pull in
-// large cyclic graphs, and CONCURRENT dynamic imports of two such graphs can
-// deadlock or fail in the Vite SSR module runner during cold evaluation
-// (observed as boot-window 500s with "[SSR onError]" at ResolvedWidget).
-// preloadAllLazyWidgets() fires every factory at once, so without this queue
-// the server races hundreds of imports on a cold graph. Client-side imports
-// are plain chunk fetches with no shared runner — they stay concurrent.
-let _serverWidgetImportQueue: Promise<AnyComponent | undefined> =
-  Promise.resolve(undefined);
+// Bounded-concurrency pool for SERVER-side widget factory imports. Widget
+// modules pull in large cyclic graphs, and racing HUNDREDS of such imports at
+// once on a cold Vite SSR module runner used to deadlock or fail (boot-window
+// 500s with "[SSR onError]" at ResolvedWidget) — preloadAllLazyWidgets() fires
+// every factory at the same time. The original fix was a strict single-flight
+// queue (concurrency 1), which is safe but serializes every import: on the
+// reload AFTER an edit the whole evicted widget graph re-imports one at a time,
+// turning a ~0.2s warm render into 25-30s. A small concurrency limit keeps the
+// thundering-herd protection (never hundreds at once) while re-importing the
+// evicted closure in parallel batches, which is where almost all of that time
+// goes. Client-side imports are plain chunk fetches with no shared runner —
+// they stay fully concurrent (not routed through this pool).
+function resolveServerWidgetImportConcurrency(): number {
+  const raw = Number(process.env["VIBE_SSR_WIDGET_IMPORT_CONCURRENCY"]);
+  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : 8;
+}
+const _serverWidgetImportConcurrency = resolveServerWidgetImportConcurrency();
+let _serverWidgetImportActive = 0;
+const _serverWidgetImportWaiters: Array<() => void> = [];
 
-function enqueueServerWidgetImport(
+function acquireServerWidgetImportSlot(): Promise<void> {
+  if (_serverWidgetImportActive < _serverWidgetImportConcurrency) {
+    _serverWidgetImportActive += 1;
+    return Promise.resolve();
+  }
+  return new Promise<void>((resolve) => {
+    _serverWidgetImportWaiters.push(resolve);
+  });
+}
+
+function releaseServerWidgetImportSlot(): void {
+  const next = _serverWidgetImportWaiters.shift();
+  if (next) {
+    // Hand the slot straight to the next waiter (active count stays the same).
+    next();
+    return;
+  }
+  _serverWidgetImportActive -= 1;
+}
+
+async function enqueueServerWidgetImport(
   run: () => Promise<AnyComponent>,
 ): Promise<AnyComponent> {
-  const result = _serverWidgetImportQueue.then(run);
-  // Chain regardless of outcome so one failed import never blocks the queue.
-  _serverWidgetImportQueue = result.catch(() => undefined);
-  return result;
+  await acquireServerWidgetImportSlot();
+  try {
+    return await run();
+  } finally {
+    releaseServerWidgetImportSlot();
+  }
 }
 
 /**

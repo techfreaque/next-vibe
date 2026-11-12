@@ -25,6 +25,26 @@ import {
 import type { ApiQueryReturn } from "./types";
 
 /**
+ * True when every `[param]` / `:param` segment of the endpoint path has a
+ * non-empty value in urlPathParams (same rule callApi's buildUrl enforces).
+ */
+function hasRequiredPathParams(
+  path: readonly string[],
+  urlPathParams: FormQueryParams | undefined,
+): boolean {
+  return path.every((segment) => {
+    const isBracketParam = segment.startsWith("[") && segment.endsWith("]");
+    const isColonParam = segment.startsWith(":");
+    if (!isBracketParam && !isColonParam) {
+      return true;
+    }
+    const paramName = isBracketParam ? segment.slice(1, -1) : segment.slice(1);
+    const value = urlPathParams?.[paramName];
+    return value !== undefined && value !== null && String(value) !== "";
+  });
+}
+
+/**
  * React Query hook for API queries
  *
  * Cache key: endpoint.path + endpoint.method + urlPathParams
@@ -95,7 +115,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     initialData,
     onSuccess,
     onError,
-    enabled = true,
+    enabled: enabledOption = true,
     staleTime = 60_000, // 60 seconds default
     gcTime,
     refetchOnWindowFocus = false,
@@ -103,6 +123,15 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     retry = 3,
     // persistToStorage will be used in Phase 3 when we setup persistQueryClient
   } = options;
+
+  // A GET whose path param is still empty can only fail in callApi ("Missing
+  // URL path parameter"): hold the query until every path param has a value,
+  // e.g. while the id it depends on is still loading.
+  const hasAllPathParams = useMemo(
+    () => hasRequiredPathParams(endpoint.path, urlPathParams),
+    [endpoint, urlPathParams],
+  );
+  const enabled = enabledOption && hasAllPathParams;
 
   // State key: endpoint.path + endpoint.method + urlPathParams + includeInCacheKey fields
   // Shared across all calls with same urlPathParams + cacheKey request data

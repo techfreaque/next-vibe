@@ -103,7 +103,9 @@ export class CreditValidatorHandler {
     }
 
     if (!validationResult.data.canUseModel) {
-      logger.warn("Insufficient credits", {
+      // debug: the caller reports the 402 (stream "Setup failed" warn, or the
+      // pulse scheduler's one-time SKIPPED log for cron tasks).
+      logger.debug("Insufficient credits", {
         user,
         modelId: modelInfo.id,
         cost: modelCost,
