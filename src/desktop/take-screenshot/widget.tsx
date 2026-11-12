@@ -21,6 +21,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { resolveMediaSrc } from "@/vibe/agent/chat/storage/media-src";
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";
 import type { DesktopTakeScreenshotResponseOutput } from "./definition";
@@ -55,7 +56,7 @@ function ScreenshotResult({
       : null;
 
   const imgSrc =
-    data.imageUrl ??
+    (data.imageUrl ? resolveMediaSrc(data.imageUrl) : undefined) ??
     (data.imageData ? `data:image/png;base64,${data.imageData}` : null);
 
   return (

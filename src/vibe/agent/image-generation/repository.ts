@@ -31,7 +31,7 @@ import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/str
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { ChatMessageRole } from "../chat/enum";
 import { getStorageAdapter } from "../chat/storage/index";
-import { parseStorageUrl } from "../chat/storage/url-utils";
+import { parseStorageUrl, resolveStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
 import {
   ApiProvider,
@@ -264,6 +264,12 @@ export class ImageGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
+    // Tool results carry portable (host-free) storage paths; providers fetch
+    // the reference themselves, so it must be fully qualified on THIS instance.
+    const inputMediaUrl = data.inputMediaUrl
+      ? resolveStorageUrl(data.inputMediaUrl)
+      : undefined;
+
     let generationResult: ResponseType<{
       imageUrl: string;
       creditCost?: number;
@@ -274,7 +280,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           aspectRatio: data.aspectRatio,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -286,7 +292,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithOpenRouter({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -298,7 +304,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -311,7 +317,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size: data.size,
           quality: data.quality,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -323,7 +329,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -335,7 +341,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size: data.size,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,

@@ -5,14 +5,29 @@
  * replayed on every later run. Requires a server (Atlas dev): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
+import { describe, expect } from "vitest";
+import { z } from "zod";
+
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
+import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
+
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 
+import { until } from "../ai-stream/testing/e2e-chat";
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { submitAndAwaitResponse } from "../ai-stream/testing/e2e-slow-submit";
+import { cacheDir } from "../ai-stream/testing/fetch-cache";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
 import imageGenerationEndpoints from "./definition";
-import { ImageGenModelId } from "./models";
+import { scopedTranslation } from "./i18n";
+import { getImageGenModelById, ImageGenModelId } from "./models";
 
 const endpoint = imageGenerationEndpoints.POST;
 /** Cheapest OpenRouter image model (~1.4 credits). Text-to-image only. */
@@ -26,6 +41,34 @@ const CHEAP_MODEL = ImageGenModelId.FLUX_2_KLEIN_4B;
  */
 const CHEAP_IMAGE_TO_IMAGE_MODEL = ImageGenModelId.QWEN_EDIT;
 const PROMPT = "A small red circle on a white background";
+/**
+ * The no-skill default image model. Pinned here on purpose: changing the
+ * product default must be a deliberate test update, not a silent swap.
+ */
+const DEFAULT_IMAGE_MODEL = "chroma";
+/** Fixture folder of the default-model test (slug of suite + test name, 60 chars). */
+const DEFAULT_MODEL_FIXTURES =
+  "e2e-vibe-agent-image-generation-resolves-the-default-image-m";
+
+/** The part of a recorded provider request this suite reads. */
+const recordedRequestSchema = z.object({
+  body: z.object({ model: z.string() }),
+});
+
+const logger = createEndpointLogger(false, defaultLocale);
+const { t } = scopedTranslation.scopedT(defaultLocale);
+
+async function balanceOf(user: JwtPrivatePayloadType): Promise<number> {
+  const balance = await CreditRepository.getCreditBalanceForUser(
+    user,
+    defaultLocale,
+    logger,
+    creditsScopedTranslation.scopedT(defaultLocale).t,
+  );
+  expect(balance.success, JSON.stringify(balance)).toBe(true);
+  return balance.success ? balance.data.total : Number.NaN;
+}
+
 /**
  * Small, stable, deterministic public reference image (320x320 PNG). Fetched
  * once during recording (by our server for Venice /image/edit, or by the
@@ -132,14 +175,13 @@ describe("E2E: image generation", () => {
     expect(result.response.message.toLowerCase()).toContain("reference image");
   }, 60_000);
 
-  e2e.it("resolves the default image model when none is passed", async ({ open, loginAs, cleanup }) => {
+  e2e.it("resolves the default image model (Chroma) when none is passed and bills it", async ({ open, loginAs, cleanup }) => {
     const buyer = await createE2ECreditUser("image-gen-default", 100);
     cleanup(buyer.remove);
     await loginAs(buyer.user);
+    const before = await balanceOf(buyer.user);
 
-    // No model in the query: the server resolves the default via requestDefaults
-    // (Lustify V8 → Venice). The resolved id is not echoed in the response, so we
-    // assert the default path produces a working, absolute-URL generation.
+    // No model in the query: the server resolves the default via requestDefaults.
     const form = await open(endpoint, { query: {} });
     await form.fill({ prompt: PROMPT });
 
@@ -149,7 +191,68 @@ describe("E2E: image generation", () => {
     if (!result.response.success) return;
     expect(result.response.data.imageUrl.length).toBeGreaterThan(0);
     expectAbsoluteUrl(result.response.data.imageUrl);
+
+    // The resolved model is not echoed in the response, but the provider call
+    // is: fixture files are named after the outbound request's model and the
+    // Nth call replays file N only when that model matches. Exactly one
+    // provider call, and it went out as Chroma - a silent default swap would
+    // record a second, differently-named file here and fail.
+    const providerCalls = readdirSync(cacheDir(DEFAULT_MODEL_FIXTURES)).filter(
+      (f) => f.endsWith("-req.json"),
+    );
+    expect(providerCalls).toEqual([`0001-atlas-${DEFAULT_IMAGE_MODEL}-req.json`]);
+    const sent = recordedRequestSchema.parse(
+      JSON.parse(
+        readFileSync(
+          join(cacheDir(DEFAULT_MODEL_FIXTURES), providerCalls[0] ?? ""),
+          "utf-8",
+        ),
+      ),
+    );
+    expect(sent.body.model).toBe(DEFAULT_IMAGE_MODEL);
+
+    // Billed exactly the default model's per-image price
+    await until("image billed", async () => (await balanceOf(buyer.user)) < before);
+    expect(DEFAULT_IMAGE_GEN_MODEL_SELECTION).toMatchObject({
+      manualModelId: ImageGenModelId.CHROMA,
+    });
+    const chroma = getImageGenModelById(ImageGenModelId.CHROMA);
+    expect(chroma).toBeDefined();
+    // Provider price + standard markup, rounded to 0.1 credit (as billed)
+    const billed =
+      Math.round(
+        (chroma?.creditCostPerImage ?? Number.NaN) *
+          (1 + STANDARD_MARKUP_PERCENTAGE) *
+          10,
+      ) / 10;
+    expect(before - (await balanceOf(buyer.user))).toBeCloseTo(billed, 5);
   }, 150_000);
+
+  e2e.it("refuses a reference image on the default Chroma model before charging", async ({ open, loginAs, cleanup }) => {
+    const buyer = await createE2ECreditUser("image-gen-chroma-ref", 10);
+    cleanup(buyer.remove);
+    await loginAs(buyer.user);
+    const before = await balanceOf(buyer.user);
+
+    // Chroma is text-to-image only: a reference must be refused up front,
+    // never sent to Venice (where it would be dropped and billed anyway).
+    const form = await open(endpoint, {
+      query: { model: ImageGenModelId.CHROMA, inputMediaUrl: REFERENCE_IMAGE_URL },
+    });
+    await form.fill({ prompt: PROMPT });
+
+    const result = await submitAndAwaitResponse(form, 30_000);
+    expect(result.requestBody).toMatchObject({
+      model: ImageGenModelId.CHROMA,
+      inputMediaUrl: REFERENCE_IMAGE_URL,
+    });
+    expect(result.response.success).toBe(false);
+    if (result.response.success) return;
+    expect(result.response.message).toBe(
+      t("post.errors.modelNoReferenceImage", { model: ImageGenModelId.CHROMA }),
+    );
+    expect(await balanceOf(buyer.user)).toBe(before);
+  }, 60_000);
 
   e2e.it("blocks an empty prompt client-side and flags the prompt field", async ({ open, loginAs, cleanup }) => {
     const buyer = await createE2ECreditUser("image-gen-empty", 10);

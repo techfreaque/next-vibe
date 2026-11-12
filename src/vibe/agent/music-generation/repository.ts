@@ -22,6 +22,7 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
+import { resolveStorageUrl } from "../chat/storage/url-utils";
 import { ApiProvider, calculateCreditCost } from "../models/models";
 import {
   checkMediaBalance,
@@ -131,6 +132,12 @@ export class MusicGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
+    // Tool results carry portable (host-free) storage paths; providers fetch
+    // the reference themselves, so it must be fully qualified on THIS instance.
+    const inputMediaUrl = data.inputMediaUrl
+      ? resolveStorageUrl(data.inputMediaUrl)
+      : undefined;
+
     let generationResult: ResponseType<{
       audioUrl: string;
       creditCost?: number;
@@ -142,7 +149,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -154,7 +161,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,
@@ -166,7 +173,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
-          inputMediaUrl: data.inputMediaUrl,
+          inputMediaUrl,
           logger,
           locale,
           fetchImpl,

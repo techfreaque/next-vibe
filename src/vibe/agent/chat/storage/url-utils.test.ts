@@ -24,9 +24,12 @@ function setAppUrl(value: string): void {
 void mock.module("next-vibe/core/env", () => ({ coreEnv: fakeEnv }));
 
 let makeAbsoluteStorageUrl: (relativeUrl: string) => string;
+let resolveStorageUrl: (url: string) => string;
+let buildStorageFileUrl: (threadId: string, filename: string) => string;
 
 beforeAll(async () => {
-  ({ makeAbsoluteStorageUrl } = await import("./url-utils"));
+  ({ makeAbsoluteStorageUrl, resolveStorageUrl, buildStorageFileUrl } =
+    await import("./url-utils"));
 });
 
 afterEach(() => {
@@ -63,6 +66,45 @@ describe("makeAbsoluteStorageUrl", () => {
   it("leaves an already-absolute https URL untouched", () => {
     setAppUrl("https://unbottled.ai");
     expect(makeAbsoluteStorageUrl("https://cdn.example.com/x.png")).toBe(
+      "https://cdn.example.com/x.png",
+    );
+  });
+});
+
+const FILE_PATH =
+  "/api/en-GLOBAL/vibe/agent/chat/threads/files/t-1/f0000000-0000-0000-0000-000000000001.png";
+
+describe("buildStorageFileUrl", () => {
+  it("returns a host-free path regardless of the runtime app URL", () => {
+    setAppUrl("http://localhost:3000");
+    expect(
+      buildStorageFileUrl("t-1", "f0000000-0000-0000-0000-000000000001.png"),
+    ).toBe(FILE_PATH);
+    setAppUrl("https://unbottled.ai");
+    expect(
+      buildStorageFileUrl("t-1", "f0000000-0000-0000-0000-000000000001.png"),
+    ).toBe(FILE_PATH);
+  });
+});
+
+describe("resolveStorageUrl", () => {
+  it("resolves a portable path onto this instance", () => {
+    setAppUrl("https://unbottled.ai");
+    expect(resolveStorageUrl(FILE_PATH)).toBe(
+      `https://unbottled.ai${FILE_PATH}`,
+    );
+  });
+
+  it("rebases a URL minted on another host onto this instance", () => {
+    setAppUrl("https://unbottled.ai");
+    expect(resolveStorageUrl(`http://localhost:3000${FILE_PATH}`)).toBe(
+      `https://unbottled.ai${FILE_PATH}`,
+    );
+  });
+
+  it("passes third-party URLs through", () => {
+    setAppUrl("https://unbottled.ai");
+    expect(resolveStorageUrl("https://cdn.example.com/x.png")).toBe(
       "https://cdn.example.com/x.png",
     );
   });

@@ -50,18 +50,22 @@ describe("E2E: video generation", () => {
     expect(result.response.success, JSON.stringify(result.response).slice(0, 500)).toBe(true);
     if (!result.response.success) return;
     expect(result.response.data.videoUrl.length).toBeGreaterThan(0);
-    // The returned URL must never be a bare relative "/path" — storage URLs are
-    // built from runtime NEXT_PUBLIC_APP_URL and come back absolute (http...),
-    // guarding the localhost/relative-URL regression. Standalone tool runs may
-    // return the provider URL directly (http or inline data:), which is fine.
+    // Storage URLs are persisted host-free (portable across instances) so a
+    // baked base URL (the prod `http://localhost:3000` regression) can never
+    // reach a stored message. Standalone tool runs may return the provider URL
+    // directly (http or inline data:), which is fine.
+    const videoUrl = result.response.data.videoUrl;
     expect(
-      result.response.data.videoUrl.startsWith("http") ||
-        result.response.data.videoUrl.startsWith("data:"),
-      `expected an absolute http(s) url or data: uri, got ${result.response.data.videoUrl.slice(0, 80)}`,
+      videoUrl.startsWith("http") ||
+        videoUrl.startsWith("data:") ||
+        videoUrl.startsWith("/api/en-GLOBAL/vibe/agent/chat/threads/files/"),
+      `expected a provider url, data: uri or portable storage path, got ${videoUrl.slice(0, 80)}`,
     ).toBe(true);
     expect(
-      result.response.data.videoUrl.startsWith("/"),
-      `generated video url is relative (lost NEXT_PUBLIC_APP_URL prefix): ${result.response.data.videoUrl.slice(0, 80)}`,
+      /^https?:\/\/[^/]+\/api\/[^/]+(\/vibe)?\/agent\/chat\/threads\/files\//.test(
+        videoUrl,
+      ),
+      `generated video storage url carries a host: ${videoUrl.slice(0, 80)}`,
     ).toBe(false);
 
     // The clip lands in a playable <video> element

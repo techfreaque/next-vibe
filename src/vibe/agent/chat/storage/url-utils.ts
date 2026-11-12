@@ -2,9 +2,13 @@ import { coreEnv } from "next-vibe/core/env";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import { buildStorageFilePath, toPortableStorageUrl } from "./storage-url";
+
 /**
- * Converts a relative storage URL to an absolute URL by prepending the app URL.
- * Used so that AI models, SSE events, and external consumers see fully-qualified URLs.
+ * Converts a relative storage URL to an absolute URL on THIS instance.
+ * Only for consumers that genuinely need a fully-qualified URL at call time
+ * (third-party providers, external links). Never persist the result: stored
+ * references stay portable (see ./storage-url.ts).
  * If the URL is already absolute (starts with http:// or https://) it is returned as-is.
  *
  * Uses the SERVER env (`coreEnv`, server-only), NOT the client env: this module
@@ -28,18 +32,27 @@ export function makeAbsoluteStorageUrl(relativeUrl: string): string {
 }
 
 /**
- * Absolute URL served by the thread-files endpoint
+ * Resolve any URL for a consumer that needs it fully qualified: storage URLs
+ * (portable, legacy route, or minted on another host) are rebased onto THIS
+ * instance; other URLs pass through unchanged.
+ */
+export function resolveStorageUrl(url: string): string {
+  return makeAbsoluteStorageUrl(toPortableStorageUrl(url));
+}
+
+/**
+ * Portable URL of a file served by the thread-files endpoint
  * (vibe/agent/chat/threads/files/[threadId]/[filename]). Single source for
  * every storage adapter — a hand-built path that drifts from the endpoint's
- * route 404s every attachment.
+ * route 404s every attachment. Root-relative on purpose: it is persisted into
+ * message content/metadata and synced across instances, so it must not carry
+ * the writing instance's host.
  */
 export function buildStorageFileUrl(
   threadId: string,
   filename: string,
 ): string {
-  return makeAbsoluteStorageUrl(
-    `/api/en-GLOBAL/vibe/agent/chat/threads/files/${threadId}/${filename}`,
-  );
+  return buildStorageFilePath(threadId, filename);
 }
 
 /**

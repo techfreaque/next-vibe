@@ -22,6 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { mediaUrlSchema } from "../chat/storage/storage-url";
 import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";
@@ -140,7 +141,7 @@ const { POST } = createEndpoint({
         schema: z
           .array(
             z.object({
-              url: z.string().url(),
+              url: mediaUrlSchema,
               role: z.enum(["first", "last", "reference"]).optional(),
             }),
           )

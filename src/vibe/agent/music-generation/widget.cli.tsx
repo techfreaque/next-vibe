@@ -10,6 +10,7 @@ import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-conte
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import type { MusicGenerationPostResponseOutput } from "./definition";
 
 interface CliWidgetProps {
@@ -23,7 +24,9 @@ function renderCli(value: MusicGenerationPostResponseOutput): string {
   const lines: string[] = [];
   lines.push(`${chalk.green("✓")} ${chalk.bold("Music generated")}`);
   lines.push("");
-  lines.push(`${chalk.dim("URL")}       ${chalk.cyan(value.audioUrl)}`);
+  lines.push(
+    `${chalk.dim("URL")}       ${chalk.cyan(resolveMediaSrc(value.audioUrl, { absolute: true }))}`,
+  );
   lines.push(
     `${chalk.dim("Duration")}  ${chalk.yellow(`${String(value.durationSeconds)}s`)}`,
   );
@@ -36,7 +39,7 @@ function renderCli(value: MusicGenerationPostResponseOutput): string {
 function renderMcp(value: MusicGenerationPostResponseOutput): string {
   return [
     "Music generated successfully.",
-    `URL: ${value.audioUrl}`,
+    `URL: ${resolveMediaSrc(value.audioUrl, { absolute: true })}`,
     `Duration: ${String(value.durationSeconds)}s`,
     `Credits used: ${String(value.creditCost)}`,
   ].join("\n");

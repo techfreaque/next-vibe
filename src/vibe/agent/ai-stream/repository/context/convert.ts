@@ -16,7 +16,10 @@ import type { ToolExecutionContext } from "../../../../core/execution-context";
 import type { DefaultFolderId } from "../../../../core/execution-context";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
+import {
+  fetchStorageFileAsBase64,
+  parseStorageUrl,
+} from "../../../chat/storage/url-utils";
 import type { ChatModelOption } from "../../models";
 import { createMetadataSystemMessage } from "../../system-prompt/builder";
 import { createFixtureFetch } from "../../testing/fetch-cache";
@@ -188,6 +191,11 @@ export async function toAiSdkMessage(
           if ("data" in attachment && attachment.data) {
             // First message: has base64 data directly
             base64Data = attachment.data;
+          } else if (attachment.url && parseStorageUrl(attachment.url)) {
+            // Message from history, our own storage: read it directly. The URL
+            // is a portable host-free path (or a legacy absolute one minted on
+            // another host) — never HTTP-fetch our own auth-gated file route.
+            base64Data = await fetchStorageFileAsBase64(attachment.url);
           } else if (attachment.url) {
             // Message from history: fetch from URL and convert to base64
             try {

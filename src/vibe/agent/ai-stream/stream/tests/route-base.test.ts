@@ -1319,7 +1319,14 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             const toolRes = resolveToolResult(toolMsg);
             expect(toolRes).not.toBeNull();
             expect(typeof toolRes!["imageUrl"]).toBe("string");
-            expect(String(toolRes!["imageUrl"])).toMatch(/^https?:\/\/.+/);
+            // Stored storage URLs are host-free (portable across instances);
+            // a provider URL may still come back absolute.
+            expect(String(toolRes!["imageUrl"])).toMatch(
+              /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+            );
+            expect(String(toolRes!["imageUrl"])).not.toMatch(
+              /^https?:\/\/[^/]+\/api\/[^/]+(\/vibe)?\/agent\/chat\/threads\/files\//,
+            );
             expect(typeof toolRes!["creditCost"]).toBe("number");
 
             // ── Tool parent is assistant, shares sequenceId ──
@@ -1769,7 +1776,12 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           ).toBe(true);
 
           expect(typeof musicRes!["audioUrl"]).toBe("string");
-          expect(String(musicRes!["audioUrl"])).toMatch(/^https?:\/\/.+/);
+          expect(String(musicRes!["audioUrl"])).toMatch(
+            /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+          );
+          expect(String(musicRes!["audioUrl"])).not.toMatch(
+            /^https?:\/\/[^/]+\/api\/[^/]+(\/vibe)?\/agent\/chat\/threads\/files\//,
+          );
           expect(typeof musicRes!["creditCost"]).toBe("number");
           expect((musicRes!["creditCost"] as number) > 0).toBe(true);
           expect(typeof musicRes!["durationSeconds"]).toBe("number");
@@ -2436,7 +2448,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               user: testUser,
               prompt: cfg.cheapMode
                 ? `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-test")} and callbackMode='wakeUp'`)}. The write runs asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO responsePath — end your reply with STEP_OK, or FAILED: <reason> if there is a responsePath already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the tool's real output): seeing a non-empty responsePath in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. In phase 2, confirm the deferred result contains a non-empty responsePath, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO responsePath appears.`
-                : `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-test")} and callbackMode='wakeUp'`)}. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an "imageUrl" field OR a rendered markdown image link ![...](https://...) — either counts. In phase 2, confirm an image URL (http or https) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
+                : `[T6a wakeUp-phase1] Call ${toolInstrWithArgs(cfg, cbTool.name, `${cbArgs("wakeup-test")} and callbackMode='wakeUp'`)}. The image will be generated asynchronously. There are TWO phases and you judge each by what the LATEST tool result in the conversation contains: PHASE 1 (dispatch): the latest result has a taskId and NO image — end your reply with STEP_OK, or FAILED: <reason> if there is an image already. PHASE 2 (you are automatically revived later; a NEW deferred tool result appears containing the finished image): seeing an image URL in that deferred result is CORRECT and EXPECTED — it does NOT mean the wakeUp mode misbehaved. The URL may appear as an "imageUrl" field OR a rendered markdown image link ![...](...) — either counts. In phase 2, confirm an image URL (an http(s) link or a /api/... storage path) is present and non-empty, then end with WAKEUP_OK. Only end with WAKEUP_FAILED: <reason> if NO image URL appears in any form.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -4188,7 +4200,14 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             ).toBe(true);
           } else {
             expect(typeof toolRes!["imageUrl"]).toBe("string");
-            expect(String(toolRes!["imageUrl"])).toMatch(/^https?:\/\/.+/);
+            // Stored storage URLs are host-free (portable across instances);
+            // a provider URL may still come back absolute.
+            expect(String(toolRes!["imageUrl"])).toMatch(
+              /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+            );
+            expect(String(toolRes!["imageUrl"])).not.toMatch(
+              /^https?:\/\/[^/]+\/api\/[^/]+(\/vibe)?\/agent\/chat\/threads\/files\//,
+            );
           }
           lastMainAiMsgId = genResult.data.lastAiMessageId!;
 

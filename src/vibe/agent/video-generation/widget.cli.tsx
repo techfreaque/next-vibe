@@ -10,6 +10,7 @@ import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-conte
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import type { VideoGenerationPostResponseOutput } from "./definition";
 
 interface CliWidgetProps {
@@ -23,7 +24,9 @@ function renderCli(value: VideoGenerationPostResponseOutput): string {
   const lines: string[] = [];
   lines.push(`${chalk.green("✓")} ${chalk.bold("Video generated")}`);
   lines.push("");
-  lines.push(`${chalk.dim("URL")}       ${chalk.cyan(value.videoUrl)}`);
+  lines.push(
+    `${chalk.dim("URL")}       ${chalk.cyan(resolveMediaSrc(value.videoUrl, { absolute: true }))}`,
+  );
   lines.push(
     `${chalk.dim("Credits")}   ${chalk.yellow(String(value.creditCost))}`,
   );
@@ -36,7 +39,7 @@ function renderCli(value: VideoGenerationPostResponseOutput): string {
 function renderMcp(value: VideoGenerationPostResponseOutput): string {
   const parts = [
     "Video generated successfully.",
-    `URL: ${value.videoUrl}`,
+    `URL: ${resolveMediaSrc(value.videoUrl, { absolute: true })}`,
     `Credits used: ${String(value.creditCost)}`,
   ];
   if (value.jobId) {

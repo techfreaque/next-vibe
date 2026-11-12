@@ -25,7 +25,11 @@ import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
-import { mimeFromUrl, parseStorageUrl } from "../chat/storage/url-utils";
+import {
+  mimeFromUrl,
+  parseStorageUrl,
+  resolveStorageUrl,
+} from "../chat/storage/url-utils";
 import { ApiProvider } from "../models/models";
 import {
   checkMediaBalance,
@@ -92,12 +96,13 @@ async function inlineOwnStorageUrl(
     const meta = await storage.getFileMetadata(parsed.fileId);
     const userId = user.isPublic ? undefined : user.id;
     if (!meta || meta.uploadedBy !== userId) {
-      return url; // not owned — leave as-is, provider will reject if unreachable
+      // not owned — hand the provider a fully-qualified URL; it will reject if unreachable
+      return resolveStorageUrl(url);
     }
   }
   const base64 = await storage.readFileAsBase64(parsed.fileId, parsed.threadId);
   if (!base64) {
-    return url;
+    return resolveStorageUrl(url);
   }
   return `data:${mimeFromUrl(url)};base64,${base64}`;
 }

@@ -26,6 +26,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import { useProviderAvailability } from "../env-availability-store";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import {
@@ -517,14 +518,14 @@ export function VideoGenerationContainer({
             {/* Video player */}
             <Div className="relative rounded-xl overflow-hidden border bg-black group">
               <Video
-                src={result.videoUrl}
+                src={resolveMediaSrc(result.videoUrl)}
                 controls
                 className="w-full max-h-[400px] object-contain"
               />
               {/* Download overlay */}
               <Div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <ExternalLink
-                  href={result.videoUrl}
+                  href={resolveMediaSrc(result.videoUrl)}
                   download="generated-video.mp4"
                   target="_blank"
                   rel="noreferrer"

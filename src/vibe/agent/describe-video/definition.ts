@@ -20,6 +20,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { mediaUrlSchema } from "../chat/storage/storage-url";
 import { DESCRIBE_VIDEO_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -68,7 +69,7 @@ const { POST } = createEndpoint({
         label: "post.fileUrl.label",
         description: "post.fileUrl.description",
         columns: 12,
-        schema: z.string().url(),
+        schema: mediaUrlSchema,
       }),
       context: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

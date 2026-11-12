@@ -26,6 +26,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import { useProviderAvailability } from "../env-availability-store";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import {
@@ -370,7 +371,7 @@ export function ImageGenerationContainer({
             {/* Image preview */}
             <Div className="relative rounded-xl overflow-hidden border bg-muted/20 group">
               <Image
-                src={result.imageUrl}
+                src={resolveMediaSrc(result.imageUrl)}
                 alt={prompt}
                 unoptimized
                 width={activeSize?.w ?? 1024}
@@ -380,7 +381,7 @@ export function ImageGenerationContainer({
               {/* Overlay actions */}
               <Div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-end justify-end p-3 opacity-0 group-hover:opacity-100">
                 <ExternalLink
-                  href={result.imageUrl}
+                  href={resolveMediaSrc(result.imageUrl)}
                   download="generated-image.png"
                   target="_blank"
                   rel="noreferrer"

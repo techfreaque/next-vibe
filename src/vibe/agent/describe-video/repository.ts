@@ -30,6 +30,7 @@ import {
   ModalityResolver,
 } from "../ai-stream/repository/core/modality-resolver";
 import { chatSettings } from "../chat/settings/db";
+import { resolveStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
 import { VISION_MINIMUM_BALANCE } from "../shared/constants";
 import { createFixtureDownload } from "../shared/fixture-download";
@@ -125,7 +126,8 @@ export class DescribeVideoRepository {
             content: [
               {
                 type: "file" as const,
-                data: new URL(data.fileUrl),
+                // Portable storage paths are host-free; the SDK needs a full URL.
+                data: new URL(resolveStorageUrl(data.fileUrl)),
                 mediaType: "video/mp4",
               },
               {

@@ -22,6 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { mediaUrlSchema } from "../chat/storage/storage-url";
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   ImageQuality,
@@ -131,7 +132,7 @@ const { POST } = createEndpoint({
         description: "post.inputMediaUrl.description",
         columns: 12,
         placeholder: "post.inputMediaUrl.placeholder",
-        schema: z.string().url().optional(),
+        schema: mediaUrlSchema.optional(),
       }),
       backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,

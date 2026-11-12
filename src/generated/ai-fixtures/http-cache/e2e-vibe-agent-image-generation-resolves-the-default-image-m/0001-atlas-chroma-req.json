@@ -6,7 +6,7 @@
     "Content-Type": "application/json"
   },
   "body": {
-    "model": "lustify-v8",
+    "model": "chroma",
     "prompt": "A small red circle on a white background",
     "n": 1,
     "size": "1024x1024",

@@ -10,6 +10,7 @@ import { useWidgetPlatform } from "next-vibe/unified-ui/_shared/use-widget-conte
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import type { ImageGenerationPostResponseOutput } from "./definition";
 
 interface CliWidgetProps {
@@ -23,7 +24,9 @@ function renderCli(value: ImageGenerationPostResponseOutput): string {
   const lines: string[] = [];
   lines.push(`${chalk.green("✓")} ${chalk.bold("Image generated")}`);
   lines.push("");
-  lines.push(`${chalk.dim("URL")}      ${chalk.cyan(value.imageUrl)}`);
+  lines.push(
+    `${chalk.dim("URL")}      ${chalk.cyan(resolveMediaSrc(value.imageUrl, { absolute: true }))}`,
+  );
   lines.push(
     `${chalk.dim("Credits")}  ${chalk.yellow(String(value.creditCost))}`,
   );
@@ -33,7 +36,7 @@ function renderCli(value: ImageGenerationPostResponseOutput): string {
 function renderMcp(value: ImageGenerationPostResponseOutput): string {
   return [
     "Image generated successfully.",
-    `URL: ${value.imageUrl}`,
+    `URL: ${resolveMediaSrc(value.imageUrl, { absolute: true })}`,
     `Credits used: ${String(value.creditCost)}`,
   ].join("\n");
 }

@@ -26,6 +26,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import { useProviderAvailability } from "../env-availability-store";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import {
@@ -308,7 +309,7 @@ export function MusicGenerationContainer({
                   </Span>
                 </Div>
                 <ExternalLink
-                  href={result.audioUrl}
+                  href={resolveMediaSrc(result.audioUrl)}
                   download="generated-audio.mp3"
                   target="_blank"
                   rel="noreferrer"
@@ -323,7 +324,11 @@ export function MusicGenerationContainer({
                   </Button>
                 </ExternalLink>
               </Div>
-              <Audio controls src={result.audioUrl} className="w-full h-10" />
+              <Audio
+                controls
+                src={resolveMediaSrc(result.audioUrl)}
+                className="w-full h-10"
+              />
             </Div>
 
             {/* Meta row */}

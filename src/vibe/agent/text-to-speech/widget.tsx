@@ -30,6 +30,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
 import { tierName } from "@/_pages/models/_shared/model-format";
 
@@ -123,7 +124,9 @@ export function TextToSpeechContainer({
   const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
 
   // When a new result arrives, reset player state during render (no cascading effect render)
-  const resultAudioUrl = result?.audioUrl;
+  const resultAudioUrl = result?.audioUrl
+    ? resolveMediaSrc(result.audioUrl)
+    : undefined;
   if (resultAudioUrl && resultAudioUrl !== currentAudioUrl) {
     setCurrentAudioUrl(resultAudioUrl);
     setCurrentTime(0);
