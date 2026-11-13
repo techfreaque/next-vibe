@@ -218,6 +218,10 @@ export const translations = {
       description: "An account with this email already exists",
       detail: "An account with this email already exists. Log in instead.",
     },
+    disposableEmail: {
+      title: "Permanent Email Required",
+      detail: "Throwaway inboxes can't sign up. Use a permanent email address.",
+    },
     userNotFound: "No account found for {{email}}",
     forbidden: {
       title: "Forbidden",

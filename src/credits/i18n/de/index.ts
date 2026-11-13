@@ -94,6 +94,11 @@ export const translations: typeof enTranslations = {
     sttHotkey: "Sprache-zu-Text (Tastenkombination)",
   },
   enums: {
+    freeStatus: {
+      active: "Gratis-Credits aktiv",
+      verifyEmail: "E-Mail bestätigen, um die Konto-Credits freizuschalten",
+      subnetLimit: "Gratis-Credits für dieses Netzwerk pausiert",
+    },
     creditType: {
       userSubscription: "Benutzer-Abonnement-Credits",
       leadFree: "Lead-Gratis-Credits",
@@ -121,6 +126,7 @@ export const translations: typeof enTranslations = {
     },
   },
   historyLabels: {
+    signupCarryover: "Vor der Anmeldung als Gast verbraucht",
     sharedLimit: "Verknüpfte Geräte teilen ein Monatslimit",
     monthly: "Monatliche Gratis-Credits",
     monthlyGuest: "Monatliche Gratis-Credits (ohne Konto)",
@@ -305,6 +311,13 @@ export const translations: typeof enTranslations = {
     },
     capacity: {
       content: "Gesamtkapazität",
+    },
+    freeStatus: {
+      content: "Status der Gratis-Credits",
+      verifyEmail:
+        "Bestätige deine E-Mail und dieses Konto bekommt {{signedIn}} Gratis-Credits im Monat. Bis dahin bleiben dir die {{guest}} für Gäste.",
+      subnetLimit:
+        "Aus deinem Netzwerk kamen diesen Monat zu viele neue Gratis-Konten. Dieses Konto bekommt deshalb vorerst keine Gratis-Credits. Ein Credit-Kauf schaltet sie frei, sonst starten sie nächsten Monat, sobald das Netzwerk wieder Platz hat.",
     },
     success: {
       title: "Guthaben abgerufen",

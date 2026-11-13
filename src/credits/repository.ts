@@ -115,13 +115,23 @@ import {
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
+  FreeCreditsStatus,
+  type FreeCreditsStatusValue,
 } from "./enum";
 import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
 import type { CreditsT } from "./i18n";
-import { userPoolLeadIdsSql } from "./pool-members";
+import {
+  type AccountFreeAccess as FreeCreditsAccess,
+  claimGuestPool,
+  isGuestPoolBlocked,
+  resolveAccountFreeAccess,
+  signupGuestCarryover,
+} from "./anti-farming/quota";
+import { SIGNUP_GUEST_SPEND_LOOKBACK_HOURS } from "./anti-farming/config";
+import { guestPoolLeadIdsSql, userPoolLeadIdsSql } from "./pool-members";
 import { PublicCapRepository } from "./public-cap/repository";
 
 export interface CreditIdentifier {
@@ -312,7 +322,7 @@ export class CreditRepository {
   ): Promise<ResponseType<CreditPool>> {
     try {
       const connectedLeadIds =
-        await CreditRepository.findConnectedLeads(leadId);
+        await CreditRepository.findGuestPoolLeadIds(leadId);
 
       let leadWallets = await db
         .select()
@@ -360,15 +370,15 @@ export class CreditRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
-      // Lead connected to an account (directly or through linked guest leads)
-      // -> the account's pool. Logging out never opens a fresh guest pool.
-      const connectedLeadIds =
-        await CreditRepository.findConnectedLeads(leadId);
-      const ownerUserId =
-        await CreditRepository.findPoolOwner(connectedLeadIds);
+      // Lead connected to an account through strong links (login, same
+      // device) -> the account's pool. Logging out never opens a fresh guest
+      // pool. Sharing an IP never makes a guest part of an account.
+      const ownerUserId = await CreditRepository.findPoolOwner(leadId);
       if (ownerUserId) {
         return CreditRepository.getUserPool(ownerUserId, logger, t, locale);
       }
+      const connectedLeadIds =
+        await CreditRepository.findGuestPoolLeadIds(leadId);
 
       // Get EXISTING wallets for all connected leads
       let leadWallets = await db
@@ -414,44 +424,38 @@ export class CreditRepository {
   }
 
   /**
-   * Find all leads connected via lead_lead_links table using graph traversal
+   * Leads in a guest pool: connected through any lead_lead_links (incl. same IP
+   * within 24 h), never entering an account's lead (credits/pool-members.ts).
    */
-  private static async findConnectedLeads(
-    startLeadId: string,
+  private static async findGuestPoolLeadIds(leadId: string): Promise<string[]> {
+    const result = await db.execute<{ lead_id: string }>(
+      guestPoolLeadIdsSql(leadId),
+    );
+    return result.rows.map((r) => r.lead_id);
+  }
+
+  /**
+   * Leads reachable through STRONG links only (no ip_match), nearest first.
+   */
+  private static async findStronglyLinkedLeadIds(
+    leadId: string,
   ): Promise<string[]> {
-    const visited = new Set<string>();
-    const queue = [startLeadId];
-
-    while (queue.length > 0) {
-      const currentLeadId = queue.shift()!;
-
-      if (visited.has(currentLeadId)) {
-        continue;
-      }
-      visited.add(currentLeadId);
-
-      // Find all links where current lead is either lead1 or lead2
-      const links = await db
-        .select()
-        .from(leadLeadLinks)
-        .where(
-          or(
-            eq(leadLeadLinks.leadId1, currentLeadId),
-            eq(leadLeadLinks.leadId2, currentLeadId),
-          ),
-        );
-
-      for (const link of links) {
-        // Get the other lead in the link
-        const otherLeadId =
-          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
-        if (!visited.has(otherLeadId)) {
-          queue.push(otherLeadId);
-        }
-      }
-    }
-
-    return [...visited];
+    const result = await db.execute<{ lead_id: string; depth: number }>(sql`
+      WITH RECURSIVE strong(lead_id, depth) AS (
+        SELECT ${leadId}::uuid, 0
+        UNION
+        SELECT CASE WHEN ll.lead_id_1 = s.lead_id
+          THEN ll.lead_id_2 ELSE ll.lead_id_1 END, s.depth + 1
+        FROM strong s
+        JOIN ${leadLeadLinks} ll
+          ON (ll.lead_id_1 = s.lead_id OR ll.lead_id_2 = s.lead_id)
+          AND ll.link_reason <> 'ip_match'
+        WHERE s.depth < 50
+      )
+      SELECT lead_id, min(depth) AS depth FROM strong
+      GROUP BY lead_id ORDER BY min(depth)
+    `);
+    return result.rows.map((r) => r.lead_id);
   }
 
   /**
@@ -469,9 +473,9 @@ export class CreditRepository {
    * so the nearest account wins. Ownership = user_lead_links or converted_user_id.
    * Null when every lead is a pure guest.
    */
-  private static async findPoolOwner(
-    connectedLeadIds: string[],
-  ): Promise<string | null> {
+  private static async findPoolOwner(leadId: string): Promise<string | null> {
+    const connectedLeadIds =
+      await CreditRepository.findStronglyLinkedLeadIds(leadId);
     if (connectedLeadIds.length === 0) {
       return null;
     }
@@ -502,8 +506,8 @@ export class CreditRepository {
         ownerByLead.set(row.leadId, row.userId);
       }
     }
-    for (const leadId of connectedLeadIds) {
-      const owner = ownerByLead.get(leadId);
+    for (const connectedLeadId of connectedLeadIds) {
+      const owner = ownerByLead.get(connectedLeadId);
       if (owner) {
         return owner;
       }
@@ -1123,8 +1127,7 @@ export class CreditRepository {
 
     // Check if the pool (guest graph, or the owning account's whole pool)
     // already has free credits in this period
-    const guestLeadIds = await CreditRepository.findConnectedLeads(leadId);
-    const ownerUserId = await CreditRepository.findPoolOwner(guestLeadIds);
+    const ownerUserId = await CreditRepository.findPoolOwner(leadId);
     const connectedLeadIds = ownerUserId
       ? [
           ...new Set([
@@ -1132,7 +1135,7 @@ export class CreditRepository {
             ...(await CreditRepository.findUserPoolLeadIds(ownerUserId)),
           ]),
         ]
-      : guestLeadIds;
+      : await CreditRepository.findGuestPoolLeadIds(leadId);
     const existingPoolWallets =
       connectedLeadIds.length > 1
         ? await db
@@ -1146,8 +1149,14 @@ export class CreditRepository {
     );
     // New lead wallets start at the guest allowance. Higher tiers (signed-in,
     // newsletter) are topped up by ensureMonthlyFreeCreditsForPool on next access.
+    // A brand-new guest pool (no account, no linked wallets) uses one of its
+    // subnet's daily guest pool slots; beyond the quota it starts empty.
+    const isNewGuestPool = !ownerUserId && existingPoolWallets.length === 0;
+    const withinGuestQuota = isNewGuestPool
+      ? await claimGuestPool(leadId, logger)
+      : true;
     const initialCredits =
-      poolFreeCredits >= FREE_CREDIT_ALLOWANCE.guest
+      !withinGuestQuota || poolFreeCredits >= FREE_CREDIT_ALLOWANCE.guest
         ? 0
         : Math.min(
             CreditRepository.getInitialFreeCredits(locale),
@@ -1238,22 +1247,137 @@ export class CreditRepository {
    */
   private static async resolvePoolFreeAllowance(
     pool: CreditPool,
-  ): Promise<{ allowance: number; legacyAllowance: number; tier: FreeTier }> {
+    logger: EndpointLogger,
+  ): Promise<{
+    allowance: number;
+    legacyAllowance: number;
+    tier: FreeTier;
+    access: FreeCreditsAccess;
+  }> {
     const userId = pool.userWallet?.userId ?? null;
     const isUserPool = pool.poolType === "USER_POOL" && userId !== null;
-    // Newsletter bonus is account-only: guest pools skip the lookup
     const leadIds = pool.leadWallets
       .map((w) => w.leadId)
       .filter((id): id is string => id !== null);
-    const hasConfirmedNewsletter = isUserPool
-      ? await poolHasConfirmedNewsletter({ userId, leadIds })
-      : false;
-    const input = { isUserPool, hasConfirmedNewsletter };
+
+    if (!isUserPool || !userId) {
+      // Guest pool started beyond its subnet's daily quota: no free credits
+      const blocked = await isGuestPoolBlocked(leadIds);
+      const input = { isUserPool: false, hasConfirmedNewsletter: false };
+      return {
+        allowance: blocked ? 0 : computeFreeAllowance(input),
+        legacyAllowance: blocked ? 0 : computeLegacyFreeAllowance(input),
+        tier: "guest",
+        access: blocked ? "subnetLimit" : "active",
+      };
+    }
+
+    // Account tiers need a verified email and a slot in the subnet's budget
+    const access = await resolveAccountFreeAccess(userId, logger);
+    // Newsletter bonus is account-only
+    const hasConfirmedNewsletter =
+      access === "active"
+        ? await poolHasConfirmedNewsletter({ userId, leadIds })
+        : false;
+    const accountInput = { isUserPool: true, hasConfirmedNewsletter };
+    // What the pre-2026-11 rules granted stays until the next refill
+    const legacyAllowance = computeLegacyFreeAllowance(accountInput);
+    if (access === "subnetLimit") {
+      return { allowance: 0, legacyAllowance: 0, tier: "account", access };
+    }
+    if (access === "verifyEmail") {
+      // Unverified accounts keep the guest share only
+      const guestInput = { isUserPool: false, hasConfirmedNewsletter: false };
+      return {
+        allowance: computeFreeAllowance(guestInput),
+        legacyAllowance,
+        tier: "guest",
+        access,
+      };
+    }
     return {
-      allowance: computeFreeAllowance(input),
-      legacyAllowance: computeLegacyFreeAllowance(input),
-      tier: computeFreeTier(input),
+      allowance: computeFreeAllowance(accountInput),
+      legacyAllowance,
+      tier: computeFreeTier(accountInput),
+      access,
     };
+  }
+
+  private static toFreeStatus(
+    access: FreeCreditsAccess,
+  ): typeof FreeCreditsStatusValue {
+    switch (access) {
+      case "verifyEmail":
+        return FreeCreditsStatus.VERIFY_EMAIL;
+      case "subnetLimit":
+        return FreeCreditsStatus.SUBNET_LIMIT;
+      default:
+        return FreeCreditsStatus.ACTIVE;
+    }
+  }
+
+  /**
+   * Guest free credits spent from the signup IP right before signup count
+   * once against the new account: one usage row, keyed so it never repeats.
+   * Only checked while the account's wallet is young.
+   */
+  private static async applySignupGuestCarryover(
+    pool: CreditPool,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const userWallet = pool.userWallet;
+    const userId = userWallet?.userId;
+    if (pool.poolType !== "USER_POOL" || !userWallet || !userId) {
+      return;
+    }
+    const youngForMs = 2 * SIGNUP_GUEST_SPEND_LOOKBACK_HOURS * 3_600_000;
+    if (Date.now() - userWallet.createdAt.getTime() > youngForMs) {
+      return;
+    }
+    const grantKey = `free:user:${userId}:signup-carryover`;
+    const [done] = await db
+      .select({ id: creditTransactions.id })
+      .from(creditTransactions)
+      .where(sql`${creditTransactions.metadata}->>'grantKey' = ${grantKey}`)
+      .limit(1);
+    if (done) {
+      return;
+    }
+    const carry = await signupGuestCarryover({
+      userId,
+      poolLeadIds: pool.leadWallets
+        .map((w) => w.leadId)
+        .filter((id): id is string => id !== null),
+    });
+    const target = pool.leadWallets.toSorted(
+      (a, b) => a.freePeriodStart.getTime() - b.freePeriodStart.getTime(),
+    )[0];
+    if (carry <= 0 || !target) {
+      return;
+    }
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    await db
+      .insert(creditTransactions)
+      .values({
+        walletId: target.id,
+        amount: -carry,
+        balanceAfter: target.freeCreditsRemaining + userWallet.balance,
+        type: CreditTransactionType.USAGE,
+        freePeriodId: periodId,
+        metadata: {
+          cost: carry,
+          freeCreditsUsed: carry,
+          packCreditsUsed: 0,
+          signupCarryover: true,
+          grantKey,
+        },
+      })
+      .onConflictDoNothing();
+    logger.debug("Counted guest spend from the signup IP against the account", {
+      userId,
+      carry,
+    });
   }
 
   /**
@@ -1301,11 +1425,24 @@ export class CreditRepository {
   private static async ensureMonthlyFreeCreditsForPool(
     pool: CreditPool,
     logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars -- kept for call-site stability; allowance no longer depends on locale
     locale: CountryLanguage,
   ): Promise<number> {
-    const { allowance, legacyAllowance, tier } =
-      await CreditRepository.resolvePoolFreeAllowance(pool);
+    return (await CreditRepository.ensurePoolFreeCredits(pool, logger, locale))
+      .cap;
+  }
+
+  /**
+   * ensureMonthlyFreeCreditsForPool + why the pool has (or lacks) its free tiers.
+   */
+  private static async ensurePoolFreeCredits(
+    pool: CreditPool,
+    logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars -- kept for call-site stability; allowance no longer depends on locale
+    locale: CountryLanguage,
+  ): Promise<{ cap: number; access: FreeCreditsAccess }> {
+    const { allowance, legacyAllowance, tier, access } =
+      await CreditRepository.resolvePoolFreeAllowance(pool, logger);
+    await CreditRepository.applySignupGuestCarryover(pool, logger);
     await CreditRepository.resetMonthlyFreeCreditsIfNeeded(
       pool,
       allowance,
@@ -1330,7 +1467,7 @@ export class CreditRepository {
       });
     }
     await CreditRepository.topUpFreeAllowanceForPool(pool, cap, tier, logger);
-    return cap;
+    return { cap, access };
   }
 
   /**
@@ -1439,7 +1576,14 @@ export class CreditRepository {
         spentThisPeriod,
         remainingInWallets,
       });
-      const topUp = Math.max(0, Math.min(allowance - grantedThisPeriod, owed));
+      // Grants above the cap already reached (each linked device's first-visit
+      // 20, a tier row whose step linked devices already held) are not "given"
+      // twice: the zero-regeneration guard only counts up to that cap.
+      const effectiveGranted =
+        reachedCap > 0
+          ? Math.min(grantedThisPeriod, reachedCap)
+          : grantedThisPeriod;
+      const topUp = Math.max(0, Math.min(allowance - effectiveGranted, owed));
       const tierStep = reachedCap > 0 ? Math.max(0, allowance - reachedCap) : 0;
       const grantAmount = alreadyRecorded ? 0 : Math.max(topUp, tierStep);
       const target = wallets.toSorted(
@@ -1770,22 +1914,24 @@ export class CreditRepository {
       }
 
       // Monthly free credit reset + tier top-up (side effect - must happen before balance read)
-      const freeAllowance =
-        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+      const { cap: freeAllowance, access } =
+        await CreditRepository.ensurePoolFreeCredits(
           poolResult.data,
           logger,
           locale,
         );
+      const freeStatus = CreditRepository.toFreeStatus(access);
 
       if (user.isPublic && poolResult.data.poolType === "USER_POOL") {
-        return success(
-          await CreditRepository.getLinkedLeadFreeBalance(
+        return success({
+          ...(await CreditRepository.getLinkedLeadFreeBalance(
             poolResult.data,
             user.leadId,
             freeAllowance,
             logger,
-          ),
-        );
+          )),
+          freeStatus,
+        });
       }
 
       // Atomic balance calc: expiry + aggregation in one PG call
@@ -1806,6 +1952,7 @@ export class CreditRepository {
         earned: result.earned,
         expiresAt: result.expires_at ? new Date(result.expires_at) : null,
         capacity: result.capacity,
+        freeStatus,
       });
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
@@ -1898,22 +2045,24 @@ export class CreditRepository {
       }
 
       // Monthly free credit reset + tier top-up (side effect)
-      const freeAllowance =
-        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+      const { cap: freeAllowance, access } =
+        await CreditRepository.ensurePoolFreeCredits(
           poolResult.data,
           logger,
           locale,
         );
+      const freeStatus = CreditRepository.toFreeStatus(access);
 
       if (user.isPublic && poolResult.data.poolType === "USER_POOL") {
-        return success(
-          await CreditRepository.getLinkedLeadFreeBalance(
+        return success({
+          ...(await CreditRepository.getLinkedLeadFreeBalance(
             poolResult.data,
             user.leadId,
             freeAllowance,
             logger,
-          ),
-        );
+          )),
+          freeStatus,
+        });
       }
 
       // Atomic balance calc: expiry + aggregation in one PG call
@@ -1934,6 +2083,7 @@ export class CreditRepository {
         earned: result.earned,
         expiresAt: result.expires_at ? new Date(result.expires_at) : null,
         capacity: result.capacity,
+        freeStatus,
       });
     } catch (error) {
       logger.error("Failed to get user balance", parseError(error), {
@@ -3280,6 +3430,11 @@ export class CreditRepository {
         or(sql`${actor} IS NULL`, byOwnDevice),
       ),
       and(inArray(creditTransactions.walletId, poolWalletIds), byOwnDevice),
+      // Guest spend before signup belongs to the account itself
+      and(
+        inArray(creditTransactions.walletId, poolWalletIds),
+        sql`(${creditTransactions.metadata}->>'signupCarryover') = 'true'`,
+      ),
     );
 
     // This month's free-credit usage across the pool, split own / other devices
@@ -3384,7 +3539,10 @@ export class CreditRepository {
         const grantLabel =
           transaction.type === CreditTransactionType.FREE_GRANT
             ? CreditRepository.freeGrantLabel(transaction.metadata, t)
-            : null;
+            : "signupCarryover" in transaction.metadata &&
+                transaction.metadata.signupCarryover
+              ? t("historyLabels.signupCarryover")
+              : null;
         const featureLabel = CreditRepository.getFetaureLabel(
           transaction.modelId,
           transaction.feature,

@@ -20,8 +20,9 @@ import {
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { users } from "next-vibe/identity/user/db";
 import {
-  createTestUser,
+  createTestUser as createUnverifiedTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
 
@@ -32,6 +33,7 @@ import {
 } from "@/newsletter/enum";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
+import { freePoolClaims } from "./anti-farming/db";
 import { creditTransactions, creditWallets } from "./db";
 import { FREE_GRANT_TIER_VERSION } from "./free-allowance";
 import { CreditTransactionType } from "./enum";
@@ -51,7 +53,45 @@ const { guest, newsletterBonus } = FREE_CREDIT_ALLOWANCE;
 // guest 20 + signedIn 20 = 40 base, +50 newsletter = 90.
 const userBase = FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
 const logger = createEndpointLogger(false, defaultLocale);
+// DB cases sign up real accounts (signup sends its emails over SMTP, ~1s each,
+// plus cold module loads on the first one): far past bun's 5s default.
+const POOL_TEST_TIMEOUT_MS = 30_000;
 const { t } = scopedTranslation.scopedT(defaultLocale);
+
+function privateIp(): string {
+  const octet = (): string => String(1 + Math.floor(Math.random() * 250));
+  return `10.${octet()}.${octet()}.${octet()}`;
+}
+
+/** Account tiers need a verified email: these cases start verified */
+async function createTestUser(
+  email: string,
+): ReturnType<typeof createUnverifiedTestUser> {
+  const created = await createUnverifiedTestUser(email);
+  if (created.success && !created.data.user.isPublic) {
+    const userId = created.data.user.id;
+    await db
+      .update(users)
+      .set({ emailVerified: true })
+      .where(eq(users.id, userId));
+    // A private network of its own: no guest spend from other tests behind
+    // the shared test IP is carried over, and no subnet budget is shared
+    const linked = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
+    await db
+      .update(leads)
+      .set({ ipAddress: privateIp() })
+      .where(
+        inArray(
+          leads.id,
+          linked.map((l) => l.leadId),
+        ),
+      );
+  }
+  return created;
+}
 
 const createdLeadIds: string[] = [];
 const createdUserIds: string[] = [];
@@ -148,6 +188,14 @@ afterAll(async () => {
     await db
       .delete(newsletterSubscriptions)
       .where(inArray(newsletterSubscriptions.email, createdEmails));
+  }
+  if (createdUserIds.length > 0) {
+    await db.delete(freePoolClaims).where(
+      inArray(
+        freePoolClaims.poolKey,
+        createdUserIds.map((id) => `user:${id}`),
+      ),
+    );
   }
   for (const userId of createdUserIds) {
     await deleteTestUser(userId);
@@ -257,7 +305,7 @@ describe("free allowance pools (DB)", () => {
   it("guest pool gets the guest allowance", async () => {
     const leadId = await createGuestLead();
     expect(await freeBalance(guestUser(leadId))).toBe(guest);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("guest pool: even a confirmed newsletter adds nothing (account first)", async () => {
     const leadId = await createGuestLead();
@@ -272,7 +320,7 @@ describe("free allowance pools (DB)", () => {
       .set({ confirmedAt: new Date() })
       .where(eq(newsletterSubscriptions.email, email));
     expect(await freeBalance(user)).toBe(guest);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("user pool: unconfirmed adds nothing; confirmed adds the bonus once", async () => {
     const created = await createTestUser(uniqueEmail("user-nl"));
@@ -293,7 +341,7 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
     // Idempotent: repeated reads never stack a second bonus
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("signed-in user gets the user allowance, +bonus with a confirmed newsletter", async () => {
     const created = await createTestUser(uniqueEmail("user"));
@@ -307,7 +355,7 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(user)).toBe(userBase);
     await addNewsletter({ userId: user.id }, true);
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("linked leads share one cap - spending on both counts together", async () => {
     const a = await createGuestLead();
@@ -326,7 +374,7 @@ describe("free allowance pools (DB)", () => {
     // 30 spent across the pool against the guest allowance -> nothing left on either device
     expect(await freeBalance(guestUser(a))).toBe(0);
     expect(await freeBalance(guestUser(b))).toBe(0);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("guest -> user mid-month carries usage over (no double dipping)", async () => {
     const guestLead = await createGuestLead();
@@ -368,7 +416,7 @@ describe("free allowance pools (DB)", () => {
     expect(shown.success && shown.data.total).toBe(expected);
     await spend(asGuest, 5);
     expect(await freeBalance(user)).toBe(expected - 5);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("existing user under the old cap is topped up to the new cap on next activity (not double-granted, prior spend carries)", async () => {
     const created = await createTestUser(uniqueEmail("existing"));
@@ -433,7 +481,7 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
     // Idempotent: repeated reads never push past the cap.
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 15);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("zeroed or spent free credits are never regenerated by the top-up", async () => {
     const leadId = await createGuestLead();
@@ -444,7 +492,7 @@ describe("free allowance pools (DB)", () => {
       .set({ freeCreditsRemaining: 0 })
       .where(eq(creditWallets.leadId, leadId));
     expect(await freeBalance(user)).toBe(0);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("unsubscribe + resubscribe never pays the bonus twice in a period", async () => {
     const created = await createTestUser(uniqueEmail("user-resub"));
@@ -473,7 +521,7 @@ describe("free allowance pools (DB)", () => {
     // Back on: the cap returns, the spend still counts. No fresh +bonus.
     await setStatus(NewsletterSubscriptionStatus.SUBSCRIBED);
     expect(await freeBalance(user)).toBe(afterSpend);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 
   it("existing account refilled at the old 70 keeps it this month, drops to 40 at the next refill", async () => {
     const created = await createTestUser(uniqueEmail("legacy-70"));
@@ -565,16 +613,13 @@ describe("free allowance pools (DB)", () => {
     // Newsletter still lifts the new base to 90
     await addNewsletter({ userId: user.id }, true);
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
-  });
+  }, POOL_TEST_TIMEOUT_MS);
 });
 
 /**
  * One account = one free pool: its user-linked leads, converted leads and every
  * guest lead connected to them through lead_lead_links share the account cap.
  */
-// Each case creates accounts and walks several pools: well past the 5s default
-const POOL_TEST_TIMEOUT_MS = 30_000;
-
 describe("account pool membership (DB)", () => {
   async function newAccount(tag: string): Promise<JwtPayloadType | null> {
     const created = await createTestUser(uniqueEmail(tag));
@@ -590,10 +635,12 @@ describe("account pool membership (DB)", () => {
     return user.isPublic ? "" : user.id;
   }
 
-  async function linkLeads(a: string, b: string): Promise<void> {
-    await db
-      .insert(leadLeadLinks)
-      .values({ leadId1: a, leadId2: b, linkReason: "test" });
+  async function linkLeads(
+    a: string,
+    b: string,
+    linkReason: "test" | "ip_match" = "test",
+  ): Promise<void> {
+    await db.insert(leadLeadLinks).values({ leadId1: a, leadId2: b, linkReason });
   }
 
   async function linkToUser(
@@ -664,10 +711,11 @@ describe("account pool membership (DB)", () => {
 
     // Logged out: same lead, same exhausted pool
     expect(await freeBalance(guestUser(device))).toBe(2);
-    // A new guest device on the same network (ip_match link) is not a fresh pool either
+    // Sharing the IP is not proof of being the same person: a guest device
+    // only IP-linked to the account's device keeps its own guest pool
     const sameIp = await createGuestLead();
-    await linkLeads(sameIp, device);
-    expect(await freeBalance(guestUser(sameIp))).toBe(2);
+    await linkLeads(sameIp, device, "ip_match");
+    expect(await freeBalance(guestUser(sameIp))).toBe(guest);
     expect(await freeBalance(user)).toBe(2);
   }, POOL_TEST_TIMEOUT_MS);
 
@@ -813,7 +861,10 @@ describe("free grants in transaction history (DB)", () => {
     );
     expect(res.success, JSON.stringify(res)).toBe(true);
     return res.success
-      ? res.data.transactions.map((r) => ({ type: r.type, amount: r.amount }))
+      ? res.data.transactions.map((r) => ({
+          type: r.type ?? "",
+          amount: r.amount,
+        }))
       : [];
   }
 

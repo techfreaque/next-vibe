@@ -1,12 +1,13 @@
-import { and, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
-import { leadLeadLinks, leads } from "./db";
+import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
+import { GUEST_IP_POOL_WINDOW_HOURS, ipPoolKey } from "./ip-key";
 
 interface ClientInfo {
   userAgent?: string;
@@ -14,7 +15,13 @@ interface ClientInfo {
   referer?: string;
 }
 
-export async function validateLeadIdExists(leadId: string): Promise<boolean> {
+/**
+ * Does `leadId` exist? `null` = the lookup itself failed (DB timeout/blip):
+ * unknown, NOT missing — callers must not treat it as a dead identity.
+ */
+export async function validateLeadIdExists(
+  leadId: string,
+): Promise<boolean | null> {
   try {
     const [lead] = await db
       .select({ id: leads.id })
@@ -23,7 +30,7 @@ export async function validateLeadIdExists(leadId: string): Promise<boolean> {
       .limit(1);
     return !!lead;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -84,6 +91,7 @@ export async function createAnonymousLead(
         createdFromTracking: true,
         userAgent: clientInfo.userAgent ?? null,
         ipAddress: clientInfo.ipAddress ?? null,
+        ipKey: ipPoolKey(clientInfo.ipAddress),
         referer: clientInfo.referer ?? null,
         timestamp: new Date().toISOString(),
       },
@@ -101,15 +109,26 @@ export async function createAnonymousLead(
   return newLead.id;
 }
 
+/**
+ * Guests behind one IP share ONE guest pool: a new lead links (ip_match) to
+ * every guest lead seen from the same IP key (IPv4 /32, IPv6 /64) within the
+ * last GUEST_IP_POOL_WINDOW_HOURS, whatever browser, incognito or fingerprint.
+ * Leads that belong to an account are never IP-linked: accounts only join
+ * devices through strong signals (login, same lead cookie).
+ */
 async function linkLeadsByIp(
   newLeadId: string,
   ipAddress: string,
   logger: EndpointLogger,
 ): Promise<void> {
   try {
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
+    const ipKey = ipPoolKey(ipAddress);
+    if (!ipKey) {
+      return;
+    }
+    const since = new Date(
+      Date.now() - GUEST_IP_POOL_WINDOW_HOURS * 60 * 60 * 1000,
+    );
 
     const sameIpLeads = await db
       .select({ id: leads.id })
@@ -118,8 +137,13 @@ async function linkLeadsByIp(
         and(
           ne(leads.id, newLeadId),
           isNull(leads.email),
-          sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
-          sql`${leads.createdAt} >= ${monthStart}`,
+          isNull(leads.convertedUserId),
+          or(
+            sql`${leads.metadata}->>'ipKey' = ${ipKey}`,
+            sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
+          ),
+          sql`GREATEST(${leads.createdAt}, ${leads.updatedAt}) >= ${since}`,
+          sql`NOT EXISTS (SELECT 1 FROM ${userLeadLinks} ull WHERE ull.lead_id = ${leads.id})`,
         ),
       )
       .limit(20);
@@ -128,22 +152,18 @@ async function linkLeadsByIp(
       return;
     }
 
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < sameIpLeads.length; i += BATCH_SIZE) {
-      const batch = sameIpLeads.slice(i, i + BATCH_SIZE);
-      await db
-        .insert(leadLeadLinks)
-        .values(
-          batch.map((existing) => ({
-            leadId1: newLeadId,
-            leadId2: existing.id,
-            linkReason: "ip_match" as const,
-          })),
-        )
-        .onConflictDoNothing();
-    }
+    await db
+      .insert(leadLeadLinks)
+      .values(
+        sameIpLeads.map((existing) => ({
+          leadId1: newLeadId,
+          leadId2: existing.id,
+          linkReason: "ip_match" as const,
+        })),
+      )
+      .onConflictDoNothing();
 
-    logger.debug("Linked new lead to same-IP leads", {
+    logger.debug("Linked new lead to same-IP guest leads", {
       newLeadId,
       linkedCount: sameIpLeads.length,
     });

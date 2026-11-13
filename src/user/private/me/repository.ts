@@ -46,6 +46,7 @@ import { SubscriptionStatus } from "../../../subscription/enum";
 import { SubscriptionRepository } from "../../../subscription/repository";
 import { withTransaction } from "../../../vibe/database/utils/repository-helpers";
 import { passwordResets } from "../../public/reset-password/db";
+import { findUserByNormalizedEmail } from "../../public/signup/email-guard";
 import type {
   MeDeleteResponseOutput,
   MeGetResponseOutput,
@@ -326,8 +327,16 @@ export class UserProfileRepository {
           logger,
           locale,
         );
+        // Alias-aware too (gmail dots, +tags): one inbox, one account
+        const aliasOwner = await findUserByNormalizedEmail(
+          data.basicInfo.email,
+          userId,
+        );
 
-        if (emailExistsResponse.success && emailExistsResponse.data) {
+        if (
+          (emailExistsResponse.success && emailExistsResponse.data) ||
+          aliasOwner
+        ) {
           return fail({
             message: t("update.errors.validation.emailTaken"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,

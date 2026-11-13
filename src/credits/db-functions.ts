@@ -14,10 +14,9 @@ import { and, eq, gt, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import { defineDbFunction } from "next-vibe/database/db-functions/define";
 import type { Plv8Global } from "next-vibe/database/db-functions/types";
 import { db } from "next-vibe/database/index";
-import { leadLeadLinks } from "next-vibe/identity/lead/db";
 
 import { creditPacks, creditTransactions, creditWallets } from "./db";
-import { userPoolLeadIdsSql } from "./pool-members";
+import { guestPoolLeadIdsSql, userPoolLeadIdsSql } from "./pool-members";
 
 // plv8 is a global injected by PostgreSQL's V8 engine at runtime.
 // Declared here for type safety inside the logic function body.
@@ -76,17 +75,7 @@ export const getPoolBalance = defineDbFunction({
       .from(creditWallets)
       .where(
         sql`${creditWallets.leadId} IN (
-          WITH RECURSIVE connected(lead_id) AS (
-            SELECT ${p.p_lead_id}::uuid
-            UNION
-            SELECT CASE
-              WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
-              ELSE ll.lead_id_1
-            END
-            FROM ${leadLeadLinks} ll
-            JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
-          )
-          SELECT DISTINCT lead_id FROM connected
+          ${guestPoolLeadIdsSql(p.p_lead_id)}
         )`,
       ),
 
@@ -131,18 +120,8 @@ export const getPoolBalance = defineDbFunction({
       .where(
         and(
           sql`${creditPacks.walletId} IN (
-            WITH RECURSIVE connected(lead_id) AS (
-              SELECT ${p.p_lead_id}::uuid
-              UNION
-              SELECT CASE
-                WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
-                ELSE ll.lead_id_1
-              END
-              FROM ${leadLeadLinks} ll
-              JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
-            )
             SELECT cw.id FROM ${creditWallets} cw
-            JOIN connected c ON cw.lead_id = c.lead_id
+            WHERE cw.lead_id IN (${guestPoolLeadIdsSql(p.p_lead_id)})
           )`,
           eq(creditPacks.type, "enums.packType.subscription"),
           isNotNull(creditPacks.expiresAt),
@@ -187,17 +166,7 @@ export const getPoolBalance = defineDbFunction({
       .from(creditWallets)
       .where(
         sql`${creditWallets.leadId} IN (
-          WITH RECURSIVE connected(lead_id) AS (
-            SELECT ${p.p_lead_id}::uuid
-            UNION
-            SELECT CASE
-              WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
-              ELSE ll.lead_id_1
-            END
-            FROM ${leadLeadLinks} ll
-            JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
-          )
-          SELECT lead_id FROM connected
+          ${guestPoolLeadIdsSql(p.p_lead_id)}
         )`,
       ),
 
@@ -242,18 +211,8 @@ export const getPoolBalance = defineDbFunction({
       .where(
         and(
           sql`${creditPacks.walletId} IN (
-            WITH RECURSIVE connected(lead_id) AS (
-              SELECT ${p.p_lead_id}::uuid
-              UNION
-              SELECT CASE
-                WHEN ll.lead_id_1 = c.lead_id THEN ll.lead_id_2
-                ELSE ll.lead_id_1
-              END
-              FROM ${leadLeadLinks} ll
-              JOIN connected c ON ll.lead_id_1 = c.lead_id OR ll.lead_id_2 = c.lead_id
-            )
             SELECT cw.id FROM ${creditWallets} cw
-            JOIN connected c ON cw.lead_id = c.lead_id
+            WHERE cw.lead_id IN (${guestPoolLeadIdsSql(p.p_lead_id)})
           )`,
           // Include permanent packs (no expiry) and non-expired packs
           or(

@@ -33,6 +33,7 @@ import creditBonusEndpoints from "@/newsletter/credit-bonus/definition";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
+import { FREE_POOL_CLAIMS_START } from "@/credits/anti-farming/config";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
@@ -45,6 +46,10 @@ import signupEndpoints from "./definition";
 const logger = createEndpointLogger(false, defaultLocale);
 const creditsT = creditsScopedTranslation.scopedT(defaultLocale).t;
 const userBase = FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
+/** Accounts created now are grandfathered until the account-rules cutoff */
+function createdBeforeCutoff(): boolean {
+  return Date.now() < FREE_POOL_CLAIMS_START.getTime();
+}
 const createdLeadIds: string[] = [];
 const createdUserIds: string[] = [];
 const createdEmails: string[] = [];
@@ -239,7 +244,11 @@ describe("signup newsletter opt-in", () => {
     expect(await getOffer(user)).toBe(
       NewsletterCreditOffer.PENDING_CONFIRMATION,
     );
-    expect(await freeBalance(user)).toBe(userBase);
+    // Created before the account-rules cutoff: grandfathered, no verification
+    // needed yet (anti-farming.test.ts covers new accounts)
+    expect(await freeBalance(user)).toBe(
+      createdBeforeCutoff() ? userBase : FREE_CREDIT_ALLOWANCE.guest,
+    );
 
     const token = createVerificationToken(user.id, email) ?? "";
     await verify(token, user.leadId);

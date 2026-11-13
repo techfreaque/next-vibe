@@ -87,3 +87,16 @@ export const CreditTransactionTypeDB = [
  */
 export type CreditTransactionTypeValue =
   (typeof CreditTransactionTypeDB)[number];
+
+/**
+ * Whether a pool gets its free monthly credits (credits balance + UI message)
+ */
+export const {
+  enum: FreeCreditsStatus,
+  options: FreeCreditsStatusOptions,
+  Value: FreeCreditsStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "enums.freeStatus.active",
+  VERIFY_EMAIL: "enums.freeStatus.verifyEmail",
+  SUBNET_LIMIT: "enums.freeStatus.subnetLimit",
+});

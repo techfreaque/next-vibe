@@ -4,10 +4,14 @@
  * One account = one monthly free pool. Its members are:
  * - leads linked to the account (user_lead_links: signup, login, second device)
  * - leads converted into the account (leads.converted_user_id)
- * - every guest lead connected to those through lead_lead_links (same-IP devices,
- *   tracked pages, ...), exactly like linked guest leads share a guest pool.
- * The walk never enters a lead that belongs to ANOTHER account, so two accounts
- * behind one IP never merge.
+ * - guest leads connected to those through STRONG lead_lead_links (tracked
+ *   page, referral, manual): never through ip_match. Sharing an IP is not
+ *   proof of being the same person, so strangers behind one IP never share an
+ *   account's pool (see credits/anti-farming for the IP-based guest rules).
+ * The walk never enters a lead that belongs to ANOTHER account.
+ *
+ * A guest pool (no account) = guest leads connected through ANY link,
+ * including ip_match (same IP within 24 h), never entering an account's lead.
  *
  * Shared by the TS pool resolver (credits/repository.ts) and the PL/v8 balance
  * function (credits/db-functions.ts) so both always agree on who is in the pool.
@@ -40,7 +44,8 @@ export function userPoolLeadIdsSql(
       SELECT nxt.lead_id
       FROM pool_leads pl
       JOIN ${leadLeadLinks} ll
-        ON ll.lead_id_1 = pl.lead_id OR ll.lead_id_2 = pl.lead_id
+        ON (ll.lead_id_1 = pl.lead_id OR ll.lead_id_2 = pl.lead_id)
+        AND ll.link_reason <> 'ip_match'
       CROSS JOIN LATERAL (
         SELECT CASE WHEN ll.lead_id_1 = pl.lead_id
           THEN ll.lead_id_2 ELSE ll.lead_id_1 END AS lead_id
@@ -58,5 +63,39 @@ export function userPoolLeadIdsSql(
       )
     )
     SELECT lead_id FROM pool_leads
+  `;
+}
+
+/**
+ * Subquery returning `lead_id` for every lead in a GUEST pool: the start lead
+ * plus guest leads connected through any lead_lead_links (incl. ip_match),
+ * never entering a lead that belongs to an account.
+ */
+export function guestPoolLeadIdsSql(
+  leadId: string | ReturnType<typeof sql.placeholder>,
+): SQL {
+  return sql`
+    WITH RECURSIVE guest_leads(lead_id) AS (
+      SELECT ${leadId}::uuid
+      UNION
+      SELECT nxt.lead_id
+      FROM guest_leads gl
+      JOIN ${leadLeadLinks} ll
+        ON ll.lead_id_1 = gl.lead_id OR ll.lead_id_2 = gl.lead_id
+      CROSS JOIN LATERAL (
+        SELECT CASE WHEN ll.lead_id_1 = gl.lead_id
+          THEN ll.lead_id_2 ELSE ll.lead_id_1 END AS lead_id
+      ) nxt
+      WHERE NOT EXISTS (
+        SELECT 1 FROM ${userLeadLinks} owned_ull
+        WHERE owned_ull.lead_id = nxt.lead_id
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM ${leads} owned_l
+        WHERE owned_l.id = nxt.lead_id
+          AND owned_l.converted_user_id IS NOT NULL
+      )
+    )
+    SELECT lead_id FROM guest_leads
   `;
 }

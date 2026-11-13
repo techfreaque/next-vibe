@@ -16,6 +16,11 @@ export const translations = {
     sttHotkey: "Speech-to-Text (Hotkey)",
   },
   enums: {
+    freeStatus: {
+      active: "Free credits active",
+      verifyEmail: "Verify your email to unlock account credits",
+      subnetLimit: "Free credits paused for this network",
+    },
     creditType: {
       userSubscription: "User Subscription Credits",
       leadFree: "Lead Free Tier Credits",
@@ -43,6 +48,7 @@ export const translations = {
     },
   },
   historyLabels: {
+    signupCarryover: "Used as a guest before signup",
     sharedLimit: "Linked devices share one monthly limit",
     monthly: "Monthly free credits",
     monthlyGuest: "Monthly free credits (no account)",
@@ -218,6 +224,13 @@ export const translations = {
     },
     capacity: {
       content: "Total Capacity",
+    },
+    freeStatus: {
+      content: "Free credits status",
+      verifyEmail:
+        "Verify your email and this account gets {{signedIn}} free credits a month. Until then you keep the guest {{guest}}.",
+      subnetLimit:
+        "Too many new free accounts came from your network this month, so this account gets no free credits for now. Buying credits unlocks them, or they start next month when the network has room again.",
     },
     success: {
       title: "Balance Retrieved",

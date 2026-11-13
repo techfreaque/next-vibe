@@ -58734,6 +58734,659 @@
     "credits": 0
   },
   {
+    "toolName": "anti-farming-report",
+    "title": "Gratis-Credit-Farming-Bericht",
+    "titleShort": "Farming-Bericht",
+    "description": "Wer Gratis-Credits abgreift. Top-Subnetze nach geblockten Versuchen und nach beanspruchten Gratis-Pools, Top-E-Mail-Domains bei doppelten und Wegwerf-Anmeldungen, dazu die aktiven Limits.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "days": {
+          "type": "form_field",
+          "fieldType": "int",
+          "label": "Zeitraum (Tage)",
+          "description": "So viele Tage zurück für geblockte Versuche, Gast-Pools und E-Mail-Domains. Konto-Pools zählen immer den laufenden UTC-Monat.",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "defaultValue": 30
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "window": {
+          "type": "text",
+          "label": "Zeitraum",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "days": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "from": {
+                  "def": {
+                    "type": "date",
+                    "coerce": true
+                  },
+                  "type": "date"
+                },
+                "month": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "thresholds": {
+          "type": "text",
+          "label": "Aktive Limits",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "accountPoolsPerSubnetPerMonth": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "guestPoolsPerSubnetPerDay": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "guestIpPoolWindowHours": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "signupGuestSpendLookbackHours": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "subnetPrefixV4": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "subnetPrefixV6": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totals": {
+          "type": "text",
+          "label": "Geblockte Versuche",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "total": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "subnetAccountLimit": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "subnetGuestLimit": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "duplicateEmail": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "disposableEmail": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subnetsByBlocked": {
+          "type": "text",
+          "label": "Top-Subnetze nach geblockten Versuchen",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "subnet": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "blocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "accountGranted": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "accountBlocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "guestGranted": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "guestBlocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "lastSeen": {
+                      "def": {
+                        "type": "date",
+                        "coerce": true
+                      },
+                      "type": "date"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "subnet": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "blocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "accountGranted": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "accountBlocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "guestGranted": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "guestBlocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "lastSeen": {
+                    "def": {
+                      "type": "date",
+                      "coerce": true
+                    },
+                    "type": "date"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subnetsByClaims": {
+          "type": "text",
+          "label": "Top-Subnetze nach beanspruchten Gratis-Pools",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "subnet": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "blocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "accountGranted": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "accountBlocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "guestGranted": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "guestBlocked": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "lastSeen": {
+                      "def": {
+                        "type": "date",
+                        "coerce": true
+                      },
+                      "type": "date"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "subnet": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "blocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "accountGranted": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "accountBlocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "guestGranted": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "guestBlocked": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "lastSeen": {
+                    "def": {
+                      "type": "date",
+                      "coerce": true
+                    },
+                    "type": "date"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "emailDomains": {
+          "type": "text",
+          "label": "Top-E-Mail-Domains",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "domain": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "duplicate": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "disposable": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "total": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "lastSeen": {
+                      "def": {
+                        "type": "date",
+                        "coerce": true
+                      },
+                      "type": "date"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "domain": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "duplicate": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "disposable": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "total": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "lastSeen": {
+                    "def": {
+                      "type": "date",
+                      "coerce": true
+                    },
+                    "type": "date"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "credits",
+    "tags": ["Anti-Farming", "Admin"],
+    "aliases": ["anti-farming-report"],
+    "credits": 0
+  },
+  {
     "toolName": "credits-avg-transaction",
     "title": "Durchschnittliche Kredit-Transaktion",
     "titleShort": "Ø Transaktion",
@@ -63147,6 +63800,1110 @@
     "category": "analytics",
     "tags": ["vibe-sense"],
     "aliases": ["credits-expired"],
+    "credits": 0
+  },
+  {
+    "toolName": "credits-farming-blocked",
+    "title": "Gratis-Credit-Farming geblockt",
+    "titleShort": "Farming geblockt",
+    "description": "Abgewehrte Versuche, Gratis-Credits abzugreifen, pro Bucket: Subnetz-Kontingent voll (Konten oder Gäste), doppelte E-Mail, Wegwerf-E-Mail. Ein Ausschlag heißt: Hier farmt jemand.",
+    "fields": {
+      "noFormElement": true,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "resolution": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Auflösung",
+          "description": "Berechnungszeitrahmen",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.resolution.1m": "enums.resolution.1m",
+                  "enums.resolution.3m": "enums.resolution.3m",
+                  "enums.resolution.5m": "enums.resolution.5m",
+                  "enums.resolution.15m": "enums.resolution.15m",
+                  "enums.resolution.30m": "enums.resolution.30m",
+                  "enums.resolution.1h": "enums.resolution.1h",
+                  "enums.resolution.4h": "enums.resolution.4h",
+                  "enums.resolution.1d": "enums.resolution.1d",
+                  "enums.resolution.1w": "enums.resolution.1w",
+                  "enums.resolution.1M": "enums.resolution.1M"
+                },
+                "options": [
+                  "enums.resolution.1m",
+                  "enums.resolution.3m",
+                  "enums.resolution.5m",
+                  "enums.resolution.15m",
+                  "enums.resolution.30m",
+                  "enums.resolution.1h",
+                  "enums.resolution.4h",
+                  "enums.resolution.1d",
+                  "enums.resolution.1w",
+                  "enums.resolution.1M"
+                ]
+              },
+              "defaultValue": "enums.resolution.1d"
+            },
+            "type": "default"
+          },
+          "options": [
+            {
+              "value": "enums.resolution.1m",
+              "label": "enums.resolution.1m"
+            },
+            {
+              "value": "enums.resolution.3m",
+              "label": "enums.resolution.3m"
+            },
+            {
+              "value": "enums.resolution.5m",
+              "label": "enums.resolution.5m"
+            },
+            {
+              "value": "enums.resolution.15m",
+              "label": "enums.resolution.15m"
+            },
+            {
+              "value": "enums.resolution.30m",
+              "label": "enums.resolution.30m"
+            },
+            {
+              "value": "enums.resolution.1h",
+              "label": "enums.resolution.1h"
+            },
+            {
+              "value": "enums.resolution.4h",
+              "label": "enums.resolution.4h"
+            },
+            {
+              "value": "enums.resolution.1d",
+              "label": "enums.resolution.1d"
+            },
+            {
+              "value": "enums.resolution.1w",
+              "label": "enums.resolution.1w"
+            },
+            {
+              "value": "enums.resolution.1M",
+              "label": "enums.resolution.1M"
+            }
+          ],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "range": {
+          "type": "form_field",
+          "fieldType": "date_range",
+          "label": "Bereich",
+          "description": "Abzufragender Zeitraum",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "from": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "to": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "lookback": {
+          "type": "form_field",
+          "fieldType": "int",
+          "label": "Rückblick",
+          "description": "Extra Balken vor Bereichsstart",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "defaultValue": 0
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "result": {
+          "type": "form_field",
+          "fieldType": "time_series",
+          "label": "Geblockte Farming-Versuche",
+          "description": "Ausgabe-Zeitreihe",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "timestamp": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "meta": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "union",
+                                "options": [
+                                  {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "null"
+                                    },
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "timestamp": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "meta": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            {
+                              "def": {
+                                "type": "null"
+                              },
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": "optional"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "meta": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Meta",
+          "description": "Knotenausführungsmetadaten",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "actualResolution": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.resolution.1m": "enums.resolution.1m",
+                      "enums.resolution.3m": "enums.resolution.3m",
+                      "enums.resolution.5m": "enums.resolution.5m",
+                      "enums.resolution.15m": "enums.resolution.15m",
+                      "enums.resolution.30m": "enums.resolution.30m",
+                      "enums.resolution.1h": "enums.resolution.1h",
+                      "enums.resolution.4h": "enums.resolution.4h",
+                      "enums.resolution.1d": "enums.resolution.1d",
+                      "enums.resolution.1w": "enums.resolution.1w",
+                      "enums.resolution.1M": "enums.resolution.1M"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  },
+                  "options": [
+                    "enums.resolution.1m",
+                    "enums.resolution.3m",
+                    "enums.resolution.5m",
+                    "enums.resolution.15m",
+                    "enums.resolution.30m",
+                    "enums.resolution.1h",
+                    "enums.resolution.4h",
+                    "enums.resolution.1d",
+                    "enums.resolution.1w",
+                    "enums.resolution.1M"
+                  ]
+                },
+                "lookbackUsed": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "sparse": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "optional"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "analytics",
+    "tags": ["vibe-sense"],
+    "aliases": ["credits-farming-blocked"],
     "credits": 0
   },
   {
@@ -78847,6 +80604,55 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "freeStatus": {
+          "type": "badge",
+          "label": "Status der Gratis-Credits",
+          "enumOptions": [
+            {
+              "value": "enums.freeStatus.active",
+              "label": "enums.freeStatus.active"
+            },
+            {
+              "value": "enums.freeStatus.verifyEmail",
+              "label": "enums.freeStatus.verifyEmail"
+            },
+            {
+              "value": "enums.freeStatus.subnetLimit",
+              "label": "enums.freeStatus.subnetLimit"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ACTIVE": "enums.freeStatus.active",
+                    "VERIFY_EMAIL": "enums.freeStatus.verifyEmail",
+                    "SUBNET_LIMIT": "enums.freeStatus.subnetLimit"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ACTIVE": "enums.freeStatus.active",
+                  "VERIFY_EMAIL": "enums.freeStatus.verifyEmail",
+                  "SUBNET_LIMIT": "enums.freeStatus.subnetLimit"
+                },
+                "options": [
+                  "enums.freeStatus.active",
+                  "enums.freeStatus.verifyEmail",
+                  "enums.freeStatus.subnetLimit"
+                ]
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true

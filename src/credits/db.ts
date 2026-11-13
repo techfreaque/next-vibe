@@ -134,6 +134,10 @@ export interface UsageMetadata extends Partial<UsageUpstreamCost> {
    * pool wallet holds them, so walletId alone does not say who used them.
    */
   actorLeadId?: string;
+  /** Guest spend from the signup IP before signup, counted once against the account */
+  signupCarryover?: boolean;
+  /** Idempotency key (uq_transactions_grant_key), e.g. free:user:<id>:signup-carryover */
+  grantKey?: string;
 }
 
 export interface ExpiryMetadata {

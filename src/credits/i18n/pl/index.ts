@@ -93,6 +93,11 @@ export const translations: typeof enTranslations = {
     sttHotkey: "Mowa na tekst (Skrót klawiszowy)",
   },
   enums: {
+    freeStatus: {
+      active: "Darmowe kredyty aktywne",
+      verifyEmail: "Potwierdź e-mail, aby odblokować kredyty konta",
+      subnetLimit: "Darmowe kredyty wstrzymane dla tej sieci",
+    },
     creditType: {
       userSubscription: "Kredyty subskrypcji użytkownika",
       leadFree: "Darmowe kredyty leada",
@@ -120,6 +125,7 @@ export const translations: typeof enTranslations = {
     },
   },
   historyLabels: {
+    signupCarryover: "Zużyte jako gość przed rejestracją",
     sharedLimit: "Powiązane urządzenia mają wspólny limit miesięczny",
     monthly: "Miesięczne darmowe kredyty",
     monthlyGuest: "Miesięczne darmowe kredyty (bez konta)",
@@ -302,6 +308,13 @@ export const translations: typeof enTranslations = {
     },
     capacity: {
       content: "Całkowita pojemność",
+    },
+    freeStatus: {
+      content: "Status darmowych kredytów",
+      verifyEmail:
+        "Potwierdź e-mail, a to konto dostanie {{signedIn}} darmowych kredytów miesięcznie. Do tego czasu masz {{guest}} jak gość.",
+      subnetLimit:
+        "Z twojej sieci powstało w tym miesiącu zbyt wiele nowych darmowych kont, więc to konto na razie nie dostaje darmowych kredytów. Zakup kredytów je odblokuje, albo ruszą w przyszłym miesiącu, gdy w sieci zwolni się miejsce.",
     },
     success: {
       title: "Saldo pobrane",

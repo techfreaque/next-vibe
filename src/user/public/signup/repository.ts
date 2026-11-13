@@ -31,15 +31,24 @@ import {
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { SessionRepository } from "next-vibe/identity/session/repository";
 import type { NewUser } from "next-vibe/identity/user/db";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { StandardUserType } from "next-vibe/identity/user/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
+import type { NextRequest } from "next-vibe/ui/lib/request";
+
+import { recordAntiFarmingEvent } from "@/credits/anti-farming/events";
+import { ipSubnetKey } from "@/credits/anti-farming/ip";
 import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
 } from "./definition";
+import { findUserByNormalizedEmail } from "./email-guard";
+import {
+  emailDomain,
+  isDisposableEmail,
+  normalizeEmailForUniqueness,
+} from "./email-identity";
 import type { SignupT } from "./i18n";
 import { scopedTranslation as signupScopedTranslation } from "./i18n";
 
@@ -62,6 +71,7 @@ export class SignupRepository {
     logger: EndpointLogger,
     platform: Platform,
     t: SignupT,
+    request: NextRequest | undefined,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
     try {
       // Extract fields from flat structure
@@ -86,7 +96,26 @@ export class SignupRepository {
         });
       }
 
-      // Check if email already exists
+      // Throwaway inboxes never get an account (free-credit farming)
+      if (isDisposableEmail(email)) {
+        logger.info("Signup blocked: disposable email domain", {
+          emailDomain: emailDomain(email),
+        });
+        await recordAntiFarmingEvent(
+          {
+            kind: "disposable_email",
+            emailDomain: emailDomain(email),
+            subnet: SignupRepository.requestSubnet(request),
+          },
+          logger,
+        );
+        return fail({
+          message: t("errors.disposableEmail.detail"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
+      // Check if email already exists (alias-aware: gmail dots, +tags)
       const emailCheckResponse =
         await SignupRepository.checkEmailAvailabilityInternal(
           email,
@@ -97,6 +126,23 @@ export class SignupRepository {
         return emailCheckResponse;
       }
       if (emailCheckResponse.data) {
+        // Same message as a plain duplicate: no account enumeration difference.
+        // Only alias variants are farming signals; a re-typed email is not.
+        if (
+          emailCheckResponse.data.toLowerCase() !== email.trim().toLowerCase()
+        ) {
+          logger.info("Signup blocked: alias of an existing account email", {
+            emailDomain: emailDomain(email),
+          });
+          await recordAntiFarmingEvent(
+            {
+              kind: "duplicate_email",
+              emailDomain: emailDomain(email),
+              subnet: SignupRepository.requestSubnet(request),
+            },
+            logger,
+          );
+        }
         return fail({
           message: t("errors.conflict.detail"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -644,25 +690,35 @@ export class SignupRepository {
     }
   }
 
+  /** Client subnet key (IPv4 /24, IPv6 /64) from proxy headers, or null */
+  private static requestSubnet(
+    request: NextRequest | undefined,
+  ): string | null {
+    const ip =
+      request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request?.headers.get("x-real-ip")?.trim();
+    return ipSubnetKey(ip);
+  }
+
   /**
-   * Internal helper: Check if email is already registered
+   * Internal helper: Check if email (or an alias of it) is already registered
    * @param email - Email to check
    * @param logger - Logger instance
-   * @returns Success or error result with boolean indicating if email exists
+   * @returns The existing account's email when taken (exact or alias), else null
    */
   private static async checkEmailAvailabilityInternal(
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  ): Promise<ResponseType<string | null>> {
     try {
-      const existingUserResponse = await UserRepository.getUserByEmail(
-        email,
-        UserDetailLevel.STANDARD,
-        locale,
-        logger,
-      );
-      return success(existingUserResponse.success); // true if email exists
+      const existing = await findUserByNormalizedEmail(email, null);
+      if (existing) {
+        logger.debug("Email taken (normalized match)", {
+          normalized: normalizeEmailForUniqueness(email),
+        });
+      }
+      return success(existing ? existing.email : null);
     } catch (error) {
       logger.error("Error checking email registration", parseError(error));
       const { t: checkErrT } = signupScopedTranslation.scopedT(locale);

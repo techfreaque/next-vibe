@@ -26,7 +26,15 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail signup if admin notification fails
       },
     ],
-    handler: async ({ data, user, locale, logger, platform, t }) =>
-      SignupRepository.registerUser(data, user, locale, logger, platform, t),
+    handler: async ({ data, user, locale, logger, platform, t, request }) =>
+      SignupRepository.registerUser(
+        data,
+        user,
+        locale,
+        logger,
+        platform,
+        t,
+        request,
+      ),
   },
 });

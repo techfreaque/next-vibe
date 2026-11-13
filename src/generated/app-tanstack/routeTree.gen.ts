@@ -231,10 +231,12 @@ import { Route as ApiLocaleChartOfAccountsReportsTrialBalanceRouteImport } from 
 import { Route as ApiLocaleCompaniesCompanyIdGetRouteImport } from './routes/api.$locale.companies.$companyId.get'
 import { Route as ApiLocaleCompaniesCompanyIdOnboardRouteImport } from './routes/api.$locale.companies.$companyId.onboard'
 import { Route as ApiLocaleCompaniesCompanyIdUpdateRouteImport } from './routes/api.$locale.companies.$companyId.update'
+import { Route as ApiLocaleCreditsAntiFarmingReportRouteImport } from './routes/api.$locale.credits.anti-farming.report'
 import { Route as ApiLocaleCreditsDataSourcesCreditsAvgTransactionRouteImport } from './routes/api.$locale.credits.data-sources.credits-avg-transaction'
 import { Route as ApiLocaleCreditsDataSourcesCreditsBalanceTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-balance-total'
 import { Route as ApiLocaleCreditsDataSourcesCreditsEarnedRouteImport } from './routes/api.$locale.credits.data-sources.credits-earned'
 import { Route as ApiLocaleCreditsDataSourcesCreditsExpiredRouteImport } from './routes/api.$locale.credits.data-sources.credits-expired'
+import { Route as ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRouteImport } from './routes/api.$locale.credits.data-sources.credits-farming-blocked'
 import { Route as ApiLocaleCreditsDataSourcesCreditsFreeGrantsRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-grants'
 import { Route as ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-pool-utilization'
 import { Route as ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRouteImport } from './routes/api.$locale.credits.data-sources.credits-free-tier-spend'
@@ -1923,6 +1925,12 @@ const ApiLocaleCompaniesCompanyIdUpdateRoute =
     path: '/api/$locale/companies/$companyId/update',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleCreditsAntiFarmingReportRoute =
+  ApiLocaleCreditsAntiFarmingReportRouteImport.update({
+    id: '/anti-farming/report',
+    path: '/anti-farming/report',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
 const ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute =
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRouteImport.update({
     id: '/data-sources/credits-avg-transaction',
@@ -1945,6 +1953,12 @@ const ApiLocaleCreditsDataSourcesCreditsExpiredRoute =
   ApiLocaleCreditsDataSourcesCreditsExpiredRouteImport.update({
     id: '/data-sources/credits-expired',
     path: '/data-sources/credits-expired',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
+const ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute =
+  ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRouteImport.update({
+    id: '/data-sources/credits-farming-blocked',
+    path: '/data-sources/credits-farming-blocked',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
 const ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute =
@@ -4802,10 +4816,12 @@ export interface FileRoutesByFullPath {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
+  '/api/$locale/credits/data-sources/credits-farming-blocked': typeof ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
   '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
@@ -5464,10 +5480,12 @@ export interface FileRoutesByTo {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
+  '/api/$locale/credits/data-sources/credits-farming-blocked': typeof ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
   '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
@@ -6134,10 +6152,12 @@ export interface FileRoutesById {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
   '/api/$locale/credits/data-sources/credits-expired': typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
+  '/api/$locale/credits/data-sources/credits-farming-blocked': typeof ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute
   '/api/$locale/credits/data-sources/credits-free-grants': typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   '/api/$locale/credits/data-sources/credits-free-pool-utilization': typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
   '/api/$locale/credits/data-sources/credits-free-tier-spend': typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
@@ -6804,10 +6824,12 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
     | '/api/$locale/credits/data-sources/credits-expired'
+    | '/api/$locale/credits/data-sources/credits-farming-blocked'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
     | '/api/$locale/credits/data-sources/credits-free-tier-spend'
@@ -7466,10 +7488,12 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
     | '/api/$locale/credits/data-sources/credits-expired'
+    | '/api/$locale/credits/data-sources/credits-farming-blocked'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
     | '/api/$locale/credits/data-sources/credits-free-tier-spend'
@@ -8135,10 +8159,12 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
     | '/api/$locale/credits/data-sources/credits-expired'
+    | '/api/$locale/credits/data-sources/credits-farming-blocked'
     | '/api/$locale/credits/data-sources/credits-free-grants'
     | '/api/$locale/credits/data-sources/credits-free-pool-utilization'
     | '/api/$locale/credits/data-sources/credits-free-tier-spend'
@@ -10597,6 +10623,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCompaniesCompanyIdUpdateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/credits/anti-farming/report': {
+      id: '/api/$locale/credits/anti-farming/report'
+      path: '/anti-farming/report'
+      fullPath: '/api/$locale/credits/anti-farming/report'
+      preLoaderRoute: typeof ApiLocaleCreditsAntiFarmingReportRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
     '/api/$locale/credits/data-sources/credits-avg-transaction': {
       id: '/api/$locale/credits/data-sources/credits-avg-transaction'
       path: '/data-sources/credits-avg-transaction'
@@ -10623,6 +10656,13 @@ declare module '@tanstack/react-router' {
       path: '/data-sources/credits-expired'
       fullPath: '/api/$locale/credits/data-sources/credits-expired'
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsExpiredRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
+    '/api/$locale/credits/data-sources/credits-farming-blocked': {
+      id: '/api/$locale/credits/data-sources/credits-farming-blocked'
+      path: '/data-sources/credits-farming-blocked'
+      fullPath: '/api/$locale/credits/data-sources/credits-farming-blocked'
+      preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
     '/api/$locale/credits/data-sources/credits-free-grants': {
@@ -13956,10 +13996,12 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsHistoryRoute: typeof ApiLocaleCreditsHistoryRoute
   ApiLocaleCreditsPublicCapRoute: typeof ApiLocaleCreditsPublicCapRoute
   ApiLocaleCreditsPurchaseRoute: typeof ApiLocaleCreditsPurchaseRoute
+  ApiLocaleCreditsAntiFarmingReportRoute: typeof ApiLocaleCreditsAntiFarmingReportRoute
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute: typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute: typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   ApiLocaleCreditsDataSourcesCreditsEarnedRoute: typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
   ApiLocaleCreditsDataSourcesCreditsExpiredRoute: typeof ApiLocaleCreditsDataSourcesCreditsExpiredRoute
+  ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute: typeof ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute
   ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute
   ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute
   ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute: typeof ApiLocaleCreditsDataSourcesCreditsFreeTierSpendRoute
@@ -13982,6 +14024,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
   ApiLocaleCreditsHistoryRoute: ApiLocaleCreditsHistoryRoute,
   ApiLocaleCreditsPublicCapRoute: ApiLocaleCreditsPublicCapRoute,
   ApiLocaleCreditsPurchaseRoute: ApiLocaleCreditsPurchaseRoute,
+  ApiLocaleCreditsAntiFarmingReportRoute:
+    ApiLocaleCreditsAntiFarmingReportRoute,
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute:
     ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute,
   ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute:
@@ -13990,6 +14034,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
     ApiLocaleCreditsDataSourcesCreditsEarnedRoute,
   ApiLocaleCreditsDataSourcesCreditsExpiredRoute:
     ApiLocaleCreditsDataSourcesCreditsExpiredRoute,
+  ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute:
+    ApiLocaleCreditsDataSourcesCreditsFarmingBlockedRoute,
   ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute:
     ApiLocaleCreditsDataSourcesCreditsFreeGrantsRoute,
   ApiLocaleCreditsDataSourcesCreditsFreePoolUtilizationRoute:

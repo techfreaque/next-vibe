@@ -16,6 +16,7 @@ import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Link } from "next-vibe/ui/components/link";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { P } from "next-vibe/ui/components/typography";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -42,6 +43,7 @@ import {
 import { useSubscription } from "@/subscription/hooks";
 
 import creditsDefinition from "./definition";
+import { FreeCreditsStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { SubscriptionStatusCard } from "./subscription-status-card";
 
@@ -294,6 +296,25 @@ export function CreditsTabHeader({
           />
         </Div>
       )}
+
+      {/* Free credits held back: say why, and what lifts it */}
+      {!isAdmin &&
+        data?.freeStatus !== undefined &&
+        data.freeStatus !== FreeCreditsStatus.ACTIVE && (
+          <Div className="px-5 pb-5 sm:px-6">
+            <Div
+              className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 text-sm"
+              data-testid="free-credits-status"
+            >
+              <Span className="font-semibold">{t(data.freeStatus)}</Span>
+              <P className="m-0 mt-1 text-muted-foreground">
+                {data.freeStatus === FreeCreditsStatus.VERIFY_EMAIL
+                  ? t("get.freeStatus.verifyEmail", freeTiers)
+                  : t("get.freeStatus.subnetLimit")}
+              </P>
+            </Div>
+          </Div>
+        )}
 
       {/* Guests: what they get now and the free step up */}
       {!isAuthenticated && (

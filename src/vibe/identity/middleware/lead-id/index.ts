@@ -52,14 +52,10 @@ export function getLeadIdFromRequest(request: NextRequest): string | undefined {
 /**
  * Check if leadId exists in database
  * @param leadId The leadId to check
- * @returns true if leadId exists in database
+ * @returns true only if the leadId is confirmed to exist (a failed lookup is false)
  */
 export async function isLeadIdValid(leadId: string): Promise<boolean> {
-  try {
-    return await validateLeadIdExists(leadId);
-  } catch {
-    return false;
-  }
+  return (await validateLeadIdExists(leadId)) === true;
 }
 
 /**
@@ -90,9 +86,12 @@ export async function checkLeadId(
     return LeadIdCheckResult.INVALID;
   }
 
-  // Check if leadId exists in database
-  const isValid = await isLeadIdValid(existingLeadId);
-  if (!isValid) {
+  // Check if leadId exists in database. Only a confirmed miss is INVALID: a
+  // failed lookup (DB slow/blip) used to count as missing, so API calls got
+  // 401 invalid_identity and page loads minted a NEW lead over the cookie —
+  // the visitor silently lost their guest credits, packs and chats.
+  const exists = await validateLeadIdExists(existingLeadId);
+  if (exists === false) {
     return LeadIdCheckResult.INVALID;
   }
 

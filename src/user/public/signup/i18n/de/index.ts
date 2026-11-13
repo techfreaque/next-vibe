@@ -226,6 +226,11 @@ export const translations: typeof enTranslations = {
       detail:
         "Für diese E-Mail-Adresse besteht bereits ein Konto. Melden Sie sich stattdessen an.",
     },
+    disposableEmail: {
+      title: "Dauerhafte E-Mail erforderlich",
+      detail:
+        "Wegwerf-Postfächer sind ausgeschlossen. Nutzen Sie eine dauerhafte E-Mail-Adresse.",
+    },
     userNotFound: "Kein Konto für {{email}} gefunden",
     forbidden: {
       title: "Zugriff verweigert",

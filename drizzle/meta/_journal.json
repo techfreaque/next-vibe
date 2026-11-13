@@ -1206,6 +1206,13 @@
       "when": 1794589856190,
       "tag": "20261113171056_model_catalog_scans",
       "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1794590350281,
+      "tag": "20261113171910_anti_farming",
+      "breakpoints": true
     }
   ]
 }

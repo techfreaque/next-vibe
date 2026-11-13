@@ -16,6 +16,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { FreeCreditsStatus, FreeCreditsStatusOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const CreditsBalanceContainer = lazyWidget(() =>
@@ -86,6 +87,13 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.capacity.content" as const,
         schema: z.coerce.number(),
+      }),
+
+      freeStatus: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        label: "get.freeStatus.content" as const,
+        enumOptions: FreeCreditsStatusOptions,
+        schema: z.enum(FreeCreditsStatus).optional(),
       }),
     },
   }),
@@ -165,6 +173,7 @@ const { GET } = createEndpoint({
         free: 0,
         expiresAt: "2025-11-16T00:00:00.000Z",
         capacity: 1820,
+        freeStatus: FreeCreditsStatus.ACTIVE,
       },
     },
   },

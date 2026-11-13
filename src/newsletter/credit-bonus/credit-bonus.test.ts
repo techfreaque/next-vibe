@@ -77,6 +77,11 @@ async function createAccount(tag: string): Promise<JwtPayloadType | null> {
     return null;
   }
   createdUserIds.push(created.data.user.id);
+  // Account tiers need a verified email
+  await db
+    .update(users)
+    .set({ emailVerified: true })
+    .where(eq(users.id, created.data.user.id));
   return created.data.user;
 }
 

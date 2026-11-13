@@ -544,6 +544,55 @@
             "response": true
           },
           "schemaType": "primitive"
+        },
+        "freeStatus": {
+          "type": "badge",
+          "label": "Free credits status",
+          "enumOptions": [
+            {
+              "value": "enums.freeStatus.active",
+              "label": "enums.freeStatus.active"
+            },
+            {
+              "value": "enums.freeStatus.verifyEmail",
+              "label": "enums.freeStatus.verifyEmail"
+            },
+            {
+              "value": "enums.freeStatus.subnetLimit",
+              "label": "enums.freeStatus.subnetLimit"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ACTIVE": "enums.freeStatus.active",
+                    "VERIFY_EMAIL": "enums.freeStatus.verifyEmail",
+                    "SUBNET_LIMIT": "enums.freeStatus.subnetLimit"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ACTIVE": "enums.freeStatus.active",
+                  "VERIFY_EMAIL": "enums.freeStatus.verifyEmail",
+                  "SUBNET_LIMIT": "enums.freeStatus.subnetLimit"
+                },
+                "options": [
+                  "enums.freeStatus.active",
+                  "enums.freeStatus.verifyEmail",
+                  "enums.freeStatus.subnetLimit"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         }
       },
       "type": "custom-widget",

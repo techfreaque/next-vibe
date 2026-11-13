@@ -23,6 +23,7 @@ import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
 import { CREDITS_EXPIRED_ALIAS } from "./data-sources/credits-expired/constants";
 import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
 import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-spend/constants";
+import { CREDITS_FARMING_BLOCKED_ALIAS } from "./data-sources/credits-farming-blocked/constants";
 import { CREDITS_FREE_POOL_UTILIZATION_ALIAS } from "./data-sources/credits-free-pool-utilization/constants";
 import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
@@ -638,6 +639,58 @@ const packSupplyAnalyticsConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
+// ─── Free Credit Farming ─────────────────────────────────────────────────────
+
+const freeCreditFarmingConfig: GraphConfig = {
+  nodes: {
+    farming_blocked: {
+      endpointPath: CREDITS_FARMING_BLOCKED_ALIAS,
+      pane: 0,
+      color: RED,
+    },
+    farming_blocked_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
+      pane: 0,
+      color: AMBER,
+    },
+
+    eval_farming_spike: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_DAY,
+      params: { op: ">", value: 25 },
+      visible: false,
+    },
+
+    action_notify_farming_spike: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: More than 25 free-credit farming attempts blocked today. Someone is farming. Run anti-farming-report to see the subnets and email domains behind it.",
+      },
+    },
+  },
+
+  edges: [
+    { from: "farming_blocked", to: "farming_blocked_ema7" },
+    { from: "farming_blocked", to: "eval_farming_spike" },
+    { from: "eval_farming_spike", to: "action_notify_farming_spike" },
+  ],
+
+  positions: {
+    farming_blocked: { x: 0, y: 0 },
+    farming_blocked_ema7: { x: 300, y: 120 },
+    eval_farming_spike: { x: 300, y: 0 },
+    action_notify_farming_spike: { x: 600, y: 0 },
+  },
+
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
@@ -682,5 +735,12 @@ export const graphSeeds: GraphSeedEntry[] = [
     description:
       "Tracks credit pack creation velocity, packs per wallet, and purchase-per-pack conversion. Alerts when pack creation stalls or conversion drops.",
     config: packSupplyAnalyticsConfig,
+  },
+  {
+    slug: "free-credit-farming",
+    name: "Free Credit Farming",
+    description:
+      "Blocked free-credit farming attempts per day (subnet budget full, duplicate or disposable email) with a 7-day EMA. Alerts when more than 25 attempts are blocked in a day.",
+    config: freeCreditFarmingConfig,
   },
 ];

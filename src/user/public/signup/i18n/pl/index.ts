@@ -222,6 +222,10 @@ export const translations: typeof enTranslations = {
       detail:
         "Konto z tym adresem e-mail już istnieje. Zaloguj się zamiast tego.",
     },
+    disposableEmail: {
+      title: "Wymagany stały adres e-mail",
+      detail: "Tymczasowe skrzynki odpadają. Podaj stały adres e-mail.",
+    },
     userNotFound: "Nie znaleziono konta dla {{email}}",
     forbidden: {
       title: "Dostęp Zabroniony",
