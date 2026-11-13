@@ -384,11 +384,12 @@ export class VideoGenerationRepository {
     // the caller's leadId and served only to that lead (browser).
     // Standalone calls (tool page, no thread) MUST be re-hosted too: provider
     // URLs like OpenRouter's are authed, so a raw one is unplayable in the
-    // browser. They get a fresh lead-owned namespace, served like incognito.
+    // browser. They get a fresh thread-less namespace: owned by the account
+    // when logged in (never swept as guest media), by the leadId for guests.
     const scThreadId = toolExecutionContext.threadId ?? crypto.randomUUID();
-    const isLeadOwned =
-      !toolExecutionContext.threadId ||
-      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
+    const isLeadOwned = toolExecutionContext.threadId
+      ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
+      : user.isPublic;
     try {
       const storage = getStorageAdapter();
       // Some providers (OpenRouter) serve the finished video from an authed

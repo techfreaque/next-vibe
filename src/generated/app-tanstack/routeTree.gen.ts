@@ -615,6 +615,7 @@ import { Route as ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRouteImport } 
 import { Route as ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-upvotes-total'
 import { Route as ApiLocaleVibeAgentChatFolderContentsRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folder-contents.$rootFolderId'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId'
+import { Route as ApiLocaleVibeAgentChatStorageGuestMediaCleanupRouteImport } from './routes/api.$locale.vibe.agent.chat.storage.guest-media-cleanup'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId'
 import { Route as ApiLocaleVibeAgentChatThreadsRenameRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.rename'
 import { Route as ApiLocaleVibeAgentChatThreadsSearchMessagesRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.search-messages'
@@ -4216,6 +4217,12 @@ const ApiLocaleVibeAgentChatFoldersRootFolderIdRoute =
     path: '/api/$locale/vibe/agent/chat/folders/$rootFolderId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute =
+  ApiLocaleVibeAgentChatStorageGuestMediaCleanupRouteImport.update({
+    id: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup',
+    path: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentChatThreadsThreadIdRoute =
   ApiLocaleVibeAgentChatThreadsThreadIdRouteImport.update({
     id: '/$threadId',
@@ -5157,6 +5164,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
@@ -5811,6 +5819,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
@@ -6473,6 +6482,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
   '/api/$locale/vibe/agent/chat/threads/search-messages': typeof ApiLocaleVibeAgentChatThreadsSearchMessagesRoute
@@ -7135,6 +7145,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
@@ -7789,6 +7800,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
@@ -8450,6 +8462,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
     | '/api/$locale/vibe/agent/chat/threads/search-messages'
@@ -8918,6 +8931,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute: typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   ApiLocaleVibeAgentChatFoldersRootFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute: typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
   ApiLocaleVibeAgentRefusalIndexModelModelIdRoute: typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
@@ -13177,6 +13191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': {
+      id: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
+      path: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
+      fullPath: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/chat/threads/$threadId': {
       id: '/api/$locale/vibe/agent/chat/threads/$threadId'
       path: '/$threadId'
@@ -15283,6 +15304,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute,
   ApiLocaleVibeAgentChatFoldersRootFolderIdRoute:
     ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren,
+  ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute:
+    ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute,
   ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute:
     ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute,
   ApiLocaleVibeAgentRefusalIndexModelModelIdRoute:

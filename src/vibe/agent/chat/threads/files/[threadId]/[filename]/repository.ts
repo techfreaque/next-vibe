@@ -23,6 +23,7 @@ import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
 import type { FileMetadata } from "../../../../storage/index";
 import { getStorageAdapter } from "../../../../storage/index";
+import { isStorageFileOwner } from "../../../../storage/url-utils";
 import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
 import type { ChatFileT } from "./i18n";
@@ -107,17 +108,19 @@ export class ChatFileRepository {
       }
 
       if (!thread) {
-        // Incognito threads have no server-side thread row — their files carry
-        // the owning leadId. Access is granted purely on leadId match (never
-        // userId), so the same browser keeps access whether logged in or not.
+        // No server-side thread row: incognito threads and standalone tool
+        // runs. Incognito/guest files carry the owning leadId (the same browser
+        // keeps access whether logged in or not); a logged-in user's
+        // standalone generations carry their user id.
         const fileMetadata = await ChatFileRepository.resolveFileMetadata(
           data.threadId,
           data.filename,
         );
-        if (!fileMetadata?.leadId || fileMetadata.leadId !== user.leadId) {
+        if (!fileMetadata || !isStorageFileOwner(fileMetadata, user)) {
           logger.error("Lead does not have permission to access file", {
             leadId: user.leadId,
             hasFileLeadId: !!fileMetadata?.leadId,
+            hasFileUploadedBy: !!fileMetadata?.uploadedBy,
             metadataFound: fileMetadata !== null,
             storageType: agentEnv.CHAT_STORAGE_TYPE,
             threadId: data.threadId,

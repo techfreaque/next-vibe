@@ -18,9 +18,10 @@ export interface FileMetadata {
   uploadedAt: Date;
   uploadedBy?: string;
   /**
-   * Owning lead for files from incognito threads (no server-side thread row).
-   * File serving authorizes purely by leadId match — never userId — so the
-   * same browser keeps access whether or not the user is logged in.
+   * Owning lead for files from incognito threads and guests' standalone tool
+   * runs (no server-side thread row). Serving matches it against the
+   * caller's leadId, so the same browser keeps access whether or not the
+   * user is logged in. Guest files are removed by guest-media-cleanup.
    */
   leadId?: string;
   threadId: string;
