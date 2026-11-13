@@ -452,6 +452,7 @@ export async function createIncognitoThread(
     streamingState: ThreadStreamingState.IDLE,
     // Incognito threads never claim a streaming run (viewer-local, no revival).
     streamingRunId: null,
+    streamingHeartbeatAt: null,
     sortOrder: 0,
     canPost: true,
     canEdit: true,

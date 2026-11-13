@@ -13,11 +13,14 @@
  *    - Tiers from FREE_CREDIT_ALLOWANCE: guest pool, user pool, user pool + confirmed newsletter
  *    - All linked leads share ONE allowance - NOT per lead - prevents gaming the system
  *    - Free credits stored in lead wallets only (never in user wallets)
- *    - Monthly renewal: entire pool resets to 20 total (not per lead)
+ *    - Monthly renewal: entire pool resets to its tier allowance (not per lead)
  *
  * 3. WALLET LINKING:
- *    - Lead-to-lead: via leadLeadLinks table (track page, referrals)
- *    - Lead-to-user: via userLeadLinks table (signup, login)
+ *    - Lead-to-lead: via leadLeadLinks table (track page, referrals, same IP)
+ *    - Lead-to-user: via userLeadLinks table (signup, login) or leads.convertedUserId
+ *    - An account's pool = its linked/converted leads + every guest lead connected
+ *      to them via leadLeadLinks, never crossing into another account's leads
+ *      (pool-members.ts). A guest lead connected to an account uses that pool.
  *    - When leads link: free credits redistribute across pool
  *    - When lead links to user: lead wallet keeps free credits, user wallet gets paid credits
  *
@@ -39,6 +42,7 @@ import {
   eq,
   gte,
   inArray,
+  isNotNull,
   isNull,
   lt,
   not,
@@ -87,6 +91,7 @@ import { withTransaction } from "../vibe/database/utils/repository-helpers";
 import { createEndpointEmitter } from "../vibe/realtime/core/emitter";
 import {
   creditPacks,
+  type CreditTransactionMetadata,
   creditTransactions,
   type CreditWallet,
   creditWallets,
@@ -96,10 +101,12 @@ import { getPoolBalance } from "./db-functions";
 import {
   computeFreeAllowance,
   computeFreeAvailable,
+  computeFreeTier,
   computeFreeTopUp,
   computeGrandfatheredFreeCap,
   computeLegacyFreeAllowance,
   FREE_GRANT_TIER_VERSION,
+  type FreeTier,
   poolHasConfirmedNewsletter,
 } from "./free-allowance";
 import type { CreditsGetResponseOutput } from "./definition";
@@ -114,6 +121,7 @@ import type {
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
 import type { CreditsT } from "./i18n";
+import { userPoolLeadIdsSql } from "./pool-members";
 import { PublicCapRepository } from "./public-cap/repository";
 
 export interface CreditIdentifier {
@@ -196,13 +204,9 @@ export class CreditRepository {
         return userWalletResult;
       }
 
-      // Get all linked leads
-      const linkedLeads = await db
-        .select({ leadId: userLeadLinks.leadId })
-        .from(userLeadLinks)
-        .where(eq(userLeadLinks.userId, userId));
-
-      const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+      // Every lead in the account's free pool (linked, converted, and guest
+      // leads connected to them)
+      const linkedLeadIds = await CreditRepository.findUserPoolLeadIds(userId);
 
       let leadWallets =
         linkedLeadIds.length > 0
@@ -272,12 +276,7 @@ export class CreditRepository {
         });
       }
 
-      const linkedLeads = await db
-        .select({ leadId: userLeadLinks.leadId })
-        .from(userLeadLinks)
-        .where(eq(userLeadLinks.userId, userId));
-
-      const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+      const linkedLeadIds = await CreditRepository.findUserPoolLeadIds(userId);
 
       const leadWallets =
         linkedLeadIds.length > 0
@@ -361,21 +360,15 @@ export class CreditRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
-      // Check if lead is linked to a user
-      const [userLink] = await db
-        .select()
-        .from(userLeadLinks)
-        .where(eq(userLeadLinks.leadId, leadId))
-        .limit(1);
-
-      if (userLink) {
-        // Lead is linked to user -> return user's pool
-        return CreditRepository.getUserPool(userLink.userId, logger, t, locale);
-      }
-
-      // Lead is not linked to user -> find lead-to-lead pool
+      // Lead connected to an account (directly or through linked guest leads)
+      // -> the account's pool. Logging out never opens a fresh guest pool.
       const connectedLeadIds =
         await CreditRepository.findConnectedLeads(leadId);
+      const ownerUserId =
+        await CreditRepository.findPoolOwner(connectedLeadIds);
+      if (ownerUserId) {
+        return CreditRepository.getUserPool(ownerUserId, logger, t, locale);
+      }
 
       // Get EXISTING wallets for all connected leads
       let leadWallets = await db
@@ -459,6 +452,63 @@ export class CreditRepository {
     }
 
     return [...visited];
+  }
+
+  /**
+   * Lead ids sharing the account's monthly free pool (see credits/pool-members.ts).
+   */
+  private static async findUserPoolLeadIds(userId: string): Promise<string[]> {
+    const result = await db.execute<{ lead_id: string }>(
+      userPoolLeadIdsSql(userId),
+    );
+    return result.rows.map((r) => r.lead_id);
+  }
+
+  /**
+   * Account that owns a set of connected leads (BFS order from the start lead),
+   * so the nearest account wins. Ownership = user_lead_links or converted_user_id.
+   * Null when every lead is a pure guest.
+   */
+  private static async findPoolOwner(
+    connectedLeadIds: string[],
+  ): Promise<string | null> {
+    if (connectedLeadIds.length === 0) {
+      return null;
+    }
+    const [links, converted] = await Promise.all([
+      db
+        .select({ leadId: userLeadLinks.leadId, userId: userLeadLinks.userId })
+        .from(userLeadLinks)
+        .where(inArray(userLeadLinks.leadId, connectedLeadIds))
+        .orderBy(userLeadLinks.createdAt),
+      db
+        .select({ leadId: leads.id, userId: leads.convertedUserId })
+        .from(leads)
+        .where(
+          and(
+            inArray(leads.id, connectedLeadIds),
+            isNotNull(leads.convertedUserId),
+          ),
+        ),
+    ]);
+    const ownerByLead = new Map<string, string>();
+    for (const row of links) {
+      if (!ownerByLead.has(row.leadId)) {
+        ownerByLead.set(row.leadId, row.userId);
+      }
+    }
+    for (const row of converted) {
+      if (row.userId && !ownerByLead.has(row.leadId)) {
+        ownerByLead.set(row.leadId, row.userId);
+      }
+    }
+    for (const leadId of connectedLeadIds) {
+      const owner = ownerByLead.get(leadId);
+      if (owner) {
+        return owner;
+      }
+    }
+    return null;
   }
 
   /**
@@ -1071,8 +1121,18 @@ export class CreditRepository {
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-    // Check if connected leads already have free credits in this period
-    const connectedLeadIds = await CreditRepository.findConnectedLeads(leadId);
+    // Check if the pool (guest graph, or the owning account's whole pool)
+    // already has free credits in this period
+    const guestLeadIds = await CreditRepository.findConnectedLeads(leadId);
+    const ownerUserId = await CreditRepository.findPoolOwner(guestLeadIds);
+    const connectedLeadIds = ownerUserId
+      ? [
+          ...new Set([
+            leadId,
+            ...(await CreditRepository.findUserPoolLeadIds(ownerUserId)),
+          ]),
+        ]
+      : guestLeadIds;
     const existingPoolWallets =
       connectedLeadIds.length > 1
         ? await db
@@ -1120,6 +1180,8 @@ export class CreditRepository {
               metadata: {
                 reason: "initial_grant",
                 tierVersion: FREE_GRANT_TIER_VERSION,
+                tier: "guest",
+                grantKey: `free:lead:${leadId}:${periodId}:initial`,
                 freeCreditsRemaining: initialCredits,
               },
             });
@@ -1176,7 +1238,7 @@ export class CreditRepository {
    */
   private static async resolvePoolFreeAllowance(
     pool: CreditPool,
-  ): Promise<{ allowance: number; legacyAllowance: number }> {
+  ): Promise<{ allowance: number; legacyAllowance: number; tier: FreeTier }> {
     const userId = pool.userWallet?.userId ?? null;
     const isUserPool = pool.poolType === "USER_POOL" && userId !== null;
     // Newsletter bonus is account-only: guest pools skip the lookup
@@ -1190,6 +1252,7 @@ export class CreditRepository {
     return {
       allowance: computeFreeAllowance(input),
       legacyAllowance: computeLegacyFreeAllowance(input),
+      tier: computeFreeTier(input),
     };
   }
 
@@ -1241,11 +1304,12 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- kept for call-site stability; allowance no longer depends on locale
     locale: CountryLanguage,
   ): Promise<number> {
-    const { allowance, legacyAllowance } =
+    const { allowance, legacyAllowance, tier } =
       await CreditRepository.resolvePoolFreeAllowance(pool);
     await CreditRepository.resetMonthlyFreeCreditsIfNeeded(
       pool,
       allowance,
+      tier,
       logger,
     );
     // Tier cut (2026-11): a pool already granted the old, higher cap this month
@@ -1265,8 +1329,23 @@ export class CreditRepository {
           ),
       });
     }
-    await CreditRepository.topUpFreeAllowanceForPool(pool, cap, logger);
+    await CreditRepository.topUpFreeAllowanceForPool(pool, cap, tier, logger);
     return cap;
+  }
+
+  /**
+   * Stable pool identity for grant idempotency keys: the account, or the guest
+   * pool's oldest lead.
+   */
+  private static poolGrantKey(pool: CreditPool): string {
+    const userId = pool.userWallet?.userId;
+    if (pool.poolType === "USER_POOL" && userId) {
+      return `user:${userId}`;
+    }
+    const oldest = pool.leadWallets.toSorted(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    )[0];
+    return `lead:${oldest?.leadId ?? pool.poolId}`;
   }
 
   /**
@@ -1279,6 +1358,7 @@ export class CreditRepository {
   private static async topUpFreeAllowanceForPool(
     pool: CreditPool,
     allowance: number,
+    tier: FreeTier,
     logger: EndpointLogger,
   ): Promise<void> {
     const leadWalletIds = pool.leadWallets.map((w) => w.id);
@@ -1287,11 +1367,16 @@ export class CreditRepository {
     }
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const topUpKey = `free:${CreditRepository.poolGrantKey(pool)}:${periodId}:topup-${String(allowance)}`;
 
     const readTopUp = async (
       tx: Pick<Parameters<Parameters<typeof db.transaction>[0]>[0], "select">,
       lock: boolean,
-    ): Promise<{ topUp: number; target: CreditWallet | undefined }> => {
+    ): Promise<{
+      topUp: number;
+      grantAmount: number;
+      target: CreditWallet | undefined;
+    }> => {
       const walletsQuery = tx
         .select()
         .from(creditWallets)
@@ -1319,6 +1404,12 @@ export class CreditRepository {
 
       let spentThisPeriod = 0;
       let grantedThisPeriod = 0;
+      // Highest cap the pool's grants already reached this month (a device's
+      // first-visit grant is the guest cap). The grant row states the full tier
+      // step (e.g. +50 newsletter) even when the pool's wallets already hold part
+      // of it from linked devices; the history's shared-limit row nets that out.
+      let reachedCap = 0;
+      let alreadyRecorded = false;
       for (const row of periodTxs) {
         const meta = row.metadata;
         if (row.type === CreditTransactionType.USAGE) {
@@ -1326,6 +1417,17 @@ export class CreditRepository {
             "freeCreditsUsed" in meta ? (meta.freeCreditsUsed ?? 0) : 0;
         } else if ("reason" in meta && meta.reason !== "admin_grant") {
           grantedThisPeriod += row.amount;
+          reachedCap = Math.max(
+            reachedCap,
+            meta.reason === "initial_grant"
+              ? FREE_CREDIT_ALLOWANCE.guest
+              : "totalPoolFreeCredits" in meta
+                ? (meta.totalPoolFreeCredits ?? row.amount)
+                : row.amount,
+          );
+          if ("grantKey" in meta && meta.grantKey === topUpKey) {
+            alreadyRecorded = true;
+          }
         }
       }
       const remainingInWallets = wallets.reduce(
@@ -1338,24 +1440,51 @@ export class CreditRepository {
         remainingInWallets,
       });
       const topUp = Math.max(0, Math.min(allowance - grantedThisPeriod, owed));
+      const tierStep = reachedCap > 0 ? Math.max(0, allowance - reachedCap) : 0;
+      const grantAmount = alreadyRecorded ? 0 : Math.max(topUp, tierStep);
       const target = wallets.toSorted(
         (a, b) => a.freePeriodStart.getTime() - b.freePeriodStart.getTime(),
       )[0];
-      return { topUp, target };
+      return { topUp, grantAmount, target };
     };
 
     // Cheap unlocked check first - the hot path almost always ends here
     const probe = await readTopUp(db, false);
-    if (probe.topUp <= 0) {
+    if (probe.grantAmount <= 0) {
       return;
     }
 
     await withTransaction(logger, async (tx) => {
-      const { topUp, target } = await readTopUp(tx, true);
-      if (topUp <= 0 || !target) {
+      const { topUp, grantAmount, target } = await readTopUp(tx, true);
+      if (grantAmount <= 0 || !target) {
         return;
       }
       const freeAfter = target.freeCreditsRemaining + topUp;
+      // The grant row goes first: its unique grantKey (pool + month + cap reached)
+      // makes a concurrent or repeated top-up a no-op.
+      const [grantRow] = await tx
+        .insert(creditTransactions)
+        .values({
+          walletId: target.id,
+          amount: grantAmount,
+          balanceAfter: freeAfter + (pool.userWallet?.balance ?? 0),
+          type: CreditTransactionType.FREE_GRANT,
+          freePeriodId: periodId,
+          metadata: {
+            reason: "allowance_topup",
+            tierVersion: FREE_GRANT_TIER_VERSION,
+            tier,
+            grantKey: topUpKey,
+            creditedAmount: topUp,
+            freeCreditsRemaining: freeAfter,
+            totalPoolFreeCredits: allowance,
+          },
+        })
+        .onConflictDoNothing()
+        .returning({ id: creditTransactions.id });
+      if (!grantRow || topUp <= 0) {
+        return;
+      }
       // Compare-and-swap on the value we read: a concurrent top-up or deduction
       // makes this a no-op (retried on the next read) instead of a double grant.
       // Row locks alone are not enough on PGlite, where pooled clients share one session.
@@ -1370,21 +1499,11 @@ export class CreditRepository {
         )
         .returning({ id: creditWallets.id });
       if (!swapped) {
+        await tx
+          .delete(creditTransactions)
+          .where(eq(creditTransactions.id, grantRow.id));
         return;
       }
-      await tx.insert(creditTransactions).values({
-        walletId: target.id,
-        amount: topUp,
-        balanceAfter: freeAfter + (pool.userWallet?.balance ?? 0),
-        type: CreditTransactionType.FREE_GRANT,
-        freePeriodId: periodId,
-        metadata: {
-          reason: "allowance_topup",
-          tierVersion: FREE_GRANT_TIER_VERSION,
-          freeCreditsRemaining: freeAfter,
-          totalPoolFreeCredits: allowance,
-        },
-      });
       logger.debug("Topped up pool free allowance", {
         poolId: pool.poolId,
         walletId: target.id,
@@ -1404,6 +1523,7 @@ export class CreditRepository {
   private static async resetMonthlyFreeCreditsIfNeeded(
     pool: CreditPool,
     allowance: number,
+    tier: FreeTier,
     logger: EndpointLogger,
   ): Promise<void> {
     const now = new Date();
@@ -1492,6 +1612,43 @@ export class CreditRepository {
         return;
       }
 
+      // Calculate total pool balance (paid credits from all wallets + new free credits)
+      const totalPaidBalance = allWallets.reduce(
+        (sum, w) => sum + w.balance,
+        0,
+      );
+      const totalBalanceAfterGrant = totalPaidBalance + maxFreeCreditsPerPool;
+
+      // The month's grant row goes first: its unique grantKey (pool + month)
+      // stops a second refill even when another request saw a different
+      // oldest wallet for the same pool.
+      const [grantRow] = await tx
+        .insert(creditTransactions)
+        .values({
+          walletId: oldestLeadWallet.id,
+          amount: maxFreeCreditsPerPool,
+          balanceAfter: totalBalanceAfterGrant,
+          type: CreditTransactionType.FREE_GRANT,
+          freePeriodId: newPeriodId,
+          metadata: {
+            reason: "monthly_reset",
+            tierVersion: FREE_GRANT_TIER_VERSION,
+            tier,
+            grantKey: `free:${CreditRepository.poolGrantKey(pool)}:${newPeriodId}:monthly`,
+            freeCreditsRemaining: maxFreeCreditsPerPool,
+            totalPoolFreeCredits: maxFreeCreditsPerPool,
+          },
+        })
+        .onConflictDoNothing()
+        .returning({ id: creditTransactions.id });
+      if (!grantRow) {
+        logger.debug("Monthly grant already recorded for this pool", {
+          poolId: pool.poolId,
+          newPeriodId,
+        });
+        return;
+      }
+
       // CRITICAL: ALWAYS reset to exactly the pool allowance when entering new period
       // This ensures fresh credits each month, regardless of leftover from previous period
 
@@ -1518,28 +1675,6 @@ export class CreditRepository {
           updatedAt: now,
         })
         .where(eq(creditWallets.id, oldestLeadWallet.id));
-
-      // Calculate total pool balance (paid credits from all wallets + new free credits)
-      const totalPaidBalance = allWallets.reduce(
-        (sum, w) => sum + w.balance,
-        0,
-      );
-      const totalBalanceAfterGrant = totalPaidBalance + maxFreeCreditsPerPool;
-
-      // Create FREE_GRANT transaction
-      await tx.insert(creditTransactions).values({
-        walletId: oldestLeadWallet.id,
-        amount: maxFreeCreditsPerPool,
-        balanceAfter: totalBalanceAfterGrant,
-        type: CreditTransactionType.FREE_GRANT,
-        freePeriodId: newPeriodId,
-        metadata: {
-          reason: "monthly_reset",
-          tierVersion: FREE_GRANT_TIER_VERSION,
-          freeCreditsRemaining: maxFreeCreditsPerPool,
-          totalPoolFreeCredits: maxFreeCreditsPerPool,
-        },
-      });
 
       logger.debug("Pool monthly free credits reset complete", {
         poolId: pool.poolId,
@@ -2533,6 +2668,7 @@ export class CreditRepository {
                 ...upstreamCost,
                 freeCreditsUsed: deduction,
                 packCreditsUsed: 0,
+                ...(currentLeadId ? { actorLeadId: currentLeadId } : {}),
               },
             });
 
@@ -2866,12 +3002,15 @@ export class CreditRepository {
   }
 
   /**
-   * Get transaction history for authenticated user
+   * Transaction history for an account.
    *
    * Shows:
-   * - Current lead's transactions (including FREE_GRANT)
-   * - User wallet's paid transactions
-   * - Aggregated usage from other linked leads (summed as "usage from other devices")
+   * - every free grant of the account's pool (monthly refill, tier upgrades,
+   *   newsletter bonus): grants belong to the pool, not to one device
+   * - this device's lead wallet + the user wallet (paid), itemized
+   * - free credits spent this month on the pool's other devices, as one
+   *   "Used on another device" row, so the balance is explainable from history
+   * Admin views (readOnly) never create wallets or grants.
    */
   private static async getTransactions(
     userId: string,
@@ -2880,6 +3019,8 @@ export class CreditRepository {
     offset: number,
     logger: EndpointLogger,
     t: CreditsT,
+    locale: CountryLanguage,
+    readOnly: boolean,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2887,150 +3028,55 @@ export class CreditRepository {
     }>
   > {
     try {
-      // Read-only pool fetch - does NOT create wallets or trigger side effects
-      const poolResult = await CreditRepository.getUserPoolReadOnly(
-        userId,
-        logger,
-        t,
-      );
+      const poolResult = readOnly
+        ? await CreditRepository.getUserPoolReadOnly(userId, logger, t)
+        : await CreditRepository.getUserPool(userId, logger, t, locale);
       if (!poolResult.success) {
         return poolResult;
       }
-
-      const updatedPool = poolResult.data;
-      if (!updatedPool.userWallet) {
-        return success({
-          transactions: [],
-          totalCount: 0,
-        });
+      const cap = readOnly
+        ? null
+        : await CreditRepository.ensurePoolGrantVisible(
+            poolResult.data,
+            logger,
+            locale,
+          );
+      const pool = readOnly
+        ? poolResult.data
+        : await CreditRepository.refetchPoolWallets(poolResult.data);
+      if (!pool.userWallet) {
+        return success({ transactions: [], totalCount: 0 });
       }
 
-      // Find current lead's wallet (may not exist if user has no lead on this device)
-      // When leadId is empty (admin view with no specific lead), treat all lead wallets as current
+      // This device = its lead wallet + the account's paid wallet.
+      // No specific lead (admin view of an account): every wallet is "own".
       const currentLeadWallet = leadId
-        ? updatedPool.leadWallets.find((w) => w.leadId === leadId)
+        ? pool.leadWallets.find((w) => w.leadId === leadId)
         : undefined;
+      const ownWalletIds = leadId
+        ? [
+            pool.userWallet.id,
+            ...(currentLeadWallet ? [currentLeadWallet.id] : []),
+          ]
+        : [pool.userWallet.id, ...pool.leadWallets.map((w) => w.id)];
 
-      // Use the wallet's actual freePeriodId for consistency
-      const currentPeriodId = updatedPool.userWallet.freePeriodId;
-
-      // Find the most recent FREE_GRANT for this period to get the reset cutoff time
-      const [latestGrant] = await db
-        .select()
-        .from(creditTransactions)
-        .where(
-          and(
-            inArray(
-              creditTransactions.walletId,
-              updatedPool.leadWallets.map((w) => w.id),
-            ),
-            eq(creditTransactions.freePeriodId, currentPeriodId),
-            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-          ),
-        )
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(1);
-
-      // Calculate spending from OTHER linked leads (not current lead) for summary entry
-      // Only count USAGE after the most recent FREE_GRANT to avoid counting old usage
-      let otherLeadsSpending = 0;
-      for (const leadWallet of updatedPool.leadWallets) {
-        if (currentLeadWallet && leadWallet.id === currentLeadWallet.id) {
-          continue; // Skip current lead
-        }
-
-        const leadTransactions = await db
-          .select()
-          .from(creditTransactions)
-          .where(
-            and(
-              eq(creditTransactions.walletId, leadWallet.id),
-              eq(creditTransactions.freePeriodId, currentPeriodId),
-              eq(creditTransactions.type, CreditTransactionType.USAGE),
-              latestGrant
-                ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-                : sql`true`,
-            ),
-          );
-
-        const leadSpending = leadTransactions.reduce(
-          (sum, txn) => sum + Math.abs(txn.amount),
-          0,
-        );
-        otherLeadsSpending += leadSpending;
-      }
-
-      // Round to avoid floating point precision artifacts
-      otherLeadsSpending =
-        Math.round(otherLeadsSpending * 1_000_000) / 1_000_000;
-
-      // Adjust offset and limit to account for synthetic summary entry on page 1
-      const hasSummaryEntry = otherLeadsSpending > 0;
-      const adjustedOffset =
-        hasSummaryEntry && offset > 0 ? offset - 1 : offset;
-      const adjustedLimit = hasSummaryEntry && offset === 0 ? limit - 1 : limit;
-
-      // Fetch transactions from current lead wallet (if exists) AND user wallet
-      // When no specific lead (admin view), include all lead wallets
-      const walletIds = leadId
-        ? currentLeadWallet
-          ? [currentLeadWallet.id, updatedPool.userWallet.id]
-          : [updatedPool.userWallet.id]
-        : [
-            updatedPool.userWallet.id,
-            ...updatedPool.leadWallets.map((w) => w.id),
-          ];
-      const transactions = await db
-        .select()
-        .from(creditTransactions)
-        .where(inArray(creditTransactions.walletId, walletIds))
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(adjustedLimit)
-        .offset(adjustedOffset);
-
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(creditTransactions)
-        .where(inArray(creditTransactions.walletId, walletIds));
-
-      // Convert count to number (PostgreSQL count returns bigint as string)
-      const totalCount = Number(count);
-      const result: CreditTransactionOutput[] = transactions.map(
-        (transaction) => {
-          const featureLabel = CreditRepository.getFetaureLabel(
-            transaction.modelId,
-            transaction.feature,
-          );
-          return {
-            id: transaction.id,
-            amount: transaction.amount,
-            balanceAfter: transaction.balanceAfter,
-            type: featureLabel
-              ? `${t(transaction.type)} (${featureLabel})`
-              : t(transaction.type),
-            modelId: transaction.modelId,
-            messageId: transaction.messageId,
-            createdAt: transaction.createdAt,
-          };
-        },
+      return success(
+        await CreditRepository.buildPoolHistory({
+          pool,
+          ownWalletIds,
+          ownLeadIds: leadId
+            ? [leadId]
+            : pool.leadWallets
+                .map((w) => w.leadId)
+                .filter((id): id is string => id !== null),
+          othersLabel: t("historyLabels.otherDevices"),
+          summaryBalance: pool.userWallet.balance,
+          cap,
+          limit,
+          offset,
+          t,
+        }),
       );
-
-      // Add summary entry for other leads' spending if > 0
-      if (otherLeadsSpending > 0 && offset === 0) {
-        result.unshift({
-          id: "other-devices-summary",
-          amount: -otherLeadsSpending,
-          balanceAfter: updatedPool.userWallet.balance,
-          type: t(CreditTransactionType.OTHER_DEVICES),
-          messageId: null,
-          createdAt: new Date(),
-        });
-      }
-
-      return success({
-        transactions: result,
-        totalCount: totalCount + (otherLeadsSpending > 0 ? 1 : 0),
-      });
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { userId });
       return fail({
@@ -3038,6 +3084,365 @@ export class CreditRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Keep the pool's grants current (monthly refill, tier top-up) and make sure
+   * this month's free credits have a grant row to show (pools refilled before
+   * grants were logged get one recorded, without changing any balance).
+   */
+  private static async ensurePoolGrantVisible(
+    pool: CreditPool,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<number> {
+    const cap = await CreditRepository.ensureMonthlyFreeCreditsForPool(
+      pool,
+      logger,
+      locale,
+    );
+    const leadWalletIds = pool.leadWallets.map((w) => w.id);
+    if (leadWalletIds.length === 0) {
+      return cap;
+    }
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const periodTxs = await db
+      .select({
+        type: creditTransactions.type,
+        metadata: creditTransactions.metadata,
+      })
+      .from(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, leadWalletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+          inArray(creditTransactions.type, [
+            CreditTransactionType.USAGE,
+            CreditTransactionType.FREE_GRANT,
+          ]),
+        ),
+      );
+    if (periodTxs.some((r) => r.type === CreditTransactionType.FREE_GRANT)) {
+      return cap;
+    }
+    const spent = periodTxs.reduce(
+      (sum, r) =>
+        sum +
+        ("freeCreditsUsed" in r.metadata
+          ? (r.metadata.freeCreditsUsed ?? 0)
+          : 0),
+      0,
+    );
+    const wallets = await db
+      .select()
+      .from(creditWallets)
+      .where(inArray(creditWallets.id, leadWalletIds));
+    const remaining = wallets.reduce(
+      (sum, w) => sum + w.freeCreditsRemaining,
+      0,
+    );
+    const amount = Math.min(cap, spent + remaining);
+    const target = wallets.toSorted(
+      (a, b) => a.freePeriodStart.getTime() - b.freePeriodStart.getTime(),
+    )[0];
+    if (amount <= 0 || !target) {
+      return cap;
+    }
+    // Same grantKey as the monthly refill: never both for one pool + month.
+    // No tierVersion: these credits were granted by the pre-logging code.
+    await db
+      .insert(creditTransactions)
+      .values({
+        walletId: target.id,
+        amount,
+        balanceAfter: remaining + (pool.userWallet?.balance ?? 0),
+        type: CreditTransactionType.FREE_GRANT,
+        freePeriodId: periodId,
+        metadata: {
+          reason: "monthly_reset",
+          grantKey: `free:${CreditRepository.poolGrantKey(pool)}:${periodId}:monthly`,
+          freeCreditsRemaining: remaining,
+          totalPoolFreeCredits: cap,
+        },
+      })
+      .onConflictDoNothing();
+    return cap;
+  }
+
+  /** Re-read the pool's wallets after grants changed them */
+  private static async refetchPoolWallets(
+    pool: CreditPool,
+  ): Promise<CreditPool> {
+    const walletIds = [
+      ...(pool.userWallet ? [pool.userWallet.id] : []),
+      ...pool.leadWallets.map((w) => w.id),
+    ];
+    if (walletIds.length === 0) {
+      return pool;
+    }
+    const fresh = await db
+      .select()
+      .from(creditWallets)
+      .where(inArray(creditWallets.id, walletIds));
+    return {
+      ...pool,
+      userWallet: pool.userWallet
+        ? (fresh.find((w) => w.id === pool.userWallet?.id) ?? pool.userWallet)
+        : null,
+      leadWallets: fresh.filter((w) => w.leadId !== null),
+    };
+  }
+
+  /**
+   * History label for a free grant, from what it was granted for.
+   */
+  private static freeGrantLabel(
+    metadata: CreditTransactionMetadata,
+    t: CreditsT,
+  ): string | null {
+    if (!("reason" in metadata)) {
+      return null;
+    }
+    const tier = "tier" in metadata ? metadata.tier : undefined;
+    switch (metadata.reason) {
+      case "initial_grant":
+        return t("historyLabels.freeGuest");
+      case "monthly_reset":
+        return tier === "guest"
+          ? t("historyLabels.monthlyGuest")
+          : tier === "account"
+            ? t("historyLabels.monthlyAccount")
+            : tier === "accountNewsletter"
+              ? t("historyLabels.monthlyAccountNewsletter")
+              : t("historyLabels.monthly");
+      case "allowance_topup":
+        return tier === "accountNewsletter"
+          ? t("historyLabels.newsletterBonus")
+          : tier === "account"
+            ? t("historyLabels.accountUpgrade")
+            : t("historyLabels.freeGuest");
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * One page of pool history: own wallets itemized, every pool grant, and this
+   * month's spending on the pool's other wallets as one summary row (page 1).
+   */
+  private static async buildPoolHistory({
+    pool,
+    ownWalletIds,
+    ownLeadIds,
+    othersLabel,
+    summaryBalance,
+    cap,
+    limit,
+    offset,
+    t,
+  }: {
+    pool: CreditPool;
+    /** Wallets whose rows are this viewer's own (paid wallet, this device) */
+    ownWalletIds: string[];
+    /** Devices whose spending is this viewer's own (usage metadata.actorLeadId) */
+    ownLeadIds: string[];
+    othersLabel: string;
+    /** Paid credits this viewer can spend (0 for a logged-out device) */
+    summaryBalance: number;
+    /** The pool's cap this month; null skips the shared-limit row (admin reads) */
+    cap: number | null;
+    limit: number;
+    offset: number;
+    t: CreditsT;
+  }): Promise<{ transactions: CreditTransactionOutput[]; totalCount: number }> {
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const poolLeadWalletIds = pool.leadWallets.map((w) => w.id);
+    const poolWalletIds = [
+      ...(pool.userWallet ? [pool.userWallet.id] : []),
+      ...poolLeadWalletIds,
+    ];
+
+    // Free credits are drawn from whichever pool wallet holds them, so a usage
+    // row belongs to the device that spent it (actorLeadId), not its wallet.
+    const actor = sql`(${creditTransactions.metadata}->>'actorLeadId')`;
+    const byOwnDevice =
+      ownLeadIds.length > 0
+        ? sql`COALESCE(${actor} IN (${sql.join(
+            ownLeadIds.map((id) => sql`${id}`),
+            sql`, `,
+          )}), false)`
+        : sql`false`;
+    const ownRow = or(
+      and(
+        inArray(creditTransactions.walletId, ownWalletIds),
+        or(sql`${actor} IS NULL`, byOwnDevice),
+      ),
+      and(inArray(creditTransactions.walletId, poolWalletIds), byOwnDevice),
+    );
+
+    // This month's free-credit usage across the pool, split own / other devices
+    const periodUsage =
+      poolLeadWalletIds.length > 0
+        ? await db
+            .select({
+              amount: creditTransactions.amount,
+              createdAt: creditTransactions.createdAt,
+              metadata: creditTransactions.metadata,
+              isOwn: sql<boolean>`COALESCE(${ownRow ?? sql`false`}, false)`,
+            })
+            .from(creditTransactions)
+            .where(
+              and(
+                inArray(creditTransactions.walletId, poolLeadWalletIds),
+                eq(creditTransactions.freePeriodId, periodId),
+                eq(creditTransactions.type, CreditTransactionType.USAGE),
+              ),
+            )
+        : [];
+    const otherUsage = periodUsage.filter((r) => !r.isOwn);
+    const freeSpentThisPeriod = periodUsage.reduce(
+      (sum, r) =>
+        sum +
+        ("freeCreditsUsed" in r.metadata
+          ? (r.metadata.freeCreditsUsed ?? 0)
+          : 0),
+      0,
+    );
+
+    // Every device's first-visit grant is logged, but linked devices share ONE
+    // monthly cap: what was granted above it this month is not spendable.
+    let overCap = 0;
+    let lastGrantAt: Date | null = null;
+    if (cap !== null && poolLeadWalletIds.length > 0) {
+      const grants = await db
+        .select({
+          amount: creditTransactions.amount,
+          metadata: creditTransactions.metadata,
+          createdAt: creditTransactions.createdAt,
+        })
+        .from(creditTransactions)
+        .where(
+          and(
+            inArray(creditTransactions.walletId, poolLeadWalletIds),
+            eq(creditTransactions.freePeriodId, periodId),
+            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+          ),
+        );
+      let granted = 0;
+      for (const g of grants) {
+        if ("reason" in g.metadata && g.metadata.reason !== "admin_grant") {
+          granted += g.amount;
+          if (lastGrantAt === null || g.createdAt > lastGrantAt) {
+            lastGrantAt = g.createdAt;
+          }
+        }
+      }
+      overCap = Math.max(0, granted - cap);
+    }
+    const otherSpending =
+      Math.round(
+        otherUsage.reduce((sum, r) => sum + Math.abs(r.amount), 0) * 1_000_000,
+      ) / 1_000_000;
+    const lastOtherUse = otherUsage.reduce<Date | null>(
+      (latest, r) =>
+        latest === null || r.createdAt > latest ? r.createdAt : latest,
+      null,
+    );
+
+    const syntheticCount = (otherSpending > 0 ? 1 : 0) + (overCap > 0 ? 1 : 0);
+    const adjustedOffset =
+      offset > 0 ? Math.max(0, offset - syntheticCount) : offset;
+    const adjustedLimit = offset === 0 ? limit - syntheticCount : limit;
+
+    const visible = or(
+      ownRow,
+      poolLeadWalletIds.length > 0
+        ? and(
+            inArray(creditTransactions.walletId, poolLeadWalletIds),
+            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+          )
+        : undefined,
+    );
+
+    const transactions = await db
+      .select()
+      .from(creditTransactions)
+      .where(visible)
+      .orderBy(desc(creditTransactions.createdAt))
+      .limit(adjustedLimit)
+      .offset(adjustedOffset);
+
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(creditTransactions)
+      .where(visible);
+
+    const result: CreditTransactionOutput[] = transactions.map(
+      (transaction) => {
+        const grantLabel =
+          transaction.type === CreditTransactionType.FREE_GRANT
+            ? CreditRepository.freeGrantLabel(transaction.metadata, t)
+            : null;
+        const featureLabel = CreditRepository.getFetaureLabel(
+          transaction.modelId,
+          transaction.feature,
+        );
+        return {
+          id: transaction.id,
+          amount: transaction.amount,
+          balanceAfter: transaction.balanceAfter,
+          type:
+            grantLabel ??
+            (featureLabel
+              ? `${t(transaction.type)} (${featureLabel})`
+              : t(transaction.type)),
+          modelId: transaction.modelId,
+          messageId: transaction.messageId,
+          createdAt: transaction.createdAt,
+        };
+      },
+    );
+
+    // Synthetic rows sit at the top of page 1: "balance after" = balance now
+    const balanceNow =
+      summaryBalance +
+      (cap === null
+        ? 0
+        : computeFreeAvailable({
+            allowance: cap,
+            spentThisPeriod: freeSpentThisPeriod,
+            remainingInWallets: pool.leadWallets.reduce(
+              (sum, w) => sum + w.freeCreditsRemaining,
+              0,
+            ),
+          }));
+    if (offset === 0 && overCap > 0) {
+      result.unshift({
+        id: "shared-limit-adjustment",
+        amount: -overCap,
+        balanceAfter: balanceNow,
+        type: t("historyLabels.sharedLimit"),
+        messageId: null,
+        createdAt: lastGrantAt ?? now,
+      });
+    }
+    if (offset === 0 && otherSpending > 0) {
+      result.unshift({
+        id: "other-devices-summary",
+        amount: -otherSpending,
+        balanceAfter: balanceNow,
+        type: othersLabel,
+        messageId: null,
+        createdAt: lastOtherUse ?? now,
+      });
+    }
+
+    return {
+      transactions: result,
+      totalCount: Number(count) + syntheticCount,
+    };
   }
 
   private static getFetaureLabel(
@@ -3091,6 +3496,8 @@ export class CreditRepository {
             offset,
             logger,
             t,
+            locale,
+            Boolean(isAdmin),
           )
         : effectiveLeadId !== undefined
           ? await CreditRepository.getTransactionsByLeadId(
@@ -3100,6 +3507,7 @@ export class CreditRepository {
               logger,
               t,
               locale,
+              Boolean(isAdmin),
             )
           : fail({
               message: t("errors.invalidIdentifier"),
@@ -3126,8 +3534,12 @@ export class CreditRepository {
   }
 
   /**
-   * Get transactions by lead ID
-   * Shows only current lead wallet's transactions + summary of other devices' spending
+   * Transaction history for a logged-out device.
+   * Shows this device's own transactions and every grant of the pool it draws
+   * on. When that pool belongs to an account (the device was linked to it),
+   * the account's spending elsewhere shows as "Used by the linked account";
+   * for a guest pool it shows as "Used on another device". The account's paid
+   * transactions are never shown without signing in.
    */
   private static async getTransactionsByLeadId(
     leadId: string | undefined,
@@ -3136,6 +3548,7 @@ export class CreditRepository {
     logger: EndpointLogger,
     t: CreditsT,
     locale: CountryLanguage,
+    readOnly: boolean,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -3149,8 +3562,8 @@ export class CreditRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      // Get lead pool (lead wallets only, no user wallet)
-      const poolResult = await CreditRepository.getLeadPoolOnly(
+      // Same pool as balance and deductions (may be the owning account's pool)
+      const poolResult = await CreditRepository.getLeadPool(
         leadId,
         logger,
         t,
@@ -3159,152 +3572,36 @@ export class CreditRepository {
       if (!poolResult.success) {
         return poolResult;
       }
+      const cap = readOnly
+        ? null
+        : await CreditRepository.ensurePoolGrantVisible(
+            poolResult.data,
+            logger,
+            locale,
+          );
+      const pool = await CreditRepository.refetchPoolWallets(poolResult.data);
 
-      const pool = poolResult.data;
-
-      // Ensure monthly free credits are reset if needed (new period)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        pool,
-        logger,
-        locale,
-      );
-
-      // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await CreditRepository.getLeadPoolOnly(
-        leadId,
-        logger,
-        t,
-        locale,
-      );
-      if (!updatedPoolResult.success) {
-        return updatedPoolResult;
-      }
-
-      const updatedPool = updatedPoolResult.data;
-      const allWallets = [
-        updatedPool.userWallet,
-        ...updatedPool.leadWallets,
-      ].filter((w): w is CreditWallet => w !== null);
-
-      // Find current lead's wallet
-      const currentWallet = allWallets.find((w) => w.leadId === leadId);
+      const currentWallet = pool.leadWallets.find((w) => w.leadId === leadId);
       if (!currentWallet) {
-        return success({
-          transactions: [],
-          totalCount: 0,
-        });
+        return success({ transactions: [], totalCount: 0 });
       }
 
-      // Use the wallet's actual freePeriodId for consistency
-      const currentPeriodId = currentWallet.freePeriodId;
-
-      // Find the most recent FREE_GRANT for this period to get the reset cutoff time
-      const leadWalletIds = allWallets
-        .filter((w) => w.leadId !== null)
-        .map((w) => w.id);
-      const [latestGrant] =
-        leadWalletIds.length > 0
-          ? await db
-              .select()
-              .from(creditTransactions)
-              .where(
-                and(
-                  inArray(creditTransactions.walletId, leadWalletIds),
-                  eq(creditTransactions.freePeriodId, currentPeriodId),
-                  eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-                ),
-              )
-              .orderBy(desc(creditTransactions.createdAt))
-              .limit(1)
-          : [];
-
-      // Calculate total spending from other linked lead wallets in current period (for summary entry)
-      // Only count USAGE after the most recent FREE_GRANT to avoid counting old usage
-      const otherWallets = allWallets.filter((w) => w.id !== currentWallet.id);
-      let otherDevicesSpending = 0;
-
-      if (otherWallets.length > 0) {
-        const otherWalletIds = otherWallets.map((w) => w.id);
-        const otherTransactions = await db
-          .select()
-          .from(creditTransactions)
-          .where(
-            and(
-              inArray(creditTransactions.walletId, otherWalletIds),
-              eq(creditTransactions.freePeriodId, currentPeriodId),
-              eq(creditTransactions.type, CreditTransactionType.USAGE),
-              latestGrant
-                ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-                : sql`true`,
-            ),
-          );
-
-        otherDevicesSpending =
-          Math.round(
-            otherTransactions.reduce(
-              (sum, txn) => sum + Math.abs(txn.amount),
-              0,
-            ) * 1_000_000,
-          ) / 1_000_000;
-      }
-
-      // Adjust offset and limit to account for synthetic summary entry on page 1
-      const hasSummaryEntry = otherDevicesSpending > 0;
-      const adjustedOffset =
-        hasSummaryEntry && offset > 0 ? offset - 1 : offset;
-      const adjustedLimit = hasSummaryEntry && offset === 0 ? limit - 1 : limit;
-
-      // Fetch transactions from ONLY current wallet
-      const transactions = await db
-        .select()
-        .from(creditTransactions)
-        .where(eq(creditTransactions.walletId, currentWallet.id))
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(adjustedLimit)
-        .offset(adjustedOffset);
-
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(creditTransactions)
-        .where(eq(creditTransactions.walletId, currentWallet.id));
-
-      // Convert count to number (PostgreSQL count returns bigint as string)
-      const totalCount = Number(count);
-      const result: CreditTransactionOutput[] = transactions.map(
-        (transaction) => {
-          const featureLabel = CreditRepository.getFetaureLabel(
-            transaction.modelId,
-            transaction.feature,
-          );
-          return {
-            id: transaction.id,
-            amount: transaction.amount,
-            balanceAfter: transaction.balanceAfter,
-            type: featureLabel
-              ? `${t(transaction.type)} (${featureLabel})`
-              : t(transaction.type),
-            messageId: transaction.messageId,
-            createdAt: transaction.createdAt,
-          };
-        },
+      return success(
+        await CreditRepository.buildPoolHistory({
+          pool,
+          ownWalletIds: [currentWallet.id],
+          ownLeadIds: [leadId],
+          othersLabel:
+            pool.poolType === "USER_POOL"
+              ? t("historyLabels.linkedAccount")
+              : t("historyLabels.otherDevices"),
+          summaryBalance: 0,
+          cap,
+          limit,
+          offset,
+          t,
+        }),
       );
-
-      // Add summary entry for other devices' spending if > 0
-      if (otherDevicesSpending > 0 && offset === 0) {
-        result.unshift({
-          id: "other-devices-summary",
-          amount: -otherDevicesSpending,
-          balanceAfter: currentWallet.balance,
-          type: t("enums.transactionType.otherDevices"),
-          messageId: null,
-          createdAt: new Date(),
-        });
-      }
-
-      return success({
-        transactions: result,
-        totalCount: totalCount + (otherDevicesSpending > 0 ? 1 : 0),
-      });
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { leadId });
       return fail({

@@ -14,9 +14,10 @@ import { and, eq, gt, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import { defineDbFunction } from "next-vibe/database/db-functions/define";
 import type { Plv8Global } from "next-vibe/database/db-functions/types";
 import { db } from "next-vibe/database/index";
-import { leadLeadLinks, userLeadLinks } from "next-vibe/identity/lead/db";
+import { leadLeadLinks } from "next-vibe/identity/lead/db";
 
 import { creditPacks, creditTransactions, creditWallets } from "./db";
+import { userPoolLeadIdsSql } from "./pool-members";
 
 // plv8 is a global injected by PostgreSQL's V8 engine at runtime.
 // Declared here for type safety inside the logic function body.
@@ -52,12 +53,13 @@ export const getPoolBalance = defineDbFunction({
       .from(creditWallets)
       .where(eq(creditWallets.userId, p.p_user_id)),
 
-    /** Lead wallets linked to a user (via user_lead_links JOIN) */
+    /** Lead wallets in a user's free pool (see credits/pool-members.ts) */
     linkedLeadWallets: db
       .select({ id: creditWallets.id })
       .from(creditWallets)
-      .innerJoin(userLeadLinks, eq(creditWallets.leadId, userLeadLinks.leadId))
-      .where(eq(userLeadLinks.userId, p.p_user_id)),
+      .where(
+        sql`${creditWallets.leadId} IN (${userPoolLeadIdsSql(p.p_user_id)})`,
+      ),
 
     /** The starting lead's own wallet */
     leadWallet: db
@@ -108,8 +110,7 @@ export const getPoolBalance = defineDbFunction({
             // Linked lead wallets
             sql`${creditPacks.walletId} IN (
               SELECT cw.id FROM ${creditWallets} cw
-              JOIN ${userLeadLinks} ull ON cw.lead_id = ull.lead_id
-              WHERE ull.user_id = ${p.p_user_id}
+              WHERE cw.lead_id IN (${userPoolLeadIdsSql(p.p_user_id)})
             )`,
           ),
           eq(creditPacks.type, "enums.packType.subscription"),
@@ -166,11 +167,7 @@ export const getPoolBalance = defineDbFunction({
       .where(
         or(
           eq(creditWallets.userId, p.p_user_id),
-          sql`${creditWallets.id} IN (
-            SELECT cw.id FROM ${creditWallets} cw
-            JOIN ${userLeadLinks} ull ON cw.lead_id = ull.lead_id
-            WHERE ull.user_id = ${p.p_user_id}
-          )`,
+          sql`${creditWallets.leadId} IN (${userPoolLeadIdsSql(p.p_user_id)})`,
           // Include current session's lead wallet even if not yet linked to user
           // (new sessions create leads before the userLeadLinks record is established)
           eq(creditWallets.leadId, p.p_lead_id),
@@ -221,8 +218,7 @@ export const getPoolBalance = defineDbFunction({
             )`,
             sql`${creditPacks.walletId} IN (
               SELECT cw.id FROM ${creditWallets} cw
-              JOIN ${userLeadLinks} ull ON cw.lead_id = ull.lead_id
-              WHERE ull.user_id = ${p.p_user_id}
+              WHERE cw.lead_id IN (${userPoolLeadIdsSql(p.p_user_id)})
             )`,
           ),
           // Include permanent packs (no expiry) and non-expired packs

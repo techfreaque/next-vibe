@@ -33,6 +33,7 @@ import {
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { creditTransactions, creditWallets } from "./db";
+import { FREE_GRANT_TIER_VERSION } from "./free-allowance";
 import { CreditTransactionType } from "./enum";
 import { publicFreeTierDailyCap } from "./public-cap/db";
 import {
@@ -565,4 +566,413 @@ describe("free allowance pools (DB)", () => {
     await addNewsletter({ userId: user.id }, true);
     expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
   });
+});
+
+/**
+ * One account = one free pool: its user-linked leads, converted leads and every
+ * guest lead connected to them through lead_lead_links share the account cap.
+ */
+// Each case creates accounts and walks several pools: well past the 5s default
+const POOL_TEST_TIMEOUT_MS = 30_000;
+
+describe("account pool membership (DB)", () => {
+  async function newAccount(tag: string): Promise<JwtPayloadType | null> {
+    const created = await createTestUser(uniqueEmail(tag));
+    expect(created.success, JSON.stringify(created)).toBe(true);
+    if (!created.success) {
+      return null;
+    }
+    createdUserIds.push(created.data.user.id);
+    return created.data.user;
+  }
+
+  function userIdOf(user: JwtPayloadType): string {
+    return user.isPublic ? "" : user.id;
+  }
+
+  async function linkLeads(a: string, b: string): Promise<void> {
+    await db
+      .insert(leadLeadLinks)
+      .values({ leadId1: a, leadId2: b, linkReason: "test" });
+  }
+
+  async function linkToUser(
+    user: JwtPayloadType,
+    leadId: string,
+    linkReason: "signup" | "login",
+  ): Promise<void> {
+    await db
+      .insert(userLeadLinks)
+      .values({ userId: userIdOf(user), leadId, linkReason });
+  }
+
+  it("guest devices linked to each other, then signup on one: guest spend on both counts against the account", async () => {
+    const deviceA = await createGuestLead();
+    const deviceB = await createGuestLead();
+    await linkLeads(deviceA, deviceB);
+    expect(await freeBalance(guestUser(deviceA))).toBe(guest);
+    await spend(guestUser(deviceA), 5);
+    await spend(guestUser(deviceB), 7);
+    expect(await freeBalance(guestUser(deviceB))).toBe(guest - 12);
+
+    const user = await newAccount("pool-signup");
+    if (!user) {
+      return;
+    }
+    await linkToUser(user, deviceA, "signup");
+
+    // Not 20 + 40 fresh: one account cap minus everything spent as a guest
+    expect(await freeBalance(user)).toBe(userBase - 12);
+    // Device B never logged in, but it is the same person: same pool
+    expect(await freeBalance(guestUser(deviceB))).toBe(userBase - 12);
+    await spend(guestUser(deviceB), 3);
+    expect(await freeBalance(user)).toBe(userBase - 15);
+    expect(await freeBalance(guestUser(deviceA))).toBe(userBase - 15);
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("login on a second device: that device's guest spend joins the pool, no extra 20", async () => {
+    const user = await newAccount("pool-second-device");
+    if (!user) {
+      return;
+    }
+    const first = await createGuestLead();
+    expect(await freeBalance(guestUser(first))).toBe(guest);
+    await linkToUser(user, first, "signup");
+    expect(await freeBalance(user)).toBe(userBase);
+    await spend(user, 10);
+
+    // New device browses as a guest first (its own fresh 20), then logs in
+    const second = await createGuestLead();
+    expect(await freeBalance(guestUser(second))).toBe(guest);
+    await spend(guestUser(second), 4);
+    await linkToUser(user, second, "login");
+
+    expect(await freeBalance(user)).toBe(userBase - 14);
+    expect(await freeBalance(guestUser(second))).toBe(userBase - 14);
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("logout on a linked device keeps drawing on the account pool (no fresh guest 20)", async () => {
+    const user = await newAccount("pool-logout");
+    if (!user) {
+      return;
+    }
+    const device = await createGuestLead();
+    expect(await freeBalance(guestUser(device))).toBe(guest);
+    await linkToUser(user, device, "signup");
+    await spend(user, userBase - 2);
+    expect(await freeBalance(user)).toBe(2);
+
+    // Logged out: same lead, same exhausted pool
+    expect(await freeBalance(guestUser(device))).toBe(2);
+    // A new guest device on the same network (ip_match link) is not a fresh pool either
+    const sameIp = await createGuestLead();
+    await linkLeads(sameIp, device);
+    expect(await freeBalance(guestUser(sameIp))).toBe(2);
+    expect(await freeBalance(user)).toBe(2);
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("a lead converted into the account (converted_user_id) shares the pool", async () => {
+    const user = await newAccount("pool-converted");
+    if (!user) {
+      return;
+    }
+    const primary = await createGuestLead();
+    expect(await freeBalance(guestUser(primary))).toBe(guest);
+    await linkToUser(user, primary, "signup");
+    const converted = await createGuestLead();
+    expect(await freeBalance(guestUser(converted))).toBe(guest);
+    await spend(guestUser(converted), 6);
+    await db
+      .update(leads)
+      .set({ convertedUserId: userIdOf(user) })
+      .where(eq(leads.id, converted));
+    try {
+      expect(await freeBalance(user)).toBe(userBase - 6);
+      expect(await freeBalance(guestUser(converted))).toBe(userBase - 6);
+    } finally {
+      await db
+        .update(leads)
+        .set({ convertedUserId: null })
+        .where(eq(leads.id, converted));
+    }
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("two accounts behind one IP never merge pools", async () => {
+    const userX = await newAccount("pool-x");
+    const userY = await newAccount("pool-y");
+    if (!userX || !userY) {
+      return;
+    }
+    const leadX = await createGuestLead();
+    const leadY = await createGuestLead();
+    expect(await freeBalance(guestUser(leadX))).toBe(guest);
+    expect(await freeBalance(guestUser(leadY))).toBe(guest);
+    await linkToUser(userX, leadX, "signup");
+    await linkToUser(userY, leadY, "signup");
+    await linkLeads(leadX, leadY);
+
+    await spend(userX, 11);
+    expect(await freeBalance(userX)).toBe(userBase - 11);
+    expect(await freeBalance(userY)).toBe(userBase);
+    expect(await freeBalance(guestUser(leadY))).toBe(userBase);
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("tier cut: old 70 on the account plus an old guest grant on a linked device stays capped at 70", async () => {
+    const user = await newAccount("pool-legacy");
+    if (!user) {
+      return;
+    }
+    const accountLead = await createGuestLead();
+    const guestDevice = await createGuestLead();
+    expect(await freeBalance(guestUser(accountLead))).toBe(guest);
+    expect(await freeBalance(guestUser(guestDevice))).toBe(guest);
+    await linkToUser(user, accountLead, "signup");
+    await linkLeads(accountLead, guestDevice);
+    expect(await freeBalance(user)).toBe(userBase);
+
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const wallets = await db
+      .select({ id: creditWallets.id, leadId: creditWallets.leadId })
+      .from(creditWallets)
+      .where(inArray(creditWallets.leadId, [accountLead, guestDevice]));
+    const walletIds = wallets.map((w) => w.id);
+    const accountWallet = wallets.find((w) => w.leadId === accountLead);
+    const deviceWallet = wallets.find((w) => w.leadId === guestDevice);
+    expect(accountWallet && deviceWallet).toBeTruthy();
+    if (!accountWallet || !deviceWallet) {
+      return;
+    }
+
+    // Rewrite this period as the OLD code left it: 70 on the account lead,
+    // 20 on the guest device, no tierVersion stamps
+    await db
+      .delete(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, walletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+          eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        ),
+      );
+    for (const [walletId, amount] of [
+      [accountWallet.id, 70],
+      [deviceWallet.id, guest],
+    ] as const) {
+      await db.insert(creditTransactions).values({
+        walletId,
+        amount,
+        balanceAfter: amount,
+        type: CreditTransactionType.FREE_GRANT,
+        freePeriodId: periodId,
+        metadata: { reason: "monthly_reset", freeCreditsRemaining: amount },
+      });
+      await db
+        .update(creditWallets)
+        .set({ freeCreditsRemaining: amount })
+        .where(eq(creditWallets.id, walletId));
+    }
+
+    // Old account cap kept this month, never 70 + 20
+    expect(await freeBalance(user)).toBe(70);
+    expect(await freeBalance(guestUser(guestDevice))).toBe(70);
+    await spend(guestUser(guestDevice), 5);
+    expect(await freeBalance(user)).toBe(65);
+
+    // New-tier grants never count toward the grace
+    const [stamped] = await db
+      .select({ metadata: creditTransactions.metadata })
+      .from(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, walletIds),
+          eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        ),
+      )
+      .limit(1);
+    expect(stamped).toBeDefined();
+    expect(FREE_GRANT_TIER_VERSION).toBe(2);
+  }, POOL_TEST_TIMEOUT_MS);
+});
+
+/**
+ * Every free grant is a real transaction row in the history, and spending on
+ * the pool's other devices shows as one summary row: the free balance is the
+ * sum of the history.
+ */
+describe("free grants in transaction history (DB)", () => {
+  async function history(
+    user: JwtPayloadType,
+  ): Promise<{ type: string; amount: number }[]> {
+    const res = await CreditRepository.getTransactionHistory(
+      { paginationInfo: { page: 1, limit: 100 } },
+      user,
+      logger,
+      t,
+      defaultLocale,
+    );
+    expect(res.success, JSON.stringify(res)).toBe(true);
+    return res.success
+      ? res.data.transactions.map((r) => ({ type: r.type, amount: r.amount }))
+      : [];
+  }
+
+  function sum(rows: { amount: number }[]): number {
+    return Math.round(rows.reduce((s, r) => s + r.amount, 0) * 1e6) / 1e6;
+  }
+
+  function labels(rows: { type: string }[]): string[] {
+    return rows.map((r) => r.type);
+  }
+
+  async function account(tag: string): Promise<JwtPayloadType | null> {
+    const created = await createTestUser(uniqueEmail(tag));
+    expect(created.success, JSON.stringify(created)).toBe(true);
+    if (!created.success) {
+      return null;
+    }
+    createdUserIds.push(created.data.user.id);
+    return created.data.user;
+  }
+
+  async function linkDevice(
+    user: JwtPayloadType,
+    linkReason: "signup" | "login",
+  ): Promise<string> {
+    const leadId = await createGuestLead();
+    expect(await freeBalance(guestUser(leadId))).toBe(guest);
+    await db.insert(userLeadLinks).values({
+      userId: user.isPublic ? "" : user.id,
+      leadId,
+      linkReason,
+    });
+    return leadId;
+  }
+
+  it("guest: the first-visit grant is a row and history sums to the balance", async () => {
+    const leadId = await createGuestLead();
+    const asGuest = guestUser(leadId);
+    expect(await freeBalance(asGuest)).toBe(guest);
+    await spend(asGuest, 5);
+    const rows = await history(asGuest);
+    expect(labels(rows)).toContain(t("historyLabels.freeGuest"));
+    expect(sum(rows)).toBe(await freeBalance(asGuest));
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("account, then account + newsletter: upgrade and bonus rows, history sums to the balance", async () => {
+    const user = await account("hist-account");
+    if (!user) {
+      return;
+    }
+    await linkDevice(user, "signup");
+    expect(await freeBalance(user)).toBe(userBase);
+    await spend(user, 3);
+
+    let rows = await history(user);
+    expect(labels(rows)).toContain(t("historyLabels.freeGuest"));
+    expect(labels(rows)).toContain(t("historyLabels.accountUpgrade"));
+    expect(sum(rows)).toBe(userBase - 3);
+    expect(sum(rows)).toBe(await freeBalance(user));
+
+    await addNewsletter({ userId: user.isPublic ? "" : user.id }, true);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus - 3);
+    rows = await history(user);
+    const bonus = rows.filter(
+      (r) => r.type === t("historyLabels.newsletterBonus"),
+    );
+    expect(bonus).toEqual([
+      { type: t("historyLabels.newsletterBonus"), amount: newsletterBonus },
+    ]);
+    expect(sum(rows)).toBe(await freeBalance(user));
+
+    // Reading history again never mints another grant
+    const again = await history(user);
+    expect(again.length).toBe(rows.length);
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("linked devices: the other device's spend shows as one row, labelled by who reads it", async () => {
+    const user = await account("hist-devices");
+    if (!user) {
+      return;
+    }
+    const deviceA = await linkDevice(user, "signup");
+    const deviceB = await linkDevice(user, "login");
+    expect(await freeBalance(user)).toBe(userBase);
+
+    // Logged out on A spends; logged out on B reads its history
+    await spend(guestUser(deviceA), 6);
+    await spend(guestUser(deviceB), 2);
+    const onB = await history(guestUser(deviceB));
+    expect(onB).toContainEqual({
+      type: t("historyLabels.linkedAccount"),
+      amount: -6,
+    });
+    expect(sum(onB)).toBe(await freeBalance(guestUser(deviceB)));
+    expect(sum(onB)).toBe(userBase - 8);
+
+    // Signed in (neither device is the session lead): both show as other devices
+    const signedIn = await history(user);
+    expect(signedIn).toContainEqual({
+      type: t("historyLabels.otherDevices"),
+      amount: -8,
+    });
+    expect(sum(signedIn)).toBe(await freeBalance(user));
+  }, POOL_TEST_TIMEOUT_MS);
+
+  it("monthly refill is one grant row per pool and month, even under concurrent reads", async () => {
+    const user = await account("hist-refill");
+    if (!user) {
+      return;
+    }
+    await linkDevice(user, "signup");
+    expect(await freeBalance(user)).toBe(userBase);
+
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 15);
+    const lastPeriodId = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
+    const poolLeadIds = (
+      await db
+        .select({ leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.userId, user.isPublic ? "" : user.id))
+    ).map((r) => r.leadId);
+    const poolWalletIds = (
+      await db
+        .select({ id: creditWallets.id })
+        .from(creditWallets)
+        .where(inArray(creditWallets.leadId, poolLeadIds))
+    ).map((r) => r.id);
+    await db
+      .update(creditTransactions)
+      .set({ freePeriodId: lastPeriodId })
+      .where(
+        and(
+          inArray(creditTransactions.walletId, poolWalletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+        ),
+      );
+    await db
+      .update(creditWallets)
+      .set({ freePeriodStart: lastMonth, freePeriodId: lastPeriodId })
+      .where(inArray(creditWallets.id, poolWalletIds));
+
+    const balances = await Promise.all(
+      Array.from({ length: 5 }, () => freeBalance(user)),
+    );
+    expect(balances).toEqual(Array.from({ length: 5 }, () => userBase));
+    const refills = await db
+      .select({ amount: creditTransactions.amount })
+      .from(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, poolWalletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+          eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        ),
+      );
+    expect(refills).toEqual([{ amount: userBase }]);
+    const rows = await history(user);
+    expect(labels(rows)).toContain(t("historyLabels.monthlyAccount"));
+  }, POOL_TEST_TIMEOUT_MS);
 });

@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
       freeReset: "Kostenlose Zurücksetzung",
       refund: "Rückerstattung",
       transfer: "Übertragung",
-      otherDevices: "Verbrauch von verknüpften Geräten/Sitzungen",
+      otherDevices: "Auf einem anderen Gerät verbraucht",
       referralEarning: "Empfehlungsverdienst",
       referralPayout: "Empfehlungsauszahlung",
     },
@@ -119,6 +119,19 @@ export const translations: typeof enTranslations = {
       bonus: "Bonus",
       earned: "Verdient",
     },
+  },
+  historyLabels: {
+    sharedLimit: "Verknüpfte Geräte teilen ein Monatslimit",
+    monthly: "Monatliche Gratis-Credits",
+    monthlyGuest: "Monatliche Gratis-Credits (ohne Konto)",
+    monthlyAccount: "Monatliche Gratis-Credits (Gratis-Konto)",
+    monthlyAccountNewsletter:
+      "Monatliche Gratis-Credits (Konto plus Newsletter)",
+    freeGuest: "Gratis-Credits (ohne Konto)",
+    accountUpgrade: "Bonus für Gratis-Konto",
+    newsletterBonus: "Newsletter-Bonus",
+    otherDevices: "Auf einem anderen Gerät verbraucht",
+    linkedAccount: "Vom verknüpften Konto verbraucht",
   },
   expire: {
     post: {

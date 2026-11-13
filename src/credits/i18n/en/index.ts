@@ -31,7 +31,7 @@ export const translations = {
       freeReset: "Free Reset",
       refund: "Refund",
       transfer: "Transfer",
-      otherDevices: "Spending from linked devices/sessions",
+      otherDevices: "Used on another device",
       referralEarning: "Referral Earning",
       referralPayout: "Referral Payout",
     },
@@ -41,6 +41,18 @@ export const translations = {
       bonus: "Bonus",
       earned: "Earned",
     },
+  },
+  historyLabels: {
+    sharedLimit: "Linked devices share one monthly limit",
+    monthly: "Monthly free credits",
+    monthlyGuest: "Monthly free credits (no account)",
+    monthlyAccount: "Monthly free credits (free account)",
+    monthlyAccountNewsletter: "Monthly free credits (account + newsletter)",
+    freeGuest: "Free credits (no account)",
+    accountUpgrade: "Free account bonus",
+    newsletterBonus: "Newsletter bonus",
+    otherDevices: "Used on another device",
+    linkedAccount: "Used by the linked account",
   },
   expire: {
     post: {

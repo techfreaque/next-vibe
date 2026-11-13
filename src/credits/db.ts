@@ -67,6 +67,18 @@ export interface FreeGrantMetadata {
    * FREE_GRANT_TIER_VERSION). Grants without it predate the 2026-11 tier cut.
    */
   tierVersion?: number;
+  /** Pool tier when granted: "guest" | "account" | "accountNewsletter" */
+  tier?: string;
+  /**
+   * Idempotency key, unique across transactions (uq_transactions_grant_key):
+   * free:<pool>:<YYYY-MM>:<monthly|initial|topup-<cap>|recorded>
+   */
+  grantKey?: string;
+  /**
+   * Credits actually added to the wallets. A tier top-up's row states the full
+   * tier step; linked devices may already hold part of it (history nets it out).
+   */
+  creditedAmount?: number;
 }
 
 export interface FreeResetMetadata {
@@ -117,6 +129,11 @@ export interface UsageMetadata extends Partial<UsageUpstreamCost> {
   messageId?: string;
   freeCreditsUsed?: number;
   packCreditsUsed?: number;
+  /**
+   * Lead (device) that spent the credits. Free credits are drawn from whichever
+   * pool wallet holds them, so walletId alone does not say who used them.
+   */
+  actorLeadId?: string;
 }
 
 export interface ExpiryMetadata {
@@ -362,6 +379,11 @@ export const creditTransactions = pgTable(
     index("idx_transactions_wallet").on(table.walletId, table.createdAt),
     // Query by transaction type
     index("idx_transactions_type").on(table.type, table.createdAt),
+    // Free grants are idempotent per pool + month + kind (metadata.grantKey):
+    // concurrent reads can never mint the same monthly grant twice.
+    uniqueIndex("uq_transactions_grant_key")
+      .on(sql`(${table.metadata}->>'grantKey')`)
+      .where(sql`(${table.metadata}->>'grantKey') IS NOT NULL`),
   ],
 );
 

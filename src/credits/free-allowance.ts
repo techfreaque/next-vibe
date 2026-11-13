@@ -40,6 +40,19 @@ export interface FreeAllowanceInput {
   hasConfirmedNewsletter: boolean;
 }
 
+/** Which free tier a pool is on (stored on grant rows, drives history labels) */
+export type FreeTier = "guest" | "account" | "accountNewsletter";
+
+export function computeFreeTier({
+  isUserPool,
+  hasConfirmedNewsletter,
+}: FreeAllowanceInput): FreeTier {
+  if (!isUserPool) {
+    return "guest";
+  }
+  return hasConfirmedNewsletter ? "accountNewsletter" : "account";
+}
+
 /**
  * Monthly free-credit cap for a pool.
  * The newsletter bonus is account-only: a guest pool stays at the guest cap.

@@ -521,6 +521,11 @@ export const chatThreads = pgTable(
     // never clobber the successor stream's claim. NULL = no owner (idle, or a
     // reconciler cleared it).
     streamingRunId: text("streaming_run_id"),
+    // Liveness of the streamingRunId owner. The process that owns the claim
+    // stamps it on claim and every RUN_HEARTBEAT_INTERVAL_MS while the run is
+    // live (any HA node, shared DB). The stale-run reaper only takes over a
+    // claim whose heartbeat stopped. NULL = claimed before heartbeats existed.
+    streamingHeartbeatAt: timestamp("streaming_heartbeat_at"),
 
     // ── Cross-instance identity (placement is DATA — it replicates verbatim; ──
     // ── these columns carry ownership/routing, never the folder path)       ──
@@ -570,6 +575,10 @@ export const chatThreads = pgTable(
       table.loopInstanceId,
     ),
     statusIdx: index("chat_threads_status_idx").on(table.status),
+    // Stale-run reaper scan: only the few non-idle rows.
+    streamingStateIdx: index("chat_threads_streaming_state_idx")
+      .on(table.streamingState)
+      .where(sql`${table.streamingState} <> 'idle'`),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),
     // GIN indexes for array containment queries on role fields
