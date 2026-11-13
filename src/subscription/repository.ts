@@ -959,7 +959,7 @@ export class SubscriptionRepository {
           return; // Idempotent - already processed
         }
 
-        await CreditRepository.addUserCredits(
+        const grant = await CreditRepository.addUserCredits(
           userId,
           product.credits,
           "subscription",
@@ -968,6 +968,15 @@ export class SubscriptionRepository {
           expiresAt ?? undefined,
           checkoutSessionId,
         );
+        if (grant.success && !grant.data.granted) {
+          // Webhook and success redirect raced: the winner sends the emails.
+          logger.info("Subscription credits granted by a concurrent handler", {
+            checkoutSessionId,
+            packId: grant.data.packId,
+            userId,
+          });
+          return;
+        }
         logger.debug("Added subscription credits", {
           userId,
           credits: product.credits,

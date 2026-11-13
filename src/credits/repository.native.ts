@@ -29,6 +29,7 @@ import type {
 } from "./history/definition";
 import type { CreditsT } from "./i18n";
 import type {
+  AddUserCreditsResult,
   CreditIdentifier,
   CreditPool,
   CreditRepositoryType,
@@ -154,7 +155,7 @@ export class CreditRepository {
     _expiresAt?: Date,
     // oxlint-disable-next-line no-unused-vars
     _sessionId?: string,
-  ): Promise<ResponseType<void>> {
+  ): Promise<ResponseType<AddUserCreditsResult>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("addUserCredits is not implemented on native");
   }

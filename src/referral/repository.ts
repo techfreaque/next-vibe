@@ -1594,12 +1594,15 @@ export class ReferralRepository {
     }
 
     // Add to permanent credits
+    // Keyed by the payout request so a retried conversion can never mint twice
     const addResult = await CreditRepository.addUserCredits(
       userId,
       amountCents,
       "permanent",
       logger,
       creditsT,
+      undefined,
+      `payout_${requestId}`,
     );
 
     if (!addResult.success) {

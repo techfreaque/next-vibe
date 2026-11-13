@@ -1171,6 +1171,13 @@
       "when": 1794561038337,
       "tag": "20261113091038_finance_fees_fallback",
       "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1794576606203,
+      "tag": "20261113133006_credit_packs_unique_session",
+      "breakpoints": true
     }
   ]
 }

@@ -150,6 +150,15 @@ interface AddReferralBonusResult {
   packId: string;
   transactionId: string;
 }
+/**
+ * Result of addUserCredits. `granted` is false when an idempotency key
+ * (sessionId) already had a pack: `packId` then points at that existing grant.
+ * Callers gate one-time side effects (confirmation emails) on `granted`.
+ */
+export interface AddUserCreditsResult {
+  packId: string;
+  granted: boolean;
+}
 
 /**
  * Credit Repository Implementation
@@ -2004,9 +2013,27 @@ export class CreditRepository {
     }
   }
 
+  /** Pack holding an idempotency key (metadata.sessionId), if any */
+  private static async findPackIdBySessionId(
+    executor: Pick<typeof db, "select">,
+    key: string,
+  ): Promise<string | undefined> {
+    const [existing] = await executor
+      .select({ id: creditPacks.id })
+      .from(creditPacks)
+      .where(sql`${creditPacks.metadata}->>'sessionId' = ${key}`)
+      .limit(1);
+    return existing?.id;
+  }
+
   /**
    * Add credits to user account (specific method)
-   * Optional sessionId for idempotency checking
+   *
+   * Optional sessionId = idempotency key, enforced by the DB: the unique
+   * partial index `uq_packs_session_id` on `metadata->>'sessionId'` plus
+   * `ON CONFLICT DO NOTHING`. Concurrent callers with the same key (webhook +
+   * success redirect + parallel getSubscription safety nets) produce exactly
+   * one pack; the losers get `{ granted: false, packId: <existing> }`.
    */
   static async addUserCredits(
     userId: string,
@@ -2016,7 +2043,7 @@ export class CreditRepository {
     t: CreditsT,
     expiresAt?: Date,
     sessionId?: string,
-  ): Promise<ResponseType<void>> {
+  ): Promise<ResponseType<AddUserCreditsResult>> {
     try {
       // Add to user wallet (credits are pooled across user + linked leads)
       const walletResult = await CreditRepository.getOrCreateUserWallet(
@@ -2044,70 +2071,106 @@ export class CreditRepository {
       }
 
       // Atomic: insert pack, increment balance, create transaction in one transaction
-      await withTransaction(logger, async (tx) => {
-        // Internal idempotency guard: if sessionId is provided, check for existing pack
-        // inside the transaction to prevent TOCTOU races from concurrent webhooks
-        if (sessionId) {
-          const [existing] = await tx
-            .select({ id: creditPacks.id })
-            .from(creditPacks)
-            .where(sql`${creditPacks.metadata}->>'sessionId' = ${sessionId}`)
-            .limit(1);
-
-          if (existing) {
-            logger.info("Idempotency: credit pack already exists for session", {
+      const result = await withTransaction(
+        logger,
+        async (tx): Promise<AddUserCreditsResult | undefined> => {
+          // Fast path: key already granted (the common retry / page-load case)
+          if (sessionId) {
+            const existingId = await CreditRepository.findPackIdBySessionId(
+              tx,
               sessionId,
-              existingPackId: existing.id,
-              userId,
-            });
-            return;
+            );
+            if (existingId) {
+              return { packId: existingId, granted: false };
+            }
           }
-        }
 
-        const [newPack] = await tx
-          .insert(creditPacks)
-          .values({
+          // The unique index uq_packs_session_id is the real guard: a
+          // concurrent grant with the same key that passed the check above
+          // waits on the winner's row and inserts nothing here.
+          const [newPack] = await tx
+            .insert(creditPacks)
+            .values({
+              walletId: wallet.id,
+              originalAmount: amount,
+              remaining: amount,
+              type: packType,
+              expiresAt: finalExpiresAt,
+              source: `${type}_purchase`,
+              metadata: sessionId ? { sessionId } : {},
+            })
+            .onConflictDoNothing()
+            .returning({ id: creditPacks.id });
+
+          if (!newPack) {
+            // Lost the race: nothing was written in this transaction.
+            return undefined;
+          }
+
+          // Atomic SQL increment - prevents lost updates from concurrent writes
+          const [updated] = await tx
+            .update(creditWallets)
+            .set({
+              balance: sql`${creditWallets.balance} + ${amount}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditWallets.id, wallet.id))
+            .returning({ balance: creditWallets.balance });
+
+          const purchaseMetadata = sessionId
+            ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
+            : { packQuantity: 1 };
+
+          await tx.insert(creditTransactions).values({
             walletId: wallet.id,
-            originalAmount: amount,
-            remaining: amount,
-            type: packType,
-            expiresAt: finalExpiresAt,
-            source: `${type}_purchase`,
-            metadata: sessionId ? { sessionId } : {},
-          })
-          .returning();
+            amount,
+            balanceAfter: updated.balance,
+            type:
+              type === "subscription"
+                ? CreditTransactionType.SUBSCRIPTION
+                : type === "free"
+                  ? CreditTransactionType.FREE_GRANT
+                  : CreditTransactionType.PURCHASE,
+            packId: newPack.id,
+            freePeriodId: wallet.freePeriodId,
+            metadata: purchaseMetadata,
+          });
+          return { packId: newPack.id, granted: true };
+        },
+      );
 
-        // Atomic SQL increment - prevents lost updates from concurrent writes
-        const [updated] = await tx
-          .update(creditWallets)
-          .set({
-            balance: sql`${creditWallets.balance} + ${amount}`,
-            updatedAt: new Date(),
-          })
-          .where(eq(creditWallets.id, wallet.id))
-          .returning({ balance: creditWallets.balance });
+      if (result) {
+        if (!result.granted) {
+          logger.info("Idempotency: credit pack already exists for session", {
+            sessionId,
+            existingPackId: result.packId,
+            userId,
+          });
+        }
+        return success(result);
+      }
 
-        const purchaseMetadata = sessionId
-          ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
-          : { packQuantity: 1 };
-
-        await tx.insert(creditTransactions).values({
-          walletId: wallet.id,
-          amount,
-          balanceAfter: updated.balance,
-          type:
-            type === "subscription"
-              ? CreditTransactionType.SUBSCRIPTION
-              : type === "free"
-                ? CreditTransactionType.FREE_GRANT
-                : CreditTransactionType.PURCHASE,
-          packId: newPack.id,
-          freePeriodId: wallet.freePeriodId,
-          metadata: purchaseMetadata,
+      // ON CONFLICT hit: the concurrent winner has committed by now (the
+      // insert waited on it), so a fresh statement sees its pack.
+      const winnerId = sessionId
+        ? await CreditRepository.findPackIdBySessionId(db, sessionId)
+        : undefined;
+      if (!winnerId) {
+        logger.error("Credit grant conflicted but no existing pack found", {
+          sessionId,
+          userId,
         });
+        return fail({
+          message: t("errors.addCreditsFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      logger.info("Idempotency: concurrent credit grant deduplicated", {
+        sessionId,
+        existingPackId: winnerId,
+        userId,
       });
-
-      return success();
+      return success({ packId: winnerId, granted: false });
     } catch (error) {
       logger.error("Failed to add user credits", parseError(error), {
         userId,
@@ -3694,6 +3757,14 @@ export class CreditRepository {
           sessionId: session.id,
           userId,
           totalCredits,
+        });
+      } else if (!result.data.granted) {
+        // A concurrent path (webhook vs success redirect) granted it first and
+        // sent the emails.
+        logger.info("Credit pack already granted by a concurrent handler", {
+          sessionId: session.id,
+          packId: result.data.packId,
+          userId,
         });
       } else {
         logger.debug("Credits added after purchase", {

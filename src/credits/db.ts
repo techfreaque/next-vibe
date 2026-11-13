@@ -17,6 +17,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -73,6 +74,8 @@ export interface FreeResetMetadata {
 
 export interface PurchaseMetadata {
   sessionId?: string;
+  /** Set (instead of sessionId) on a duplicate grant neutralised by the uq_packs_session_id migration */
+  duplicateOfSessionId?: string;
   stripePaymentIntentId?: string;
   packQuantity?: number;
   totalPaid?: number;
@@ -178,7 +181,10 @@ export type CreditTransactionMetadata =
  * Pack metadata for tracking source
  */
 export interface CreditPackMetadata {
+  /** Grant idempotency key, unique across packs (uq_packs_session_id) */
   sessionId?: string;
+  /** Duplicate grant neutralised by the uq_packs_session_id migration */
+  duplicateOfSessionId?: string;
   subscriptionId?: string;
   adminId?: string;
   reason?: string;
@@ -292,6 +298,12 @@ export const creditPacks = pgTable(
     index("idx_packs_wallet_priority").on(table.walletId, table.expiresAt),
     // Fast lookup by wallet
     index("idx_packs_wallet").on(table.walletId),
+    // Idempotency: one pack per grant key (Stripe/NOWPayments session,
+    // renewal_<sub>_<periodEnd>, dispute-won:<id>, payout_<request>).
+    // addUserCredits inserts with ON CONFLICT DO NOTHING against this index.
+    uniqueIndex("uq_packs_session_id")
+      .on(sql`(${table.metadata}->>'sessionId')`)
+      .where(sql`(${table.metadata}->>'sessionId') IS NOT NULL`),
   ],
 );
 
