@@ -8,7 +8,8 @@
 ;
 ; Static records below mirror the hosttech zone (391416) EXACTLY so cutting the
 ; registrar delegation to these nameservers changes NOTHING except who answers
-; — mail (MX/SPF/DKIM/DMARC to a42.ch), the wildcard, and s2 all keep working.
+; — mail (MX/SPF/DKIM/DMARC to a42.ch) and s2 keep working. The apex and www
+; A sets are the only health-managed records (;;WWW_A_RECORDS;; = same set).
 ;
 ; TTLs: apex A = 30s (fast failover). Everything static = 1h.
 ; ===========================================================================
@@ -37,11 +38,11 @@ ns2         IN A     179.198.214.41
 ;;APEX_A_RECORDS;;
 
 ; ---- www → apex (served by each node's Caddy with a 308 to the bare host) ----
-www         IN A     72.61.156.49
-www         IN A     179.198.214.41
+; Health-managed exactly like the apex (same healthy set, same 30s TTL), so a
+; dead box drops out of www too.
+;;WWW_A_RECORDS;;
 
-; ---- wildcard (kept from hosttech: everything else → prod/S1) ----
-*           IN A     72.61.156.49
+; (no wildcard: the hosttech zone has none, so unknown names stay NXDOMAIN)
 
 ; ---- s2 test node (kept from hosttech) ----
 s2          IN A     179.198.214.41

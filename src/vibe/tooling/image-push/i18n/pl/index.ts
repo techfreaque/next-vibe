@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         description:
           "Gdy Server 1 działa i jest zdrowy, zaktualizuj też drugi węzeł HA (SSH_SERVER2): wczytaj obraz pod SSH_SERVER2_IMAGE_TAG (nigdy :latest), skopiuj .env z Servera 1, uruchom ponownie, sprawdź zdrowie, w razie błędu cofnij automatycznie. Caddy na każdej maszynie w tym czasie obsługuje ruch z drugiej, więc nikt nie zauważy przerwy. Pomijane, gdy brak SSH_SERVER2 albo podano --sshTarget.",
       },
+      primary: {
+        title: "Wdróż Server 1",
+        description:
+          "Domyślnie włączone. Wyłączone = Server 1 leży albo jest odcięty po failoverze: obraz idzie z tej maszyny prosto na Server 2 (SSH_SERVER2) i aktualizowany jest tylko ten węzeł, z jego własnym .env i nadpisaniami z failoveru. Wolne (upload z domu, bez przekazu serwer-serwer).",
+      },
       success: {
         title: "Sukces",
       },
@@ -148,6 +153,12 @@ export const translations: typeof enTranslations = {
           "🔁 Server 1 działa. Aktualizuję Server 2 ({{target}}) ...",
         secondarySuccess:
           "🚀 Wdrożono {{refs}} na {{target}} i Server 2 ({{secondary}})",
+        secondaryOnlyMissing:
+          "--primary=false aktualizuje tylko Server 2, ale SSH_SERVER2 nie jest ustawiony",
+        secondaryOnlySuccess:
+          "🚀 Server 1 pominięty. Wdrożono {{refs}} na Server 2 ({{secondary}})",
+        secondaryOnlyFailed:
+          "Aktualizacja samego Servera 2 ({{secondary}}) nie powiodła się: {{error}}. Server 2 zachował lub przywrócił poprzedni obraz.",
         secondaryFailed:
           "Server 1 ({{target}}) działa NA ŻYWO z nowym obrazem, ale aktualizacja Servera 2 ({{secondary}}) nie powiodła się: {{error}}. Server 2 zachował lub przywrócił poprzedni obraz.",
         envSyncFailed:

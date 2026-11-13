@@ -139,6 +139,16 @@ export class ImagePushRepository {
       });
     }
 
+    // Server 1 down (or fenced after a failover): --primary=false ships the
+    // image straight from this machine to Server 2 and rolls only that node.
+    if (data.push && !data.primary) {
+      return ImagePushRepository.deploySecondaryOnly(
+        { refs, image, tags, sha, shortSha, contextDir, startTime },
+        logger,
+        t,
+      );
+    }
+
     if (transferTarget) {
       const transferResult = await ImagePushRepository.transferViaSsh(
         refs,
@@ -529,12 +539,76 @@ export class ImagePushRepository {
   }
 
   /**
+   * `--primary=false`: Server 1 is down (or fenced after ha-failover promote),
+   * so the image goes from this machine straight to Server 2 (slow home
+   * uplink, no box-to-box relay) and only Server 2 is rolled. Server 1's .env
+   * is not copied (it is unreachable); the node keeps its current .env plus
+   * .ha-overrides, so after a failover the app stays on its local backends and
+   * runs migrations itself (HA_DB_SETUP=true).
+   */
+  private static async deploySecondaryOnly(
+    build: {
+      refs: string[];
+      image: string;
+      tags: string[];
+      sha: string;
+      shortSha: string;
+      contextDir: string;
+      startTime: number;
+    },
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<ImagePushResponseOutput>> {
+    const secondaryTarget = imagePushEnv.SSH_SERVER2;
+    if (!secondaryTarget) {
+      return fail({
+        message: t("post.repository.messages.secondaryOnlyMissing"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+    const shaRef = build.refs[0] ?? "";
+    const transfer = await ImagePushRepository.transferViaSsh(
+      build.refs,
+      secondaryTarget,
+      logger,
+      t,
+      imagePushEnv.SSH_SERVER2_PWD,
+      ImagePushRepository.secondaryLoadCmd(shaRef),
+    );
+    const rolled = await ImagePushRepository.rollSecondary(
+      undefined,
+      secondaryTarget,
+      transfer,
+      shaRef,
+      build.contextDir,
+      build.shortSha,
+      logger,
+      t,
+    );
+    if (!rolled.success) {
+      return rolled;
+    }
+    ImagePushRepository.recordDeployedSha(build.sha, build.shortSha, logger, t);
+    return success({
+      success: true,
+      output: t("post.repository.messages.secondaryOnlySuccess", {
+        refs: build.refs.join(", "),
+        secondary: secondaryTarget,
+      }),
+      resolvedImage: build.image,
+      tags: build.tags,
+      duration: Date.now() - build.startTime,
+    });
+  }
+
+  /**
    * Rolls the second HA node after Server 1 is live: copies Server 1's .env
    * across, then runs SSH_SERVER2_DEPLOY_SCRIPT (synced from the commit), which
    * retags, recreates, health-checks and auto-rolls-back on its own.
+   * `primaryTarget` undefined = Server 1 is down: no .env copy.
    */
   private static async rollSecondary(
-    primaryTarget: string,
+    primaryTarget: string | undefined,
     secondaryTarget: string,
     transfer: ResponseType<void>,
     shaRef: string,
@@ -545,11 +619,16 @@ export class ImagePushRepository {
   ): Promise<ResponseType<void>> {
     const secondaryFailed = (cause: ResponseType<void>): ResponseType<void> =>
       fail({
-        message: t("post.repository.messages.secondaryFailed", {
-          target: primaryTarget,
-          secondary: secondaryTarget,
-          error: cause.success ? "" : cause.message,
-        }),
+        message: primaryTarget
+          ? t("post.repository.messages.secondaryFailed", {
+              target: primaryTarget,
+              secondary: secondaryTarget,
+              error: cause.success ? "" : cause.message,
+            })
+          : t("post.repository.messages.secondaryOnlyFailed", {
+              secondary: secondaryTarget,
+              error: cause.success ? "" : cause.message,
+            }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         cause: cause.success ? undefined : cause,
       });
@@ -565,6 +644,17 @@ export class ImagePushRepository {
 
     const script = imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT;
     if (script) {
+      const filesResult = await ImagePushRepository.syncSecondaryHaFiles(
+        secondaryTarget,
+        script,
+        contextDir,
+        t,
+      );
+      if (!filesResult.success) {
+        return secondaryFailed(filesResult);
+      }
+    }
+    if (script && primaryTarget) {
       const envResult = await ImagePushRepository.copyPrimaryEnv(
         primaryTarget,
         secondaryTarget,
@@ -646,6 +736,62 @@ export class ImagePushRepository {
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+    return success(undefined);
+  }
+
+  /**
+   * Ships the HA support files the secondary's deploy script depends on from
+   * the EXPORTED COMMIT TREE (like syncDeployScript): the .env merger and the
+   * Server 2 compose overlay. Without this the node kept whatever copy was
+   * scp'd once by hand. Atomic per file (`.incoming` + mv); files missing from
+   * an older commit are skipped and the node keeps its current copy.
+   */
+  private static async syncSecondaryHaFiles(
+    secondaryTarget: string,
+    secondaryScript: string,
+    contextDir: string,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const q = ImagePushRepository.shellQuote;
+    const scriptDir = secondaryScript.split("/").slice(0, -1).join("/") || "/";
+    const projectDir = scriptDir.endsWith("/scripts")
+      ? scriptDir.slice(0, -"/scripts".length)
+      : scriptDir;
+    const files: { from: string; to: string }[] = [
+      { from: "ha/scripts/merge-env.py", to: "ha/scripts/merge-env.py" },
+      {
+        from: "ha/edge-lb/docker-compose.s2-ha.yml",
+        to: "docker-compose.s2-ha.yml",
+      },
+    ];
+    for (const file of files) {
+      const localPath = join(contextDir, file.from);
+      if (!existsSync(localPath)) {
+        continue;
+      }
+      const dest = `${projectDir}/${file.to}`;
+      const destDir = dest.split("/").slice(0, -1).join("/") || "/";
+      const result = await ImagePushRepository.runRemote(
+        secondaryTarget,
+        `mkdir -p ${q(destDir)} && cat > ${q(`${dest}.incoming`)} && mv ${q(`${dest}.incoming`)} ${q(dest)}`,
+        createReadStream(localPath),
+        imagePushEnv.SSH_SERVER2_PWD,
+      );
+      if (result.error !== undefined || result.exitCode !== 0) {
+        return fail({
+          message: t("post.repository.messages.scriptSyncFailed", {
+            script: file.from,
+            target: secondaryTarget,
+            error:
+              result.error ??
+              t("post.repository.messages.scriptRemoteExit", {
+                code: result.exitCode,
+              }),
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
     }
     return success(undefined);
   }

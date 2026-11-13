@@ -37,7 +37,8 @@ compose() { docker compose -p "$PROJECT" --env-file .env "${FILES[@]}" "$@"; }
 if [ -f .env.from-s1 ]; then
   if [ -f ha/scripts/merge-env.py ] && [ -f .ha-database-url ]; then
     cp .env ".env.bak.deploy-$(date -u +%Y%m%d%H%M%S)"
-    python3 ha/scripts/merge-env.py .env.from-s1 .env .env.next .ha-database-url
+    OVR=(); [ -f .ha-overrides ] && OVR=(.ha-overrides)
+    python3 ha/scripts/merge-env.py .env.from-s1 .env .env.next .ha-database-url "${OVR[@]}"
     chmod 600 .env.next
     mv .env.next .env
     log "env merged from Server 1"
@@ -96,7 +97,13 @@ if health_wait; then
   exit 0
 fi
 
-# 5. Roll back.
+# 5. Roll back (skipped for a pure recreate, e.g. ha-failover switching the
+#    app to local backends: the previous image would not fix a config issue).
+if [ "${HA_NO_ROLLBACK:-0}" = "1" ]; then
+  log "ERROR: $APP unhealthy after recreate (HA_NO_ROLLBACK=1, leaving it as is)"
+  compose logs --tail=60 app || true
+  exit 1
+fi
 log "ERROR: new image unhealthy, rolling back to :${ROLLBACK_TAG}"
 compose logs --tail=60 app || true
 if docker image inspect "${IMAGE_NAME}:${ROLLBACK_TAG}" >/dev/null 2>&1; then

@@ -18,8 +18,9 @@
 # host port 127.0.0.1:5434 for checks. Data: /srv/unbottled/pg-replica.
 #
 # NEVER run `promote` while S1 is alive: that splits the brain (two writable
-# primaries). Promotion is the documented manual failover in
-# ha/FAILOVER-S1-DOWN.md, not an automatic action.
+# primaries). Prefer `ha-failover promote` (ha/failover/ha-failover.sh): it
+# refuses while S1 answers, fences S1, waits for replay, promotes, switches the
+# app to local backends and alerts. See ha/README.md "Server 1 total outage".
 # ============================================================================
 set -euo pipefail
 IMAGE="${REPLICA_IMAGE:-unbottled-postgres:prod-s1}"

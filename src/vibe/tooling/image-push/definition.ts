@@ -109,6 +109,14 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(true),
       }),
 
+      primary: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.primary.title",
+        description: "post.fields.primary.description",
+        schema: z.boolean().default(true),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -2,7 +2,9 @@
 # ===========================================================================
 # ha-host-fw.sh: host firewall for the unbottled.ai HA boxes (S1 + S2).
 #
-# Public surface after this script: 22, 80, 443 (tcp, + 443/udp for HTTP/3).
+# Public surface after this script: 22, 80, 443 (tcp, + 443/udp for HTTP/3),
+# plus 53 tcp/udp (PowerDNS, per-source rate-limited; v4 only, pdns is not
+# published on v6).
 # WireGuard UDP 51820 is accepted ONLY from the peer box. Everything the HA
 # layer needs (Postgres, Redis, MinIO, app 3000/3100/4000, PowerDNS) is
 # reached over wg0 (10.88.0.0/24) or docker networks, never over eth0.
@@ -10,8 +12,14 @@
 # What it blocks on the PUBLIC interface:
 #   - udp 51820 from anyone but the peer
 #   - tcp 3000/4000 (docker-published app ports that bypass Caddy)
-#   - tcp/udp 53 (PowerDNS edge; not delegated yet; re-open only after it is
-#     hardened with rate limiting, see ha/edge-dns/README.md)
+#   - tcp/udp 53 above a per-source-IP rate (PowerDNS edge, authoritative only).
+#     Since 2026-11-13 :53 is OPEN with hashlimit: per source IP max
+#     DNS_UDP_QPS q/s (burst DNS_UDP_BURST) over UDP and DNS_TCP_CPS new TCP
+#     conns/s; plus a global UDP ceiling DNS_UDP_TOTAL q/s. In a reflection
+#     attack every spoofed query carries the VICTIM's address as source, so the
+#     per-source cap bounds what this box can ever send to one victim
+#     (~DNS_UDP_QPS x <=500 bytes). DNS_OPEN=0 in /etc/default/ha-host-fw
+#     drops public :53 entirely again.
 #   - tcp/udp 5355 (systemd-resolved LLMNR)
 #
 # Docker-published v4 ports are DNATed in PREROUTING and never hit INPUT, so
@@ -41,6 +49,11 @@ PEER_V4="${PEER_V4:?set PEER_V4 in /etc/default/ha-host-fw}"
 PEER_V6="${PEER_V6:-}"
 PUB_IF="${PUB_IF:-eth0}"
 WG_PORT="${WG_PORT:-51820}"
+DNS_OPEN="${DNS_OPEN:-1}"
+DNS_UDP_QPS="${DNS_UDP_QPS:-30}"
+DNS_UDP_BURST="${DNS_UDP_BURST:-60}"
+DNS_UDP_TOTAL="${DNS_UDP_TOTAL:-1500}"
+DNS_TCP_CPS="${DNS_TCP_CPS:-5}"
 
 unhook() {
   iptables -D INPUT -j HA-INPUT 2>/dev/null
@@ -87,14 +100,30 @@ if iptables -n -L DOCKER-USER >/dev/null 2>&1; then
     --ctorigdstport 3000 -j DROP
   iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
     --ctorigdstport 4000 -j DROP
-  iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
-    --ctorigdstport 53 -j DROP
-  iptables -A HA-DOCKER -i "$PUB_IF" -p udp -m conntrack --ctdir ORIGINAL \
-    --ctorigdstport 53 -j DROP
+  if [ "$DNS_OPEN" = "1" ]; then
+    # PowerDNS edge (docker-published on the public IP): rate-limited, not dropped.
+    iptables -A HA-DOCKER -i "$PUB_IF" -p udp -m conntrack --ctdir ORIGINAL \
+      --ctorigdstport 53 -m hashlimit --hashlimit-name ha-dns-udp \
+      --hashlimit-mode srcip --hashlimit-above "${DNS_UDP_QPS}/sec" \
+      --hashlimit-burst "$DNS_UDP_BURST" --hashlimit-htable-expire 60000 -j DROP
+    iptables -A HA-DOCKER -i "$PUB_IF" -p udp -m conntrack --ctdir ORIGINAL \
+      --ctorigdstport 53 -m hashlimit --hashlimit-name ha-dns-udp-all \
+      --hashlimit-above "${DNS_UDP_TOTAL}/sec" \
+      --hashlimit-burst "$((DNS_UDP_TOTAL * 2))" -j DROP
+    iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
+      --ctorigdstport 53 --ctstate NEW -m hashlimit --hashlimit-name ha-dns-tcp \
+      --hashlimit-mode srcip --hashlimit-above "${DNS_TCP_CPS}/sec" \
+      --hashlimit-burst "$((DNS_TCP_CPS * 4))" -j DROP
+  else
+    iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
+      --ctorigdstport 53 -j DROP
+    iptables -A HA-DOCKER -i "$PUB_IF" -p udp -m conntrack --ctdir ORIGINAL \
+      --ctorigdstport 53 -j DROP
+  fi
   iptables -A HA-DOCKER -j RETURN
   iptables -C DOCKER-USER -j HA-DOCKER 2>/dev/null || iptables -I DOCKER-USER 1 -j HA-DOCKER
 else
   echo "ha-host-fw: DOCKER-USER chain missing (docker not up?); docker ports NOT filtered" >&2
   exit 1
 fi
-echo "ha-host-fw: applied (peer v4=$PEER_V4 v6=${PEER_V6:-none} if=$PUB_IF)"
+echo "ha-host-fw: applied (peer v4=$PEER_V4 v6=${PEER_V6:-none} if=$PUB_IF dns_open=$DNS_OPEN)"

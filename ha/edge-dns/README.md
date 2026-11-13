@@ -93,27 +93,42 @@ clamp very low TTLs upward).
 | `docker-compose.health.yml`   | the health-daemon container (alpine + curl)                                                                                 |
 | `edge-up.sh`                  | stage/start the edge on one box: `./edge-up.sh s1\|s2 [--dry-run]`                                                          |
 
-## Status (staged, NOT live)
+## Status (2026-11-13: hardened, :53 open, DELEGATED ~13:25 UTC)
 
-> **2026-11-13: public :53 FIREWALLED on both boxes** (`ha/scripts/ha-host-fw.sh`, HA-DOCKER chain). The pdns containers still run and
-> answer on the WG IPs, but the internet cannot reach them. Before the registrar delegation: harden first (rate limiting via
-> dnsdist or pdns `max-qps`-style limits, `any-to-tcp=yes`, small responses, no recursion), then drop the `53` rules from
-> `ha-host-fw.sh` and re-apply. Query volume while it was open was tiny (S2: 87 queries in 3.5 days), so it was not the cause
-> of the S1 shutdown (that was wstunnel, see `ha/README.md`), but an open authoritative NS needs limits before it goes live.
+- **Both boxes run pdns + health daemon** (S1 ns1, S2 ns2), same files as this
+  dir under `/root/ha-edge/edge-dns/`, zone in `/srv/ha-edge/zones/`.
+- **Hardening** (`pdns/pdns.conf`): authoritative only (other names REFUSED),
+  `any-to-tcp` (ANY over UDP -> empty 41-byte TC reply), UDP answers capped at
+  1232 bytes (largest real answer: DKIM TXT, 491 bytes), AXFR refused,
+  `version-string=anonymous`, no webserver/API, no security polling, bounded
+  TCP. Rate limits live in `ha/scripts/ha-host-fw.sh` (iptables hashlimit on
+  the docker-published :53): 30 q/s per source IP (burst 60), 1500 q/s UDP
+  overall, 5 new TCP conns/s per IP. In a reflection attack the spoofed source
+  IS the victim, so one victim can get at most ~15 KB/s from each box.
+- **Verified from outside** (home line, both IPs): SOA/apex/www answer,
+  recursion REFUSED, AXFR refused, version.bind hidden, ANY->TC 41 B, a
+  300-query burst gets 60 answers then drops, recovers immediately. Every
+  static record matches hosttech zone 391416 (DKIM equal after joining the
+  string chunks); the wildcard `*` was removed (hosttech has none).
+- **www is health-managed** like the apex (`;;WWW_A_RECORDS;;`).
+- **Probe is DB-backed** (since 13:22 UTC): `GET /api/en-US/credits` with the
+  probe lead's cookie (`/root/ha-edge/edge-dns/probe-cookie`, mode 600, one
+  line `lead_id=<uuid>`, not in the repo) must return 200 and contain
+  `"success":true`. `/robots.txt` stayed 200 while S2's app could not reach
+  Postgres, so it was useless as a liveness signal. Recreate the cookie if
+  the lead row is ever deleted (see `docker-compose.health.yml`).
+- **Manual drain:** `touch /srv/ha-edge/zones/drain.<s1|s2>` on BOTH boxes
+  removes that node immediately; `rm` it to let the probes re-add it. Use it
+  while the boxes run different app builds (chunk 404s otherwise).
+- Rollback of the hardening: `/root/ha-dns-harden-20261113/` on each box holds
+  the previous pdns.conf, daemon, template, zone, `ha-host-fw.sh` and an
+  `iptables-save`; `DNS_OPEN=0` in `/etc/default/ha-host-fw` +
+  `systemctl restart ha-host-fw` closes :53 again.
 
-- **S2 (Frankfurt):** edge is RUNNING as a verifiable staging instance — pdns
-  answers on `179.198.214.41:53` + `10.88.0.2:53` with the full correct zone;
-  the health daemon runs. Nobody queries it (the registrar does not delegate to
-  it yet), so it is inert for the public domain. Verify:
-  `dig @179.198.214.41 unbottled.ai A` → both IPs, TTL 30.
-- **S1 (prod):** files STAGED under `/root/ha-edge/edge-dns/`, `--dry-run`
-  verified, **NO container started** (prod untouched). Start at cutover with
-  `./edge-up.sh s1`.
+## Registrar action Max must make (the ONE manual step)
 
-## Registrar action Max must make (the ONE manual step) — AT CUTOVER, not now
-
-The `.ai` registrar currently delegates `unbottled.ai` to a mix of
-`ns1/2/3.hosttech.ch` + `ns2/3.hostserv.eu` (hosttech's own NS). To make the
+The `.ai` registry (registrar Key-Systems, resold by hosttech; DNSSEC
+unsigned) currently delegates `unbottled.ai` to `ns1/2/3.hosttech.ch`. To make the
 self-hosted edge authoritative, at the registrar for `unbottled.ai` set the
 nameservers to our two boxes, WITH GLUE (because the NS names are inside the
 delegated zone):

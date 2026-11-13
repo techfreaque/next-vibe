@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         description:
           "Sobald Server 1 live und gesund ist, auch den zweiten HA-Knoten (SSH_SERVER2) aktualisieren: Image unter SSH_SERVER2_IMAGE_TAG laden (nie :latest), .env von Server 1 übernehmen, neu starten, Health-Check, automatischer Rollback. Caddy auf jeder Box bedient solange von der anderen Box aus, also merkt niemand eine Lücke. Ignoriert, wenn SSH_SERVER2 fehlt oder --sshTarget gesetzt ist.",
       },
+      primary: {
+        title: "Server 1 deployen",
+        description:
+          "Standard an. Aus = Server 1 ist down oder nach einem Failover abgeschottet: Image direkt von diesem Rechner auf Server 2 (SSH_SERVER2) übertragen und nur diesen Knoten ausrollen, mit seiner eigenen .env und den Failover-Overrides. Langsam (Heim-Upload, kein Box-zu-Box-Relay).",
+      },
       success: {
         title: "Erfolg",
       },
@@ -147,6 +152,12 @@ export const translations: typeof enTranslations = {
         secondaryStart: "🔁 Server 1 läuft. Rolle Server 2 ({{target}}) ...",
         secondarySuccess:
           "🚀 {{refs}} auf {{target}} und Server 2 ({{secondary}}) ausgerollt",
+        secondaryOnlyMissing:
+          "--primary=false rollt nur Server 2 aus, aber SSH_SERVER2 ist nicht gesetzt",
+        secondaryOnlySuccess:
+          "🚀 Server 1 übersprungen. {{refs}} auf Server 2 ({{secondary}}) ausgerollt",
+        secondaryOnlyFailed:
+          "Rollout nur auf Server 2 ({{secondary}}) fehlgeschlagen: {{error}}. Server 2 hat sein vorheriges Image behalten oder wiederhergestellt.",
         secondaryFailed:
           "Server 1 ({{target}}) läuft LIVE mit dem neuen Image, aber Server 2 ({{secondary}}) ist fehlgeschlagen: {{error}}. Server 2 hat sein vorheriges Image behalten oder wiederhergestellt.",
         envSyncFailed:

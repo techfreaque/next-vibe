@@ -28,7 +28,11 @@ services:
       # Probe BOTH nodes over the public internet (Host/SNI = unbottled.ai).
       NODES: "${EDGE_NODES:-s1=72.61.156.49 s2=179.198.214.41}"
       HEALTH_HOST: "${EDGE_HEALTH_HOST:-unbottled.ai}"
-      HEALTH_PATH: "${EDGE_HEALTH_PATH:-/robots.txt}"
+      # DB-backed probe: the credits API for a fixed probe lead reads Postgres,
+      # so a node whose app lost its DB drops out of DNS (see the daemon).
+      HEALTH_PATH: "${EDGE_HEALTH_PATH:-/api/en-US/credits}"
+      HEALTH_EXPECT: "${EDGE_HEALTH_EXPECT:-\"success\":true}"
+      PROBE_COOKIE_FILE: "/probe-cookie"
       ZONE_FILE: "/etc/powerdns/zones/unbottled.ai.zone"
       ZONE_TMPL: "/zone.tmpl"
       CHECK_INTERVAL: "${EDGE_CHECK_INTERVAL:-10}"
@@ -44,6 +48,9 @@ services:
     volumes:
       - ./health/ha-dns-health.sh:/ha-dns-health.sh:ro
       - ./zone.unbottled.ai.tmpl:/zone.tmpl:ro
+      # "lead_id=<uuid>" of the probe lead; create once per deployment:
+      #   curl -s -D - -o /dev/null -A unbottled-ha-probe/1 https://unbottled.ai/en-US/story | grep -i set-cookie
+      - ${EDGE_PROBE_COOKIE_FILE:-./probe-cookie}:/probe-cookie:ro
       - ${EDGE_ZONE_DIR:-/srv/ha-edge/zones}:/etc/powerdns/zones
     depends_on:
       - pdns

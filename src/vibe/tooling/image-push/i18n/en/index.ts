@@ -50,6 +50,11 @@ export const translations = {
         description:
           "After Server 1 is live and healthy, also roll the second HA node (SSH_SERVER2): load the image under SSH_SERVER2_IMAGE_TAG (never :latest), sync Server 1's .env, recreate, health-check, auto-rollback. Each box's Caddy serves from the other box meanwhile, so nobody sees a gap. Ignored when SSH_SERVER2 is unset or --sshTarget is given.",
       },
+      primary: {
+        title: "Deploy Server 1",
+        description:
+          "Default on. Off = Server 1 is down or fenced after a failover: ship the image from this machine straight to Server 2 (SSH_SERVER2) and roll only that node, keeping its own .env and failover overrides. Slow (home upload, no box-to-box relay).",
+      },
       success: {
         title: "Success",
       },
@@ -142,6 +147,12 @@ export const translations = {
         secondaryStart: "🔁 Server 1 live. Rolling Server 2 ({{target}}) ...",
         secondarySuccess:
           "🚀 Rolled {{refs}} to {{target}} and Server 2 ({{secondary}})",
+        secondaryOnlyMissing:
+          "--primary=false rolls Server 2 only, but SSH_SERVER2 is not set",
+        secondaryOnlySuccess:
+          "🚀 Server 1 skipped. Rolled {{refs}} to Server 2 ({{secondary}})",
+        secondaryOnlyFailed:
+          "Rolling Server 2 ({{secondary}}) alone failed: {{error}}. Server 2 kept or restored its previous image.",
         secondaryFailed:
           "Server 1 ({{target}}) is LIVE on the new image, but rolling Server 2 ({{secondary}}) failed: {{error}}. Server 2 kept or restored its previous image.",
         envSyncFailed: "Copying Server 1's .env to Server 2 failed: {{error}}",

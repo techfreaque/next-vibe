@@ -36,8 +36,9 @@ echo "== edge-up ($ROLE) : public=$NODE_PUBLIC_IP wg=$NODE_WG_IP zonedir=$EDGE_Z
 mkdir -p "$EDGE_ZONE_DIR"; chmod 755 "$EDGE_ZONE_DIR"
 serial="$(( $(date -u +%s) - 1700000000 ))"   # uint32-safe, monotonic (see daemon note)
 apex="@\t30\tIN A\t72.61.156.49\n@\t30\tIN A\t179.198.214.41\n"
+www="www\t30\tIN A\t72.61.156.49\nwww\t30\tIN A\t179.198.214.41\n"
 sed -e "s/@@SERIAL@@/${serial}/" "$HERE/zone.unbottled.ai.tmpl" \
-  | awk -v apex="$apex" '/^;;APEX_A_RECORDS;;$/ { printf apex; next } { print }' \
+  | awk -v apex="$apex" -v www="$www" '/^;;APEX_A_RECORDS;;$/ { printf apex; next } /^;;WWW_A_RECORDS;;$/ { printf www; next } { print }' \
   > "$EDGE_ZONE_DIR/unbottled.ai.zone"
 chmod 644 "$EDGE_ZONE_DIR/unbottled.ai.zone"
 echo "   rendered $EDGE_ZONE_DIR/unbottled.ai.zone (serial $serial, apex = both nodes)"

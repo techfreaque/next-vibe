@@ -14,8 +14,10 @@
 # .env = Server 1's /unbottled/.env (same identity, keys, public URL) + the
 # Server 2 infra overrides appended by ha/scripts/merge-env.py.
 #
-# Guards: no migrations / seeds / db-function deploys / task loop on this node.
-# Server 1 owns migrations (it is rolled first) and the cron/task runner.
+# Guards (while Server 1 is primary): no migrations / seeds / db-function
+# deploys / task loop on this node. Server 1 owns migrations (it is rolled
+# first) and the cron/task runner. After a failover HA_DB_SETUP/HA_TASK_RUNNER
+# flip to true here and Server 1 is fenced (its app + Postgres stopped).
 #
 # Port: WireGuard only (10.88.0.2:3100 -> container 3000, single-port proxy
 # mode = HTTP + /ws on one port). Server 1's Caddy uses it as its fallback
@@ -26,16 +28,24 @@
 # ============================================================================
 services:
   app:
+    # HA_* keys default to "Server 1 is primary". After a failover
+    # (ha/failover/ha-failover.sh promote) they live in .ha-overrides, which
+    # merge-env.py appends to .env, and point at this box's own backends:
+    #   HA_DATABASE_URL  s2app @ pg-replica:5432 (the promoted standby)
+    #   HA_REDIS_URL     redis://unbottled-redis:6379
+    #   HA_S3_*          unbottled-minio (the replication target) + its creds
+    #   HA_TASK_RUNNER   true (crons run here; S1 is fenced, never both)
+    #   HA_DB_SETUP      true (S2-only deploys then run migrations)
     environment:
       DATABASE_URL: ${HA_DATABASE_URL:?HA_DATABASE_URL must be set in .env}
       WS_PUBSUB_TYPE: "redis"
-      REDIS_URL: "redis://10.88.0.1:6379"
+      REDIS_URL: ${HA_REDIS_URL:-redis://10.88.0.1:6379}
       CHAT_STORAGE_TYPE: "s3"
-      S3_ENDPOINT: "http://10.88.0.1:9000"
+      S3_ENDPOINT: ${HA_S3_ENDPOINT:-http://10.88.0.1:9000}
       S3_REGION: "us-east-1"
       S3_BUCKET: "chat-media"
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?S3_ACCESS_KEY_ID must be set in .env}
-      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY must be set in .env}
+      S3_ACCESS_KEY_ID: ${HA_S3_ACCESS_KEY_ID:-${S3_ACCESS_KEY_ID:?S3_ACCESS_KEY_ID must be set in .env}}
+      S3_SECRET_ACCESS_KEY: ${HA_S3_SECRET_ACCESS_KEY:-${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY must be set in .env}}
       VIBE_DISABLE_PROXY: "false"
       NEXT_PUBLIC_APP_URL: "https://unbottled.ai"
       NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai"
@@ -45,15 +55,15 @@ services:
       - caddy_internal
     labels: !reset []
     ports: !override
-      - "10.88.0.2:3100:3000"
+      - "${HA_APP_BIND:-10.88.0.2:3100}:3000"
     command:
       [
         "bun",
         "src/vibe/platforms/cli/vibe-runtime.ts",
         "start",
         "--seed=false",
-        "--db-setup=false",
-        "--task-runner=false",
+        "--db-setup=${HA_DB_SETUP:-false}",
+        "--task-runner=${HA_TASK_RUNNER:-false}",
       ]
 
 networks:
