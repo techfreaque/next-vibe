@@ -1152,6 +1152,36 @@ import * as SiX from "./SiX";
 const testSiX: typeof webSiX = SiX;
 void testSiX;
 
+import type * as webSiQwen from "../../../web/components/icons/SiQwen";
+import * as SiQwen from "./SiQwen";
+const testSiQwen: typeof webSiQwen = SiQwen;
+void testSiQwen;
+
+import type * as webSiAlibabacloud from "../../../web/components/icons/SiAlibabacloud";
+import * as SiAlibabacloud from "./SiAlibabacloud";
+const testSiAlibabacloud: typeof webSiAlibabacloud = SiAlibabacloud;
+void testSiAlibabacloud;
+
+import type * as webSiKimi from "../../../web/components/icons/SiKimi";
+import * as SiKimi from "./SiKimi";
+const testSiKimi: typeof webSiKimi = SiKimi;
+void testSiKimi;
+
+import type * as webSiMoonshotai from "../../../web/components/icons/SiMoonshotai";
+import * as SiMoonshotai from "./SiMoonshotai";
+const testSiMoonshotai: typeof webSiMoonshotai = SiMoonshotai;
+void testSiMoonshotai;
+
+import type * as webSiDeepseek from "../../../web/components/icons/SiDeepseek";
+import * as SiDeepseek from "./SiDeepseek";
+const testSiDeepseek: typeof webSiDeepseek = SiDeepseek;
+void testSiDeepseek;
+
+import type * as webSiMeta from "../../../web/components/icons/SiMeta";
+import * as SiMeta from "./SiMeta";
+const testSiMeta: typeof webSiMeta = SiMeta;
+void testSiMeta;
+
 import type * as webSiZdotai from "../../../web/components/icons/SiZdotai";
 import * as SiZdotai from "./SiZdotai";
 const testSiZdotai: typeof webSiZdotai = SiZdotai;

@@ -558,17 +558,17 @@ export const modelProviders: Record<string, ModelProvider> = {
   moonshotAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Moonshot AI",
-    icon: "moon",
+    icon: "si-moonshotai",
   },
   deepSeek: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "DeepSeek",
-    icon: "whale",
+    icon: "si-deepseek",
   },
   alibaba: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Alibaba",
-    icon: "si-alibabadotcom",
+    icon: "si-alibabacloud",
   },
   xAI: {
     name: "X-AI",
@@ -625,7 +625,7 @@ export const modelProviders: Record<string, ModelProvider> = {
   meta: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Meta",
-    icon: "music",
+    icon: "si-meta",
   },
   udio: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier

@@ -1103,7 +1103,7 @@ export const imageGenModelDefinitions: Record<
     description: "chat.models.descriptions.qwenImage3",
     parameterCount: undefined,
     contextWindow: 0,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"],
     providers: [
@@ -1140,7 +1140,7 @@ export const imageGenModelDefinitions: Record<
     description: "chat.models.descriptions.qwenImage3Pro",
     parameterCount: undefined,
     contextWindow: 0,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image"], // updated: 2026-11-11 from capability-audit
     outputs: ["image"],
     providers: [

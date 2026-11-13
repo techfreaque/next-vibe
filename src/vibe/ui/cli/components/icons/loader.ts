@@ -479,6 +479,18 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./SiX") as Promise<IconModule>;
     case "SiXiaomi":
       return import("./SiXiaomi") as Promise<IconModule>;
+    case "SiQwen":
+      return import("./SiQwen") as Promise<IconModule>;
+    case "SiAlibabacloud":
+      return import("./SiAlibabacloud") as Promise<IconModule>;
+    case "SiKimi":
+      return import("./SiKimi") as Promise<IconModule>;
+    case "SiMoonshotai":
+      return import("./SiMoonshotai") as Promise<IconModule>;
+    case "SiDeepseek":
+      return import("./SiDeepseek") as Promise<IconModule>;
+    case "SiMeta":
+      return import("./SiMeta") as Promise<IconModule>;
     case "SiZdotai":
       return import("./SiZdotai") as Promise<IconModule>;
     case "SiZendesk":

@@ -398,7 +398,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     // Venice serves 1M but bills 4x input / 2x output past 256K tokens —
     // capped (also by the Venice price fetcher) so one flat price stays correct.
     contextWindow: 256000,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image"], // updated: 2026-11-07 from venice-api
     outputs: ["text"], // updated: 2026-11-07 from venice-api
     providers: [
@@ -1981,7 +1981,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK2_6",
     parameterCount: undefined,
     contextWindow: 262144,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text", "image"], // updated: 2026-07-02 from openrouter-api
     outputs: ["text"], // updated: 2026-07-02 from openrouter-api
     providers: [
@@ -2024,7 +2024,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK2",
     parameterCount: 1000,
     contextWindow: 262144,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2067,7 +2067,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK2_5",
     parameterCount: 1000,
     contextWindow: 262144,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text", "image"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2110,7 +2110,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK2Thinking",
     parameterCount: 1000,
     contextWindow: 262144,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2921,7 +2921,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekV4Pro",
     parameterCount: 1600,
     contextWindow: 1048576,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-25 from openrouter-api
     outputs: ["text"], // updated: 2026-04-25 from openrouter-api
     providers: [
@@ -2962,7 +2962,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekV4Flash",
     parameterCount: 284,
     contextWindow: 1048576,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-25 from openrouter-api
     outputs: ["text"], // updated: 2026-04-25 from openrouter-api
     providers: [
@@ -3003,7 +3003,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekV32",
     parameterCount: 671,
     contextWindow: 163840,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -3044,7 +3044,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekV31",
     parameterCount: 671,
     contextWindow: 163840,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -3080,7 +3080,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekR1",
     parameterCount: 671,
     contextWindow: 163840,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -3122,7 +3122,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
     contextWindow: 131072,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text"], // updated: 2026-11-11 from openrouter-api
     outputs: ["text"], // updated: 2026-11-11 from openrouter-api
     providers: [
@@ -3161,7 +3161,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekR1Distill",
     parameterCount: 70,
     contextWindow: 32768,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -3200,7 +3200,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.qwen257b",
     parameterCount: 7,
     contextWindow: 32768,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -4330,7 +4330,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK3",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -4458,7 +4458,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.qwen37Flash",
     parameterCount: undefined,
     contextWindow: 1000000,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -4496,7 +4496,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.qwen38Max",
     parameterCount: undefined,
     contextWindow: 1000000,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -4618,7 +4618,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.metaMuseSpark12",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "cpu",
+    icon: "si-meta",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5251,7 +5251,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.kimiK31Pro",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "moon",
+    icon: "si-kimi",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5294,7 +5294,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.deepseekV41Flash",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "whale",
+    icon: "si-deepseek",
     inputs: ["text", "image"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5338,7 +5338,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.qwen38Flash",
     parameterCount: undefined,
     contextWindow: 1000000,
-    icon: "si-alibabadotcom",
+    icon: "si-qwen",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5544,7 +5544,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.metaMuseSpark13",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "cpu",
+    icon: "si-meta",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5585,7 +5585,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.metaMuseWonder",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "cpu",
+    icon: "si-meta",
     inputs: ["text", "image", "video", "audio"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5772,7 +5772,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.metaMuseEmber",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "cpu",
+    icon: "si-meta",
     inputs: ["text", "image", "video", "audio"], // updated: 2026-11-13 from openrouter-api
     outputs: ["text"], // updated: 2026-11-13 from openrouter-api
     providers: [
