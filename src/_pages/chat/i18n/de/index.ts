@@ -968,7 +968,7 @@ export const translations: typeof enTranslations = {
       publicExplanation:
         "Das öffentliche Forum ist ein durch den ersten Verfassungszusatz geschützter Raum, in dem Menschen und KI in offenen Dialog treten. Teilen Sie Ideen, hinterfragen Sie Perspektiven und nehmen Sie an unzensierten Diskussionen teil.",
       incognitoExplanation:
-        "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet - nicht einmal mit Ihrem Konto verknüpft.",
+        "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet (generierte Medien speichern wir aus technischen Gründen vorübergehend) - nicht einmal mit Ihrem Konto verknüpft.",
       requiresAccount:
         "Um auf {{folderName}} zuzugreifen, müssen Sie ein Konto erstellen oder sich anmelden.",
       loginButton: "Anmelden",
@@ -1891,7 +1891,7 @@ export const translations: typeof enTranslations = {
       name: "Inkognito",
       suffix: "Ordner",
       description:
-        "Maximale Privatsphäre. Chat-Verlauf nur auf deinem Gerät gespeichert, nie auf unseren Servern. Nachrichten von KI verarbeitet, dann sofort verworfen. Perfekt für sensible Themen mit unzensierten Modellen.",
+        "Maximale Privatsphäre. Chat-Verlauf nur auf deinem Gerät gespeichert, nie auf unseren Servern. Nachrichten von KI verarbeitet, dann sofort verworfen (generierte Medien speichern wir aus technischen Gründen vorübergehend). Perfekt für sensible Themen mit unzensierten Modellen.",
       note: "Kein Konto • Kein Verlauf gespeichert • Nur lokal",
     },
     publicFolder: {

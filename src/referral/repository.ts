@@ -32,6 +32,7 @@ import type {
   CodesListGetResponseOutput,
   ReferralCode,
 } from "./codes/list/definition";
+import { commissionAfterReversal } from "./commission";
 import { REFERRAL_CONFIG } from "./config";
 import {
   leadReferrals,
@@ -726,23 +727,33 @@ export class ReferralRepository {
   }
 
   /**
-   * Apply referral payout on payment success
-   * Uses credits as the base for commission calculation (currency-independent)
-   * 1 credit = 1 cent in commission value
+   * Apply referral payout on payment success.
+   * Commission is computed on the revenue the payment actually brought in
+   * (amount paid, converted to USD cents), not on the credits it granted.
+   * Earned commission is credited at 1 credit = 1 USD cent.
    */
   static async applyReferralPayoutOnPayment(
     transactionId: string,
     userId: string,
-    creditsAmount: number,
+    revenueUsdCents: number,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    grantedCredits: number | null = null,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Applying referral payout", {
         transactionId,
         userId,
-        creditsAmount,
+        revenueUsdCents,
+        grantedCredits,
       });
+
+      if (revenueUsdCents <= 0) {
+        logger.debug("No revenue on payment, no referral payout", {
+          transactionId,
+        });
+        return success();
+      }
 
       // Get referral chain for the user
       const chain = await ReferralRepository.getReferralChain(userId, logger);
@@ -752,9 +763,8 @@ export class ReferralRepository {
         return success();
       }
 
-      // Calculate commission shares based on credits (1 credit = 1 cent for commission)
       const shares = ReferralRepository.calculateCommissionShares(
-        creditsAmount,
+        revenueUsdCents,
         chain,
       );
 
@@ -769,9 +779,10 @@ export class ReferralRepository {
             sourceUserId: userId,
             transactionId,
             level: share.level,
-            amountCents: share.amountCents, // Credits earned (1 credit = 1 cent value)
-            baseCredits: creditsAmount,
-            currency: "CREDITS", // Currency-independent, stored as credits
+            amountCents: share.amountCents, // Credits earned (1 credit = 1 USD cent)
+            baseCredits: grantedCredits,
+            baseAmountUsdCents: revenueUsdCents,
+            currency: "CREDITS", // Paid out as earned credits
             status: ReferralEarningStatus.PENDING,
           })
           .onConflictDoNothing(); // Idempotency: one earning per tx/earner/level
@@ -780,7 +791,7 @@ export class ReferralRepository {
       logger.debug("Referral payout applied successfully", {
         transactionId,
         sharesCount: shares.length,
-        totalCredits: creditsAmount,
+        revenueUsdCents,
       });
 
       return success();
@@ -877,7 +888,8 @@ export class ReferralRepository {
               .where(eq(users.id, locked.sourceUserId))
               .limit(1);
 
-            const base = locked.baseCredits ?? 0;
+            // Commission base: revenue in USD cents (legacy rows: credits)
+            const base = locked.baseAmountUsdCents ?? locked.baseCredits ?? 0;
             if (locked.amountCents > 0) {
               const [newPack] = await tx
                 .insert(creditPacks)
@@ -976,17 +988,21 @@ export class ReferralRepository {
   }
 
   /**
-   * Reverse all referral earnings of a refunded / charged-back payment.
-   * PENDING → CANCELED (never granted). CONFIRMED → CANCELED and the earned
-   * credits are clawed back from the earner's EARNED packs — never below
-   * zero; any part already spent or paid out is recorded as unrecovered on
-   * the REFUND transaction and logged at error level for manual review.
-   * Idempotent: only PENDING/CONFIRMED rows are touched.
+   * Reverse the referral earnings of a refunded / charged-back payment in
+   * proportion to the share of the payment reversed (cumulative, 0..1).
+   * Each earning keeps `original × (1 - reversedFraction)`; at 1 it is CANCELED.
+   * PENDING: the amount is simply reduced (never granted yet). CONFIRMED: the
+   * reduction is clawed back from the earner's EARNED packs, never below zero;
+   * any part already spent or paid out is recorded as unrecovered on the REFUND
+   * transaction and logged at error level for manual review.
+   * Idempotent: the target is computed from the original commission, so webhook
+   * retries and repeated partial refunds never reverse twice.
    */
   static async reverseEarningsForTransaction(
     transactionId: string,
     reason: "refund" | "dispute",
     logger: EndpointLogger,
+    reversedFraction = 1,
   ): Promise<
     ResponseType<{
       canceledPending: number;
@@ -1024,14 +1040,26 @@ export class ReferralRepository {
             return { kind: "noop" as const, unrecovered: 0 };
           }
 
+          const original = locked.originalAmountCents ?? locked.amountCents;
+          const target = commissionAfterReversal(original, reversedFraction);
+          const reduceBy = locked.amountCents - target;
+          if (reduceBy <= 0 && target > 0) {
+            return { kind: "noop" as const, unrecovered: 0 };
+          }
+
           const wasConfirmed =
             locked.status === ReferralEarningStatus.CONFIRMED;
           await tx
             .update(referralEarnings)
-            .set({ status: ReferralEarningStatus.CANCELED })
+            .set({
+              amountCents: target,
+              originalAmountCents: original,
+              status:
+                target === 0 ? ReferralEarningStatus.CANCELED : locked.status,
+            })
             .where(eq(referralEarnings.id, locked.id));
 
-          if (!wasConfirmed || locked.amountCents <= 0) {
+          if (!wasConfirmed || reduceBy <= 0) {
             return { kind: "pending" as const, unrecovered: 0 };
           }
 
@@ -1044,7 +1072,7 @@ export class ReferralRepository {
           if (!wallet) {
             return {
               kind: "confirmed" as const,
-              unrecovered: locked.amountCents,
+              unrecovered: reduceBy,
             };
           }
 
@@ -1060,7 +1088,7 @@ export class ReferralRepository {
             .orderBy(desc(creditPacks.createdAt))
             .for("update");
 
-          let toRecover = locked.amountCents;
+          let toRecover = reduceBy;
           for (const pack of earnedPacks) {
             if (toRecover <= 0) {
               break;
@@ -1075,7 +1103,7 @@ export class ReferralRepository {
               .where(eq(creditPacks.id, pack.id));
             toRecover -= take;
           }
-          const recovered = locked.amountCents - toRecover;
+          const recovered = reduceBy - toRecover;
 
           const [updated] = await tx
             .update(creditWallets)
@@ -1095,7 +1123,7 @@ export class ReferralRepository {
             metadata: {
               reason: `referral_${reason}_reversal`,
               originalTransactionId: locked.id,
-              revokedCredits: locked.amountCents,
+              revokedCredits: reduceBy,
               unrecoveredCredits: toRecover,
             },
           });

@@ -166,7 +166,7 @@ export const translations: typeof enTranslations = {
         suffix: "Ordner",
         description:
           "Chatten Sie ohne Speicherung auf dem Server. Nachrichten werden lokal in Ihrem Browser gespeichert und bleiben erhalten, bis Sie sie löschen.",
-        note: "Während Inkognito-Sitzungen werden keine Daten auf unseren Servern gespeichert.",
+        note: "Während Inkognito-Sitzungen werden keine Daten auf unseren Servern gespeichert (generierte Medien speichern wir aus technischen Gründen vorübergehend).",
       },
       sharedFolder: {
         name: "Geteilt",

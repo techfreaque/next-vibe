@@ -107,6 +107,11 @@ export const translations = {
       description:
         "No third-party trackers, no ad pixels, no fingerprinting. One first-party cookie identifies your browser to us. To learn which channels bring people who stay, we record how you first arrived and how you most recently arrived through a tagged link: the campaign tags in the link (utm_source, utm_medium, utm_campaign, utm_content, utm_term), the referring website's domain (never the full address), the page you landed on (without its query string) and any referral code. We then note when you first chatted, signed up, confirmed the newsletter, paid and renewed. This is linked to your account when you sign up, used only in aggregate to judge marketing channels, never sold or shared, and deleted with your account.",
     },
+    guestMedia: {
+      title: "Media Created Without an Account",
+      description:
+        "Images, audio and video generated without an account, including in incognito mode, are stored on our servers so they can be shown and downloaded. If you never create an account, these files are deleted automatically after 4 months.",
+    },
     thirdPartySites: {
       title: "Third-Party Websites",
       description:
@@ -124,17 +129,12 @@ export const translations = {
     },
     controller: {
       description:
-        "The controller responsible for your data under the GDPR is {{operator}}, a private individual, {{address}}.",
+        "The controller responsible for your data under the GDPR is {{operator}}, {{address}}.",
     },
     gdpr: {
       title: "GDPR Compliance",
       description:
         "For users in the European Union, we respect your GDPR rights. Export your data any time from Settings. When you delete your account, your profile, chats, memories, addresses, newsletter subscription and contact details are erased, and personal details on linked visitor records are removed. Anonymous aggregate statistics and the credit ledger (no longer linked to you) are kept. Contact us for anything Settings does not cover.",
-    },
-    ccpa: {
-      title: "CCPA Compliance",
-      description:
-        "For California residents, we comply with the California Consumer Privacy Act and respect your privacy rights.",
     },
   },
   post: {

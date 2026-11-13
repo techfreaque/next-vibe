@@ -2731,7 +2731,7 @@ export const translations = {
           cta: "Upgrade to Pro",
         },
         signoff: "Happy chatting,\nThe {{appName}} Team",
-        ps: "P.S. Use Incognito mode to keep conversations on your device only - we never store them on our servers.",
+        ps: "P.S. Use Incognito mode to keep conversations on your device only - we never store them on our servers (generated media is stored temporarily for technical reasons).",
       },
       emailTemplates: {
         welcome: {

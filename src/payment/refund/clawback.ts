@@ -1,7 +1,7 @@
 /**
  * Payment Clawback
- * Revokes the credits (and referral earnings) granted by a payment that was
- * refunded or charged back. Single entry point for Stripe `charge.refunded`,
+ * Revokes the credits (and, proportionally, the referral earnings) granted by
+ * a payment that was refunded or charged back. Single entry point for Stripe `charge.refunded`,
  * `charge.dispute.*`, NOWPayments `refunded` and the admin refund endpoint.
  *
  * Rules:
@@ -208,8 +208,8 @@ export class PaymentClawbackRepository {
           .where(eq(paymentTransactions.id, target.transactionId));
       }
 
-      // Commission on reversed money is not earned — cancel the whole
-      // payment's referral earnings on any refund or dispute.
+      // Commission on reversed money is not earned: reduce the payment's
+      // referral earnings by the same share of the payment that was reversed.
       let referralCanceledPending = 0;
       let referralReversedConfirmed = 0;
       if (target.transactionId) {
@@ -217,6 +217,7 @@ export class PaymentClawbackRepository {
           target.transactionId,
           reversal.kind,
           logger,
+          fraction,
         );
         if (!referral.success) {
           return referral;

@@ -409,6 +409,9 @@ export class StripeProvider implements PaymentProvider {
       ) {
         webhookData.amount_total = eventData.amount_total;
       }
+      if ("currency" in eventData && typeof eventData.currency === "string") {
+        webhookData.currency = eventData.currency;
+      }
       // Extract subscription ID: try direct field first, then parent.subscription_details
       // (Stripe API 2025-03-31+ deprecated `subscription` on Invoice in favor of `parent`)
       if ("subscription" in eventData) {

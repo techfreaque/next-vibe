@@ -8,7 +8,6 @@ export const translations: typeof enTranslations = {
   websiteUrl: "https://unbottled.ai",
   group: {
     name: "Unbottled.ai",
-    legalStatus: "Osoba prywatna, jedyny prowadzący serwis unbottled.ai",
     foundedYear: 2024,
     address: {
       title: "Adres",
@@ -39,8 +38,6 @@ export const translations: typeof enTranslations = {
     twitterUrl: "https://twitter.com/unbottled_ai",
     discordInvite: "https://discord.gg/hBuA22SzkR",
     linkedinUrl: "https://linkedin.com/company/unbottled",
-    facebookUrl: "https://facebook.com/unbottled",
-    instagramUrl: "https://instagram.com/unbottled",
   },
   timezone: {
     PL: "Europe/Warsaw",

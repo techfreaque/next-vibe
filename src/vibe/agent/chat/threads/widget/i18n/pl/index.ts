@@ -166,7 +166,7 @@ export const translations: typeof enTranslations = {
         suffix: "Folder",
         description:
           "Rozmawiaj bez zapisywania historii na serwerze. Wiadomości są przechowywane lokalnie w przeglądarce i pozostają do momentu ich usunięcia.",
-        note: "Żadne dane nie są przechowywane na naszych serwerach podczas sesji incognito.",
+        note: "Żadne dane nie są przechowywane na naszych serwerach podczas sesji incognito (wygenerowane media przechowujemy tymczasowo ze względów technicznych).",
       },
       sharedFolder: {
         name: "Udostępniony",

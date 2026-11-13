@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
   title: "Warunki korzystania z usługi",
   lastUpdated: "Ostatnia aktualizacja: listopad 2026",
   introduction:
-    "Witamy w {{appName}}. Korzystając z naszej platformy czatu AI, zgadzasz się na niniejsze Warunki korzystania z usługi. Przeczytaj je uważnie. Serwis {{appName}} prowadzi {{operator}}, osoba prywatna z Niemiec.",
+    "Witamy w {{appName}}. Korzystając z naszej platformy czatu AI, zgadzasz się na niniejsze Warunki korzystania z usługi. Przeczytaj je uważnie. Serwis {{appName}} prowadzi {{operator}} z Niemiec.",
   sections: {
     agreement: {
       title: "Zgoda na warunki",

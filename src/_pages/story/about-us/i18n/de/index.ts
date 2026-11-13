@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
     integrity: {
       title: "Privatsphäre ab Werk",
       description:
-        "Im Inkognito-Modus bleiben Gespräche auf deinem Gerät. Deine Daten gehören dir - sie sind kein Produkt, das wir verkaufen.",
+        "Im Inkognito-Modus bleiben Gespräche auf deinem Gerät (generierte Medien speichern wir aus technischen Gründen vorübergehend). Deine Daten gehören dir - sie sind kein Produkt, das wir verkaufen.",
     },
     collaboration: {
       title: "Öffentlich gebaut",

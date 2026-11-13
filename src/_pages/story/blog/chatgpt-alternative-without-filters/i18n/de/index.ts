@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     title: "Ist ein ungefilterter KI-Chat privat?",
     intro: "Kommt auf den Ordner an. Das passiert genau.",
     incognito:
-      "Inkognito-Chats liegen im lokalen Speicher deines Browsers. Auf unseren Servern wird die Unterhaltung nicht gespeichert. Browserdaten löschen, und sie ist weg.",
+      "Inkognito-Chats liegen im lokalen Speicher deines Browsers. Auf unseren Servern wird die Unterhaltung nicht gespeichert (generierte Medien speichern wir aus technischen Gründen vorübergehend). Browserdaten löschen, und sie ist weg.",
     transit:
       "Jede Nachricht läuft trotzdem über unseren Server zum Modellanbieter, der die Antwort schreibt. So funktioniert jede gehostete KI. Der Creditverbrauch wird für die Abrechnung erfasst.",
     memory:

@@ -2772,7 +2772,7 @@ export const translations: typeof enTranslations = {
           cta: "Zobacz plan Unlimited",
         },
         signoff: "Miłych rozmów,\nZespół {{appName}}",
-        ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu - nigdy nie przechowujemy ich na naszych serwerach.",
+        ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu - nigdy nie przechowujemy ich na naszych serwerach (wygenerowane media przechowujemy tymczasowo ze względów technicznych).",
       },
       emailTemplates: {
         welcome: {

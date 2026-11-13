@@ -30,6 +30,19 @@ export function classifyMediaError(code: number | null): AudioFailureKind {
   return code === null ? "unknown" : (MEDIA_ERROR_KIND[code] ?? "unknown");
 }
 
+/**
+ * True only for the AbortError our own stop()/pause() teardown causes: the
+ * caller marked the playback as stopped by us AND the rejection is an
+ * AbortError. Any other rejection (or an AbortError we did not cause, e.g.
+ * the browser interrupting playback) must still be logged.
+ */
+export function isOwnTeardownAbort(
+  error: Error | null,
+  stoppedByUs: boolean,
+): boolean {
+  return stoppedByUs && error instanceof Error && error.name === "AbortError";
+}
+
 /** Kind of an `audio.play()` rejection. */
 export function classifyPlayRejection(
   error: Error | string | null,

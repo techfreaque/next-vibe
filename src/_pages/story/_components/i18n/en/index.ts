@@ -309,7 +309,7 @@ export const translations = {
           },
           privacy: {
             q: "Who can read my chats?",
-            a: "Incognito chats live only in your browser - we don't store them. Private chats are saved to your account and only you can open them. To answer, your message goes to the model provider you picked.",
+            a: "Incognito chats live only in your browser - we don't store them (generated media is stored temporarily for technical reasons). Private chats are saved to your account and only you can open them. To answer, your message goes to the model provider you picked.",
           },
           account: {
             q: "Do I need an account?",
@@ -477,7 +477,7 @@ export const translations = {
         label: "True Privacy",
         title: "Incognito means incognito",
         description:
-          "Four privacy levels. Private: server-stored, you only. Shared: collaborative access. Public: community forum. Incognito: stays in your browser - never sent to our servers, architecturally impossible to log. Not a promise. A technical constraint.",
+          "Four privacy levels. Private: server-stored, you only. Shared: collaborative access. Public: community forum. Incognito: stays in your browser - never sent to our servers, architecturally impossible to log (generated media is stored temporarily for technical reasons). Not a promise. A technical constraint.",
         imageAlt: "Four privacy levels from private to incognito",
         levels: {
           private: { name: "Private", desc: "Server-stored. Only you." },

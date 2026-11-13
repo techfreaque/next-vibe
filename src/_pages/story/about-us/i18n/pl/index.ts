@@ -50,7 +50,7 @@ export const translations: typeof enTranslations = {
     integrity: {
       title: "Prywatność domyślnie",
       description:
-        "Tryb incognito trzyma rozmowy na Twoim urządzeniu. Twoje dane są Twoje - nie są produktem na sprzedaż.",
+        "Tryb incognito trzyma rozmowy na Twoim urządzeniu (wygenerowane media przechowujemy tymczasowo ze względów technicznych). Twoje dane są Twoje - nie są produktem na sprzedaż.",
     },
     collaboration: {
       title: "Budujemy publicznie",

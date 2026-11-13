@@ -74,6 +74,8 @@ export interface WebhookData {
   current_period_start?: number;
   current_period_end?: number;
   amount_total?: number | null;
+  /** Checkout session / invoice: ISO currency of amount_total (lowercase on Stripe) */
+  currency?: string;
   subscription?: string;
   billing_reason?: string;
   parent?: Stripe.InvoiceItem.Parent | Stripe.Invoice.Parent;

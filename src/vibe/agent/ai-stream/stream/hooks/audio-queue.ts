@@ -13,6 +13,7 @@ import {
   classifyPlayRejection,
   describeAudioElement,
   describeAudioSource,
+  isOwnTeardownAbort,
 } from "../../../text-to-speech/audio-diagnostics";
 
 /** How many seconds before the current chunk ends to start preloading the next */
@@ -356,7 +357,7 @@ export class AudioQueueManager {
       // Schedule look-ahead prefetch of the next chunk
       this.schedulePrefetch(audio, chunkIndex);
 
-      /** Set when stop() tore this playback down on purpose */
+      /** Set only by stop() (via currentPlaybackCancel) when we tear this playback down on purpose */
       let cancelled = false;
 
       const detach = (): void => {
@@ -392,7 +393,9 @@ export class AudioQueueManager {
         audio.play().catch((e: Error) => {
           // stop() pausing/releasing the element rejects a pending play()
           // with AbortError: that is our own teardown, not a playback failure.
-          if (cancelled) {
+          // Anything else (other errors, or an AbortError we did not cause)
+          // is still logged.
+          if (isOwnTeardownAbort(e, cancelled)) {
             return;
           }
           logger.error("[TTS-PLAY] play() failed", e, {
@@ -401,7 +404,12 @@ export class AudioQueueManager {
             component: "AudioQueueManager",
             chunkIndex,
             failureKind: classifyPlayRejection(e),
+            stoppedByUs: cancelled,
           });
+          if (cancelled) {
+            // stop() already detached and settled this playback
+            return;
+          }
           detach();
           reject(e);
         });

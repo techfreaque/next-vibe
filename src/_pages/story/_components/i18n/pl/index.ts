@@ -312,7 +312,7 @@ export const translations: typeof enTranslations = {
           },
           privacy: {
             q: "Kto może czytać moje czaty?",
-            a: "Czaty incognito istnieją tylko w Twojej przeglądarce - nie przechowujemy ich. Prywatne czaty są zapisane na Twoim koncie i tylko Ty możesz je otworzyć. Żeby odpowiedzieć, wiadomość trafia do wybranego dostawcy modelu.",
+            a: "Czaty incognito istnieją tylko w Twojej przeglądarce - nie przechowujemy ich (wygenerowane media przechowujemy tymczasowo ze względów technicznych). Prywatne czaty są zapisane na Twoim koncie i tylko Ty możesz je otworzyć. Żeby odpowiedzieć, wiadomość trafia do wybranego dostawcy modelu.",
           },
           account: {
             q: "Czy potrzebuję konta?",
@@ -482,7 +482,7 @@ export const translations: typeof enTranslations = {
         label: "Prawdziwa prywatność",
         title: "Incognito oznacza incognito",
         description:
-          "Cztery poziomy prywatności. Prywatny: na serwerze, tylko Ty. Współdzielony: dostęp kolaboracyjny. Publiczny: forum społeczności. Incognito: zostaje w Twojej przeglądarce - nigdy nie wysyłany na nasze serwery, architektonicznie niemożliwy do zalogowania. Nie obietnica. Ograniczenie techniczne.",
+          "Cztery poziomy prywatności. Prywatny: na serwerze, tylko Ty. Współdzielony: dostęp kolaboracyjny. Publiczny: forum społeczności. Incognito: zostaje w Twojej przeglądarce - nigdy nie wysyłany na nasze serwery, architektonicznie niemożliwy do zalogowania (wygenerowane media przechowujemy tymczasowo ze względów technicznych). Nie obietnica. Ograniczenie techniczne.",
         imageAlt: "Cztery poziomy prywatności od prywatnego po incognito",
         levels: {
           private: { name: "Prywatny", desc: "Na serwerze. Tylko Ty." },

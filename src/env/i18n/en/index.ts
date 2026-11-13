@@ -6,7 +6,6 @@ export const translations = {
   websiteUrl: "https://unbottled.ai",
   group: {
     name: "Unbottled.ai",
-    legalStatus: "Private individual, sole operator of unbottled.ai",
     foundedYear: 2024,
     address: {
       title: "Address",
@@ -37,8 +36,6 @@ export const translations = {
     twitterUrl: "https://twitter.com/unbottled_ai",
     discordInvite: "https://discord.gg/hBuA22SzkR",
     linkedinUrl: "https://linkedin.com/company/unbottled",
-    facebookUrl: "https://facebook.com/unbottled",
-    instagramUrl: "https://instagram.com/unbottled",
   },
   timezone: {
     PL: "Europe/Warsaw",

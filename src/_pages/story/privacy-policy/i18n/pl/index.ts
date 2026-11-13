@@ -108,6 +108,11 @@ export const translations: typeof enTranslations = {
       description:
         "Żadnych trackerów firm trzecich, żadnych pikseli reklamowych, żadnego fingerprintingu. Jeden własny plik cookie pozwala nam rozpoznać Twoją przeglądarkę. Żeby wiedzieć, które kanały przyprowadzają ludzi, którzy zostają, zapisujemy, jak trafiłeś do nas pierwszy raz i ostatnio przez oznaczony link: tagi kampanii z linku (utm_source, utm_medium, utm_campaign, utm_content, utm_term), domenę strony odsyłającej (nigdy pełny adres), stronę wejścia (bez parametrów zapytania) i ewentualny kod polecający. Notujemy też, kiedy pierwszy raz napisałeś na czacie, założyłeś konto, potwierdziłeś newsletter, zapłaciłeś i odnowiłeś. Po rejestracji wiążemy to z Twoim kontem. Używamy tego wyłącznie zbiorczo do oceny kanałów marketingowych, nigdy nie sprzedajemy ani nie udostępniamy i usuwamy razem z kontem.",
     },
+    guestMedia: {
+      title: "Media tworzone bez konta",
+      description:
+        "Obrazy, dźwięk i wideo wygenerowane bez konta, także w trybie incognito, przechowujemy na naszych serwerach, żeby można je było wyświetlić i pobrać. Jeśli nigdy nie założysz konta, automatycznie usuwamy te pliki po 4 miesiącach.",
+    },
     thirdPartySites: {
       title: "Strony trzecie",
       description:
@@ -125,17 +130,12 @@ export const translations: typeof enTranslations = {
     },
     controller: {
       description:
-        "Administratorem Twoich danych w rozumieniu RODO jest {{operator}} (osoba prywatna), {{address}}.",
+        "Administratorem Twoich danych w rozumieniu RODO jest {{operator}}, {{address}}.",
     },
     gdpr: {
       title: "Zgodność z RODO",
       description:
         "Dla użytkowników z Unii Europejskiej szanujemy Twoje prawa wynikające z RODO. Eksportuj dane w dowolnej chwili w ustawieniach. Po usunięciu konta kasujemy profil, czaty, wspomnienia, adresy, zapis do newslettera i dane kontaktowe, a dane osobowe w powiązanych rekordach odwiedzających są usuwane. Zachowujemy anonimowe statystyki zbiorcze oraz rejestr kredytów (niepowiązany już z Tobą). W sprawach, których ustawienia nie obejmują, skontaktuj się z nami.",
-    },
-    ccpa: {
-      title: "Zgodność z CCPA",
-      description:
-        "Dla mieszkańców Kalifornii przestrzegamy California Consumer Privacy Act.",
     },
   },
   post: {

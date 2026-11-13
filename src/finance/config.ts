@@ -72,10 +72,10 @@ export const FINANCE_CONFIG = {
    *
    * Gab AI: the API key rides the "Gab Plus" plan (GET /v1/credits reports
    * is_plus=true, a 2,000 credit monthly_allotment and purchased.available=0).
-   * gab.ai/pricing (2026-11-12): Plus $20.00/month or $200.00/year. Set 16.67
-   * here if the account is billed yearly.
+   * gab.ai/pricing (2026-11-12): Plus $20.00/month or $200.00/year. The
+   * account is on the yearly plan ($200/year), spread evenly per month.
    */
-  fixedMonthlyCostUsd: { gab: 20 },
+  fixedMonthlyCostUsd: { gab: 200 / 12 },
 
   /**
    * Usage-priced providers without any spend / balance API (uncensored.ai,

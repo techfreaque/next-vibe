@@ -93,7 +93,7 @@ describe("finance digest", () => {
     expect(body).not.toContain("Stripe: FALLBACK");
     expect(body).toContain("Processor fees MTD: $5.00");
     expect(body).toContain("Gross margin MTD: $65.00 (65.0%)");
-    expect(body).toContain("Gab AI: flat-rate plan $20.00/month (counted in cost)");
+    expect(body).toContain("Gab AI: flat-rate plan $16.67/month (counted in cost)");
     expect(body).toContain("uncensored.ai: no API, spend estimated from 351 billed calls");
   });
 });

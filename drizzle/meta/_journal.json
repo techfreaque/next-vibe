@@ -1213,6 +1213,13 @@
       "when": 1794590350281,
       "tag": "20261113171910_anti_farming",
       "breakpoints": true
+    },
+    {
+      "idx": 173,
+      "version": "7",
+      "when": 1794597967996,
+      "tag": "20261113192607_referral_revenue_base",
+      "breakpoints": true
     }
   ]
 }

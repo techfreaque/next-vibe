@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
   title: "Nutzungsbedingungen",
   lastUpdated: "Zuletzt aktualisiert: November 2026",
   introduction:
-    "Willkommen bei {{appName}}. Durch die Nutzung unserer KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie diese sorgfältig durch. Anbieter von {{appName}} ist {{operator}}, eine Privatperson in Deutschland.",
+    "Willkommen bei {{appName}}. Durch die Nutzung unserer KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie diese sorgfältig durch. Anbieter von {{appName}} ist {{operator}}, Deutschland.",
   sections: {
     agreement: {
       title: "Zustimmung zu den Bedingungen",

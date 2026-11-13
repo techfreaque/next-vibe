@@ -76,7 +76,7 @@ export const translations = {
       publicExplanation:
         "The Public Forum is a First Amendment protected space where people and AI engage in open dialogue. Share ideas, challenge perspectives, and participate in uncensored discussions.",
       incognitoExplanation:
-        "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers - not even tied to your account.",
+        "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers (generated media is stored temporarily for technical reasons) - not even tied to your account.",
       requiresAccount:
         "To access {{folderName}}, you need to create an account or sign in.",
       loginButton: "Login",

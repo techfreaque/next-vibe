@@ -164,7 +164,7 @@ export const translations = {
         suffix: "Folder",
         description:
           "Chat without saving history to the server. Messages are stored locally in your browser and persist until you clear them.",
-        note: "No data is stored on our servers during incognito sessions.",
+        note: "No data is stored on our servers during incognito sessions (generated media is stored temporarily for technical reasons).",
       },
       sharedFolder: {
         name: "Shared",

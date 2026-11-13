@@ -21,16 +21,9 @@ export const translations: typeof enTranslations = {
   introduction:
     "Dieses Impressum enthält die gesetzlich vorgeschriebenen Angaben zu {{appName}} nach dem geltenden Recht.",
   sections: {
-    partnerships: {
-      title: "Partnerschaften",
-      description: "Angaben zu unseren geschäftlichen Partnerschaften.",
-      content:
-        "{{appName}} arbeitet mit führenden KI-Anbietern zusammen, um seinen Nutzern den bestmöglichen Service zu bieten.",
-    },
     companyInfo: {
       title: "Anbieter",
-      description:
-        "{{appName}} wird von einer Privatperson in Deutschland betrieben, nicht von einem eingetragenen Unternehmen.",
+      description: "Betreiber von {{appName}}:",
     },
     responsiblePerson: {
       title: "Verantwortlich für den Inhalt",

@@ -50,7 +50,7 @@ export const translations: typeof enTranslations = {
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",
             answer:
-              "Tak! Prywatne foldery widzisz tylko Ty, tryb incognito trzyma czaty poza naszymi serwerami, a w ustawieniach możesz wyeksportować wszystkie swoje dane lub usunąć konto wraz z powiązanymi danymi osobowymi. Twoje rozmowy są Twoje - nigdy nie sprzedajemy Twoich danych. Szyfrowanie end-to-end już wkrótce.",
+              "Tak! Prywatne foldery widzisz tylko Ty, tryb incognito trzyma czaty poza naszymi serwerami (wygenerowane media przechowujemy tymczasowo ze względów technicznych), a w ustawieniach możesz wyeksportować wszystkie swoje dane lub usunąć konto wraz z powiązanymi danymi osobowymi. Twoje rozmowy są Twoje - nigdy nie sprzedajemy Twoich danych. Szyfrowanie end-to-end już wkrótce.",
           },
         },
       },

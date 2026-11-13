@@ -84,7 +84,7 @@ export const translations = {
     title: "Is an unfiltered AI chat private?",
     intro: "It depends on the folder. Here is exactly what happens.",
     incognito:
-      "Incognito chats live in your browser's local storage. The conversation is not saved on our servers. Clear your browser data and it is gone.",
+      "Incognito chats live in your browser's local storage. The conversation is not saved on our servers (generated media is stored temporarily for technical reasons). Clear your browser data and it is gone.",
     transit:
       "Each message still passes through our server to the model provider that writes the answer. That is how every hosted AI works. Credit usage is recorded so billing works.",
     memory:

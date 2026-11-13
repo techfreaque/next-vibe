@@ -963,7 +963,7 @@ export const translations: typeof enTranslations = {
       publicExplanation:
         "Forum publiczne to przestrzeń chroniona przez pierwszą poprawkę, gdzie ludzie i AI angażują się w otwarty dialog. Dziel się pomysłami, kwestionuj perspektywy i uczestniczą w niecenzurowanych dyskusjach.",
       incognitoExplanation:
-        "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery - nawet nie są powiązane z Twoim kontem.",
+        "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery (wygenerowane media przechowujemy tymczasowo ze względów technicznych) - nawet nie są powiązane z Twoim kontem.",
       requiresAccount:
         "Aby uzyskać dostęp do {{folderName}}, musisz utworzyć konto lub się zalogować.",
       loginButton: "Zaloguj się",
@@ -1859,7 +1859,7 @@ export const translations: typeof enTranslations = {
       name: "Incognito",
       suffix: "Folder",
       description:
-        "Maksymalna prywatność. Historia czatu przechowywana tylko na twoim urządzeniu, nigdy na naszych serwerach. Wiadomości przetwarzane przez AI, następnie natychmiast usuwane. Idealne dla wrażliwych tematów z niecenzurowanymi modelami.",
+        "Maksymalna prywatność. Historia czatu przechowywana tylko na twoim urządzeniu, nigdy na naszych serwerach. Wiadomości przetwarzane przez AI, następnie natychmiast usuwane (wygenerowane media przechowujemy tymczasowo ze względów technicznych). Idealne dla wrażliwych tematów z niecenzurowanymi modelami.",
       note: "Bez konta • Bez przechowywanej historii • Tylko lokalnie",
     },
     publicFolder: {

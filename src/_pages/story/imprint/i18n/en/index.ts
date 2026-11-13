@@ -18,17 +18,9 @@ export const translations = {
   introduction:
     "This imprint provides legally required information about {{appName}} in accordance with applicable laws.",
   sections: {
-    partnerships: {
-      title: "Partnerships & Affiliations",
-      description:
-        "Information about our business partnerships and affiliations.",
-      content:
-        "{{appName}} maintains partnerships with leading AI providers to deliver the best possible service to our users.",
-    },
     companyInfo: {
       title: "Provider",
-      description:
-        "{{appName}} is run by a private individual in Germany, not by a registered company.",
+      description: "{{appName}} is operated by:",
     },
     responsiblePerson: {
       title: "Responsible Person",

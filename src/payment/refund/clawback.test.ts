@@ -3,7 +3,7 @@
  *
  * A buyer gets a credit pack from a payment; refunds and disputes revoke the
  * credits that payment granted (cumulative, idempotent, never below zero) and
- * cancel the referral earnings it produced.
+ * reduce the referral earnings it produced by the same share.
  */
 
 import "server-only";
@@ -254,6 +254,7 @@ describe("PaymentClawbackRepository", () => {
       500,
       logger,
       defaultLocale,
+      500,
     );
     expect(applied.success).toBe(true);
 
@@ -263,6 +264,7 @@ describe("PaymentClawbackRepository", () => {
       .where(eq(referralEarnings.transactionId, transactionId));
     expect(earning?.status).toBe(ReferralEarningStatus.PENDING);
     expect(earning?.baseCredits).toBe(500);
+    expect(earning?.baseAmountUsdCents).toBe(500);
 
     // Confirm it (as the cron would after the hold window) — credits granted
     const confirmed = await ReferralRepository.confirmMaturedEarnings(
@@ -302,6 +304,111 @@ describe("PaymentClawbackRepository", () => {
         earnedBefore.data.total - (earning?.amountCents ?? 0),
       );
     }
+  });
+
+  it("commission is 10% of revenue: an $88 annual plan pays $8.80, not $0.80", async () => {
+    const { transactionId } = await buyPack("annual");
+    const applied = await ReferralRepository.applyReferralPayoutOnPayment(
+      transactionId,
+      buyer.user.id,
+      8800,
+      logger,
+      defaultLocale,
+      800,
+    );
+    expect(applied.success).toBe(true);
+    const [earning] = await db
+      .select()
+      .from(referralEarnings)
+      .where(eq(referralEarnings.transactionId, transactionId));
+    expect(earning?.level).toBe(0);
+    expect(earning?.amountCents).toBe(880);
+    expect(earning?.baseAmountUsdCents).toBe(8800);
+    expect(earning?.baseCredits).toBe(800);
+  });
+
+  it("partial refunds reduce referral earnings proportionally, retries never double-reverse", async () => {
+    // Pending earning: 10% of $20 = 200, half refunded -> 100 left
+    const pending = await buyPack("ref-partial-pending");
+    await ReferralRepository.applyReferralPayoutOnPayment(
+      pending.transactionId,
+      buyer.user.id,
+      2000,
+      logger,
+      defaultLocale,
+    );
+    const half = await PaymentClawbackRepository.reverseCharge(
+      refundOf(pending.paymentIntentId, 0.5),
+      logger,
+    );
+    expect(half.success && half.data.referralCanceledPending).toBe(1);
+    const again = await PaymentClawbackRepository.reverseCharge(
+      refundOf(pending.paymentIntentId, 0.5),
+      logger,
+    );
+    expect(again.success && again.data.referralCanceledPending).toBe(0);
+    const [p] = await db
+      .select()
+      .from(referralEarnings)
+      .where(eq(referralEarnings.transactionId, pending.transactionId));
+    expect(p?.status).toBe(ReferralEarningStatus.PENDING);
+    expect(p?.amountCents).toBe(100);
+    expect(p?.originalAmountCents).toBe(200);
+
+    // Confirmed earning: 10% of $40 = 400, 25% refunded -> 100 clawed back
+    const confirmedPay = await buyPack("ref-partial-confirmed");
+    await ReferralRepository.applyReferralPayoutOnPayment(
+      confirmedPay.transactionId,
+      buyer.user.id,
+      4000,
+      logger,
+      defaultLocale,
+    );
+    const confirmed = await ReferralRepository.confirmMaturedEarnings(
+      logger,
+      creditsT,
+      new Date(Date.now() + 31 * 24 * 60 * 60 * 1000),
+    );
+    expect(confirmed.success).toBe(true);
+    const earnedBefore = await CreditRepository.getEarnedCreditsBalance(
+      referrer.user.id,
+      logger,
+      creditsT,
+    );
+    const quarter = await PaymentClawbackRepository.reverseCharge(
+      refundOf(confirmedPay.paymentIntentId, 0.25),
+      logger,
+    );
+    expect(quarter.success && quarter.data.referralReversedConfirmed).toBe(1);
+    const [c] = await db
+      .select()
+      .from(referralEarnings)
+      .where(eq(referralEarnings.transactionId, confirmedPay.transactionId));
+    expect(c?.status).toBe(ReferralEarningStatus.CONFIRMED);
+    expect(c?.amountCents).toBe(300);
+    const earnedAfter = await CreditRepository.getEarnedCreditsBalance(
+      referrer.user.id,
+      logger,
+      creditsT,
+    );
+    expect(earnedBefore.success && earnedAfter.success).toBe(true);
+    if (earnedBefore.success && earnedAfter.success) {
+      expect(earnedAfter.data.total).toBe(earnedBefore.data.total - 100);
+    }
+
+    // Rest refunded: the earning is canceled and the remaining 300 reversed
+    const full = await PaymentClawbackRepository.reverseCharge(
+      refundOf(confirmedPay.paymentIntentId, 1),
+      logger,
+    );
+    expect(full.success && full.data.referralReversedConfirmed).toBe(1);
+    const [cAfter] = await db
+      .select()
+      .from(referralEarnings)
+      .where(eq(referralEarnings.transactionId, confirmedPay.transactionId));
+    expect(cAfter?.status).toBe(ReferralEarningStatus.CANCELED);
+    expect(cAfter?.amountCents).toBe(0);
+    expect(cAfter?.originalAmountCents).toBe(400);
   });
 
   it("an unmappable charge is reported unmapped, not guessed", async () => {

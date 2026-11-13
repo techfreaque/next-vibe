@@ -21,17 +21,9 @@ export const translations: typeof enTranslations = {
   introduction:
     "Niniejsza stopka redakcyjna zawiera informacje wymagane przez prawo dotyczące {{appName}} zgodnie z obowiązującymi przepisami.",
   sections: {
-    partnerships: {
-      title: "Partnerstwa i stowarzyszenia",
-      description:
-        "Informacje o naszych partnerstwach i stowarzyszeniach biznesowych.",
-      content:
-        "{{appName}} utrzymuje partnerstwa z wiodącymi dostawcami AI, aby zapewnić naszym użytkownikom najlepszą możliwą usługę.",
-    },
     companyInfo: {
       title: "Usługodawca",
-      description:
-        "Serwis {{appName}} prowadzi osoba prywatna w Niemczech, a nie zarejestrowana firma.",
+      description: "Serwis {{appName}} prowadzi:",
     },
     responsiblePerson: {
       title: "Osoba odpowiedzialna",

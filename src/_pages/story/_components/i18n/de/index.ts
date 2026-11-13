@@ -311,7 +311,7 @@ export const translations: typeof enTranslations = {
           },
           privacy: {
             q: "Wer kann meine Chats lesen?",
-            a: "Inkognito-Chats existieren nur in deinem Browser - wir speichern sie nicht. Private Chats liegen in deinem Konto und nur du kannst sie öffnen. Für die Antwort geht deine Nachricht an den Modellanbieter, den du gewählt hast.",
+            a: "Inkognito-Chats existieren nur in deinem Browser - wir speichern sie nicht (generierte Medien speichern wir aus technischen Gründen vorübergehend). Private Chats liegen in deinem Konto und nur du kannst sie öffnen. Für die Antwort geht deine Nachricht an den Modellanbieter, den du gewählt hast.",
           },
           account: {
             q: "Brauche ich ein Konto?",
@@ -483,7 +483,7 @@ export const translations: typeof enTranslations = {
         label: "Echte Privatsphäre",
         title: "Inkognito heißt inkognito",
         description:
-          "Vier Privatsphäre-Stufen. Privat: server-gespeichert, nur du. Geteilt: kollaborativer Zugriff. Öffentlich: Community-Forum. Inkognito: bleibt in deinem Browser - nie an unsere Server gesendet, architekturbedingt unmöglich zu loggen. Kein Versprechen. Eine technische Einschränkung.",
+          "Vier Privatsphäre-Stufen. Privat: server-gespeichert, nur du. Geteilt: kollaborativer Zugriff. Öffentlich: Community-Forum. Inkognito: bleibt in deinem Browser - nie an unsere Server gesendet, architekturbedingt unmöglich zu loggen (generierte Medien speichern wir aus technischen Gründen vorübergehend). Kein Versprechen. Eine technische Einschränkung.",
         imageAlt: "Vier Privatsphäre-Stufen von privat bis inkognito",
         levels: {
           private: { name: "Privat", desc: "Server-gespeichert. Nur du." },

@@ -92,7 +92,6 @@ export function TanstackPage({
               </LegalP>
               <LegalCard>
                 <Strong>{configT("group.responsiblePerson.name")}</Strong>
-                <P>{configT("group.legalStatus")}</P>
                 <P>{configT("group.address.addressIn1Line")}</P>
               </LegalCard>
             </>
@@ -129,16 +128,6 @@ export function TanstackPage({
                 <Strong>{configT("group.responsiblePerson.name")}</Strong>
                 <P>{configT("group.address.addressIn1Line")}</P>
               </LegalCard>
-            </>
-          ),
-        },
-        {
-          id: "partnerships",
-          title: t("sections.partnerships.title"),
-          content: (
-            <>
-              <LegalP>{t("sections.partnerships.description")}</LegalP>
-              <LegalP>{t("sections.partnerships.content", { appName })}</LegalP>
             </>
           ),
         },

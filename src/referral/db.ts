@@ -106,8 +106,18 @@ export const referralEarnings = pgTable(
       .references(() => paymentTransactions.id, { onDelete: "cascade" }),
     level: integer("level").notNull(),
     amountCents: integer("amount_cents").notNull(),
-    /** Credits of the source purchase the commission was computed from (null on legacy rows) */
+    /** Credits the source purchase granted (informational; null on legacy rows) */
     baseCredits: integer("base_credits"),
+    /**
+     * Revenue the commission was computed from: the amount actually paid,
+     * converted to USD cents (null on legacy rows, which used baseCredits).
+     */
+    baseAmountUsdCents: integer("base_amount_usd_cents"),
+    /**
+     * Commission before any refund/dispute reduced it. Set on the first partial
+     * reversal; null means amountCents is still the original commission.
+     */
+    originalAmountCents: integer("original_amount_cents"),
     currency: text("currency").notNull(),
     status: text("status", { enum: ReferralEarningStatusDB })
       .notNull()

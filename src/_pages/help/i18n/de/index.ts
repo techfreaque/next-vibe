@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
           q4: {
             question: "Sind meine Daten privat und sicher?",
             answer:
-              "Ja! Private Ordner sind nur für Sie sichtbar, der Inkognito-Modus hält Chats von unseren Servern fern, und in den Einstellungen können Sie alle Ihre Daten exportieren oder Ihr Konto samt der damit verknüpften personenbezogenen Daten löschen. Ihre Gespräche gehören Ihnen - wir verkaufen Ihre Daten niemals. Ende-zu-Ende-Verschlüsselung folgt bald.",
+              "Ja! Private Ordner sind nur für Sie sichtbar, der Inkognito-Modus hält Chats von unseren Servern fern (generierte Medien speichern wir aus technischen Gründen vorübergehend), und in den Einstellungen können Sie alle Ihre Daten exportieren oder Ihr Konto samt der damit verknüpften personenbezogenen Daten löschen. Ihre Gespräche gehören Ihnen - wir verkaufen Ihre Daten niemals. Ende-zu-Ende-Verschlüsselung folgt bald.",
           },
         },
       },

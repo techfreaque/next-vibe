@@ -48,7 +48,7 @@ export const translations = {
     integrity: {
       title: "Private by default",
       description:
-        "Incognito mode keeps conversations on your device. Your data stays yours - not a product we sell.",
+        "Incognito mode keeps conversations on your device (generated media is stored temporarily for technical reasons). Your data stays yours - not a product we sell.",
     },
     collaboration: {
       title: "Built in public",

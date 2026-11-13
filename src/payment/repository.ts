@@ -1143,22 +1143,23 @@ export class PaymentRepository {
         );
       }
 
-      // Apply referral payout using credits (currency-independent)
-      // Credits are determined from product type, not payment amount
+      // Referral commission is a share of the revenue this payment actually
+      // brought in, not of the credits it granted (an annual plan grants one
+      // month of credits but pays for twelve). Stripe reports what was charged
+      // (after promotion codes) in amount_total; NOWPayments invoices are fixed
+      // fiat amounts, stored on the transaction at checkout.
       const { productsRepository, ProductIds } =
         await import("../products/repository-client");
+      const { checkoutRevenueUsdCents } =
+        await import("../referral/commission");
 
-      let creditsAmount = 0;
+      let grantedCredits = 0;
       if (type === "subscription") {
-        const subscriptionProduct = productsRepository.getProduct(
+        grantedCredits = productsRepository.getProduct(
           ProductIds.SUBSCRIPTION,
           userLocale,
-        );
-        creditsAmount = subscriptionProduct.credits; // 800
+        ).credits;
       } else if (type === "credit_pack") {
-        // Credit pack: quantity * credits per pack
-        // Credits were fixed at checkout creation (productId * quantity), so
-        // payout matches the grant for both pack sizes.
         const metaTotalCredits =
           metadata && typeof metadata === "object" && "totalCredits" in metadata
             ? Number(metadata.totalCredits) || 0
@@ -1167,25 +1168,44 @@ export class PaymentRepository {
           metadata && typeof metadata === "object" && "quantity" in metadata
             ? Number(metadata.quantity) || 1
             : 1;
-        const creditPackProduct = productsRepository.getProduct(
-          ProductIds.CREDIT_PACK,
-          userLocale,
-        );
-        creditsAmount =
+        grantedCredits =
           metaTotalCredits > 0
             ? metaTotalCredits
-            : quantity * creditPackProduct.credits;
+            : quantity *
+              productsRepository.getProduct(ProductIds.CREDIT_PACK, userLocale)
+                .credits;
       }
 
-      if (creditsAmount > 0) {
-        const { ReferralRepository } = await import("../referral/repository");
-        await ReferralRepository.applyReferralPayoutOnPayment(
-          transaction.id,
-          transaction.userId,
-          creditsAmount,
-          logger,
-          userLocale,
-        );
+      if (type === "subscription" || type === "credit_pack") {
+        const revenueUsdCents = checkoutRevenueUsdCents({
+          amountTotalMinor: data.amount_total,
+          amountTotalCurrency: data.currency,
+          transactionAmount: transaction.amount,
+          transactionCurrency: transaction.currency,
+        });
+
+        if (revenueUsdCents === null) {
+          logger.error(
+            "Referral payout skipped: payment currency has no USD rate - review manually",
+            {
+              transactionId: transaction.id,
+              amountTotal: data.amount_total,
+              sessionCurrency: data.currency,
+              transactionAmount: transaction.amount,
+              transactionCurrency: transaction.currency,
+            },
+          );
+        } else {
+          const { ReferralRepository } = await import("../referral/repository");
+          await ReferralRepository.applyReferralPayoutOnPayment(
+            transaction.id,
+            transaction.userId,
+            revenueUsdCents,
+            logger,
+            userLocale,
+            grantedCredits > 0 ? grantedCredits : null,
+          );
+        }
       }
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {

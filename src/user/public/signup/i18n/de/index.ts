@@ -464,7 +464,7 @@ export const translations: typeof enTranslations = {
       cta: "Auf Pro upgraden",
     },
     signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
-    ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten - wir speichern sie niemals auf unseren Servern.",
+    ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten - wir speichern sie niemals auf unseren Servern (generierte Medien speichern wir aus technischen Gründen vorübergehend).",
   },
   emailTemplates: {
     welcome: {

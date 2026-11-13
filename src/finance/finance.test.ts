@@ -1009,12 +1009,13 @@ describe("finance ingest (mocked externals)", () => {
         .select()
         .from(financeDailyRollups)
         .where(eq(financeDailyRollups.day, new Date(Date.UTC(2031, 2, 4))));
-      // $20 / 31 days in March = $0.65 per day, on top of the measured spend.
+      // $200/year = $16.67/month / 31 days in March = $0.54 per day, on top
+      // of the measured spend.
       const spend = rollup?.perProviderSpend ?? {};
-      expect(spend[FinanceSource.GAB]).toBe(0.65);
+      expect(spend[FinanceSource.GAB]).toBe(0.54);
       const total = Object.values(spend).reduce((a, b) => a + b, 0);
       expect(today?.upstreamCostUsd).toBe(Math.round(total * 100) / 100);
-      expect(today?.upstreamCostUsd ?? 0).toBeGreaterThanOrEqual(1.65);
+      expect(today?.upstreamCostUsd ?? 0).toBeGreaterThanOrEqual(1.54);
     } finally {
       FinanceRepository.deps = testDeps;
     }

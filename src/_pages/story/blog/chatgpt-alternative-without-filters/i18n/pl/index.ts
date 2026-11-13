@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     title: "Czy czat AI bez filtrów jest prywatny?",
     intro: "Zależy od folderu. Oto dokładnie, co się dzieje.",
     incognito:
-      "Czaty incognito są zapisane w pamięci lokalnej twojej przeglądarki. Rozmowa nie trafia do zapisu na naszych serwerach. Wyczyścisz dane przeglądarki i jej nie ma.",
+      "Czaty incognito są zapisane w pamięci lokalnej twojej przeglądarki. Rozmowa nie trafia do zapisu na naszych serwerach (wygenerowane media przechowujemy tymczasowo ze względów technicznych). Wyczyścisz dane przeglądarki i jej nie ma.",
     transit:
       "Każda wiadomość nadal przechodzi przez nasz serwer do dostawcy modelu, który pisze odpowiedź. Tak działa każda AI w chmurze. Zużycie kredytów jest rejestrowane na potrzeby rozliczeń.",
     memory:

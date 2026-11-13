@@ -17,7 +17,7 @@ export const translations = {
   title: "Terms of Service",
   lastUpdated: "Last updated: November 2026",
   introduction:
-    "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully. {{appName}} is operated by {{operator}}, a private individual in Germany.",
+    "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully. {{appName}} is operated by {{operator}}, Germany.",
   sections: {
     agreement: {
       title: "Agreement to Terms",

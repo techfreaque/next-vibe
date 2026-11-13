@@ -168,6 +168,11 @@ export function TanstackPage({
           content: <LegalP>{t("sections.cookies.description")}</LegalP>,
         },
         {
+          id: "guest-media",
+          title: t("sections.guestMedia.title"),
+          content: <LegalP>{t("sections.guestMedia.description")}</LegalP>,
+        },
+        {
           id: "third-party-sites",
           title: t("sections.thirdPartySites.title"),
           content: <LegalP>{t("sections.thirdPartySites.description")}</LegalP>,
@@ -209,11 +214,6 @@ export function TanstackPage({
           id: "gdpr",
           title: t("sections.gdpr.title"),
           content: <LegalP>{t("sections.gdpr.description")}</LegalP>,
-        },
-        {
-          id: "ccpa",
-          title: t("sections.ccpa.title"),
-          content: <LegalP>{t("sections.ccpa.description")}</LegalP>,
         },
       ]}
     />
