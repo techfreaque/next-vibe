@@ -18,6 +18,7 @@ import { Meta } from "next-vibe/ui/components/meta";
 import { Outlet } from "next-vibe/ui/components/outlet";
 import { Script } from "next-vibe/ui/components/script";
 import { Scripts } from "next-vibe/ui/components/scripts";
+import type { ThemePreference } from "next-vibe/ui/components/theme-provider";
 import { cookies } from "next-vibe/ui/lib/headers";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX, ReactNode } from "react";
@@ -81,7 +82,7 @@ interface StructuredDataOrganization {
 interface RootLayoutData {
   locale: CountryLanguage;
   structuredData: StructuredDataOrganization;
-  theme: "light" | "dark";
+  theme: ThemePreference;
   availability: AgentEnvAvailability;
   children?: ReactNode;
 }
@@ -123,7 +124,8 @@ export async function tanstackLoader({
     },
   };
   const themeCookie = (await cookies()).get("theme_v2")?.value;
-  const theme: "light" | "dark" = themeCookie === "light" ? "light" : "dark";
+  const theme: ThemePreference =
+    themeCookie === "light" || themeCookie === "system" ? themeCookie : "dark";
   const availability = await getEnvAvailability();
 
   return { locale, structuredData, theme, availability };
@@ -137,7 +139,13 @@ export function TanstackPage({
   children,
 }: RootLayoutData): JSX.Element {
   return (
-    <Html lang={locale} className={theme} suppressHydrationWarning>
+    // "system" can't be resolved on the server: render dark, the head theme
+    // script swaps to the OS scheme before first paint.
+    <Html
+      lang={locale}
+      className={theme === "light" ? "light" : "dark"}
+      suppressHydrationWarning
+    >
       <Head>
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
         <LinkTag rel="manifest" href={`/api/${locale}/manifest`} />
@@ -145,7 +153,7 @@ export function TanstackPage({
         <Script
           id="theme-sync"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme_v2=(light|dark)/);if(m)localStorage.setItem('theme_v2',m[1]);}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)theme_v2=(light|dark|system)/);if(m)localStorage.setItem('theme_v2',m[1]);}catch(e){}})();`,
           }}
         />
       </Head>

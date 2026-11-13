@@ -7,6 +7,7 @@ import { cn } from "../../../unified-ui/_shared/cn";
 export const THEME_COOKIE_NAME = "theme_v2";
 
 import type {
+  ThemePreference,
   ThemeProviderProps,
   UseThemeToggleReturn,
 } from "../../web/components/theme-provider";
@@ -53,6 +54,12 @@ function useIsMounted(): boolean {
   );
 }
 
+function setPreference(preference: ThemePreference): void {
+  Appearance.setColorScheme(
+    preference === "system" ? "unspecified" : preference,
+  );
+}
+
 export function useThemeToggle(): UseThemeToggleReturn {
   const colorScheme = useColorScheme();
   const theme = colorScheme === "dark" ? "dark" : "light";
@@ -65,6 +72,10 @@ export function useThemeToggle(): UseThemeToggleReturn {
   return {
     onToggleTheme,
     theme,
+    // RN exposes no "is following OS" flag; the resolved scheme is the best
+    // available reflection of the choice.
+    preference: theme,
+    setPreference,
     isMounted,
   };
 }

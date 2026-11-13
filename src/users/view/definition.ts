@@ -124,15 +124,17 @@ export const { GET } = createEndpoint({
         }),
       }),
 
-      // Payment & Revenue Statistics
+      // Payment & Revenue Statistics (USD via static FX)
       paymentStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
-          totalRevenueCents: z.coerce.number(),
+          totalPaidUsd: z.coerce.number(),
+          totalRefundedUsd: z.coerce.number(),
           totalPayments: z.coerce.number(),
           successfulPayments: z.coerce.number(),
           failedPayments: z.coerce.number(),
-          totalRefundsCents: z.coerce.number(),
+          pendingPayments: z.coerce.number(),
+          firstPaymentAt: z.coerce.date().nullable(),
           lastPaymentAt: z.coerce.date().nullable(),
           stripeCustomerId: z.string().nullable(),
           hasActiveSubscription: z.boolean(),
@@ -140,7 +142,43 @@ export const { GET } = createEndpoint({
           subscriptionInterval: z.string().nullable(),
           subscriptionNextBilling: z.coerce.date().nullable(),
           subscriptionStatus: z.string().nullable(),
+          cancelAtPeriodEnd: z.boolean(),
         }),
+      }),
+
+      // Recent payment attempts (any status)
+      payments: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            createdAt: z.coerce.date(),
+            amount: z.coerce.number(),
+            currency: z.string(),
+            amountUsd: z.coerce.number(),
+            status: z.string(),
+            provider: z.string(),
+            mode: z.string(),
+          }),
+        ),
+      }),
+
+      // Subscription history
+      subscriptions: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            status: z.string(),
+            planId: z.string(),
+            billingInterval: z.string(),
+            provider: z.string(),
+            createdAt: z.coerce.date(),
+            currentPeriodEnd: z.coerce.date().nullable(),
+            cancelAtPeriodEnd: z.boolean(),
+            canceledAt: z.coerce.date().nullable(),
+          }),
+        ),
       }),
 
       // Newsletter Status
@@ -154,15 +192,69 @@ export const { GET } = createEndpoint({
         }),
       }),
 
-      // Referral Statistics
+      // Referral performance as a referrer
       referralStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalReferrals: z.coerce.number(),
-          totalReferralRevenueCents: z.coerce.number(),
-          totalReferralEarningsCents: z.coerce.number(),
+          payingReferrals: z.coerce.number(),
           activeReferralCodes: z.coerce.number(),
+          earnings: z.array(
+            z.object({
+              currency: z.string(),
+              amountCents: z.coerce.number(),
+              count: z.coerce.number(),
+            }),
+          ),
         }),
+      }),
+
+      // Who referred this user
+      referredBy: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z
+          .object({
+            userId: z.string(),
+            email: z.string(),
+            code: z.string().nullable(),
+            referredAt: z.coerce.date(),
+          })
+          .nullable(),
+      }),
+
+      // Users this user referred
+      referredUsers: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            email: z.string(),
+            createdAt: z.coerce.date(),
+            totalPaidUsd: z.coerce.number(),
+          }),
+        ),
+      }),
+
+      // First/last touch attribution
+      attribution: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z
+          .object({
+            firstChannel: z.string(),
+            firstSource: z.string().nullable(),
+            firstMedium: z.string().nullable(),
+            firstCampaign: z.string().nullable(),
+            firstRefCode: z.string().nullable(),
+            firstReferrerHost: z.string().nullable(),
+            firstLandingPath: z.string().nullable(),
+            firstTouchAt: z.coerce.date(),
+            lastChannel: z.string(),
+            lastTouchAt: z.coerce.date(),
+            firstChatAt: z.coerce.date().nullable(),
+            signedUpAt: z.coerce.date().nullable(),
+            firstPaidAt: z.coerce.date().nullable(),
+          })
+          .nullable(),
       }),
 
       // User Roles
@@ -184,7 +276,33 @@ export const { GET } = createEndpoint({
           lastThreadCreated: z.coerce.date().nullable(),
           lastMessageSent: z.coerce.date().nullable(),
           lastPayment: z.coerce.date().nullable(),
+          lastCreditUsage: z.coerce.date().nullable(),
+          activeSessions: z.coerce.number(),
         }),
+      }),
+
+      // Favorites and custom skills
+      engagement: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.object({
+          favoritesCount: z.coerce.number(),
+          customSkillsCount: z.coerce.number(),
+        }),
+      }),
+
+      // Error log rows mentioning this user
+      errorLogs: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            message: z.string(),
+            level: z.string(),
+            occurrences: z.coerce.number(),
+            lastSeenAt: z.coerce.date(),
+            resolved: z.boolean(),
+          }),
+        ),
       }),
 
       // Model Usage Statistics
@@ -282,19 +400,47 @@ export const { GET } = createEndpoint({
           nextExpiry: "2026-03-15T00:00:00.000Z",
         },
         paymentStats: {
-          totalRevenueCents: 5000,
-          totalPayments: 5,
-          successfulPayments: 5,
+          totalPaidUsd: 17.28,
+          totalRefundedUsd: 0,
+          totalPayments: 2,
+          successfulPayments: 2,
           failedPayments: 0,
-          totalRefundsCents: 0,
-          lastPaymentAt: "2024-01-15T10:00:00.000Z",
+          pendingPayments: 0,
+          firstPaymentAt: "2026-10-15T10:00:00.000Z",
+          lastPaymentAt: "2026-11-15T10:00:00.000Z",
           stripeCustomerId: "cus_123",
           hasActiveSubscription: true,
-          subscriptionPlan: "enums.subscription.subscription",
+          subscriptionPlan: "enums.plan.subscription",
           subscriptionInterval: "enums.billing.monthly",
-          subscriptionNextBilling: "2026-04-15T00:00:00.000Z",
+          subscriptionNextBilling: "2026-12-15T00:00:00.000Z",
           subscriptionStatus: "enums.status.active",
+          cancelAtPeriodEnd: false,
         },
+        payments: [
+          {
+            id: "323e4567-e89b-12d3-a456-426614174002",
+            createdAt: "2026-11-15T10:00:00.000Z",
+            amount: 8,
+            currency: "EUR",
+            amountUsd: 8.64,
+            status: "enums.paymentStatus.succeeded",
+            provider: "enums.paymentProvider.stripe",
+            mode: "enums.checkoutMode.subscription",
+          },
+        ],
+        subscriptions: [
+          {
+            id: "423e4567-e89b-12d3-a456-426614174003",
+            status: "enums.status.active",
+            planId: "enums.plan.subscription",
+            billingInterval: "enums.billing.monthly",
+            provider: "enums.paymentProvider.stripe",
+            createdAt: "2026-10-15T10:00:00.000Z",
+            currentPeriodEnd: "2026-12-15T00:00:00.000Z",
+            cancelAtPeriodEnd: false,
+            canceledAt: null,
+          },
+        ],
         newsletterInfo: {
           isSubscribed: true,
           subscribedAt: "2024-01-15T10:00:00.000Z",
@@ -303,9 +449,33 @@ export const { GET } = createEndpoint({
         },
         referralStats: {
           totalReferrals: 3,
-          totalReferralRevenueCents: 15000,
-          totalReferralEarningsCents: 3000,
+          payingReferrals: 1,
           activeReferralCodes: 2,
+          earnings: [{ currency: "USD", amountCents: 300, count: 2 }],
+        },
+        referredBy: null,
+        referredUsers: [
+          {
+            id: "523e4567-e89b-12d3-a456-426614174004",
+            email: "friend@example.com",
+            createdAt: "2026-11-01T10:00:00.000Z",
+            totalPaidUsd: 8,
+          },
+        ],
+        attribution: {
+          firstChannel: "google.com",
+          firstSource: null,
+          firstMedium: null,
+          firstCampaign: null,
+          firstRefCode: null,
+          firstReferrerHost: "google.com",
+          firstLandingPath: "/en-US",
+          firstTouchAt: "2026-10-14T10:00:00.000Z",
+          lastChannel: "direct",
+          lastTouchAt: "2026-11-14T10:00:00.000Z",
+          firstChatAt: "2026-10-14T10:05:00.000Z",
+          signedUpAt: "2026-10-15T10:00:00.000Z",
+          firstPaidAt: "2026-10-15T10:10:00.000Z",
         },
         roles: [
           {
@@ -318,7 +488,14 @@ export const { GET } = createEndpoint({
           lastThreadCreated: "2024-01-15T10:00:00.000Z",
           lastMessageSent: "2024-01-15T10:00:00.000Z",
           lastPayment: "2024-01-15T10:00:00.000Z",
+          lastCreditUsage: "2024-01-15T10:00:00.000Z",
+          activeSessions: 1,
         },
+        engagement: {
+          favoritesCount: 3,
+          customSkillsCount: 0,
+        },
+        errorLogs: [],
         modelUsageStats: [
           {
             modelId: "gpt-5-mini",

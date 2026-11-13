@@ -479,6 +479,12 @@ export const translations = {
     noSocials: "No social links added yet",
     viewPublicProfile: "View public profile",
     profileUrl: "Your link",
+    verifyNudge: {
+      title: "Confirm your email",
+      description:
+        "We sent a link to {{email}}. Chat works either way. Confirming keeps your account recoverable.",
+      action: "Resend link",
+    },
     slugWarning:
       "Changing this URL will break any existing links to your profile.",
     bioPreview: "Preview",
@@ -495,9 +501,10 @@ export const translations = {
       title: "Appearance",
       sectionHint: "How the app looks and reads.",
       theme: "Theme",
-      themeHint: "Light or dark. Takes effect everywhere.",
+      themeHint: "Light, dark, or match your device. Applies everywhere.",
       light: "Light",
       dark: "Dark",
+      system: "System",
       language: "Language",
       languageHint: "Interface and content language.",
     },

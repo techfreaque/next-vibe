@@ -2,6 +2,13 @@ export const translations = {
   category: "Users",
 
   roles: {
+    widget: {
+      added: "Role granted: {{role}}",
+      removed: "Role removed: {{role}}",
+      removeWarning:
+        "The user loses every permission this role grants on their next request.",
+      addHint: "Takes effect on the user's next request.",
+    },
     post: {
       title: "Add User Role",
       titleShort: "Add Role",

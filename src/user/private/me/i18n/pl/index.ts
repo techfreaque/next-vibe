@@ -486,6 +486,12 @@ export const translations: typeof enTranslations = {
     noSocials: "Nie dodano jeszcze żadnych linków społecznościowych",
     viewPublicProfile: "Zobacz publiczny profil",
     profileUrl: "Twój link",
+    verifyNudge: {
+      title: "Potwierdź e-mail",
+      description:
+        "Wysłaliśmy link na {{email}}. Czat działa i bez tego. Potwierdzenie pozwala odzyskać konto.",
+      action: "Wyślij link ponownie",
+    },
     slugWarning:
       "Zmiana tego adresu URL spowoduje, że wszystkie istniejące linki do Twojego profilu przestaną działać.",
     bioPreview: "Podgląd",
@@ -502,9 +508,10 @@ export const translations: typeof enTranslations = {
       title: "Wygląd",
       sectionHint: "Wygląd i język aplikacji.",
       theme: "Motyw",
-      themeHint: "Jasny lub ciemny. Działa wszędzie.",
+      themeHint: "Jasny, ciemny lub jak w urządzeniu. Działa wszędzie.",
       light: "Jasny",
       dark: "Ciemny",
+      system: "Systemowy",
       language: "Język",
       languageHint: "Język interfejsu i treści.",
     },

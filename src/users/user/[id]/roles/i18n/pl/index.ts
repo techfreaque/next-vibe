@@ -3,6 +3,13 @@ export const translations: typeof enTranslations = {
   category: "Użytkownicy",
 
   roles: {
+    widget: {
+      added: "Nadano rolę: {{role}}",
+      removed: "Odebrano rolę: {{role}}",
+      removeWarning:
+        "Użytkownik traci wszystkie uprawnienia tej roli przy następnym żądaniu.",
+      addHint: "Działa od następnego żądania użytkownika.",
+    },
     post: {
       title: "Dodaj rolę użytkownika",
       titleShort: "Dodaj rolę",

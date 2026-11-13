@@ -11,6 +11,11 @@ export const dateSchema = z
     if (val instanceof Date) {
       return val;
     }
+    // Tolerate a JSON-quoted ISO string ("\"2026-01-05T00:00:00.000Z\"") from
+    // older clients that JSON.stringify'd Dates into GET query params.
+    if (typeof val === "string" && val.length > 1 && val.startsWith('"')) {
+      return new Date(val.replaceAll('"', ""));
+    }
     return new Date(val);
   });
 

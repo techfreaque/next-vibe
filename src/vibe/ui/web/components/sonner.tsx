@@ -6,8 +6,9 @@ import type { ToasterProps } from "sonner";
 import { Toaster as Sonner } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps): JSX.Element => {
-  const { theme: rawTheme = "system" } = useTheme();
-  const theme = rawTheme as "system" | "light" | "dark";
+  const { theme: rawTheme } = useTheme();
+  const theme: ToasterProps["theme"] =
+    rawTheme === "light" || rawTheme === "dark" ? rawTheme : "system";
   return (
     <Sonner
       theme={theme}

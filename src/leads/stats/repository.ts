@@ -20,7 +20,7 @@ import {
 } from "drizzle-orm";
 import type { ChartType } from "next-vibe/core/core-utils/stats-filtering.schema";
 import {
-  getDateRangeFromPreset,
+  resolveStatsDateRange,
   TimePeriod,
 } from "next-vibe/core/core-utils/stats-filtering.schema";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -145,8 +145,12 @@ export class LeadStatsRepository {
     try {
       logger.debug("Getting leads stats");
 
-      // Get date range from preset
-      const dateRange = getDateRangeFromPreset(query.dateRangePreset);
+      // Explicit dateFrom/dateTo (custom range) win over the preset
+      const dateRange = resolveStatsDateRange(
+        query.dateRangePreset,
+        query.dateFrom,
+        query.dateTo,
+      );
       dateFrom = dateRange.from;
       dateTo = dateRange.to;
 
@@ -226,6 +230,18 @@ export class LeadStatsRepository {
     // Date range filter
     conditions.push(gte(leads.createdAt, dateFrom));
     conditions.push(lte(leads.createdAt, dateTo));
+    if (query.createdAfter) {
+      conditions.push(gte(leads.createdAt, query.createdAfter));
+    }
+    if (query.createdBefore) {
+      conditions.push(lte(leads.createdAt, query.createdBefore));
+    }
+    if (query.updatedAfter) {
+      conditions.push(gte(leads.updatedAt, query.updatedAfter));
+    }
+    if (query.updatedBefore) {
+      conditions.push(lte(leads.updatedAt, query.updatedBefore));
+    }
 
     // Status filter
     if (query.status && query.status !== LeadStatusFilter.ALL) {

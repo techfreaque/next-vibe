@@ -11,32 +11,40 @@ import type { StyleType } from "../utils/style-type";
 
 export const THEME_COOKIE_NAME = "theme_v2";
 
-/** Mirrors the resolved theme to a non-expiring cookie so SSR can read it.
- *  Cookie is the single source of truth; localStorage is kept in sync. */
+/** Theme choice: an explicit mode, or "system" to follow the OS setting. */
+export type ThemePreference = "light" | "dark" | "system";
+
+function isThemePreference(
+  value: string | null | undefined,
+): value is ThemePreference {
+  return value === "light" || value === "dark" || value === "system";
+}
+
+/** Mirrors the theme CHOICE (light/dark/system) to a non-expiring cookie so
+ *  SSR can read it. next-themes owns localStorage; the head script resolves
+ *  "system" via prefers-color-scheme before first paint. */
 function ThemeCookieSync(): null {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const logger = useLogger();
   useEffect(() => {
-    // Sanitize legacy "system" value in localStorage
-    void storage.getItem("theme_v2", logger).then((stored) => {
-      if (stored !== null && stored !== "light" && stored !== "dark") {
+    // Sanitize unknown legacy values in localStorage
+    void storage.getItem(THEME_COOKIE_NAME, logger).then((stored) => {
+      if (stored !== null && !isThemePreference(stored)) {
         setTheme("dark");
       }
       return undefined;
     });
-    if (!resolvedTheme) {
+    if (!isThemePreference(theme)) {
       return;
     }
-    // Keep cookie and localStorage in sync - cookie wins on SSR, localStorage is just next-themes' internal state
-    void setCookie(THEME_COOKIE_NAME, resolvedTheme, logger);
-    void storage.setItem("theme_v2", resolvedTheme, logger);
-  }, [resolvedTheme, setTheme, logger]);
+    void setCookie(THEME_COOKIE_NAME, theme, logger);
+  }, [theme, setTheme, logger]);
   return null;
 }
 
 export type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: "light" | "dark" | "system";
+  defaultTheme?: ThemePreference;
   storageKey?: string;
 } & StyleType;
 
@@ -51,7 +59,7 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       defaultTheme={defaultTheme}
-      enableSystem={false}
+      enableSystem={true}
       disableTransitionOnChange={true}
       storageKey={storageKey}
       attribute={attribute}
@@ -65,7 +73,11 @@ export function ThemeProvider({
 
 export interface UseThemeToggleReturn {
   onToggleTheme: () => void;
+  /** Resolved theme actually shown (system already mapped to light/dark). */
   theme: "light" | "dark";
+  /** The stored choice, including "system". */
+  preference: ThemePreference;
+  setPreference: (preference: ThemePreference) => void;
   isMounted: boolean;
 }
 
@@ -81,8 +93,11 @@ function useIsMounted(): boolean {
 }
 
 export function useThemeToggle(): UseThemeToggleReturn {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme, theme: storedTheme } = useTheme();
   const theme = resolvedTheme === "dark" ? "dark" : "light";
+  const preference: ThemePreference = isThemePreference(storedTheme)
+    ? storedTheme
+    : theme;
   const isMounted = useIsMounted();
 
   function onToggleTheme(): void {
@@ -92,6 +107,8 @@ export function useThemeToggle(): UseThemeToggleReturn {
   return {
     onToggleTheme,
     theme,
+    preference,
+    setPreference: setTheme,
     isMounted,
   };
 }

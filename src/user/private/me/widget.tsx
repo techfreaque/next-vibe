@@ -310,15 +310,15 @@ function isVisualPlatform(platform: Platform): boolean {
 }
 
 /**
- * Two-option theme switch. Reuses the exact same theme state as the top-bar and
- * nav toggles (useThemeToggle → next-themes), so flipping it here updates every
- * other theme control instantly and vice-versa. Theme is light/dark only by
- * platform design (enableSystem=false), so onToggleTheme flips between the two.
+ * Three-option theme switch: light, dark, or follow the OS. Reuses the exact
+ * same theme state as the top-bar and nav toggles (useThemeToggle ->
+ * next-themes), so a change here updates every other theme control instantly
+ * and vice-versa.
  */
 function ThemeSegmented(): JSX.Element {
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof meDefinition.POST>();
-  const { theme, onToggleTheme, isMounted } = useThemeToggle();
+  const { preference, setPreference, isMounted } = useThemeToggle();
   const options = [
     {
       key: "light" as const,
@@ -330,6 +330,11 @@ function ThemeSegmented(): JSX.Element {
       icon: <Moon className="h-3.5 w-3.5" />,
       label: t("widget.appearance.dark"),
     },
+    {
+      key: "system" as const,
+      icon: <Monitor className="h-3.5 w-3.5" />,
+      label: t("widget.appearance.system"),
+    },
   ];
   return (
     <Div
@@ -337,7 +342,7 @@ function ThemeSegmented(): JSX.Element {
       suppressHydrationWarning
     >
       {options.map((opt) => {
-        const active = isMounted && theme === opt.key;
+        const active = isMounted && preference === opt.key;
         return (
           <Button
             key={`${opt.key}-${locale}`}
@@ -346,8 +351,8 @@ function ThemeSegmented(): JSX.Element {
             size="sm"
             suppressHydrationWarning
             onClick={(): void => {
-              if (theme !== opt.key) {
-                onToggleTheme();
+              if (preference !== opt.key) {
+                setPreference(opt.key);
               }
             }}
             className={cn(
@@ -1056,6 +1061,34 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
           <ChevronLeft className={iconClass} />
           {t("widget.nav.back")}
         </Button>
+      )}
+
+      {/* ── VERIFY NUDGE (never blocks anything, just asks) ── */}
+      {profile && !profile.emailVerified && (
+        <Div className="flex flex-col gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <Div className="flex min-w-0 items-start gap-2.5">
+            <Mail className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+            <Div className="flex min-w-0 flex-col gap-0.5">
+              <Span className="text-sm font-medium text-foreground">
+                {t("widget.verifyNudge.title")}
+              </Span>
+              <Span className="text-xs leading-relaxed text-foreground/80">
+                {t("widget.verifyNudge.description", { email: profile.email })}
+              </Span>
+            </Div>
+          </Div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-9 shrink-0"
+            onClick={(): void => {
+              navigate(verifyEmailDef.POST, {});
+            }}
+          >
+            {t("widget.verifyNudge.action")}
+          </Button>
+        </Div>
       )}
 
       {/* ── IDENTITY HERO ── */}

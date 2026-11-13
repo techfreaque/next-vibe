@@ -40,6 +40,19 @@ const { POST } = createEndpoint({
   tags: ["adminAdd.post.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        // The admin user detail shows the wallet: refresh it after a grant
+        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
+        const viewDefinition = await import("@/users/view/definition");
+        await apiClient.refetchEndpoint(viewDefinition.GET, data.logger, {
+          requestData: { userId: data.requestData.targetUserId },
+        });
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: AdminAddCreditsContainer,
     usage: { request: "data", response: true } as const,

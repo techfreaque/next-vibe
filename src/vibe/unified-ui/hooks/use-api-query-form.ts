@@ -13,6 +13,7 @@ import {
   fail,
   success,
 } from "../../core/route/response.schema";
+import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
@@ -253,9 +254,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // Convert object to FormQueryParams
         const safeParams: FormQueryParams = {};
         for (const [key, value] of Object.entries(
-          params as {
-            [key: string]: string | number | boolean | null | undefined;
-          },
+          params as { [key: string]: WidgetData },
         )) {
           if (
             typeof value === "string" ||
@@ -263,6 +262,14 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             typeof value === "boolean"
           ) {
             safeParams[key] = value;
+          } else if (value instanceof Date) {
+            // JSON.stringify(date) wraps it in quotes ("\"2026-...\""), which
+            // the query string then carries verbatim and dateSchema parses to
+            // Invalid Date - every date filter on a GET form was silently
+            // dropped. Store the bare ISO string; skip invalid dates.
+            if (!Number.isNaN(value.getTime())) {
+              safeParams[key] = value.toISOString();
+            }
           } else if (value !== undefined && value !== null) {
             // Convert other types to string safely
             if (typeof value === "object") {

@@ -230,3 +230,40 @@ export function getDateRangeFromPreset(preset: DateRangePreset): {
       };
   }
 }
+
+/**
+ * Resolve the queried window for a stats endpoint.
+ * An explicit custom range (CUSTOM preset, or any from/to supplied) wins over
+ * the preset so date pickers actually filter; otherwise the preset applies.
+ * Both ends snap to whole UTC days (date pickers send UTC-midnight dates), so
+ * `to` includes that whole day; an inverted range is swapped.
+ */
+export function resolveStatsDateRange(
+  preset: DateRangePreset,
+  from: Date | undefined,
+  to: Date | undefined,
+): { from: Date; to: Date } {
+  const validFrom = from && !Number.isNaN(from.getTime()) ? from : undefined;
+  const validTo = to && !Number.isNaN(to.getTime()) ? to : undefined;
+  if (!validFrom && !validTo) {
+    return getDateRangeFromPreset(preset);
+  }
+  // A lone bound gets a 30-day window on its open side (to = now when only
+  // `from` is set, from = to - 30 days when only `to` is set).
+  const resolvedFrom = new Date(
+    validFrom ??
+      (validTo ? validTo.getTime() : Date.now()) - 30 * 24 * 60 * 60 * 1000,
+  );
+  resolvedFrom.setUTCHours(0, 0, 0, 0);
+  const resolvedTo = new Date(validTo ?? new Date());
+  resolvedTo.setUTCHours(23, 59, 59, 999);
+  if (resolvedFrom <= resolvedTo) {
+    return { from: resolvedFrom, to: resolvedTo };
+  }
+  // Inverted: swap and re-normalize both ends to whole days.
+  const swappedFrom = new Date(resolvedTo);
+  swappedFrom.setUTCHours(0, 0, 0, 0);
+  const swappedTo = new Date(resolvedFrom);
+  swappedTo.setUTCHours(23, 59, 59, 999);
+  return { from: swappedFrom, to: swappedTo };
+}

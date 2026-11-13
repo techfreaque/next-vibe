@@ -8,7 +8,10 @@ import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-stor
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
-import { ThemeProvider } from "next-vibe/ui/components/theme-provider";
+import {
+  type ThemePreference,
+  ThemeProvider,
+} from "next-vibe/ui/components/theme-provider";
 import { Toaster } from "next-vibe/ui/components/toaster";
 import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import { QueryProvider } from "next-vibe/unified-ui/hooks/query-provider";
@@ -23,7 +26,7 @@ export function RootProviders({
   children,
 }: {
   locale: CountryLanguage;
-  theme?: "light" | "dark";
+  theme?: ThemePreference;
   availability: AgentEnvAvailability;
   children: ReactNode;
 }): JSX.Element {
@@ -35,7 +38,7 @@ export function RootProviders({
         <ThemeProvider
           attribute="class"
           defaultTheme={theme ?? "dark"}
-          enableSystem={false}
+          enableSystem={true}
         >
           <TranslationProvider currentLocale={locale}>
             <AgentAvailabilityProvider availability={availability}>

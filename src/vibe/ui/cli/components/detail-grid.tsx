@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import type { JSX } from "react";
+import { isValidElement, type JSX } from "react";
 
 import type {
   DetailFieldProps,
@@ -25,9 +25,15 @@ export function DetailField({ label, value }: DetailFieldProps): JSX.Element {
   return (
     <Box gap={1}>
       <Text dimColor>{label}:</Text>
-      <Text>
-        {value !== undefined && value !== null ? String(value) : "\u2014"}
-      </Text>
+      {isValidElement(value) ? (
+        value
+      ) : (
+        <Text>
+          {value !== undefined && value !== null && value !== false
+            ? String(value)
+            : "\u2014"}
+        </Text>
+      )}
     </Box>
   );
 }

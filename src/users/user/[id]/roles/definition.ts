@@ -7,7 +7,6 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
@@ -17,8 +16,9 @@ import {
   UserRole,
   UserRoleDB,
 } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   requestUrlPathParamsField,
   responseField,
@@ -26,7 +26,15 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { USER_ROLE_ADD_ALIAS, USER_ROLE_REMOVE_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
+
+const UserRoleAddContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserRoleAddContainer })),
+);
+const UserRoleRemoveContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UserRoleRemoveContainer })),
+);
 
 /**
  * Add Role Endpoint Definition (POST)
@@ -35,6 +43,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["users", "user", "[id]", "roles"],
+  aliases: [USER_ROLE_ADD_ALIAS] as const,
   title: "roles.post.title" as const,
   titleShort: "roles.post.titleShort" as const,
   description: "roles.post.description" as const,
@@ -44,12 +53,24 @@ const { POST } = createEndpoint({
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "roles.post.container.title" as const,
-    description: "roles.post.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data&urlPathParams", response: true },
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        // The admin user detail lists roles: refresh it
+        const [{ apiClient }, viewDefinition] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../../../view/definition"),
+        ]);
+        await apiClient.refetchEndpoint(viewDefinition.GET, data.logger, {
+          requestData: { userId: data.pathParams.id },
+        });
+      },
+    },
+  },
+
+  fields: customWidgetObject({
+    render: UserRoleAddContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {
@@ -177,6 +198,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["users", "user", "[id]", "roles"],
+  aliases: [USER_ROLE_REMOVE_ALIAS] as const,
   title: "roles.delete.title",
   titleShort: "roles.delete.titleShort" as const,
   description: "roles.delete.description" as const,
@@ -186,12 +208,24 @@ const { DELETE } = createEndpoint({
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "roles.delete.container.title" as const,
-    description: "roles.delete.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data&urlPathParams", response: true },
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        // The admin user detail lists roles: refresh it
+        const [{ apiClient }, viewDefinition] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../../../view/definition"),
+        ]);
+        await apiClient.refetchEndpoint(viewDefinition.GET, data.logger, {
+          requestData: { userId: data.pathParams.id },
+        });
+      },
+    },
+  },
+
+  fields: customWidgetObject({
+    render: UserRoleRemoveContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMS ===
       id: requestUrlPathParamsField(scopedTranslation, {

@@ -1,554 +1,176 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Statystyki użytkowników",
-  titleShort: "Statystyki użytkowników",
-  description: "Kompleksowe analizy i statystyki użytkowników",
+  title: "Liczby biznesowe",
+  titleShort: "Statystyki",
+  description:
+    "Rejestracje, aktywni i płacący użytkownicy, MRR, przychód, wydane kredyty, konwersja z rejestracji do płatności i retencja D7. Każda liczba względem poprzedniego okresu, plus trend, kanały i najwięksi użytkownicy.",
   category: "Użytkownicy",
   tag: "Statystyki",
-  container: {
-    title: "Panel statystyk użytkowników",
-    description: "Wyświetl kompleksowe analizy i statystyki użytkowników",
-  },
-  actions: {
-    refresh: "Odśwież",
-    refreshing: "Odświeżanie...",
-  },
-  basicFilters: {
-    title: "Podstawowe filtry",
-    description: "Filtruj użytkowników według statusu i roli",
-  },
-  subscriptionFilters: {
-    title: "Filtry subskrypcji",
-    description: "Filtruj według subskrypcji i płatności",
-  },
-  locationFilters: {
-    title: "Filtry lokalizacji",
-    description: "Filtruj według kraju i języka",
-  },
-  timePeriodOptions: {
-    title: "Opcje okresu czasu",
-    description: "Skonfiguruj okres czasu i ustawienia wykresów",
-  },
-  sections: {
-    filterOptions: {
-      title: "Opcje filtrów",
-      description: "Skonfiguruj filtry dla statystyk użytkowników",
-    },
-  },
   fields: {
-    status: {
-      label: "Filtr statusu",
-      description: "Filtruj statystyki według statusu użytkownika",
+    range: {
+      label: "Okres",
+      description:
+        "Okres raportu, porównany z okresem tej samej długości tuż przed nim",
     },
-    role: {
-      label: "Filtr ról",
-      description: "Filtruj statystyki według roli użytkownika",
-    },
-    country: {
-      label: "Filtr kraju",
-      description: "Filtruj statystyki według kraju",
-      placeholder: "Wybierz kraj...",
-    },
-    language: {
-      label: "Filtr języka",
-      description: "Filtruj statystyki według języka",
-      placeholder: "Wybierz język...",
-    },
-    search: {
-      label: "Wyszukaj",
-      description: "Wyszukaj użytkowników do statystyk",
-      placeholder: "Wprowadź wyszukiwany termin...",
-    },
-    chartType: {
-      label: "Typ wykresu",
-      description: "Wybierz typ wykresu do wyświetlenia",
-    },
-    dateRangePreset: {
-      label: "Szablon zakresu dat",
-      description: "Wybierz predefiniowany zakres dat",
-    },
-    dateFrom: {
+    from: {
       label: "Od",
-      description: "Początek własnego zakresu. Zastępuje szablon.",
+      description: "Pierwszy dzień (UTC). Nadpisuje początek okresu",
     },
-    dateTo: {
+    to: {
       label: "Do",
-      description: "Koniec własnego zakresu. Zastępuje szablon.",
+      description: "Ostatni dzień (UTC). Nadpisuje koniec okresu",
     },
-    includeComparison: {
-      label: "Uwzględnij porównanie",
-      description: "Uwzględnij porównanie z poprzednim okresem",
+    granularity: {
+      label: "Podział wykresu",
+      description: "Dzień, tydzień lub miesiąc. Auto dobiera według długości",
     },
-    timePeriod: {
-      label: "Okres czasu",
-      description: "Wybierz okres czasu dla statystyk",
-    },
-    subscriptionStatus: {
-      label: "Status subskrypcji",
-      description: "Filtruj według statusu subskrypcji",
-    },
-    paymentMethod: {
-      label: "Metoda płatności",
-      description: "Filtruj według metody płatności",
+    includeInternal: {
+      label: "Uwzględnij adminów",
+      description: "Licz wewnętrzne konta adminów i ich płatności",
     },
   },
   response: {
-    overviewStats: {
-      title: "Statystyki przeglądowe",
-      description: "Przegląd ogólnych statystyk użytkowników",
-      totalUsers: {
-        label: "Łącznie użytkowników",
-      },
-      activeUsers: {
-        label: "Aktywni użytkownicy",
-      },
-      inactiveUsers: {
-        label: "Nieaktywni użytkownicy",
-      },
-      newUsers: {
-        label: "Nowi użytkownicy",
-      },
+    period: "Okres",
+    kpis: "Wskaźniki",
+    series: "Szereg czasowy",
+    channels: "Kanały rejestracji",
+    revenueByCurrency: "Przychód wg waluty",
+    subscriptionsByStatus: "Subskrypcje wg statusu",
+    topSpenders: "Najwięksi użytkownicy",
+    generatedAt: "Wygenerowano",
+  },
+  enums: {
+    range: {
+      last7Days: "Ostatnie 7 dni",
+      last30Days: "Ostatnie 30 dni",
+      last90Days: "Ostatnie 90 dni",
+      last12Months: "Ostatnie 12 miesięcy",
+      thisMonth: "Ten miesiąc",
+      lastMonth: "Poprzedni miesiąc",
+      allTime: "Od początku",
+      custom: "Własne daty",
     },
-    emailStats: {
-      title: "Statystyki e-mail",
-      description: "Statystyki weryfikacji e-mail użytkowników",
-      emailVerifiedUsers: {
-        label: "Zweryfikowane e-maile",
-      },
-      emailUnverifiedUsers: {
-        label: "Niezweryfikowane e-maile",
-      },
-      verificationRate: {
-        label: "Wskaźnik weryfikacji",
-      },
+    granularity: {
+      auto: "Auto",
+      day: "Dzień",
+      week: "Tydzień",
+      month: "Miesiąc",
     },
-    profileStats: {
-      title: "Statystyki profili",
-      description: "Statystyki kompletności profili użytkowników",
-      complete: {
-        title: "Kompletność profilu",
-        description: "Szczegółowe metryki kompletności profilu",
-        usersWithPhone: {
-          content: "Użytkownicy z numerem telefonu",
-        },
-        usersWithBio: {
-          content: "Użytkownicy z biografią",
-        },
-        usersWithWebsite: {
-          content: "Użytkownicy ze stroną internetową",
-        },
-        usersWithJobTitle: {
-          content: "Użytkownicy ze stanowiskiem",
-        },
-        usersWithImage: {
-          content: "Użytkownicy ze zdjęciem profilowym",
-        },
-        completionRate: {
-          content: "Wskaźnik kompletności profilu",
-        },
-      },
-    },
-    subscriptionStats: {
-      title: "Statystyki subskrypcji",
-      description: "Statystyki dystrybucji subskrypcji użytkowników",
-      activeSubscriptions: {
-        label: "Aktywne",
-      },
-      canceledSubscriptions: {
-        label: "Anulowane",
-      },
-      expiredSubscriptions: {
-        label: "Wygasłe",
-      },
-      noSubscription: {
-        label: "Brak subskrypcji",
-      },
-      subscriptionChart: {
-        label: "Dystrybucja subskrypcji",
-        description: "Wizualny podział statusów subskrypcji",
-      },
-    },
-    paymentStats: {
-      title: "Statystyki płatności",
-      description: "Statystyki przychodów i transakcji",
-      totalRevenue: {
-        label: "Całkowity przychód",
-      },
-      transactionCount: {
-        label: "Transakcje",
-      },
-      averageOrderValue: {
-        label: "Śr. wart. zamówienia",
-      },
-      refundRate: {
-        label: "Wskaźnik zwrotów",
-      },
-    },
-    roleStats: {
-      title: "Statystyki ról",
-      description: "Statystyki dystrybucji ról użytkowników",
-      publicUsers: {
-        label: "Publiczni",
-      },
-      customerUsers: {
-        label: "Klienci",
-      },
-      partnerAdminUsers: {
-        label: "Admini partnerów",
-      },
-      partnerEmployeeUsers: {
-        label: "Personel partnerów",
-      },
-      adminUsers: {
-        label: "Admini",
-      },
-      roleChart: {
-        label: "Dystrybucja ról",
-        description: "Wizualny podział użytkowników według roli",
-      },
-    },
-    timeStats: {
-      title: "Statystyki czasowe",
-      description: "Statystyki tworzenia użytkowników i wzrostu w czasie",
-      usersCreatedToday: {
-        label: "Dzisiaj",
-      },
-      usersCreatedThisWeek: {
-        label: "Ten tydzień",
-      },
-      usersCreatedThisMonth: {
-        label: "Ten miesiąc",
-      },
-      usersCreatedLastMonth: {
-        label: "Zeszły miesiąc",
-      },
-      growthRate: {
-        label: "Wskaźnik wzrostu",
-      },
-    },
-    companyStats: {
-      title: "Statystyki firm",
-      description: "Statystyki użytkowników związane z firmami",
-      uniqueCompanies: {
-        content: "Unikalne firmy",
-      },
-    },
-    // Keep the flat structure for backward compatibility
-    totalUsers: {
-      content: "Łączna liczba użytkowników",
-    },
-    activeUsers: {
-      content: "Aktywni użytkownicy",
-    },
-    inactiveUsers: {
-      content: "Nieaktywni użytkownicy",
-    },
-    newUsers: {
-      content: "Nowi użytkownicy",
-    },
-    emailVerifiedUsers: {
-      content: "Użytkownicy z weryfikowanym e-mailem",
-    },
-    emailUnverifiedUsers: {
-      content: "Użytkownicy z nieweryfikowanym e-mailem",
-    },
-    verificationRate: {
-      content: "Wskaźnik weryfikacji e-mail",
-    },
-    usersWithPhone: {
-      content: "Użytkownicy z numerem telefonu",
-    },
-    usersWithBio: {
-      content: "Użytkownicy z biografią",
-    },
-    usersWithWebsite: {
-      content: "Użytkownicy ze stroną internetową",
-    },
-    usersWithJobTitle: {
-      content: "Użytkownicy ze stanowiskiem pracy",
-    },
-    usersWithImage: {
-      content: "Użytkownicy ze zdjęciem profilowym",
-    },
-    usersWithStripeId: {
-      content: "Użytkownicy z identyfikatorem Stripe",
-    },
-    usersWithoutStripeId: {
-      content: "Użytkownicy bez identyfikatora Stripe",
-    },
-    stripeIntegrationRate: {
-      content: "Wskaźnik integracji ze Stripe",
-    },
-    usersWithLeadId: {
-      content: "Użytkownicy z identyfikatorem leada",
-    },
-    usersWithoutLeadId: {
-      content: "Użytkownicy bez identyfikatora leada",
-    },
-    leadAssociationRate: {
-      content: "Wskaźnik powiązania z leadami",
-    },
-    publicUsers: {
-      content: "Użytkownicy publiczni",
-    },
-    customerUsers: {
-      content: "Użytkownicy-klienci",
-    },
-    partnerAdminUsers: {
-      content: "Administratorzy partnerów",
-    },
-    partnerEmployeeUsers: {
-      content: "Pracownicy partnerów",
-    },
-    adminUsers: {
-      content: "Administratorzy",
-    },
-    uniqueCompanies: {
-      content: "Unikalne firmy",
-    },
-    usersCreatedToday: {
-      content: "Użytkownicy utworzeni dzisiaj",
-    },
-    usersCreatedThisWeek: {
-      content: "Użytkownicy utworzeni w tym tygodniu",
-    },
-    usersCreatedThisMonth: {
-      content: "Użytkownicy utworzeni w tym miesiącu",
-    },
-    usersCreatedLastMonth: {
-      content: "Użytkownicy utworzeni w zeszłym miesiącu",
-    },
-    growthRate: {
-      content: "Wskaźnik wzrostu",
-    },
-    leadToUserConversionRate: {
-      content: "Wskaźnik konwersji lead-użytkownik",
-    },
-    retentionRate: {
-      content: "Wskaźnik retencji użytkowników",
-    },
-    generatedAt: {
-      content: "Statystyki wygenerowane o",
-    },
-    growthMetrics: {
-      title: "Metryki wzrostu",
-      description: "Metryki wzrostu i konwersji użytkowników",
-      growthChart: {
-        label: "Wzrost użytkowników w czasie",
-        description: "Wizualna reprezentacja trendów tworzenia użytkowników",
-      },
-    },
-    performanceRates: {
-      title: "Wskaźniki wydajności",
-      description: "Metryki wydajności i konwersji użytkowników",
-      growthRate: {
-        label: "Wskaźnik wzrostu",
-      },
-      leadToUserConversionRate: {
-        label: "Konwersja leadów",
-      },
-      retentionRate: {
-        label: "Wskaźnik retencji",
-      },
-    },
-    businessInsights: {
-      title: "Wgląd biznesowy",
-      description: "Business intelligence i analityka",
-      uniqueCompanies: {
-        label: "Unikalne firmy",
-      },
-      generatedAt: {
-        label: "Wygenerowano",
-      },
+  },
+  kpi: {
+    revenue: "Przychód",
+    revenueHint: "Udane płatności, USD",
+    refundsHint: "{{amount}} zwrócono",
+    mrr: "MRR",
+    mrrHint: "{{active}} aktywnych subskrypcji, {{pastDue}} zaległych",
+    payingUsers: "Płacący",
+    payingAllTimeHint: "{{count}} zapłaciło kiedykolwiek",
+    creditsSpent: "Wydane kredyty",
+    creditsHint: "około {{usd}} użycia",
+    newUsers: "Rejestracje",
+    totalUsersHint: "{{count}} użytkowników łącznie",
+    activeUsers: "Aktywni",
+    anonymousHint: "+{{count}} anonimowych z wydatkami",
+    signupToPaid: "Rejestracja do płatności",
+    ratioHint: "{{converted}} z {{cohort}} nowych zapłaciło",
+    retentionD7: "Retencja D7",
+    retentionHint: "{{converted}} z {{cohort}} wróciło po 7. dniu",
+    activeSubscribers: "Aktywni subskrybenci",
+    pastDue: "Zaległe",
+    totalUsers: "Użytkownicy łącznie",
+    payingAllTime: "Zapłacili kiedykolwiek",
+    revenueAllTime: "Przychód łącznie",
+    refunds: "Zwroty",
+    anonymousActive: "Anonimowi z wydatkami",
+  },
+  series: {
+    signups: "Rejestracje",
+    activeUsers: "Aktywni",
+    payingUsers: "Płacący",
+    revenueUsd: "Przychód",
+    creditsSpent: "Kredyty",
+  },
+  sections: {
+    trend: "Trend",
+    channels: "Kanały rejestracji",
+    subscriptions: "Subskrypcje teraz",
+    currencies: "Przychód wg waluty",
+    topSpenders: "Najwięcej wydali w okresie",
+  },
+  table: {
+    channel: "Kanał",
+    signups: "Rejestracje",
+    paying: "Zapłacili",
+    conversion: "Konw.",
+    user: "Użytkownik",
+    creditsSpent: "Wydane kredyty",
+    lifetimePaid: "Zapłacono łącznie",
+  },
+  widget: {
+    times: "{{count}}x",
+    loading: "Liczę...",
+    users: "Użytkownicy",
+    refresh: "Odśwież",
+    new: "nowe",
+    noData: "Brak danych w tym okresie.",
+    chartTotal: "Razem {{total}}",
+    period:
+      "{{from}} do {{to}} ({{days}} dni, UTC). Zmiany względem {{days}} dni wcześniej.",
+    definitions:
+      "Aktywny = wydał kredyty (własny lub powiązany portfel leada). Płacący = udana płatność w okresie. Przychód w USD po stałym kursie. MRR = trwające subskrypcje wycenione ostatnią płatnością. Konta adminów pominięte, chyba że uwzględnione wyżej.",
+    text: {
+      header: "{{from}} do {{to}} ({{days}} dni, UTC)",
+      metric: "Wskaźnik",
+      current: "Teraz",
+      previous: "Wcześniej",
+      change: "Zmiana",
+      bucket: "Okres",
+      paying: "{{count}} zapłaciło",
+      footer:
+        "Okresy: --range=enums.range.last7Days|last90Days|last12Months|allTime. Użytkownicy: vibe users-list",
     },
   },
   errors: {
     validation: {
-      title: "Walidacja nie powiodła się",
-      description: "Podano nieprawidłowe parametry statystyk",
+      title: "Nieprawidłowe zapytanie",
+      description: "Sprawdź okres i daty",
     },
     unauthorized: {
-      title: "Nieautoryzowany dostęp",
-      description: "Musisz być zalogowany, aby wyświetlić statystyki",
+      title: "Wymagane logowanie",
+      description: "Zaloguj się, aby zobaczyć statystyki",
     },
     forbidden: {
-      title: "Dostęp zabroniony",
-      description: "Nie masz uprawnień do wyświetlania statystyk",
+      title: "Tylko dla adminów",
+      description: "Potrzebujesz roli admina",
     },
     notFound: {
-      title: "Statystyki nie zostały znalezione",
-      description: "Żądane statystyki nie mogły zostać znalezione",
+      title: "Brak danych",
+      description: "Nic do pokazania w tym okresie",
     },
-    conflict: {
-      title: "Błąd konfliktu",
-      description:
-        "Nie można wygenerować statystyk z powodu istniejących konfliktów",
+    server: {
+      title: "Nie udało się policzyć statystyk",
+      description: "Serwer nie policzył statystyk użytkowników",
     },
     network: {
       title: "Błąd sieci",
-      description: "Nie można połączyć się z serwerem",
+      description: "Brak połączenia z serwerem",
+    },
+    unknown: {
+      title: "Nieoczekiwany błąd",
+      description: "Coś poszło nie tak przy liczeniu",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",
-      description: "Masz niezapisane zmiany, które zostaną utracone",
+      description: "Masz niezapisane zmiany",
     },
-    server: {
-      title: "Błąd serwera",
-      description: "Nie można wygenerować statystyk z powodu błędu serwera",
-      detail: "Nie udało się zbudować statystyk użytkowników: {{error}}",
+    conflict: {
+      title: "Konflikt",
+      description: "Żądanie koliduje z bieżącymi danymi",
     },
-    unknown: {
-      title: "Nieznany błąd",
-      description: "Wystąpił nieoczekiwany błąd podczas generowania statystyk",
-    },
-  },
-  enums: {
-    subscriptionStatusFilter: {
-      all: "Wszystkie",
-      active: "Aktywne",
-      trialing: "Okres próbny",
-      pastDue: "Zaległy",
-      canceled: "Anulowane",
-      unpaid: "Niezapłacone",
-      paused: "Wznowione",
-      noSubscription: "Brak subskrypcji",
-    },
-    paymentMethodFilter: {
-      all: "Wszystkie",
-      card: "Karta",
-      bankTransfer: "Transfer bankowy",
-      paypal: "PayPal",
-      applePay: "Apple Pay",
-      googlePay: "Google Pay",
-      sepaDebit: "Polecenie zapłaty SEPA",
-      crypto: "Kryptowaluta",
-      noPaymentMethod: "Brak metody płatności",
-    },
-  },
-  stats: {
-    enums: {
-      subscriptionStatusFilter: {
-        all: "Wszystkie",
-        active: "Aktywne",
-        trialing: "Okres próbny",
-        pastDue: "Zaległy",
-        canceled: "Anulowane",
-        unpaid: "Niezapłacone",
-        paused: "Wznowione",
-        noSubscription: "Brak subskrypcji",
-      },
-      paymentMethodFilter: {
-        all: "Wszystkie",
-        card: "Karta",
-        bankTransfer: "Transfer bankowy",
-        paypal: "PayPal",
-        applePay: "Apple Pay",
-        googlePay: "Google Pay",
-        sepaDebit: "Polecenie zapłaty SEPA",
-        crypto: "Kryptowaluta",
-        noPaymentMethod: "Brak metody płatności",
-      },
-    },
-    timePeriod: {
-      day: "Dzień",
-      week: "Tydzień",
-      month: "Miesiąc",
-      quarter: "Kwartał",
-      year: "Rok",
-    },
-    dateRange: {
-      today: "Dzisiaj",
-      yesterday: "Wczoraj",
-      last7Days: "Ostatnie 7 dni",
-      last30Days: "Ostatnie 30 dni",
-      last90Days: "Ostatnie 90 dni",
-      thisWeek: "Ten tydzień",
-      lastWeek: "Ostatni tydzień",
-      thisMonth: "Ten miesiąc",
-      lastMonth: "Ostatni miesiąc",
-      thisQuarter: "Ten kwartał",
-      lastQuarter: "Ostatni kwartał",
-      thisYear: "Ten rok",
-      lastYear: "Ostatni rok",
-      custom: "Niestandardowy",
-    },
-    chartType: {
-      line: "Wykres liniowy",
-      bar: "Wykres słupkowy",
-      area: "Wykres obszarowy",
-      pie: "Wykres kołowy",
-      donut: "Wykres pierścieniowy",
-    },
-  },
-  list: {
-    enums: {
-      userStatusFilter: {
-        all: "Wszystkie",
-        active: "Aktywny",
-        inactive: "Nieaktywny",
-        pending: "Oczekujący",
-        suspended: "Zawieszony",
-        emailVerified: "E-mail zweryfikowany",
-        emailUnverified: "E-mail niezweryfikowany",
-      },
-      userRoleFilter: {
-        all: "Wszystkie",
-        user: "Użytkownik",
-        public: "Publiczny",
-        customer: "Klient",
-        moderator: "Moderator",
-        partnerAdmin: "Administrator Partnera",
-        partnerEmployee: "Pracownik Partnera",
-        admin: "Administrator",
-        superAdmin: "Super Administrator",
-      },
-    },
-  },
-  countries: {
-    global: "Globalny",
-    de: "Niemcy",
-    pl: "Polska",
-    us: "Stany Zjednoczone",
-  },
-  languages: {
-    en: "Angielski",
-    de: "Niemiecki",
-    pl: "Polski",
   },
   success: {
-    title: "Statystyki zostały wygenerowane pomyślnie",
-    description: "Statystyki użytkowników zostały wygenerowane pomyślnie",
-  },
-  widget: {
-    headerTitle: "Statystyki u\u017Cytkownik\u00F3w",
-    refresh: "Od\u015Bwie\u017C",
-    labelTotalUsers: "\u0141\u0105cznie u\u017Cytkownik\u00F3w",
-    labelActiveUsers: "Aktywni u\u017Cytkownicy",
-    labelNewToday: "Nowi dzi\u015B",
-    labelNewThisWeek: "Nowi w tym tygodniu",
-    labelNewThisMonth: "Nowi w tym miesi\u0105cu",
-    labelTotalRevenue: "Ca\u0142kowity prych\u00F3d",
-    labelAvgRevenuePerUser: "\u015Aredn. prych\u00F3d / u\u017Cytkownik",
-    labelEmailVerified: "E-mail zweryfikowany",
-    labelVerificationRate: "Wska\u017Anik weryfikacji",
-    labelEmailUnverified: "E-mail niezweryfikowany",
-    labelGrowthRate: "Wska\u017Anik wzrostu",
-    labelLeadUserCvr: "Lead \u2192 Konwersja u\u017Cytkownik\u00F3w",
-    labelRetentionRate: "Wska\u017Anik retencji",
-    chartByRole: "Wed\u0142ug roli",
-    chartBySubscriptionStatus: "Wed\u0142ug statusu subskrypcji",
-    chartGrowthOverTime: "Wzrost w czasie",
-    recentSignupsSummary: "Podsumowanie ostatnich rejestracji",
-    rowToday: "Dzi\u015B",
-    rowThisWeek: "Ten tydzie\u0144",
-    rowThisMonth: "Ten miesi\u0105c",
-    rowLastMonth: "Zesz\u0142y miesi\u0105c",
-    generatedAt: "Wygenerowano:",
-    filters: "Filtry",
-    filtersTitle: "Opcje filtrowania",
-    applyFilters: "Zastosuj filtry",
-    viewUsers: "Zobacz użytkowników",
-    createUser: "Utwórz użytkownika",
+    title: "Statystyki gotowe",
+    description: "Statystyki użytkowników policzone",
   },
 };

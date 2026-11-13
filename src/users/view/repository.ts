@@ -5,9 +5,11 @@
 
 import "server-only";
 
-import { and, count, desc, eq, inArray, or, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, or, sql, sum } from "drizzle-orm";
 import { chatMessages, chatThreads } from "next-vibe/agent/chat/db";
-import { ChatMessageRoleDB, ThreadStatusDB } from "next-vibe/agent/chat/enum";
+import { ChatMessageRole, ThreadStatusDB } from "next-vibe/agent/chat/enum";
+import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
+import { customSkills } from "next-vibe/agent/skills/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -23,18 +25,23 @@ import {
   leads,
   userLeadLinks,
 } from "next-vibe/identity/lead/db";
+import { sessions } from "next-vibe/identity/session/db";
 import { userRoles, users } from "next-vibe/identity/user/db";
+import { errorLogs } from "next-vibe/logger/error-monitor/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
-import { CreditPackType, CreditTransactionTypeDB } from "@/credits/enum";
+import { CreditPackType, CreditTransactionType } from "@/credits/enum";
+import { growthJourneys } from "@/leads/growth/db";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 import { paymentRefunds, paymentTransactions } from "@/payment/db";
-import { PaymentStatusDB } from "@/payment/enum";
-import { referralCodes, referralEarnings } from "@/referral/db";
+import { PaymentStatus, RefundStatus } from "@/payment/enum";
+import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
 import { subscriptions } from "@/subscription/db";
-import { SubscriptionStatusDB } from "@/subscription/enum";
+import { SubscriptionStatus } from "@/subscription/enum";
+
+import { roundMoney, usdAmountSql } from "../money-sql";
 
 import type { UserViewResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -55,7 +62,6 @@ export class UserViewRepository {
         requestingUserId: requestingUser.id,
       });
 
-      // Fetch basic user info
       const [user] = await db
         .select()
         .from(users)
@@ -70,36 +76,44 @@ export class UserViewRepository {
         });
       }
 
-      // Run all queries in parallel for better performance
+      // Wallets whose spend belongs to this user: own wallet + directly linked
+      // lead wallets (free-tier spend happens on lead wallets).
+      const walletIds = await UserViewRepository.getWalletIds(userId);
+
       const [
-        chatStatsResult,
-        creditInfoResult,
-        paymentStatsResult,
-        newsletterInfoResult,
-        referralStatsResult,
-        userRolesResult,
-        recentActivityResult,
-        modelUsageStatsResult,
-        connectionsResult,
+        chatStats,
+        creditInfo,
+        paymentStats,
+        payments,
+        subscriptionRows,
+        newsletterInfo,
+        referralStats,
+        referredBy,
+        referredUsers,
+        attribution,
+        roles,
+        recentActivity,
+        engagement,
+        errorLogRows,
+        modelUsageStats,
+        connections,
       ] = await Promise.all([
-        // Chat Statistics
-        this.getChatStats(userId),
-        // Credit Information
-        this.getCreditInfo(userId),
-        // Payment Statistics
-        this.getPaymentStats(userId),
-        // Newsletter Information
-        this.getNewsletterInfo(user.email),
-        // Referral Statistics
-        this.getReferralStats(userId),
-        // User Roles
-        this.getUserRoles(userId),
-        // Recent Activity
-        this.getRecentActivity(userId),
-        // Model Usage Statistics
-        this.getModelUsageStats(userId),
-        // Connected leads and users
-        this.getConnections(userId),
+        UserViewRepository.getChatStats(userId),
+        UserViewRepository.getCreditInfo(userId, walletIds),
+        UserViewRepository.getPaymentStats(userId, user.stripeCustomerId),
+        UserViewRepository.getPayments(userId),
+        UserViewRepository.getSubscriptions(userId),
+        UserViewRepository.getNewsletterInfo(user.email),
+        UserViewRepository.getReferralStats(userId),
+        UserViewRepository.getReferredBy(userId),
+        UserViewRepository.getReferredUsers(userId),
+        UserViewRepository.getAttribution(userId),
+        UserViewRepository.getUserRoles(userId),
+        UserViewRepository.getRecentActivity(userId, walletIds),
+        UserViewRepository.getEngagement(userId),
+        UserViewRepository.getErrorLogs(userId),
+        UserViewRepository.getModelUsageStats(userId),
+        UserViewRepository.getConnections(userId),
       ]);
 
       logger.debug("User view data fetched successfully", { userId });
@@ -121,16 +135,23 @@ export class UserViewRepository {
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
-        chatStats: chatStatsResult,
-        creditInfo: creditInfoResult,
-        paymentStats: paymentStatsResult,
-        newsletterInfo: newsletterInfoResult,
-        referralStats: referralStatsResult,
-        roles: userRolesResult,
-        recentActivity: recentActivityResult,
-        modelUsageStats: modelUsageStatsResult,
-        connectedLeads: connectionsResult.connectedLeads,
-        connectedUsers: connectionsResult.connectedUsers,
+        chatStats,
+        creditInfo,
+        paymentStats,
+        payments,
+        subscriptions: subscriptionRows,
+        newsletterInfo,
+        referralStats,
+        referredBy,
+        referredUsers,
+        attribution,
+        roles,
+        recentActivity,
+        engagement,
+        errorLogs: errorLogRows,
+        modelUsageStats,
+        connectedLeads: connections.connectedLeads,
+        connectedUsers: connections.connectedUsers,
       });
     } catch (error) {
       logger.error("Error fetching user view data", parseError(error), {
@@ -144,8 +165,27 @@ export class UserViewRepository {
     }
   }
 
+  private static async getWalletIds(userId: string): Promise<string[]> {
+    const [own, leadWallets] = await Promise.all([
+      db
+        .select({ id: creditWallets.id })
+        .from(creditWallets)
+        .where(eq(creditWallets.userId, userId)),
+      db
+        .select({ id: creditWallets.id })
+        .from(userLeadLinks)
+        .innerJoin(
+          creditWallets,
+          eq(creditWallets.leadId, userLeadLinks.leadId),
+        )
+        .where(eq(userLeadLinks.userId, userId)),
+    ]);
+    return [...new Set([...own, ...leadWallets].map((w) => w.id))];
+  }
+
   /**
-   * Get chat statistics for user
+   * Chat statistics. Incognito chats are never stored, so these undercount;
+   * credit spend is the real usage signal.
    */
   private static async getChatStats(userId: string): Promise<{
     totalThreads: number;
@@ -156,97 +196,49 @@ export class UserViewRepository {
     aiMessages: number;
     lastActivityAt: Date | null;
   }> {
-    // Get thread counts
-    const [[threadsCount], [activeThreadsCount], [archivedThreadsCount]] =
-      await Promise.all([
-        db
-          .select({ count: count() })
-          .from(chatThreads)
-          .where(eq(chatThreads.userId, userId)),
-        db
-          .select({ count: count() })
-          .from(chatThreads)
-          .where(
-            sql`${chatThreads.userId} = ${userId} AND ${chatThreads.status} = ${ThreadStatusDB[0]} AND ${chatThreads.archived} = false`,
+    const [[threadCounts], [messageCounts]] = await Promise.all([
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          active: sql<number>`count(*) filter (where ${chatThreads.status} = ${ThreadStatusDB[0]} and ${chatThreads.archived} = false)::int`,
+          archived: sql<number>`count(*) filter (where ${chatThreads.archived} = true)::int`,
+        })
+        .from(chatThreads)
+        .where(eq(chatThreads.userId, userId)),
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          user: sql<number>`count(*) filter (where ${chatMessages.role} = ${ChatMessageRole.USER})::int`,
+          ai: sql<number>`count(*) filter (where ${chatMessages.role} = ${ChatMessageRole.ASSISTANT})::int`,
+          lastAt: sql<Date | null>`max(${chatMessages.createdAt})`.mapWith(
+            chatMessages.createdAt,
           ),
-        db
-          .select({ count: count() })
-          .from(chatThreads)
-          .where(
-            sql`${chatThreads.userId} = ${userId} AND ${chatThreads.archived} = true`,
-          ),
-      ]);
-
-    // Get message counts
-    const userThreadIds = await db
-      .select({ id: chatThreads.id })
-      .from(chatThreads)
-      .where(eq(chatThreads.userId, userId));
-
-    const threadIds = userThreadIds.map((t) => t.id);
-
-    if (threadIds.length === 0) {
-      return {
-        totalThreads: 0,
-        activeThreads: 0,
-        archivedThreads: 0,
-        totalMessages: 0,
-        userMessages: 0,
-        aiMessages: 0,
-        lastActivityAt: null,
-      };
-    }
-
-    const [[messagesCount], [userMessagesCount], [aiMessagesCount]] =
-      await Promise.all([
-        db
-          .select({ count: count() })
-          .from(chatMessages)
-          .where(inArray(chatMessages.threadId, threadIds)),
-        db
-          .select({ count: count() })
-          .from(chatMessages)
-          .where(
-            and(
-              inArray(chatMessages.threadId, threadIds),
-              eq(chatMessages.role, ChatMessageRoleDB[1]),
-            ),
-          ),
-        db
-          .select({ count: count() })
-          .from(chatMessages)
-          .where(
-            and(
-              inArray(chatMessages.threadId, threadIds),
-              eq(chatMessages.role, ChatMessageRoleDB[0]),
-            ),
-          ),
-      ]);
-
-    // Get last activity
-    const [lastActivity] = await db
-      .select({ lastActivityAt: chatMessages.createdAt })
-      .from(chatMessages)
-      .where(inArray(chatMessages.threadId, threadIds))
-      .orderBy(desc(chatMessages.createdAt))
-      .limit(1);
+        })
+        .from(chatMessages)
+        .innerJoin(chatThreads, eq(chatThreads.id, chatMessages.threadId))
+        .where(eq(chatThreads.userId, userId)),
+    ]);
 
     return {
-      totalThreads: threadsCount?.count ?? 0,
-      activeThreads: activeThreadsCount?.count ?? 0,
-      archivedThreads: archivedThreadsCount?.count ?? 0,
-      totalMessages: messagesCount?.count ?? 0,
-      userMessages: userMessagesCount?.count ?? 0,
-      aiMessages: aiMessagesCount?.count ?? 0,
-      lastActivityAt: lastActivity?.lastActivityAt ?? null,
+      totalThreads: Number(threadCounts?.total ?? 0),
+      activeThreads: Number(threadCounts?.active ?? 0),
+      archivedThreads: Number(threadCounts?.archived ?? 0),
+      totalMessages: Number(messageCounts?.total ?? 0),
+      userMessages: Number(messageCounts?.user ?? 0),
+      aiMessages: Number(messageCounts?.ai ?? 0),
+      lastActivityAt: messageCounts?.lastAt ?? null,
     };
   }
 
   /**
-   * Get credit information for user
-   * freeCreditsRemaining sums across all linked lead wallets (user wallet itself holds 0 free credits)
+   * Credit wallet. freeCreditsRemaining sums linked lead wallets (the user
+   * wallet itself never holds free credits). Spend counts every wallet that
+   * belongs to the user.
    */
-  private static async getCreditInfo(userId: string): Promise<{
+  private static async getCreditInfo(
+    userId: string,
+    walletIds: string[],
+  ): Promise<{
     currentBalance: number;
     freeCreditsRemaining: number;
     totalCreditsEarned: number;
@@ -266,91 +258,54 @@ export class UserViewRepository {
       .where(eq(creditWallets.userId, userId))
       .limit(1);
 
-    if (!wallet) {
-      return {
-        currentBalance: 0,
-        freeCreditsRemaining: 0,
-        totalCreditsEarned: 0,
-        totalCreditsSpent: 0,
-        totalCreditsPurchased: 0,
-        freePeriodStart: null,
-        freePeriodId: null,
-        subscriptionCredits: 0,
-        permanentCredits: 0,
-        bonusCredits: 0,
-        earnedCredits: 0,
-        nextExpiry: null,
-      };
-    }
-
-    // Sum free credits across all linked lead wallets (user wallet never holds free credits)
-    const linkedLeads = await db
-      .select({ leadId: userLeadLinks.leadId })
+    const [freeResult] = await db
+      .select({ total: sum(creditWallets.freeCreditsRemaining) })
       .from(userLeadLinks)
+      .innerJoin(creditWallets, eq(creditWallets.leadId, userLeadLinks.leadId))
       .where(eq(userLeadLinks.userId, userId));
-    const linkedLeadIds = linkedLeads.map((l) => l.leadId);
-    const leadFreeCredits =
-      linkedLeadIds.length > 0
-        ? await db
+
+    const [[totals], packBreakdown] = await Promise.all([
+      walletIds.length > 0
+        ? db
             .select({
-              freeCreditsRemaining: creditWallets.freeCreditsRemaining,
+              spent: sql<number>`coalesce(sum(-${creditTransactions.amount}) filter (where ${creditTransactions.type} = ${CreditTransactionType.USAGE}), 0)::float8`,
+              earned: sql<number>`coalesce(sum(${creditTransactions.amount}) filter (where ${creditTransactions.type} = ${CreditTransactionType.REFERRAL_EARNING}), 0)::float8`,
+              purchased: sql<number>`coalesce(sum(${creditTransactions.amount}) filter (where ${creditTransactions.type} in (${CreditTransactionType.PURCHASE}, ${CreditTransactionType.SUBSCRIPTION})), 0)::float8`,
             })
-            .from(creditWallets)
-            .where(inArray(creditWallets.leadId, linkedLeadIds))
-        : [];
+            .from(creditTransactions)
+            .where(inArray(creditTransactions.walletId, walletIds))
+        : Promise.resolve([{ spent: 0, earned: 0, purchased: 0 }]),
+      wallet
+        ? db
+            .select({
+              type: creditPacks.type,
+              total: sum(creditPacks.remaining),
+              nextExpiry:
+                sql<Date | null>`min(${creditPacks.expiresAt})`.mapWith(
+                  creditPacks.expiresAt,
+                ),
+            })
+            .from(creditPacks)
+            .where(
+              and(
+                eq(creditPacks.walletId, wallet.id),
+                gt(creditPacks.remaining, 0),
+              ),
+            )
+            .groupBy(creditPacks.type)
+        : Promise.resolve([]),
+    ]);
 
-    // Get transaction totals and pack breakdown in parallel
-    const [[earnedResult], [spentResult], [purchasedResult], packBreakdown] =
-      await Promise.all([
-        // Total credits earned (positive transactions excluding purchases)
-        db
-          .select({ total: sum(creditTransactions.amount) })
-          .from(creditTransactions)
-          .where(
-            sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.type} IN (${CreditTransactionTypeDB[4]}, ${CreditTransactionTypeDB[5]})`,
-          ),
-        // Total credits spent (negative transactions)
-        db
-          .select({ total: sum(creditTransactions.amount) })
-          .from(creditTransactions)
-          .where(
-            sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.amount} < 0`,
-          ),
-        // Total credits purchased
-        db
-          .select({ total: sum(creditTransactions.amount) })
-          .from(creditTransactions)
-          .where(
-            sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.type} IN (${CreditTransactionTypeDB[1]}, ${CreditTransactionTypeDB[2]})`,
-          ),
-        // Credit pack breakdown by type (remaining > 0 only)
-        db
-          .select({
-            type: creditPacks.type,
-            total: sum(creditPacks.remaining),
-            nextExpiry: sql<Date | null>`MIN(${creditPacks.expiresAt})`,
-          })
-          .from(creditPacks)
-          .where(
-            sql`${creditPacks.walletId} = ${wallet.id} AND ${creditPacks.remaining} > 0`,
-          )
-          .groupBy(creditPacks.type),
-      ]);
-
-    // Extract pack amounts by type
     let subscriptionCredits = 0;
     let permanentCredits = 0;
     let bonusCredits = 0;
     let earnedCreditsRemaining = 0;
     let nextExpiry: Date | null = null;
-
     for (const pack of packBreakdown) {
       const amount = Number(pack.total) || 0;
       if (pack.type === CreditPackType.SUBSCRIPTION) {
         subscriptionCredits = amount;
-        if (pack.nextExpiry) {
-          nextExpiry = pack.nextExpiry;
-        }
+        nextExpiry = pack.nextExpiry;
       } else if (pack.type === CreditPackType.PERMANENT) {
         permanentCredits = amount;
       } else if (pack.type === CreditPackType.BONUS) {
@@ -360,36 +315,36 @@ export class UserViewRepository {
       }
     }
 
-    const totalFreeCredits = leadFreeCredits.reduce(
-      (acc, lw) => acc + (Number(lw.freeCreditsRemaining) || 0),
-      0,
-    );
-
     return {
-      currentBalance: Number(wallet.balance) || 0,
-      freeCreditsRemaining: totalFreeCredits,
-      totalCreditsEarned: Math.abs(Number(earnedResult?.total) || 0),
-      totalCreditsSpent: Math.abs(Number(spentResult?.total) || 0),
-      totalCreditsPurchased: Number(purchasedResult?.total) || 0,
-      freePeriodStart: wallet.freePeriodStart,
-      freePeriodId: wallet.freePeriodId,
-      subscriptionCredits,
-      permanentCredits,
-      bonusCredits,
-      earnedCredits: earnedCreditsRemaining,
+      currentBalance: roundMoney(Number(wallet?.balance ?? 0)),
+      freeCreditsRemaining: roundMoney(Number(freeResult?.total ?? 0)),
+      totalCreditsEarned: roundMoney(Number(totals?.earned ?? 0)),
+      totalCreditsSpent: roundMoney(Number(totals?.spent ?? 0)),
+      totalCreditsPurchased: roundMoney(Number(totals?.purchased ?? 0)),
+      freePeriodStart: wallet?.freePeriodStart ?? null,
+      freePeriodId: wallet?.freePeriodId ?? null,
+      subscriptionCredits: roundMoney(subscriptionCredits),
+      permanentCredits: roundMoney(permanentCredits),
+      bonusCredits: roundMoney(bonusCredits),
+      earnedCredits: roundMoney(earnedCreditsRemaining),
       nextExpiry,
     };
   }
 
   /**
-   * Get payment statistics for user
+   * Payment totals in USD (static FX, same table as finance-status).
    */
-  private static async getPaymentStats(userId: string): Promise<{
-    totalRevenueCents: number;
+  private static async getPaymentStats(
+    userId: string,
+    stripeCustomerId: string | null,
+  ): Promise<{
+    totalPaidUsd: number;
+    totalRefundedUsd: number;
     totalPayments: number;
     successfulPayments: number;
     failedPayments: number;
-    totalRefundsCents: number;
+    pendingPayments: number;
+    firstPaymentAt: Date | null;
     lastPaymentAt: Date | null;
     stripeCustomerId: string | null;
     hasActiveSubscription: boolean;
@@ -397,97 +352,420 @@ export class UserViewRepository {
     subscriptionInterval: string | null;
     subscriptionNextBilling: Date | null;
     subscriptionStatus: string | null;
+    cancelAtPeriodEnd: boolean;
   }> {
-    // Get payment totals
-    const [[revenueResult], [paymentsCount], [successfulCount], [failedCount]] =
-      await Promise.all([
-        // Total revenue
-        db
-          .select({ total: sum(paymentTransactions.amount) })
-          .from(paymentTransactions)
-          .where(
-            sql`${paymentTransactions.userId} = ${userId} AND ${paymentTransactions.status} = ${PaymentStatusDB[2]}`,
+    const [[paymentRow], [refundRow], [subscription]] = await Promise.all([
+      db
+        .select({
+          paidUsd: sql<number>`coalesce(sum(${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)::float8`,
+          total: sql<number>`count(*)::int`,
+          succeeded: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
+          failed: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.FAILED})::int`,
+          pending: sql<number>`count(*) filter (where ${paymentTransactions.status} in (${PaymentStatus.PENDING}, ${PaymentStatus.PROCESSING}))::int`,
+          firstAt:
+            sql<Date | null>`min(${paymentTransactions.createdAt}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})`.mapWith(
+              paymentTransactions.createdAt,
+            ),
+          lastAt:
+            sql<Date | null>`max(${paymentTransactions.createdAt}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})`.mapWith(
+              paymentTransactions.createdAt,
+            ),
+        })
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.userId, userId)),
+      db
+        .select({
+          refundedUsd: sql<number>`coalesce(sum(${usdAmountSql(paymentRefunds.amount, paymentRefunds.currency)}), 0)::float8`,
+        })
+        .from(paymentRefunds)
+        .where(
+          and(
+            eq(paymentRefunds.userId, userId),
+            eq(paymentRefunds.status, RefundStatus.SUCCEEDED),
           ),
-        // Total payments
-        db
-          .select({ count: count() })
-          .from(paymentTransactions)
-          .where(eq(paymentTransactions.userId, userId)),
-        // Successful payments
-        db
-          .select({ count: count() })
-          .from(paymentTransactions)
-          .where(
-            sql`${paymentTransactions.userId} = ${userId} AND ${paymentTransactions.status} = ${PaymentStatusDB[2]}`,
-          ),
-        // Failed payments
-        db
-          .select({ count: count() })
-          .from(paymentTransactions)
-          .where(
-            sql`${paymentTransactions.userId} = ${userId} AND ${paymentTransactions.status} = ${PaymentStatusDB[3]}`,
-          ),
-      ]);
+        ),
+      db
+        .select({
+          status: subscriptions.status,
+          planId: subscriptions.planId,
+          billingInterval: subscriptions.billingInterval,
+          currentPeriodEnd: subscriptions.currentPeriodEnd,
+          cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+        })
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .orderBy(desc(subscriptions.createdAt))
+        .limit(1),
+    ]);
 
-    // Get refund total
-    const [refundResult] = await db
-      .select({ total: sum(paymentRefunds.amount) })
-      .from(paymentRefunds)
-      .where(eq(paymentRefunds.userId, userId));
+    const status = subscription?.status ?? null;
+    return {
+      totalPaidUsd: roundMoney(Number(paymentRow?.paidUsd ?? 0)),
+      totalRefundedUsd: roundMoney(Number(refundRow?.refundedUsd ?? 0)),
+      totalPayments: Number(paymentRow?.total ?? 0),
+      successfulPayments: Number(paymentRow?.succeeded ?? 0),
+      failedPayments: Number(paymentRow?.failed ?? 0),
+      pendingPayments: Number(paymentRow?.pending ?? 0),
+      firstPaymentAt: paymentRow?.firstAt ?? null,
+      lastPaymentAt: paymentRow?.lastAt ?? null,
+      stripeCustomerId,
+      hasActiveSubscription:
+        status === SubscriptionStatus.ACTIVE ||
+        status === SubscriptionStatus.TRIALING,
+      subscriptionPlan: subscription?.planId ?? null,
+      subscriptionInterval: subscription?.billingInterval ?? null,
+      subscriptionNextBilling: subscription?.currentPeriodEnd ?? null,
+      subscriptionStatus: status,
+      cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
+    };
+  }
 
-    // Get last payment
-    const [lastPayment] = await db
-      .select({ createdAt: paymentTransactions.createdAt })
-      .from(paymentTransactions)
-      .where(
-        sql`${paymentTransactions.userId} = ${userId} AND ${paymentTransactions.status} = ${PaymentStatusDB[2]}`,
-      )
-      .orderBy(desc(paymentTransactions.createdAt))
-      .limit(1);
-
-    // Get most recent subscription (any status) for plan details
-    const [subscription] = await db
+  /** Most recent payment attempts, any status. */
+  private static async getPayments(userId: string): Promise<
+    Array<{
+      id: string;
+      createdAt: Date;
+      amount: number;
+      currency: string;
+      amountUsd: number;
+      status: string;
+      provider: string;
+      mode: string;
+    }>
+  > {
+    const rows = await db
       .select({
+        id: paymentTransactions.id,
+        createdAt: paymentTransactions.createdAt,
+        amount: paymentTransactions.amount,
+        currency: paymentTransactions.currency,
+        amountUsd: sql<number>`${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}::float8`,
+        status: paymentTransactions.status,
+        provider: paymentTransactions.provider,
+        mode: paymentTransactions.mode,
+      })
+      .from(paymentTransactions)
+      .where(eq(paymentTransactions.userId, userId))
+      .orderBy(desc(paymentTransactions.createdAt))
+      .limit(25);
+    return rows.map((r) => ({
+      id: r.id,
+      createdAt: r.createdAt,
+      amount: Number(r.amount),
+      currency: r.currency,
+      amountUsd: roundMoney(Number(r.amountUsd)),
+      status: r.status,
+      provider: r.provider,
+      mode: r.mode,
+    }));
+  }
+
+  private static async getSubscriptions(userId: string): Promise<
+    Array<{
+      id: string;
+      status: string;
+      planId: string;
+      billingInterval: string;
+      provider: string;
+      createdAt: Date;
+      currentPeriodEnd: Date | null;
+      cancelAtPeriodEnd: boolean;
+      canceledAt: Date | null;
+    }>
+  > {
+    return db
+      .select({
+        id: subscriptions.id,
         status: subscriptions.status,
         planId: subscriptions.planId,
         billingInterval: subscriptions.billingInterval,
+        provider: subscriptions.provider,
+        createdAt: subscriptions.createdAt,
         currentPeriodEnd: subscriptions.currentPeriodEnd,
+        cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+        canceledAt: subscriptions.canceledAt,
       })
       .from(subscriptions)
       .where(eq(subscriptions.userId, userId))
       .orderBy(desc(subscriptions.createdAt))
-      .limit(1);
+      .limit(20);
+  }
 
-    // Get user's Stripe customer ID
-    const [userRecord] = await db
-      .select({ stripeCustomerId: users.stripeCustomerId })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    // Convert string amounts to cents (multiply by 100)
-    const totalRevenueCents = Math.round(
-      (Number(revenueResult?.total) || 0) * 100,
-    );
-    const totalRefundsCents = Math.round(
-      (Number(refundResult?.total) || 0) * 100,
-    );
-
-    const isActive = subscription?.status === SubscriptionStatusDB[3]; // ACTIVE
+  /**
+   * Referral performance as a referrer: signups through their links, how many
+   * of those pay, and earnings per currency (amounts are minor units).
+   */
+  private static async getReferralStats(userId: string): Promise<{
+    totalReferrals: number;
+    payingReferrals: number;
+    activeReferralCodes: number;
+    earnings: Array<{ currency: string; amountCents: number; count: number }>;
+  }> {
+    const [[codes], [signups], earnings] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(referralCodes)
+        .where(
+          and(
+            eq(referralCodes.ownerUserId, userId),
+            eq(referralCodes.isActive, true),
+          ),
+        ),
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          paying: sql<number>`count(*) filter (where exists (select 1 from ${paymentTransactions} where ${paymentTransactions.userId} = ${userReferrals.referredUserId} and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}))::int`,
+        })
+        .from(userReferrals)
+        .where(eq(userReferrals.referrerUserId, userId)),
+      db
+        .select({
+          currency: referralEarnings.currency,
+          amountCents: sql<number>`coalesce(sum(${referralEarnings.amountCents}), 0)::int`,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(referralEarnings)
+        .where(eq(referralEarnings.earnerUserId, userId))
+        .groupBy(referralEarnings.currency),
+    ]);
 
     return {
-      totalRevenueCents,
-      totalPayments: paymentsCount?.count ?? 0,
-      successfulPayments: successfulCount?.count ?? 0,
-      failedPayments: failedCount?.count ?? 0,
-      totalRefundsCents,
-      lastPaymentAt: lastPayment?.createdAt ?? null,
-      stripeCustomerId: userRecord?.stripeCustomerId ?? null,
-      hasActiveSubscription: isActive,
-      subscriptionPlan: subscription?.planId ?? null,
-      subscriptionInterval: subscription?.billingInterval ?? null,
-      subscriptionNextBilling: subscription?.currentPeriodEnd ?? null,
-      subscriptionStatus: subscription?.status ?? null,
+      totalReferrals: Number(signups?.total ?? 0),
+      payingReferrals: Number(signups?.paying ?? 0),
+      activeReferralCodes: Number(codes?.count ?? 0),
+      earnings: earnings.map((e) => ({
+        currency: e.currency,
+        amountCents: Number(e.amountCents),
+        count: Number(e.count),
+      })),
+    };
+  }
+
+  /** Who referred this user, if anyone. */
+  private static async getReferredBy(userId: string): Promise<{
+    userId: string;
+    email: string;
+    code: string | null;
+    referredAt: Date;
+  } | null> {
+    const [row] = await db
+      .select({
+        userId: userReferrals.referrerUserId,
+        email: users.email,
+        code: referralCodes.code,
+        referredAt: userReferrals.createdAt,
+      })
+      .from(userReferrals)
+      .innerJoin(users, eq(users.id, userReferrals.referrerUserId))
+      .leftJoin(
+        referralCodes,
+        eq(referralCodes.id, userReferrals.referralCodeId),
+      )
+      .where(eq(userReferrals.referredUserId, userId))
+      .limit(1);
+    return row ?? null;
+  }
+
+  /** Users who signed up through this user's links, newest first. */
+  private static async getReferredUsers(
+    userId: string,
+  ): Promise<
+    Array<{ id: string; email: string; createdAt: Date; totalPaidUsd: number }>
+  > {
+    const rows = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        createdAt: users.createdAt,
+        totalPaidUsd: sql<number>`coalesce((select sum(${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}) from ${paymentTransactions} where ${paymentTransactions.userId} = ${users.id} and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)::float8`,
+      })
+      .from(userReferrals)
+      .innerJoin(users, eq(users.id, userReferrals.referredUserId))
+      .where(eq(userReferrals.referrerUserId, userId))
+      .orderBy(desc(users.createdAt))
+      .limit(50);
+    return rows.map((r) => ({
+      id: r.id,
+      email: r.email,
+      createdAt: r.createdAt,
+      totalPaidUsd: roundMoney(Number(r.totalPaidUsd)),
+    }));
+  }
+
+  /** First/last touch attribution from the growth journey. */
+  private static async getAttribution(userId: string): Promise<{
+    firstChannel: string;
+    firstSource: string | null;
+    firstMedium: string | null;
+    firstCampaign: string | null;
+    firstRefCode: string | null;
+    firstReferrerHost: string | null;
+    firstLandingPath: string | null;
+    firstTouchAt: Date;
+    lastChannel: string;
+    lastTouchAt: Date;
+    firstChatAt: Date | null;
+    signedUpAt: Date | null;
+    firstPaidAt: Date | null;
+  } | null> {
+    const [row] = await db
+      .select({
+        firstChannel: growthJourneys.firstChannel,
+        firstSource: growthJourneys.firstSource,
+        firstMedium: growthJourneys.firstMedium,
+        firstCampaign: growthJourneys.firstCampaign,
+        firstRefCode: growthJourneys.firstRefCode,
+        firstReferrerHost: growthJourneys.firstReferrerHost,
+        firstLandingPath: growthJourneys.firstLandingPath,
+        firstTouchAt: growthJourneys.firstTouchAt,
+        lastChannel: growthJourneys.lastChannel,
+        lastTouchAt: growthJourneys.lastTouchAt,
+        firstChatAt: growthJourneys.firstChatAt,
+        signedUpAt: growthJourneys.signedUpAt,
+        firstPaidAt: growthJourneys.firstPaidAt,
+      })
+      .from(growthJourneys)
+      .where(eq(growthJourneys.userId, userId))
+      .limit(1);
+    return row ?? null;
+  }
+
+  private static async getEngagement(userId: string): Promise<{
+    favoritesCount: number;
+    customSkillsCount: number;
+  }> {
+    const [[favorites], [skills]] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(chatFavorites)
+        .where(eq(chatFavorites.userId, userId)),
+      db
+        .select({ count: count() })
+        .from(customSkills)
+        .where(eq(customSkills.userId, userId)),
+    ]);
+    return {
+      favoritesCount: Number(favorites?.count ?? 0),
+      customSkillsCount: Number(skills?.count ?? 0),
+    };
+  }
+
+  /**
+   * Error log rows whose logger metadata mentions this user id.
+   * error_logs has no user column; the id lands in metadata via logger context.
+   */
+  private static async getErrorLogs(userId: string): Promise<
+    Array<{
+      id: string;
+      message: string;
+      level: string;
+      occurrences: number;
+      lastSeenAt: Date;
+      resolved: boolean;
+    }>
+  > {
+    return db
+      .select({
+        id: errorLogs.id,
+        message: errorLogs.message,
+        level: errorLogs.level,
+        occurrences: errorLogs.occurrences,
+        lastSeenAt: errorLogs.createdAt,
+        resolved: errorLogs.resolved,
+      })
+      .from(errorLogs)
+      .where(sql`${errorLogs.metadata}::text like ${`%${userId}%`}`)
+      .orderBy(desc(errorLogs.createdAt))
+      .limit(15);
+  }
+
+  /**
+   * Activity timestamps. lastLogin = newest session; lastCreditUsage covers
+   * own and linked lead wallets.
+   */
+  private static async getRecentActivity(
+    userId: string,
+    walletIds: string[],
+  ): Promise<{
+    lastLogin: Date | null;
+    lastThreadCreated: Date | null;
+    lastMessageSent: Date | null;
+    lastPayment: Date | null;
+    lastCreditUsage: Date | null;
+    activeSessions: number;
+  }> {
+    const [[sessionRow], [threadRow], [messageRow], [paymentRow], usageRows] =
+      await Promise.all([
+        db
+          .select({
+            lastAt: sql<Date | null>`max(${sessions.createdAt})`.mapWith(
+              sessions.createdAt,
+            ),
+            active: sql<number>`count(*) filter (where ${sessions.expiresAt} > now())::int`,
+          })
+          .from(sessions)
+          .where(eq(sessions.userId, userId)),
+        db
+          .select({
+            lastAt: sql<Date | null>`max(${chatThreads.createdAt})`.mapWith(
+              chatThreads.createdAt,
+            ),
+          })
+          .from(chatThreads)
+          .where(eq(chatThreads.userId, userId)),
+        db
+          .select({
+            lastAt: sql<Date | null>`max(${chatMessages.createdAt})`.mapWith(
+              chatMessages.createdAt,
+            ),
+          })
+          .from(chatMessages)
+          .innerJoin(chatThreads, eq(chatThreads.id, chatMessages.threadId))
+          .where(
+            and(
+              eq(chatThreads.userId, userId),
+              eq(chatMessages.role, ChatMessageRole.USER),
+            ),
+          ),
+        db
+          .select({
+            lastAt:
+              sql<Date | null>`max(${paymentTransactions.createdAt})`.mapWith(
+                paymentTransactions.createdAt,
+              ),
+          })
+          .from(paymentTransactions)
+          .where(
+            and(
+              eq(paymentTransactions.userId, userId),
+              eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
+            ),
+          ),
+        walletIds.length > 0
+          ? db
+              .select({
+                lastAt:
+                  sql<Date | null>`max(${creditTransactions.createdAt})`.mapWith(
+                    creditTransactions.createdAt,
+                  ),
+              })
+              .from(creditTransactions)
+              .where(
+                and(
+                  inArray(creditTransactions.walletId, walletIds),
+                  eq(creditTransactions.type, CreditTransactionType.USAGE),
+                ),
+              )
+          : Promise.resolve([{ lastAt: null }]),
+      ]);
+
+    return {
+      lastLogin: sessionRow?.lastAt ?? null,
+      lastThreadCreated: threadRow?.lastAt ?? null,
+      lastMessageSent: messageRow?.lastAt ?? null,
+      lastPayment: paymentRow?.lastAt ?? null,
+      lastCreditUsage: usageRows[0]?.lastAt ?? null,
+      activeSessions: Number(sessionRow?.active ?? 0),
     };
   }
 
@@ -525,45 +803,6 @@ export class UserViewRepository {
   }
 
   /**
-   * Get referral statistics for user
-   */
-  private static async getReferralStats(userId: string): Promise<{
-    totalReferrals: number;
-    totalReferralRevenueCents: number;
-    totalReferralEarningsCents: number;
-    activeReferralCodes: number;
-  }> {
-    // Get referral codes count
-    const [activeCodesCount] = await db
-      .select({ count: count() })
-      .from(referralCodes)
-      .where(
-        sql`${referralCodes.ownerUserId} = ${userId} AND ${referralCodes.isActive} = true`,
-      );
-
-    // Get total referrals (distinct users referred)
-    const [referralsCountResult] = await db
-      .select({
-        count: sql<number>`COUNT(DISTINCT ${referralEarnings.sourceUserId})`,
-      })
-      .from(referralEarnings)
-      .where(eq(referralEarnings.earnerUserId, userId));
-
-    // Get total referral revenue and earnings
-    const [earningsResult] = await db
-      .select({ total: sum(referralEarnings.amountCents) })
-      .from(referralEarnings)
-      .where(eq(referralEarnings.earnerUserId, userId));
-
-    return {
-      totalReferrals: Number(referralsCountResult?.count) || 0,
-      totalReferralRevenueCents: 0, // Revenue calculation requires additional business logic
-      totalReferralEarningsCents: Math.round(Number(earningsResult.total) || 0),
-      activeReferralCodes: activeCodesCount.count ?? 0,
-    };
-  }
-
-  /**
    * Get user roles
    */
   private static async getUserRoles(
@@ -582,75 +821,6 @@ export class UserViewRepository {
       role: r.role,
       assignedAt: r.assignedAt,
     }));
-  }
-
-  /**
-   * Get recent activity summary
-   */
-  private static async getRecentActivity(userId: string): Promise<{
-    lastLogin: Date | null;
-    lastThreadCreated: Date | null;
-    lastMessageSent: Date | null;
-    lastPayment: Date | null;
-  }> {
-    // Get user's threads for message queries
-    const userThreadIds = await db
-      .select({ id: chatThreads.id })
-      .from(chatThreads)
-      .where(eq(chatThreads.userId, userId));
-
-    const threadIds = userThreadIds.map((t) => t.id);
-
-    const [lastThread, lastMessage, lastPayment] = await Promise.all([
-      // Last thread created
-      db
-        .select({ createdAt: chatThreads.createdAt })
-        .from(chatThreads)
-        .where(eq(chatThreads.userId, userId))
-        .orderBy(desc(chatThreads.createdAt))
-        .limit(1)
-        .then((r) => r[0]),
-      // Last message sent (if threads exist)
-      threadIds.length > 0
-        ? db
-            .select({ createdAt: chatMessages.createdAt })
-            .from(chatMessages)
-            .where(
-              and(
-                inArray(chatMessages.threadId, threadIds),
-                eq(chatMessages.role, ChatMessageRoleDB[1]),
-              ),
-            )
-            .orderBy(desc(chatMessages.createdAt))
-            .limit(1)
-            .then((r) => r[0])
-        : null,
-      // Last payment
-      db
-        .select({ createdAt: paymentTransactions.createdAt })
-        .from(paymentTransactions)
-        .where(
-          sql`${paymentTransactions.userId} = ${userId} AND ${paymentTransactions.status} = ${PaymentStatusDB[2]}`,
-        )
-        .orderBy(desc(paymentTransactions.createdAt))
-        .limit(1)
-        .then((r) => r[0]),
-    ]);
-
-    // Note: lastLogin would require session tracking, which we don't have in the schema
-    // Using updatedAt as a proxy for now
-    const [user] = await db
-      .select({ updatedAt: users.updatedAt })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    return {
-      lastLogin: user?.updatedAt ?? null,
-      lastThreadCreated: lastThread?.createdAt ?? null,
-      lastMessageSent: lastMessage?.createdAt ?? null,
-      lastPayment: lastPayment?.createdAt ?? null,
-    };
   }
 
   /**
@@ -724,7 +894,7 @@ export class UserViewRepository {
       .where(
         and(
           inArray(creditTransactions.walletId, allWalletIds),
-          sql`${creditTransactions.type} = ${CreditTransactionTypeDB[3]}`,
+          eq(creditTransactions.type, CreditTransactionType.USAGE),
           sql`${creditTransactions.modelId} IS NOT NULL`,
         ),
       )

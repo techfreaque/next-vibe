@@ -1,61 +1,47 @@
 /**
- * Users Statistics API Definition
- * Comprehensive endpoint for user analytics with historical charts
+ * Users Stats API Definition
+ * Business dashboard: signups, active and paying users, MRR, revenue, credit
+ * spend, signup-to-paid conversion and D7 retention, each against the
+ * previous window, plus a time series and channel/top-spender breakdowns.
  */
-import {
-  ChartType,
-  ChartTypeOptions,
-  DateRangePresetOptions,
-  TimePeriodOptions,
-} from "next-vibe/core/core-utils/stats-filtering";
-import {
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/core/core-utils/stats-filtering.schema";
+
 import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  objectField,
-  objectOptionalField,
   requestField,
   responseField,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import {
-  PaymentMethodFilter,
-  PaymentMethodFilterOptions,
-  SubscriptionStatusFilter,
-  SubscriptionStatusFilterOptions,
-  UserRoleFilter,
-  UserRoleFilterOptions,
-  UserStatusFilter,
-  UserStatusFilterOptions,
-} from "../enum";
 import { USERS_STATS_ALIAS } from "./constants";
+import {
+  StatsGranularity,
+  StatsGranularityOptions,
+  StatsRange,
+  StatsRangeOptions,
+} from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const UsersStatsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersStatsContainer })),
 );
+
+const ratioSchema = z.object({
+  cohort: z.coerce.number(),
+  converted: z.coerce.number(),
+  rate: z.coerce.number(),
+});
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -77,629 +63,174 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       backButton: backButton(scopedTranslation, {
-        usage: { response: true },
+        usage: { request: "data", response: true },
       }),
 
-      // === FORM ALERT (shows validation and API errors) ===
+      range: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "fields.range.label" as const,
+        description: "fields.range.description" as const,
+        options: StatsRangeOptions,
+        columns: 4,
+        schema: z.enum(StatsRange).default(StatsRange.LAST_30_DAYS),
+      }),
+      from: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "fields.from.label" as const,
+        description: "fields.from.description" as const,
+        columns: 3,
+        schema: dateSchema.optional(),
+      }),
+      to: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "fields.to.label" as const,
+        description: "fields.to.description" as const,
+        columns: 3,
+        schema: dateSchema.optional(),
+      }),
+      granularity: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "fields.granularity.label" as const,
+        description: "fields.granularity.description" as const,
+        options: StatsGranularityOptions,
+        columns: 3,
+        schema: z.enum(StatsGranularity).default(StatsGranularity.AUTO),
+      }),
+      includeInternal: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.includeInternal.label" as const,
+        description: "fields.includeInternal.description" as const,
+        columns: 3,
+        schema: z.boolean().default(false),
+      }),
+
       formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
-        order: 3.5,
         usage: { request: "data" },
       }),
 
-      // === BASIC FILTERS ===
-      basicFilters: objectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "basicFilters.title" as const,
-        description: "basicFilters.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 3,
-        order: 1,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { request: "data" },
-        children: {
-          search: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "fields.search.label" as const,
-            description: "fields.search.description" as const,
-            placeholder: "fields.search.placeholder" as const,
-            columns: 12,
-            schema: z.string().optional(),
-          }),
-          status: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.status.label" as const,
-            description: "fields.status.description" as const,
-            options: UserStatusFilterOptions,
-            columns: 6,
-            schema: z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
-          }),
-          role: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.role.label" as const,
-            description: "fields.role.description" as const,
-            options: UserRoleFilterOptions,
-            columns: 6,
-            schema: z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
-          }),
-        },
+      period: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.period" as const,
+        schema: z.object({
+          from: z.coerce.date(),
+          to: z.coerce.date(),
+          previousFrom: z.coerce.date(),
+          days: z.coerce.number(),
+          granularity: z.enum(["day", "week", "month"]),
+        }),
       }),
 
-      // === SUBSCRIPTION FILTERS ===
-      subscriptionFilters: objectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "subscriptionFilters.title" as const,
-        description: "subscriptionFilters.description" as const,
-        layoutType: LayoutType.GRID_2_COLUMNS,
-        order: 1.5,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { request: "data" },
-        children: {
-          subscriptionStatus: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.subscriptionStatus.label" as const,
-            description: "fields.subscriptionStatus.description" as const,
-            options: SubscriptionStatusFilterOptions,
-            columns: 6,
-            schema: z
-              .enum(SubscriptionStatusFilter)
-              .default(SubscriptionStatusFilter.ALL),
-          }),
-          paymentMethod: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.paymentMethod.label" as const,
-            description: "fields.paymentMethod.description" as const,
-            options: PaymentMethodFilterOptions,
-            columns: 6,
-            schema: z
-              .enum(PaymentMethodFilter)
-              .default(PaymentMethodFilter.ALL),
-          }),
-        },
+      kpis: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.kpis" as const,
+        schema: z.object({
+          totalUsers: z.coerce.number(),
+          newUsers: z.coerce.number(),
+          newUsersPrev: z.coerce.number(),
+          activeUsers: z.coerce.number(),
+          activeUsersPrev: z.coerce.number(),
+          anonymousActive: z.coerce.number(),
+          payingUsers: z.coerce.number(),
+          payingUsersPrev: z.coerce.number(),
+          payingUsersAllTime: z.coerce.number(),
+          activeSubscribers: z.coerce.number(),
+          pastDueSubscribers: z.coerce.number(),
+          mrrUsd: z.coerce.number(),
+          revenueUsd: z.coerce.number(),
+          revenuePrevUsd: z.coerce.number(),
+          refundsUsd: z.coerce.number(),
+          revenueAllTimeUsd: z.coerce.number(),
+          creditsSpent: z.coerce.number(),
+          creditsSpentPrev: z.coerce.number(),
+          signupToPaid: ratioSchema,
+          retentionD7: ratioSchema,
+        }),
       }),
 
-      // === LOCATION FILTERS ===
-      locationFilters: objectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "locationFilters.title" as const,
-        description: "locationFilters.description" as const,
-        layoutType: LayoutType.GRID_2_COLUMNS,
-        order: 2,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { request: "data" },
-        children: {
-          country: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.country.label" as const,
-            description: "fields.country.description" as const,
-            placeholder: "fields.country.placeholder" as const,
-            options: CountriesOptions,
-            columns: 6,
-            schema: z.enum(Countries).optional(),
+      series: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.series" as const,
+        schema: z.array(
+          z.object({
+            bucket: z.coerce.date(),
+            signups: z.coerce.number(),
+            activeUsers: z.coerce.number(),
+            payingUsers: z.coerce.number(),
+            revenueUsd: z.coerce.number(),
+            creditsSpent: z.coerce.number(),
           }),
-          language: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.language.label" as const,
-            description: "fields.language.description" as const,
-            placeholder: "fields.language.placeholder" as const,
-            options: LanguagesOptions,
-            columns: 6,
-            schema: z.enum(Languages).optional(),
-          }),
-        },
+        ),
       }),
 
-      // === TIME PERIOD OPTIONS ===
-      timePeriodOptions: objectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "timePeriodOptions.title" as const,
-        description: "timePeriodOptions.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 4,
-        order: 3,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { request: "data" },
-        children: {
-          timePeriod: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.timePeriod.label" as const,
-            description: "fields.timePeriod.description" as const,
-            options: TimePeriodOptions,
-            columns: 3,
-            schema: z.enum(TimePeriod).default(TimePeriod.DAY),
+      channels: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.channels" as const,
+        schema: z.array(
+          z.object({
+            channel: z.string(),
+            signups: z.coerce.number(),
+            paying: z.coerce.number(),
           }),
-          dateRangePreset: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.dateRangePreset.label" as const,
-            description: "fields.dateRangePreset.description" as const,
-            options: DateRangePresetOptions,
-            columns: 3,
-            schema: z
-              .enum(DateRangePreset)
-              .default(DateRangePreset.LAST_30_DAYS),
-          }),
-          dateFrom: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.DATE,
-            label: "fields.dateFrom.label" as const,
-            description: "fields.dateFrom.description" as const,
-            columns: 3,
-            schema: dateSchema.optional(),
-          }),
-          dateTo: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.DATE,
-            label: "fields.dateTo.label" as const,
-            description: "fields.dateTo.description" as const,
-            columns: 3,
-            schema: dateSchema.optional(),
-          }),
-          chartType: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "fields.chartType.label" as const,
-            description: "fields.chartType.description" as const,
-            options: ChartTypeOptions,
-            columns: 3,
-            schema: z.enum(ChartType).default(ChartType.LINE),
-          }),
-          includeComparison: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "fields.includeComparison.label" as const,
-            description: "fields.includeComparison.description" as const,
-            columns: 3,
-            schema: z.coerce.boolean().default(false),
-          }),
-        },
+        ),
       }),
 
-      // === OVERVIEW STATISTICS ===
-      overviewStats: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "response.overviewStats.title" as const,
-        description: "response.overviewStats.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 4,
-        order: 4,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          totalUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.overviewStats.totalUsers.label" as const,
-            icon: "users",
-            variant: "default",
-            format: "compact",
-            schema: z.coerce
-              .number()
-              .describe("Total number of users in system"),
+      revenueByCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.revenueByCurrency" as const,
+        schema: z.array(
+          z.object({
+            currency: z.string(),
+            amount: z.coerce.number(),
+            amountUsd: z.coerce.number(),
+            count: z.coerce.number(),
           }),
-          activeUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.overviewStats.activeUsers.label" as const,
-            icon: "check",
-            variant: "success",
-            format: "compact",
-            schema: z.coerce.number().describe("Number of active users"),
-          }),
-          inactiveUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.overviewStats.inactiveUsers.label" as const,
-            icon: "alert-circle",
-            variant: "muted",
-            format: "compact",
-            schema: z.coerce.number().describe("Number of inactive users"),
-          }),
-          newUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.overviewStats.newUsers.label" as const,
-            icon: "trending-up",
-            variant: "info",
-            format: "compact",
-            schema: z.coerce.number().describe("New users this period"),
-          }),
-        },
+        ),
       }),
 
-      // === EMAIL VERIFICATION STATISTICS ===
-      emailStats: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "response.emailStats.title" as const,
-        description: "response.emailStats.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 3,
-        order: 5,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          emailVerifiedUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.emailStats.emailVerifiedUsers.label" as const,
-            icon: "check-circle",
-            variant: "success",
-            format: "compact",
-            schema: z.coerce.number().describe("Users with verified emails"),
+      subscriptionsByStatus: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.subscriptionsByStatus" as const,
+        schema: z.array(
+          z.object({
+            status: z.string(),
+            count: z.coerce.number(),
           }),
-          emailUnverifiedUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.emailStats.emailUnverifiedUsers.label" as const,
-            icon: "x-circle",
-            variant: "warning",
-            format: "compact",
-            schema: z.coerce.number().describe("Users with unverified emails"),
-          }),
-          verificationRate: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.emailStats.verificationRate.label" as const,
-            icon: "activity",
-            variant: "info",
-            format: "percentage",
-            schema: z.coerce
-              .number()
-              .describe("Email verification percentage (0-1)"),
-          }),
-        },
+        ),
       }),
 
-      // === SUBSCRIPTION STATISTICS ===
-      subscriptionStats: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "response.subscriptionStats.title" as const,
-        description: "response.subscriptionStats.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 4,
-        order: 6,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          activeSubscriptions: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label:
-              "response.subscriptionStats.activeSubscriptions.label" as const,
-            icon: "check",
-            variant: "success",
-            format: "compact",
-            schema: z.coerce
-              .number()
-              .describe("Users with active subscriptions"),
+      topSpenders: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.topSpenders" as const,
+        schema: z.array(
+          z.object({
+            userId: z.string(),
+            email: z.string(),
+            creditsSpent: z.coerce.number(),
+            totalPaidUsd: z.coerce.number(),
           }),
-          canceledSubscriptions: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label:
-              "response.subscriptionStats.canceledSubscriptions.label" as const,
-            icon: "x",
-            variant: "warning",
-            format: "compact",
-            schema: z.coerce
-              .number()
-              .describe("Users with canceled subscriptions"),
-          }),
-          expiredSubscriptions: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label:
-              "response.subscriptionStats.expiredSubscriptions.label" as const,
-            icon: "clock",
-            variant: "muted",
-            format: "compact",
-            schema: z.coerce
-              .number()
-              .describe("Users with expired subscriptions"),
-          }),
-          noSubscription: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.subscriptionStats.noSubscription.label" as const,
-            icon: "users",
-            variant: "muted",
-            format: "compact",
-            schema: z.coerce
-              .number()
-              .describe("Users without any subscription"),
-          }),
-          subscriptionChart: responseField(scopedTranslation, {
-            type: WidgetType.CHART,
-            chartType: "pie",
-            label:
-              "response.subscriptionStats.subscriptionChart.label" as const,
-            description:
-              "response.subscriptionStats.subscriptionChart.description" as const,
-            height: 280,
-            showLegend: true,
-            columns: 12,
-            schema: z
-              .array(
-                z.object({
-                  x: z.string(),
-                  y: z.coerce.number(),
-                  label: z.string().optional(),
-                }),
-              )
-              .describe("Subscription distribution chart data"),
-          }),
-        },
+        ),
       }),
 
-      // === PAYMENT STATISTICS ===
-      paymentStats: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "response.paymentStats.title" as const,
-        description: "response.paymentStats.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 4,
-        order: 6.5,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          totalRevenue: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.paymentStats.totalRevenue.label" as const,
-            icon: "dollar-sign",
-            variant: "success",
-            format: "currency",
-            schema: z.coerce.number().describe("Total revenue in cents"),
-          }),
-          transactionCount: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.paymentStats.transactionCount.label" as const,
-            icon: "receipt",
-            variant: "info",
-            format: "compact",
-            schema: z.coerce.number().describe("Total number of transactions"),
-          }),
-          averageOrderValue: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.paymentStats.averageOrderValue.label" as const,
-            icon: "trending-up",
-            variant: "info",
-            format: "currency",
-            schema: z.coerce.number().describe("Average order value in cents"),
-          }),
-          refundRate: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.paymentStats.refundRate.label" as const,
-            icon: "refresh-cw",
-            variant: "warning",
-            format: "percentage",
-            schema: z.coerce.number().describe("Refund rate (0-1)"),
-          }),
-        },
-      }),
-
-      // === ROLE DISTRIBUTION ===
-      roleDistribution: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "response.roleStats.title" as const,
-        description: "response.roleStats.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 3,
-        order: 7,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          publicUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.roleStats.publicUsers.label" as const,
-            icon: "users",
-            variant: "muted",
-            size: "sm",
-            schema: z.coerce.number().describe("Users with public role"),
-          }),
-          customerUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.roleStats.customerUsers.label" as const,
-            icon: "users",
-            variant: "success",
-            size: "sm",
-            schema: z.coerce.number().describe("Users with customer role"),
-          }),
-          partnerAdminUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.roleStats.partnerAdminUsers.label" as const,
-            icon: "users",
-            variant: "info",
-            size: "sm",
-            schema: z.coerce.number().describe("Users with partner admin role"),
-          }),
-          partnerEmployeeUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.roleStats.partnerEmployeeUsers.label" as const,
-            icon: "users",
-            variant: "info",
-            size: "sm",
-            schema: z.coerce
-              .number()
-              .describe("Users with partner employee role"),
-          }),
-          adminUsers: responseField(scopedTranslation, {
-            type: WidgetType.STAT,
-            label: "response.roleStats.adminUsers.label" as const,
-            icon: "star",
-            variant: "warning",
-            size: "sm",
-            schema: z.coerce.number().describe("Users with admin role"),
-          }),
-          roleChart: responseField(scopedTranslation, {
-            type: WidgetType.CHART,
-            chartType: "pie",
-            label: "response.roleStats.roleChart.label" as const,
-            description: "response.roleStats.roleChart.description" as const,
-            height: 280,
-            showLegend: true,
-            columns: 12,
-            schema: z
-              .array(
-                z.object({
-                  x: z.string(),
-                  y: z.coerce.number(),
-                  label: z.string().optional(),
-                }),
-              )
-              .describe("Role distribution chart data"),
-          }),
-        },
-      }),
-
-      // === GROWTH METRICS ===
-      growthMetrics: objectField(scopedTranslation, {
-        title: "response.growthMetrics.title" as const,
-        description: "response.growthMetrics.description" as const,
-        type: WidgetType.CONTAINER,
-        layoutType: LayoutType.GRID_2_COLUMNS,
-        order: 8,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          timeSeriesData: objectField(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "response.timeStats.title" as const,
-            description: "response.timeStats.description" as const,
-            layoutType: LayoutType.GRID,
-            columns: 4,
-            showFormAlert: false,
-            showSubmitButton: false,
-            usage: { response: true },
-            children: {
-              usersCreatedToday: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label: "response.timeStats.usersCreatedToday.label" as const,
-                icon: "clock",
-                variant: "info",
-                size: "sm",
-                schema: z.coerce.number().describe("Users created today"),
-              }),
-              usersCreatedThisWeek: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label: "response.timeStats.usersCreatedThisWeek.label" as const,
-                icon: "clock",
-                variant: "info",
-                size: "sm",
-                schema: z.coerce.number().describe("Users created this week"),
-              }),
-              usersCreatedThisMonth: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label:
-                  "response.timeStats.usersCreatedThisMonth.label" as const,
-                icon: "clock",
-                variant: "success",
-                size: "sm",
-                schema: z.coerce.number().describe("Users created this month"),
-              }),
-              usersCreatedLastMonth: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label:
-                  "response.timeStats.usersCreatedLastMonth.label" as const,
-                icon: "clock",
-                variant: "muted",
-                size: "sm",
-                schema: z.coerce.number().describe("Users created last month"),
-              }),
-            },
-          }),
-          performanceRates: objectField(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "response.performanceRates.title" as const,
-            description: "response.performanceRates.description" as const,
-            layoutType: LayoutType.GRID,
-            columns: 3,
-            showFormAlert: false,
-            showSubmitButton: false,
-            usage: { response: true },
-            children: {
-              growthRate: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label: "response.performanceRates.growthRate.label" as const,
-                icon: "trending-up",
-                variant: "success",
-                format: "percentage",
-                schema: z.coerce
-                  .number()
-                  .describe("User growth rate percentage (0-1)"),
-              }),
-              leadToUserConversionRate: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label:
-                  "response.performanceRates.leadToUserConversionRate.label" as const,
-                icon: "target",
-                variant: "info",
-                format: "percentage",
-                schema: z.coerce
-                  .number()
-                  .describe("Lead to user conversion rate (0-1)"),
-              }),
-              retentionRate: responseField(scopedTranslation, {
-                type: WidgetType.STAT,
-                label: "response.performanceRates.retentionRate.label" as const,
-                icon: "users",
-                variant: "success",
-                format: "percentage",
-                schema: z.coerce.number().describe("User retention rate (0-1)"),
-              }),
-            },
-          }),
-          growthChart: responseField(scopedTranslation, {
-            type: WidgetType.CHART,
-            chartType: "bar",
-            label: "response.growthMetrics.growthChart.label" as const,
-            description:
-              "response.growthMetrics.growthChart.description" as const,
-            height: 280,
-            showLegend: false,
-            xAxisLabel: "Time Period",
-            yAxisLabel: "Users Created",
-            columns: 12,
-            schema: z
-              .array(
-                z.object({
-                  x: z.string(),
-                  y: z.coerce.number(),
-                  label: z.string().optional(),
-                }),
-              )
-              .describe("User growth over time chart data"),
-          }),
-        },
-      }),
-
-      // === BUSINESS INSIGHTS ===
-      businessInsights: objectField(scopedTranslation, {
-        title: "response.businessInsights.title" as const,
-        description: "response.businessInsights.description" as const,
-        type: WidgetType.CONTAINER,
-        layoutType: LayoutType.STACKED,
-        order: 9,
-        showFormAlert: false,
-        showSubmitButton: false,
-        usage: { response: true },
-        children: {
-          generatedAt: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            fieldType: FieldDataType.DATETIME,
-            label: "response.businessInsights.generatedAt.label" as const,
-            schema: dateSchema.describe("When these statistics were generated"),
-          }),
-        },
+      generatedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.generatedAt" as const,
+        schema: z.coerce.date(),
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -710,9 +241,21 @@ const { GET } = createEndpoint({
       title: "errors.unauthorized.title" as const,
       description: "errors.unauthorized.description" as const,
     },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
+    },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "errors.server.title" as const,
       description: "errors.server.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "errors.unknown.title" as const,
@@ -726,126 +269,120 @@ const { GET } = createEndpoint({
       title: "errors.conflict.title" as const,
       description: "errors.conflict.description" as const,
     },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title" as const,
-      description: "errors.forbidden.description" as const,
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title" as const,
-      description: "errors.notFound.description" as const,
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title" as const,
-      description: "errors.network.description" as const,
-    },
   },
+
   successTypes: {
     title: "success.title" as const,
     description: "success.description" as const,
   },
+
   examples: {
     requests: {
       default: {},
+      quarter: {
+        range: StatsRange.LAST_90_DAYS,
+        granularity: StatsGranularity.WEEK,
+      },
     },
     responses: {
       default: {
-        overviewStats: {
-          totalUsers: 2450,
-          activeUsers: 2100,
-          inactiveUsers: 350,
-          newUsers: 125,
+        period: {
+          from: "2026-10-13T00:00:00.000Z",
+          to: "2026-11-12T23:59:59.999Z",
+          previousFrom: "2026-09-13T00:00:00.000Z",
+          days: 31,
+          granularity: "day",
         },
-        emailStats: {
-          emailVerifiedUsers: 2200,
-          emailUnverifiedUsers: 250,
-          verificationRate: 0.898,
+        kpis: {
+          totalUsers: 381,
+          newUsers: 91,
+          newUsersPrev: 120,
+          activeUsers: 140,
+          activeUsersPrev: 110,
+          anonymousActive: 900,
+          payingUsers: 10,
+          payingUsersPrev: 7,
+          payingUsersAllTime: 30,
+          activeSubscribers: 12,
+          pastDueSubscribers: 3,
+          mrrUsd: 98.5,
+          revenueUsd: 112.4,
+          revenuePrevUsd: 90.1,
+          refundsUsd: 0,
+          revenueAllTimeUsd: 470.2,
+          creditsSpent: 11800,
+          creditsSpentPrev: 9000,
+          signupToPaid: { cohort: 91, converted: 4, rate: 0.044 },
+          retentionD7: { cohort: 70, converted: 21, rate: 0.3 },
         },
-        subscriptionStats: {
-          activeSubscriptions: 850,
-          canceledSubscriptions: 120,
-          expiredSubscriptions: 230,
-          noSubscription: 1250,
-          subscriptionChart: [
-            {
-              x: "Active",
-              y: 850,
-              label: "response.subscriptionStats.activeSubscriptions.label",
-            },
-            {
-              x: "Canceled",
-              y: 120,
-              label: "response.subscriptionStats.canceledSubscriptions.label",
-            },
-            {
-              x: "Expired",
-              y: 230,
-              label: "response.subscriptionStats.expiredSubscriptions.label",
-            },
-            {
-              x: "None",
-              y: 1250,
-              label: "response.subscriptionStats.noSubscription.label",
-            },
-          ],
-        },
-        paymentStats: {
-          totalRevenue: 125000000,
-          transactionCount: 2450,
-          averageOrderValue: 5102,
-          refundRate: 0.023,
-        },
-        roleDistribution: {
-          publicUsers: 1800,
-          customerUsers: 500,
-          partnerAdminUsers: 50,
-          partnerEmployeeUsers: 80,
-          adminUsers: 20,
-          roleChart: [
-            { x: "Public", y: 1800, label: "Public" },
-            { x: "Customer", y: 500, label: "Customer" },
-            { x: "Partner Admin", y: 50, label: "Partner Admin" },
-            { x: "Partner Staff", y: 80, label: "Partner Staff" },
-            { x: "Admin", y: 20, label: "Admin" },
-          ],
-        },
-        growthMetrics: {
-          timeSeriesData: {
-            usersCreatedToday: 12,
-            usersCreatedThisWeek: 85,
-            usersCreatedThisMonth: 320,
-            usersCreatedLastMonth: 280,
+        series: [
+          {
+            bucket: "2026-11-12T00:00:00.000Z",
+            signups: 4,
+            activeUsers: 30,
+            payingUsers: 1,
+            revenueUsd: 8.64,
+            creditsSpent: 420,
           },
-          performanceRates: {
-            growthRate: 0.143,
-            leadToUserConversionRate: 0.204,
-            retentionRate: 0.857,
+        ],
+        channels: [{ channel: "direct", signups: 80, paying: 3 }],
+        revenueByCurrency: [
+          { currency: "USD", amount: 56, amountUsd: 56, count: 7 },
+        ],
+        subscriptionsByStatus: [{ status: "enums.status.active", count: 12 }],
+        topSpenders: [
+          {
+            userId: "123e4567-e89b-12d3-a456-426614174000",
+            email: "user@example.com",
+            creditsSpent: 2096,
+            totalPaidUsd: 30.24,
           },
-          growthChart: [
-            { x: "Last Month", y: 280, label: "Last Month" },
-            { x: "This Month", y: 320, label: "This Month" },
-            { x: "This Week", y: 85, label: "This Week" },
-            { x: "Today", y: 12, label: "Today" },
-          ],
+        ],
+        generatedAt: "2026-11-12T21:00:00.000Z",
+      },
+      quarter: {
+        period: {
+          from: "2026-08-14T00:00:00.000Z",
+          to: "2026-11-12T23:59:59.999Z",
+          previousFrom: "2026-05-16T00:00:00.000Z",
+          days: 91,
+          granularity: "week",
         },
-        businessInsights: {
-          generatedAt: "2024-01-07T12:00:00.000Z",
+        kpis: {
+          totalUsers: 381,
+          newUsers: 300,
+          newUsersPrev: 50,
+          activeUsers: 250,
+          activeUsersPrev: 40,
+          anonymousActive: 3000,
+          payingUsers: 25,
+          payingUsersPrev: 2,
+          payingUsersAllTime: 30,
+          activeSubscribers: 12,
+          pastDueSubscribers: 3,
+          mrrUsd: 98.5,
+          revenueUsd: 400,
+          revenuePrevUsd: 20,
+          refundsUsd: 0,
+          revenueAllTimeUsd: 470.2,
+          creditsSpent: 50000,
+          creditsSpentPrev: 3000,
+          signupToPaid: { cohort: 300, converted: 20, rate: 0.067 },
+          retentionD7: { cohort: 280, converted: 70, rate: 0.25 },
         },
+        series: [],
+        channels: [],
+        revenueByCurrency: [],
+        subscriptionsByStatus: [],
+        topSpenders: [],
+        generatedAt: "2026-11-12T21:00:00.000Z",
       },
     },
   },
 });
 
-// Extract types using the new enhanced system
-export type UserStatsRequestInput = typeof GET.types.RequestInput;
 export type UserStatsRequestOutput = typeof GET.types.RequestOutput;
-export type UserStatsResponseInput = typeof GET.types.ResponseInput;
 export type UserStatsResponseOutput = typeof GET.types.ResponseOutput;
 
-/**
- * Export definitions
- */
-const definitions = {
-  GET,
-} as const;
-
+const definitions = { GET } as const;
 export default definitions;

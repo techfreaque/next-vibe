@@ -1,453 +1,245 @@
 export const translations = {
+  tag: "Users",
   get: {
-    title: "User List",
-    titleShort: "User List",
-    description: "Search and filter users",
-    form: {
-      title: "User Management",
-      description: "Manage and filter users",
-    },
-    actions: {
-      refresh: "Refresh",
-      refreshing: "Refreshing...",
-    },
-    // Search & Filters section
-    searchFilters: {
-      title: "Search & Filters",
-      description: "Search and filter users by criteria",
-    },
-    search: {
-      label: "Search",
-      description: "Search users by name or email",
-      placeholder: "Search users...",
-    },
-    status: {
-      label: "Status",
-      description: "Filter users by status",
-      placeholder: "Select status...",
-    },
-    role: {
-      label: "Role",
-      description: "Filter users by role",
-      placeholder: "Select role...",
-    },
-    subscription: {
-      label: "Subscription",
-      description: "Filter by subscription status",
-      placeholder: "Any subscription status",
-    },
-    creditActivity: {
-      label: "Credit Activity",
-      description: "Filter by credit purchase or spending activity",
-      placeholder: "Any credit activity",
-    },
-    threads: {
-      label: "Threads",
-      description: "Filter by whether the user has any chat threads",
-      placeholder: "Any thread status",
-    },
-    referralActivity: {
-      label: "Referral Activity",
-      description:
-        "Filter by referral link, clicks, signups, or paying subscribers",
-      placeholder: "Any referral activity",
-    },
-    // Sorting section
-    sortingOptions: {
-      title: "Sorting",
-      description: "Configure result sorting",
-    },
-    sortBy: {
-      label: "Sort By",
-      description: "Field to sort by",
-      placeholder: "Select sort field...",
-    },
-    sortOrder: {
-      label: "Sort Order",
-      description: "Sort direction",
-      placeholder: "Select sort order...",
-    },
-    // Response section
-    response: {
-      title: "Users",
-      description: "List of users matching criteria",
-      users: {
-        id: "User ID",
-        email: "Email",
-        privateName: "Private Name",
-        publicName: "Public Name",
-        isActive: "Active",
-        emailVerified: "Verified",
-        createdAt: "Created",
-        updatedAt: "Updated",
-        referralCode: "Ref Code Used",
-        referredByUserId: "Referred By",
-        totalReferrals: "Referrals Made",
+    title: "Users",
+    titleShort: "Users",
+    description:
+      "Every account with what it paid, what it spends and when it was last active. Search, filter by revenue, activity, signup date or source, sort by any money column.",
+    fields: {
+      search: {
+        label: "Search",
+        description: "Email, name, or the start of a user ID",
+        placeholder: "Search email, name or ID...",
       },
-      totalCount: "Total Users",
-      pageCount: "Total Pages",
+      roles: {
+        label: "Roles",
+        description: "Users holding any of these roles",
+        placeholder: "Any role",
+      },
+      accountState: {
+        label: "Account state",
+        description: "Active, inactive, banned, verified or unverified",
+        placeholder: "Any state",
+      },
+      payer: {
+        label: "Paid or free",
+        description: "Paid = at least one successful payment ever",
+        placeholder: "Paid or free",
+      },
+      subscription: {
+        label: "Subscription",
+        description: "Active subscription now, ever subscribed, or never",
+        placeholder: "Any subscription",
+      },
+      lastActive: {
+        label: "Last active",
+        description:
+          "Activity = credit spend (own or linked lead wallets) or a new login",
+        placeholder: "Any time",
+      },
+      signupFrom: {
+        label: "Signed up from",
+        description: "First signup day to include",
+      },
+      signupTo: {
+        label: "Signed up to",
+        description: "Last signup day to include",
+      },
+      creditsMin: {
+        label: "Credits at least",
+        description: "Minimum wallet balance",
+      },
+      creditsMax: {
+        label: "Credits at most",
+        description: "Maximum wallet balance",
+      },
+      source: {
+        label: "Source",
+        description:
+          "First-touch channel, UTM source/medium/campaign, referrer host or referral code",
+        placeholder: "google, ref:, newsletter...",
+      },
+      referralActivity: {
+        label: "As referrer",
+        description: "Users who share a referral link and what it produced",
+        placeholder: "Any",
+      },
+      sortBy: {
+        label: "Sort by",
+        description: "Column to sort by",
+      },
+      sortOrder: {
+        label: "Order",
+        description: "Ascending or descending",
+      },
+      page: {
+        label: "Page",
+        description: "Page number, starts at 1",
+      },
+      limit: {
+        label: "Per page",
+        description: "Users per page (max 200)",
+      },
     },
-    // Pagination section
-    page: {
-      label: "Page",
+    response: {
+      users: "Users",
+      summary: "Summary",
     },
-    limit: {
-      label: "Per Page",
-    },
-    // Error messages
     errors: {
       unauthorized: {
         title: "Unauthorized",
-        description: "You must be logged in to view users",
+        description: "Log in to view users",
       },
       validation: {
-        title: "Validation Error",
-        description: "Invalid parameters provided",
+        title: "Invalid filters",
+        description: "Check the filter values and try again",
       },
       forbidden: {
-        title: "Access Forbidden",
-        description: "You don't have permission to view users",
+        title: "Admins only",
+        description: "You need the admin role to view users",
       },
       server: {
-        title: "Server Error",
-        description: "Unable to retrieve users",
+        title: "Could not load users",
+        description: "The server failed to load the user list",
       },
       unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
+        title: "Unexpected error",
+        description: "Something went wrong loading users",
       },
       conflict: {
-        title: "Conflict Error",
-        description: "Unable to list users due to conflicts",
+        title: "Conflict",
+        description: "The request conflicts with current data",
       },
       network: {
-        title: "Network Error",
-        description: "Unable to connect to the server",
+        title: "Network error",
+        description: "Could not reach the server",
       },
       notFound: {
-        title: "Not Found",
-        description: "No users found",
+        title: "No users",
+        description: "No users match these filters",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Success",
-      description: "Users retrieved successfully",
+      title: "Users loaded",
+      description: "User list loaded",
     },
-  },
-  // Legacy keys for backward compatibility
-  title: "List Users",
-  description: "List and search users with filtering",
-  category: "Users",
-  tag: "List",
-  container: {
-    title: "User List",
-    description: "Search and filter users",
-  },
-  response: {
-    summary: {
-      title: "User Summary",
-      description: "Summary statistics for user list",
-    },
-    users: {
-      title: "Users",
-    },
-    user: {
-      title: "User",
-      id: "User ID",
-      email: "Email",
-      privateName: "Private Name",
-      publicName: "Public Name",
-      firstName: "First Name",
-      lastName: "Last Name",
-      company: "Company",
-      phone: "Phone",
-      isActive: "Active",
-      emailVerified: "Email Verified",
-      role: "Role",
-      createdAt: "Created At",
-      updatedAt: "Updated At",
-    },
-    total: {
-      content: "Total Users",
-    },
-    page: {
-      content: "Current Page",
-    },
-    limit: {
-      content: "Users Per Page",
-    },
-    totalPages: {
-      content: "Total Pages",
-    },
-  },
-  errors: {
-    unauthorized: {
-      title: "Unauthorized Access",
-      description: "You must be logged in to view users",
-    },
-    validation: {
-      title: "Validation Failed",
-      description: "Invalid parameters provided for user listing",
-    },
-    forbidden: {
-      title: "Access Forbidden",
-      description: "You don't have permission to view users",
-    },
-    server: {
-      title: "Server Error",
-      description: "Unable to retrieve users due to server error",
-    },
-    unknown: {
-      title: "Unknown Error",
-      description: "An unexpected error occurred while listing users",
-    },
-    conflict: {
-      title: "Conflict Error",
-      description: "Unable to list users due to existing conflicts",
-    },
-    network: {
-      title: "Network Error",
-      description: "Unable to connect to the server",
-    },
-    notFound: {
-      title: "Users Not Found",
-      description: "No users were found matching your criteria",
-    },
-    unsavedChanges: {
-      title: "Unsaved Changes",
-      description: "You have unsaved changes that will be lost",
-    },
-    internal: {
-      title: "Internal Error",
-      description: "An internal error occurred while listing users",
-    },
-  },
-  post: {
-    title: "List",
-    description: "List endpoint",
-    form: {
-      title: "List Configuration",
-      description: "Configure list parameters",
-    },
-    response: {
-      title: "Response",
-      description: "List response data",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      server: {
-        title: "Server Error",
-        description: "Internal server error occurred",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unknown error occurred",
-      },
-      network: {
-        title: "Network Error",
-        description: "Network error occurred",
-      },
-      forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Resource not found",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "Data conflict occurred",
-      },
-    },
-    success: {
-      title: "Success",
-      description: "Operation completed successfully",
-    },
-  },
-  widget: {
-    statusActive: "Active",
-    statusInactive: "Inactive",
-    statusUnverified: "Unverified",
-    joined: "Joined",
-    creditHistory: "Credit History",
-    view: "View",
-    edit: "Edit",
-    delete: "Delete",
-    stats: "Stats",
-    graphs: "Graphs",
-    newUser: "New User",
-    searchPlaceholder: "Search by name or email\u2026 (Ctrl+F)",
-    roleFilterLabel: "Role",
-    sortLabel: "Sort:",
-    clearFilters: "Clear filters",
-    noUsersMatchFilters: "No users match your filters.",
-    noUsersFound: "No users found.",
-    userStatistics: "User Statistics",
-    refresh: "Refresh",
-    roleAll: "All",
-    roleAdmin: "Admin",
-    roleCustomer: "Customer",
-    rolePartnerAdmin: "Partner Admin",
-    rolePartnerEmployee: "Partner Employee",
-    statusAll: "All",
-    sortNewest: "Newest",
-    sortOldest: "Oldest",
-    sortNameAZ: "Name A-Z",
-    sortNameZA: "Name Z-A",
-    sortEmailAZ: "Email A-Z",
-    of: "of",
-    usersShown: "users shown",
-    paginationPage: "Page",
-    paginationOf: "of",
-    paginationSeparator: "·",
-    paginationUsers: "users",
   },
   enums: {
-    userSortField: {
-      createdAt: "Created At",
-      updatedAt: "Updated At",
-      email: "Email",
-      privateName: "Private Name",
-      publicName: "Public Name",
-      firstName: "First Name",
-      lastName: "Last Name",
-      company: "Company",
-      lastLogin: "Last Login",
-    },
     sortOrder: {
       asc: "Ascending",
       desc: "Descending",
     },
-    userStatusFilter: {
-      all: "All",
-      active: "Active",
-      inactive: "Inactive",
-      pending: "Pending",
-      suspended: "Suspended",
-      emailVerified: "Email Verified",
-      emailUnverified: "Email Unverified",
-    },
-    userStatus: {
-      active: "Active",
-      inactive: "Inactive",
-      pending: "Pending",
-      suspended: "Suspended",
-    },
-    userRoleFilter: {
-      all: "All",
-      user: "User",
-      public: "Public",
-      customer: "Customer",
-      moderator: "Moderator",
-      partnerAdmin: "Partner Admin",
-      partnerEmployee: "Partner Employee",
+    role: {
       admin: "Admin",
-      superAdmin: "Super Admin",
+      customer: "Customer",
+      partnerAdmin: "Partner admin",
+      partnerEmployee: "Partner employee",
+      public: "Public",
     },
-    subscriptionPresenceFilter: {
+    subscription: {
       any: "Any",
-      hasActive: "Has active subscription",
-      hadAny: "Had a subscription (ever)",
+      hasActive: "Active now",
+      hadAny: "Ever subscribed",
       never: "Never subscribed",
     },
-    creditActivityFilter: {
+    referrer: {
       any: "Any",
-      boughtPack: "Bought credit pack",
-      spentCredits: "Spent credits",
-      neverSpent: "Never spent credits",
+      hasCode: "Has a referral link",
+      hasClicks: "Link got clicks",
+      hasSignups: "Link got signups",
+      hasSubscribers: "Link got paying subscribers",
     },
-    threadsFilter: {
-      any: "Any",
-      hasThreads: "Has threads",
-      noThreads: "No threads",
+    sortField: {
+      createdAt: "Signup date",
+      lastActive: "Last active",
+      credits: "Credit balance",
+      totalPaid: "Total paid",
+      creditsSpent: "Credits spent",
+      email: "Email",
+      name: "Name",
     },
-    referralActivityFilter: {
-      any: "Any",
-      hasCode: "Has referral link",
-      hasClicks: "Has referral clicks",
-      hasSignups: "Has referral signups",
-      hasSubscribers: "Has paying referrals",
+    accountState: {
+      active: "Active",
+      inactive: "Inactive",
+      banned: "Banned",
+      verified: "Email verified",
+      unverified: "Email unverified",
+    },
+    payer: {
+      any: "Paid or free",
+      paid: "Paying",
+      free: "Never paid",
+    },
+    lastActive: {
+      any: "Any time",
+      day: "Last 24 hours",
+      week: "Last 7 days",
+      month: "Last 30 days",
+      dormant: "Dormant 30+ days",
+      never: "Never active",
     },
   },
-  list: {
-    enums: {
-      userSortField: {
-        createdAt: "Created At",
-        updatedAt: "Updated At",
-        email: "Email",
-        privateName: "Private Name",
-        publicName: "Public Name",
-        firstName: "First Name",
-        lastName: "Last Name",
-        company: "Company",
-        lastLogin: "Last Login",
-      },
-      sortOrder: {
-        asc: "Ascending",
-        desc: "Descending",
-      },
-      userStatusFilter: {
-        all: "All",
-        active: "Active",
-        inactive: "Inactive",
-        pending: "Pending",
-        suspended: "Suspended",
-        emailVerified: "Email Verified",
-        emailUnverified: "Email Unverified",
-      },
-      userStatus: {
-        active: "Active",
-        inactive: "Inactive",
-        pending: "Pending",
-        suspended: "Suspended",
-      },
-      userRoleFilter: {
-        all: "All",
-        user: "User",
-        public: "Public",
-        customer: "Customer",
-        moderator: "Moderator",
-        partnerAdmin: "Partner Admin",
-        partnerEmployee: "Partner Employee",
-        admin: "Admin",
-        superAdmin: "Super Admin",
-      },
-      subscriptionPresenceFilter: {
-        any: "Any",
-        hasActive: "Has active subscription",
-        hadAny: "Had a subscription (ever)",
-        never: "Never subscribed",
-      },
-      creditActivityFilter: {
-        any: "Any",
-        boughtPack: "Bought credit pack",
-        spentCredits: "Spent credits",
-        neverSpent: "Never spent credits",
-      },
-      threadsFilter: {
-        any: "Any",
-        hasThreads: "Has threads",
-        noThreads: "No threads",
-      },
-      referralActivityFilter: {
-        any: "Any",
-        hasCode: "Has referral link",
-        hasClicks: "Has referral clicks",
-        hasSignups: "Has referral signups",
-        hasSubscribers: "Has paying referrals",
-      },
+  widget: {
+    creditsAny: "Any",
+    titleWithCount: "Users ({{count}})",
+    loading: "Loading users...",
+    never: "Never",
+    referredBy: "via {{email}}",
+    actions: {
+      stats: "Stats",
+      refresh: "Refresh",
+      newUser: "New user",
+      clearFilters: "Clear filters",
+      moreFilters: "Filters",
+    },
+    kpi: {
+      matching: "Matching users",
+      paying: "Paying",
+      payingShare: "{{percent}}% of matching",
+      revenue: "Lifetime revenue",
+      revenueHint: "Succeeded payments, USD",
+      credits: "Credits held",
+      creditsHint: "Sum of wallet balances",
+    },
+    quick: {
+      paying: "Paying",
+      free: "Never paid",
+      activeWeek: "Active 7d",
+      dormant: "Dormant 30d+",
+      never: "Never active",
+    },
+    columns: {
+      user: "User",
+      joined: "Joined",
+      lastActive: "Last active",
+      credits: "Credits",
+      spent: "Spent",
+      paid: "Paid",
+      subscription: "Plan",
+      source: "Source",
+      id: "ID",
+    },
+    flags: {
+      admin: "admin",
+      banned: "Banned",
+      unverified: "Unverified",
+    },
+    empty: {
+      none: "No users yet",
+      filtered: "No users match these filters",
+      filteredHint: "Loosen a filter or clear them all.",
+    },
+    pagination: {
+      showing: "{{start}}-{{end}} of {{total}}",
+    },
+    text: {
+      header: "{{total}} users | {{paying}} paying | {{paid}} lifetime revenue",
+      pageHint: "Page {{page}}/{{pages}}. Next: --page={{next}}",
+      detailHint: "Details: vibe users-view --userId=<ID>",
     },
   },
 };

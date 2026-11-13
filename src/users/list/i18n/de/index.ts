@@ -1,457 +1,247 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  tag: "Nutzer",
   get: {
-    title: "Benutzerliste",
-    titleShort: "Benutzerliste",
-    description: "Benutzer durchsuchen und filtern",
-    form: {
-      title: "Benutzerverwaltung",
-      description: "Benutzer verwalten und filtern",
-    },
-    actions: {
-      refresh: "Aktualisieren",
-      refreshing: "Aktualisiere...",
-    },
-    // Search & Filters section
-    searchFilters: {
-      title: "Suche & Filter",
-      description: "Benutzer nach Kriterien durchsuchen und filtern",
-    },
-    search: {
-      label: "Suchen",
-      description: "Benutzer nach Name oder E-Mail durchsuchen",
-      placeholder: "Benutzer suchen...",
-    },
-    status: {
-      label: "Status",
-      description: "Benutzer nach Status filtern",
-      placeholder: "Status auswählen...",
-    },
-    role: {
-      label: "Rolle",
-      description: "Benutzer nach Rolle filtern",
-      placeholder: "Rolle auswählen...",
-    },
-    subscription: {
-      label: "Abonnement",
-      description: "Nach Abonnementstatus filtern",
-      placeholder: "Beliebiger Abonnementstatus",
-    },
-    creditActivity: {
-      label: "Kreditaktivität",
-      description: "Nach Kauf oder Verbrauch von Guthaben filtern",
-      placeholder: "Beliebige Kreditaktivität",
-    },
-    threads: {
-      label: "Unterhaltungen",
-      description: "Filtern, ob der Benutzer Chat-Unterhaltungen hat",
-      placeholder: "Beliebiger Status",
-    },
-    referralActivity: {
-      label: "Empfehlungsaktivität",
-      description:
-        "Nach Empfehlungslink, Klicks, Anmeldungen oder zahlenden Abonnenten filtern",
-      placeholder: "Beliebige Empfehlungsaktivität",
-    },
-    // Sorting section
-    sortingOptions: {
-      title: "Sortierung",
-      description: "Ergebnissortierung konfigurieren",
-    },
-    sortBy: {
-      label: "Sortieren nach",
-      description: "Feld zum Sortieren",
-      placeholder: "Sortierfeld auswählen...",
-    },
-    sortOrder: {
-      label: "Sortierreihenfolge",
-      description: "Sortierrichtung",
-      placeholder: "Sortierrichtung auswählen...",
-    },
-    // Response section
-    response: {
-      title: "Benutzer",
-      description: "Liste der Benutzer, die den Kriterien entsprechen",
-      users: {
-        id: "Benutzer-ID",
-        email: "E-Mail",
-        privateName: "Privater Name",
-        publicName: "Öffentlicher Name",
-        isActive: "Aktiv",
-        emailVerified: "Verifiziert",
-        createdAt: "Erstellt",
-        updatedAt: "Aktualisiert",
-        referralCode: "Verwendeter Ref.-Code",
-        referredByUserId: "Empfohlen von",
-        totalReferrals: "Geworbene Nutzer",
+    title: "Nutzer",
+    titleShort: "Nutzer",
+    description:
+      "Jedes Konto mit Umsatz, Credit-Verbrauch und letzter Aktivität. Suchen, nach Umsatz, Aktivität, Anmeldedatum oder Herkunft filtern, nach jeder Geldspalte sortieren.",
+    fields: {
+      search: {
+        label: "Suche",
+        description: "E-Mail, Name oder Anfang einer Nutzer-ID",
+        placeholder: "E-Mail, Name oder ID suchen...",
       },
-      totalCount: "Benutzer insgesamt",
-      pageCount: "Seiten insgesamt",
-    },
-    // Pagination section
-    page: {
-      label: "Seite",
-    },
-    limit: {
-      label: "Pro Seite",
-    },
-    // Error messages
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Sie müssen angemeldet sein, um Benutzer anzuzeigen",
+      roles: {
+        label: "Rollen",
+        description: "Nutzer mit einer dieser Rollen",
+        placeholder: "Jede Rolle",
       },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Parameter angegeben",
+      accountState: {
+        label: "Kontostatus",
+        description: "Aktiv, inaktiv, gesperrt, verifiziert oder unverifiziert",
+        placeholder: "Jeder Status",
       },
-      forbidden: {
-        title: "Zugriff verboten",
-        description: "Sie haben keine Berechtigung, Benutzer anzuzeigen",
+      payer: {
+        label: "Zahlend oder gratis",
+        description: "Zahlend = mindestens eine erfolgreiche Zahlung",
+        placeholder: "Zahlend oder gratis",
       },
-      server: {
-        title: "Serverfehler",
-        description: "Benutzer konnten nicht abgerufen werden",
+      subscription: {
+        label: "Abo",
+        description: "Aktuell aktives Abo, jemals abonniert oder nie",
+        placeholder: "Jedes Abo",
       },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler ist aufgetreten",
-      },
-      conflict: {
-        title: "Konfliktfehler",
+      lastActive: {
+        label: "Zuletzt aktiv",
         description:
-          "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
+          "Aktivität = Credit-Verbrauch (eigene oder verknüpfte Lead-Wallets) oder neuer Login",
+        placeholder: "Beliebig",
       },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Keine Verbindung zum Server möglich",
+      signupFrom: {
+        label: "Angemeldet ab",
+        description: "Erster einbezogener Anmeldetag",
       },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Keine Benutzer gefunden",
+      signupTo: {
+        label: "Angemeldet bis",
+        description: "Letzter einbezogener Anmeldetag",
       },
-      unsavedChanges: {
-        title: "Ungespeicherte Änderungen",
-        description: "Sie haben ungespeicherte Änderungen",
+      creditsMin: {
+        label: "Credits mindestens",
+        description: "Minimales Wallet-Guthaben",
       },
-    },
-    success: {
-      title: "Erfolg",
-      description: "Benutzer erfolgreich abgerufen",
-    },
-  },
-  // Legacy keys for backward compatibility
-  title: "Benutzer auflisten",
-  description: "Benutzer auflisten und durchsuchen mit Filterung",
-  category: "Benutzer",
-  tag: "Liste",
-  container: {
-    title: "Benutzerliste",
-    description: "Benutzer durchsuchen und filtern",
-  },
-  response: {
-    summary: {
-      title: "Benutzer-Zusammenfassung",
-      description: "Zusammenfassungsstatistiken für die Benutzerliste",
-    },
-    users: {
-      title: "Benutzer",
-    },
-    user: {
-      title: "Benutzer",
-      id: "Benutzer-ID",
-      email: "E-Mail",
-      privateName: "Privater Name",
-      publicName: "Öffentlicher Name",
-      firstName: "Vorname",
-      lastName: "Nachname",
-      company: "Unternehmen",
-      phone: "Telefon",
-      isActive: "Aktiv",
-      emailVerified: "E-Mail verifiziert",
-      role: "Rolle",
-      createdAt: "Erstellt am",
-      updatedAt: "Aktualisiert am",
-    },
-    total: {
-      content: "Benutzer insgesamt",
-    },
-    page: {
-      content: "Aktuelle Seite",
-    },
-    limit: {
-      content: "Benutzer pro Seite",
-    },
-    totalPages: {
-      content: "Seiten insgesamt",
-    },
-  },
-  errors: {
-    unauthorized: {
-      title: "Nicht autorisiert",
-      description: "Authentifizierung erforderlich",
-    },
-    validation: {
-      title: "Validierungsfehler",
-      description: "Ungültige Anfrageparameter",
-    },
-    forbidden: {
-      title: "Verboten",
-      description: "Zugriff verboten",
-    },
-    server: {
-      title: "Serverfehler",
-      description: "Interner Serverfehler",
-    },
-    unknown: {
-      title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist aufgetreten",
-    },
-    network: {
-      title: "Netzwerkfehler",
-      description: "Netzwerkfehler aufgetreten",
-    },
-    notFound: {
-      title: "Nicht gefunden",
-      description: "Ressource nicht gefunden",
-    },
-    conflict: {
-      title: "Konflikt",
-      description: "Datenkonflikt aufgetreten",
-    },
-    unsavedChanges: {
-      title: "Ungespeicherte Änderungen",
-      description: "Sie haben ungespeicherte Änderungen, die verloren gehen",
-    },
-    internal: {
-      title: "Interner Fehler",
-      description:
-        "Ein interner Fehler ist beim Auflisten der Benutzer aufgetreten",
-    },
-  },
-  post: {
-    title: "Liste",
-    description: "Listen-Endpunkt",
-    form: {
-      title: "Listenkonfiguration",
-      description: "Listenparameter konfigurieren",
+      creditsMax: {
+        label: "Credits höchstens",
+        description: "Maximales Wallet-Guthaben",
+      },
+      source: {
+        label: "Herkunft",
+        description:
+          "Erstkontakt-Kanal, UTM-Quelle/Medium/Kampagne, Referrer-Host oder Empfehlungscode",
+        placeholder: "google, ref:, newsletter...",
+      },
+      referralActivity: {
+        label: "Als Empfehler",
+        description: "Nutzer mit Empfehlungslink und was er gebracht hat",
+        placeholder: "Beliebig",
+      },
+      sortBy: {
+        label: "Sortieren nach",
+        description: "Sortierspalte",
+      },
+      sortOrder: {
+        label: "Reihenfolge",
+        description: "Aufsteigend oder absteigend",
+      },
+      page: {
+        label: "Seite",
+        description: "Seitennummer, beginnt bei 1",
+      },
+      limit: {
+        label: "Pro Seite",
+        description: "Nutzer pro Seite (max. 200)",
+      },
     },
     response: {
-      title: "Antwort",
-      description: "Listen-Antwortdaten",
+      users: "Nutzer",
+      summary: "Übersicht",
     },
     errors: {
       unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
+        title: "Nicht angemeldet",
+        description: "Melde dich an, um Nutzer zu sehen",
       },
       validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Interner Serverfehler",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist aufgetreten",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
+        title: "Ungültige Filter",
+        description: "Prüfe die Filterwerte und versuche es erneut",
       },
       forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
+        title: "Nur für Admins",
+        description: "Dafür brauchst du die Admin-Rolle",
       },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Ressource nicht gefunden",
+      server: {
+        title: "Nutzer konnten nicht geladen werden",
+        description: "Der Server konnte die Nutzerliste nicht laden",
+      },
+      unknown: {
+        title: "Unerwarteter Fehler",
+        description: "Beim Laden der Nutzer ist etwas schiefgelaufen",
       },
       conflict: {
         title: "Konflikt",
-        description: "Datenkonflikt aufgetreten",
+        description: "Die Anfrage widerspricht den aktuellen Daten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Server nicht erreichbar",
+      },
+      notFound: {
+        title: "Keine Nutzer",
+        description: "Keine Nutzer passen zu diesen Filtern",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Du hast ungespeicherte Änderungen",
       },
     },
     success: {
-      title: "Erfolg",
-      description: "Vorgang erfolgreich abgeschlossen",
+      title: "Nutzer geladen",
+      description: "Nutzerliste geladen",
     },
-  },
-  widget: {
-    statusActive: "Aktiv",
-    statusInactive: "Inaktiv",
-    statusUnverified: "Nicht verifiziert",
-    joined: "Beigetreten",
-    creditHistory: "Kreditverlauf",
-    view: "Ansehen",
-    edit: "Bearbeiten",
-    delete: "L\u00F6schen",
-    stats: "Statistiken",
-    graphs: "Graphen",
-    newUser: "Neuer Benutzer",
-    searchPlaceholder: "Nach Name oder E-Mail suchen\u2026 (Strg+F)",
-    roleFilterLabel: "Rolle",
-    sortLabel: "Sortieren:",
-    clearFilters: "Filter zur\u00FCcksetzen",
-    noUsersMatchFilters: "Keine Benutzer entsprechen den Filtern.",
-    noUsersFound: "Keine Benutzer gefunden.",
-    userStatistics: "Benutzerstatistiken",
-    refresh: "Aktualisieren",
-    roleAll: "Alle",
-    roleAdmin: "Administrator",
-    roleCustomer: "Kunde",
-    rolePartnerAdmin: "Partner Administrator",
-    rolePartnerEmployee: "Partner Mitarbeiter",
-    statusAll: "Alle",
-    sortNewest: "Neueste",
-    sortOldest: "\u00C4lteste",
-    sortNameAZ: "Name A-Z",
-    sortNameZA: "Name Z-A",
-    sortEmailAZ: "E-Mail A-Z",
-    of: "von",
-    usersShown: "Benutzer angezeigt",
-    paginationPage: "Seite",
-    paginationOf: "von",
-    paginationSeparator: "·",
-    paginationUsers: "Benutzer",
   },
   enums: {
-    userSortField: {
-      createdAt: "Erstellt am",
-      updatedAt: "Aktualisiert am",
-      email: "E-Mail",
-      privateName: "Privater Name",
-      publicName: "Öffentlicher Name",
-      firstName: "Vorname",
-      lastName: "Nachname",
-      company: "Unternehmen",
-      lastLogin: "Letzter Login",
-    },
     sortOrder: {
       asc: "Aufsteigend",
       desc: "Absteigend",
     },
-    userStatusFilter: {
-      all: "Alle",
-      active: "Aktiv",
-      inactive: "Inaktiv",
-      pending: "Ausstehend",
-      suspended: "Gesperrt",
-      emailVerified: "E-Mail verifiziert",
-      emailUnverified: "E-Mail nicht verifiziert",
-    },
-    userStatus: {
-      active: "Aktiv",
-      inactive: "Inaktiv",
-      pending: "Ausstehend",
-      suspended: "Gesperrt",
-    },
-    userRoleFilter: {
-      all: "Alle",
-      user: "Benutzer",
-      public: "Öffentlich",
+    role: {
+      admin: "Admin",
       customer: "Kunde",
-      moderator: "Moderator",
-      partnerAdmin: "Partner Administrator",
-      partnerEmployee: "Partner Mitarbeiter",
-      admin: "Administrator",
-      superAdmin: "Super Administrator",
+      partnerAdmin: "Partner-Admin",
+      partnerEmployee: "Partner-Mitarbeiter",
+      public: "Öffentlich",
     },
-    subscriptionPresenceFilter: {
+    subscription: {
       any: "Beliebig",
-      hasActive: "Hat aktives Abonnement",
-      hadAny: "Hatte jemals ein Abonnement",
+      hasActive: "Aktuell aktiv",
+      hadAny: "Jemals abonniert",
       never: "Nie abonniert",
     },
-    creditActivityFilter: {
-      any: "Beliebig",
-      boughtPack: "Guthaben-Paket gekauft",
-      spentCredits: "Guthaben verbraucht",
-      neverSpent: "Nie Guthaben verbraucht",
-    },
-    threadsFilter: {
-      any: "Beliebig",
-      hasThreads: "Hat Unterhaltungen",
-      noThreads: "Keine Unterhaltungen",
-    },
-    referralActivityFilter: {
+    referrer: {
       any: "Beliebig",
       hasCode: "Hat Empfehlungslink",
-      hasClicks: "Hat Empfehlungsklicks",
-      hasSignups: "Hat Empfehlungsanmeldungen",
-      hasSubscribers: "Hat zahlende Geworbene",
+      hasClicks: "Link hat Klicks",
+      hasSignups: "Link hat Anmeldungen",
+      hasSubscribers: "Link hat zahlende Abonnenten",
+    },
+    sortField: {
+      createdAt: "Anmeldedatum",
+      lastActive: "Zuletzt aktiv",
+      credits: "Credit-Guthaben",
+      totalPaid: "Gesamtumsatz",
+      creditsSpent: "Verbrauchte Credits",
+      email: "E-Mail",
+      name: "Name",
+    },
+    accountState: {
+      active: "Aktiv",
+      inactive: "Inaktiv",
+      banned: "Gesperrt",
+      verified: "E-Mail verifiziert",
+      unverified: "E-Mail unverifiziert",
+    },
+    payer: {
+      any: "Zahlend oder gratis",
+      paid: "Zahlend",
+      free: "Nie bezahlt",
+    },
+    lastActive: {
+      any: "Beliebig",
+      day: "Letzte 24 Stunden",
+      week: "Letzte 7 Tage",
+      month: "Letzte 30 Tage",
+      dormant: "Seit 30+ Tagen inaktiv",
+      never: "Nie aktiv",
     },
   },
-  list: {
-    enums: {
-      userSortField: {
-        createdAt: "Erstellt am",
-        updatedAt: "Aktualisiert am",
-        email: "E-Mail",
-        privateName: "Privater Name",
-        publicName: "Öffentlicher Name",
-        firstName: "Vorname",
-        lastName: "Nachname",
-        company: "Unternehmen",
-        lastLogin: "Letzter Login",
-      },
-      sortOrder: {
-        asc: "Aufsteigend",
-        desc: "Absteigend",
-      },
-      userStatusFilter: {
-        all: "Alle",
-        active: "Aktiv",
-        inactive: "Inaktiv",
-        pending: "Ausstehend",
-        suspended: "Gesperrt",
-        emailVerified: "E-Mail verifiziert",
-        emailUnverified: "E-Mail nicht verifiziert",
-      },
-      userStatus: {
-        active: "Aktiv",
-        inactive: "Inaktiv",
-        pending: "Ausstehend",
-        suspended: "Gesperrt",
-      },
-      userRoleFilter: {
-        all: "Alle",
-        user: "Benutzer",
-        public: "Öffentlich",
-        customer: "Kunde",
-        moderator: "Moderator",
-        partnerAdmin: "Partner Administrator",
-        partnerEmployee: "Partner Mitarbeiter",
-        admin: "Administrator",
-        superAdmin: "Super Administrator",
-      },
-      subscriptionPresenceFilter: {
-        any: "Beliebig",
-        hasActive: "Hat aktives Abonnement",
-        hadAny: "Hatte jemals ein Abonnement",
-        never: "Nie abonniert",
-      },
-      creditActivityFilter: {
-        any: "Beliebig",
-        boughtPack: "Guthaben-Paket gekauft",
-        spentCredits: "Guthaben verbraucht",
-        neverSpent: "Nie Guthaben verbraucht",
-      },
-      threadsFilter: {
-        any: "Beliebig",
-        hasThreads: "Hat Unterhaltungen",
-        noThreads: "Keine Unterhaltungen",
-      },
-      referralActivityFilter: {
-        any: "Beliebig",
-        hasCode: "Hat Empfehlungslink",
-        hasClicks: "Hat Empfehlungsklicks",
-        hasSignups: "Hat Empfehlungsanmeldungen",
-        hasSubscribers: "Hat zahlende Geworbene",
-      },
+  widget: {
+    creditsAny: "Beliebig",
+    titleWithCount: "Nutzer ({{count}})",
+    loading: "Nutzer werden geladen...",
+    never: "Nie",
+    referredBy: "über {{email}}",
+    actions: {
+      stats: "Statistik",
+      refresh: "Aktualisieren",
+      newUser: "Neuer Nutzer",
+      clearFilters: "Filter zurücksetzen",
+      moreFilters: "Filter",
+    },
+    kpi: {
+      matching: "Treffer",
+      paying: "Zahlend",
+      payingShare: "{{percent}}% der Treffer",
+      revenue: "Gesamtumsatz",
+      revenueHint: "Erfolgreiche Zahlungen, USD",
+      credits: "Credit-Bestand",
+      creditsHint: "Summe aller Wallet-Guthaben",
+    },
+    quick: {
+      paying: "Zahlend",
+      free: "Nie bezahlt",
+      activeWeek: "Aktiv 7 T.",
+      dormant: "Inaktiv 30+ T.",
+      never: "Nie aktiv",
+    },
+    columns: {
+      user: "Nutzer",
+      joined: "Seit",
+      lastActive: "Zuletzt aktiv",
+      credits: "Credits",
+      spent: "Verbraucht",
+      paid: "Bezahlt",
+      subscription: "Abo",
+      source: "Herkunft",
+      id: "ID",
+    },
+    flags: {
+      admin: "Admin",
+      banned: "Gesperrt",
+      unverified: "Unverifiziert",
+    },
+    empty: {
+      none: "Noch keine Nutzer",
+      filtered: "Keine Nutzer passen zu diesen Filtern",
+      filteredHint: "Lockere einen Filter oder setze alle zurück.",
+    },
+    pagination: {
+      showing: "{{start}}-{{end}} von {{total}}",
+    },
+    text: {
+      header: "{{total}} Nutzer | {{paying}} zahlend | {{paid}} Gesamtumsatz",
+      pageHint: "Seite {{page}}/{{pages}}. Weiter: --page={{next}}",
+      detailHint: "Details: vibe users-view --userId=<ID>",
     },
   },
 };

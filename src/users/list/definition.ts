@@ -1,13 +1,14 @@
 /**
  * Users List API Route Definition
- * Following the exact pattern from leads/list/definition.ts
+ * Admin user directory: search, business filters, sortable money/activity columns.
+ * Every request field is flat and optional so CLI/MCP calls work with zero args.
  */
 
+import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
@@ -16,44 +17,65 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
-  objectField,
-  objectOptionalField,
   requestField,
-  requestResponseField,
-  responseArrayField,
   responseField,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import {
-  CreditActivityFilter,
-  CreditActivityFilterOptions,
-  ReferralActivityFilter,
-  ReferralActivityFilterOptions,
-  SortOrder,
-  SortOrderOptions,
-  SubscriptionPresenceFilter,
-  SubscriptionPresenceFilterOptions,
-  ThreadsFilter,
-  ThreadsFilterOptions,
-  UserRoleFilter,
-  UserRoleFilterOptions,
-  UserSortField,
-  UserSortFieldOptions,
-  UserStatusFilter,
-  UserStatusFilterOptions,
-} from "../enum";
 import { USERS_LIST_ALIAS } from "./constants";
+import {
+  AccountStateFilter,
+  AccountStateFilterOptions,
+  LastActiveFilter,
+  LastActiveFilterOptions,
+  ListSortOrder,
+  ListSortOrderOptions,
+  PayerFilter,
+  PayerFilterOptions,
+  ReferrerFilter,
+  ReferrerFilterOptions,
+  RoleFilter,
+  RoleFilterOptions,
+  SubscriptionFilter,
+  SubscriptionFilterOptions,
+  UserListSortField,
+  UserListSortFieldOptions,
+} from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const UsersListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.UsersListContainer })),
 );
 
+export const USERS_LIST_DEFAULT_LIMIT = 25;
+export const USERS_LIST_MAX_LIMIT = 200;
+
+const userRowSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  privateName: z.string(),
+  publicName: z.string(),
+  roles: z.array(z.string()),
+  isActive: z.boolean(),
+  isBanned: z.boolean(),
+  emailVerified: z.boolean(),
+  createdAt: z.coerce.date(),
+  lastActiveAt: z.coerce.date().nullable(),
+  creditBalance: z.coerce.number(),
+  creditsSpent: z.coerce.number(),
+  totalPaidUsd: z.coerce.number(),
+  paymentsCount: z.coerce.number(),
+  subscriptionStatus: z.string().nullable(),
+  source: z.string().nullable(),
+  referredByEmail: z.string().nullable(),
+  referredByUserId: z.string().nullable(),
+  referralCode: z.string().nullable(),
+  referralsMade: z.coerce.number(),
+});
+
 /**
  * Get Users List Endpoint (GET)
- * Retrieves a paginated list of users with filtering
  */
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -78,248 +100,195 @@ const { GET } = createEndpoint({
       backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
-      // === SEARCH & FILTERS ===
-      searchFilters: objectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.searchFilters.title" as const,
-        description: "get.searchFilters.description" as const,
-        layoutType: LayoutType.GRID,
+
+      // === SEARCH ===
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.search.label" as const,
+        description: "get.fields.search.description" as const,
+        placeholder: "get.fields.search.placeholder" as const,
+        columns: 12,
+        schema: z.string().trim().max(200).optional(),
+      }),
+
+      // === FILTERS ===
+      roles: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "get.fields.roles.label" as const,
+        description: "get.fields.roles.description" as const,
+        placeholder: "get.fields.roles.placeholder" as const,
+        options: RoleFilterOptions,
+        columns: 6,
+        schema: z.array(z.enum(RoleFilter)).optional(),
+      }),
+      accountState: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "get.fields.accountState.label" as const,
+        description: "get.fields.accountState.description" as const,
+        placeholder: "get.fields.accountState.placeholder" as const,
+        options: AccountStateFilterOptions,
+        columns: 6,
+        schema: z.array(z.enum(AccountStateFilter)).optional(),
+      }),
+      payer: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.payer.label" as const,
+        description: "get.fields.payer.description" as const,
+        placeholder: "get.fields.payer.placeholder" as const,
+        options: PayerFilterOptions,
+        columns: 4,
+        schema: z.enum(PayerFilter).optional(),
+      }),
+      subscription: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.subscription.label" as const,
+        description: "get.fields.subscription.description" as const,
+        placeholder: "get.fields.subscription.placeholder" as const,
+        options: SubscriptionFilterOptions,
+        columns: 4,
+        schema: z.enum(SubscriptionFilter).optional(),
+      }),
+      lastActive: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.lastActive.label" as const,
+        description: "get.fields.lastActive.description" as const,
+        placeholder: "get.fields.lastActive.placeholder" as const,
+        options: LastActiveFilterOptions,
+        columns: 4,
+        schema: z.enum(LastActiveFilter).optional(),
+      }),
+      signupFrom: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "get.fields.signupFrom.label" as const,
+        description: "get.fields.signupFrom.description" as const,
         columns: 3,
-        order: 1,
-        usage: { request: "data" },
-        children: {
-          search: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "get.search.label" as const,
-            description: "get.search.description" as const,
-            placeholder: "get.search.placeholder" as const,
-            columns: 12,
-            schema: z.string().optional(),
-          }),
-          status: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "get.status.label" as const,
-            description: "get.status.description" as const,
-            placeholder: "get.status.placeholder" as const,
-            options: UserStatusFilterOptions,
-            columns: 6,
-            schema: z.array(z.enum(UserStatusFilter)).optional(),
-          }),
-          role: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "get.role.label" as const,
-            description: "get.role.description" as const,
-            placeholder: "get.role.placeholder" as const,
-            options: UserRoleFilterOptions,
-            columns: 6,
-            schema: z.array(z.enum(UserRoleFilter)).optional(),
-          }),
-          subscription: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.subscription.label" as const,
-            description: "get.subscription.description" as const,
-            placeholder: "get.subscription.placeholder" as const,
-            options: SubscriptionPresenceFilterOptions,
-            columns: 6,
-            schema: z.enum(SubscriptionPresenceFilter).optional(),
-          }),
-          creditActivity: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.creditActivity.label" as const,
-            description: "get.creditActivity.description" as const,
-            placeholder: "get.creditActivity.placeholder" as const,
-            options: CreditActivityFilterOptions,
-            columns: 6,
-            schema: z.enum(CreditActivityFilter).optional(),
-          }),
-          threads: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.threads.label" as const,
-            description: "get.threads.description" as const,
-            placeholder: "get.threads.placeholder" as const,
-            options: ThreadsFilterOptions,
-            columns: 6,
-            schema: z.enum(ThreadsFilter).optional(),
-          }),
-          referralActivity: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.referralActivity.label" as const,
-            description: "get.referralActivity.description" as const,
-            placeholder: "get.referralActivity.placeholder" as const,
-            options: ReferralActivityFilterOptions,
-            columns: 6,
-            schema: z.enum(ReferralActivityFilter).optional(),
-          }),
-        },
+        schema: dateSchema.optional(),
+      }),
+      signupTo: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "get.fields.signupTo.label" as const,
+        description: "get.fields.signupTo.description" as const,
+        columns: 3,
+        schema: dateSchema.optional(),
+      }),
+      creditsMin: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.creditsMin.label" as const,
+        description: "get.fields.creditsMin.description" as const,
+        columns: 3,
+        schema: z.coerce.number().min(0).optional(),
+      }),
+      creditsMax: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.creditsMax.label" as const,
+        description: "get.fields.creditsMax.description" as const,
+        columns: 3,
+        schema: z.coerce.number().min(0).optional(),
+      }),
+      source: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.source.label" as const,
+        description: "get.fields.source.description" as const,
+        placeholder: "get.fields.source.placeholder" as const,
+        columns: 6,
+        schema: z.string().trim().max(200).optional(),
+      }),
+      referralActivity: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.referralActivity.label" as const,
+        description: "get.fields.referralActivity.description" as const,
+        placeholder: "get.fields.referralActivity.placeholder" as const,
+        options: ReferrerFilterOptions,
+        columns: 6,
+        schema: z.enum(ReferrerFilter).optional(),
       }),
 
-      // === SORTING OPTIONS ===
-      sortingOptions: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.sortingOptions.title" as const,
-        description: "get.sortingOptions.description" as const,
-        layoutType: LayoutType.GRID_2_COLUMNS,
-        order: 2,
-        usage: { request: "data" },
-        children: {
-          sortBy: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.sortBy.label" as const,
-            description: "get.sortBy.description" as const,
-            placeholder: "get.sortBy.placeholder" as const,
-            options: UserSortFieldOptions,
-            columns: 6,
-            schema: z.enum(UserSortField).default(UserSortField.CREATED_AT),
-          }),
-          sortOrder: requestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "get.sortOrder.label" as const,
-            description: "get.sortOrder.description" as const,
-            placeholder: "get.sortOrder.placeholder" as const,
-            options: SortOrderOptions,
-            columns: 6,
-            schema: z.enum(SortOrder).default(SortOrder.DESC),
-          }),
-        },
+      // === SORT + PAGE ===
+      sortBy: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.sortBy.label" as const,
+        description: "get.fields.sortBy.description" as const,
+        options: UserListSortFieldOptions,
+        columns: 6,
+        schema: z.enum(UserListSortField).default(UserListSortField.CREATED_AT),
+      }),
+      sortOrder: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.sortOrder.label" as const,
+        description: "get.fields.sortOrder.description" as const,
+        options: ListSortOrderOptions,
+        columns: 6,
+        schema: z.enum(ListSortOrder).default(ListSortOrder.DESC),
+      }),
+      page: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.page.label" as const,
+        description: "get.fields.page.description" as const,
+        columns: 6,
+        schema: z.coerce.number().int().min(1).default(1),
+      }),
+      limit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.limit.label" as const,
+        description: "get.fields.limit.description" as const,
+        columns: 6,
+        schema: z.coerce
+          .number()
+          .int()
+          .min(1)
+          .max(USERS_LIST_MAX_LIMIT)
+          .default(USERS_LIST_DEFAULT_LIMIT),
       }),
 
-      // === FORM ALERT (shows validation and API errors) ===
       formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
-        order: 2.5,
         usage: { request: "data" },
       }),
 
-      // === RESPONSE FIELDS ===
-      response: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.title" as const,
-        description: "get.response.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 12,
-        order: 3,
-        usage: { response: true },
-        children: {
-          users: responseArrayField(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            columns: 12,
-            child: objectField(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              usage: { response: true },
-              children: {
-                email: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.email" as const,
-                  schema: z.string(),
-                }),
-                privateName: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.privateName" as const,
-                  schema: z.string(),
-                }),
-                publicName: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.publicName" as const,
-                  schema: z.string(),
-                }),
-                isActive: responseField(scopedTranslation, {
-                  type: WidgetType.BADGE,
-                  text: "get.response.users.isActive" as const,
-                  schema: z.boolean(),
-                }),
-                emailVerified: responseField(scopedTranslation, {
-                  type: WidgetType.BADGE,
-                  text: "get.response.users.emailVerified" as const,
-                  schema: z.boolean(),
-                }),
-                createdAt: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  fieldType: FieldDataType.DATETIME,
-                  label: "get.response.users.createdAt" as const,
-                  schema: z.coerce.date(),
-                }),
-                updatedAt: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  fieldType: FieldDataType.DATETIME,
-                  label: "get.response.users.updatedAt" as const,
-                  schema: z.coerce.date(),
-                }),
-                id: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.id" as const,
-                  schema: z.string(),
-                }),
-                referralCode: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.referralCode" as const,
-                  schema: z.string().nullable(),
-                }),
-                referredByUserId: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.referredByUserId" as const,
-                  schema: z.string().nullable(),
-                }),
-                totalReferrals: responseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  label: "get.response.users.totalReferrals" as const,
-                  schema: z.coerce.number(),
-                }),
-              },
-            }),
-          }),
-        },
+      // === RESPONSE ===
+      users: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.users" as const,
+        schema: z.array(userRowSchema),
       }),
-
-      // === PAGINATION INFO (Editable controls + display in one row) ===
-      paginationInfo: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        layoutType: LayoutType.HORIZONTAL,
-        noCard: true,
-        gap: "4",
-        order: 4,
-        usage: { request: "data", response: true },
-        children: {
-          page: requestResponseField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            label: "get.page.label" as const,
-            columns: 3,
-            schema: z.coerce.number().optional().default(1),
-          }),
-          limit: requestResponseField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            label: "get.limit.label" as const,
-            columns: 3,
-            schema: z.coerce.number().optional().default(20),
-          }),
-          totalCount: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.totalCount" as const,
-            columns: 3,
-            schema: z.coerce.number(),
-          }),
-          pageCount: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.pageCount" as const,
-            columns: 3,
-            schema: z.coerce.number(),
-          }),
-        },
+      summary: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.summary" as const,
+        schema: z.object({
+          totalCount: z.coerce.number(),
+          pageCount: z.coerce.number(),
+          page: z.coerce.number(),
+          limit: z.coerce.number(),
+          payingCount: z.coerce.number(),
+          totalPaidUsd: z.coerce.number(),
+          creditBalance: z.coerce.number(),
+        }),
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -367,53 +336,61 @@ const { GET } = createEndpoint({
 
   examples: {
     requests: {
-      default: {
-        searchFilters: {},
-        sortingOptions: {
-          sortBy: UserSortField.CREATED_AT,
-          sortOrder: SortOrder.DESC,
-        },
-        paginationInfo: {
-          page: 1,
-          limit: 20,
-        },
-      },
-      filtered: {
-        searchFilters: {
-          search: "john",
-          status: [UserStatusFilter.ACTIVE],
-        },
-        sortingOptions: {
-          sortBy: UserSortField.EMAIL,
-          sortOrder: SortOrder.ASC,
-        },
-        paginationInfo: {
-          page: 1,
-          limit: 10,
-        },
+      default: {},
+      payingActive: {
+        payer: PayerFilter.PAID,
+        lastActive: LastActiveFilter.WEEK,
+        sortBy: UserListSortField.TOTAL_PAID,
+        sortOrder: ListSortOrder.DESC,
+        limit: 20,
       },
     },
     responses: {
       default: {
-        response: {
-          users: [],
+        users: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174000",
+            email: "user@example.com",
+            privateName: "Jane Doe",
+            publicName: "jane",
+            roles: ["enums.userRole.customer"],
+            isActive: true,
+            isBanned: false,
+            emailVerified: true,
+            createdAt: "2026-10-01T10:00:00.000Z",
+            lastActiveAt: "2026-11-10T09:00:00.000Z",
+            creditBalance: 420.5,
+            creditsSpent: 1300,
+            totalPaidUsd: 17.28,
+            paymentsCount: 2,
+            subscriptionStatus: "enums.status.active",
+            source: "google.com",
+            referredByEmail: null,
+            referredByUserId: null,
+            referralCode: null,
+            referralsMade: 0,
+          },
+        ],
+        summary: {
+          totalCount: 1,
+          pageCount: 1,
+          page: 1,
+          limit: 25,
+          payingCount: 1,
+          totalPaidUsd: 17.28,
+          creditBalance: 420.5,
         },
-        paginationInfo: {
+      },
+      payingActive: {
+        users: [],
+        summary: {
           totalCount: 0,
           pageCount: 0,
           page: 1,
           limit: 20,
-        },
-      },
-      filtered: {
-        response: {
-          users: [],
-        },
-        paginationInfo: {
-          totalCount: 0,
-          pageCount: 0,
-          page: 1,
-          limit: 10,
+          payingCount: 0,
+          totalPaidUsd: 0,
+          creditBalance: 0,
         },
       },
     },
@@ -425,6 +402,7 @@ export type UserListRequestInput = typeof GET.types.RequestInput;
 export type UserListRequestOutput = typeof GET.types.RequestOutput;
 export type UserListResponseInput = typeof GET.types.ResponseInput;
 export type UserListResponseOutput = typeof GET.types.ResponseOutput;
+export type UserListRow = UserListResponseOutput["users"][number];
 
 const definitions = { GET } as const;
 export default definitions;

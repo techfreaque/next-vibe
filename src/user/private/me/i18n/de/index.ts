@@ -491,6 +491,12 @@ export const translations: typeof enTranslations = {
     noSocials: "Noch keine Social Links hinzugefügt",
     viewPublicProfile: "Öffentliches Profil ansehen",
     profileUrl: "Dein Link",
+    verifyNudge: {
+      title: "E-Mail bestätigen",
+      description:
+        "Wir haben einen Link an {{email}} geschickt. Chatten geht auch ohne. Mit Bestätigung bleibt dein Konto wiederherstellbar.",
+      action: "Link erneut senden",
+    },
     slugWarning:
       "Wenn du diese URL änderst, werden alle bestehenden Links zu deinem Profil ungültig.",
     bioPreview: "Vorschau",
@@ -507,9 +513,10 @@ export const translations: typeof enTranslations = {
       title: "Darstellung",
       sectionHint: "Aussehen und Sprache der App.",
       theme: "Design",
-      themeHint: "Hell oder dunkel. Gilt überall.",
+      themeHint: "Hell, dunkel oder wie dein Gerät. Gilt überall.",
       light: "Hell",
       dark: "Dunkel",
+      system: "System",
       language: "Sprache",
       languageHint: "Sprache der Oberfläche und Inhalte.",
     },

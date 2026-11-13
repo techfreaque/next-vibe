@@ -1,6 +1,7 @@
 import * as React from "react";
 
 export type {
+  ThemePreference,
   ThemeProviderProps,
   UseThemeToggleReturn,
 } from "../../web/components/theme-provider";
@@ -22,6 +23,8 @@ export function useThemeToggle(): UseThemeToggleReturn {
   return {
     onToggleTheme: (): void => undefined,
     theme: "dark",
+    preference: "dark",
+    setPreference: (): void => undefined,
     isMounted: true,
   };
 }

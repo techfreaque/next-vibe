@@ -515,28 +515,31 @@ const { PUT } = createEndpoint({
               success: true,
               data: {
                 ...oldData.data,
-                response: {
-                  ...oldData.data.response,
-                  users: oldData.data.response.users.map((u) =>
-                    u.id === data.pathParams.id
-                      ? {
-                          ...u,
-                          email: data.responseData.email ?? u.email,
-                          privateName:
-                            data.responseData.privateName ?? u.privateName,
-                          publicName:
-                            data.responseData.publicName ?? u.publicName,
-                          isActive: data.responseData.isActive ?? u.isActive,
-                          emailVerified:
-                            data.responseData.emailVerified ?? u.emailVerified,
-                        }
-                      : u,
-                  ),
-                },
+                users: oldData.data.users.map((u) =>
+                  u.id === data.pathParams.id
+                    ? {
+                        ...u,
+                        email: data.responseData.email ?? u.email,
+                        privateName:
+                          data.responseData.privateName ?? u.privateName,
+                        publicName:
+                          data.responseData.publicName ?? u.publicName,
+                        isActive: data.responseData.isActive ?? u.isActive,
+                        emailVerified:
+                          data.responseData.emailVerified ?? u.emailVerified,
+                        isBanned: data.responseData.isBanned ?? u.isBanned,
+                      }
+                    : u,
+                ),
               },
             };
           },
         );
+        // Admin detail view shows ban state, roles and profile: refresh it
+        const viewDefinition = await import("../../view/definition");
+        await apiClient.refetchEndpoint(viewDefinition.GET, data.logger, {
+          requestData: { userId: data.pathParams.id },
+        });
       },
     },
   },
@@ -808,21 +811,13 @@ const { DELETE } = createEndpoint({
               success: true,
               data: {
                 ...oldData.data,
-                response: {
-                  ...oldData.data.response,
-                  users: oldData.data.response.users.filter(
-                    (u) => u.id !== data.pathParams.id,
-                  ),
+                users: oldData.data.users.filter(
+                  (u) => u.id !== data.pathParams.id,
+                ),
+                summary: {
+                  ...oldData.data.summary,
+                  totalCount: Math.max(0, oldData.data.summary.totalCount - 1),
                 },
-                paginationInfo: oldData.data.paginationInfo
-                  ? {
-                      ...oldData.data.paginationInfo,
-                      totalCount: Math.max(
-                        0,
-                        (oldData.data.paginationInfo.totalCount ?? 1) - 1,
-                      ),
-                    }
-                  : oldData.data.paginationInfo,
               },
             };
           },

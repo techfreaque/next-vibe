@@ -14,6 +14,7 @@ import {
   type LeadsTranslationKey,
   scopedTranslation as leadsScopedTranslation,
 } from "next-vibe/identity/lead/i18n";
+import { DateRangePreset } from "next-vibe/core/core-utils/stats-filtering.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
@@ -47,7 +48,7 @@ import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/numb
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type definition from "./definition";
 
@@ -466,6 +467,19 @@ export function LeadsStatsContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  // Picking a named preset drops a stale custom range: explicit dates win
+  // server-side, so leaving them set would silently override the preset.
+  const dateRangePreset = form.watch("dateRangePreset");
+  useEffect(() => {
+    if (dateRangePreset === DateRangePreset.CUSTOM) {
+      return;
+    }
+    if (form.getValues("dateFrom") || form.getValues("dateTo")) {
+      form.setValue("dateFrom", undefined);
+      form.setValue("dateTo", undefined);
+    }
+  }, [dateRangePreset, form]);
+
   const data = useWidgetValue<typeof definition.GET>();
 
   const handleRefresh = useCallback((): void => {
@@ -733,7 +747,15 @@ export function LeadsStatsContainer({
                       : "";
                   })()}
                   onChange={(e) => {
-                    form.setValue(key, new Date(e.target.value));
+                    const picked = e.target.value
+                      ? new Date(e.target.value)
+                      : undefined;
+                    form.setValue(key, picked);
+                    // A hand-picked range IS the custom preset; keep the
+                    // select in sync so it never claims a different window.
+                    if (picked && (key === "dateFrom" || key === "dateTo")) {
+                      form.setValue("dateRangePreset", DateRangePreset.CUSTOM);
+                    }
                   }}
                   className="h-9"
                 />
