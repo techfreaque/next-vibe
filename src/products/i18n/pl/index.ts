@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Oferujemy plany Darmowy ({{freeCredits}} kredytów/miesiąc jako gość, {{freeCreditsSignedIn}} po zalogowaniu, +{{freeCreditsNewsletterBonus}} z newsletterem), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów albo {{packCurrency}}{{largePackPrice}} za {{largePackCredits}}), które każdy kupi bez subskrypcji.",
+    "Oferujemy plany Darmowy ({{freeCredits}} kredytów/miesiąc jako gość, {{freeCreditsSignedIn}} po zalogowaniu, +{{freeCreditsNewsletterBonus}} z newsletterem), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów), które każdy kupi bez subskrypcji.",
 
   // Free tier product
   free: {
@@ -56,19 +56,9 @@ export const translations: typeof enTranslations = {
     },
   },
 
-  // Duży pakiet kredytów
+  // Duży pakiet kredytów: wycofany, widoczny tylko w starych zakupach.
   creditPackLarge: {
-    name: "Duży pakiet kredytów",
-    description:
-      "{{largePackCredits}} kredytów w lepszej cenie. Bez subskrypcji. Nie wygasają.",
-    longDescription:
-      "Pakiet hurtowy. {{largePackCredits}} kredytów w niższej cenie za kredyt. Subskrypcja niepotrzebna.",
-    features: {
-      credits: "{{largePackCredits}} kredytów na pakiet",
-      allModels: "Wszystkie {{modelCount}} modeli AI włączone",
-      allFeatures: "Wszystkie funkcje włączone",
-      multiple: "Kup kilka pakietów",
-      permanent: "Kredyty nigdy nie wygasają",
-    },
+    name: "Duży pakiet kredytów (wycofany)",
+    description: "Już niedostępny. Kupione kredyty zostają ważne.",
   },
 };

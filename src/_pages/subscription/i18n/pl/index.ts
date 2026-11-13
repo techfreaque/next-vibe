@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
         permanent: {
           title: "Pakiety kredytów",
           description:
-            "{{packPrice}} za {{packCredits}} kredytów albo {{largePackPrice}} za {{largePackCredits}}. Nie wygasają. Bez subskrypcji.",
+            "{{packPrice}} za {{packCredits}} kredytów. Kupujesz, ile chcesz. Nie wygasają. Bez subskrypcji.",
         },
         free: {
           title: "Darmowe kredyty",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       costs: {
         title: "Ile to kosztuje",
         description:
-          "Kredyty za wiadomość, obraz, klip lub wywołanie narzędzia.",
+          "Kredyty za wiadomość, obraz, klip lub wywołanie narzędzia. Ceny wiadomości są szacunkowe: modele OpenRouter rozliczamy według realnego kosztu dostawcy plus naszą marżę.",
         models: {
           title: "Modele AI (na wiadomość)",
           gpt4: "GPT-4",

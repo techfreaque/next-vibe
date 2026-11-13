@@ -37,6 +37,7 @@ import type { MessageDbWriter } from "../core/message-db-writer";
 import type { ToolExecutionContextImpl } from "../core/stream";
 import { clearStreamingState } from "../core/stream";
 import { estimateTokensFromContext } from "../core/token-estimator";
+import { billsUpstreamCost } from "../loop/token-accumulator";
 import { serializeError } from "./error-utils";
 
 /**
@@ -411,6 +412,22 @@ export class AbortErrorHandler {
             : 0;
 
           totalCredits += modelCreditCost;
+
+          // A cut-off step never reports the provider's real cost: actual-cost
+          // models fall back to the listed token price for it.
+          if (modelInfo && billsUpstreamCost(modelInfo)) {
+            logger.warn(
+              "[AI Stream] Upstream cost missing for cut-off step - billing estimated token price",
+              {
+                model,
+                apiProvider: modelInfo.apiProvider,
+                providerModel: modelInfo.providerModel,
+                promptTokens: tokenEstimate.promptTokens,
+                completionTokens: tokenEstimate.completionTokens,
+                modelCreditCost,
+              },
+            );
+          }
 
           logger.debug("[AI Stream] Estimated usage for aborted stream", {
             messageId: ctx.currentAssistantMessageId,

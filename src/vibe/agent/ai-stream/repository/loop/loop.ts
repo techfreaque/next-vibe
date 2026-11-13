@@ -25,6 +25,7 @@ import type {
   JSONValue,
   LanguageModel,
   ModelMessage,
+  ProviderMetadata,
   TextStreamPart,
   ToolSet,
 } from "ai";
@@ -1015,6 +1016,7 @@ export class StreamLoop implements StreamLoopState {
       };
     };
     finishReason?: string;
+    providerMetadata?: ProviderMetadata;
   }): void {
     return onStepFinish(this, stepResult);
   }

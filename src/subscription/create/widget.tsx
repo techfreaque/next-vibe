@@ -1,7 +1,7 @@
 "use client";
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
@@ -62,11 +62,7 @@ import { scopedTranslation as publicCapScopedTranslation } from "@/credits/publi
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
-import {
-  CREDIT_PACK_PRODUCT_IDS,
-  ProductIds,
-  productsRepository,
-} from "@/products/platform-products";
+import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import subscriptionDefinitions from "../definition";
@@ -74,7 +70,7 @@ import { useSubscription } from "../hooks";
 import type definition from "./definition";
 
 const MIN_QTY = 1;
-// Crypto minimum is ~$25 of credits (5 standard packs); the large pack clears it alone.
+// Crypto minimum is ~$25 of credits (5 packs).
 const MIN_CRYPTO_CREDITS = 2500;
 
 function formatPrice(price: number, locale: string, currency: string): string {
@@ -108,7 +104,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
   const isAuthenticated = !user.isPublic;
   const availability = useProviderAvailability();
-  const totalModelCount = getAvailableModelCount(isAdmin, availability);
+  const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   const subscriptionEndpoint = useSubscription(logger, user);
   const currentSubscription = subscriptionEndpoint.read?.data;
@@ -126,10 +122,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
     "year",
   );
   const yearlySubscriptionPrice = yearlyProduct.price;
-  const [packProductId, setPackProductId] = useState<
-    (typeof CREDIT_PACK_PRODUCT_IDS)[number]
-  >(ProductIds.CREDIT_PACK);
-  const packProduct = products[packProductId];
+  const packProduct = products[ProductIds.CREDIT_PACK];
   const packPrice = packProduct.price;
   const packCredits = packProduct.credits;
 
@@ -293,7 +286,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
     provider: typeof PaymentProviderValue,
   ): void => {
     setIsPackProviderModalOpen(false);
-    packForm?.setValue("productId", packProductId);
+    packForm?.setValue("productId", ProductIds.CREDIT_PACK);
     packForm?.setValue("provider", provider);
     void packSubmit?.();
   };
@@ -788,40 +781,6 @@ export function SubscriptionCreateContainer(): JSX.Element {
               <Div className="text-sm text-muted-foreground">
                 {tPurchase("post.pack.perPack")}
               </Div>
-            </Div>
-            <Div className="grid grid-cols-2 gap-2">
-              {CREDIT_PACK_PRODUCT_IDS.map((id) => (
-                <Button
-                  key={id}
-                  type="button"
-                  variant={packProductId === id ? "default" : "outline"}
-                  className="h-auto flex-col items-start gap-0.5 p-3 text-left"
-                  onClick={() => setPackProductId(id)}
-                >
-                  <Span className="text-sm font-semibold">
-                    {id === ProductIds.CREDIT_PACK
-                      ? tPurchase("post.pack.sizeStandard")
-                      : tPurchase("post.pack.sizeLarge")}
-                  </Span>
-                  <Span className="text-xs opacity-80">
-                    {formatPrice(
-                      products[id].price,
-                      locale,
-                      products[id].currency,
-                    )}
-                  </Span>
-                  <Span className="text-xs opacity-80">
-                    {tPurchase("post.pack.features.credits", {
-                      count: products[id].credits,
-                    })}
-                  </Span>
-                  {id === ProductIds.CREDIT_PACK_LARGE && (
-                    <Span className="text-xs font-medium text-success">
-                      {tPurchase("post.pack.bestRate")}
-                    </Span>
-                  )}
-                </Button>
-              ))}
             </Div>
             <Div className="flex flex-col gap-3 text-sm">
               <Div className="flex items-center gap-2.5">

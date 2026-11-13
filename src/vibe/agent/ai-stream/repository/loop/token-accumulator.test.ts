@@ -1,17 +1,29 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 
-import { calculateCreditCost } from "../../../models/models";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { createEndpointLogger } from "next-vibe/logger/server";
+
+import {
+  ApiProvider,
+  calculateCreditCost,
+  upstreamCostToCredits,
+} from "../../../models/models";
 import {
   ChatModelId,
   type ChatModelOption,
   getChatModelById,
 } from "../../models";
-import { TokenAccumulator, type TokenCounters } from "./token-accumulator";
+import {
+  readStepUpstreamCost,
+  TokenAccumulator,
+  type TokenCounters,
+} from "./token-accumulator";
 
 /** A token-priced option with round prices: $2/M in, $10/M out, $0.10/M cache read. */
 function pricedModel(): ChatModelOption {
   return {
     ...getChatModelById(ChatModelId.KIMI_K3),
+    apiProvider: ApiProvider.OPENROUTER,
     creditCost: calculateCreditCost,
     inputTokenCost: 2,
     outputTokenCost: 10,
@@ -29,7 +41,26 @@ function freshCounters(): TokenCounters {
     tokenLastInput: 0,
     tokensBilled: false,
     tokenStepCount: 0,
+    upstreamCostUsd: 0,
+    upstreamFallbackCostUsd: 0,
+    upstreamCostSteps: 0,
+    upstreamCostMissingSteps: 0,
+    upstreamProvider: null,
   };
+}
+
+/** Same prices, served by a provider that returns no reliable real cost. */
+function nanoGptModel(): ChatModelOption {
+  return { ...pricedModel(), apiProvider: ApiProvider.NANO_GPT };
+}
+
+const logger = createEndpointLogger(false, defaultLocale);
+
+/** OpenRouter step metadata as the provider package exposes it. */
+function openRouterMeta(cost: number, provider = "Parasail"): {
+  openrouter: { provider: string; usage: { cost: number } };
+} {
+  return { openrouter: { provider, usage: { cost } } };
 }
 
 /** Credits for a turn in USD terms: 1 credit = $0.01, 30% markup, ceil to 0.01. */
@@ -168,5 +199,181 @@ describe("TokenAccumulator multi-step billing", () => {
 
   it("unbilledCompletedSteps is null when no step finished", () => {
     expect(TokenAccumulator.unbilledCompletedSteps(freshCounters())).toBeNull();
+  });
+});
+
+describe("upstreamCostToCredits", () => {
+  it("applies the 30% markup at $0.01 per credit, ceil to 0.1 credit", () => {
+    // $0.01 x 1.3 = 1.3 credits exactly (no float ceiling up to 1.4)
+    expect(upstreamCostToCredits(0.01)).toBe(1.3);
+    // $0.0123 x 1.3 / 0.01 = 1.599 -> 1.6
+    expect(upstreamCostToCredits(0.0123)).toBe(1.6);
+    // tiny but non-zero still charges the minimum 0.1
+    expect(upstreamCostToCredits(0.000001)).toBe(0.1);
+    // $1 -> 130 credits
+    expect(upstreamCostToCredits(1)).toBe(130);
+  });
+
+  it("charges nothing for zero or invalid cost", () => {
+    expect(upstreamCostToCredits(0)).toBe(0);
+    expect(upstreamCostToCredits(-1)).toBe(0);
+    expect(upstreamCostToCredits(Number.NaN)).toBe(0);
+  });
+});
+
+describe("readStepUpstreamCost", () => {
+  it("reads usage.cost and the serving endpoint", () => {
+    expect(readStepUpstreamCost(openRouterMeta(0.0042, "Modal"))).toEqual({
+      costUsd: 0.0042,
+      provider: "Modal",
+    });
+  });
+
+  it("returns null cost when the step reported none", () => {
+    expect(readStepUpstreamCost(undefined)).toEqual({
+      costUsd: null,
+      provider: null,
+    });
+    expect(
+      readStepUpstreamCost({ openrouter: { usage: { promptTokens: 10 } } }),
+    ).toEqual({ costUsd: null, provider: null });
+  });
+});
+
+describe("TokenAccumulator actual upstream cost billing", () => {
+  /** Run the per-step path the way onStepFinish does. */
+  function runSteps(
+    ctx: TokenCounters,
+    model: ChatModelOption,
+    costs: Array<number | null>,
+  ): void {
+    STEPS.forEach((step, i) => {
+      TokenAccumulator.accumulate(ctx, step);
+      const cost = costs[i] ?? null;
+      TokenAccumulator.recordUpstreamCost(
+        ctx,
+        model,
+        step,
+        readStepUpstreamCost(cost === null ? undefined : openRouterMeta(cost)),
+        logger,
+      );
+    });
+  }
+
+  it("bills the summed real per-step cost x markup, not the token price", () => {
+    const ctx = freshCounters();
+    // Routed to an endpoint ~5x pricier than the listed token price.
+    runSteps(ctx, pricedModel(), [0.05, 0.03, 0.04]);
+    const charge = TokenAccumulator.resolveCharge(ctx, pricedModel(), {
+      inputTokens: 66_000,
+      outputTokens: 1_400,
+      cachedInputTokens: 42_000,
+      cacheWriteTokens: 0,
+    });
+    // $0.12 x 1.3 / 0.01 = 15.6
+    expect(charge.credits).toBe(15.6);
+    expect(charge.credits).toBeGreaterThan(expectedCredits(STEPS_USD));
+    expect(charge.upstreamCost).toEqual({
+      upstreamCostUsd: 0.12,
+      fallbackCostUsd: 0,
+      upstreamProvider: "Parasail",
+      billingBasis: "upstream_cost",
+    });
+  });
+
+  it("falls back to the token price for a step without cost and warns", () => {
+    const warn = spyOn(logger, "warn");
+    const ctx = freshCounters();
+    runSteps(ctx, pricedModel(), [0.05, null, 0.04]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+
+    const step2 = STEPS[1];
+    const step2Usd =
+      ((step2.inputTokens - step2.cachedInputTokens) * 2 +
+        step2.cachedInputTokens * 0.1 +
+        step2.outputTokens * 10) /
+      1_000_000;
+    const charge = TokenAccumulator.resolveCharge(ctx, pricedModel(), {
+      inputTokens: 66_000,
+      outputTokens: 1_400,
+      cachedInputTokens: 42_000,
+      cacheWriteTokens: 0,
+    });
+    expect(charge.credits).toBe(upstreamCostToCredits(0.09 + step2Usd));
+    expect(charge.upstreamCost?.billingBasis).toBe("mixed");
+    expect(charge.upstreamCost?.fallbackCostUsd).toBeCloseTo(step2Usd, 12);
+  });
+
+  it("uses the plain token price when no step reported a cost", () => {
+    const warn = spyOn(logger, "warn");
+    const ctx = freshCounters();
+    runSteps(ctx, pricedModel(), [null, null, null]);
+    expect(warn).toHaveBeenCalledTimes(3);
+    warn.mockRestore();
+    const charge = TokenAccumulator.resolveCharge(ctx, pricedModel(), {
+      inputTokens: 66_000,
+      outputTokens: 1_400,
+      cachedInputTokens: 42_000,
+      cacheWriteTokens: 0,
+    });
+    expect(charge.credits).toBe(expectedCredits(STEPS_USD));
+    expect(charge.upstreamCost).toBeUndefined();
+  });
+
+  it("ignores reported cost for non-OpenRouter providers", () => {
+    const warn = spyOn(logger, "warn");
+    const ctx = freshCounters();
+    runSteps(ctx, nanoGptModel(), [0.05, 0.03, 0.04]);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+    expect(ctx.upstreamCostSteps).toBe(0);
+    const charge = TokenAccumulator.resolveCharge(ctx, nanoGptModel(), {
+      inputTokens: 66_000,
+      outputTokens: 1_400,
+      cachedInputTokens: 42_000,
+      cacheWriteTokens: 0,
+    });
+    expect(charge.credits).toBe(expectedCredits(STEPS_USD));
+    expect(charge.upstreamCost).toBeUndefined();
+  });
+
+  it("early-ended turn bills the finished steps' real cost exactly once", () => {
+    const ctx = freshCounters();
+    // Two steps finished, then endLoop / user stop ended the turn.
+    STEPS.slice(0, 2).forEach((step, i) => {
+      TokenAccumulator.accumulate(ctx, step);
+      TokenAccumulator.recordUpstreamCost(
+        ctx,
+        pricedModel(),
+        step,
+        readStepUpstreamCost(openRouterMeta(i === 0 ? 0.02 : 0.011)),
+        logger,
+      );
+    });
+    // What billCompletedSteps does.
+    const steps = TokenAccumulator.unbilledCompletedSteps(ctx);
+    expect(steps).not.toBeNull();
+    if (!steps) {
+      return;
+    }
+    ctx.tokensBilled = true;
+    const charge = TokenAccumulator.resolveCharge(ctx, pricedModel(), steps);
+    // $0.031 x 1.3 / 0.01 = 4.03 -> 4.1
+    expect(charge.credits).toBe(4.1);
+    expect(charge.upstreamCost?.upstreamCostUsd).toBeCloseTo(0.031, 12);
+    // A second early-end path (or complete()) finds nothing left to bill.
+    expect(TokenAccumulator.unbilledCompletedSteps(ctx)).toBeNull();
+  });
+
+  it("chargeSingleCall bills a standalone call (compacting) by real cost", () => {
+    const charge = TokenAccumulator.chargeSingleCall(
+      pricedModel(),
+      FIRST_STEP,
+      openRouterMeta(0.02),
+      logger,
+    );
+    expect(charge.credits).toBe(2.6);
+    expect(charge.upstreamCost?.billingBasis).toBe("upstream_cost");
   });
 });

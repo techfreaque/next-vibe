@@ -85,7 +85,26 @@ export interface SubscriptionMetadata {
   periodEnd?: string;
 }
 
-export interface UsageMetadata {
+/**
+ * How a model-usage charge was priced:
+ * - upstream_cost: the provider's REAL per-step cost (OpenRouter usage.cost) x markup
+ * - mixed: upstream cost for most steps, listed token price for steps that
+ *   reported no cost (stream cut, provider omitted it)
+ */
+export type UsageBillingBasis = "upstream_cost" | "mixed";
+
+/** Upstream cost of a model-usage charge, stored for finance reconciliation. */
+export interface UsageUpstreamCost {
+  /** Real upstream cost in USD reported by the provider (no markup). */
+  upstreamCostUsd: number;
+  /** Listed-token-price USD for steps that reported no real cost (no markup). */
+  fallbackCostUsd: number;
+  /** Upstream endpoint that served the last step (e.g. "Parasail"). */
+  upstreamProvider: string | null;
+  billingBasis: UsageBillingBasis;
+}
+
+export interface UsageMetadata extends Partial<UsageUpstreamCost> {
   cost: number;
   messageId?: string;
   freeCreditsUsed?: number;

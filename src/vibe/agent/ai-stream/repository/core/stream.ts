@@ -193,6 +193,18 @@ export class ToolExecutionContextImpl {
   /** Steps that reported finishing (onStepFinish), even with empty usage:
    *  per-message priced models report no tokens but still cost per turn. */
   tokenStepCount = 0;
+  /** Sum of the REAL upstream USD cost the provider reported per finished
+   *  step (OpenRouter usage.cost). Billed instead of listed token prices. */
+  upstreamCostUsd = 0;
+  /** Listed-token-price USD of finished steps that reported NO real cost
+   *  (stream cut, provider omitted it): the per-step fallback. */
+  upstreamFallbackCostUsd = 0;
+  /** Finished steps that reported a real upstream cost. */
+  upstreamCostSteps = 0;
+  /** Finished steps of an actual-cost model that reported none. */
+  upstreamCostMissingSteps = 0;
+  /** Upstream endpoint that served the last costed step (e.g. "Parasail"). */
+  upstreamProvider: string | null = null;
 
   /** Provider first-part watchdog timer handle (see FirstPartWatchdog). */
   firstPartWatchdogTimer: ReturnType<typeof setTimeout> | null = null;

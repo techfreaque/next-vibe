@@ -25,6 +25,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { UsageUpstreamCost } from "@/credits/db";
 import type { CreditsT as ModuleT } from "@/credits/i18n";
 
 import type { ToolExecutionContext } from "../../../../core/execution-context";
@@ -478,6 +479,7 @@ export class MessageDbWriter {
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     user: JwtPayloadType;
     creditCost: number;
+    upstreamCost?: UsageUpstreamCost;
   }): Promise<void> {
     return compactingWrites.emitCompactingDone(this, params);
   }

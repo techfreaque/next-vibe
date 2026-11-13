@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
       lessThanMin: "<0,1",
     },
     tokenBased: {
-      header: "Koszt za wiadomość",
+      header: "Szacowany koszt za wiadomość",
       costRangeLabel: "Typowy zakres:",
       costRangeValue: "{{min}} - {{max}} kredytów",
       examplesLabel: "Przykłady:",
@@ -124,7 +124,7 @@ export const translations: typeof enTranslations = {
       triggersCompacting: "⚡ Aktywuje kompresję",
       tokensCount: "{{count}} tokenów",
       explanation:
-        "AI przetwarza całą historię rozmowy przy każdej wiadomości. Dłuższe rozmowy kosztują więcej, ponieważ jest więcej kontekstu do przetworzenia.",
+        "AI przetwarza całą historię rozmowy przy każdej wiadomości. Dłuższe rozmowy kosztują więcej, ponieważ jest więcej kontekstu do przetworzenia. To szacunki: modele przez OpenRouter rozliczamy według realnego kosztu dostawcy plus naszą marżę, więc wiadomość może kosztować więcej lub mniej.",
       compactingLabel: "✨ Auto-kompresja:",
       compactingExplanation:
         " Przy {{threshold}} tokenów starsze wiadomości są automatycznie streszczane, aby zmniejszyć koszty przy zachowaniu kontekstu.",

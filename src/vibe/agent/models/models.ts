@@ -2,7 +2,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
+import {
+  CREDIT_VALUE_USD,
+  STANDARD_MARKUP_PERCENTAGE,
+} from "@/products/constants";
 
 import type { ChatModelId, ChatModelOption } from "../ai-stream/models";
 import type {
@@ -791,6 +794,58 @@ interface CreditCostInput extends ModelOptionBase {
   cacheWriteTokenCost?: number;
 }
 
+/**
+ * Upstream USD cost of a token usage at the model's LISTED token prices
+ * (no markup). actualInputTokens is the FULL input (uncached + cached); it is
+ * clamped so a caller passing an already-uncached count never goes negative.
+ */
+export function calculateTokenCostUsd(
+  modelOption: Pick<
+    CreditCostInput,
+    | "inputTokenCost"
+    | "outputTokenCost"
+    | "cacheReadTokenCost"
+    | "cacheWriteTokenCost"
+  >,
+  actualInputTokens: number,
+  actualOutputTokens: number,
+  cachedInputTokens = 0,
+  cacheWriteTokens = 0,
+): number {
+  const inputTokenCost = modelOption.inputTokenCost ?? 0;
+  const outputTokenCost = modelOption.outputTokenCost ?? 0;
+  const uncachedInputTokens = Math.max(
+    0,
+    actualInputTokens - cachedInputTokens,
+  );
+  const uncachedInputCost = (inputTokenCost / 1_000_000) * uncachedInputTokens;
+  const cachedInputCost =
+    ((modelOption.cacheReadTokenCost ?? inputTokenCost) / 1_000_000) *
+    cachedInputTokens;
+  const cacheWriteCost =
+    ((modelOption.cacheWriteTokenCost ?? inputTokenCost) / 1_000_000) *
+    cacheWriteTokens;
+  const outputCost = (outputTokenCost / 1_000_000) * actualOutputTokens;
+  return uncachedInputCost + cachedInputCost + cacheWriteCost + outputCost;
+}
+
+/**
+ * Credits for a REAL upstream charge (e.g. OpenRouter's per-step
+ * `usage.cost`): the same markup as token pricing, converted at the platform
+ * credit value, rounded UP to 0.1 credit. Zero stays zero. The 1e-9 epsilon
+ * keeps float noise on an exact boundary from ceiling up a full tenth.
+ */
+export function upstreamCostToCredits(costUsd: number): number {
+  if (!(costUsd > 0)) {
+    return 0;
+  }
+  const credits =
+    (costUsd / CREDIT_VALUE_USD) * (1 + STANDARD_MARKUP_PERCENTAGE);
+  const rounded = Math.ceil(credits * 10 - 1e-9) / 10;
+  // Snap float noise (0.30000000000000004) back onto the 0.1 grid.
+  return Math.round(rounded * 10) / 10;
+}
+
 export function calculateCreditCost(
   modelOption: CreditCostInput,
   actualInputTokens: number,
@@ -835,30 +890,15 @@ export function calculateCreditCost(
     );
   }
 
-  const DOLLARS_PER_CREDIT = 0.01;
-  const inputTokenCost = modelOption.inputTokenCost ?? 0;
-  const outputTokenCost = modelOption.outputTokenCost ?? 0;
-  // actualInputTokens is the FULL input (uncached + cached). Clamp so a caller
-  // that passes an already-uncached count can never bill below zero.
-  const uncachedInputTokens = Math.max(
-    0,
-    actualInputTokens - cachedInputTokens,
-  );
-  const uncachedInputCost = (inputTokenCost / 1_000_000) * uncachedInputTokens;
-  const effectiveCacheReadRate =
-    modelOption.cacheReadTokenCost ?? inputTokenCost;
-  const cachedInputCost =
-    (effectiveCacheReadRate / 1_000_000) * cachedInputTokens;
-  const effectiveCacheWriteRate =
-    modelOption.cacheWriteTokenCost ?? inputTokenCost;
-  const cacheWriteCost =
-    (effectiveCacheWriteRate / 1_000_000) * cacheWriteTokens;
-  const outputCostPerMessage =
-    (outputTokenCost / 1_000_000) * actualOutputTokens;
-  const totalCostPerMessage =
-    uncachedInputCost + cachedInputCost + cacheWriteCost + outputCostPerMessage;
   const credits =
-    (totalCostPerMessage / DOLLARS_PER_CREDIT) *
+    (calculateTokenCostUsd(
+      modelOption,
+      actualInputTokens,
+      actualOutputTokens,
+      cachedInputTokens,
+      cacheWriteTokens,
+    ) /
+      CREDIT_VALUE_USD) *
     (1 + STANDARD_MARKUP_PERCENTAGE);
   // Round UP to the 0.01-credit billing granularity: rounding to nearest let
   // tiny turns round down to 0 — deducted nothing, wrote no ledger

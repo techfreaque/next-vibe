@@ -65,9 +65,6 @@ export const translations: typeof enTranslations = {
       signUp: "Registrieren",
       signInToBuy:
         "Kostenloses Konto anlegen, um Credits zu kaufen. Karte oder Krypto.",
-      sizeStandard: "Standardpaket",
-      sizeLarge: "Großes Paket",
-      bestRate: "Bester Preis",
     },
     submit: {
       text: "Credit-Paket kaufen",

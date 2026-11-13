@@ -61,9 +61,6 @@ export const translations = {
       logIn: "Log in",
       signUp: "Sign up",
       signInToBuy: "Create a free account to buy credits. Card or crypto.",
-      sizeStandard: "Standard pack",
-      sizeLarge: "Large pack",
-      bestRate: "Best rate",
       totalSummary: "{{totalCredits}} credits total · {{totalPrice}} total",
     },
     submit: {

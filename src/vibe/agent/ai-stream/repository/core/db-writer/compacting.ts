@@ -9,6 +9,8 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
+import type { UsageUpstreamCost } from "@/credits/db";
+
 import { chatMessages } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
@@ -191,6 +193,8 @@ export async function emitCompactingDone(
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     user: JwtPayloadType;
     creditCost: number;
+    /** Real upstream cost behind creditCost (actual-cost models). */
+    upstreamCost?: UsageUpstreamCost;
   },
 ): Promise<void> {
   const {
@@ -203,6 +207,7 @@ export async function emitCompactingDone(
     model,
     user,
     creditCost,
+    upstreamCost,
   } = params;
 
   // DB: update content + token metadata
@@ -265,6 +270,7 @@ export async function emitCompactingDone(
     feature: `compacting-${model}`,
     type: "model",
     model,
+    upstreamCost,
   });
 
   // SSE: COMPACTING_DONE

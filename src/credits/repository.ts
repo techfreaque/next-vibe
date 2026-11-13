@@ -90,6 +90,7 @@ import {
   creditTransactions,
   type CreditWallet,
   creditWallets,
+  type UsageUpstreamCost,
 } from "./db";
 import { getPoolBalance } from "./db-functions";
 import {
@@ -2135,6 +2136,7 @@ export class CreditRepository {
     t: CreditsT,
     locale: CountryLanguage,
     allowPartial = false, //  allow deducting less than requested
+    upstreamCost?: UsageUpstreamCost,
   ): Promise<ResponseType<DeductCreditsResult>> {
     // Round amount to 6 decimal places to avoid floating point precision artifacts
     const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
@@ -2402,6 +2404,7 @@ export class CreditRepository {
               metadata: {
                 cost: amount,
                 messageId,
+                ...upstreamCost,
                 freeCreditsUsed: deduction,
                 packCreditsUsed: 0,
               },
@@ -2472,6 +2475,7 @@ export class CreditRepository {
               metadata: {
                 cost: amount,
                 messageId,
+                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -2551,6 +2555,7 @@ export class CreditRepository {
               metadata: {
                 cost: amount,
                 messageId,
+                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -2634,6 +2639,7 @@ export class CreditRepository {
               metadata: {
                 cost: amount,
                 messageId,
+                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -3535,6 +3541,8 @@ export class CreditRepository {
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
+    /** Real upstream cost behind this charge (OpenRouter), for reconciliation. */
+    upstreamCost?: UsageUpstreamCost,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -3573,6 +3581,7 @@ export class CreditRepository {
         t,
         locale,
         true, // Allow partial deduction for model usage
+        upstreamCost,
       );
 
       if (!result.success) {

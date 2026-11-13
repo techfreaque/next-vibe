@@ -8,11 +8,10 @@ import "server-only";
 import type { JSONValue, streamText as aiStreamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
-import { calculateCreditCost } from "../../../models/models";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
 import type { StreamLoopState } from "./state";
-import { TokenAccumulator } from "./token-accumulator";
+import { readStepUpstreamCost, TokenAccumulator } from "./token-accumulator";
 
 /**
  * Finalize ASSISTANT message at stream end.
@@ -104,16 +103,15 @@ export async function billCompletedSteps(
     return;
   }
   ctx.tokensBilled = true;
-  const creditCost = calculateCreditCost(
+  const { credits: creditCost, upstreamCost } = TokenAccumulator.resolveCharge(
+    ctx,
     modelConfig,
-    steps.inputTokens,
-    steps.outputTokens,
-    steps.cachedInputTokens,
-    steps.cacheWriteTokens,
+    steps,
   );
-  logger.debug("[AI Stream] Billing finished steps of a turn ended early", {
+  logger.info("[AI Stream] Billing finished steps of a turn ended early", {
     model,
     ...steps,
+    ...upstreamCost,
     creditCost,
   });
   const messageId = ctx.lastAssistantMessageId ?? ctx.currentAssistantMessageId;
@@ -133,6 +131,7 @@ export async function billCompletedSteps(
     feature: model,
     type: "model",
     model,
+    upstreamCost,
   });
 }
 
@@ -187,6 +186,20 @@ export async function complete(
     outputTokens: usageData.outputTokens ?? 0,
     cachedInputTokens: usageData.inputTokenDetails?.cacheReadTokens ?? 0,
   };
+  // Models without tools never register onStepFinish, so their single step's
+  // real upstream cost is read from the aggregate provider metadata here.
+  if (state.p.ctx.tokenStepCount === 0) {
+    TokenAccumulator.recordUpstreamCost(
+      state.p.ctx,
+      modelConfig,
+      {
+        ...sdkTotals,
+        cacheWriteTokens: providerCacheWriteTokens,
+      },
+      readStepUpstreamCost(providerMeta),
+      logger,
+    );
+  }
   const {
     inputTokens: finalInputTokens,
     outputTokens: finalOutputTokens,
@@ -205,14 +218,25 @@ export async function complete(
   // itself. Passing the already-uncached count subtracted cached twice: cache
   // hits were billed below zero and long cached tool loops went negative
   // (deductAndEmitCredits skips amount <= 0, so the whole turn was free).
-  const actualCreditCost = calculateCreditCost(
-    modelConfig,
-    finalUncachedInputTokens + finalCachedInputTokens,
-    finalOutputTokens,
-    finalCachedInputTokens,
-    finalCacheWriteTokens,
-  );
+  // Actual-cost models (OpenRouter) bill the summed real per-step cost.
+  const { credits: actualCreditCost, upstreamCost } =
+    TokenAccumulator.resolveCharge(state.p.ctx, modelConfig, {
+      inputTokens: finalUncachedInputTokens + finalCachedInputTokens,
+      outputTokens: finalOutputTokens,
+      cachedInputTokens: finalCachedInputTokens,
+      cacheWriteTokens: finalCacheWriteTokens,
+    });
   state.p.ctx.tokensBilled = true;
+  logger.info("[AI Stream] Turn charge", {
+    model,
+    threadId,
+    creditCost: actualCreditCost,
+    upstreamCostUsd: upstreamCost?.upstreamCostUsd ?? null,
+    fallbackCostUsd: upstreamCost?.fallbackCostUsd ?? null,
+    upstreamProvider: upstreamCost?.upstreamProvider ?? null,
+    billingBasis: upstreamCost?.billingBasis ?? "token_price",
+    steps: state.p.ctx.tokenStepCount,
+  });
 
   const cachePercentage =
     finalInputTokens > 0
@@ -428,6 +452,7 @@ export async function complete(
     feature: model,
     type: "model",
     model,
+    upstreamCost,
   });
 
   // Flush ALL pending throttled writes BEFORE signaling idle. Anyone who

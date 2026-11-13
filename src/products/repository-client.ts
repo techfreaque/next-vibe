@@ -224,12 +224,10 @@ export enum ProductIds {
 
 /**
  * Credit pack products a user can buy (one-time, no subscription required).
- * Ordered small to large.
+ * Ordered small to large. Retired packs stay in ProductIds (old purchases and
+ * ledger rows reference them) but are left out of this list.
  */
-export const CREDIT_PACK_PRODUCT_IDS = [
-  ProductIds.CREDIT_PACK,
-  ProductIds.CREDIT_PACK_LARGE,
-] as const;
+export const CREDIT_PACK_PRODUCT_IDS = [ProductIds.CREDIT_PACK] as const;
 
 /**
  * Internal product definitions with pricing for all countries
@@ -289,7 +287,8 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     allowedIntervals: ["one_time" as const],
     status: "active" as const,
   },
-  // Bigger pack, better rate: $20 / 2500 credits ($0.008 per credit vs $0.01).
+  // Retired 2026-11-13: $20 / 2500 credits ($0.008 per credit) lost money after
+  // Stripe fees. Kept so historical purchases still resolve; not for sale.
   credit_pack_large: {
     name: "creditPackLarge.name",
     description: "creditPackLarge.description",
@@ -308,7 +307,9 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     credits: 2500,
     isSubscription: false,
     allowedIntervals: ["one_time" as const],
-    status: "active" as const,
+    status: "deprecated" as const,
+    deprecatedAt: new Date("2026-11-13T00:00:00Z"),
+    replacedBy: ProductIds.CREDIT_PACK,
   },
 };
 
@@ -394,13 +395,9 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       allowedIntervals: definition.allowedIntervals,
       credits: definition.credits,
       country,
-      status: definition.status || "active",
-      deprecatedAt: ("deprecatedAt" in definition
-        ? definition.deprecatedAt
-        : undefined) as Date | undefined,
-      replacedBy: ("replacedBy" in definition
-        ? definition.replacedBy
-        : undefined) as ProductIds | undefined,
+      status: definition.status,
+      deprecatedAt: definition.deprecatedAt,
+      replacedBy: definition.replacedBy,
     };
   }
 
@@ -432,27 +429,21 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   canPurchase(productId: ProductIds): boolean {
     const definition = productDefinitions[productId];
-    return (definition.status || "active") === "active";
+    return definition.status === "active";
   }
 
   /**
    * Check if a product is deprecated (for existing subscribers check)
    */
   isDeprecated(productId: ProductIds): boolean {
-    const definition = productDefinitions[productId];
-    // Type widening: definition.status is inferred as "active" literal from const context
-    // but architecturally it represents the union "active" | "deprecated"
-    return (definition.status as "active" | "deprecated") === "deprecated";
+    return productDefinitions[productId].status === "deprecated";
   }
 
   /**
    * Get replacement product ID for a deprecated product
    */
   getReplacementProduct(productId: ProductIds): ProductIds | null {
-    const definition = productDefinitions[productId];
-    return (
-      "replacedBy" in definition ? definition.replacedBy || null : null
-    ) as ProductIds | null;
+    return productDefinitions[productId].replacedBy ?? null;
   }
 
   /**
@@ -476,7 +467,6 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const freeTier = productDefinitions[ProductIds.FREE_TIER];
     const subscription = productDefinitions[ProductIds.SUBSCRIPTION];
     const creditPack = productDefinitions[ProductIds.CREDIT_PACK];
-    const largePack = productDefinitions[ProductIds.CREDIT_PACK_LARGE];
 
     const subPrice = subscription.priceByCountry[country].price;
     const subCurrency = subscription.priceByCountry[country].currency;
@@ -486,10 +476,6 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     )[country];
     const packPrice = packPriceData.price;
     const packCurrency = packPriceData.currency;
-
-    const largePackPriceData = (
-      largePack.oneTimePriceByCountry ?? largePack.priceByCountry
-    )[country];
 
     const subCurrencySymbol =
       subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
@@ -503,8 +489,6 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       packCurrency: packCurrencySymbol,
       packPrice: packPrice,
       packCredits: creditPack.credits,
-      largePackPrice: largePackPriceData.price,
-      largePackCredits: largePack.credits,
       subCredits: subscription.credits,
       subCurrency: subCurrencySymbol,
       subPrice: subPrice,
@@ -532,17 +516,11 @@ export function getPricingParams(
   const free = productDefinitions[ProductIds.FREE_TIER];
   const sub = productDefinitions[ProductIds.SUBSCRIPTION];
   const pack = productDefinitions[ProductIds.CREDIT_PACK];
-
-  const largePack = productDefinitions[ProductIds.CREDIT_PACK_LARGE];
   const subPriceData = sub.priceByCountry[country];
   // Packs are one-time purchases: checkout charges oneTimePriceByCountry
   const packPriceData = (pack.oneTimePriceByCountry ?? pack.priceByCountry)[
     country
   ];
-
-  const largePackPriceData = (
-    largePack.oneTimePriceByCountry ?? largePack.priceByCountry
-  )[country];
   const subSymbol = currencySymbol(subPriceData.currency);
   const packSymbol = currencySymbol(packPriceData.currency);
 
@@ -559,8 +537,6 @@ export function getPricingParams(
     packCredits: String(pack.credits),
     subscriptionPrice: `${subSymbol}${subPriceData.price}`,
     packPrice: `${packSymbol}${packPriceData.price}`,
-    largePackCredits: String(largePack.credits),
-    largePackPrice: `${currencySymbol(largePackPriceData.currency)}${largePackPriceData.price}`,
   };
 }
 

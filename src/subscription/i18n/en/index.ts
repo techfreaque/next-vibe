@@ -572,7 +572,7 @@ export const translations = {
       packs: {
         title: "Need more credits?",
         description:
-          "Buy credit packs anytime, subscription or not - {{packPrice}} for {{packCredits}} credits, or {{largePackPrice}} for {{largePackCredits}}. They never expire and stack on top of any monthly allowance.",
+          "Buy credit packs anytime, with or without a subscription: {{packPrice}} for {{packCredits}} credits. They never expire and stack on top of any monthly allowance.",
         cta: "Buy Credit Pack",
       },
       manage: "Manage or cancel your subscription anytime in",

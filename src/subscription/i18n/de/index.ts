@@ -598,7 +598,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Mehr Credits benötigt?",
         description:
-          "Kaufe Credit-Pakete jederzeit, mit oder ohne Abo - {{packPrice}} für {{packCredits}} Credits oder {{largePackPrice}} für {{largePackCredits}}. Sie verfallen nie und stapeln sich auf jedes Monatskontingent.",
+          "Kaufe Credit-Pakete jederzeit, mit oder ohne Abo: {{packPrice}} für {{packCredits}} Credits. Sie verfallen nie und kommen zu jedem Monatskontingent obendrauf.",
         cta: "Credit-Paket kaufen",
       },
       manage: "Abo jederzeit verwalten oder kündigen in",

@@ -12,9 +12,9 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatMessage } from "../../../chat/db";
-import { calculateCreditCost } from "../../../models/models";
 import { type ChatModelId, getChatModelById } from "../../models";
 import type { ToolExecutionContextImpl } from "../core/stream";
+import { TokenAccumulator } from "../loop/token-accumulator";
 
 /**
  * Hard cap for the compacting LLM call. Summarization of a large thread
@@ -152,13 +152,20 @@ export async function runCompactingLLM(params: {
 
         // Full input + cached split: passing only the uncached count left
         // every cache-hit token of the compacting call unbilled.
-        const creditCost = calculateCreditCost(
-          modelConfig,
-          inputTokens,
-          outputTokens,
-          cachedInputTokens,
-          usageData.inputTokenDetails?.cacheWriteTokens ?? 0,
-        );
+        // Actual-cost models (OpenRouter) bill the call's real upstream cost.
+        const { credits: creditCost, upstreamCost } =
+          TokenAccumulator.chargeSingleCall(
+            modelConfig,
+            {
+              inputTokens,
+              outputTokens,
+              cachedInputTokens,
+              cacheWriteTokens:
+                usageData.inputTokenDetails?.cacheWriteTokens ?? 0,
+            },
+            await streamResult.providerMetadata,
+            params.logger,
+          );
 
         // DB update + TOKENS_UPDATED + CREDITS_DEDUCTED + COMPACTING_DONE
         await ctx.dbWriter.emitCompactingDone({
@@ -173,6 +180,7 @@ export async function runCompactingLLM(params: {
           messagesToCompact,
           user,
           creditCost,
+          upstreamCost,
         });
       }
 

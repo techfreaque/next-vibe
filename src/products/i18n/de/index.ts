@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat als Gast, {{freeCreditsSignedIn}} angemeldet, +{{freeCreditsNewsletterBonus}} mit Newsletter), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits oder {{packCurrency}}{{largePackPrice}} für {{largePackCredits}}), die jeder ohne Abonnement kaufen kann, an.",
+    "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat als Gast, {{freeCreditsSignedIn}} angemeldet, +{{freeCreditsNewsletterBonus}} mit Newsletter), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits), die jeder ohne Abonnement kaufen kann, an.",
 
   // Free tier product
   free: {
@@ -56,19 +56,10 @@ export const translations: typeof enTranslations = {
     },
   },
 
-  // Großes Credit-Paket
+  // Großes Credit-Paket: eingestellt, nur noch in alten Käufen sichtbar.
   creditPackLarge: {
-    name: "Großes Credit-Paket",
+    name: "Großes Credit-Paket (eingestellt)",
     description:
-      "{{largePackCredits}} Credits zum besseren Preis. Kein Abo. Laufen nie ab.",
-    longDescription:
-      "Das Vorratspaket. {{largePackCredits}} Credits zu einem niedrigeren Preis pro Credit. Kein Abonnement nötig.",
-    features: {
-      credits: "{{largePackCredits}} Credits pro Paket",
-      allModels: "Alle {{modelCount}} KI-Modelle enthalten",
-      allFeatures: "Alle Funktionen enthalten",
-      multiple: "Mehrere Pakete kaufen",
-      permanent: "Credits laufen nie ab",
-    },
+      "Nicht mehr erhältlich. Bereits gekaufte Credits bleiben gültig.",
   },
 };

@@ -69,7 +69,7 @@ export const translations = {
         permanent: {
           title: "Credit packs",
           description:
-            "{{packPrice}} for {{packCredits}} credits, or {{largePackPrice}} for {{largePackCredits}}. Never expire. No subscription needed.",
+            "{{packPrice}} for {{packCredits}} credits. Buy as many as you need. Never expire. No subscription needed.",
         },
         free: {
           title: "Free credits",
@@ -79,7 +79,8 @@ export const translations = {
       },
       costs: {
         title: "What things cost",
-        description: "Credits per message, image, clip or tool call.",
+        description:
+          "Credits per message, image, clip or tool call. Message prices are estimates: OpenRouter models bill the real provider cost plus our markup.",
         models: {
           title: "AI Models (per message)",
           gpt4: "GPT-4",

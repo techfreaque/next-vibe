@@ -109,7 +109,7 @@ export const translations = {
       lessThanMin: "<0.1",
     },
     tokenBased: {
-      header: "Cost per message",
+      header: "Estimated cost per message",
       costRangeLabel: "Typical range:",
       costRangeValue: "{{min}} - {{max}} credits",
       examplesLabel: "Examples:",
@@ -121,7 +121,7 @@ export const translations = {
       triggersCompacting: "⚡ Triggers compacting",
       tokensCount: "{{count}} tokens",
       explanation:
-        "The AI processes your entire conversation history with each message. Longer conversations cost more because there's more context to process.",
+        "The AI processes your entire conversation history with each message. Longer conversations cost more because there's more context to process. These are estimates: models served via OpenRouter bill the provider's real cost plus our markup, so a message can cost more or less.",
       compactingLabel: "✨ Auto-compacting:",
       compactingExplanation:
         " At {{threshold}} tokens, older messages are automatically summarized to reduce costs while preserving context.",

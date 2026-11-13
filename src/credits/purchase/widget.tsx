@@ -47,16 +47,12 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
-import {
-  CREDIT_PACK_PRODUCT_IDS,
-  ProductIds,
-  productsRepository,
-} from "@/products/repository-client";
+import { ProductIds, productsRepository } from "@/products/repository-client";
 
 import type definition from "./definition";
 
 const MIN_QTY = 1;
-// Crypto minimum is ~$25 of credits (5 standard packs); the large pack clears it alone.
+// Crypto minimum is ~$25 of credits (5 packs).
 const MIN_CRYPTO_CREDITS = 2500;
 
 /**
@@ -92,11 +88,7 @@ export function CreditsPurchaseContainer({
   const children = field.children;
 
   const products = productsRepository.getProducts(locale);
-  const selectedProductId =
-    form.watch("productId") === ProductIds.CREDIT_PACK_LARGE
-      ? ProductIds.CREDIT_PACK_LARGE
-      : ProductIds.CREDIT_PACK;
-  const packProduct = products[selectedProductId];
+  const packProduct = products[ProductIds.CREDIT_PACK];
   const packPrice = packProduct.price;
   const packCredits = packProduct.credits;
   const isAuthenticated = !user.isPublic;
@@ -221,42 +213,6 @@ export function CreditsPurchaseContainer({
               <TrendingUp className="h-4 w-4 text-info" />
               <Span>{t("post.pack.features.bestFor")}</Span>
             </Div>
-          </Div>
-
-          {/* Pack size */}
-          <Div className="grid grid-cols-2 gap-2">
-            {CREDIT_PACK_PRODUCT_IDS.map((id) => (
-              <Button
-                key={id}
-                type="button"
-                variant={selectedProductId === id ? "default" : "outline"}
-                className="h-auto flex-col items-start gap-0.5 p-3 text-left"
-                onClick={() => form.setValue("productId", id)}
-              >
-                <Span className="text-sm font-semibold">
-                  {id === ProductIds.CREDIT_PACK
-                    ? t("post.pack.sizeStandard")
-                    : t("post.pack.sizeLarge")}
-                </Span>
-                <Span className="text-xs opacity-80">
-                  {formatPrice(
-                    products[id].price,
-                    locale,
-                    products[id].currency,
-                  )}
-                </Span>
-                <Span className="text-xs opacity-80">
-                  {t("post.pack.features.credits", {
-                    count: products[id].credits,
-                  })}
-                </Span>
-                {id === ProductIds.CREDIT_PACK_LARGE && (
-                  <Span className="text-xs font-medium text-success">
-                    {t("post.pack.bestRate")}
-                  </Span>
-                )}
-              </Button>
-            ))}
           </Div>
 
           {/* Purchase Form - any signed-in user, no subscription needed */}

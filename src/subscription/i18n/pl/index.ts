@@ -576,7 +576,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Potrzebujesz więcej creditów?",
         description:
-          "Kupuj pakiety creditów w dowolnym momencie, z subskrypcją lub bez - {{packPrice}} za {{packCredits}} creditów albo {{largePackPrice}} za {{largePackCredits}}. Nigdy nie wygasają i sumują się z miesięcznym przydziałem.",
+          "Kupuj pakiety kredytów kiedy chcesz, z subskrypcją lub bez: {{packPrice}} za {{packCredits}} kredytów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem.",
         cta: "Kup pakiet creditów",
       },
       manage: "Zarządzaj lub anuluj subskrypcję w dowolnym momencie w",

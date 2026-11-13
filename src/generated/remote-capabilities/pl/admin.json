@@ -80011,16 +80011,14 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "credit_pack": "credit_pack",
-                    "credit_pack_large": "credit_pack_large"
+                    "credit_pack": "credit_pack"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "credit_pack": "credit_pack",
-                  "credit_pack_large": "credit_pack_large"
+                  "credit_pack": "credit_pack"
                 },
-                "options": ["credit_pack", "credit_pack_large"]
+                "options": ["credit_pack"]
               },
               "defaultValue": "credit_pack"
             },
@@ -85319,6 +85317,12 @@
                       },
                       "type": "nullable"
                     },
+                    "fallback": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
                     "lastRunAt": {
                       "def": {
                         "type": "nullable",
@@ -85482,6 +85486,12 @@
                     },
                     "type": "nullable"
                   },
+                  "fallback": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
                   "lastRunAt": {
                     "def": {
                       "type": "nullable",
@@ -85585,6 +85595,14 @@
                   "type": "number",
                   "isFinite": true
                 },
+                "processorFeesUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
                 "upstreamCostUsd": {
                   "def": {
                     "type": "number",
@@ -85620,6 +85638,30 @@
                     "type": "boolean"
                   },
                   "type": "boolean"
+                },
+                "marginDays": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "totalDays": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "netRevenueAllDaysUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
                 }
               }
             },
@@ -85647,6 +85689,14 @@
                       "type": "string"
                     },
                     "netRevenueUsd": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "processorFeesUsd": {
                       "def": {
                         "type": "number",
                         "checks": []
@@ -85748,6 +85798,14 @@
                     "type": "string"
                   },
                   "netRevenueUsd": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "processorFeesUsd": {
                     "def": {
                       "type": "number",
                       "checks": []
@@ -557673,9 +557731,9 @@
         "SSH_SERVER2_RELAY_ADDR": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Private (WireGuard) host:port on SSH_SERVER2 for the box-to-box image relay from SSH_SERVER. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
-          "description": "Private (WireGuard) host:port on SSH_SERVER2 for the box-to-box image relay from SSH_SERVER. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
-          "placeholder": "10.88.0.2:7799",
+          "label": "Private (WireGuard) address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over SSH with its restricted /root/.ssh/ha-image-relay key (see ha/README.md). Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+          "description": "Private (WireGuard) address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over SSH with its restricted /root/.ssh/ha-image-relay key (see ha/README.md). Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+          "placeholder": "10.88.0.2",
           "columns": 12,
           "schema": {
             "def": {

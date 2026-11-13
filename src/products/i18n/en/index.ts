@@ -13,7 +13,7 @@ export const translations = {
 
   // Product summary (single source of truth)
   summary:
-    "We offer Free ({{freeCredits}} credits/month as a guest, {{freeCreditsSignedIn}} signed in, +{{freeCreditsNewsletterBonus}} with the newsletter), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits, or {{packCurrency}}{{largePackPrice}} for {{largePackCredits}}) that anyone can buy without a subscription.",
+    "We offer Free ({{freeCredits}} credits/month as a guest, {{freeCreditsSignedIn}} signed in, +{{freeCreditsNewsletterBonus}} with the newsletter), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits) that anyone can buy without a subscription.",
 
   // Free tier product
   free: {
@@ -53,19 +53,9 @@ export const translations = {
     },
   },
 
-  // Large credit pack product
+  // Large credit pack: retired, no longer sold. Shown only on past purchases.
   creditPackLarge: {
-    name: "Large Credit Pack",
-    description:
-      "{{largePackCredits}} credits at a better rate. No subscription. Never expire.",
-    longDescription:
-      "The bulk pack. {{largePackCredits}} credits at a lower price per credit. No subscription required.",
-    features: {
-      credits: "{{largePackCredits}} credits per pack",
-      allModels: "All {{modelCount}} AI models included",
-      allFeatures: "All features included",
-      multiple: "Buy multiple packs",
-      permanent: "Credits never expire",
-    },
+    name: "Large Credit Pack (retired)",
+    description: "No longer sold. Credits already bought stay valid.",
   },
 };

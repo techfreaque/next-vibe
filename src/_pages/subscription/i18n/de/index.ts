@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
         permanent: {
           title: "Credit-Pakete",
           description:
-            "{{packPrice}} für {{packCredits}} Credits, oder {{largePackPrice}} für {{largePackCredits}}. Verfallen nie. Kein Abo nötig.",
+            "{{packPrice}} für {{packCredits}} Credits. Beliebig viele Pakete. Verfallen nie. Kein Abo nötig.",
         },
         free: {
           title: "Gratis-Credits",
@@ -82,7 +82,8 @@ export const translations: typeof enTranslations = {
       },
       costs: {
         title: "Was es kostet",
-        description: "Credits pro Nachricht, Bild, Clip oder Tool-Aufruf.",
+        description:
+          "Credits pro Nachricht, Bild, Clip oder Tool-Aufruf. Nachrichtenpreise sind Schätzwerte: OpenRouter-Modelle rechnen die echten Anbieterkosten plus unseren Aufschlag ab.",
         models: {
           title: "KI-Modelle (pro Nachricht)",
           gpt4: "GPT-4",

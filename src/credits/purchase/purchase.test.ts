@@ -63,48 +63,40 @@ const { t: creditsT } = scopedTranslation.scopedT(defaultLocale);
 const { t: purchaseT } = purchaseScopedTranslation.scopedT(defaultLocale);
 
 describe("pack pricing", () => {
-  it("exposes the large pack at a better per-credit rate in every country", () => {
-    for (const locale of ["en-US", "de-DE", "pl-PL", "en-GLOBAL"] as const) {
-      const small = productsRepository.getProduct(
-        ProductIds.CREDIT_PACK,
-        locale,
-        "one_time",
-      );
-      const large = productsRepository.getProduct(
-        ProductIds.CREDIT_PACK_LARGE,
-        locale,
-        "one_time",
-      );
-      expect(large.credits).toBe(2500);
-      expect(small.currency).toBe(large.currency);
-      expect(large.price / large.credits).toBeLessThan(
-        small.price / small.credits,
-      );
-    }
+  it("sells only the standard pack", () => {
+    expect([...CREDIT_PACK_PRODUCT_IDS]).toEqual([ProductIds.CREDIT_PACK]);
+    expect(productsRepository.canPurchase(ProductIds.CREDIT_PACK)).toBe(true);
     expect(
-      productsRepository.getProduct(
-        ProductIds.CREDIT_PACK_LARGE,
-        "en-US",
-        "one_time",
-      ).price,
-    ).toBe(20);
+      productsRepository.getProductDefinitions()[ProductIds.CREDIT_PACK]
+        .allowedIntervals,
+    ).toEqual(["one_time"]);
   });
 
-  it("getPricingParams carries both packs", () => {
+  it("retires the large pack but keeps it resolvable for past purchases", () => {
+    expect(productsRepository.canPurchase(ProductIds.CREDIT_PACK_LARGE)).toBe(
+      false,
+    );
+    expect(productsRepository.isDeprecated(ProductIds.CREDIT_PACK_LARGE)).toBe(
+      true,
+    );
+    expect(
+      productsRepository.getReplacementProduct(ProductIds.CREDIT_PACK_LARGE),
+    ).toBe(ProductIds.CREDIT_PACK);
+    const large = productsRepository.getProduct(
+      ProductIds.CREDIT_PACK_LARGE,
+      "en-US",
+      "one_time",
+    );
+    expect(large.credits).toBe(2500);
+    expect(large.status).toBe("deprecated");
+  });
+
+  it("getPricingParams no longer advertises the large pack", () => {
     const params = getPricingParams("en-US");
     expect(params.packCredits).toBe("500");
     expect(params.packPrice).toBe("$5");
-    expect(params.largePackCredits).toBe("2500");
-    expect(params.largePackPrice).toBe("$20");
-    expect(getPricingParams("pl-PL").largePackPrice).toBe("zł160");
-  });
-
-  it("both packs are purchasable one-time products", () => {
-    for (const id of CREDIT_PACK_PRODUCT_IDS) {
-      expect(productsRepository.canPurchase(id)).toBe(true);
-      expect(productsRepository.getProductDefinitions()[id].allowedIntervals)
-        .toEqual(["one_time"]);
-    }
+    expect(params.largePackCredits).toBeUndefined();
+    expect(params.largePackPrice).toBeUndefined();
   });
 });
 
@@ -166,6 +158,8 @@ describe("pack purchase without a subscription", () => {
     }
   }
 
+  // Uses the retired large pack: webhooks for packs bought before the
+  // retirement must still grant the credits fixed at checkout.
   it("grants credits once even when the webhook is retried", async () => {
     const session = {
       id: `sess_idem_${Date.now()}`,

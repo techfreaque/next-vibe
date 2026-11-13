@@ -1,7 +1,7 @@
 "use client";
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Div } from "next-vibe/ui/components/div";
@@ -48,7 +48,7 @@ export function CreditsBalanceContainer(): JSX.Element {
 
   const isAdmin =
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
-  const totalModelCount = getAvailableModelCount(isAdmin, availability);
+  const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   const products = productsRepository.getProducts(locale);
   const subscriptionProduct = products[ProductIds.SUBSCRIPTION];
@@ -105,8 +105,6 @@ export function CreditsBalanceContainer(): JSX.Element {
         {
           packPrice: pricing.packPrice,
           packCredits: packProduct.credits,
-          largePackPrice: pricing.largePackPrice,
-          largePackCredits: pricing.largePackCredits,
           subCredits: subscriptionProduct.credits,
         },
       ),

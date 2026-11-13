@@ -6,10 +6,13 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ProviderMetadata } from "ai";
 
 import { ThreadStreamingState } from "../../../chat/enum";
-import { calculateCreditCost } from "../../../models/models";
+import {
+  calculateCreditCost,
+  upstreamCostToCredits,
+} from "../../../models/models";
 import {
   AbortReason,
   MAX_TOOL_CALLS,
@@ -21,7 +24,11 @@ import { estimateInputTokens } from "../core/token-estimator";
 import { injectPendingWakeUpResults } from "../revival/revival";
 import { FINAL_STEP_INSTRUCTIONS } from "./helpers";
 import type { StreamLoopState } from "./state";
-import { TokenAccumulator } from "./token-accumulator";
+import {
+  billsUpstreamCost,
+  readStepUpstreamCost,
+  TokenAccumulator,
+} from "./token-accumulator";
 
 /**
  * Process finish-step event and handle tool confirmation checks.
@@ -572,6 +579,7 @@ export function onStepFinish(
       };
     };
     finishReason?: string;
+    providerMetadata?: ProviderMetadata;
   },
 ): void {
   const { ctx, modelConfig } = state.p;
@@ -592,12 +600,21 @@ export function onStepFinish(
     state.p.ctx.lastStepInputTokens = inputTokens;
   }
 
-  TokenAccumulator.accumulate(state.p.ctx, {
+  const stepTokens = {
     inputTokens,
     outputTokens,
     cachedInputTokens,
     cacheWriteTokens,
-  });
+  };
+  TokenAccumulator.accumulate(state.p.ctx, stepTokens);
+  const upstream = readStepUpstreamCost(stepResult.providerMetadata);
+  TokenAccumulator.recordUpstreamCost(
+    state.p.ctx,
+    modelConfig,
+    stepTokens,
+    upstream,
+    state.p.logger,
+  );
 
   // Emit real per-step token counts for the assistant message that just
   // completed. This corrects any estimated tokens emitted during streaming
@@ -607,14 +624,18 @@ export function onStepFinish(
   const stepAssistantMessageId =
     ctx.currentAssistantMessageId ?? ctx.lastAssistantMessageId;
   if (stepAssistantMessageId && (inputTokens > 0 || outputTokens > 0)) {
-    // Full input: calculateCreditCost subtracts the cached part itself.
-    const stepCreditCost = calculateCreditCost(
-      modelConfig,
-      inputTokens,
-      outputTokens,
-      cachedInputTokens,
-      cacheWriteTokens,
-    );
+    // Actual-cost models show the step's real cost; others the token price
+    // (full input: calculateCreditCost subtracts the cached part itself).
+    const stepCreditCost =
+      billsUpstreamCost(modelConfig) && upstream.costUsd !== null
+        ? upstreamCostToCredits(upstream.costUsd)
+        : calculateCreditCost(
+            modelConfig,
+            inputTokens,
+            outputTokens,
+            cachedInputTokens,
+            cacheWriteTokens,
+          );
     ctx.dbWriter.emitTokensUpdated({
       messageId: stepAssistantMessageId,
       promptTokens: inputTokens,

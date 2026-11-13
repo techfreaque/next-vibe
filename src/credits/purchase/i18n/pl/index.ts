@@ -64,9 +64,6 @@ export const translations: typeof enTranslations = {
       logIn: "Zaloguj się",
       signUp: "Załóż konto",
       signInToBuy: "Załóż darmowe konto, żeby kupić kredyty. Karta lub krypto.",
-      sizeStandard: "Pakiet standardowy",
-      sizeLarge: "Duży pakiet",
-      bestRate: "Najlepsza cena",
     },
     submit: {
       text: "Kup pakiet kredytów",

@@ -1033,16 +1033,14 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "credit_pack": "credit_pack",
-                    "credit_pack_large": "credit_pack_large"
+                    "credit_pack": "credit_pack"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "credit_pack": "credit_pack",
-                  "credit_pack_large": "credit_pack_large"
+                  "credit_pack": "credit_pack"
                 },
-                "options": ["credit_pack", "credit_pack_large"]
+                "options": ["credit_pack"]
               },
               "defaultValue": "credit_pack"
             },
