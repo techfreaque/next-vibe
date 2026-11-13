@@ -384,42 +384,46 @@ export class AbortErrorHandler {
         let totalCredits = 0;
 
         if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
+          // The in-flight step was cut off mid-generation: the provider still
+          // charged its prompt and every token streamed so far. Estimate and
+          // bill it for EVERY payer (incognito and guests included; those
+          // paths used to stream for free). Finished steps were already billed
+          // from real usage by billCompletedSteps.
+          const fullSystemPrompt =
+            [systemPrompt, trailingSystemMessage]
+              .filter(Boolean)
+              .join("\n\n") || undefined;
+
+          const tokenEstimate = estimateTokensFromContext({
+            systemPrompt: fullSystemPrompt,
+            messages,
+            tools,
+            aiResponse: ctx.currentAssistantContent,
+          });
+
+          const modelInfo = getChatModelById(model);
+          const modelCreditCost = modelInfo
+            ? calculateCreditCost(
+                modelInfo,
+                tokenEstimate.promptTokens,
+                tokenEstimate.completionTokens,
+              )
+            : 0;
+
+          totalCredits += modelCreditCost;
+
+          logger.debug("[AI Stream] Estimated usage for aborted stream", {
+            messageId: ctx.currentAssistantMessageId,
+            promptTokens: tokenEstimate.promptTokens,
+            completionTokens: tokenEstimate.completionTokens,
+            totalTokens: tokenEstimate.totalTokens,
+            modelCreditCost,
+          });
+
           if (!isIncognito) {
             logger.debug("[AI Stream] Saving partial content to database", {
               messageId: ctx.currentAssistantMessageId,
               contentLength: ctx.currentAssistantContent.length,
-            });
-
-            const fullSystemPrompt =
-              [systemPrompt, trailingSystemMessage]
-                .filter(Boolean)
-                .join("\n\n") || undefined;
-
-            const tokenEstimate = estimateTokensFromContext({
-              systemPrompt: fullSystemPrompt,
-              messages,
-              tools,
-              aiResponse: ctx.currentAssistantContent,
-            });
-
-            const modelInfo = getChatModelById(model);
-            let modelCreditCost = 0;
-            if (modelInfo) {
-              modelCreditCost = calculateCreditCost(
-                modelInfo,
-                tokenEstimate.promptTokens,
-                tokenEstimate.completionTokens,
-              );
-            }
-
-            totalCredits += modelCreditCost;
-
-            logger.debug("[AI Stream] Estimated usage for aborted stream", {
-              messageId: ctx.currentAssistantMessageId,
-              promptTokens: tokenEstimate.promptTokens,
-              completionTokens: tokenEstimate.completionTokens,
-              totalTokens: tokenEstimate.totalTokens,
-              modelCreditCost,
             });
 
             // Flush + write final partial content to DB, emit CONTENT_DONE SSE
@@ -453,22 +457,6 @@ export class AbortErrorHandler {
               finishReason: "stop",
               creditCost: modelCreditCost,
             });
-
-            // Deduct model credits and emit CREDITS_DEDUCTED
-            if (userId && modelCreditCost > 0) {
-              await ctx.dbWriter.deductAndEmitCredits({
-                user,
-                amount: modelCreditCost,
-                feature: `model:${model}`,
-                type: "model",
-                model,
-              });
-
-              logger.debug("[AI Stream] Deducted and emitted model credits", {
-                amount: modelCreditCost,
-                model,
-              });
-            }
           } else {
             // Incognito: emit CONTENT_DONE SSE only (no DB write) so frontend cache is updated
             ctx.dbWriter.emitContentDoneRaw({
@@ -476,6 +464,23 @@ export class AbortErrorHandler {
               content: ctx.currentAssistantContent,
               totalTokens: null,
               finishReason: "stop",
+            });
+          }
+
+          // Deduct model credits and emit CREDITS_DEDUCTED (any payer: user,
+          // guest lead, incognito - complete() bills all of them the same way).
+          if (modelCreditCost > 0) {
+            await ctx.dbWriter.deductAndEmitCredits({
+              user,
+              amount: modelCreditCost,
+              feature: `model:${model}`,
+              type: "model",
+              model,
+            });
+
+            logger.debug("[AI Stream] Deducted and emitted model credits", {
+              amount: modelCreditCost,
+              model,
             });
           }
         } else {

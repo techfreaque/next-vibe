@@ -10,10 +10,31 @@ import "server-only";
 
 import type { ToolExecutionContextImpl } from "../core/stream";
 
+/** The per-step token counters these ops read and write on the stream context. */
+export type TokenCounters = Pick<
+  ToolExecutionContextImpl,
+  | "tokenUncachedInput"
+  | "tokenCachedInput"
+  | "tokenCacheWrite"
+  | "tokenOutput"
+  | "tokenLastInput"
+  | "tokensBilled"
+  | "tokenStepCount"
+>;
+
+/** Billable token totals in the shape calculateCreditCost expects. */
+export interface BillableTokens {
+  /** FULL input (uncached + cached): calculateCreditCost subtracts cached itself. */
+  inputTokens: number;
+  outputTokens: number;
+  cachedInputTokens: number;
+  cacheWriteTokens: number;
+}
+
 /** Accumulates per-step token counts for accurate multi-step credit billing. */
 export class TokenAccumulator {
   static accumulate(
-    ctx: ToolExecutionContextImpl,
+    ctx: TokenCounters,
     step: {
       inputTokens: number;
       outputTokens: number;
@@ -21,6 +42,7 @@ export class TokenAccumulator {
       cacheWriteTokens: number;
     },
   ): void {
+    ctx.tokenStepCount += 1;
     if (step.inputTokens > 0) {
       ctx.tokenLastInput = step.inputTokens;
     }
@@ -41,7 +63,7 @@ export class TokenAccumulator {
    * accumulators stay at zero — fall back to SDK aggregate (single-step, accurate).
    */
   static finalize(
-    ctx: ToolExecutionContextImpl,
+    ctx: TokenCounters,
     sdk: {
       inputTokens: number;
       outputTokens: number;
@@ -76,5 +98,29 @@ export class TokenAccumulator {
           uncachedInputTokens: ctx.tokenUncachedInput,
           cacheWriteTokens,
         };
+  }
+
+  /**
+   * Billable totals of the steps that already FINISHED, for a turn that ends
+   * without complete(): endLoop / approve / wait park-aborts, user stop,
+   * client disconnect, superseded, provider error. Those paths used to drop
+   * every finished step on the floor (a new thread's first turn ends with
+   * rename-thread + endLoop, so it was never billed). null when no step
+   * finished or the turn was already billed. Token counts can be all zero for
+   * per-message priced models; calculateCreditCost still charges them.
+   */
+  static unbilledCompletedSteps(ctx: TokenCounters): BillableTokens | null {
+    if (ctx.tokensBilled) {
+      return null;
+    }
+    if (ctx.tokenStepCount === 0) {
+      return null;
+    }
+    return {
+      inputTokens: ctx.tokenUncachedInput + ctx.tokenCachedInput,
+      outputTokens: ctx.tokenOutput,
+      cachedInputTokens: ctx.tokenCachedInput,
+      cacheWriteTokens: ctx.tokenCacheWrite,
+    };
   }
 }

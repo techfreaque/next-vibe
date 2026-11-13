@@ -187,6 +187,12 @@ export class ToolExecutionContextImpl {
   tokenOutput = 0;
   /** Full prompt size on the last step — for display/threshold purposes. */
   tokenLastInput = 0;
+  /** True once this turn's tokens were billed (complete() or the abort path),
+   *  so the two can never both charge the same steps. */
+  tokensBilled = false;
+  /** Steps that reported finishing (onStepFinish), even with empty usage:
+   *  per-message priced models report no tokens but still cost per turn. */
+  tokenStepCount = 0;
 
   /** Provider first-part watchdog timer handle (see FirstPartWatchdog). */
   firstPartWatchdogTimer: ReturnType<typeof setTimeout> | null = null;

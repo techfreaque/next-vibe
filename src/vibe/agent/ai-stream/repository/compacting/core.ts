@@ -150,10 +150,14 @@ export async function runCompactingLLM(params: {
           return { status: "empty", inputTokens, outputTokens };
         }
 
+        // Full input + cached split: passing only the uncached count left
+        // every cache-hit token of the compacting call unbilled.
         const creditCost = calculateCreditCost(
           modelConfig,
-          uncachedInputTokens,
+          inputTokens,
           outputTokens,
+          cachedInputTokens,
+          usageData.inputTokenDetails?.cacheWriteTokens ?? 0,
         );
 
         // DB update + TOKENS_UPDATED + CREDITS_DEDUCTED + COMPACTING_DONE

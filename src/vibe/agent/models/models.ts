@@ -838,7 +838,12 @@ export function calculateCreditCost(
   const DOLLARS_PER_CREDIT = 0.01;
   const inputTokenCost = modelOption.inputTokenCost ?? 0;
   const outputTokenCost = modelOption.outputTokenCost ?? 0;
-  const uncachedInputTokens = actualInputTokens - cachedInputTokens;
+  // actualInputTokens is the FULL input (uncached + cached). Clamp so a caller
+  // that passes an already-uncached count can never bill below zero.
+  const uncachedInputTokens = Math.max(
+    0,
+    actualInputTokens - cachedInputTokens,
+  );
   const uncachedInputCost = (inputTokenCost / 1_000_000) * uncachedInputTokens;
   const effectiveCacheReadRate =
     modelOption.cacheReadTokenCost ?? inputTokenCost;

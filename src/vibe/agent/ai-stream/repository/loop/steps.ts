@@ -607,10 +607,10 @@ export function onStepFinish(
   const stepAssistantMessageId =
     ctx.currentAssistantMessageId ?? ctx.lastAssistantMessageId;
   if (stepAssistantMessageId && (inputTokens > 0 || outputTokens > 0)) {
-    const uncachedInputTokens = inputTokens - cachedInputTokens;
+    // Full input: calculateCreditCost subtracts the cached part itself.
     const stepCreditCost = calculateCreditCost(
       modelConfig,
-      uncachedInputTokens,
+      inputTokens,
       outputTokens,
       cachedInputTokens,
       cacheWriteTokens,

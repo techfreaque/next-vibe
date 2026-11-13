@@ -80,12 +80,70 @@ export function abortReasonAsError(
     : new Error(String(reason ?? "Stream aborted"));
 }
 
+/**
+ * Bill the steps that already finished when a turn ends without complete():
+ * endLoop / approve / wait park-aborts, user stop, client disconnect,
+ * superseded, provider error. The provider charged for every finished step;
+ * before this, all of them were dropped. A new thread's first turn ends with
+ * rename-thread + endLoop, so it was never billed at all.
+ * Idempotent via ctx.tokensBilled (complete() sets it too).
+ */
+export async function billCompletedSteps(
+  state: StreamLoopState,
+): Promise<void> {
+  const { ctx, modelConfig, model, user, logger } = state.p;
+  // The AI SDK enqueues the finish-step part BEFORE it awaits onStepFinish
+  // (where the counters are accumulated). A park-abort fires from the
+  // finish-step part handler, so yield one macrotask to let the last step's
+  // onStepFinish land before reading the counters.
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+  const steps = TokenAccumulator.unbilledCompletedSteps(ctx);
+  if (!steps) {
+    return;
+  }
+  ctx.tokensBilled = true;
+  const creditCost = calculateCreditCost(
+    modelConfig,
+    steps.inputTokens,
+    steps.outputTokens,
+    steps.cachedInputTokens,
+    steps.cacheWriteTokens,
+  );
+  logger.debug("[AI Stream] Billing finished steps of a turn ended early", {
+    model,
+    ...steps,
+    creditCost,
+  });
+  const messageId = ctx.lastAssistantMessageId ?? ctx.currentAssistantMessageId;
+  if (messageId) {
+    await ctx.dbWriter.writeTokenMetadataOnly(messageId, {
+      promptTokens: ctx.tokenLastInput,
+      completionTokens: steps.outputTokens,
+      finishReason: null,
+      cachedInputTokens: steps.cachedInputTokens,
+      cacheWriteTokens: steps.cacheWriteTokens,
+      creditCost,
+    });
+  }
+  await ctx.dbWriter.deductAndEmitCredits({
+    user,
+    amount: creditCost,
+    feature: model,
+    type: "model",
+    model,
+  });
+}
+
 /** ONE abort-handler invocation shared by the pump-return and catch paths
- *  (previously duplicated verbatim). */
+ *  (previously duplicated verbatim). Bills finished steps first: every path
+ *  that reaches here skipped complete(). */
 export async function runAbortHandler(
   state: StreamLoopState,
   error: Error,
 ): Promise<{ wasHandled: boolean }> {
+  await billCompletedSteps(state);
   const { AbortErrorHandler } = await import("../errors/errors");
   return AbortErrorHandler.handleAbortError({
     error,
@@ -143,13 +201,18 @@ export async function complete(
   const finalTotalTokens =
     finalUncachedInputTokens + finalCachedInputTokens + finalOutputTokens;
 
+  // calculateCreditCost takes the FULL input and subtracts the cached part
+  // itself. Passing the already-uncached count subtracted cached twice: cache
+  // hits were billed below zero and long cached tool loops went negative
+  // (deductAndEmitCredits skips amount <= 0, so the whole turn was free).
   const actualCreditCost = calculateCreditCost(
     modelConfig,
-    finalUncachedInputTokens,
+    finalUncachedInputTokens + finalCachedInputTokens,
     finalOutputTokens,
     finalCachedInputTokens,
     finalCacheWriteTokens,
   );
+  state.p.ctx.tokensBilled = true;
 
   const cachePercentage =
     finalInputTokens > 0
