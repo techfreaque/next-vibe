@@ -177,12 +177,28 @@ export function listAllCatalogEntries(
   return result;
 }
 
-/** Non-legacy models across every catalog type. Same number in meta + hero. */
-export function countCatalogModels(
-  entriesByType: Partial<Record<CatalogType, CatalogEntry[]>>,
-): number {
-  return Object.values(entriesByType).reduce(
-    (sum, entries) => sum + entries.filter((entry) => !entry.isLegacy).length,
-    0,
-  );
+/** Media (non-chat) catalog types, counted separately from chat models. */
+export interface CatalogMediaModelCounts {
+  image: number;
+  video: number;
+  music: number;
+  voice: number;
+}
+
+/**
+ * Offered image/video/music/voice models, per modality. Same visibility rule
+ * as the catalog rows. Chat models are never mixed in: the public chat figure
+ * is `getAvailableChatModelCount` (all-models.ts).
+ */
+export function getCatalogMediaModelCounts(
+  availability: AgentEnvAvailability,
+): CatalogMediaModelCounts {
+  const count = (type: CatalogType): number =>
+    listCatalogEntries(type, { availability }).length;
+  return {
+    image: count("image"),
+    video: count("video"),
+    music: count("audio"),
+    voice: count("tts") + count("stt"),
+  };
 }

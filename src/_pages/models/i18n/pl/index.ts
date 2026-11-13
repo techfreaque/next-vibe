@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     category: "Modele AI",
     index: {
-      title: "{{count}} modeli AI - ceny, kontekst, filtry | {{appName}}",
+      title: "{{count}} modeli czatu AI - ceny, kontekst, filtry | {{appName}}",
       description:
         "Wszystkie modele na {{appName}} na jednej liście: Claude, GPT, Gemini, Grok, DeepSeek, czat otwarty i bez cenzury, a do tego obraz, głos, muzyka i wideo. Prawdziwa cena za użycie, okno kontekstu, wejścia. Wybierz i działaj.",
       imageAlt: "Katalog modeli AI na {{appName}}",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     hideLegacy: "Ukryj starsze",
   },
   index: {
-    eyebrow: "{{count}} modeli",
+    eyebrow: "{{chat}} modeli czatu, do tego modele obrazu: {{image}}, wideo: {{video}}, muzyki: {{music}}, głosu: {{voice}}",
     title: "Każdy model. Jeden czat.",
     subtitle:
       "Mainstream, otwarte i bez cenzury. Prawdziwe ceny za wiadomość, prawdziwe rozmiary kontekstu. Filtr wybierasz ty. Nie my.",

@@ -6,13 +6,15 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
-  countCatalogModels,
-  listAllCatalogEntries,
+  type CatalogMediaModelCounts,
+  getCatalogMediaModelCounts,
 } from "./_shared/model-catalog-entries";
 import { MODELS_OG_IMAGE } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -29,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const count = countCatalogModels(listAllCatalogEntries());
+  const count = getAvailableChatModelCount(false, await getEnvAvailability());
   return metadataGenerator(locale, {
     path: "models",
     title: t("meta.index.title", { appName, count }),
@@ -43,13 +45,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export interface ModelsIndexPageData {
   locale: CountryLanguage;
+  /** Public chat-model count, same figure as the rest of the site */
+  chatModelCount: number;
+  mediaModelCounts: CatalogMediaModelCounts;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<ModelsIndexPageData> {
   const { locale } = await params;
-  return { locale };
+  const availability = await getEnvAvailability();
+  return {
+    locale,
+    chatModelCount: getAvailableChatModelCount(false, availability),
+    mediaModelCounts: getCatalogMediaModelCounts(availability),
+  };
 }
 
 export function TanstackPage(data: ModelsIndexPageData): JSX.Element {

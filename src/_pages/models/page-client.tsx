@@ -13,7 +13,6 @@ import {
   CATALOG_TYPE_ORDER,
   type CatalogEntry,
   type CatalogType,
-  countCatalogModels,
   listAllCatalogEntries,
 } from "./_shared/model-catalog-entries";
 import { scopedTranslation } from "./i18n";
@@ -36,6 +35,8 @@ function matchesQuery(entry: CatalogEntry, query: string): boolean {
 
 export function ModelsIndexClient({
   locale,
+  chatModelCount,
+  mediaModelCounts,
 }: ModelsIndexPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [query, setQuery] = useState("");
@@ -54,15 +55,14 @@ export function ModelsIndexClient({
     }
     return result;
   }, [allEntries, query]);
-  const totalCount = useMemo(
-    () => countCatalogModels(allEntries),
-    [allEntries],
-  );
 
   return (
     <Div>
       <PageHero
-        eyebrow={t("index.eyebrow", { count: totalCount })}
+        eyebrow={t("index.eyebrow", {
+          chat: chatModelCount,
+          ...mediaModelCounts,
+        })}
         title={t("index.title")}
         subtitle={t("index.subtitle")}
       >

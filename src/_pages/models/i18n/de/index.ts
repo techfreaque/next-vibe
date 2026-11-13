@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     category: "KI-Modelle",
     index: {
-      title: "{{count}} KI-Modelle - Preise, Kontext, Filter | {{appName}}",
+      title: "{{count}} KI-Chatmodelle - Preise, Kontext, Filter | {{appName}}",
       description:
         "Alle Modelle auf {{appName}} in einer Liste: Claude, GPT, Gemini, Grok, DeepSeek, offene und unzensierte Chat-Modelle, dazu Bild, Stimme, Musik und Video. Echter Preis pro Nutzung, Kontextfenster, Eingaben. Modell wählen, loslegen.",
       imageAlt: "KI-Modellverzeichnis auf {{appName}}",
@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
     hideLegacy: "Veraltete ausblenden",
   },
   index: {
-    eyebrow: "{{count}} Modelle",
+    eyebrow: "{{chat}} Chat-Modelle, dazu {{image}} Bild-, {{video}} Video-, {{music}} Musik- und {{voice}} Sprachmodelle",
     title: "Jedes Modell. Ein Chat.",
     subtitle:
       "Mainstream, offen und unzensiert. Echte Preise pro Nachricht, echte Kontextgrößen. Den Filter bestimmst du. Nicht wir.",
