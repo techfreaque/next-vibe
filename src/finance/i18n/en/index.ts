@@ -24,6 +24,7 @@ export const translations = {
       dispute: "Dispute",
       cancellation: "Cancellation",
       payout: "Payout",
+      fee: "Processor fee",
     },
     runStatus: {
       ok: "OK",
@@ -132,7 +133,7 @@ export const translations = {
       result: "Ingest result",
       resultDry: "Dry run (nothing stored, nothing sent)",
       events: "{{count}} rows",
-      margin: "Margin: net revenue - upstream cost",
+      margin: "Margin: net revenue - fees - upstream cost",
       costUnknown: "cost unknown",
       alerts: "Alerts: {{raised}} raised, {{suppressed}} suppressed",
     },
@@ -162,12 +163,13 @@ export const translations = {
         title: "Margin (last 7 days)",
         revenue: "Net revenue",
         cost: "Upstream cost",
+        fees: "Processor fees",
         margin: "Gross margin",
         pct: "Margin %",
         empty: "No rollups yet. Run an ingest.",
         costUnknown: "cost unknown",
         costIncomplete:
-          "Upstream cost is incomplete for some days in this window — margin excludes untracked cost and is a partial figure.",
+          "Margin covers {{tracked}} of {{total}} days: only days with complete upstream cost count. Net revenue over all {{total}} days: {{revenue}}.",
       },
       providers: {
         title: "Provider balances",
@@ -176,6 +178,7 @@ export const translations = {
       },
       revenue: {
         title: "Revenue sources",
+        fallback: "Fallback: own records",
       },
       alerts: {
         title: "Recent alerts",

@@ -26,6 +26,7 @@ export const translations: typeof enTranslations = {
       dispute: "Rückbuchung",
       cancellation: "Kündigung",
       payout: "Auszahlung",
+      fee: "Zahlungsgebühr",
     },
     runStatus: {
       ok: "OK",
@@ -135,7 +136,7 @@ export const translations: typeof enTranslations = {
       result: "Ergebnis",
       resultDry: "Probelauf (nichts gespeichert, nichts gesendet)",
       events: "{{count}} Zeilen",
-      margin: "Marge: Nettoumsatz - Einkaufskosten",
+      margin: "Marge: Nettoumsatz - Gebühren - Einkaufskosten",
       costUnknown: "Kosten unbekannt",
       alerts: "Alarme: {{raised}} ausgelöst, {{suppressed}} unterdrückt",
     },
@@ -165,12 +166,13 @@ export const translations: typeof enTranslations = {
         title: "Marge (letzte 7 Tage)",
         revenue: "Nettoumsatz",
         cost: "Einkaufskosten",
+        fees: "Zahlungsgebühren",
         margin: "Bruttomarge",
         pct: "Marge %",
         empty: "Noch keine Auswertung. Abruf starten.",
         costUnknown: "Kosten unbekannt",
         costIncomplete:
-          "Die Einkaufskosten sind für einige Tage in diesem Zeitraum unvollständig — die Marge lässt nicht erfasste Kosten aus und ist nur ein Teilwert.",
+          "Marge über {{tracked}} von {{total}} Tagen: Es zählen nur Tage mit vollständig erfassten Einkaufskosten. Nettoumsatz über alle {{total}} Tage: {{revenue}}.",
       },
       providers: {
         title: "Anbieter-Guthaben",
@@ -179,6 +181,7 @@ export const translations: typeof enTranslations = {
       },
       revenue: {
         title: "Umsatzquellen",
+        fallback: "Ersatzdaten: eigene Buchungen",
       },
       alerts: {
         title: "Letzte Alarme",

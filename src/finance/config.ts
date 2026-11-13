@@ -59,9 +59,33 @@ export const FINANCE_CONFIG = {
 
   /**
    * USD value of one native unit for providers that report a non-USD balance.
-   * null = unknown, the provider is tracked but excluded from USD cost.
+   * null = no per-unit price: Gab credits come with the flat-rate plan below, so
+   * burning them costs nothing extra (only purchased top-ups would, and Gab
+   * publishes no per-credit price for those).
    */
   nativeUnitUsd: { gab: null as number | null },
+
+  /**
+   * Flat-rate provider plans, USD per month. Added to every tracked day's
+   * upstream cost as monthly / days-in-month, so margin carries the real cost
+   * even though usage against the plan is $0 per call.
+   *
+   * Gab AI: the API key rides the "Gab Plus" plan (GET /v1/credits reports
+   * is_plus=true, a 2,000 credit monthly_allotment and purchased.available=0).
+   * gab.ai/pricing (2026-11-12): Plus $20.00/month or $200.00/year. Set 16.67
+   * here if the account is billed yearly.
+   */
+  fixedMonthlyCostUsd: { gab: 20 },
+
+  /**
+   * Usage-priced providers without any spend / balance API (uncensored.ai,
+   * FreedomGPT). Spend = billed calls in credit_transactions x the per-call raw
+   * price from the model definitions (creditCost of the direct provider entry,
+   * 1 credit = $0.01). One assistant turn can be split across several usage rows
+   * (free + pack credits); they share a messageId and count once.
+   */
+  usageLedgerNote:
+    "estimated from our own usage log (billed calls x per-call price), no provider API",
 
   /** Default thresholds. Keyed by ThresholdKey value suffix (see enum.ts). */
   thresholdDefaults: {

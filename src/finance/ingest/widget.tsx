@@ -105,6 +105,11 @@ export function FinanceIngestContainer({
                       >
                         {t(s.status)}
                       </Badge>
+                      {s.fallback && (
+                        <Badge variant="destructive">
+                          {t("status.widget.revenue.fallback")}
+                        </Badge>
+                      )}
                     </Div>
                     <Span className="text-sm tabular-nums">
                       {s.balanceUsd !== null

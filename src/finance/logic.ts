@@ -174,6 +174,8 @@ export interface MarginInput {
   grossRevenueUsd: number;
   refundsUsd: number;
   disputesUsd: number;
+  /** Payment processor fees: a real cost of revenue, subtracted from margin. */
+  processorFeesUsd: number;
   upstreamCostUsd: number;
   internalBilledUsd: number;
 }
@@ -191,7 +193,9 @@ export function computeMargin(input: MarginInput): MarginResult {
   const netRevenueUsd = round2(
     input.grossRevenueUsd - input.refundsUsd - input.disputesUsd,
   );
-  const grossMarginUsd = round2(netRevenueUsd - input.upstreamCostUsd);
+  const grossMarginUsd = round2(
+    netRevenueUsd - input.processorFeesUsd - input.upstreamCostUsd,
+  );
   const grossMarginPct =
     netRevenueUsd > 0 ? round2((grossMarginUsd / netRevenueUsd) * 100) : null;
   const billingGapPct =
@@ -391,6 +395,7 @@ export interface DayFacts {
   grossRevenueUsd: number;
   refundsUsd: number;
   disputesUsd: number;
+  processorFeesUsd: number;
   refundCount: number;
   disputeCount: number;
   cancellationCount: number;

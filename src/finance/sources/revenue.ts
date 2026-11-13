@@ -2,8 +2,10 @@
  * Finance revenue adapters (READ-ONLY).
  *
  *  - Stripe: balance transactions (reporting_category charge / refund /
- *    dispute / payout) plus customer.subscription.deleted events, via the
- *    existing Stripe client. Paginated, capped, idempotent by object id.
+ *    dispute / payout / fee) plus ended subscriptions (status canceled,
+ *    ended_at) as cancellations, via the existing Stripe client. Paginated,
+ *    capped, idempotent by object id. Balance transactions carry renewals and
+ *    fees; our payment_transactions do not, so the API is the source of truth.
  *  - NOWPayments: GET /payment needs a JWT (email + password login), an API
  *    key alone is rejected. With NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD we
  *    pull the list; without them we fall back to the local IPN ledger
@@ -97,14 +99,23 @@ export function createStripePort(): StripeLedgerPort | null {
       return out;
     },
     async listCancellations(since) {
+      // From the subscription objects, not customer.subscription.deleted
+      // events: Stripe keeps events for 30 days only, so a backfill (or a
+      // missed window) would silently lose every older cancellation. A
+      // cancellation is a subscription that ENDED (ended_at) inside the window.
       const out: StripeCancellation[] = [];
-      for await (const ev of stripe.events.list({
-        type: "customer.subscription.deleted",
-        created: { gte: sinceUnix(since) },
+      const from = sinceUnix(since);
+      let scanned = 0;
+      for await (const sub of stripe.subscriptions.list({
+        status: "canceled",
         limit: 100,
       })) {
-        out.push({ id: ev.id, createdUnix: ev.created });
-        if (out.length >= MAX_ITEMS) {
+        scanned += 1;
+        const endedUnix = sub.ended_at ?? sub.canceled_at;
+        if (endedUnix !== null && endedUnix >= from) {
+          out.push({ id: sub.id, createdUnix: endedUnix });
+        }
+        if (scanned >= MAX_ITEMS) {
           break;
         }
       }
@@ -118,6 +129,13 @@ export interface RevenuePull {
   /** Rows dropped because their currency has no FX rate */
   unconvertible: number;
   note: string | null;
+  /**
+   * True when the figures come from our own payment records instead of the
+   * processor's API (missing credentials, rejected login, or an API that
+   * reported nothing while our ledger shows sales). Surfaced as a FALLBACK flag
+   * in every report so a degraded source never reads as a verified one.
+   */
+  fallback: boolean;
 }
 
 const STRIPE_KIND: Readonly<Record<string, typeof RevenueEventKindValue>> = {
@@ -125,6 +143,8 @@ const STRIPE_KIND: Readonly<Record<string, typeof RevenueEventKindValue>> = {
   refund: RevenueEventKind.REFUND,
   dispute: RevenueEventKind.DISPUTE,
   payout: RevenueEventKind.PAYOUT,
+  // Account-level Stripe fees (Billing, Radar, ...): a real cost of revenue.
+  fee: RevenueEventKind.FEE,
 };
 
 export async function pullStripe(
@@ -165,7 +185,7 @@ export async function pullStripe(
       occurredAt: new Date(c.createdUnix * 1000),
     });
   }
-  return { events, unconvertible, note: null };
+  return { events, unconvertible, note: null, fallback: false };
 }
 
 // ─── NOWPayments ─────────────────────────────────────────────────────────────
@@ -186,9 +206,18 @@ export interface NowPaymentsRefund {
   createdAt: Date;
 }
 
+/** Env keys that switch NOWPayments revenue from the local fallback to the API. */
+export const NOWPAYMENTS_API_ENV_KEYS = [
+  "NOWPAYMENTS_API_KEY",
+  "NOWPAYMENTS_EMAIL",
+  "NOWPAYMENTS_PASSWORD",
+] as const;
+
 export interface NowPaymentsLedger {
   /** "api" = live list via JWT, "local" = IPN ledger fallback */
   origin: "api" | "local";
+  /** Why the local ledger was used (null on the API path). */
+  fallbackReason: string | null;
   payments: NowPaymentsPayment[];
   refunds: NowPaymentsRefund[];
 }
@@ -211,7 +240,10 @@ const npListSchema = z.object({
 });
 
 /** Local IPN ledger: what the webhook recorded. */
-async function loadLocalLedger(since: Date): Promise<NowPaymentsLedger> {
+export async function loadLocalLedger(
+  since: Date,
+  fallbackReason: string,
+): Promise<NowPaymentsLedger> {
   const tx = await db
     .select()
     .from(paymentTransactions)
@@ -232,11 +264,13 @@ async function loadLocalLedger(since: Date): Promise<NowPaymentsLedger> {
     .where(
       and(
         eq(paymentTransactions.provider, PaymentProvider.NOWPAYMENTS),
+        eq(paymentRefunds.status, RefundStatus.SUCCEEDED),
         gte(paymentRefunds.createdAt, since),
       ),
     );
   return {
     origin: "local",
+    fallbackReason,
     payments: tx.map((row) => ({
       id: row.providerPaymentIntentId ?? row.providerSessionId ?? row.id,
       priceAmount: Number(row.amount),
@@ -266,7 +300,11 @@ export function createNowPaymentsPort(
   return {
     async load(since) {
       if (!email || !password) {
-        return loadLocalLedger(since);
+        const missing = [
+          email ? null : "NOWPAYMENTS_EMAIL",
+          password ? null : "NOWPAYMENTS_PASSWORD",
+        ].filter((k): k is string => k !== null);
+        return loadLocalLedger(since, `${missing.join(" + ")} not set`);
       }
       const auth = await http({
         url: `${base}/auth`,
@@ -276,7 +314,10 @@ export function createNowPaymentsPort(
       });
       const token = npAuthSchema.safeParse(auth.json);
       if (auth.status !== 200 || !token.success) {
-        return loadLocalLedger(since);
+        return loadLocalLedger(
+          since,
+          `NOWPayments POST /auth rejected the login (HTTP ${auth.status}): check NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD, and that the account has no 2FA on API login`,
+        );
       }
       const payments: NowPaymentsPayment[] = [];
       for (let page = 0; page < FINANCE_CONFIG.maxPages; page += 1) {
@@ -313,8 +354,13 @@ export function createNowPaymentsPort(
         }
       }
       // The list API has no refund object; refunds come from our ledger.
-      const local = await loadLocalLedger(since);
-      return { origin: "api", payments, refunds: local.refunds };
+      const local = await loadLocalLedger(since, "refunds only");
+      return {
+        origin: "api",
+        fallbackReason: null,
+        payments,
+        refunds: local.refunds,
+      };
     },
   };
 }
@@ -367,8 +413,9 @@ export function pullNowPayments(ledger: NowPaymentsLedger): RevenuePull {
     unconvertible,
     note:
       ledger.origin === "local"
-        ? "NOWPayments payment list needs a JWT (set NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD); used the local IPN ledger. Payouts unavailable."
+        ? `FALLBACK: local IPN ledger (payment_transactions), not the NOWPayments API (${ledger.fallbackReason ?? "API unavailable"}). Payments whose IPN never arrived stay "pending" and are NOT counted; payouts unavailable. Enable the API path with ${NOWPAYMENTS_API_ENV_KEYS.join(" + ")}.`
         : "Payouts unavailable (not pulled).",
+    fallback: ledger.origin === "local",
   };
 }
 
@@ -461,7 +508,8 @@ export async function pullLocalPaymentLedger(
   return {
     events,
     unconvertible,
-    note: "Local sales ledger (payment_transactions): succeeded payments only; processor API not configured, so fees / payouts are unavailable.",
+    note: "FALLBACK: local sales ledger (payment_transactions), not the processor API: succeeded checkouts only (subscription renewals, fees and payouts are NOT in it).",
+    fallback: true,
   };
 }
 
@@ -488,16 +536,23 @@ export async function reconcileWithLocalSales(
     return external;
   }
   const local = await pullLocalPaymentLedger(provider, source, since);
+  // A quiet window (no sales anywhere) is not a fallback: nothing was replaced.
+  if (!local.events.some((e) => e.kind === RevenueEventKind.CHARGE)) {
+    return external;
+  }
   const keep = external.events.filter(
     (e) =>
       e.kind !== RevenueEventKind.CHARGE && e.kind !== RevenueEventKind.REFUND,
   );
-  const note = [external.note, local.note].filter(
-    (n): n is string => n !== null,
-  );
+  const note = [
+    external.note,
+    "processor API reported no charges while our ledger has sales",
+    local.note,
+  ].filter((n): n is string => n !== null);
   return {
     events: [...local.events, ...keep],
     unconvertible: local.unconvertible + external.unconvertible,
-    note: note.length > 0 ? note.join("; ") : null,
+    note: note.join("; "),
+    fallback: true,
   };
 }

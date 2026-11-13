@@ -12,6 +12,7 @@
 import { CreditTransactionType } from "@/credits/enum";
 import { CREDIT_VALUE_USD } from "@/products/constants";
 
+import { FINANCE_CONFIG } from "./config";
 import { FinanceSource, RevenueSources, SourceRunStatus } from "./enum";
 
 export type DigestRow = Record<string, string | number | null>;
@@ -20,6 +21,13 @@ export interface DigestQueryRunner {
   tableExists(table: string): Promise<boolean>;
   rows(query: string, since: Date): Promise<DigestRow[]>;
 }
+
+/** Env keys that switch a revenue source from the local fallback to its API. */
+const FALLBACK_KEYS: Readonly<Record<string, string>> = {
+  [FinanceSource.STRIPE]: "STRIPE_SECRET_KEY",
+  [FinanceSource.NOWPAYMENTS]:
+    "NOWPAYMENTS_API_KEY + NOWPAYMENTS_EMAIL + NOWPAYMENTS_PASSWORD",
+};
 
 /** Env key that unblocks each revenue source. */
 const REVENUE_KEY: Readonly<Record<string, string>> = {
@@ -85,11 +93,11 @@ export async function collectFinanceDigestLines(
 
   // Revenue + upstream cost, month to date.
   const [mtd] = await run.rows(
-    `SELECT coalesce(sum(net_revenue_usd), 0) AS net, coalesce(sum(upstream_cost_usd), 0) AS cost FROM finance_daily_rollups WHERE day >= '${month}'`,
+    `SELECT coalesce(sum(net_revenue_usd), 0) AS net, coalesce(sum(upstream_cost_usd), 0) AS cost, coalesce(sum(processor_fees_usd), 0) AS fees FROM finance_daily_rollups WHERE day >= '${month}'`,
     since,
   );
   const sourceRows = await run.rows(
-    `SELECT source, last_status, last_reason, last_ok_at FROM finance_source_status`,
+    `SELECT source, last_status, last_reason, last_ok_at, last_fallback FROM finance_source_status`,
     since,
   );
   const revenueBlocked = RevenueSources.filter((source) => {
@@ -98,6 +106,7 @@ export async function collectFinanceDigestLines(
   });
   const net = num(mtd, "net") ?? 0;
   const cost = num(mtd, "cost") ?? 0;
+  const fees = num(mtd, "fees") ?? 0;
   if (revenueBlocked.length === RevenueSources.length) {
     lines.push(
       `Revenue MTD: UNVERIFIED (awaiting ${revenueBlocked.map((s) => REVENUE_KEY[s] ?? s).join(" + ")}). Any figure shown would be fake.`,
@@ -109,14 +118,29 @@ export async function collectFinanceDigestLines(
         `  ${label(source)}: awaiting ${REVENUE_KEY[source] ?? source}, not counted`,
       );
     }
+    for (const row of sourceRows) {
+      const source = text(row, "source");
+      const fallback = text(row, "last_fallback");
+      if (
+        RevenueSources.some((s) => s === source) &&
+        (fallback === "true" || fallback === "t")
+      ) {
+        lines.push(
+          `  ${label(source)}: FALLBACK, counted from our own payment records, not the ${label(source)} API (can miss payments). Real API needs ${FALLBACK_KEYS[source] ?? "API credentials"}.`,
+        );
+      }
+    }
   }
   lines.push(
     cost > 0
       ? `Provider cost MTD: ${usd(cost)}`
       : "Provider cost MTD: $0.00 (no spend measured yet, not proof of zero cost)",
   );
+  if (fees > 0) {
+    lines.push(`Processor fees MTD: ${usd(fees)}`);
+  }
   if (net > 0) {
-    const margin = net - cost;
+    const margin = net - fees - cost;
     lines.push(
       `Gross margin MTD: ${usd(margin)} (${((margin / net) * 100).toFixed(1)}%)`,
     );
@@ -144,6 +168,14 @@ export async function collectFinanceDigestLines(
     const unit = text(row, "unit");
     if (balanceUsd !== null) {
       lines.push(`  ${label(provider)}: ${usd(balanceUsd)} left`);
+    } else if (provider === FinanceSource.GAB && native !== null) {
+      lines.push(
+        `  ${label(provider)}: flat-rate plan ${usd(FINANCE_CONFIG.fixedMonthlyCostUsd.gab)}/month (counted in cost), ${native.toLocaleString("en-US", { maximumFractionDigits: 1 })} plan credits left`,
+      );
+    } else if (unit === "calls" && native !== null) {
+      lines.push(
+        `  ${label(provider)}: no API, spend estimated from ${whole(native)} billed calls in our usage log`,
+      );
     } else if (native !== null) {
       lines.push(
         `  ${label(provider)}: ${native.toLocaleString("en-US", { maximumFractionDigits: 1 })} ${unit} (no USD rate, excluded from cost)`,

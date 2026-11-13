@@ -73,6 +73,7 @@ export const {
   DISPUTE: "enums.eventKind.dispute",
   CANCELLATION: "enums.eventKind.cancellation",
   PAYOUT: "enums.eventKind.payout",
+  FEE: "enums.eventKind.fee",
 });
 
 export const RevenueEventKindDB = [
@@ -81,6 +82,7 @@ export const RevenueEventKindDB = [
   RevenueEventKind.DISPUTE,
   RevenueEventKind.CANCELLATION,
   RevenueEventKind.PAYOUT,
+  RevenueEventKind.FEE,
 ] as const;
 
 /** How the last run of one source ended. */

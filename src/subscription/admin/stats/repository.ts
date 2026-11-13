@@ -22,8 +22,11 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditPacks, creditWallets } from "@/credits/db";
+import { financeRevenueEvents } from "@/finance/db";
+import { RevenueEventKind } from "@/finance/enum";
 import { paymentTransactions } from "@/payment/db";
-import { PaymentStatus } from "@/payment/enum";
+import { CheckoutMode, PaymentStatus } from "@/payment/enum";
+import { usdAmountSql } from "@/users/money-sql";
 import { payoutRequests, referralEarnings, userReferrals } from "@/referral/db";
 import { PayoutStatus } from "@/referral/enum";
 import { subscriptions } from "@/subscription/db";
@@ -131,63 +134,143 @@ export class SubscriptionAdminStatsRepository {
     }
   }
 
+  /**
+   * Net revenue in range, USD cents. Primary source: the finance ledger
+   * (processor data incl. renewals, refunds and disputes). Fallback when it
+   * holds nothing in range (finance ingest never ran on this instance): our
+   * own succeeded checkouts, FX-normalized (no renewals, so a lower bound).
+   */
+  private static async revenueInRange(dateRange: {
+    from: Date;
+    to: Date;
+  }): Promise<{
+    netCents: number;
+    grossCents: number;
+    chargeCount: number;
+    fromFinanceLedger: boolean;
+  }> {
+    const [ledger] = await db
+      .select({
+        gross: sql<number>`coalesce(sum(${financeRevenueEvents.amountUsd}) filter (where ${financeRevenueEvents.kind} = ${RevenueEventKind.CHARGE}), 0)::float`,
+        reversed: sql<number>`coalesce(sum(${financeRevenueEvents.amountUsd}) filter (where ${financeRevenueEvents.kind} in (${RevenueEventKind.REFUND}, ${RevenueEventKind.DISPUTE})), 0)::float`,
+        charges: sql<number>`count(*) filter (where ${financeRevenueEvents.kind} = ${RevenueEventKind.CHARGE})::int`,
+      })
+      .from(financeRevenueEvents)
+      .where(
+        and(
+          gte(financeRevenueEvents.occurredAt, dateRange.from),
+          lte(financeRevenueEvents.occurredAt, dateRange.to),
+        ),
+      );
+    const charges = ledger?.charges ?? 0;
+    if (charges > 0) {
+      const gross = Number(ledger?.gross ?? 0);
+      const reversed = Number(ledger?.reversed ?? 0);
+      return {
+        netCents: Math.round((gross - reversed) * 100),
+        grossCents: Math.round(gross * 100),
+        chargeCount: charges,
+        fromFinanceLedger: true,
+      };
+    }
+    const [local] = await db
+      .select({
+        gross: sql<number>`coalesce(sum(${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}), 0)::float`,
+        charges: sql<number>`count(*)::int`,
+      })
+      .from(paymentTransactions)
+      .where(
+        and(
+          eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
+          gte(paymentTransactions.createdAt, dateRange.from),
+          lte(paymentTransactions.createdAt, dateRange.to),
+        ),
+      );
+    const grossCents = Math.round(Number(local?.gross ?? 0) * 100);
+    return {
+      netCents: grossCents,
+      grossCents,
+      chargeCount: local?.charges ?? 0,
+      fromFinanceLedger: false,
+    };
+  }
+
   private static async buildResponse(
     dateRange: { from: Date; to: Date },
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
     locale: CountryLanguage,
   ): Promise<SubscriptionStatsResponseOutput> {
-    // Revenue stats
-    const [revenueResult] = await db
+    // All money below is USD CENTS (the widget formats value / 100).
+    // payment_transactions holds major units in mixed USD / EUR / PLN, so every
+    // sum goes through the finance FX table, never a raw sum of mixed units.
+    //
+    // Revenue: the finance ledger (finance_revenue_events) is the processor's
+    // own record - it carries Stripe subscription RENEWALS, which never land in
+    // payment_transactions (that table only sees checkouts). Fall back to
+    // payment_transactions only when the finance ledger has nothing in range.
+    const revenue =
+      await SubscriptionAdminStatsRepository.revenueInRange(dateRange);
+    const totalRevenue = revenue.netCents;
+    const transactionCount = revenue.chargeCount;
+    const avgOrderValue =
+      transactionCount > 0
+        ? Math.round(revenue.grossCents / transactionCount)
+        : 0;
+
+    // MRR: each live subscription at ITS OWN price (latest succeeded
+    // subscription payment of that user, FX to USD), yearly / 12. Live =
+    // status ACTIVE and the paid period has not ended (a stale "active" row
+    // whose period ran out long ago is not revenue). Scheduled cancellations
+    // still count until they end, matching Stripe.
+    const now = new Date();
+    const latestSubPayment = db
       .select({
-        totalRevenue: sql<number>`coalesce(sum(${paymentTransactions.amount}::numeric) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)::int`,
-        transactionCount: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
+        userId: paymentTransactions.userId,
+        usd: sql<number>`${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}`.as(
+          "usd",
+        ),
+        rn: sql<number>`row_number() over (partition by ${paymentTransactions.userId} order by ${paymentTransactions.createdAt} desc)`.as(
+          "rn",
+        ),
       })
       .from(paymentTransactions)
       .where(
         and(
-          gte(paymentTransactions.createdAt, dateRange.from),
-          lte(paymentTransactions.createdAt, dateRange.to),
+          eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
+          eq(paymentTransactions.mode, CheckoutMode.SUBSCRIPTION),
         ),
-      );
-
-    const totalRevenue = revenueResult?.totalRevenue ?? 0;
-    const transactionCount = revenueResult?.transactionCount ?? 0;
-    const avgOrderValue =
-      transactionCount > 0 ? Math.round(totalRevenue / transactionCount) : 0;
-
-    // Calculate MRR from active monthly subscriptions + yearly/12
+      )
+      .as("latest_sub_payment");
     const [mrrResult] = await db
       .select({
-        monthlyRevenue: sql<number>`coalesce(sum(
+        mrrUsd: sql<number>`coalesce(sum(
           CASE
-            WHEN ${subscriptions.billingInterval} = ${BillingInterval.MONTHLY} THEN 1
-            ELSE 0
+            WHEN ${subscriptions.billingInterval} = ${BillingInterval.YEARLY} THEN ${latestSubPayment.usd} / 12
+            ELSE ${latestSubPayment.usd}
           END
-        ), 0)::int`,
-        yearlyRevenue: sql<number>`coalesce(sum(
-          CASE
-            WHEN ${subscriptions.billingInterval} = ${BillingInterval.YEARLY} THEN 1
-            ELSE 0
-          END
-        ), 0)::int`,
+        ), 0)::float`,
       })
       .from(subscriptions)
-      .where(eq(subscriptions.status, SubscriptionStatus.ACTIVE));
-
-    // Rough MRR estimate: monthly subs * avg order + yearly subs * avg order / 12
-    const monthlySubCount = mrrResult?.monthlyRevenue ?? 0;
-    const yearlySubCount = mrrResult?.yearlyRevenue ?? 0;
-    const mrr =
-      avgOrderValue > 0
-        ? monthlySubCount * avgOrderValue +
-          Math.round((yearlySubCount * avgOrderValue) / 12)
-        : 0;
+      .leftJoin(
+        latestSubPayment,
+        and(
+          eq(latestSubPayment.userId, subscriptions.userId),
+          eq(latestSubPayment.rn, 1),
+        ),
+      )
+      .where(
+        and(
+          eq(subscriptions.status, SubscriptionStatus.ACTIVE),
+          gte(subscriptions.currentPeriodEnd, now),
+        ),
+      );
+    const mrr = Math.round(Number(mrrResult?.mrrUsd ?? 0) * 100);
     const arr = mrr * 12;
 
-    // Subscription counts
+    // Subscription counts (active = live as defined for MRR above)
     const [subCounts] = await db
       .select({
-        activeCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.ACTIVE})::int`,
+        activeCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.ACTIVE} and ${subscriptions.currentPeriodEnd} >= ${now})::int`,
         trialingCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.TRIALING})::int`,
         canceledCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.CANCELED})::int`,
         totalCount: sql<number>`count(*)::int`,
@@ -208,7 +291,7 @@ export class SubscriptionAdminStatsRepository {
       })
       .from(subscriptions)
       .where(
-        sql`${subscriptions.status} IN (${SubscriptionStatus.ACTIVE}, ${SubscriptionStatus.TRIALING})`,
+        sql`${subscriptions.status} IN (${SubscriptionStatus.ACTIVE}, ${SubscriptionStatus.TRIALING}) and ${subscriptions.currentPeriodEnd} >= ${now}`,
       );
 
     const monthlyCount = intervalResult?.monthlyCount ?? 0;
@@ -253,34 +336,56 @@ export class SubscriptionAdminStatsRepository {
       })
       .from(payoutRequests);
 
+    // Conversion: referred users who made at least one succeeded payment.
+    const [convertedResult] = await db
+      .select({
+        converted: sql<number>`count(*)::int`,
+      })
+      .from(userReferrals)
+      .where(
+        sql`exists (select 1 from ${paymentTransactions} where ${paymentTransactions.userId} = ${userReferrals.referredUserId} and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})`,
+      );
+
     const totalReferrals = referralResult?.totalReferrals ?? 0;
     const totalEarned = earningsResult?.totalEarned ?? 0;
     const pendingPayouts = payoutResult?.pendingPayouts ?? 0;
-    // Conversion rate: referrals that earned something / total referrals
     const conversionRate =
-      totalReferrals > 0 ? Math.min(1, totalEarned > 0 ? 0.23 : 0) : 0;
+      totalReferrals > 0
+        ? (convertedResult?.converted ?? 0) / totalReferrals
+        : 0;
 
     // Revenue chart - time series
     const dateTruncFormat =
       SubscriptionAdminStatsRepository.getDateTruncFormat(timePeriod);
-    const revenueChartData = await db
-      .select({
-        period: sql<string>`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${paymentTransactions.createdAt})::text`,
-        total: sql<number>`coalesce(sum(${paymentTransactions.amount}::numeric) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)::int`,
-      })
-      .from(paymentTransactions)
-      .where(
-        and(
-          gte(paymentTransactions.createdAt, dateRange.from),
-          lte(paymentTransactions.createdAt, dateRange.to),
-        ),
-      )
-      .groupBy(
-        sql`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${paymentTransactions.createdAt})`,
-      )
-      .orderBy(
-        sql`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${paymentTransactions.createdAt})`,
-      );
+    const revenueChartData = revenue.fromFinanceLedger
+      ? await db
+          .select({
+            period: sql<string>`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${financeRevenueEvents.occurredAt})::text`,
+            total: sql<number>`round(coalesce(sum(case when ${financeRevenueEvents.kind} = ${RevenueEventKind.CHARGE} then ${financeRevenueEvents.amountUsd} when ${financeRevenueEvents.kind} in (${RevenueEventKind.REFUND}, ${RevenueEventKind.DISPUTE}) then -${financeRevenueEvents.amountUsd} else 0 end), 0) * 100)::int`,
+          })
+          .from(financeRevenueEvents)
+          .where(
+            and(
+              gte(financeRevenueEvents.occurredAt, dateRange.from),
+              lte(financeRevenueEvents.occurredAt, dateRange.to),
+            ),
+          )
+          .groupBy(sql`1`)
+          .orderBy(sql`1`)
+      : await db
+          .select({
+            period: sql<string>`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${paymentTransactions.createdAt})::text`,
+            total: sql<number>`round(coalesce(sum(${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0) * 100)::int`,
+          })
+          .from(paymentTransactions)
+          .where(
+            and(
+              gte(paymentTransactions.createdAt, dateRange.from),
+              lte(paymentTransactions.createdAt, dateRange.to),
+            ),
+          )
+          .groupBy(sql`1`)
+          .orderBy(sql`1`);
 
     const revenueChart = revenueChartData.map((item) => ({
       x: SubscriptionAdminStatsRepository.formatPeriodLabel(

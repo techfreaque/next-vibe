@@ -43,6 +43,8 @@ const sourceReportSchema = z.object({
   kind: z.enum(["revenue", "provider"]),
   status: z.enum(SourceRunStatusDB),
   reason: z.string().nullable(),
+  // true when the figures came from our own records instead of the source API
+  fallback: z.boolean(),
   balanceUsd: z.number().nullable(),
   spendUsd: z.number().nullable(),
   events: z.number(),
@@ -53,6 +55,8 @@ const dayReportSchema = z.object({
   grossRevenueUsd: z.number(),
   refundsUsd: z.number(),
   disputesUsd: z.number(),
+  // Stripe per-charge + account-level fees, subtracted in the margin.
+  processorFeesUsd: z.number(),
   netRevenueUsd: z.number(),
   // null when cost coverage is NONE (cost unknown, never faked to 0).
   upstreamCostUsd: z.number().nullable(),
@@ -191,6 +195,7 @@ const { POST } = createEndpoint({
             kind: "provider",
             status: "enums.runStatus.ok",
             reason: null,
+            fallback: false,
             balanceUsd: 11.77,
             spendUsd: 0.42,
             events: 0,

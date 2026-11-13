@@ -146,10 +146,14 @@ export function FinanceStatusWidget(): JSX.Element {
 
         <Section title={t("status.widget.margin.title")}>
           <>
-            <Div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
+            <Div className="grid grid-cols-2 gap-3 @sm:grid-cols-5">
               <Stat
                 label={t("status.widget.margin.revenue")}
                 value={money.format(data.week.netRevenueUsd)}
+              />
+              <Stat
+                label={t("status.widget.margin.fees")}
+                value={money.format(data.week.processorFeesUsd)}
               />
               <Stat
                 label={t("status.widget.margin.cost")}
@@ -172,7 +176,11 @@ export function FinanceStatusWidget(): JSX.Element {
             </Div>
             {!data.week.costComplete && (
               <P className="text-xs text-muted-foreground">
-                {t("status.widget.margin.costIncomplete")}
+                {t("status.widget.margin.costIncomplete", {
+                  tracked: data.week.marginDays,
+                  total: data.week.totalDays,
+                  revenue: money.format(data.week.netRevenueAllDaysUsd),
+                })}
               </P>
             )}
             {data.days.length === 0 ? (
@@ -187,6 +195,9 @@ export function FinanceStatusWidget(): JSX.Element {
                     <Span className="font-medium">{d.day}</Span>
                     <Span className="text-muted-foreground">
                       {money.format(d.netRevenueUsd)} -{" "}
+                      {d.processorFeesUsd > 0
+                        ? `${money.format(d.processorFeesUsd)} - `
+                        : ""}
                       {d.upstreamCostUsd === null
                         ? t("status.widget.margin.costUnknown")
                         : money.format(d.upstreamCostUsd)}
@@ -265,6 +276,11 @@ export function FinanceStatusWidget(): JSX.Element {
                 <Div className="flex items-center gap-2">
                   <Span className="text-sm font-semibold">{t(s.source)}</Span>
                   <StatusBadge status={s.status} t={t} />
+                  {s.fallback && (
+                    <Badge variant="destructive">
+                      {t("status.widget.revenue.fallback")}
+                    </Badge>
+                  )}
                   <Span className="text-xs text-muted-foreground">
                     {when(s.lastOkAt)}
                   </Span>

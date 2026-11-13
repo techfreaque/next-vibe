@@ -1593,6 +1593,19 @@ export class SubscriptionRepository {
         currentStatus: subscription.status,
       });
 
+      // CANCELED is terminal. When Stripe gives up on dunning it sends
+      // customer.subscription.deleted and then, ~0.5s later, the final
+      // invoice.payment_failed for the same invoice. Without this guard that
+      // late event flipped the ended subscription back to PAST_DUE, so it kept
+      // counting as a live subscriber (seen on prod for 3 subscriptions).
+      if (subscription.status === SubscriptionStatus.CANCELED) {
+        logger.info("Ignoring payment failure for a canceled subscription", {
+          subscriptionId,
+          invoiceId,
+        });
+        return;
+      }
+
       // Set grace period only on first failure (don't reset on Stripe retries)
       const GRACE_PERIOD_DAYS = 7;
       const now = new Date();

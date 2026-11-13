@@ -74,6 +74,8 @@ export const financeRevenueSnapshots = pgTable(
     disputesUsd: doublePrecision("disputes_usd").notNull().default(0),
     netUsd: doublePrecision("net_usd").notNull().default(0),
     payoutsUsd: doublePrecision("payouts_usd").notNull().default(0),
+    /** Processor fees (per-charge fees + account-level fee rows), positive USD */
+    feesUsd: doublePrecision("fees_usd").notNull().default(0),
     paymentCount: integer("payment_count").notNull().default(0),
     refundCount: integer("refund_count").notNull().default(0),
     disputeCount: integer("dispute_count").notNull().default(0),
@@ -126,6 +128,8 @@ export const financeDailyRollups = pgTable("finance_daily_rollups", {
   refundsUsd: doublePrecision("refunds_usd").notNull().default(0),
   disputesUsd: doublePrecision("disputes_usd").notNull().default(0),
   netRevenueUsd: doublePrecision("net_revenue_usd").notNull().default(0),
+  /** Payment processor fees that day (Stripe per-charge + account fees). Subtracted in the margin. */
+  processorFeesUsd: doublePrecision("processor_fees_usd").notNull().default(0),
   /**
    * Measured upstream cost. NULL when cost coverage is NONE (no provider
    * snapshots that day): the cost is unknown, never faked to 0. When coverage is
@@ -160,6 +164,8 @@ export const financeSourceStatus = pgTable("finance_source_status", {
   lastStatus: text("last_status", { enum: SourceRunStatusDB }).notNull(),
   /** Why a source was skipped or failed; also notes on partial data. */
   lastReason: text("last_reason"),
+  /** True when the last run used our own records instead of the source API. */
+  lastFallback: boolean("last_fallback").notNull().default(false),
   lastOkAt: timestamp("last_ok_at"),
 });
 

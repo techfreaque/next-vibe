@@ -32,6 +32,8 @@ const sourceSchema = z.object({
   source: z.enum(FinanceSourceDB),
   status: z.enum(SourceRunStatusDB).nullable(),
   reason: z.string().nullable(),
+  // true when the last run used our own records instead of the source API
+  fallback: z.boolean(),
   lastRunAt: z.string().nullable(),
   lastOkAt: z.string().nullable(),
   balanceUsd: z.number().nullable(),
@@ -43,6 +45,7 @@ const sourceSchema = z.object({
 const daySchema = z.object({
   day: z.string(),
   netRevenueUsd: z.number(),
+  processorFeesUsd: z.number(),
   upstreamCostUsd: z.number().nullable(),
   grossMarginUsd: z.number().nullable(),
   grossMarginPct: z.number().nullable(),
@@ -100,11 +103,17 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "status.response.week",
         schema: z.object({
+          // Revenue / fees / cost / margin over the COMPLETE-cost days only.
           netRevenueUsd: z.number(),
+          processorFeesUsd: z.number(),
           upstreamCostUsd: z.number(),
           grossMarginUsd: z.number(),
           grossMarginPct: z.number().nullable(),
           costComplete: z.boolean(),
+          marginDays: z.number(),
+          totalDays: z.number(),
+          // Net revenue over every day in the window, tracked cost or not.
+          netRevenueAllDaysUsd: z.number(),
         }),
       }),
       days: responseField(scopedTranslation, {
@@ -137,10 +146,14 @@ const { GET } = createEndpoint({
         sources: [],
         week: {
           netRevenueUsd: 120,
+          processorFeesUsd: 6,
           upstreamCostUsd: 48,
-          grossMarginUsd: 72,
-          grossMarginPct: 60,
+          grossMarginUsd: 66,
+          grossMarginPct: 55,
           costComplete: true,
+          marginDays: 8,
+          totalDays: 8,
+          netRevenueAllDaysUsd: 120,
         },
         days: [],
         alerts: [],

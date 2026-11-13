@@ -6,10 +6,17 @@
  *  - NanoGPT     POST /api/check-balance              documented  usd_balance
  *  - Venice      GET  /api/v1/api_keys/rate_limits    documented  data.balances.USD
  *  - Gab         GET  /v1/credits                     undocumented total_available (own credit unit)
- *  - uncensored.ai   none: credits live in a Supabase table read with the dashboard
- *                    session, there is no API-key balance endpoint
- *  - FreedomGPT  none: /credits /balance /usage /user all 404
- * A provider with no endpoint is skipped with a recorded reason, never an error.
+ *                Flat-rate "Gab Plus" plan: credits are a monthly allotment, the
+ *                real cost is the plan fee (FINANCE_CONFIG.fixedMonthlyCostUsd),
+ *                added to each tracked day by the rollup.
+ *  - uncensored.ai   no API: credits live in a Supabase table read with the
+ *                    dashboard session (re-probed 2026-11-12: /api/* is the SPA
+ *                    fallback, api.uncensored.ai does not resolve)
+ *  - FreedomGPT  no API: /credits /balance /usage /user all 404
+ * The two API-less providers are priced from OUR usage log instead: billed calls
+ * in credit_transactions x the per-call raw price from the model definitions,
+ * reported as a cumulative usage counter so the same snapshot / delta / anomaly
+ * machinery as OpenRouter applies.
  */
 
 /* eslint-disable i18next/no-literal-string */
@@ -18,10 +25,22 @@ import "server-only";
 
 import { z } from "zod";
 
+import {
+  ChatModelId,
+  chatModelDefinitions,
+} from "@/vibe/agent/ai-stream/models-definitions";
+import { ApiProvider } from "@/vibe/agent/models/models";
+
 import { FINANCE_CONFIG } from "../config";
 import { FinanceSource, type FinanceSourceValue } from "../enum";
 import type { FinanceHttp } from "./http";
 import type { ProviderResult } from "./types";
+
+/** Our own usage log, for providers that expose no spend / balance API. */
+export interface UsageLedgerPort {
+  /** Distinct billed calls (all time) on these model ids. */
+  billedCalls(modelIds: readonly ChatModelId[]): Promise<number>;
+}
 
 export interface ProviderAdapter {
   source: typeof FinanceSourceValue;
@@ -30,7 +49,11 @@ export interface ProviderAdapter {
   endpoint: string | null;
   /** Why there is no endpoint (recorded as the skip reason). */
   noEndpointReason: string | null;
-  fetchBalance(http: FinanceHttp, apiKey: string): Promise<ProviderResult>;
+  fetchBalance(
+    http: FinanceHttp,
+    apiKey: string,
+    ledger: UsageLedgerPort,
+  ): Promise<ProviderResult>;
 }
 
 const bearer = (apiKey: string): Record<string, string> => ({
@@ -147,7 +170,10 @@ const venice: ProviderAdapter = {
 
 const gabSchema = z.object({
   total_available: numeric,
-  monthly_allotment: z.object({ used: numeric }).optional(),
+  monthly_allotment: z
+    .object({ used: numeric, total: numeric.optional() })
+    .optional(),
+  purchased: z.object({ available: numeric }).optional(),
 });
 
 const gab: ProviderAdapter = {
@@ -169,8 +195,12 @@ const gab: ProviderAdapter = {
       return unexpectedShape("Gab");
     }
     // Gab bills in its own credit unit; USD only when a unit price is configured.
+    // The plan fee itself is a fixed cost the rollup adds per day.
     const unitUsd = FINANCE_CONFIG.nativeUnitUsd.gab;
     const used = parsed.data.monthly_allotment?.used;
+    const total = parsed.data.monthly_allotment?.total;
+    const allotment =
+      used !== undefined && total !== undefined ? { used, total } : null;
     return {
       status: "ok",
       balanceUsd:
@@ -179,37 +209,96 @@ const gab: ProviderAdapter = {
       unit: "gab-credits",
       cumulativeUsageUsd:
         unitUsd === null || used === undefined ? null : used * unitUsd,
+      note: `flat-rate plan: $${FINANCE_CONFIG.fixedMonthlyCostUsd.gab.toFixed(2)}/month counted as fixed daily cost${
+        allotment
+          ? `; ${allotment.used.toFixed(1)} of ${allotment.total.toFixed(0)} monthly credits used`
+          : ""
+      }${parsed.data.purchased && parsed.data.purchased.available > 0 ? `; ${parsed.data.purchased.available} purchased credits (unpriced)` : ""}`,
     };
   },
 };
 
-const uncensoredAi: ProviderAdapter = {
+/** Model ids served by a provider and its raw per-call price (USD). */
+export interface UsagePricing {
+  modelIds: ChatModelId[];
+  /** null when the provider's models are not priced per call, or disagree */
+  unitPriceUsd: number | null;
+}
+
+/**
+ * Per-call price of a provider from the model definitions: the creditCost of
+ * each model's entry for that apiProvider (raw upstream cost, before markup).
+ * One call count can only be priced when every model on the provider agrees.
+ */
+export function usagePricing(apiProvider: ApiProvider): UsagePricing {
+  const modelIds: ChatModelId[] = [];
+  const prices = new Set<number>();
+  for (const modelId of Object.values(ChatModelId)) {
+    for (const p of chatModelDefinitions[modelId].providers) {
+      if (p.apiProvider !== apiProvider) {
+        continue;
+      }
+      modelIds.push(modelId);
+      prices.add(typeof p.creditCost === "number" ? p.creditCost : Number.NaN);
+    }
+  }
+  const [only] = [...prices];
+  return {
+    modelIds,
+    unitPriceUsd:
+      prices.size === 1 && only !== undefined && Number.isFinite(only)
+        ? only * FINANCE_CONFIG.creditValueUsd
+        : null,
+  };
+}
+
+function usageLedgerAdapter(input: {
+  source: typeof FinanceSourceValue;
+  label: string;
+  apiProvider: ApiProvider;
+  noApiReason: string;
+}): ProviderAdapter {
+  return {
+    source: input.source,
+    label: input.label,
+    endpoint: "usage-ledger:credit_transactions",
+    noEndpointReason: null,
+    // oxlint-disable-next-line no-unused-vars
+    async fetchBalance(_http, _apiKey, ledger) {
+      const pricing = usagePricing(input.apiProvider);
+      if (pricing.modelIds.length === 0 || pricing.unitPriceUsd === null) {
+        return {
+          status: "skipped",
+          reason: `${input.noApiReason}; no single per-call price in the model definitions to estimate from`,
+        };
+      }
+      const calls = await ledger.billedCalls(pricing.modelIds);
+      return {
+        status: "ok",
+        balanceUsd: null,
+        balanceNative: calls,
+        unit: "calls",
+        cumulativeUsageUsd: calls * pricing.unitPriceUsd,
+        note: `${input.noApiReason}: spend ${FINANCE_CONFIG.usageLedgerNote} at $${pricing.unitPriceUsd.toFixed(2)}/call`,
+      };
+    },
+  };
+}
+
+const uncensoredAi = usageLedgerAdapter({
   source: FinanceSource.UNCENSORED_AI,
   label: "uncensored.ai",
-  endpoint: null,
-  noEndpointReason:
-    "no API-key balance endpoint: the credit balance sits in the dashboard (Supabase api_keys.credits_remaining) behind a logged-in session; the JS bundle exposes no key-authenticated route",
-  async fetchBalance() {
-    return {
-      status: "skipped",
-      reason: uncensoredAi.noEndpointReason ?? "no endpoint",
-    };
-  },
-};
+  apiProvider: ApiProvider.UNCENSORED_AI,
+  noApiReason:
+    "no API-key balance endpoint (credits sit in the logged-in dashboard)",
+});
 
-const freedomGpt: ProviderAdapter = {
+const freedomGpt = usageLedgerAdapter({
   source: FinanceSource.FREEDOM_GPT,
   label: "FreedomGPT",
-  endpoint: null,
-  noEndpointReason:
-    "no balance endpoint: /api/v1/credits, /balance, /usage and /user all return 404",
-  async fetchBalance() {
-    return {
-      status: "skipped",
-      reason: freedomGpt.noEndpointReason ?? "no endpoint",
-    };
-  },
-};
+  apiProvider: ApiProvider.FREEDOMGPT,
+  noApiReason: "no balance endpoint (/credits /balance /usage /user all 404)",
+});
 
 export const PROVIDER_ADAPTERS: readonly ProviderAdapter[] = [
   openRouter,

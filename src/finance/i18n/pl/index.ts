@@ -26,6 +26,7 @@ export const translations: typeof enTranslations = {
       dispute: "Spór",
       cancellation: "Anulowanie",
       payout: "Wypłata",
+      fee: "Opłata za płatność",
     },
     runStatus: {
       ok: "OK",
@@ -134,7 +135,7 @@ export const translations: typeof enTranslations = {
       result: "Wynik",
       resultDry: "Próba (nic nie zapisano, nic nie wysłano)",
       events: "{{count}} wierszy",
-      margin: "Marża: przychód netto - koszt u dostawców",
+      margin: "Marża: przychód netto - opłaty - koszt u dostawców",
       costUnknown: "koszt nieznany",
       alerts: "Alerty: {{raised}} wywołane, {{suppressed}} stłumione",
     },
@@ -164,12 +165,13 @@ export const translations: typeof enTranslations = {
         title: "Marża (ostatnie 7 dni)",
         revenue: "Przychód netto",
         cost: "Koszt u dostawców",
+        fees: "Opłaty za płatności",
         margin: "Marża brutto",
         pct: "Marża %",
         empty: "Brak podsumowań. Uruchom pobranie.",
         costUnknown: "koszt nieznany",
         costIncomplete:
-          "Koszt u dostawców jest niepełny dla niektórych dni w tym okresie — marża pomija nieśledzony koszt i jest wartością częściową.",
+          "Marża liczy {{tracked}} z {{total}} dni: tylko dni z pełnym kosztem u dostawców. Przychód netto ze wszystkich {{total}} dni: {{revenue}}.",
       },
       providers: {
         title: "Salda dostawców",
@@ -178,6 +180,7 @@ export const translations: typeof enTranslations = {
       },
       revenue: {
         title: "Źródła przychodu",
+        fallback: "Zastępczo: własne zapisy",
       },
       alerts: {
         title: "Ostatnie alerty",

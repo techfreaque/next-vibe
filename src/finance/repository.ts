@@ -79,10 +79,15 @@ import {
   trailingSpendRate,
 } from "./logic";
 import { type FinanceHttp, liveHttp } from "./sources/http";
-import { PROVIDER_ADAPTERS, providerLabel } from "./sources/providers";
+import {
+  PROVIDER_ADAPTERS,
+  providerLabel,
+  type UsageLedgerPort,
+} from "./sources/providers";
 import {
   createNowPaymentsPort,
   createStripePort,
+  NOWPAYMENTS_API_ENV_KEYS,
   type NowPaymentsPort,
   pullLocalPaymentLedger,
   pullNowPayments,
@@ -111,6 +116,8 @@ export interface FinanceDeps {
   apiKey(source: typeof FinanceSourceValue): string | undefined;
   stripePort(): StripeLedgerPort | null;
   nowPaymentsPort(http: FinanceHttp): NowPaymentsPort | null;
+  /** Our own usage log, for providers without a spend API (uncensored.ai, FreedomGPT). */
+  usageLedger: UsageLedgerPort;
   /** Finance-alert recipients (ops inbox + Thea mailbox); empty when none resolve. */
   recipients(): string[];
   sendMail(
@@ -151,6 +158,27 @@ export const defaultFinanceDeps: FinanceDeps = {
   },
   stripePort: () => createStripePort(),
   nowPaymentsPort: (http) => createNowPaymentsPort(http),
+  usageLedger: {
+    async billedCalls(modelIds) {
+      if (modelIds.length === 0) {
+        return 0;
+      }
+      // One assistant turn can be split over several usage rows (free + pack
+      // credits) sharing a messageId: count the call once.
+      const [row] = await db
+        .select({
+          calls: sql<number>`count(distinct coalesce(${creditTransactions.messageId}::text, ${creditTransactions.metadata}->>'messageId', ${creditTransactions.id}::text))`,
+        })
+        .from(creditTransactions)
+        .where(
+          and(
+            eq(creditTransactions.type, CreditTransactionType.USAGE),
+            inArray(creditTransactions.modelId, [...modelIds]),
+          ),
+        );
+      return Number(row?.calls ?? 0);
+    },
+  },
   recipients() {
     // Ops inbox + the Thea mailbox, deduped. Deliberately NOT
     // THEA_MAIL_REPORT_TO: that is the founder's personal address for the daily
@@ -181,6 +209,8 @@ interface DayComputation {
   report: DayReport;
   revenue: DayRevenue;
   upstreamCostUsd: number | null;
+  /** Usage-priced part of upstream cost (no flat plan fees): what per-use alerts judge. */
+  variableCostUsd: number | null;
   internalBilledUsd: number;
   coverage: typeof CostCoverageValue;
 }
@@ -194,6 +224,8 @@ interface DayRevenue {
   paymentCount: number;
   cancellationCount: number;
   payoutsUsd: number;
+  /** Per-charge processor fees + account-level fee rows */
+  feesUsd: number;
 }
 
 const emptyDay = (): DayRevenue => ({
@@ -205,6 +237,7 @@ const emptyDay = (): DayRevenue => ({
   paymentCount: 0,
   cancellationCount: 0,
   payoutsUsd: 0,
+  feesUsd: 0,
 });
 
 /** Aggregate raw revenue rows into per source per UTC day totals. */
@@ -218,6 +251,8 @@ export function aggregateEvents(
     const key = dayKey(ev.occurredAt);
     const day = days.get(key) ?? emptyDay();
     days.set(key, day);
+    // Fees ride on any row (charge fee, dispute fee); a FEE row is all fee.
+    day.feesUsd += ev.feeUsd;
     switch (ev.kind) {
       case RevenueEventKind.CHARGE:
         day.grossUsd += ev.amountUsd;
@@ -236,6 +271,9 @@ export function aggregateEvents(
         break;
       case RevenueEventKind.PAYOUT:
         day.payoutsUsd += ev.amountUsd;
+        break;
+      case RevenueEventKind.FEE:
+        day.feesUsd += ev.amountUsd;
         break;
       default:
         break;
@@ -426,6 +464,7 @@ export class FinanceRepository {
       kind: "provider",
       status: SourceRunStatus.SKIPPED,
       reason: null,
+      fallback: false,
       balanceUsd: null,
       spendUsd: null,
       events: 0,
@@ -442,7 +481,11 @@ export class FinanceRepository {
       return { ...base, reason: "no API key configured" };
     }
     try {
-      const result = await adapter.fetchBalance(deps.http, apiKey);
+      const result = await adapter.fetchBalance(
+        deps.http,
+        apiKey,
+        deps.usageLedger,
+      );
       if (result.status !== "ok") {
         return {
           ...base,
@@ -528,6 +571,7 @@ export class FinanceRepository {
       return {
         ...base,
         status: SourceRunStatus.OK,
+        reason: result.note ?? null,
         balanceUsd: result.balanceUsd,
         spendUsd: delta?.spendUsd ?? null,
       };
@@ -582,6 +626,55 @@ export class FinanceRepository {
 
   // ─── Revenue ───────────────────────────────────────────────────────────────
 
+  /**
+   * One processor's revenue since `since`, from its API when configured, else
+   * (flagged as FALLBACK) from our own payment records. Shared by the live
+   * ingest and the backfill so both read the same source of truth: our
+   * payment_transactions lack Stripe renewals and fees, so the API wins.
+   */
+  private static async pullSource(
+    source: (typeof RevenueSources)[number],
+    since: Date,
+  ): Promise<RevenuePull> {
+    const deps = FinanceRepository.deps;
+    if (source === FinanceSource.STRIPE) {
+      const port = deps.stripePort();
+      // Count real sales even when the Stripe API is missing or its account
+      // diverges from our records, so revenue is never silently $0.
+      return port
+        ? reconcileWithLocalSales(
+            await pullStripe(port, since),
+            PaymentProvider.STRIPE,
+            FinanceSource.STRIPE,
+            since,
+          )
+        : pullLocalPaymentLedger(
+            PaymentProvider.STRIPE,
+            FinanceSource.STRIPE,
+            since,
+          );
+    }
+    const port = deps.nowPaymentsPort(deps.http);
+    if (!port) {
+      const local = await pullLocalPaymentLedger(
+        PaymentProvider.NOWPAYMENTS,
+        FinanceSource.NOWPAYMENTS,
+        since,
+      );
+      return {
+        ...local,
+        note: `${local.note ?? ""} NOWPayments API path needs ${NOWPAYMENTS_API_ENV_KEYS.join(" + ")} (NOWPAYMENTS_API_KEY not set).`,
+      };
+    }
+    // Same reconciliation for crypto against the local IPN ledger.
+    return reconcileWithLocalSales(
+      pullNowPayments(await port.load(since)),
+      PaymentProvider.NOWPAYMENTS,
+      FinanceSource.NOWPAYMENTS,
+      since,
+    );
+  }
+
   private static async ingestRevenue(
     source: (typeof RevenueSources)[number],
     since: Date,
@@ -589,67 +682,23 @@ export class FinanceRepository {
     pulled: RevenueEventInput[],
     logger: EndpointLogger,
   ): Promise<SourceReport> {
-    const deps = FinanceRepository.deps;
     const base: SourceReport = {
       source,
       kind: "revenue",
       status: SourceRunStatus.SKIPPED,
       reason: null,
+      fallback: false,
       balanceUsd: null,
       spendUsd: null,
       events: 0,
     };
     try {
-      let pull: RevenuePull;
-      if (source === FinanceSource.STRIPE) {
-        const port = deps.stripePort();
-        // Count real sales even when the Stripe API is missing or its account
-        // diverges from our records, so revenue is never silently $0.
-        pull = port
-          ? await reconcileWithLocalSales(
-              await pullStripe(port, since),
-              PaymentProvider.STRIPE,
-              FinanceSource.STRIPE,
-              since,
-            )
-          : await pullLocalPaymentLedger(
-              PaymentProvider.STRIPE,
-              FinanceSource.STRIPE,
-              since,
-            );
-      } else {
-        const port = deps.nowPaymentsPort(deps.http);
-        // Same reconciliation for crypto against the local IPN ledger.
-        pull = port
-          ? await reconcileWithLocalSales(
-              pullNowPayments(await port.load(since)),
-              PaymentProvider.NOWPAYMENTS,
-              FinanceSource.NOWPAYMENTS,
-              since,
-            )
-          : await pullLocalPaymentLedger(
-              PaymentProvider.NOWPAYMENTS,
-              FinanceSource.NOWPAYMENTS,
-              since,
-            );
-      }
-
+      const pull = await FinanceRepository.pullSource(source, since);
       pulled.push(...pull.events);
       if (!dryRun) {
         await FinanceRepository.persistEvents(source, pull.events, since);
       }
-      const notes = [
-        pull.note,
-        pull.unconvertible > 0
-          ? `${pull.unconvertible} rows skipped: currency without FX rate`
-          : null,
-      ].filter((n): n is string => n !== null);
-      return {
-        ...base,
-        status: SourceRunStatus.OK,
-        reason: notes.length > 0 ? notes.join("; ") : null,
-        events: pull.events.length,
-      };
+      return FinanceRepository.revenueReport(base, pull);
     } catch (error) {
       logger.warn("[Finance] Revenue pull failed", {
         source,
@@ -663,84 +712,122 @@ export class FinanceRepository {
     }
   }
 
-  /** Upsert raw rows by (source, kind, external id), then rebuild the window's daily snapshots. */
+  private static revenueReport(
+    base: SourceReport,
+    pull: RevenuePull,
+  ): SourceReport {
+    const notes = [
+      pull.note,
+      pull.unconvertible > 0
+        ? `${pull.unconvertible} rows skipped: currency without FX rate`
+        : null,
+    ].filter((n): n is string => n !== null && n.trim() !== "");
+    return {
+      ...base,
+      status: SourceRunStatus.OK,
+      reason: notes.length > 0 ? notes.join("; ") : null,
+      fallback: pull.fallback,
+      events: pull.events.length,
+    };
+  }
+
+  /**
+   * Replace the source's rows in the window with this pull, then rebuild the
+   * window's daily snapshots. The pull is complete for its window, so it is
+   * authoritative: rows from an earlier pull of a DIFFERENT origin (local-ledger
+   * ids vs Stripe balance-transaction ids for the same sale) are dropped
+   * instead of double counting, and a day whose rows vanished is cleared.
+   */
   private static async persistEvents(
     source: (typeof RevenueSources)[number],
     events: RevenueEventInput[],
     since: Date,
   ): Promise<void> {
-    for (let i = 0; i < events.length; i += 500) {
-      const chunk = events.slice(i, i + 500);
-      await db
-        .insert(financeRevenueEvents)
-        .values(
-          chunk.map((e) => ({
-            source: e.source,
-            kind: e.kind,
-            externalId: e.externalId,
-            amountUsd: e.amountUsd,
-            feeUsd: e.feeUsd,
-            currency: e.currency,
-            occurredAt: e.occurredAt,
-          })),
+    const windowStart = startOfUtcDay(since);
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(financeRevenueEvents)
+        .where(
+          and(
+            eq(financeRevenueEvents.source, source),
+            gte(financeRevenueEvents.occurredAt, windowStart),
+          ),
+        );
+      for (let i = 0; i < events.length; i += 500) {
+        const chunk = events.slice(i, i + 500);
+        await tx
+          .insert(financeRevenueEvents)
+          .values(
+            chunk.map((e) => ({
+              source: e.source,
+              kind: e.kind,
+              externalId: e.externalId,
+              amountUsd: e.amountUsd,
+              feeUsd: e.feeUsd,
+              currency: e.currency,
+              occurredAt: e.occurredAt,
+            })),
+          )
+          .onConflictDoUpdate({
+            target: [
+              financeRevenueEvents.source,
+              financeRevenueEvents.kind,
+              financeRevenueEvents.externalId,
+            ],
+            set: {
+              amountUsd: sql`excluded.amount_usd`,
+              feeUsd: sql`excluded.fee_usd`,
+              occurredAt: sql`excluded.occurred_at`,
+            },
+          });
+      }
+      await tx
+        .delete(financeRevenueSnapshots)
+        .where(
+          and(
+            eq(financeRevenueSnapshots.source, source),
+            gte(financeRevenueSnapshots.day, windowStart),
+          ),
+        );
+      const stored = await tx
+        .select()
+        .from(financeRevenueEvents)
+        .where(
+          and(
+            eq(financeRevenueEvents.source, source),
+            gte(financeRevenueEvents.occurredAt, windowStart),
+          ),
         )
-        .onConflictDoUpdate({
-          target: [
-            financeRevenueEvents.source,
-            financeRevenueEvents.kind,
-            financeRevenueEvents.externalId,
-          ],
-          set: {
-            amountUsd: sql`excluded.amount_usd`,
-            feeUsd: sql`excluded.fee_usd`,
-          },
+        .orderBy(asc(financeRevenueEvents.occurredAt));
+      const days = aggregateEvents(
+        stored.map((s) => ({
+          source,
+          kind: s.kind,
+          externalId: s.externalId,
+          amountUsd: s.amountUsd,
+          feeUsd: s.feeUsd,
+          currency: s.currency,
+          occurredAt: s.occurredAt,
+        })),
+      ).get(source);
+      for (const [key, day] of days ?? []) {
+        await tx.insert(financeRevenueSnapshots).values({
+          source,
+          day: new Date(`${key}T00:00:00.000Z`),
+          grossUsd: round2(day.grossUsd),
+          refundsUsd: round2(day.refundsUsd),
+          disputesUsd: round2(day.disputesUsd),
+          netUsd: round2(day.grossUsd - day.refundsUsd - day.disputesUsd),
+          payoutsUsd: round2(day.payoutsUsd),
+          feesUsd: round2(day.feesUsd),
+          paymentCount: day.paymentCount,
+          refundCount: day.refundCount,
+          disputeCount: day.disputeCount,
+          cancellationCount: day.cancellationCount,
+          updatedAt: new Date(),
         });
-    }
-    // Rebuild from the stored rows so a re-run is idempotent whatever was re-pulled.
-    const stored = await db
-      .select()
-      .from(financeRevenueEvents)
-      .where(
-        and(
-          eq(financeRevenueEvents.source, source),
-          gte(financeRevenueEvents.occurredAt, startOfUtcDay(since)),
-        ),
-      )
-      .orderBy(asc(financeRevenueEvents.occurredAt));
-    const days = aggregateEvents(
-      stored.map((s) => ({
-        source,
-        kind: s.kind,
-        externalId: s.externalId,
-        amountUsd: s.amountUsd,
-        feeUsd: s.feeUsd,
-        currency: s.currency,
-        occurredAt: s.occurredAt,
-      })),
-    ).get(source);
-    for (const [key, day] of days ?? []) {
-      const values = {
-        source,
-        day: new Date(`${key}T00:00:00.000Z`),
-        grossUsd: round2(day.grossUsd),
-        refundsUsd: round2(day.refundsUsd),
-        disputesUsd: round2(day.disputesUsd),
-        netUsd: round2(day.grossUsd - day.refundsUsd - day.disputesUsd),
-        payoutsUsd: round2(day.payoutsUsd),
-        paymentCount: day.paymentCount,
-        refundCount: day.refundCount,
-        disputeCount: day.disputeCount,
-        cancellationCount: day.cancellationCount,
-        updatedAt: new Date(),
-      };
-      await db
-        .insert(financeRevenueSnapshots)
-        .values(values)
-        .onConflictDoUpdate({
-          target: [financeRevenueSnapshots.source, financeRevenueSnapshots.day],
-          set: values,
-        });
-    }
+      }
+    });
   }
 
   // ─── Rollup ────────────────────────────────────────────────────────────────
@@ -789,7 +876,8 @@ export class FinanceRepository {
           disputeCount: comp.revenue.disputeCount,
           cancellationCount: comp.revenue.cancellationCount,
           trailingAvgCancellations: trailingCancel,
-          upstreamCostUsd: comp.upstreamCostUsd ?? 0,
+          processorFeesUsd: comp.revenue.feesUsd,
+          upstreamCostUsd: comp.variableCostUsd ?? 0,
           internalBilledUsd: comp.internalBilledUsd,
         },
         thresholds,
@@ -875,6 +963,7 @@ export class FinanceRepository {
         paymentCount: s.paymentCount,
         cancellationCount: s.cancellationCount,
         payoutsUsd: s.payoutsUsd,
+        feesUsd: s.feesUsd,
       });
     }
     return revenue;
@@ -909,9 +998,23 @@ export class FinanceRepository {
       now: input.now,
       gapToleranceHours: FINANCE_CONFIG.costGapToleranceHours,
     });
-    const measuredCost = round2(
+    // Usage-priced spend measured from snapshots (per-call / per-token).
+    const variableCost = round2(
       Object.values(input.perProvider).reduce((a, b) => a + b, 0),
     );
+    // Flat-rate plans (Gab Plus) cost the same whether used or not: their
+    // monthly fee is spread over the days of the month and folded in.
+    const perProvider: Record<string, number> = { ...input.perProvider };
+    for (const fixed of FinanceRepository.fixedCosts()) {
+      perProvider[fixed.source] = round2(
+        (perProvider[fixed.source] ?? 0) +
+          fixed.monthlyUsd / daysInUtcMonth(dayStart),
+      );
+    }
+    const measuredCost = round2(
+      Object.values(perProvider).reduce((a, b) => a + b, 0),
+    );
+    const processorFeesUsd = round2(revenue.feesUsd);
     // NONE: cost unknown, store NULL (never 0). PARTIAL/COMPLETE: store what we measured.
     const upstreamCostUsd =
       coverage === CostCoverage.NONE ? null : measuredCost;
@@ -925,13 +1028,19 @@ export class FinanceRepository {
             grossRevenueUsd: revenue.grossUsd,
             refundsUsd: revenue.refundsUsd,
             disputesUsd: revenue.disputesUsd,
+            processorFeesUsd,
             upstreamCostUsd: measuredCost,
             internalBilledUsd,
           })
         : null;
     const grossMarginUsd = margin ? margin.grossMarginUsd : null;
     const grossMarginPct = margin ? margin.grossMarginPct : null;
-    const billingGapPct = margin ? margin.billingGapPct : null;
+    // Billing gap judges per-use pricing: usage-priced cost vs credits billed,
+    // without the flat plan fee (that is not billed per call by design).
+    const billingGapPct =
+      margin && internalBilledUsd > 0
+        ? round2(((variableCost - internalBilledUsd) / internalBilledUsd) * 100)
+        : null;
 
     if (input.persist) {
       const values = {
@@ -940,13 +1049,14 @@ export class FinanceRepository {
         refundsUsd: round2(revenue.refundsUsd),
         disputesUsd: round2(revenue.disputesUsd),
         netRevenueUsd,
+        processorFeesUsd,
         upstreamCostUsd,
         grossMarginUsd,
         grossMarginPct,
         internalBilledUsd: round2(internalBilledUsd),
         billingGapPct,
         cancellationCount: revenue.cancellationCount,
-        perProviderSpend: input.perProvider,
+        perProviderSpend: perProvider,
         costCoverage: coverage,
         computedAt: new Date(),
       };
@@ -963,6 +1073,7 @@ export class FinanceRepository {
         refundsUsd: round2(revenue.refundsUsd),
         disputesUsd: round2(revenue.disputesUsd),
         netRevenueUsd,
+        processorFeesUsd,
         upstreamCostUsd,
         grossMarginUsd,
         grossMarginPct,
@@ -971,6 +1082,7 @@ export class FinanceRepository {
       },
       revenue,
       upstreamCostUsd,
+      variableCostUsd: coverage === CostCoverage.NONE ? null : variableCost,
       internalBilledUsd,
       coverage,
     };
@@ -1079,8 +1191,9 @@ export class FinanceRepository {
       });
     }
 
-    // 1. Rebuild revenue snapshots across the range from the complete local
-    //    payment ledger (uncapped, idempotent). The source of historical truth.
+    // 1. Rebuild revenue snapshots across the range from the processor API
+    //    (local ledger only as a flagged fallback). Idempotent: the range is
+    //    replaced, never appended to.
     const sources: SourceReport[] = [];
     for (const source of RevenueSources) {
       sources.push(await FinanceRepository.backfillRevenue(source, fromDay));
@@ -1122,7 +1235,7 @@ export class FinanceRepository {
     });
   }
 
-  /** Rebuild one revenue source's events + daily snapshots from our own succeeded payments. */
+  /** Rebuild one revenue source's events + daily snapshots over the backfill range. */
   private static async backfillRevenue(
     source: (typeof RevenueSources)[number],
     since: Date,
@@ -1132,22 +1245,36 @@ export class FinanceRepository {
       kind: "revenue",
       status: SourceRunStatus.SKIPPED,
       reason: null,
+      fallback: false,
       balanceUsd: null,
       spendUsd: null,
       events: 0,
     };
-    const provider =
-      source === FinanceSource.STRIPE
-        ? PaymentProvider.STRIPE
-        : PaymentProvider.NOWPAYMENTS;
-    const pull = await pullLocalPaymentLedger(provider, source, since);
+    // Same source of truth as the live ingest: the processor API when
+    // configured (our ledger misses Stripe renewals + fees), else the flagged
+    // local-ledger fallback.
+    const pull = await FinanceRepository.pullSource(source, since);
     await FinanceRepository.persistEvents(source, pull.events, since);
-    return {
-      ...base,
-      status: SourceRunStatus.OK,
-      reason: pull.note,
-      events: pull.events.length,
-    };
+    return FinanceRepository.revenueReport(base, pull);
+  }
+
+  /** Flat-rate provider plans in use (a plan counts only while its key is set). */
+  static fixedCosts(): {
+    source: typeof FinanceSourceValue;
+    monthlyUsd: number;
+  }[] {
+    const deps = FinanceRepository.deps;
+    const out: { source: typeof FinanceSourceValue; monthlyUsd: number }[] = [];
+    if (
+      deps.apiKey(FinanceSource.GAB) &&
+      FINANCE_CONFIG.fixedMonthlyCostUsd.gab > 0
+    ) {
+      out.push({
+        source: FinanceSource.GAB,
+        monthlyUsd: FINANCE_CONFIG.fixedMonthlyCostUsd.gab,
+      });
+    }
+    return out;
   }
 
   /** Credits users burned in [from, to) valued at the credit price. */
@@ -1196,6 +1323,7 @@ export class FinanceRepository {
         lastRunAt: now,
         lastStatus: report.status,
         lastReason: report.reason,
+        lastFallback: report.fallback,
         lastOkAt: ok ? now : null,
       })
       .onConflictDoUpdate({
@@ -1204,6 +1332,7 @@ export class FinanceRepository {
           lastRunAt: now,
           lastStatus: report.status,
           lastReason: report.reason,
+          lastFallback: report.fallback,
           ...(ok ? { lastOkAt: now } : {}),
         },
       });
@@ -1326,6 +1455,7 @@ export class FinanceRepository {
           source,
           status: status?.lastStatus ?? null,
           reason: status?.lastReason ?? null,
+          fallback: status?.lastFallback ?? false,
           lastRunAt: status?.lastRunAt.toISOString() ?? null,
           lastOkAt: status?.lastOkAt?.toISOString() ?? null,
           balanceUsd: snap?.balanceUsd ?? null,
@@ -1344,25 +1474,30 @@ export class FinanceRepository {
       const days = rollups.map((r) => ({
         day: dayKey(r.day),
         netRevenueUsd: r.netRevenueUsd,
+        processorFeesUsd: r.processorFeesUsd,
         upstreamCostUsd: r.upstreamCostUsd,
         grossMarginUsd: r.grossMarginUsd,
         grossMarginPct: r.grossMarginPct,
         billingGapPct: r.billingGapPct,
         costCoverage: r.costCoverage,
       }));
-      // Revenue is always known; cost / margin only over days whose cost we
-      // actually captured (coverage != NONE), so the week total never mixes in a
-      // faked zero for an untracked day. The week is flagged partial when any day
-      // in it lacks complete cost coverage.
-      const net = rollups.reduce((a, r) => a + r.netRevenueUsd, 0);
-      const cost = rollups.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
-      const costComplete = rollups.every(
+      // The week margin is judged ONLY over days with COMPLETE cost coverage:
+      // mixing in revenue from a day whose cost is unknown (or partial) inflates
+      // the margin with cost that was never measured. Revenue over every day is
+      // reported separately so nothing is hidden.
+      const tracked = rollups.filter(
         (r) => r.costCoverage === CostCoverage.COMPLETE,
       );
+      const netAll = rollups.reduce((a, r) => a + r.netRevenueUsd, 0);
+      const net = tracked.reduce((a, r) => a + r.netRevenueUsd, 0);
+      const fees = tracked.reduce((a, r) => a + r.processorFeesUsd, 0);
+      const cost = tracked.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
+      const costComplete = tracked.length === rollups.length;
       const weekMargin = computeMargin({
         grossRevenueUsd: net,
         refundsUsd: 0,
         disputesUsd: 0,
+        processorFeesUsd: fees,
         upstreamCostUsd: cost,
         internalBilledUsd: 0,
       });
@@ -1384,10 +1519,14 @@ export class FinanceRepository {
         sources,
         week: {
           netRevenueUsd: round2(net),
+          processorFeesUsd: round2(fees),
           upstreamCostUsd: round2(cost),
           grossMarginUsd: weekMargin.grossMarginUsd,
           grossMarginPct: weekMargin.grossMarginPct,
           costComplete,
+          marginDays: tracked.length,
+          totalDays: rollups.length,
+          netRevenueAllDaysUsd: round2(netAll),
         },
         days,
         alerts: alertRows.map((a) => ({
@@ -1421,6 +1560,12 @@ export class FinanceRepository {
   }
 }
 
+function daysInUtcMonth(day: Date): number {
+  return new Date(
+    Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+}
+
 function addDay(target: DayRevenue, add: DayRevenue | undefined): void {
   if (!add) {
     return;
@@ -1433,4 +1578,5 @@ function addDay(target: DayRevenue, add: DayRevenue | undefined): void {
   target.paymentCount += add.paymentCount;
   target.cancellationCount += add.cancellationCount;
   target.payoutsUsd += add.payoutsUsd;
+  target.feesUsd += add.feesUsd;
 }
