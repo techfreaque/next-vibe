@@ -489,6 +489,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./SiX") as Promise<IconModule>;
     case "SiXiaomi":
       return import("./SiXiaomi") as Promise<IconModule>;
+    case "SiZdotai":
+      return import("./SiZdotai") as Promise<IconModule>;
     case "SiZendesk":
       return import("./SiZendesk") as Promise<IconModule>;
     case "Smartphone":

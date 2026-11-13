@@ -1152,6 +1152,11 @@ import * as SiX from "./SiX";
 const testSiX: typeof webSiX = SiX;
 void testSiX;
 
+import type * as webSiZdotai from "../../../web/components/icons/SiZdotai";
+import * as SiZdotai from "./SiZdotai";
+const testSiZdotai: typeof webSiZdotai = SiZdotai;
+void testSiZdotai;
+
 import type * as webSiZendesk from "../../../web/components/icons/SiZendesk";
 import * as SiZendesk from "./SiZendesk";
 const testSiZendesk: typeof webSiZendesk = SiZendesk;

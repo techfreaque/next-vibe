@@ -312,6 +312,7 @@ export { SiTribe } from "./SiTribe";
 export { SiTypescript } from "./SiTypescript";
 export { SiX } from "./SiX";
 export { SiXiaomi } from "./SiXiaomi";
+export { SiZdotai } from "./SiZdotai";
 export { SiZendesk } from "./SiZendesk";
 export { Smartphone } from "./Smartphone";
 export { SquareCheck } from "./SquareCheck";

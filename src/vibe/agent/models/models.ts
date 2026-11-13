@@ -585,7 +585,7 @@ export const modelProviders: Record<string, ModelProvider> = {
   },
   zAi: {
     name: "Z.AI",
-    icon: "si-zendesk",
+    icon: "si-zdotai",
   },
   veniceAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier

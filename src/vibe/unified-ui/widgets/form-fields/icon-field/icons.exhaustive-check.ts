@@ -298,6 +298,7 @@ const {
   SiTypescript,
   SiX,
   SiXiaomi,
+  SiZdotai,
   SiZendesk,
   VeniceAILogo,
   Airplay,

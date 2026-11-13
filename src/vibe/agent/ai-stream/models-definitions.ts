@@ -441,7 +441,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm47FlashHeretic",
     parameterCount: undefined,
     contextWindow: 200000, // updated: 2026-11-07 from venice-api
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-11-07 from venice-api
     outputs: ["text"], // updated: 2026-11-07 from venice-api
     providers: [
@@ -525,7 +525,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm53Uncensored",
     parameterCount: undefined,
     contextWindow: 1048576, // updated: 2026-11-07 from nano-gpt-api
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-11-07 from nano-gpt-api
     outputs: ["text"], // updated: 2026-11-07 from nano-gpt-api
     providers: [
@@ -585,7 +585,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm53FlashUncensored",
     parameterCount: 320,
     contextWindow: 1048576, // updated: 2026-11-07 from nano-gpt-api
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text", "image"], // updated: 2026-11-07 from nano-gpt-api
     outputs: ["text"], // updated: 2026-11-07 from nano-gpt-api
     providers: [
@@ -2155,7 +2155,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm5_1",
     parameterCount: undefined,
     contextWindow: 204800,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-07-02 from openrouter-api
     outputs: ["text"], // updated: 2026-07-02 from openrouter-api
     providers: [
@@ -2196,7 +2196,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm5",
     parameterCount: undefined,
     contextWindow: 204800,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2238,7 +2238,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm5Turbo",
     parameterCount: undefined,
     contextWindow: 202752,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2281,7 +2281,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm47",
     parameterCount: undefined,
     contextWindow: 204800,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2322,7 +2322,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm47Flash",
     parameterCount: undefined,
     contextWindow: 200000,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2358,7 +2358,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm45Air",
     parameterCount: undefined,
     contextWindow: 131072,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2394,7 +2394,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm46",
     parameterCount: undefined,
     contextWindow: 204800,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -2435,7 +2435,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm45v",
     parameterCount: 106,
     contextWindow: 65536,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text", "image"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
     providers: [
@@ -4373,7 +4373,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm52",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5379,7 +5379,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm53",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [
@@ -5420,7 +5420,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     description: "chat.models.descriptions.glm53Flash",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: "si-zendesk",
+    icon: "si-zdotai",
     inputs: ["text", "image", "video"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
     providers: [

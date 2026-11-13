@@ -329,6 +329,7 @@ export const CLI_ICONS: Record<IconKey, string> = {
   "si-x": "✕",
   "si-xiaomi": "📱",
   "si-minimax": "〽️",
+  "si-zdotai": "Z",
   "si-zendesk": "💬",
   "si-alibabadotcom": "🛒",
   "freedom-gpt-logo": "🦅",
