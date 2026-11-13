@@ -3,19 +3,18 @@
 /**
  * New-thread empty state: the mode spotlight.
  *
- * A companion's default mode runs a smart open model. Great daily driver, but
- * guarded on politics. People come for "uncensored", ask something political
- * on the default and leave. This screen shows which mode answers now, what its
- * model is weak at, and the mode that covers it, one tap away.
- *
- * "Uncensored" is not one capability. UncensoredLM answers politics straight;
- * the GLM uncensored model is built for security work and is as guarded on
- * politics as the default. So every mode is described by what its model is
- * good and weak at (keyed by the resolved model id), never on one
- * filtered-to-free scale, and politics always routes to UncensoredLM.
- *
+ * Shows where the chat lives, who answers, which mode and model are on, and
+ * what each mode is good and weak at, with the covering mode one tap away.
  * Mode switching goes through `ChatSettingsRepositoryClient.selectFavorite`,
  * the same write the chat input selector makes.
+ *
+ * Details:
+ * - The current-mode card shows the variant's advantage AND its disadvantage.
+ * - Per-variant copy (one-line description, strength, weakness) comes from the
+ *   skill variant data when the variant defines it; the model-keyed
+ *   capability text stays as the fallback (`resolveModeCopy`).
+ * - No flash of the default companion while settings load: until the selected
+ *   skill is known, the card area shows a quiet placeholder.
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -156,6 +155,12 @@ interface ModeView {
   modelName: string | null;
   modelIcon: IconKey | null;
   use: Use;
+  /** Variant's own one-liner, when the skill data defines one. */
+  summary: string | null;
+  /** What this mode is good at: variant data first, model-keyed fallback. */
+  good: string;
+  /** What this mode is weak at: variant data first, model-keyed fallback. */
+  weak: string;
   isDefault: boolean;
   isActive: boolean;
 }
@@ -207,14 +212,44 @@ function resolveVariantModel(
     : null;
 }
 
+interface ModeCopy {
+  summary: string | null;
+  good: string;
+  weak: string;
+}
+
+/**
+ * Copy for one mode. The skill variant's own description / strength /
+ * weakness win when present (skill data is the source of truth); otherwise
+ * the capability text keyed by the model the variant resolves to.
+ */
+function resolveModeCopy(params: {
+  variant: SkillVariant;
+  use: Use;
+  t: ThreadsT;
+  tSkills: SkillsT;
+}): ModeCopy {
+  const { variant, use, t, tSkills } = params;
+  return {
+    summary: variant.description ? tSkills(variant.description) : null,
+    good: variant.strength
+      ? tSkills(variant.strength)
+      : t(`widget.emptyState.use.${use}.good`),
+    weak: variant.weakness
+      ? tSkills(variant.weakness)
+      : t(`widget.emptyState.use.${use}.weak`),
+  };
+}
+
 function buildModes(params: {
   skill: Skill;
   activeVariantId: string | null;
+  t: ThreadsT;
   tSkills: SkillsT;
   user: ReturnType<typeof useWidgetUser>;
   availability: ReturnType<typeof useProviderAvailability>;
 }): ModeView[] {
-  const { skill, activeVariantId, tSkills, user, availability } = params;
+  const { skill, activeVariantId, t, tSkills, user, availability } = params;
   const defaultId =
     skill.variants.find((v) => v.isDefault)?.id ?? skill.variants[0]?.id;
   const activeId =
@@ -226,6 +261,7 @@ function buildModes(params: {
     const model = resolveVariantModel(variant, user, availability);
     const isDefault = variant.id === defaultId;
     const known = model ? USE_BY_MODEL[model.id] : undefined;
+    const use: Use = known ?? (isDefault ? "everyday" : "general");
     return {
       variantId: variant.id,
       composite: formatSkillId(skill.id, variant.id),
@@ -233,7 +269,8 @@ function buildModes(params: {
       modelId: model?.id ?? null,
       modelName: model?.name ?? null,
       modelIcon: model?.icon ?? null,
-      use: known ?? (isDefault ? "everyday" : "general"),
+      use,
+      ...resolveModeCopy({ variant, use, t, tSkills }),
       isDefault,
       isActive: variant.id === activeId,
     };
@@ -382,38 +419,33 @@ function ModelLine({
 
 /** Good at / weak at: the honest two-liner. */
 function GoodWeak({
-  use,
+  mode,
   t,
   weakAction,
-  hideGood = false,
 }: {
-  use: Use;
+  mode: ModeView;
   t: ThreadsT;
-  /** Skip the good-at line when the same text is already on screen. */
-  hideGood?: boolean;
   /** Inline fix for the weak spot, e.g. a link to the mode that covers it. */
   weakAction?: ReactNode;
 }): JSX.Element {
   return (
     <Div className="grid gap-2 text-sm">
-      {hideGood ? null : (
-        <Span className="flex items-start gap-2">
-          <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-          <Span className="min-w-0 text-foreground">
-            <Span className="mr-1 font-semibold">
-              {t("widget.emptyState.mode.goodAt")}
-            </Span>
-            {t(`widget.emptyState.use.${use}.good`)}
+      <Span className="flex items-start gap-2">
+        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        <Span className="min-w-0 text-foreground">
+          <Span className="mr-1 font-semibold">
+            {t("widget.emptyState.mode.goodAt")}
           </Span>
+          {mode.good}
         </Span>
-      )}
+      </Span>
       <Span className="flex items-start gap-2">
         <Minus className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
         <Span className="min-w-0 text-foreground">
           <Span className="mr-1 font-semibold">
             {t("widget.emptyState.mode.weakAt")}
           </Span>
-          <Span className="mr-2">{t(`widget.emptyState.use.${use}.weak`)}</Span>
+          <Span className="mr-2">{mode.weak}</Span>
           {weakAction}
         </Span>
       </Span>
@@ -634,7 +666,7 @@ function SingleModelCard({
           </Div>
         </Div>
         <Div className="mt-3 sm:mt-4">
-          <GoodWeak use={view.active.use} t={t} />
+          <GoodWeak mode={view.active} t={t} />
         </Div>
       </Div>
       {footer}
@@ -662,7 +694,8 @@ interface SpotlightBodyProps {
 /** Rows past `limit` hide on these breakpoints until "show all" is pressed. */
 const COLLAPSE_RULES: readonly { limit: number; hide: string; show: string }[] =
   [
-    { limit: 3, hide: "max-sm:hidden", show: "max-sm:flex" },
+    // The current-mode card is taller (advantage + disadvantage), so phones keep two.
+    { limit: 2, hide: "max-sm:hidden", show: "max-sm:flex" },
     {
       limit: 4,
       hide: "sm:[@media(max-height:900px)]:hidden",
@@ -756,11 +789,15 @@ function SpotlightBody({
                 <ModelLine mode={active} t={t} />
               </Div>
             </Div>
+            {active.summary ? (
+              <P className="mt-3 text-sm text-muted-foreground max-sm:hidden">
+                {active.summary}
+              </P>
+            ) : null}
             <Div className="mt-3 sm:mt-4">
               <GoodWeak
-                use={active.use}
+                mode={active}
                 t={t}
-                hideGood
                 weakAction={
                   fix ? (
                     <Button
@@ -805,7 +842,7 @@ function SpotlightBody({
                   aria-current={m.isActive ? "true" : undefined}
                   variant="ghost"
                   size="unset"
-                  aria-label={`${m.name}, ${m.modelName ?? m.name}. ${t(`widget.emptyState.use.${m.use}.good`)}`}
+                  aria-label={`${m.name}, ${m.modelName ?? m.name}. ${m.summary ?? m.good}`}
                   onClick={() => {
                     if (!m.isActive) {
                       onSelectMode(m);
@@ -842,8 +879,8 @@ function SpotlightBody({
                       </Span>
                       <ModelLine mode={m} t={t} className="text-[11px]" />
                     </Span>
-                    <Span className="truncate text-xs text-muted-foreground">
-                      {t(`widget.emptyState.use.${m.use}.good`)}
+                    <Span className="truncate text-xs text-muted-foreground sm:line-clamp-2 sm:whitespace-normal">
+                      {m.summary ?? m.good}
                     </Span>
                   </Span>
                 </Button>
@@ -871,6 +908,23 @@ function SpotlightBody({
           </Div>
         </Div>
       )}
+    </Div>
+  );
+}
+
+/**
+ * Holds the layout while settings load, so nothing jumps and no companion is
+ * shown before we know which one (if any) the user picked.
+ */
+function LoadingPlaceholder(): JSX.Element {
+  return (
+    <Div
+      aria-hidden="true"
+      className="mt-4 flex w-full flex-col items-center [@media(max-height:760px)]:mt-3"
+    >
+      <Div className="h-8 w-28 rounded-full bg-muted motion-safe:animate-pulse" />
+      <Div className="mt-4 h-8 w-3/5 max-w-md rounded-lg bg-muted motion-safe:animate-pulse sm:h-10" />
+      <Div className="mt-6 h-56 w-full rounded-2xl border border-border bg-card/60 sm:mt-7" />
     </Div>
   );
 }
@@ -905,18 +959,23 @@ export function SpotlightEmptyState({
   const logger = useWidgetLogger();
   const availability = useProviderAvailability();
   const { favorites } = useChatFavorites(logger, { activeFavoriteId: null });
-  const { settings } = useChatSettings(user, logger);
+  const { settings, isLoading: settingsLoading } = useChatSettings(
+    user,
+    logger,
+  );
   const scrollRef = useRef<DivRefObject | null>(null);
   const requestTour = useTourState((s) => s.requestTour);
 
-  // Settings resolve after first paint. Fall back to the same default the
-  // chat input shows, so this never flashes a "no companion" state.
+  // Until settings say which skill is selected, show a placeholder instead of
+  // guessing: guessing the default companion flashed Thea's card for people
+  // who chose no companion. Once loaded with nothing saved, use the defaults.
+  const knownSkillId =
+    skillId ?? settings?.selectedSkill ?? (settingsLoading ? null : undefined);
   const effectiveSkillId =
-    skillId ??
-    ChatSettingsRepositoryClient.getDefaults(user, availability).selectedSkill;
-  const parsed = parseSkillId(effectiveSkillId);
-  const skill = DEFAULT_SKILLS.find((s) => s.id === parsed.skillId);
-
+    knownSkillId === undefined
+      ? ChatSettingsRepositoryClient.getDefaults(user, availability)
+          .selectedSkill
+      : knownSkillId;
   const folderConfig = getDefaultFolderConfig(rootFolderId);
   const folder: FolderView = {
     icon: folderConfig?.icon ?? "message-circle",
@@ -926,10 +985,25 @@ export function SpotlightEmptyState({
       FOLDER_TONES[folderConfig?.color ?? "blue"] ?? FOLDER_TONES.blue ?? "",
   };
 
+  if (effectiveSkillId === null) {
+    return (
+      <Shell bottomPadding={bottomPadding} scrollRef={scrollRef}>
+        <Div className="flex flex-col items-center">
+          <FolderPill folder={folder} />
+          <LoadingPlaceholder />
+        </Div>
+      </Shell>
+    );
+  }
+
+  const parsed = parseSkillId(effectiveSkillId);
+  const skill = DEFAULT_SKILLS.find((s) => s.id === parsed.skillId);
+
   const buildCompanionView = (target: Skill): CompanionView | null => {
     const modes = buildModes({
       skill: target,
       activeVariantId: parsed.variantId,
+      t,
       tSkills,
       user,
       availability,
@@ -960,6 +1034,7 @@ export function SpotlightEmptyState({
     const modes = buildModes({
       skill: c,
       activeVariantId: null,
+      t,
       tSkills,
       user,
       availability,
@@ -1008,6 +1083,7 @@ export function SpotlightEmptyState({
     const modes = buildModes({
       skill: target,
       activeVariantId: null,
+      t,
       tSkills,
       user,
       availability,
