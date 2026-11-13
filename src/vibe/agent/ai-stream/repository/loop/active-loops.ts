@@ -58,40 +58,87 @@ export function activeLoopCount(): number {
 }
 
 /**
+ * Whole AI runs (the loop PLUS its finalization: credits, streaming-state
+ * clear, stream-finished emit, the next queued message). A StreamLoop
+ * deregisters before finalization runs, and an interactive run is detached
+ * from its HTTP request, so the loop registry alone lets a drain exit while a
+ * turn is still settling.
+ */
+const activeRuns = new Set<Promise<void>>();
+
+/** Track a detached or awaited AI run until it settles (resolve or reject). */
+export function trackActiveRun(run: Promise<void>): void {
+  activeRuns.add(run);
+  // The run's own error handling lives with its creator; this chain only
+  // observes settlement (and must not surface a second unhandled rejection).
+  run
+    .finally(() => {
+      activeRuns.delete(run);
+    })
+    .catch(() => undefined);
+}
+
+/** Current count of AI runs that have not settled yet. */
+export function activeRunCount(): number {
+  return activeRuns.size;
+}
+
+/** How long aborted stragglers get to persist partial content and settle. */
+const ABORT_SETTLE_MS = 10_000;
+
+/**
  * Begin draining: flip the flag so new streams are refused, then wait for every
- * in-flight loop to finish, up to `timeoutMs`. On timeout, abort whatever is
- * still running (so the process can exit) and resolve.
+ * in-flight loop and run (plus `extraBusy`, e.g. async tool tasks) to finish,
+ * up to `timeoutMs`. On timeout, abort whatever is still running and give the
+ * abort handlers up to {@link ABORT_SETTLE_MS} to save partial content, settle
+ * credits and clear streaming state before resolving.
  *
- * Returns the number of loops still active when the wait ended (0 = clean).
+ * Returns the busy count when the wait ended (0 = clean).
  * Idempotent: a second call just waits again on whatever remains.
  */
 export async function drainActiveLoops(
   timeoutMs: number,
   onProgress?: (remaining: number) => void,
+  extraBusy?: () => number,
 ): Promise<number> {
   draining = true;
 
+  const busy = (): number =>
+    activeLoops.size + activeRuns.size + (extraBusy?.() ?? 0);
   const deadline = Date.now() + Math.max(0, timeoutMs);
   const pollMs = 250;
+  let lastReport = 0;
 
-  while (activeLoops.size > 0 && Date.now() < deadline) {
-    onProgress?.(activeLoops.size);
+  while (busy() > 0 && Date.now() < deadline) {
+    if (Date.now() - lastReport >= 5000) {
+      lastReport = Date.now();
+      onProgress?.(busy());
+    }
     await new Promise<void>((resolve) => {
       setTimeout(resolve, pollMs);
     });
   }
 
-  const remaining = activeLoops.size;
+  const remaining = busy();
   if (remaining > 0) {
     // Timed out — abort the stragglers so the process can exit. Their abort
     // handlers persist partial content + settle credits (idempotent), same as
-    // a user-initiated stop.
+    // a user-initiated stop; wait for them so that work is not cut too.
     for (const loop of activeLoops) {
       try {
         loop.abort("shutdown-drain-timeout");
       } catch {
         // best-effort; we are exiting regardless
       }
+    }
+    const settleDeadline = Date.now() + ABORT_SETTLE_MS;
+    while (
+      activeLoops.size + activeRuns.size > 0 &&
+      Date.now() < settleDeadline
+    ) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, pollMs);
+      });
     }
   }
   return remaining;

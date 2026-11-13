@@ -133,6 +133,8 @@ export class ServerStartRepository {
   private static taskRunnerRestartCount = 0;
   /** The supervised child process (only set in supervisor mode) */
   private static supervisedChild: ChildProcess | null = null;
+  /** The server-process deploy drain watcher runs once per process. */
+  private static drainWatcherStarted = false;
   /** Handle for the health-snapshot interval (only set in the child/server process) */
   private static healthSnapshotInterval: ReturnType<typeof setInterval> | null =
     null;
@@ -1481,6 +1483,11 @@ export class ServerStartRepository {
               NODE_ENV: "production",
               NEXT_DIST_DIR: ".next-prod",
               PORT: String(nextPort),
+              // Next's own SIGTERM handler exits as soon as no HTTP request is
+              // open, which kills the detached AI runs (tokens go over WS, not
+              // the request). src/instrumentation.ts owns shutdown instead:
+              // stop accepting, drain the runs, then exit.
+              NEXT_MANUAL_SIG_HANDLE: "true",
               // 8 GB heap for Next.js - leaves headroom for Bun proxy + OS + Postgres on 16 GB server.
               // Without this Node defaults to ~4 GB and gets OOM-killed under load.
               NODE_OPTIONS:
@@ -1595,6 +1602,13 @@ export class ServerStartRepository {
       const wsHandle = await startWebProxy({ port: wsPort, logger });
       ServerStartRepository.wsServerHandle = wsHandle ?? null;
 
+      // Deploy drain status of THIS process (WS hub + in-process task runner);
+      // the Next child reports its AI loops itself (src/instrumentation.ts).
+      if (!ServerStartRepository.drainWatcherStarted) {
+        ServerStartRepository.drainWatcherStarted = true;
+        await ServerStartRepository.startServerDrainWatcher(logger);
+      }
+
       // Start writing periodic health snapshots so the supervisor has pre-crash memory data
       ServerStartRepository.startHealthSnapshot(logger);
 
@@ -1670,6 +1684,9 @@ export class ServerStartRepository {
   private static async gracefulShutdown(logger: EndpointLogger): Promise<void> {
     // Signal auto-restart loop not to re-spawn after we kill Next.js.
     ServerStartRepository.nextServerShuttingDown = true;
+    // Stop the cron pulse from claiming new work while we shut down.
+    const { markShuttingDown } = await import("../drain");
+    markShuttingDown();
 
     const drainMs = Number.parseInt(
       process.env["STREAM_DRAIN_TIMEOUT_MS"] ?? "",
@@ -1725,8 +1742,83 @@ export class ServerStartRepository {
     }
     ServerStartRepository.nextServerProcess = null;
 
+    // Work running in THIS process (cron AI runs, pulse attempts) gets a short
+    // window too; the deploy drain normally waited for it already.
+    await ServerStartRepository.waitForLocalWork(10_000, logger);
+
     // WS sidecar + aux children last (after the app has drained its streams).
     ServerStartRepository.stopAllProcesses();
+  }
+
+  /** In-flight AI runs + task attempts held by this (server) process. */
+  private static async localBusyCount(): Promise<number> {
+    const { activeLoopCount, activeRunCount } =
+      await import("../../../agent/ai-stream/repository/loop/active-loops");
+    const { RunningTaskRegistry } =
+      await import("../../../tasks/watchdog/registry");
+    return activeLoopCount() + activeRunCount() + RunningTaskRegistry.size();
+  }
+
+  private static async waitForLocalWork(
+    timeoutMs: number,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const deadline = Date.now() + timeoutMs;
+    let busy = await ServerStartRepository.localBusyCount();
+    if (busy > 0) {
+      logger.info(`Waiting for ${String(busy)} in-process run(s)/task(s)`);
+    }
+    while (busy > 0 && Date.now() < deadline) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 250);
+      });
+      busy = await ServerStartRepository.localBusyCount();
+    }
+    if (busy > 0) {
+      logger.warn(`Shutting down with ${String(busy)} in-process run(s) left`);
+    }
+  }
+
+  /**
+   * Report this process's in-flight work while a deploy drains the node, and
+   * close every client WebSocket with 1012 when the deploy asks for it (after
+   * the AI work finished), so browsers reconnect to the peer.
+   */
+  private static async startServerDrainWatcher(
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const { startDrainWatcher } = await import("../drain");
+    const { activeLoopCount, activeRunCount } =
+      await import("../../../agent/ai-stream/repository/loop/active-loops");
+    const { RunningTaskRegistry } =
+      await import("../../../tasks/watchdog/registry");
+    startDrainWatcher({
+      role: "server",
+      counts: () => {
+        const ws = ServerStartRepository.wsServerHandle?.clientCount() ?? {
+          clients: 0,
+          connectors: 0,
+        };
+        return {
+          loops: activeLoopCount(),
+          runs: activeRunCount(),
+          tasks: RunningTaskRegistry.size(),
+          wsClients: ws.clients,
+          wsConnectors: ws.connectors,
+        };
+      },
+      onDrainStart: () => {
+        logger.info("Deploy drain requested: reporting in-flight work");
+      },
+      onWsClose: () => {
+        const closed =
+          ServerStartRepository.wsServerHandle?.closeClients() ?? 0;
+        logger.info(
+          `Deploy drain: closed ${String(closed)} WebSocket client(s) with 1012`,
+        );
+        return closed;
+      },
+    });
   }
 
   private static stopAllProcesses(): void {

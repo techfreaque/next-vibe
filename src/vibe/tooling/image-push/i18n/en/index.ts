@@ -55,6 +55,16 @@ export const translations = {
         description:
           "Default on. Off = Server 1 is down or fenced after a failover: ship the image from this machine straight to Server 2 (SSH_SERVER2) and roll only that node, keeping its own .env and failover overrides. Slow (home upload, no box-to-box relay).",
       },
+      drain: {
+        title: "Drain before restart",
+        description:
+          "Default on (both HA nodes). Each node leaves rotation first (Caddy sends new requests to the peer, DNS drops it), finishes its in-flight AI streams and tasks, moves its WebSocket clients over, and only then gets the new image. Server 1 first, then Server 1 takes the traffic back while Server 2 drains. Off = recreate without waiting (old behaviour).",
+      },
+      drainTimeout: {
+        title: "Drain timeout (seconds)",
+        description:
+          "Longest a node waits for its in-flight AI work before the restart. Whatever still runs then gets the shutdown drain (STREAM_DRAIN_TIMEOUT_MS) and is aborted with partial content saved.",
+      },
       success: {
         title: "Success",
       },
@@ -155,6 +165,19 @@ export const translations = {
           "Rolling Server 2 ({{secondary}}) alone failed: {{error}}. Server 2 kept or restored its previous image.",
         secondaryFailed:
           "Server 1 ({{target}}) is LIVE on the new image, but rolling Server 2 ({{secondary}}) failed: {{error}}. Server 2 kept or restored its previous image.",
+        drainStart:
+          "🚰 Draining {{node}}: new traffic goes to the peer, in-flight AI work gets up to {{timeout}}s",
+        drainSwap:
+          "🔀 {{from}} is live on the new image and takes the traffic back. Draining {{to}} (up to {{timeout}}s)",
+        drainUndrained: "{{node}} is back in rotation on its previous image",
+        drainLeftDrained:
+          "{{node}} stays DRAINED (out of rotation, the peer serves everything): {{error}}. Fix it, then run on both boxes: bash scripts/ha-node-drain.sh edge-off {{node}}",
+        drainPreflightFailed:
+          "Drain pre-check on {{target}} refused the deploy, nothing was changed: {{error}}",
+        drainScriptMissing:
+          "scripts/ha-node-drain.sh is missing from commit {{sha}}: deploying without drain",
+        drainStepFailed:
+          "ha-node-drain.sh {{step}} on {{target}} failed: {{error}}",
         envSyncFailed: "Copying Server 1's .env to Server 2 failed: {{error}}",
       },
     },

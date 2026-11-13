@@ -55,6 +55,9 @@ interface ChannelState {
   descriptor?: WsChannelDescriptor;
 }
 
+/** RFC 6455 close code the server sends on a restart or deploy drain. */
+const WS_SERVICE_RESTART_CODE = 1012;
+
 // Shared connection state
 let sharedWs: WebSocket | null = null;
 let reconnectAttempts = 0;
@@ -197,8 +200,15 @@ function connect(logger: EndpointLogger): void {
       });
       return;
     }
-    // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+    // 1012 "Service Restart" on the first drop = a deploy moved this node out
+    // of rotation (or restarted it): the peer is already serving, so come
+    // back fast, with jitter so every tab does not reconnect in the same tick.
+    // Events emitted during the gap are not replayed; keep it short.
+    // Otherwise exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s.
+    const delay =
+      event.code === WS_SERVICE_RESTART_CODE && reconnectAttempts === 0
+        ? 100 + Math.floor(Math.random() * 400)
+        : Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
     reconnectAttempts++;
     setTimeout(() => {
       connect(logger);

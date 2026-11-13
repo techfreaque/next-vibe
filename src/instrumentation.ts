@@ -45,23 +45,44 @@ export const onRequestError: Instrumentation.onRequestError = async (
 };
 
 /**
+ * Stop accepting NEW connections on every listening server in this process
+ * (Next's HTTP server). In-flight requests and open streams continue; Caddy
+ * gets "connection refused" for new requests and retries them on the peer
+ * node (lb_policy first), exactly like a stopped container, while this
+ * process keeps running its AI loops to completion.
+ */
+async function closeListeningServers(): Promise<number> {
+  const { Server } = await import("node:net");
+  let closed = 0;
+  for (const handle of process._getActiveHandles?.() ?? []) {
+    if (handle instanceof Server && handle.listening) {
+      handle.close();
+      closed++;
+    }
+  }
+  return closed;
+}
+
+/**
  * Next.js server-init hook (runs once in the Node server runtime).
  *
- * Installs the GRACEFUL SHUTDOWN DRAIN (G1) for in-flight AI streams. The
- * `vibe start` supervisor forwards SIGTERM to this Next.js child on a rolling
- * deploy / scale-in; by the time that happens the load balancer has already
- * deregistered this node (rolling-deploy script), so no NEW HTTP traffic is
- * arriving. This handler then:
- *   1. flips the drain flag (health endpoint starts reporting "draining" so any
- *      LB that is still health-checking fails this node fast),
- *   2. awaits every in-flight StreamLoop up to STREAM_DRAIN_TIMEOUT_MS,
- *   3. aborts whatever is still running (its abort handler saves partial content
- *      + settles credits, like a user cancel), then lets the process exit.
+ * 1. DEPLOY DRAIN STATUS: while `scripts/ha-node-drain.sh` has asked this node
+ *    to drain (see platforms/web/drain.ts), report the in-flight AI loops, AI
+ *    runs (loop + finalization) and async tool tasks of this process, so the
+ *    deploy recreates the container only once they reached 0.
  *
- * This is what makes rolling deploys stream-safe: no half-written answer is
- * severed as long as it finishes within the drain window.
+ * 2. GRACEFUL SHUTDOWN (G1). The `vibe start` server process forwards SIGTERM
+ *    to this Next.js child, which runs with NEXT_MANUAL_SIG_HANDLE=true so
+ *    Next's own handler (close + exit as soon as no HTTP request is open)
+ *    does not cut the detached AI runs. This handler instead:
+ *      a. stops accepting new connections (Caddy retries them on the peer),
+ *      b. waits for every in-flight loop, run and async task up to
+ *         STREAM_DRAIN_TIMEOUT_MS,
+ *      c. on timeout aborts the stragglers and waits briefly for their abort
+ *         handlers (partial content, credits, streaming state), cancels the
+ *         async tasks (CANCELLED, not stuck RUNNING), then exits.
  *
- * Only the Node.js runtime gets the handler (the edge runtime has no AI loops).
+ * Only the Node.js runtime gets this (the edge runtime has no AI loops).
  */
 export async function register(): Promise<void> {
   if (process.env["NEXT_RUNTIME"] !== "nodejs") {
@@ -77,8 +98,20 @@ export async function register(): Promise<void> {
   const STREAM_DRAIN_TIMEOUT_MS =
     Number.isFinite(parsed) && parsed > 0 ? parsed : 90_000;
 
-  const { drainActiveLoops, activeLoopCount } =
+  const { drainActiveLoops, activeLoopCount, activeRunCount } =
     await import("@/vibe/agent/ai-stream/repository/loop/active-loops");
+  const { RunningTaskRegistry } =
+    await import("@/vibe/tasks/watchdog/registry");
+  const { startDrainWatcher } = await import("@/vibe/platforms/web/drain");
+
+  startDrainWatcher({
+    role: "next",
+    counts: () => ({
+      loops: activeLoopCount(),
+      runs: activeRunCount(),
+      tasks: RunningTaskRegistry.size(),
+    }),
+  });
 
   let draining = false;
   const onSignal = (signal: NodeJS.Signals): void => {
@@ -87,22 +120,38 @@ export async function register(): Promise<void> {
     }
     draining = true;
     const started = Date.now();
-    const initial = activeLoopCount();
-    // eslint-disable-next-line no-console
-    console.log(
-      `[shutdown] ${signal} received — draining ${initial} in-flight AI stream(s) (timeout ${STREAM_DRAIN_TIMEOUT_MS}ms)`,
-    );
-    void drainActiveLoops(STREAM_DRAIN_TIMEOUT_MS, (remaining) => {
-      // eslint-disable-next-line no-console
-      console.log(`[shutdown] still draining — ${remaining} loop(s) left`);
-    })
-      .then((remaining) => {
+    void closeListeningServers()
+      .catch(() => 0)
+      .then((closedServers) => {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[shutdown] ${signal} received: closed ${String(closedServers)} listener(s), draining ${String(activeRunCount())} AI run(s), ${String(RunningTaskRegistry.size())} async task(s) (timeout ${String(STREAM_DRAIN_TIMEOUT_MS)}ms)`,
+        );
+        return drainActiveLoops(
+          STREAM_DRAIN_TIMEOUT_MS,
+          (remaining) => {
+            // eslint-disable-next-line no-console
+            console.log(`[shutdown] still draining: ${String(remaining)} busy`);
+          },
+          () => RunningTaskRegistry.size(),
+        );
+      })
+      .then(async (remaining) => {
+        if (remaining > 0 && RunningTaskRegistry.cancelAll("server-shutdown")) {
+          // Let the cancelled tasks write their CANCELLED rows.
+          const deadline = Date.now() + 5000;
+          while (RunningTaskRegistry.size() > 0 && Date.now() < deadline) {
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 250);
+            });
+          }
+        }
         const secs = ((Date.now() - started) / 1000).toFixed(1);
         // eslint-disable-next-line no-console
         console.log(
           remaining > 0
-            ? `[shutdown] drain window elapsed after ${secs}s — aborted ${remaining} straggler(s), exiting`
-            : `[shutdown] all AI streams drained cleanly in ${secs}s — exiting`,
+            ? `[shutdown] drain window elapsed after ${secs}s: aborted ${String(remaining)} straggler(s), exiting`
+            : `[shutdown] all AI work drained cleanly in ${secs}s, exiting`,
         );
         process.exit(0);
       })

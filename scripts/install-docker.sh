@@ -12,11 +12,22 @@ if [ "${NO_GIT_RESET:-0}" != "1" ]; then
   git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
 fi
 
-# Build postgres image first (includes plv8 + pgvector via Dockerfile.postgres)
-$COMPOSE build postgres
-
-# Ensure postgres is running and healthy (restarts if image changed)
-$COMPOSE up -d postgres
+# Postgres is the SHARED primary (Server 2's app and standby use it too): an
+# app deploy must never restart it. It used to be rebuilt + `up -d` on every
+# deploy; after the build-cache prune at the end of the previous deploy the
+# rebuild pulled newer apt packages, produced a new image and recreated
+# prod-postgres mid-deploy (seen 2026-11-13 16:35 UTC). Now it is only
+# (re)built when it is not running or when DEPLOY_POSTGRES=1 asks for a
+# planned database image update.
+PG_CONTAINER="${PG_CONTAINER_NAME:-prod-postgres}"
+if [ "${DEPLOY_POSTGRES:-0}" = "1" ] || [ "$(docker inspect -f '{{.State.Running}}' "$PG_CONTAINER" 2>/dev/null)" != "true" ]; then
+  # Build postgres image first (includes plv8 + pgvector via Dockerfile.postgres)
+  $COMPOSE build postgres
+  # Ensure postgres is running and healthy (restarts if image changed)
+  $COMPOSE up -d postgres
+else
+  echo "Postgres $PG_CONTAINER running: left alone (DEPLOY_POSTGRES=1 rebuilds it)"
+fi
 echo "Waiting for postgres..."
 until $COMPOSE exec -T postgres pg_isready -U "${POSTGRES_USER:-postgres}" > /dev/null 2>&1; do
   sleep 1
@@ -74,6 +85,18 @@ archive_app_logs() {
     echo "  (log archive: no running $APP_CONTAINER yet, nothing to archive)"
   fi
 }
+# Drain-based rolling deploy (vibe image-push, HA): this node is already out
+# of rotation (Caddy sends new requests to the peer, DNS dropped it); wait for
+# its in-flight AI runs / tasks to finish and move its WebSocket clients to
+# the peer before the recreate. HA_DRAIN_TIMEOUT bounds the wait (seconds).
+if [ "${HA_DRAIN_WAIT:-0}" = "1" ]; then
+  if [ -f scripts/ha-node-drain.sh ]; then
+    bash scripts/ha-node-drain.sh app-wait || echo "WARN: drain wait failed, recreating anyway (SIGTERM drain covers in-flight work)"
+  else
+    echo "WARN: HA_DRAIN_WAIT=1 but scripts/ha-node-drain.sh is missing, recreating without the wait"
+  fi
+fi
+
 archive_app_logs
 
 # Swap: bring up new app container (replaces old one).
@@ -84,33 +107,50 @@ archive_app_logs
 # even though a brand new image was just loaded under the same tag. Without
 # this flag every deploy "succeeds" (waits for /, gets 200 from the still-
 # running old container) while silently shipping nothing.
+# --no-deps: never recreate the shared postgres/redis/minio with the app.
 echo "Starting new app container..."
-$COMPOSE up -d --force-recreate app
+$COMPOSE up -d --no-deps --force-recreate app
 
 # Wait for the new container to be healthy (up to 180s)
 # Check from the host via the mapped port - not inside the container.
 # The app runs a Bun proxy on port 3000 which proxies to Next.js on 3100 internally;
 # only the host-side port reliably reflects when both layers are ready.
 echo "Waiting for new app to respond..."
-TRIES=0
-MAX_TRIES=90
-until curl -sf --max-time 3 http://localhost:3000 > /dev/null 2>&1; do
-  # Bail early if container has already exited
-  STATUS=$($COMPOSE ps -q app | xargs docker inspect --format='{{.State.Status}}' 2>/dev/null || echo "missing")
-  if [ "$STATUS" = "exited" ] || [ "$STATUS" = "missing" ]; then
-    echo "ERROR: App container exited during startup. Check logs:"
-    echo "  $COMPOSE logs --tail=50 app"
-    exit 1
+wait_app_healthy() {
+  local tries=0
+  until curl -sf --max-time 3 http://localhost:3000 > /dev/null 2>&1; do
+    # Bail early if container has already exited
+    STATUS=$($COMPOSE ps -q app | xargs docker inspect --format='{{.State.Status}}' 2>/dev/null || echo "missing")
+    if [ "$STATUS" = "exited" ] || [ "$STATUS" = "missing" ]; then
+      echo "ERROR: App container exited during startup."
+      return 1
+    fi
+    tries=$((tries + 1))
+    if [ "$tries" -ge 90 ]; then
+      echo "ERROR: New app not responding after 180s."
+      return 1
+    fi
+    sleep 2
+  done
+}
+if ! wait_app_healthy; then
+  docker logs --tail=50 "$APP_CONTAINER" 2>&1 || true
+  # Roll back to the image that ran before this deploy (image-push points
+  # :rollback at the previous :latest before loading the new one).
+  IMAGE_REF=$($COMPOSE config --images app 2>/dev/null | head -1)
+  ROLLBACK_REF="${IMAGE_REF%:*}:rollback"
+  if [ "${HA_NO_ROLLBACK:-0}" != "1" ] && [ -n "$IMAGE_REF" ] && docker image inspect "$ROLLBACK_REF" > /dev/null 2>&1; then
+    echo "Rolling back: $ROLLBACK_REF -> $IMAGE_REF"
+    docker tag "$ROLLBACK_REF" "$IMAGE_REF"
+    $COMPOSE up -d --no-deps --force-recreate app
+    if wait_app_healthy; then
+      echo "ERROR: new image unhealthy; ROLLED BACK, app healthy on the previous image."
+    else
+      echo "ERROR: new image unhealthy AND the rollback is unhealthy. Check: docker logs $APP_CONTAINER"
+    fi
   fi
-  TRIES=$((TRIES + 1))
-  if [ "$TRIES" -ge "$MAX_TRIES" ]; then
-    WAIT_SECS=$((MAX_TRIES * 2))
-    echo "ERROR: New app not responding after ${WAIT_SECS}s. Check logs:"
-    echo "  $COMPOSE logs --tail=50 app"
-    exit 1
-  fi
-  sleep 2
-done
+  exit 1
+fi
 
 echo "Deployment successful - new app is responding."
 echo "Cleaning up docker resources..."

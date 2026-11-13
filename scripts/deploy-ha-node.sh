@@ -9,8 +9,9 @@
 #     previous one to :${IMAGE_TAG}-rollback;
 #   - optionally dropped Server 1's current .env at .env.from-s1.
 #
-# Steps: merge .env (S1 identity + this node's infra overrides) -> archive logs
-# -> recreate the app (SIGTERM stream drain via stop_grace_period) -> health
+# Steps: merge .env (S1 identity + this node's infra overrides) -> [drain wait,
+# HA_DRAIN_WAIT=1: scripts/ha-node-drain.sh app-wait] -> archive logs ->
+# recreate the app (SIGTERM stream drain via stop_grace_period) -> health
 # wait -> on failure roll back to :${IMAGE_TAG}-rollback and exit 1.
 # While this node's app is down, this box's Caddy serves unbottled.ai from
 # Server 1 over WireGuard (lb_policy first), so the roll is uninterrupted.
@@ -87,7 +88,16 @@ health_wait() {
   done
 }
 
-# 4. Roll.
+# 4. Roll. Drain-based deploy (vibe image-push, HA_DRAIN_WAIT=1): this node is
+#    already out of rotation; wait for its in-flight AI runs / tasks, then move
+#    its WebSocket clients to the peer, before the recreate.
+if [ "${HA_DRAIN_WAIT:-0}" = "1" ]; then
+  if [ -f scripts/ha-node-drain.sh ]; then
+    bash scripts/ha-node-drain.sh app-wait || log "WARN: drain wait failed, recreating anyway (SIGTERM drain covers in-flight work)"
+  else
+    log "WARN: HA_DRAIN_WAIT=1 but scripts/ha-node-drain.sh is missing, recreating without the wait"
+  fi
+fi
 archive_logs
 log "recreating $APP on ${IMAGE_NAME}:${IMAGE_TAG} (Server 1 covers traffic meanwhile)"
 compose up -d --no-deps --force-recreate app

@@ -65,6 +65,10 @@ export async function resolveWebProxyPorts(
 export interface WebProxyHandle {
   /** Stop the Bun server. */
   stop: () => void;
+  /** Open /ws sockets (deploy drain status). */
+  clientCount: () => { clients: number; connectors: number };
+  /** Close every /ws socket with 1012 so clients reconnect (deploy drain). */
+  closeClients: () => number;
 }
 
 /**

@@ -66,4 +66,23 @@ export class RunningTaskRegistry {
   static has(taskId: string): boolean {
     return entries().has(taskId);
   }
+
+  /** Runs this process holds right now (deploy drain status). */
+  static size(): number {
+    return entries().size;
+  }
+
+  /**
+   * Abort every run this process holds (shutdown drain timed out). Each run
+   * finishes as CANCELLED instead of staying RUNNING until the watchdog sweep.
+   */
+  static cancelAll(reason: string): number {
+    let cancelled = 0;
+    for (const taskId of entries().keys()) {
+      if (RunningTaskRegistry.cancel(taskId, reason)) {
+        cancelled++;
+      }
+    }
+    return cancelled;
+  }
 }

@@ -57,6 +57,16 @@ export const translations: typeof enTranslations = {
         description:
           "Standard an. Aus = Server 1 ist down oder nach einem Failover abgeschottet: Image direkt von diesem Rechner auf Server 2 (SSH_SERVER2) übertragen und nur diesen Knoten ausrollen, mit seiner eigenen .env und den Failover-Overrides. Langsam (Heim-Upload, kein Box-zu-Box-Relay).",
       },
+      drain: {
+        title: "Vor dem Neustart leeren",
+        description:
+          "Standard an (beide HA-Knoten). Jeder Knoten verlässt zuerst die Rotation (Caddy schickt neue Anfragen an die Gegenstelle, DNS nimmt ihn heraus), beendet seine laufenden KI-Streams und Tasks, übergibt seine WebSocket-Clients und bekommt erst dann das neue Image. Erst Server 1, dann übernimmt Server 1 den Verkehr wieder und Server 2 leert sich. Aus = sofortiger Neustart ohne Warten (altes Verhalten).",
+      },
+      drainTimeout: {
+        title: "Leerungs-Timeout (Sekunden)",
+        description:
+          "Maximale Wartezeit eines Knotens auf laufende KI-Arbeit vor dem Neustart. Was danach noch läuft, bekommt den Shutdown-Drain (STREAM_DRAIN_TIMEOUT_MS) und wird abgebrochen, der Teilinhalt bleibt gespeichert.",
+      },
       success: {
         title: "Erfolg",
       },
@@ -160,6 +170,20 @@ export const translations: typeof enTranslations = {
           "Rollout nur auf Server 2 ({{secondary}}) fehlgeschlagen: {{error}}. Server 2 hat sein vorheriges Image behalten oder wiederhergestellt.",
         secondaryFailed:
           "Server 1 ({{target}}) läuft LIVE mit dem neuen Image, aber Server 2 ({{secondary}}) ist fehlgeschlagen: {{error}}. Server 2 hat sein vorheriges Image behalten oder wiederhergestellt.",
+        drainStart:
+          "🚰 {{node}} wird geleert: neuer Verkehr geht an die Gegenstelle, laufende KI-Arbeit bekommt bis zu {{timeout}}s",
+        drainSwap:
+          "🔀 {{from}} läuft mit dem neuen Image und übernimmt den Verkehr. {{to}} wird geleert (bis zu {{timeout}}s)",
+        drainUndrained:
+          "{{node}} ist mit dem vorherigen Image wieder in der Rotation",
+        drainLeftDrained:
+          "{{node}} bleibt GELEERT (außerhalb der Rotation, die Gegenstelle bedient alles): {{error}}. Beheben, dann auf beiden Boxen: bash scripts/ha-node-drain.sh edge-off {{node}}",
+        drainPreflightFailed:
+          "Drain-Vorprüfung auf {{target}} hat das Deployment abgelehnt, nichts wurde geändert: {{error}}",
+        drainScriptMissing:
+          "scripts/ha-node-drain.sh fehlt in Commit {{sha}}: Deployment ohne Drain",
+        drainStepFailed:
+          "ha-node-drain.sh {{step}} auf {{target}} fehlgeschlagen: {{error}}",
         envSyncFailed:
           "Kopieren der .env von Server 1 auf Server 2 fehlgeschlagen: {{error}}",
       },

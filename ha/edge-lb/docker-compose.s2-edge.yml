@@ -9,7 +9,9 @@
 # Sites (label prefix caddy_internal, this box's caddy-docker-proxy):
 #   https://unbottled.ai      local unbottled-app first, Server 1 app over WG as
 #                             fallback (lb_policy first). /ws* falls back to S1's
-#                             split-port WS sidecar :4000.
+#                             split-port WS sidecar :4000. Drained (deploy, file
+#                             /root/caddy_data/ha-drain/s2): Server 1 first for
+#                             every NEW request; open streams/sockets stay.
 #   https://www.unbottled.ai  308 -> apex
 #   https://s2.unbottled.ai   direct test hostname for this node
 #   http://unbottled.ai, http://www.unbottled.ai
@@ -32,23 +34,46 @@ services:
       caddy_internal_10: "https://unbottled.ai"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
+      # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while
+      # /root/caddy_data/ha-drain/s2 exists (/data/ha-drain/s2 in caddy),
+      # NEW requests and WS upgrades prefer Server 1; open ones stay here.
+      caddy_internal_10.@ha_drained.file.root: "/data/ha-drain"
+      caddy_internal_10.@ha_drained.file.try_files: "/s2"
       caddy_internal_10.handle_0: "/ws*"
-      caddy_internal_10.handle_0.reverse_proxy: "unbottled-app:3000 10.88.0.1:4000"
-      caddy_internal_10.handle_0.reverse_proxy.lb_policy: "first"
-      caddy_internal_10.handle_0.reverse_proxy.lb_try_duration: "20s"
-      caddy_internal_10.handle_0.reverse_proxy.lb_try_interval: "250ms"
-      caddy_internal_10.handle_0.reverse_proxy.fail_duration: "15s"
-      caddy_internal_10.handle_0.reverse_proxy.max_fails: "1"
-      caddy_internal_10.handle_1.reverse_proxy: "unbottled-app:3000 10.88.0.1:3000"
-      caddy_internal_10.handle_1.reverse_proxy.lb_policy: "first"
-      caddy_internal_10.handle_1.reverse_proxy.lb_try_duration: "20s"
-      caddy_internal_10.handle_1.reverse_proxy.lb_try_interval: "250ms"
-      caddy_internal_10.handle_1.reverse_proxy.fail_duration: "15s"
-      caddy_internal_10.handle_1.reverse_proxy.max_fails: "1"
-      caddy_internal_10.handle_1.reverse_proxy.health_uri: "/robots.txt"
-      caddy_internal_10.handle_1.reverse_proxy.health_interval: "5s"
-      caddy_internal_10.handle_1.reverse_proxy.health_timeout: "3s"
-      caddy_internal_10.handle_1.reverse_proxy.health_status: "200"
+      caddy_internal_10.handle_0.0_reverse_proxy: "@ha_drained 10.88.0.1:4000 unbottled-app:3000"
+      caddy_internal_10.handle_0.0_reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_0.0_reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_0.0_reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_0.0_reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_0.0_reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_0.0_reverse_proxy.stream_close_delay: "10m"
+      caddy_internal_10.handle_0.1_reverse_proxy: "unbottled-app:3000 10.88.0.1:4000"
+      caddy_internal_10.handle_0.1_reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_0.1_reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_0.1_reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_0.1_reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_0.1_reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_0.1_reverse_proxy.stream_close_delay: "10m"
+      caddy_internal_10.handle_1.0_reverse_proxy: "@ha_drained 10.88.0.1:3000 unbottled-app:3000"
+      caddy_internal_10.handle_1.0_reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_1.0_reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_1.0_reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_1.0_reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_1.0_reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_1.0_reverse_proxy.health_uri: "/robots.txt"
+      caddy_internal_10.handle_1.0_reverse_proxy.health_interval: "5s"
+      caddy_internal_10.handle_1.0_reverse_proxy.health_timeout: "3s"
+      caddy_internal_10.handle_1.0_reverse_proxy.health_status: "200"
+      caddy_internal_10.handle_1.1_reverse_proxy: "unbottled-app:3000 10.88.0.1:3000"
+      caddy_internal_10.handle_1.1_reverse_proxy.lb_policy: "first"
+      caddy_internal_10.handle_1.1_reverse_proxy.lb_try_duration: "20s"
+      caddy_internal_10.handle_1.1_reverse_proxy.lb_try_interval: "250ms"
+      caddy_internal_10.handle_1.1_reverse_proxy.fail_duration: "15s"
+      caddy_internal_10.handle_1.1_reverse_proxy.max_fails: "1"
+      caddy_internal_10.handle_1.1_reverse_proxy.health_uri: "/robots.txt"
+      caddy_internal_10.handle_1.1_reverse_proxy.health_interval: "5s"
+      caddy_internal_10.handle_1.1_reverse_proxy.health_timeout: "3s"
+      caddy_internal_10.handle_1.1_reverse_proxy.health_status: "200"
 
       caddy_internal_11: "https://www.unbottled.ai"
       caddy_internal_11.tls.issuer: "acme"

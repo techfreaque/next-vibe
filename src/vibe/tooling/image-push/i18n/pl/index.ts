@@ -57,6 +57,16 @@ export const translations: typeof enTranslations = {
         description:
           "Domyślnie włączone. Wyłączone = Server 1 leży albo jest odcięty po failoverze: obraz idzie z tej maszyny prosto na Server 2 (SSH_SERVER2) i aktualizowany jest tylko ten węzeł, z jego własnym .env i nadpisaniami z failoveru. Wolne (upload z domu, bez przekazu serwer-serwer).",
       },
+      drain: {
+        title: "Opróżnij przed restartem",
+        description:
+          "Domyślnie włączone (oba węzły HA). Każdy węzeł najpierw wychodzi z rotacji (Caddy kieruje nowe żądania do drugiego węzła, DNS go usuwa), kończy trwające strumienie AI i zadania, przekazuje klientów WebSocket i dopiero wtedy dostaje nowy obraz. Najpierw Server 1, potem Server 1 przejmuje ruch z powrotem, a Server 2 się opróżnia. Wyłączone = restart od razu, bez czekania (stare zachowanie).",
+      },
+      drainTimeout: {
+        title: "Limit opróżniania (sekundy)",
+        description:
+          "Najdłuższy czas, przez jaki węzeł czeka na trwającą pracę AI przed restartem. To, co nadal działa, dostaje drain przy wyłączaniu (STREAM_DRAIN_TIMEOUT_MS) i zostaje przerwane z zapisaną częściową treścią.",
+      },
       success: {
         title: "Sukces",
       },
@@ -161,6 +171,19 @@ export const translations: typeof enTranslations = {
           "Aktualizacja samego Servera 2 ({{secondary}}) nie powiodła się: {{error}}. Server 2 zachował lub przywrócił poprzedni obraz.",
         secondaryFailed:
           "Server 1 ({{target}}) działa NA ŻYWO z nowym obrazem, ale aktualizacja Servera 2 ({{secondary}}) nie powiodła się: {{error}}. Server 2 zachował lub przywrócił poprzedni obraz.",
+        drainStart:
+          "🚰 Opróżniam {{node}}: nowy ruch idzie do drugiego węzła, trwająca praca AI ma do {{timeout}}s",
+        drainSwap:
+          "🔀 {{from}} działa na nowym obrazie i przejmuje ruch z powrotem. Opróżniam {{to}} (do {{timeout}}s)",
+        drainUndrained: "{{node}} wrócił do rotacji na poprzednim obrazie",
+        drainLeftDrained:
+          "{{node}} zostaje OPRÓŻNIONY (poza rotacją, drugi węzeł obsługuje cały ruch): {{error}}. Napraw to, potem na obu maszynach: bash scripts/ha-node-drain.sh edge-off {{node}}",
+        drainPreflightFailed:
+          "Wstępna kontrola drainu na {{target}} odrzuciła wdrożenie, nic nie zmieniono: {{error}}",
+        drainScriptMissing:
+          "Brak scripts/ha-node-drain.sh w commicie {{sha}}: wdrożenie bez drainu",
+        drainStepFailed:
+          "ha-node-drain.sh {{step}} na {{target}} nie powiódł się: {{error}}",
         envSyncFailed:
           "Kopiowanie .env z Servera 1 na Server 2 nie powiodło się: {{error}}",
       },

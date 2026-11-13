@@ -153,7 +153,7 @@ Now "the primary" is the VIP, ready for auto-failover.
 - Kill Server 2 app → traffic stays on Server 1 (Caddy ejects srv2). Restart → rejoins.
 - Kill Server 1 app → Caddy serves from srv2; keepalived moves VIP; `notify-pg.sh`
   promotes srv2 PG; Redis HAProxy routes to the promoted replica. Confirm chat works.
-- Rolling deploy drill: `ha/scripts/rolling-deploy.sh` → both nodes update, no
+- Rolling deploy drill (superseded by `vibe image-push` drain deploys, ha/README.md): `ha/scripts/rolling-deploy.sh` → both nodes update, no
   stream kills (watch a live stream survive the other node's roll).
 
 ## Rollback (whole cutover)

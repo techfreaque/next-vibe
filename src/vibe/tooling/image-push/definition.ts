@@ -117,6 +117,22 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(true),
       }),
 
+      drain: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.drain.title",
+        description: "post.fields.drain.description",
+        schema: z.boolean().default(true),
+      }),
+
+      drainTimeout: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.fields.drainTimeout.title",
+        description: "post.fields.drainTimeout.description",
+        schema: z.coerce.number().int().min(30).max(3600).default(900),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -210,6 +226,9 @@ const { POST } = createEndpoint({
       viaSsh: {
         sshTarget: "root@203.0.113.5",
       },
+      noDrain: {
+        drain: false,
+      },
       specificCommit: {
         commit: "a1b2c3d",
         push: false,
@@ -239,6 +258,14 @@ const { POST } = createEndpoint({
         resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
         tags: ["a1b2c3d", "latest"],
         duration: 150000,
+      },
+      noDrain: {
+        success: true,
+        output:
+          "🚀 Rolled ghcr.io/techfreaque/next-vibe-app:a1b2c3d to root@203.0.113.5 and Server 2 (root@203.0.113.6)",
+        resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
+        tags: ["a1b2c3d", "latest"],
+        duration: 900000,
       },
       specificCommit: {
         success: true,

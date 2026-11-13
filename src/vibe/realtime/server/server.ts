@@ -63,6 +63,13 @@ const channels = new Map<string, Set<ServerWebSocket<WsConnectionData>>>();
  */
 const connectorSockets = new Map<string, ServerWebSocket<WsConnectionData>>();
 
+/**
+ * Every open /ws socket (browser clients and connectors, with or without
+ * channels). The deploy drain counts and closes these; the channel map alone
+ * misses sockets that have not subscribed yet.
+ */
+const wsClients = new Set<ServerWebSocket<WsConnectionData>>();
+
 function closeConnectorSocket(instanceId: string): void {
   const ws = connectorSockets.get(instanceId);
   if (!ws) {
@@ -99,6 +106,21 @@ let shuttingDown = false;
 /** RFC 6455 1012 "Service Restart": sent to every client on a clean stop. */
 const WS_SERVER_RESTART_CODE = 1012;
 const WS_SERVER_RESTART_REASON = "server-restart";
+/** Reason sent with 1012 when a deploy drains this node (the server stays up). */
+const WS_SERVER_DRAIN_REASON = "server-draining";
+
+/** Close every open /ws socket with 1012 + `reason`; returns how many. */
+function closeAllWsClients(reason: string): number {
+  const sockets = [...wsClients];
+  for (const ws of sockets) {
+    try {
+      ws.close(WS_SERVER_RESTART_CODE, reason);
+    } catch {
+      /* already closing */
+    }
+  }
+  return sockets.length;
+}
 
 /**
  * Broadcast to all subscribers on a channel (no user filter).
@@ -280,6 +302,14 @@ interface WebSocketServerOptions {
 export interface WebSocketServerHandle {
   /** Stop the Bun server */
   stop: () => void;
+  /** Open /ws sockets and how many of them are remote-instance connectors. */
+  clientCount: () => { clients: number; connectors: number };
+  /**
+   * Close every /ws socket with 1012 "Service Restart" while the server keeps
+   * running (deploy drain): browsers and connectors reconnect, which lands
+   * them on the peer node once this one is out of rotation. Returns the count.
+   */
+  closeClients: () => number;
   /** Internal Next.js port (main port + NEXT_PORT_OFFSET) */
   nextPort: number;
 }
@@ -519,6 +549,7 @@ export function startWebSocketServer(
           return;
         }
         // Normal /ws connection - register initial channels from query param
+        wsClients.add(ws as ServerWebSocket<WsConnectionData>);
         const initialChannels = [...ws.data.channels];
         // Clear first since subscribeToChannel() re-adds them
         ws.data.channels.clear();
@@ -599,6 +630,7 @@ export function startWebSocketServer(
           ws.data.proxyWs.close();
           return;
         }
+        wsClients.delete(ws as ServerWebSocket<WsConnectionData>);
         if (ws.data.connectorInstanceId) {
           connectorSockets.delete(ws.data.connectorInstanceId);
         }
@@ -626,17 +658,14 @@ export function startWebSocketServer(
       // Close every client socket with 1012 "Service Restart" + a reason
       // first, so the browser's "[WS Client] Connection lost" row says the
       // server restarted (deploy/restart) instead of an anonymous 1006.
-      for (const subscribers of channels.values()) {
-        for (const ws of subscribers) {
-          try {
-            ws.close(WS_SERVER_RESTART_CODE, WS_SERVER_RESTART_REASON);
-          } catch {
-            /* already closing */
-          }
-        }
-      }
+      closeAllWsClients(WS_SERVER_RESTART_REASON);
       server.stop(true);
     },
+    clientCount: () => ({
+      clients: wsClients.size,
+      connectors: connectorSockets.size,
+    }),
+    closeClients: () => closeAllWsClients(WS_SERVER_DRAIN_REASON),
     nextPort,
   };
 }

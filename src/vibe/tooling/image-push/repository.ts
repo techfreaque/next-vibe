@@ -21,7 +21,10 @@ import { join } from "node:path";
 import type { Readable } from "node:stream";
 import { createGzip } from "node:zlib";
 
-import type { ResponseType } from "../../core/route/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -35,6 +38,26 @@ import type {
 } from "./definition";
 import { imagePushEnv } from "./env";
 import type { ImagePushT } from "./i18n";
+
+/** Node-local drain helper, shipped from the commit to both HA boxes. */
+const DRAIN_SCRIPT = "scripts/ha-node-drain.sh";
+
+/** One HA box as the drain orchestration reaches it. */
+interface DrainBox {
+  node: "s1" | "s2";
+  target: string;
+  password: string | undefined;
+  /** Where the deploy scripts live (`<projectDir>/scripts/...`). */
+  projectDir: string;
+}
+
+/** A drain-based rolling deploy across both boxes. */
+interface DrainPlan {
+  /** Max seconds a node waits for its in-flight work before the recreate. */
+  timeout: number;
+  s1: DrainBox;
+  s2: DrainBox;
+}
 
 export class ImagePushRepository {
   static async execute(
@@ -188,6 +211,27 @@ export class ImagePushRepository {
             )
         : undefined;
 
+      // Drain-based rolling deploy (both HA nodes): each node leaves rotation,
+      // finishes its in-flight AI work, is recreated, and only then serves
+      // again. See scripts/ha-node-drain.sh and ha/README.md "Deploys".
+      const drain =
+        data.drain && secondaryTarget
+          ? await ImagePushRepository.prepareDrain(
+              transferTarget,
+              secondaryTarget,
+              secondaryTransfer,
+              contextDir,
+              shortSha,
+              data.drainTimeout,
+              logger,
+              t,
+            )
+          : success(undefined);
+      if (!drain.success) {
+        return drain;
+      }
+      const drainPlan = drain.data;
+
       const deployResult = await ImagePushRepository.runDeployScript(
         transferTarget,
         contextDir,
@@ -197,11 +241,21 @@ export class ImagePushRepository {
         {
           script: imagePushEnv.SSH_DEPLOY_SCRIPT,
           password: imagePushEnv.SSH_SERVER_PWD,
-          envPrefix: "NO_GIT_RESET=1",
+          envPrefix: drainPlan
+            ? `NO_GIT_RESET=1 HA_DRAIN_WAIT=1 HA_DRAIN_TIMEOUT=${String(drainPlan.timeout)}`
+            : "NO_GIT_RESET=1",
         },
       );
       if (!deployResult.success) {
-        return deployResult;
+        return drainPlan
+          ? await ImagePushRepository.afterFailedNodeDeploy(
+              drainPlan,
+              drainPlan.s1,
+              deployResult,
+              logger,
+              t,
+            )
+          : deployResult;
       }
       // Server 1 now runs this commit: record it before the secondary roll so
       // a failing Server 2 never leaves the marker pointing at the old sha.
@@ -219,6 +273,7 @@ export class ImagePushRepository {
           shortSha,
           logger,
           t,
+          drainPlan,
         );
         if (!secondaryResult.success) {
           return secondaryResult;
@@ -618,6 +673,7 @@ export class ImagePushRepository {
     shortSha: string,
     logger: EndpointLogger,
     t: ImagePushT,
+    drainPlan?: DrainPlan,
   ): Promise<ResponseType<void>> {
     const secondaryFailed = (cause: ResponseType<void>): ResponseType<void> =>
       fail({
@@ -668,6 +724,15 @@ export class ImagePushRepository {
       }
     }
 
+    // Server 1 (new image) takes all traffic back while Server 2 (old image)
+    // leaves rotation, in one step: the boxes never serve mixed builds.
+    if (drainPlan) {
+      const swap = await ImagePushRepository.drainSwap(drainPlan, logger, t);
+      if (!swap.success) {
+        return swap;
+      }
+    }
+
     const deployResult = await ImagePushRepository.runDeployScript(
       secondaryTarget,
       contextDir,
@@ -677,10 +742,258 @@ export class ImagePushRepository {
       {
         script,
         password: imagePushEnv.SSH_SERVER2_PWD,
-        envPrefix: `NO_GIT_RESET=1 HA_IMAGE_TAG=${ImagePushRepository.shellQuote(imagePushEnv.SSH_SERVER2_IMAGE_TAG)} HA_NEW_IMAGE_REF=${ImagePushRepository.shellQuote(shaRef)}`,
+        envPrefix: `NO_GIT_RESET=1 HA_IMAGE_TAG=${ImagePushRepository.shellQuote(imagePushEnv.SSH_SERVER2_IMAGE_TAG)} HA_NEW_IMAGE_REF=${ImagePushRepository.shellQuote(shaRef)}${drainPlan ? ` HA_DRAIN_WAIT=1 HA_DRAIN_TIMEOUT=${String(drainPlan.timeout)}` : ""}`,
       },
     );
-    return deployResult.success ? deployResult : secondaryFailed(deployResult);
+    if (!drainPlan) {
+      return deployResult.success
+        ? deployResult
+        : secondaryFailed(deployResult);
+    }
+    if (!deployResult.success) {
+      // A rolled-back Server 2 runs the OLD build: keep it out of rotation
+      // (Server 1 serves everything) instead of mixing builds.
+      return secondaryFailed(
+        ImagePushRepository.leftDrained(drainPlan.s2, deployResult, t),
+      );
+    }
+    return await ImagePushRepository.undrainNode(drainPlan, drainPlan.s2, t);
+  }
+
+  // ==========================================================================
+  // Drain-based rolling deploy
+  // ==========================================================================
+
+  /**
+   * Checks the pair, ships scripts/ha-node-drain.sh to both boxes and takes
+   * Server 1 out of rotation. Returns undefined (deploy without drain) when
+   * the commit predates the drain script or the boxes lack their deploy
+   * scripts; fails (nothing changed) when a box refuses the pre-check.
+   */
+  private static async prepareDrain(
+    primaryTarget: string,
+    secondaryTarget: string,
+    secondaryTransfer: ResponseType<void> | undefined,
+    contextDir: string,
+    shortSha: string,
+    timeout: number,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<DrainPlan | undefined>> {
+    const primaryScript = imagePushEnv.SSH_DEPLOY_SCRIPT;
+    const secondaryScript = imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT;
+    if (!primaryScript || !secondaryScript) {
+      return success(undefined);
+    }
+    if (!existsSync(join(contextDir, DRAIN_SCRIPT))) {
+      logger.warn(
+        t("post.repository.messages.drainScriptMissing", { sha: shortSha }),
+      );
+      return success(undefined);
+    }
+    // Draining Server 1 only to find Server 2 cannot take the new image
+    // would leave a half-rolled pair: stop before touching anything.
+    if (secondaryTransfer && !secondaryTransfer.success) {
+      return secondaryTransfer;
+    }
+    const plan: DrainPlan = {
+      timeout,
+      s1: {
+        node: "s1",
+        target: primaryTarget,
+        password: imagePushEnv.SSH_SERVER_PWD,
+        projectDir: ImagePushRepository.projectDirOf(primaryScript),
+      },
+      s2: {
+        node: "s2",
+        target: secondaryTarget,
+        password: imagePushEnv.SSH_SERVER2_PWD,
+        projectDir: ImagePushRepository.projectDirOf(secondaryScript),
+      },
+    };
+    for (const box of [plan.s1, plan.s2]) {
+      const synced = await ImagePushRepository.syncHaFiles(
+        box.target,
+        box.projectDir,
+        contextDir,
+        [{ from: DRAIN_SCRIPT, to: DRAIN_SCRIPT }],
+        box.password,
+        t,
+      );
+      if (!synced.success) {
+        return synced;
+      }
+    }
+    for (const box of [plan.s1, plan.s2]) {
+      const pre = await ImagePushRepository.drainStep(box, "preflight s1", t);
+      if (!pre.success) {
+        return fail({
+          message: t("post.repository.messages.drainPreflightFailed", {
+            target: box.target,
+            error: pre.message,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          cause: pre,
+        });
+      }
+    }
+    logger.info(
+      t("post.repository.messages.drainStart", {
+        node: "Server 1",
+        timeout: plan.timeout,
+      }),
+    );
+    for (const box of [plan.s2, plan.s1]) {
+      const on = await ImagePushRepository.drainStep(box, "edge-on s1", t);
+      if (!on.success) {
+        // Best-effort revert on both boxes, then stop.
+        for (const undo of [plan.s1, plan.s2]) {
+          await ImagePushRepository.drainStep(undo, "edge-off s1", t);
+        }
+        return on;
+      }
+    }
+    return success(plan);
+  }
+
+  /** Server 1 rolled: it takes the traffic back, Server 2 leaves rotation. */
+  private static async drainSwap(
+    plan: DrainPlan,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    logger.info(
+      t("post.repository.messages.drainSwap", {
+        from: "Server 1",
+        to: "Server 2",
+        timeout: plan.timeout,
+      }),
+    );
+    // Server 1's box first: it refuses (changing nothing) when its new app
+    // fails the DB-backed probe, which leaves Server 2 serving everything.
+    const fromSide = await ImagePushRepository.drainStep(
+      plan.s1,
+      "swap s1 s2",
+      t,
+    );
+    if (!fromSide.success) {
+      return ImagePushRepository.leftDrained(plan.s1, fromSide, t);
+    }
+    const toSide = await ImagePushRepository.drainStep(
+      plan.s2,
+      "swap s1 s2",
+      t,
+    );
+    if (!toSide.success) {
+      // Server 2 could not drain itself: undo the DNS half of the swap on both
+      // boxes (both nodes in rotation, mixed builds) and stop loudly.
+      await ImagePushRepository.drainStep(plan.s1, "edge-off s2", t);
+      await ImagePushRepository.drainStep(plan.s2, "edge-off s1", t);
+      return toSide;
+    }
+    return success(undefined);
+  }
+
+  /**
+   * A node's deploy script failed. If its app answers the DB-backed probe
+   * (the script rolled back to the previous image, the same build the peer
+   * runs) it rejoins; otherwise it stays out of rotation.
+   */
+  private static async afterFailedNodeDeploy(
+    plan: DrainPlan,
+    box: DrainBox,
+    cause: ErrorResponseType,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ErrorResponseType> {
+    const healthy = await ImagePushRepository.drainStep(box, "local-probe", t);
+    if (!healthy.success) {
+      return ImagePushRepository.leftDrained(box, cause, t);
+    }
+    const back = await ImagePushRepository.undrainNode(plan, box, t);
+    if (back.success) {
+      logger.warn(
+        t("post.repository.messages.drainUndrained", { node: box.node }),
+      );
+    }
+    return cause;
+  }
+
+  /** Put `box` back into rotation on both boxes (local probe first). */
+  private static async undrainNode(
+    plan: DrainPlan,
+    box: DrainBox,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const healthy = await ImagePushRepository.drainStep(box, "local-probe", t);
+    if (!healthy.success) {
+      return ImagePushRepository.leftDrained(box, healthy, t);
+    }
+    // The node's own box first: it warms the app up before Caddy routes to it.
+    const order = box.node === "s1" ? [plan.s1, plan.s2] : [plan.s2, plan.s1];
+    for (const each of order) {
+      const off = await ImagePushRepository.drainStep(
+        each,
+        `edge-off ${box.node} --wait`,
+        t,
+      );
+      if (!off.success) {
+        return off;
+      }
+    }
+    return success(undefined);
+  }
+
+  private static leftDrained(
+    box: DrainBox,
+    cause: ErrorResponseType,
+    t: ImagePushT,
+  ): ErrorResponseType {
+    return fail({
+      message: t("post.repository.messages.drainLeftDrained", {
+        node: box.node,
+        error: cause.message,
+      }),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      cause,
+    });
+  }
+
+  /** Run one scripts/ha-node-drain.sh verb on a box. */
+  private static async drainStep(
+    box: DrainBox,
+    args: string,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
+    const result = await ImagePushRepository.runRemote(
+      box.target,
+      `cd ${ImagePushRepository.shellQuote(box.projectDir)} && bash ${DRAIN_SCRIPT} ${args} < /dev/null`,
+      undefined,
+      box.password,
+    );
+    if (result.error !== undefined || result.exitCode !== 0) {
+      return fail({
+        message: t("post.repository.messages.drainStepFailed", {
+          step: args,
+          target: box.target,
+          error:
+            result.error ??
+            t("post.repository.messages.scriptRemoteExit", {
+              code: result.exitCode,
+            }),
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+    return success(undefined);
+  }
+
+  /** `/root/unbottled/scripts/deploy.sh` -> `/root/unbottled`. */
+  private static projectDirOf(script: string): string {
+    const scriptDir = script.split("/").slice(0, -1).join("/") || "/";
+    return scriptDir.endsWith("/scripts")
+      ? scriptDir.slice(0, -"/scripts".length)
+      : scriptDir;
   }
 
   /**
@@ -755,18 +1068,37 @@ export class ImagePushRepository {
     contextDir: string,
     t: ImagePushT,
   ): Promise<ResponseType<void>> {
+    return await ImagePushRepository.syncHaFiles(
+      secondaryTarget,
+      ImagePushRepository.projectDirOf(secondaryScript),
+      contextDir,
+      [
+        { from: "ha/scripts/merge-env.py", to: "ha/scripts/merge-env.py" },
+        {
+          from: "ha/edge-lb/docker-compose.s2-ha.yml",
+          to: "docker-compose.s2-ha.yml",
+        },
+        { from: DRAIN_SCRIPT, to: DRAIN_SCRIPT },
+      ],
+      imagePushEnv.SSH_SERVER2_PWD,
+      t,
+    );
+  }
+
+  /**
+   * Copies files from the exported commit tree into `projectDir` on a box,
+   * atomically per file (`.incoming` + mv). Files missing from an older
+   * commit are skipped and the box keeps its current copy.
+   */
+  private static async syncHaFiles(
+    target: string,
+    projectDir: string,
+    contextDir: string,
+    files: { from: string; to: string }[],
+    password: string | undefined,
+    t: ImagePushT,
+  ): Promise<ResponseType<void>> {
     const q = ImagePushRepository.shellQuote;
-    const scriptDir = secondaryScript.split("/").slice(0, -1).join("/") || "/";
-    const projectDir = scriptDir.endsWith("/scripts")
-      ? scriptDir.slice(0, -"/scripts".length)
-      : scriptDir;
-    const files: { from: string; to: string }[] = [
-      { from: "ha/scripts/merge-env.py", to: "ha/scripts/merge-env.py" },
-      {
-        from: "ha/edge-lb/docker-compose.s2-ha.yml",
-        to: "docker-compose.s2-ha.yml",
-      },
-    ];
     for (const file of files) {
       const localPath = join(contextDir, file.from);
       if (!existsSync(localPath)) {
@@ -775,16 +1107,16 @@ export class ImagePushRepository {
       const dest = `${projectDir}/${file.to}`;
       const destDir = dest.split("/").slice(0, -1).join("/") || "/";
       const result = await ImagePushRepository.runRemote(
-        secondaryTarget,
+        target,
         `mkdir -p ${q(destDir)} && cat > ${q(`${dest}.incoming`)} && mv ${q(`${dest}.incoming`)} ${q(dest)}`,
         createReadStream(localPath),
-        imagePushEnv.SSH_SERVER2_PWD,
+        password,
       );
       if (result.error !== undefined || result.exitCode !== 0) {
         return fail({
           message: t("post.repository.messages.scriptSyncFailed", {
             script: file.from,
-            target: secondaryTarget,
+            target,
             error:
               result.error ??
               t("post.repository.messages.scriptRemoteExit", {

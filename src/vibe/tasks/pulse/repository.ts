@@ -55,6 +55,7 @@ import {
   isInsufficientCreditsFailure,
   type RetryDecision,
 } from "../watchdog/policy";
+import { isDrainRequested } from "../../platforms/web/drain";
 import { RunningTaskRegistry } from "../watchdog/registry";
 import { TaskIncidentType } from "../watchdog/enum";
 import { resolveTaskDisplayName } from "./i18n-utils";
@@ -207,6 +208,10 @@ export class PulseHealthRepository {
       const tasksSucceeded: string[] = [];
       const tasksFailed: string[] = [];
       const tasksSkipped: string[] = [];
+      const drainRequested = !options.force && isDrainRequested();
+      if (drainRequested) {
+        logger.info("Pulse: node is draining, not claiming new tasks");
+      }
 
       // Resolve admin user for system tasks (cached for entire pulse cycle)
       const adminEmail = identityEnv.VIBE_ADMIN_USER_EMAIL;
@@ -302,6 +307,13 @@ export class PulseHealthRepository {
               dbTask.runOnce ? dbTask.createdAt : null,
             );
           if (!isDue) {
+            tasksSkipped.push(dbTask.displayName);
+            continue;
+          }
+
+          // Deploy drain / shutdown: claim nothing new. The task stays due
+          // (lastExecutedAt unchanged), so the next node up runs it.
+          if (drainRequested) {
             tasksSkipped.push(dbTask.displayName);
             continue;
           }

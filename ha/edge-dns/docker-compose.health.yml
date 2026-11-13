@@ -31,7 +31,7 @@ services:
       # DB-backed probe: the credits API for a fixed probe lead reads Postgres,
       # so a node whose app lost its DB drops out of DNS (see the daemon).
       HEALTH_PATH: "${EDGE_HEALTH_PATH:-/api/en-US/credits}"
-      HEALTH_EXPECT: "${EDGE_HEALTH_EXPECT:-\"success\":true}"
+      HEALTH_EXPECT: '${EDGE_HEALTH_EXPECT:-"success":true}'
       PROBE_COOKIE_FILE: "/probe-cookie"
       ZONE_FILE: "/etc/powerdns/zones/unbottled.ai.zone"
       ZONE_TMPL: "/zone.tmpl"

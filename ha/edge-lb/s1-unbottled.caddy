@@ -1,0 +1,137 @@
+# ===================== unbottled.ai HA (S1) =====================
+# Canonical copy of the unbottled section of Server 1's /caddy/Caddyfile
+# (caddy:2 container `caddy-caddy-1`, /caddy/data mounted at /data). The rest
+# of that file (a42.ch sites) is not unbottled's. Apply: paste over the
+# section, then
+#   docker exec caddy-caddy-1 caddy validate --config /etc/caddy/Caddyfile
+#   docker exec caddy-caddy-1 caddy reload --config /etc/caddy/Caddyfile
+# Server 2 carries the mirror image as labels (docker-compose.s2-edge.yml).
+#
+# Upstreams: local prod app first, Server 2's unbottled-app over WireGuard as
+# hot fallback (lb_policy first). A local app recreate or crash moves traffic
+# to S2 instead of returning 502.
+#
+# Deploy drain (scripts/ha-node-drain.sh edge-on s1 / swap): while the file
+# /caddy/data/ha-drain/s1 exists (/data/ha-drain/s1 in the container) every
+# NEW request and WebSocket upgrade prefers S2 (local stays the fallback).
+# Requests and sockets already open keep running on the local app, so an AI
+# stream in flight finishes here. The file matcher is evaluated per request:
+# no reload, no dropped connections.
+#
+# stream_close_delay keeps upgraded WebSockets open across a config reload
+# (Caddy would otherwise close them all on every reload).
+(unbottled_app_upstreams) {
+	lb_policy first
+	lb_try_duration 20s
+	lb_try_interval 250ms
+	fail_duration 15s
+	max_fails 1
+	health_uri /robots.txt
+	health_interval 5s
+	health_timeout 3s
+	health_status 200
+}
+# WS: S1 app is split-port (WS sidecar :4000), S2 app is single-port (:3100).
+# Passive health only (the WS port does not serve /robots.txt).
+(unbottled_ws_upstreams) {
+	lb_policy first
+	lb_try_duration 20s
+	lb_try_interval 250ms
+	fail_duration 15s
+	max_fails 1
+	stream_close_delay 10m
+}
+# ACME HTTP-01 across the two-box edge: Let's Encrypt may reach EITHER box for
+# a name both boxes serve. Caddy answers its own tokens before any route runs;
+# a token it does not know is forwarded once to the peer (loop-guarded by the
+# X-HA-Acme-Fwd header). Everything else on :80 redirects to https.
+(unbottled_http_edge) {
+	@acme_to_peer {
+		path /.well-known/acme-challenge/*
+		not header X-HA-Acme-Fwd *
+	}
+	handle @acme_to_peer {
+		reverse_proxy 10.88.0.2:80 {
+			header_up Host {host}
+			header_up X-HA-Acme-Fwd 1
+		}
+	}
+	handle /.well-known/acme-challenge/* {
+		respond 404
+	}
+	handle {
+		redir https://{host}{uri} 308
+	}
+}
+
+http://unbottled.ai, http://www.unbottled.ai {
+	import unbottled_http_edge
+}
+
+unbottled.ai {
+	tls {
+		issuer acme {
+			disable_tlsalpn_challenge
+		}
+	}
+	@ha_drained file {
+		root /data/ha-drain
+		try_files /s1
+	}
+	handle /ws* {
+		reverse_proxy @ha_drained 10.88.0.2:3100 next-vibe-app:4000 {
+			import unbottled_ws_upstreams
+		}
+		reverse_proxy next-vibe-app:4000 10.88.0.2:3100 {
+			import unbottled_ws_upstreams
+		}
+	}
+	handle {
+		reverse_proxy @ha_drained 10.88.0.2:3100 next-vibe-app:3000 {
+			import unbottled_app_upstreams
+		}
+		reverse_proxy next-vibe-app:3000 10.88.0.2:3100 {
+			import unbottled_app_upstreams
+		}
+	}
+}
+
+www.unbottled.ai {
+	tls {
+		issuer acme {
+			disable_tlsalpn_challenge
+		}
+	}
+	@all path /*
+	redir @all https://unbottled.ai{uri} 308
+}
+
+www.bucksflux.com {
+	@all path /*
+	redir @all https://bucksflux.com{uri} 308
+}
+
+bucksflux.com {
+	@keep path_regexp ^(/[^/]+/track|/[^/]+/story/newsletter/unsubscribe|/api/|/_next/)
+	@keep_drained {
+		path_regexp ^(/[^/]+/track|/[^/]+/story/newsletter/unsubscribe|/api/|/_next/)
+		file {
+			root /data/ha-drain
+			try_files /s1
+		}
+	}
+
+	handle @keep_drained {
+		reverse_proxy 10.88.0.2:3100 next-vibe-app:3000 {
+			import unbottled_app_upstreams
+		}
+	}
+	handle @keep {
+		reverse_proxy next-vibe-app:3000 10.88.0.2:3100 {
+			import unbottled_app_upstreams
+		}
+	}
+	handle {
+		redir https://unbottled.ai{uri} 302
+	}
+}

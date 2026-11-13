@@ -95,6 +95,7 @@ import { GapFillExecutor } from "./handlers/gap-fill-executor";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
 import { runAutoQueueBranch } from "./intake/queue";
+import { trackActiveRun } from "./loop/active-loops";
 import { StreamLoop } from "./loop/loop";
 import { runRelayBranch } from "./relay/caller";
 import {
@@ -2020,11 +2021,17 @@ export class AiStreamRepository {
       if (awaitResult) {
         // Headless path: await the full loop AND finalization — the caller
         // (relay receiver, cron, ai-run) treats the return as "thread settled".
-        try {
-          await runStream();
-        } finally {
-          await finalizeStream();
-        }
+        // Tracked for the deploy drain (loop/active-loops.ts): a cron or relay
+        // run is a run in flight until it has finalized, same as interactive.
+        const headlessRun = (async (): Promise<void> => {
+          try {
+            await runStream();
+          } finally {
+            await finalizeStream();
+          }
+        })();
+        trackActiveRun(headlessRun);
+        await headlessRun;
 
         logger.debug("[AI Stream] Headless execution complete", {
           threadId: threadResultThreadId,
@@ -2048,7 +2055,9 @@ export class AiStreamRepository {
       // Interactive path: fire-and-forget - stream runs independently of HTTP
       // connection. Events flow via WebSocket; the POST returns immediately
       // with threadId. The finally guarantees finalization even on crashes.
-      void runStream()
+      // The whole chain (loop + finalization) is tracked so a deploy drain
+      // waits for the turn to settle, not just for the loop to end.
+      const interactiveRun = runStream()
         .catch((error) => {
           const msg = error instanceof Error ? error.message : String(error);
           logger.error("[AI Stream] Background stream failed", {
@@ -2056,8 +2065,8 @@ export class AiStreamRepository {
             threadId: threadResultThreadId,
           });
         })
-        .finally(() => {
-          void finalizeStream().catch(async (err) => {
+        .finally(() =>
+          finalizeStream().catch(async (err) => {
             logger.error("[AI Stream] Stream finalization failed", {
               error: err instanceof Error ? err.message : String(err),
               threadId: threadResultThreadId,
@@ -2072,8 +2081,9 @@ export class AiStreamRepository {
               logger,
               user,
             });
-          });
-        });
+          }),
+        );
+      trackActiveRun(interactiveRun);
 
       logger.debug("[AI Stream] Interactive stream started (fire-and-forget)", {
         threadId: threadResultThreadId,
