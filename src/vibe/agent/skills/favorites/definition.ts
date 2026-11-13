@@ -26,14 +26,10 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { ChatModelId, chatModelSelectionSchema } from "../../ai-stream/models";
+import { ChatModelId } from "../../ai-stream/models";
 import { parseSkillId } from "../../chat/slugify";
-import { getClientAvailability } from "../../env-availability-store";
 import { DEFAULT_TTS_VOICE_ID } from "../../text-to-speech/constants";
-import {
-  TtsModelId,
-  voiceModelSelectionSchema,
-} from "../../text-to-speech/models";
+import { TtsModelId } from "../../text-to-speech/models";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
@@ -43,23 +39,46 @@ const FavoritesListContainer = lazyWidget(() =>
 );
 
 /**
+ * One favorite card exactly as the list returns it. Single source for the
+ * list's per-item response field schemas AND the `favorite-created` event
+ * payload, so a created card can never arrive thinner than a listed one.
+ */
+const favoriteCardSchema = z.object({
+  id: z.string(),
+  skillId: z.string(),
+  customVariantName: z.string().nullable(),
+  modelId: z.enum(ChatModelId).nullable(),
+  voiceId: z.enum(TtsModelId).nullable(),
+  position: z.number().int(),
+  icon: iconSchema,
+  name: z.string(),
+  tagline: z.string().nullable(),
+  activeBadge: z
+    .string()
+    .nullable() as z.ZodType<FavoritesTranslationKey | null>,
+  description: z.string().nullable(),
+  modelIcon: iconSchema,
+  modelInfo: z.string(),
+  modelProvider: z.string(),
+});
+
+/**
+ * `favorite-created` event envelope: the server-resolved cards (skill name,
+ * tagline, icon, variant model) for every row the create produced — the new
+ * favorite plus any companion variants the variants-mode reconcile back-added.
+ * Hoisted so onEvent can parse the wire payload explicitly — the
+ * self-referential events-map inference does not reach a payloadType consumed
+ * in the SAME definition's onEvent.
+ */
+const favoriteCreatedPayloadSchema = z.object({
+  skillId: z.string(),
+  favorites: z.array(favoriteCardSchema),
+});
+
+/**
  * Get Favorites List Endpoint (GET)
  * Retrieves all favorites for the current user
  */
-/**
- * `favorite-created` event envelope. Hoisted so onEvent can parse the wire
- * payload explicitly — the self-referential events-map inference does not
- * reach a payloadType consumed in the SAME definition's onEvent.
- */
-const favoriteCreatedPayloadSchema = z.object({
-  id: z.string().optional(),
-  skillId: z.string().optional(),
-  customVariantName: z.string().nullable().optional(),
-  icon: iconSchema.optional(),
-  voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
-  modelSelection: chatModelSelectionSchema.nullable().optional(),
-});
-
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -181,78 +200,76 @@ const { GET } = createEndpoint({
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string(),
+              schema: favoriteCardSchema.shape.id,
             }),
             skillId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string(),
+              schema: favoriteCardSchema.shape.skillId,
             }),
             customVariantName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.string().nullable(),
+              schema: favoriteCardSchema.shape.customVariantName,
             }),
             modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.enum(ChatModelId).nullable(),
+              schema: favoriteCardSchema.shape.modelId,
             }),
             voiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.enum(TtsModelId).nullable(),
+              schema: favoriteCardSchema.shape.voiceId,
             }),
             position: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
-              schema: z.number().int(),
+              schema: favoriteCardSchema.shape.position,
             }),
             icon: responseField(scopedTranslation, {
               type: WidgetType.ICON,
               containerSize: "lg",
               iconSize: "lg",
               borderRadius: "lg",
-              schema: iconSchema,
+              schema: favoriteCardSchema.shape.icon,
             }),
             // Flattened fields (no nested content/titleRow/modelRow objects)
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "base",
               emphasis: "bold",
-              schema: z.string(),
+              schema: favoriteCardSchema.shape.name,
             }),
             tagline: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
-              schema: z.string().nullable(),
+              schema: favoriteCardSchema.shape.tagline,
             }),
             activeBadge: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "default",
               size: "xs",
-              schema: z
-                .string()
-                .nullable() as z.ZodType<FavoritesTranslationKey | null>,
+              schema: favoriteCardSchema.shape.activeBadge,
             }),
             description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
-              schema: z.string().nullable(),
+              schema: favoriteCardSchema.shape.description,
             }),
             modelIcon: responseField(scopedTranslation, {
               type: WidgetType.ICON,
               iconSize: "xs",
               noHover: true,
-              schema: iconSchema,
+              schema: favoriteCardSchema.shape.modelIcon,
             }),
             modelInfo: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
-              schema: z.string(),
+              schema: favoriteCardSchema.shape.modelInfo,
             }),
             separator1: widgetField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -267,7 +284,7 @@ const { GET } = createEndpoint({
               size: "xs",
               variant: "muted",
               className: "hidden sm:inline",
-              schema: z.string(),
+              schema: favoriteCardSchema.shape.modelProvider,
             }),
             separator2: widgetField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -329,79 +346,32 @@ const { GET } = createEndpoint({
   },
 
   // The list owns the `favorite-created` event so the favorites page's active
-  // subscription (on this GET endpoint) catches cross-instance sync events.
-  // The POST (create) endpoint is the relay origin (remoteEvent: true, syncDomain);
-  // this GET is the local-delivery receiver — no remoteEvent flag here.
+  // subscription (on this GET endpoint) catches local and cross-instance
+  // creates. The POST (create) endpoint is the relay origin (remoteEvent: true,
+  // syncDomain); this GET is the local-delivery receiver — no remoteEvent flag.
+  // Creation event => upsert: the payload carries the COMPLETE server-resolved
+  // cards, which replace any thinner optimistic card with the same id.
   channel: { scope: "user" } as const,
   events: {
     "favorite-created": {
-      operation: "merge" as const,
+      operation: "upsert" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       payloadType: favoriteCreatedPayloadSchema,
-      onEvent: async ({ payload: rawPayload, logger, locale, user }) => {
+      onEvent: async ({ payload: rawPayload, logger }) => {
         // Explicit envelope parse (see favoriteCreatedPayloadSchema above).
         const payload = favoriteCreatedPayloadSchema.parse(rawPayload);
-        const [
-          { apiClient },
-          favoritesDefinition,
-          charactersDefinition,
-          skillSingleDefinition,
-          { ChatFavoritesRepositoryClient },
-        ] = await Promise.all([
-          import("next-vibe/unified-ui/hooks/store"),
-          import("./definition"),
-          import("../definition"),
-          import("../[id]/definition"),
-          import("./repository-client"),
-        ]);
+        const [{ apiClient }, favoritesDefinition, charactersDefinition] =
+          await Promise.all([
+            import("next-vibe/unified-ui/hooks/store"),
+            import("./definition"),
+            import("../definition"),
+          ]);
 
-        const { skillId: baseSkillId, variantId } = parseSkillId(
-          payload.skillId ?? "default",
-        );
+        const baseSkillId = parseSkillId(payload.skillId).skillId;
 
-        const character = apiClient.getEndpointData(
-          skillSingleDefinition.default.GET,
-          logger,
-          { urlPathParams: { id: baseSkillId } },
-        );
-        let characterName: string | null = null;
-        let characterTagline: string | null = null;
-        let characterDescription: string | null = null;
-        let characterModelSelection = payload.modelSelection ?? null;
-        if (character?.success) {
-          characterName = character.data.name ?? null;
-          characterTagline = character.data.tagline ?? null;
-          characterDescription = character.data.description ?? null;
-          const variant = variantId
-            ? character.data.variants?.find((v) => v.id === variantId)
-            : character.data.variants?.[0];
-          characterModelSelection =
-            payload.modelSelection ?? variant?.modelSelection ?? null;
-        }
-
-        const card = ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-          {
-            id: payload.id ?? "",
-            skillId: payload.skillId ?? "default",
-            customVariantName: payload.customVariantName ?? null,
-            customIcon: null,
-            voiceModelSelection: payload.voiceModelSelection ?? null,
-            modelSelection: payload.modelSelection ?? null,
-            position: 0,
-          },
-          characterModelSelection,
-          payload.icon ?? null,
-          characterName,
-          characterTagline,
-          characterDescription,
-          null,
-          payload.voiceModelSelection ?? null,
-          locale,
-          user,
-          getClientAvailability(),
-        );
-
-        // View 1 — favorites list: append if not already present.
+        // View 1 — favorites list: upsert the server cards by id. A card already
+        // present (optimistic insert) is replaced, keeping its activeBadge (the
+        // create never changes which favorite is active).
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,
           logger,
@@ -409,12 +379,21 @@ const { GET } = createEndpoint({
             if (!old?.success) {
               return old;
             }
-            if (old.data.favorites.some((f) => f.id === card.id)) {
-              return old;
-            }
+            const incoming = new Map(payload.favorites.map((f) => [f.id, f]));
+            const updated = old.data.favorites.map((existing) => {
+              const card = incoming.get(existing.id);
+              if (!card) {
+                return existing;
+              }
+              incoming.delete(existing.id);
+              return { ...card, activeBadge: existing.activeBadge };
+            });
             return {
               ...old,
-              data: { ...old.data, favorites: [...old.data.favorites, card] },
+              data: {
+                ...old.data,
+                favorites: [...updated, ...incoming.values()],
+              },
             };
           },
         );

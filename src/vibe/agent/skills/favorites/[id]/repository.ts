@@ -42,7 +42,7 @@ import { SkillsRepository } from "../../repository";
 import { FavoritesCreateRepository } from "../create/repository";
 import { chatFavorites } from "../db";
 import { ChatFavoritesRepository } from "../repository";
-import { reconcileVariantsMode } from "../variants-mode";
+import { markCompanionsSubset, reconcileVariantsMode } from "../variants-mode";
 import favoriteByIdDefinitions, {
   type FavoriteDeleteResponseOutput,
   type FavoriteDeleteUrlVariablesOutput,
@@ -626,6 +626,9 @@ export class SingleFavoriteRepository {
 
       const deleted = result[0];
       const deletedId = deleted.slug || deleted.id;
+      // Partial removal = explicit subset; keeps the ALL reconcile from
+      // re-adding the variant just removed.
+      await markCompanionsSubset({ userId, skillIds: [deleted.skillId] });
 
       // This op owns its `favorite-deleted` event, carrying the deleted id.
       // Locally its client onEvent removes the row from the list cache;

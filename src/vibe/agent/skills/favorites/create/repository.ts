@@ -107,6 +107,49 @@ export class FavoritesCreateRepository {
     return "favorite";
   }
   /**
+   * Emit `favorite-created` on the GET (list) endpoint with the COMPLETE list
+   * cards for every row the user holds of this skill (the new favorite plus
+   * any sibling variants the variants-mode reconcile back-added). The client
+   * upserts them by id, so no card ever renders without its skill name,
+   * tagline, icon and resolved variant model. fanOut:false: local delivery
+   * only, the POST event owns the cross-instance relay.
+   */
+  static async emitFavoriteCardsCreated(params: {
+    skillId: string;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+  }): Promise<void> {
+    const { skillId, user, logger, locale } = params;
+    if (!user.id) {
+      return;
+    }
+    try {
+      const [{ default: favoritesListDef }, { ChatFavoritesRepository }] =
+        await Promise.all([import("../definition"), import("../repository")]);
+      const favorites = await ChatFavoritesRepository.getFavoriteCardsForSkill({
+        userId: user.id,
+        skillId,
+        user,
+        logger,
+        locale,
+      });
+      createEndpointEmitter(favoritesListDef.GET, logger, user, {
+        fanOut: false,
+      })("favorite-created", {
+        payload: { skillId, favorites },
+      });
+    } catch (error) {
+      // The favorite is already stored; a failed live update only delays the
+      // card until the next list fetch, so it must not fail the create.
+      logger.error(
+        `Failed to emit favorite-created cards for skill ${skillId}`,
+        parseError(error),
+      );
+    }
+  }
+
+  /**
    * Create a new favorite
    */
   static async createFavorite(
@@ -426,19 +469,11 @@ export class FavoritesCreateRepository {
           user,
         )("favorite-created", relayPayload);
         // 2. Local browser update via GET event
-        const { default: favoritesListDef } = await import("../definition");
-        createEndpointEmitter(favoritesListDef.GET, logger, user, {
-          fanOut: false,
-        })("favorite-created", {
-          responseData: { id: favorite.slug },
-          payload: {
-            id: favorite.slug,
-            skillId: mergedSkillId,
-            customVariantName: favorite.customVariantName ?? null,
-            icon: data.icon,
-            voiceModelSelection: voiceToStore,
-            modelSelection: modelSelectionToStore ?? null,
-          },
+        await FavoritesCreateRepository.emitFavoriteCardsCreated({
+          skillId: canonicalSkillId,
+          user,
+          logger,
+          locale,
         });
       }
 
@@ -494,20 +529,16 @@ export class FavoritesCreateRepository {
       return;
     }
     // Emit on the GET (list) endpoint — that's what the favorites page subscribes
-    // to. The GET's `favorite-created` onEvent updates the browser list cache.
-    // fanOut:false prevents re-relay (the POST already handled cross-instance relay).
-    const { default: favoritesListDef } = await import("../definition");
-    createEndpointEmitter(favoritesListDef.GET, logger, user, {
-      fanOut: false,
-    })("favorite-created", {
-      payload: {
-        skillId: requestData.skillId,
-        customVariantName: requestData.customVariantName ?? null,
-        icon: requestData.icon ?? undefined,
-        voiceModelSelection: requestData.voiceModelSelection ?? null,
-        modelSelection: requestData.modelSelection ?? null,
-      },
-      responseData: { id: result.data.id },
+    // to. The GET's `favorite-created` onEvent upserts the cards into the
+    // browser list cache. fanOut:false prevents re-relay (the POST already
+    // handled cross-instance relay).
+    await FavoritesCreateRepository.emitFavoriteCardsCreated({
+      skillId: await SkillsRepository.resolveCanonicalSkillId(
+        parseSkillId(requestData.skillId).skillId,
+      ),
+      user,
+      logger,
+      locale,
     });
   }
 }

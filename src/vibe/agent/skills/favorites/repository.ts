@@ -16,7 +16,10 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -32,7 +35,10 @@ import {
   isUuid,
   parseSkillId,
 } from "../../chat/slugify";
-import { getEnvAvailability } from "../../env-availability";
+import {
+  type AgentEnvAvailability,
+  getEnvAvailability,
+} from "../../env-availability";
 import type { VoiceModelSelection } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";
@@ -43,8 +49,11 @@ import {
   FAVORITE_CONFIG_COLUMNS,
   type FavoriteConfig,
 } from "./db";
-import type { FavoritesListResponseOutput } from "./definition";
-import { reconcileAllFlaggedCompanions } from "./variants-mode";
+import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
+import {
+  markCompanionsSubset,
+  reconcileAllFlaggedCompanions,
+} from "./variants-mode";
 import type { FavoriteSummaryItem } from "./favorites-formatter";
 import type { FavoritesT } from "./i18n";
 import reorderDefinitions from "./reorder/definition";
@@ -182,75 +191,16 @@ export class ChatFavoritesRepository {
 
       // Compute display fields for all favorites
       const favoritesCards = await Promise.all(
-        favorites.map(async (favorite) => {
-          // Fetch skill data if needed
-          let characterModelSelection = null;
-          let characterIcon = null;
-          let characterName = null;
-          let characterTagline = null;
-          let characterDescription = null;
-          let characterVoice: VoiceModelSelection | null = null;
-
-          if (favorite.skillId && favorite.skillId.trim() !== "") {
-            const skillResult = await SkillsRepository.getSkillById(
-              { id: favorite.skillId },
-              user,
-              logger,
-              locale,
-            );
-            if (skillResult.success) {
-              characterIcon = skillResult.data.icon;
-              characterName = skillResult.data.name;
-              characterTagline = skillResult.data.tagline;
-              characterDescription = skillResult.data.description;
-              // Resolve variant's model selections from the skill's variants list
-              // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
-              const variants = skillResult.data.variants;
-              const variant = favorite.variantId
-                ? variants.find((v) => v.id === favorite.variantId)
-                : (variants.find((v) => v.isDefault) ?? variants[0] ?? null);
-              characterModelSelection = variant?.modelSelection ?? null;
-              // Derive voice from the resolved variant; fall back to skill-level top field
-              characterVoice = variant?.voiceModelSelection ?? null;
-            }
-          }
-
-          // Normalize skillId to canonical slug (legacy rows may store UUIDs)
-          const canonicalSkillId =
-            await SkillsRepository.resolveCanonicalSkillId(favorite.skillId);
-
-          // Use client repository's compute method for DRY
-          // Map ChatFavorite to StoredLocalFavorite structure
-          // Use slug as the external ID (fall back to UUID for backcompat)
-          return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-            {
-              id: favorite.slug || favorite.id,
-              skillId: formatSkillId(
-                canonicalSkillId,
-                favorite.variantId ?? null,
-              ),
-              customVariantName: favorite.customVariantName ?? null,
-              customIcon: favorite.customIcon,
-              voiceModelSelection: favorite.voiceModelSelection ?? null,
-              modelSelection: favorite.modelSelection,
-              position: favorite.position,
-            },
-            characterModelSelection,
-            characterIcon,
-            characterName,
-            characterTagline,
-            characterDescription,
-            // Match activeFavoriteId against both slug and UUID
-            favorite.slug === activeFavoriteId ||
-              favorite.id === activeFavoriteId
-              ? favorite.slug || favorite.id
-              : null,
-            characterVoice,
-            locale,
+        favorites.map((favorite) =>
+          ChatFavoritesRepository.buildFavoriteCard({
+            favorite,
+            activeFavoriteId,
             user,
+            logger,
+            locale,
             availability,
-          );
-        }),
+          }),
+        ),
       );
 
       // Apply search filter if query provided
@@ -309,6 +259,127 @@ export class ChatFavoritesRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * The list card for one stored favorite row: skill name/tagline/icon and the
+   * resolved variant model. Single source for the list response and the
+   * `favorite-created` event, so both always carry the same complete card.
+   */
+  static async buildFavoriteCard(params: {
+    favorite: typeof chatFavorites.$inferSelect;
+    activeFavoriteId: string | null;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    availability: AgentEnvAvailability;
+  }): Promise<FavoriteCard> {
+    const { favorite, activeFavoriteId, user, logger, locale, availability } =
+      params;
+    let characterModelSelection = null;
+    let characterIcon = null;
+    let characterName = null;
+    let characterTagline = null;
+    let characterDescription = null;
+    let characterVoice: VoiceModelSelection | null = null;
+
+    if (favorite.skillId && favorite.skillId.trim() !== "") {
+      const skillResult = await SkillsRepository.getSkillById(
+        { id: favorite.skillId },
+        user,
+        logger,
+        locale,
+      );
+      if (skillResult.success) {
+        characterIcon = skillResult.data.icon;
+        characterName = skillResult.data.name;
+        characterTagline = skillResult.data.tagline;
+        characterDescription = skillResult.data.description;
+        // Resolve variant's model selections from the skill's variants list
+        // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
+        const variants = skillResult.data.variants;
+        const variant = favorite.variantId
+          ? variants.find((v) => v.id === favorite.variantId)
+          : (variants.find((v) => v.isDefault) ?? variants[0] ?? null);
+        characterModelSelection = variant?.modelSelection ?? null;
+        // Derive voice from the resolved variant; fall back to skill-level top field
+        characterVoice = variant?.voiceModelSelection ?? null;
+      }
+    }
+
+    // Normalize skillId to canonical slug (legacy rows may store UUIDs)
+    const canonicalSkillId = await SkillsRepository.resolveCanonicalSkillId(
+      favorite.skillId,
+    );
+
+    // Use slug as the external ID (fall back to UUID for backcompat)
+    return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+      {
+        id: favorite.slug || favorite.id,
+        skillId: formatSkillId(canonicalSkillId, favorite.variantId ?? null),
+        customVariantName: favorite.customVariantName ?? null,
+        customIcon: favorite.customIcon,
+        voiceModelSelection: favorite.voiceModelSelection ?? null,
+        modelSelection: favorite.modelSelection,
+        position: favorite.position,
+      },
+      characterModelSelection,
+      characterIcon,
+      characterName,
+      characterTagline,
+      characterDescription,
+      // Match activeFavoriteId against both slug and UUID
+      favorite.slug === activeFavoriteId || favorite.id === activeFavoriteId
+        ? favorite.slug || favorite.id
+        : null,
+      characterVoice,
+      locale,
+      user,
+      availability,
+    );
+  }
+
+  /**
+   * Complete list cards for every favorite row the user holds of one skill,
+   * ordered by position. Used by the `favorite-created` event: a create can
+   * also back-add sibling variants (variants-mode ALL), and all of them must
+   * reach the client fully resolved.
+   */
+  static async getFavoriteCardsForSkill(params: {
+    userId: string;
+    skillId: string;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+  }): Promise<FavoriteCard[]> {
+    const { userId, skillId, user, logger, locale } = params;
+    const [availability, rows] = await Promise.all([
+      getEnvAvailability(),
+      db
+        .select()
+        .from(chatFavorites)
+        .where(
+          and(
+            eq(chatFavorites.userId, userId),
+            eq(chatFavorites.skillId, skillId),
+          ),
+        )
+        .orderBy(asc(chatFavorites.position)),
+    ]);
+    return Promise.all(
+      rows.map((favorite) =>
+        ChatFavoritesRepository.buildFavoriteCard({
+          favorite,
+          // The client keeps each card's existing activeBadge on upsert; a
+          // create never changes which favorite is active.
+          activeFavoriteId: null,
+          user,
+          logger,
+          locale,
+          availability,
+        }),
+      ),
+    );
   }
 
   /**
@@ -488,16 +559,20 @@ export class ChatFavoritesRepository {
     logger: EndpointLogger,
   ): Promise<void> {
     try {
+      const removedSkillIds: string[] = [];
       for (const fav of favorites) {
-        await db
+        const removed = await db
           .delete(chatFavorites)
           .where(
             and(
               eq(chatFavorites.userId, userId),
               eq(chatFavorites.slug, fav.id),
             ),
-          );
+          )
+          .returning({ skillId: chatFavorites.skillId });
+        removedSkillIds.push(...removed.map((r) => r.skillId));
       }
+      await markCompanionsSubset({ userId, skillIds: removedSkillIds });
     } catch (error) {
       logger.error("Failed to apply remote favorite delete", parseError(error));
     }

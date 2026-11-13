@@ -125,9 +125,14 @@ const { POST } = createEndpoint({
           characterTagline = character.data.tagline ?? null;
           characterDescription = character.data.description ?? null;
           const variants = character.data.variants;
-          const variant = resolvedVariantId
-            ? variants?.find((v) => v.id === resolvedVariantId)
-            : variants?.[0];
+          // Same variant resolution as the server list (default variant when
+          // the favorite names none), so the optimistic card matches it.
+          const variant =
+            (resolvedVariantId
+              ? variants?.find((v) => v.id === resolvedVariantId)
+              : undefined) ??
+            variants?.find((v) => v.isDefault) ??
+            variants?.[0];
           characterModelSelection = variant?.modelSelection ?? null;
         } else {
           logger.error(

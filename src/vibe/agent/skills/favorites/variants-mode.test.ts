@@ -5,6 +5,8 @@
  *  - 2+ held variants of a companion => auto-complete missing + flag ALL
  *  - a user flagged ALL picks up a newly-introduced variant on reconcile
  *  - a single variant stays SOME
+ *  - removing one variant of an ALL companion flips it to SOME, so the read
+ *    reconcile never re-adds what the user just removed
  */
 
 import { and, eq } from "drizzle-orm";
@@ -18,6 +20,7 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { chatFavorites } from "./db";
 import { VariantsMode } from "./enum";
 import {
+  markCompanionsSubset,
   promoteMultiVariantCompanions,
   reconcileAllFlaggedCompanions,
 } from "./variants-mode";
@@ -164,5 +167,42 @@ describe("variants-mode reconcile", () => {
     // No promotion, no auto-completion, no ALL flag.
     expect(result).toHaveLength(1);
     expect(result[0]?.variantsMode).toBe(VariantsMode.SOME);
+  });
+
+  it("removing one variant of an ALL companion is not undone on read", async () => {
+    await seed(THEA_VARIANT_IDS);
+    await db
+      .update(chatFavorites)
+      .set({ variantsMode: VariantsMode.ALL })
+      .where(
+        and(
+          eq(chatFavorites.userId, user.id),
+          eq(chatFavorites.skillId, SKILL_ID),
+        ),
+      );
+    await db
+      .delete(chatFavorites)
+      .where(
+        and(
+          eq(chatFavorites.userId, user.id),
+          eq(chatFavorites.skillId, SKILL_ID),
+          eq(chatFavorites.variantId, "hacker"),
+        ),
+      );
+
+    await markCompanionsSubset({ userId: user.id, skillIds: [SKILL_ID] });
+    await reconcileAllFlaggedCompanions({
+      userId: user.id,
+      logger,
+      variantIdsForSkill: (skillId) =>
+        skillId === SKILL_ID ? THEA_VARIANT_IDS : [],
+    });
+
+    const result = await rows();
+    expect(result).toHaveLength(THEA_VARIANT_IDS.length - 1);
+    expect(result.some((r) => r.variantId === "hacker")).toBe(false);
+    expect(result.every((r) => r.variantsMode === VariantsMode.SOME)).toBe(
+      true,
+    );
   });
 });

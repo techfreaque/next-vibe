@@ -10,9 +10,11 @@
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { and, eq, like } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { testEndpoint } from "next-vibe/tooling/testing/testing-suite/test-endpoint";
@@ -26,6 +28,7 @@ import { chatFavorites } from "./db";
 import favoriteDeleteBatchEndpoint from "./delete-batch/definition";
 // ── Definition imports ───────────────────────────────────────────────────────
 import favoritesListEndpoint from "./definition";
+import { ChatFavoritesRepository } from "./repository";
 import favoriteReorderEndpoint from "./reorder/definition";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
@@ -210,6 +213,25 @@ describe("Favorites CRUD Integration", () => {
     expectSlug(found.id, "listed favorite.id");
     expectSlugSkillId(found.skillId, "listed favorite.skillId");
     expect(typeof found.position).toBe("number");
+
+    // The `favorite-created` event carries these exact cards: a freshly added
+    // favorite must render identically to the list (name, tagline, icon,
+    // resolved model) — never an "Unknown" / "No model" placeholder.
+    const eventCards = await ChatFavoritesRepository.getFavoriteCardsForSkill({
+      userId: adminUser.id,
+      skillId: "thea",
+      user: adminUser,
+      logger: createEndpointLogger(false, defaultLocale),
+      locale: defaultLocale,
+    });
+    const eventCard = eventCards.find((f) => f.id === createdFavSlug1);
+    expect(eventCard, "Created favorite missing from event cards").toBeTruthy();
+    expect({ ...eventCard, activeBadge: null }).toEqual({
+      ...found,
+      activeBadge: null,
+    });
+    expect(eventCard?.name).toBe("Thea");
+    expect(eventCard?.modelId).not.toBeNull();
   });
 
   // ── F4: Create second favorite ──────────────────────────────────────────

@@ -258,7 +258,12 @@ export function useAddToFavorites({
         favoritesListDefinition.default.GET,
         logger,
         (oldData) => {
-          if (!oldData?.success) {
+          // The server's `favorite-created` event may already have upserted
+          // the complete card; never replace or duplicate it.
+          if (
+            !oldData?.success ||
+            oldData.data.favorites.some((f) => f.id === createResponse.data.id)
+          ) {
             return oldData;
           }
           const newFavorite =

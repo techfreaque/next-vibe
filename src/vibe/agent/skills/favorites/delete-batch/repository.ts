@@ -22,6 +22,7 @@ import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
 import { chatFavorites } from "../db";
 import { SingleFavoriteRepository } from "../[id]/repository";
+import { markCompanionsSubset } from "../variants-mode";
 import deleteBatchDefinitions, {
   type FavoritesDeleteBatchRequestOutput,
   type FavoritesDeleteBatchResponseOutput,
@@ -56,15 +57,21 @@ export class FavoritesDeleteBatchRepository {
         count: requestData.ids.length,
       });
 
+      const removedSkillIds: string[] = [];
       await db.transaction(async (tx) => {
         for (const id of requestData.ids) {
-          await tx
+          const removed = await tx
             .delete(chatFavorites)
             .where(
               SingleFavoriteRepository.resolveFavoriteCondition(id, userId),
-            );
+            )
+            .returning({ skillId: chatFavorites.skillId });
+          removedSkillIds.push(...removed.map((r) => r.skillId));
         }
       });
+      // Partial removal = explicit subset; keeps the ALL reconcile from
+      // re-adding the variants just removed.
+      await markCompanionsSubset({ userId, skillIds: removedSkillIds });
 
       logger.info("Favorites batch-deleted successfully", {
         userId,
@@ -106,11 +113,15 @@ export class FavoritesDeleteBatchRepository {
   >): Promise<void> {
     const userId = user.id;
     try {
+      const removedSkillIds: string[] = [];
       for (const id of requestData.ids) {
-        await db
+        const removed = await db
           .delete(chatFavorites)
-          .where(SingleFavoriteRepository.resolveFavoriteCondition(id, userId));
+          .where(SingleFavoriteRepository.resolveFavoriteCondition(id, userId))
+          .returning({ skillId: chatFavorites.skillId });
+        removedSkillIds.push(...removed.map((r) => r.skillId));
       }
+      await markCompanionsSubset({ userId, skillIds: removedSkillIds });
       createEndpointEmitter(deleteBatchDefinitions.POST, logger, user, {
         fanOut: false,
       })("favorites-deleted-batch", {

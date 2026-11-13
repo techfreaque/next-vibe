@@ -15,7 +15,7 @@
 
 import "server-only";
 
-import { and, asc, eq, max, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, max, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -139,6 +139,33 @@ export async function reconcileVariantsMode(params: {
         eq(chatFavorites.userId, userId),
         eq(chatFavorites.skillId, skillId),
         sql`${chatFavorites.variantsMode} <> ${targetMode}`,
+      ),
+    );
+}
+
+/**
+ * After an explicit removal, the companion's surviving rows are a SUBSET the
+ * user chose — flip them to SOME. Without this, a companion flagged ALL gets the
+ * removed variant re-added by the read-time reconcile (the "removed model comes
+ * back after reload" bug). Removing a whole companion leaves no rows: no-op.
+ */
+export async function markCompanionsSubset(params: {
+  userId: string;
+  skillIds: string[];
+}): Promise<void> {
+  const { userId, skillIds } = params;
+  const unique = [...new Set(skillIds)];
+  if (unique.length === 0) {
+    return;
+  }
+  await db
+    .update(chatFavorites)
+    .set({ variantsMode: VariantsMode.SOME, updatedAt: new Date() })
+    .where(
+      and(
+        eq(chatFavorites.userId, userId),
+        inArray(chatFavorites.skillId, unique),
+        eq(chatFavorites.variantsMode, VariantsMode.ALL),
       ),
     );
 }

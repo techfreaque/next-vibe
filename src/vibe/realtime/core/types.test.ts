@@ -452,8 +452,8 @@ type _FavPayloadType =
 type _VerifyFavPayloadTypedSkillId = Expect<
   Equal<"skillId" extends keyof _FavPayloadType ? true : false, true>
 >;
-type _VerifyFavPayloadTypedIcon = Expect<
-  Equal<"icon" extends keyof _FavPayloadType ? true : false, true>
+type _VerifyFavPayloadTypedFavorites = Expect<
+  Equal<"favorites" extends keyof _FavPayloadType ? true : false, true>
 >;
 type _VerifyFavPayloadTypeNotAny = Expect<
   Equal<Equal<_FavPayloadType, any>, false>
