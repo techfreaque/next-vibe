@@ -46,6 +46,10 @@ export const translations: typeof enTranslations = {
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Utworzony {{created}} · {{rate}}",
     rateLimit: "{{n}} zapytań/min",
+    uncensoredLabel: "Zezwól na modele bez cenzury dla moich kluczy",
+    uncensoredHint:
+      "Mam 18+ i akceptuję, że modele bez cenzury mogą generować obraźliwe, fałszywe, niebezpieczne, nielegalne lub złośliwe treści, bez filtra. Biorę odpowiedzialność za to, jak je wykorzystam. Bez tego identyfikatory modeli bez cenzury zwracają HTTP 403.",
+    uncensoredFailed: "Nie udało się zapisać. Spróbuj ponownie.",
     billingNote:
       "Brak kredytów zwraca HTTP 402. Streaming działa na każdym endpoincie.",
   },

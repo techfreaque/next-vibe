@@ -2,6 +2,7 @@ export const translations = {
   errorTypes: {
     auth_error: "Authentication error",
     bad_request: "Bad request",
+    consent_required: "Consent required",
     database_error: "Database error",
     email_error: "Email error",
     external_service_error: "External service error",

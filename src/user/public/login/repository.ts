@@ -363,6 +363,16 @@ export class LoginRepository {
         await import("next-vibe/identity/lead/device-auth");
       await LeadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
+      // A guest who confirmed the uncensored-model consent before logging in
+      // keeps it on the account.
+      const { UncensoredConsentRepository } =
+        await import("next-vibe/agent/models/uncensored-consent/repository");
+      await UncensoredConsentRepository.carryLeadConsentToUser(
+        leadId,
+        userId,
+        logger,
+      );
+
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits.
       // Also include all IP-linked leads so their shared pool collapses into the user.

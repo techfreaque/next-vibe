@@ -6848,22 +6848,32 @@
       },
       "children": {
         "email": {
-          "type": "text",
+          "type": "form_field",
+          "fieldType": "email",
           "label": "Email Address",
+          "description": "The email address to check subscription status for",
+          "placeholder": "user@example.com",
+          "helpText": "Leave empty to check your own subscription",
+          "columns": 12,
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "email",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
                 },
                 "type": "string"
               }
             },
             "type": "optional"
           },
+          "order": 1,
           "usage": {
-            "response": true
+            "request": "data"
           },
           "schemaType": "primitive"
         },
@@ -6903,6 +6913,26 @@
               "type": "boolean"
             },
             "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subscriptionEmail": {
+          "type": "text",
+          "label": "Email Address",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -56121,6 +56151,211 @@
     "category": "ai",
     "tags": ["Models"],
     "aliases": ["models", "list-models"],
+    "credits": 0
+  },
+  {
+    "toolName": "uncensored-consent",
+    "title": "Uncensored models consent",
+    "titleShort": "Uncensored consent",
+    "description": "Shows whether this account or guest confirmed being 18+ and accepts unfiltered output from uncensored models. Uncensored models refuse to run until this is confirmed.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "consented": {
+          "type": "text",
+          "label": "Confirmed",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "consentedAt": {
+          "type": "text",
+          "label": "Confirmed on",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "version": {
+          "type": "text",
+          "label": "Consent version",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Consent"],
+    "aliases": ["uncensored-consent"],
     "credits": 0
   },
   {

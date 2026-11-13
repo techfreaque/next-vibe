@@ -15,6 +15,7 @@ import { BudgetScope as BudgetScopeEnum, type BudgetScopeValue } from "./enum";
 const PERMANENT_ERROR_KEYS: ReadonlySet<string> = new Set([
   "errorTypes.payment_required",
   "errorTypes.payment_failed",
+  "errorTypes.consent_required",
   "errorTypes.validation_error",
   "errorTypes.bad_request",
   "errorTypes.auth_error",

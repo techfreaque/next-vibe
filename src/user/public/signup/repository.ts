@@ -220,6 +220,15 @@ export class SignupRepository {
         );
       }
 
+      // A guest who already confirmed the uncensored-model consent keeps it.
+      const { UncensoredConsentRepository } =
+        await import("next-vibe/agent/models/uncensored-consent/repository");
+      await UncensoredConsentRepository.carryLeadConsentToUser(
+        user.leadId,
+        userData.id,
+        logger,
+      );
+
       // Growth funnel: the user inherits the lead's first/last-touch attribution
       const { GrowthJourneyRepository } =
         await import("@/leads/growth/repository");

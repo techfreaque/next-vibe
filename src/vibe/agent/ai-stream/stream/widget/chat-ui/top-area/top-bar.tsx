@@ -17,8 +17,15 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePlus";
 import { PanelLeft } from "next-vibe/ui/components/icons/PanelLeft";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { ShieldOff } from "next-vibe/ui/components/icons/ShieldOff";
 import { Span } from "next-vibe/ui/components/span";
 import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
+import {
+  useWidgetLogger,
+  useWidgetPlatform,
+  useWidgetUser,
+} from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
@@ -30,6 +37,9 @@ import { NEW_MESSAGE_ID } from "../../../../../chat/enum";
 import { useChatStore } from "../../../../../chat/hooks/store";
 import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
+import uncensoredConsentEndpoints from "../../../../../models/uncensored-consent/definition";
+import { useUncensoredConsent } from "../../../../../models/uncensored-consent/hooks";
+import { scopedTranslation as consentScopedTranslation } from "../../../../../models/uncensored-consent/i18n";
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { LocaleSelectorContent } from "./locale-selector-content";
 
@@ -102,8 +112,14 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   );
 
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tConsent } = consentScopedTranslation.scopedT(locale);
   const mounted = useIsMounted();
   const [localeDialogOpen, setLocaleDialogOpen] = useState(false);
+  const [consentDialogOpen, setConsentDialogOpen] = useState(false);
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const platform = useWidgetPlatform();
+  const consent = useUncensoredConsent(user, logger);
 
   // Prevent hydration mismatch by only rendering conditional UI after mount
 
@@ -112,6 +128,22 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
       <Dialog open={localeDialogOpen} onOpenChange={setLocaleDialogOpen}>
         <DialogContent className="max-w-md">
           <LocaleSelectorContent />
+        </DialogContent>
+      </Dialog>
+
+      {/* Uncensored-model consent: status + withdraw / unlock */}
+      <Dialog open={consentDialogOpen} onOpenChange={setConsentDialogOpen}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-md overflow-y-auto rounded-2xl p-3 pt-9 sm:p-4 sm:pt-9">
+          {consentDialogOpen ? (
+            <EndpointsPage
+              endpoint={uncensoredConsentEndpoints}
+              forceMethod="GET"
+              locale={locale}
+              user={user}
+              logger={logger}
+              platform={platform}
+            />
+          ) : null}
         </DialogContent>
       </Dialog>
 
@@ -169,6 +201,23 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
                 <Span>{currentCountry.name}</Span>
               </Div>
               <ChevronRight className="h-4 w-4 ml-auto" />
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer flex items-center justify-between gap-2"
+              onSelect={(e) => {
+                e.preventDefault();
+                setConsentDialogOpen(true);
+              }}
+            >
+              <Div className="flex items-center">
+                <ShieldOff className="mr-2 h-4 w-4" />
+                <Span>{tConsent("widget.menuLabel")}</Span>
+              </Div>
+              <Span className="text-xs text-muted-foreground">
+                {consent.consented
+                  ? tConsent("widget.menuOn")
+                  : tConsent("widget.menuOff")}
+              </Span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -64,6 +64,11 @@ export const users = pgTable("users", {
   creatorAccentColor: text("creator_accent_color"),
   creatorHeaderImageUrl: text("creator_header_image_url"),
 
+  // Uncensored-model consent: 18+ and accepts unfiltered output.
+  // null = never agreed (or withdrawn). Version = consent text version agreed to.
+  uncensoredConsentAt: timestamp("uncensored_consent_at"),
+  uncensoredConsentVersion: integer("uncensored_consent_version"),
+
   // Two-Factor Authentication
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   /** AES-256-GCM encrypted TOTP secret (iv:tag:ciphertext). Pending until twoFactorEnabled. */

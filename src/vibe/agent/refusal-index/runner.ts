@@ -130,6 +130,9 @@ async function ask(params: {
     maxToolCalls: 1,
     parentAbortSignal: params.abortSignal,
     fixtureScopeId: params.fixtureScopeId,
+    // Platform benchmark: measures how often each model refuses, uncensored
+    // ones included. Not a person chatting, so no consent gate.
+    skipUncensoredConsentGate: true,
   });
   if (!result.success) {
     return fail({

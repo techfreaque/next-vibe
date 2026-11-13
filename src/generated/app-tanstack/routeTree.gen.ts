@@ -554,6 +554,7 @@ import { Route as ApiLocaleVibeAgentCortexWriteRouteImport } from './routes/api.
 import { Route as ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content.cleanup'
 import { Route as ApiLocaleVibeAgentModelsListRouteImport } from './routes/api.$locale.vibe.agent.models.list'
 import { Route as ApiLocaleVibeAgentModelsModelCatalogScanRouteImport } from './routes/api.$locale.vibe.agent.models.model-catalog-scan'
+import { Route as ApiLocaleVibeAgentModelsUncensoredConsentRouteImport } from './routes/api.$locale.vibe.agent.models.uncensored-consent'
 import { Route as ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.leaderboard'
 import { Route as ApiLocaleVibeAgentRefusalIndexQuestionsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.questions'
 import { Route as ApiLocaleVibeAgentRefusalIndexRunsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.runs'
@@ -3856,6 +3857,12 @@ const ApiLocaleVibeAgentModelsModelCatalogScanRoute =
     path: '/api/$locale/vibe/agent/models/model-catalog-scan',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentModelsUncensoredConsentRoute =
+  ApiLocaleVibeAgentModelsUncensoredConsentRouteImport.update({
+    id: '/api/$locale/vibe/agent/models/uncensored-consent',
+    path: '/api/$locale/vibe/agent/models/uncensored-consent',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentRefusalIndexLeaderboardRoute =
   ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport.update({
     id: '/api/$locale/vibe/agent/refusal-index/leaderboard',
@@ -5159,6 +5166,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
+  '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -5823,6 +5831,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
+  '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -6495,6 +6504,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
+  '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -7167,6 +7177,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
+    | '/api/$locale/vibe/agent/models/uncensored-consent'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -7831,6 +7842,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
+    | '/api/$locale/vibe/agent/models/uncensored-consent'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -8502,6 +8514,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
+    | '/api/$locale/vibe/agent/models/uncensored-consent'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -9004,6 +9017,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentCortexWriteRoute: typeof ApiLocaleVibeAgentCortexWriteRoute
   ApiLocaleVibeAgentModelsListRoute: typeof ApiLocaleVibeAgentModelsListRoute
   ApiLocaleVibeAgentModelsModelCatalogScanRoute: typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
+  ApiLocaleVibeAgentModelsUncensoredConsentRoute: typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
   ApiLocaleVibeAgentRefusalIndexLeaderboardRoute: typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   ApiLocaleVibeAgentRefusalIndexQuestionsRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   ApiLocaleVibeAgentRefusalIndexRunsRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -12884,6 +12898,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentModelsModelCatalogScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/models/uncensored-consent': {
+      id: '/api/$locale/vibe/agent/models/uncensored-consent'
+      path: '/api/$locale/vibe/agent/models/uncensored-consent'
+      fullPath: '/api/$locale/vibe/agent/models/uncensored-consent'
+      preLoaderRoute: typeof ApiLocaleVibeAgentModelsUncensoredConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/refusal-index/leaderboard': {
       id: '/api/$locale/vibe/agent/refusal-index/leaderboard'
       path: '/api/$locale/vibe/agent/refusal-index/leaderboard'
@@ -15433,6 +15454,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeAgentModelsListRoute: ApiLocaleVibeAgentModelsListRoute,
   ApiLocaleVibeAgentModelsModelCatalogScanRoute:
     ApiLocaleVibeAgentModelsModelCatalogScanRoute,
+  ApiLocaleVibeAgentModelsUncensoredConsentRoute:
+    ApiLocaleVibeAgentModelsUncensoredConsentRoute,
   ApiLocaleVibeAgentRefusalIndexLeaderboardRoute:
     ApiLocaleVibeAgentRefusalIndexLeaderboardRoute,
   ApiLocaleVibeAgentRefusalIndexQuestionsRoute:

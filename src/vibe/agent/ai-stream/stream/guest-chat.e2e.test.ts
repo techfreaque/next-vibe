@@ -21,6 +21,7 @@ import { CreditRepository } from "@/credits/repository";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
@@ -29,6 +30,8 @@ import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { formatSkillId } from "../../chat/slugify";
 import { scopedTranslation as threadsWidgetScopedTranslation } from "../../chat/threads/widget/i18n";
 import { COMPANION_SKILLS, type SkillVariant } from "../../skills/config";
+import { scopedTranslation as consentScopedTranslation } from "../../models/uncensored-consent/i18n";
+import { UncensoredConsentRepository } from "../../models/uncensored-consent/repository";
 import { ModelSelectionType } from "../../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import {
@@ -61,6 +64,7 @@ const { t } = scopedTranslation.scopedT(defaultLocale);
 const { t: tSkills } = skillsScopedTranslation.scopedT(defaultLocale);
 const { t: tThreads } = threadsWidgetScopedTranslation.scopedT(defaultLocale);
 const { t: tCredits } = creditsScopedTranslation.scopedT(defaultLocale);
+const { t: tConsent } = consentScopedTranslation.scopedT(defaultLocale);
 
 /** The skill a guest gets without choosing: the first companion. */
 const DEFAULT_SKILL = COMPANION_SKILLS[0];
@@ -141,6 +145,16 @@ async function leadBalance(leadId: string): Promise<number> {
   );
   expect(balance.success, JSON.stringify(balance)).toBe(true);
   return balance.success ? balance.data : Number.NaN;
+}
+
+/** The guest's uncensored-model consent, as the server gate reads it. */
+async function leadConsented(leadId: string): Promise<boolean> {
+  const status = await UncensoredConsentRepository.getStatus(
+    { isPublic: true, leadId, roles: [UserPermissionRole.PUBLIC] },
+    logger,
+    tConsent,
+  );
+  return status.success && status.data.consented;
 }
 
 /**
@@ -258,7 +272,12 @@ describe("E2E: guest chat money path", () => {
       const uncensoredModel = pinnedModel(UNCENSORED_VARIANT);
       expect(uncensoredModel, "no uncensored variant").toBeDefined();
       expect(uncensoredModel).not.toBe(pinnedModel(DEFAULT_VARIANT));
-      await becomeFreeGuest(context, baseUrl, cleanup, "uncensored");
+      const guestLeadId = await becomeFreeGuest(
+        context,
+        baseUrl,
+        cleanup,
+        "uncensored",
+      );
 
       // First message on the default, like every guest
       const { composer, call: first } = await sendThroughDevRestart(
@@ -315,6 +334,13 @@ describe("E2E: guest chat money path", () => {
             .locator('[aria-current="true"]')
             .count()) === 1,
       );
+      // First uncensored pick: the one-time 18+ consent dialog. Agreeing
+      // stores it on the guest's lead; the server refuses the model without it.
+      const consentDialog = page.getByTestId("uncensored-consent-dialog");
+      await consentDialog.waitFor();
+      await page.getByTestId("uncensored-consent-agree").click();
+      await consentDialog.waitFor({ state: "detached" });
+      expect(await leadConsented(guestLeadId)).toBe(true);
       await page.keyboard.press("Escape");
 
       const second = await sendFromComposer(

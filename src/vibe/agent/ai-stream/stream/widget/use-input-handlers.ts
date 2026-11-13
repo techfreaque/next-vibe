@@ -12,7 +12,11 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import type { DefaultFolderId } from "../../../../core/execution-context";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import { useChatInputStore } from "../hooks/input-store";
-import { clearDraft } from "../hooks/use-input-autosave";
+import {
+  clearDraft,
+  saveDraft,
+  saveDraftAttachments,
+} from "../hooks/use-input-autosave";
 
 // Utility functions
 const isValidInput = (input: string): boolean => input.trim().length > 0;
@@ -50,6 +54,11 @@ interface UseInputHandlersProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   draftKey: string;
+  /**
+   * Checked before the composer is cleared. false = do not send now (e.g.
+   * the uncensored-model consent dialog opened); the text stays as typed.
+   */
+  canSend?: () => boolean;
 }
 
 interface UseInputHandlersReturn {
@@ -69,6 +78,7 @@ export function useInputHandlers({
   locale,
   logger,
   draftKey,
+  canSend,
 }: UseInputHandlersProps): UseInputHandlersReturn {
   const { pushState, replaceState } = useSilentHistory();
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
@@ -81,9 +91,11 @@ export function useInputHandlers({
   // state updates during navigation. The ref always points to the latest
   // sendMessage callback (which captures up-to-date settings, model, etc.).
   const sendMessageRef = useRef(sendMessage);
+  const canSendRef = useRef(canSend);
   useLayoutEffect(() => {
     sendMessageRef.current = sendMessage;
-  }, [sendMessage]);
+    canSendRef.current = canSend;
+  }, [sendMessage, canSend]);
 
   const submitMessage = useCallback(async () => {
     // Read current input from store at invocation time (not closure time)
@@ -101,6 +113,10 @@ export function useInputHandlers({
     });
 
     if (isValidInput(currentInput)) {
+      if (canSendRef.current && !canSendRef.current()) {
+        logger.debug("Chat", "submitMessage held by canSend guard");
+        return;
+      }
       logger.debug("Chat", "submitMessage calling sendMessage");
 
       // Clear input immediately so the UI feels instant.
@@ -161,6 +177,11 @@ export function useInputHandlers({
         useChatInputStore.getState().setIsSubmitting(false);
         useChatInputStore.getState().setInput(currentInput);
         useChatInputStore.getState().setAttachments(currentAttachments);
+        // The pre-send context's draft was autosaved empty by the reset above;
+        // reverting navigation reloads that draft. Write the text back first
+        // so the restore survives the revert.
+        await saveDraft(draftKey, currentInput, logger);
+        await saveDraftAttachments(draftKey, currentAttachments, logger);
 
         if (result.createdThreadId) {
           setNavigation(preNavSnapshot);

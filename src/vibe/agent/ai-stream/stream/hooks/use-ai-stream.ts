@@ -37,7 +37,14 @@ import {
   addErrorMessageToChat,
   discardOptimisticTurn,
 } from "../../../chat/threads/[threadId]/messages/hooks/update-messages";
+import { isUncensoredContent } from "../../../models/uncensored-consent/constants";
+import {
+  getCachedUncensoredConsent,
+  markUncensoredConsentMissing,
+  useUncensoredConsentGate,
+} from "../../../models/uncensored-consent/hooks";
 import cancelEndpoints from "../../cancel/definition";
+import { getChatModelById } from "../../models";
 import { serializeError } from "../../repository/errors/error-utils";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
@@ -75,6 +82,31 @@ export function useAIStream(): UseAIStreamReturn {
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
   /**
+   * Consent missing for an uncensored model (client check or server 403
+   * CONSENT_REQUIRED): drop the optimistic turn, keep the composer text (the
+   * caller restores it) and open the consent dialog. A plain send goes out by
+   * itself right after the person agrees. Never an error bubble or toast.
+   */
+  const holdForConsent = useCallback(
+    (data: AiStreamPostRequestOutput, modelName: string): void => {
+      if (data.threadId) {
+        discardOptimisticTurn(data.threadId, data.rootFolderId, logger);
+      }
+      logger.info("Stream held: uncensored model needs consent", {
+        model: data.model,
+        operation: data.operation,
+        threadId: data.threadId,
+      });
+      useUncensoredConsentGate.getState().request({
+        prompt: "send",
+        modelName,
+        resendOnAgree: data.operation === "send",
+      });
+    },
+    [logger],
+  );
+
+  /**
    * Start an AI stream.
    *
    * 1. Pre-warms WS channel
@@ -87,6 +119,22 @@ export function useAIStream(): UseAIStreamReturn {
   const startStream = useCallback(
     async (data: AiStreamPostRequestOutput): Promise<boolean> => {
       const threadId = data.threadId ?? "";
+
+      // Uncensored model without the one-time 18+ consent: hold the send and
+      // show the consent dialog instead of a request the server refuses.
+      // Tool confirmations continue a turn that already runs - never held.
+      // Unknown status (never loaded) goes through; the server decides.
+      const model = getChatModelById(data.model);
+      const isContinuation =
+        !!data.toolConfirmations && data.toolConfirmations.length > 0;
+      if (
+        !isContinuation &&
+        isUncensoredContent(model?.content) &&
+        getCachedUncensoredConsent(logger) === false
+      ) {
+        holdForConsent(data, model?.name ?? data.model);
+        return false;
+      }
 
       // Reset audio queue to prevent old audio from playing
       const audioQueue = getAudioQueue(logger);
@@ -166,6 +214,9 @@ export function useAIStream(): UseAIStreamReturn {
         // Credit refusal (402) is an expected outcome, shown as a card below.
         const isCreditRefusal =
           errorType !== null && isOutOfCreditsErrorCode(errorType.errorCode);
+        // Consent refusal (403 CONSENT_REQUIRED) is expected too: dialog below.
+        const isConsentRefusal =
+          errorType?.errorKey === ErrorResponseTypes.CONSENT_REQUIRED.errorKey;
         // HTTP_ERROR = callApi got a response that is not our API's JSON
         // (e.g. a 200 text/html page from a proxy, captive portal or content
         // filter). It is not a handler rejection: the HTTP status, headers and
@@ -182,7 +233,7 @@ export function useAIStream(): UseAIStreamReturn {
             : errorType !== null
               ? "Stream request rejected by server"
               : "Stream request failed (no server response)";
-        (isBrowserNetworkLoss || isCreditRefusal
+        (isBrowserNetworkLoss || isCreditRefusal || isConsentRefusal
           ? logger.warn
           : logger.error
         ).bind(logger)(label, {
@@ -196,6 +247,14 @@ export function useAIStream(): UseAIStreamReturn {
           rootFolderId: data.rootFolderId,
           online: isOnline(),
         });
+
+        // Consent refusal (uncensored model, no 18+ confirmation yet): the
+        // consent dialog, not an error. Status is stale - mark it missing.
+        if (isConsentRefusal) {
+          markUncensoredConsentMissing(logger);
+          holdForConsent(data, model?.name ?? data.model);
+          return false;
+        }
 
         const activeThreadId = data.threadId;
         // Credit refusal (402): the composer shows a sign-up / top-up card
@@ -252,6 +311,15 @@ export function useAIStream(): UseAIStreamReturn {
           },
         );
 
+        if (
+          result.errorType?.errorKey ===
+          ErrorResponseTypes.CONSENT_REQUIRED.errorKey
+        ) {
+          markUncensoredConsentMissing(logger);
+          holdForConsent(data, model?.name ?? data.model);
+          return false;
+        }
+
         const activeThreadId = data.threadId;
         if (isOutOfCreditsErrorCode(result.errorType?.errorCode)) {
           if (activeThreadId) {
@@ -290,7 +358,7 @@ export function useAIStream(): UseAIStreamReturn {
       });
       return true;
     },
-    [logger, t, streamMutation, locale, storeSetPending],
+    [logger, t, streamMutation, locale, storeSetPending, holdForConsent],
   );
 
   /**

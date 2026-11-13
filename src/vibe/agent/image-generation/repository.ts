@@ -40,6 +40,7 @@ import {
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
 } from "../models/models";
+import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -145,6 +146,19 @@ export class ImageGenerationRepository {
         message: t("post.errors.not_found.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
+    }
+
+    // Uncensored image models need the caller's one-time 18+ consent, same
+    // as uncensored chat models.
+    const consentGate = await UncensoredConsentRepository.gate({
+      content: modelConfig.content,
+      modelName: modelConfig.name,
+      user,
+      locale,
+      logger,
+    });
+    if (!consentGate.success) {
+      return consentGate;
     }
 
     // Token-based multimodal model → use headless AI runner as polyfill

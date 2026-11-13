@@ -2,9 +2,11 @@
 
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import { useUncensoredConsent } from "next-vibe/agent/models/uncensored-consent/hooks";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
 import { Button } from "next-vibe/ui/components/button";
+import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Check } from "next-vibe/ui/components/icons/Check";
@@ -12,6 +14,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
@@ -160,6 +163,18 @@ export function ApiKeysContainer(): JSX.Element {
   const [revoking, setRevoking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newKey, setNewKey] = useState<string | null>(null);
+  // Uncensored models on /v1 need the account's one-time 18+ consent.
+  const consent = useUncensoredConsent(user, logger);
+
+  const handleUncensoredToggle = (allow: boolean): void => {
+    setError(null);
+    void (async (): Promise<void> => {
+      const result = allow ? await consent.agree() : await consent.withdraw();
+      if (!result.success) {
+        setError(result.message ?? t("widget.uncensoredFailed"));
+      }
+    })();
+  };
 
   const handleCreate = (): void => {
     const trimmed = name.trim();
@@ -294,6 +309,26 @@ export function ApiKeysContainer(): JSX.Element {
             >
               {creating ? t("widget.creating") : t("widget.create")}
             </Button>
+          </Div>
+          <Div className="mt-1 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/5 p-3">
+            <Checkbox
+              id="api-keys-uncensored-consent"
+              className="mt-0.5"
+              checked={consent.consented === true}
+              disabled={consent.consented === null || consent.isSaving}
+              onCheckedChange={handleUncensoredToggle}
+            />
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Label
+                htmlFor="api-keys-uncensored-consent"
+                className="cursor-pointer text-sm font-semibold leading-snug"
+              >
+                {t("widget.uncensoredLabel")}
+              </Label>
+              <Span className="text-xs leading-relaxed text-muted-foreground">
+                {t("widget.uncensoredHint")}
+              </Span>
+            </Div>
           </Div>
         </Div>
       ) : undefined}

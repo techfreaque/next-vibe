@@ -44,6 +44,10 @@ export const translations = {
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Created {{created}} · {{rate}}",
     rateLimit: "{{n}} req/min",
+    uncensoredLabel: "Allow uncensored models on my keys",
+    uncensoredHint:
+      "I am 18+ and accept that uncensored models can produce offensive, false, dangerous, illegal or malicious content, unfiltered. I am responsible for how I use it. Without this, uncensored model ids return HTTP 403.",
+    uncensoredFailed: "Couldn't save. Try again.",
     billingNote:
       "Out of credits returns HTTP 402. Streaming works on every endpoint.",
   },

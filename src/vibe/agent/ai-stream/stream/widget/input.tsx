@@ -80,6 +80,9 @@ import {
   DEFAULT_OUTPUT_TOKENS,
 } from "../../../models/constants";
 import { calculateCreditCost } from "../../../models/models";
+import { canSendWithModel } from "../../../models/uncensored-consent/hooks";
+import { UncensoredConsentGate } from "../../../models/uncensored-consent/widget/consent-gate";
+import { useTourState } from "../../../chat/tour-state";
 import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
@@ -323,6 +326,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     locale,
     logger,
     draftKey,
+    canSend: (): boolean => canSendWithModel(selectedModel, logger),
   });
   const { handleSubmit, submitWithContent, submitWithAudio, handleKeyDown } =
     inputHandlers;
@@ -705,6 +709,18 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           className="mb-2 @sm:mb-3"
         />
       )}
+
+      {/* One-time 18+ consent for uncensored models (selection or held send) */}
+      <UncensoredConsentGate
+        modelId={selectedModel}
+        locale={locale}
+        onResend={(): void => {
+          void handleSubmit();
+        }}
+        onPickAnother={(): void => {
+          useTourState.getState().setModelSelectorOpen(true);
+        }}
+      />
 
       {/* Recording modal */}
       <RecordingInputArea

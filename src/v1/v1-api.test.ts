@@ -41,6 +41,8 @@ import type { V1ChatCompletionsPostRequestOutput } from "./chat/completions/defi
 import { generateApiKey } from "@/api-keys/keys";
 import { resetPaidCache } from "@/api-keys/paid";
 import { listUserChatModels } from "./shared/models";
+import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
+import uncensoredConsentEndpoints from "next-vibe/agent/models/uncensored-consent/definition";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -137,14 +139,19 @@ describe("OpenAI-compatible API", () => {
   let bob: E2ECreditUser;
   let modelId = "";
   let toolModelId = "";
+  let uncensoredModelId = "";
   let free: E2ECreditUser;
 
   beforeAll(async () => {
     alice = await createE2ECreditUser("v1-api-alice", 500);
     bob = await createE2ECreditUser("v1-api-bob", 500);
     const models = listUserChatModels(alice.user, await getEnvAvailability());
-    modelId = models[0]?.id ?? "";
-    toolModelId = models.find((m) => m.supportsTools)?.id ?? "";
+    // Uncensored models need the account's 18+ consent (own describe below).
+    const ungated = models.filter((m) => !isUncensoredContent(m.content));
+    modelId = ungated[0]?.id ?? "";
+    toolModelId = ungated.find((m) => m.supportsTools)?.id ?? "";
+    uncensoredModelId =
+      models.find((m) => isUncensoredContent(m.content))?.id ?? "";
     free = await createE2ECreditUser("v1-api-free", 0);
   });
 
@@ -582,6 +589,52 @@ describe("OpenAI-compatible API", () => {
         messages: [{ role: "tool", content: "x" }],
       });
       expect(res.status).toBe(400);
+    });
+  });
+  describe("uncensored-model consent", () => {
+    it("403 uncensored_consent_required until the account consents, then 200", async () => {
+      if (!uncensoredModelId) {
+        // No uncensored provider key in this environment.
+        return;
+      }
+      const { key } = await createKey(alice.user, "uncensored-consent");
+      const refused = await completionsCall(key, { model: uncensoredModelId });
+      expect(refused.status).toBe(403);
+      const body = (await refused.json()) as {
+        error: { type: string; code: string; param: string; message: string };
+      };
+      expect(body.error.type).toBe("permission_error");
+      expect(body.error.code).toBe("uncensored_consent_required");
+      expect(body.error.param).toBe("model");
+      expect(body.error.message.length).toBeGreaterThan(20);
+      // Refused before inference: nothing charged.
+      const before = await balanceOf(alice.user);
+
+      const agreed = await sendTestRequest({
+        endpoint: uncensoredConsentEndpoints.POST,
+        data: { confirm: true },
+        user: alice.user,
+        toolExecutionContext: undefined,
+      });
+      expect(agreed.success, JSON.stringify(agreed)).toBe(true);
+      expect(await balanceOf(alice.user)).toBe(before);
+
+      const ok = await completionsCall(key, { model: uncensoredModelId });
+      expect(ok.status).toBe(200);
+
+      // Withdrawn consent locks it again.
+      const withdrawn = await sendTestRequest({
+        endpoint: uncensoredConsentEndpoints.DELETE,
+        user: alice.user,
+        toolExecutionContext: undefined,
+      });
+      expect(withdrawn.success).toBe(true);
+      expect((await completionsCall(key, { model: uncensoredModelId })).status).toBe(403);
+    });
+
+    it("mainstream models never need consent", async () => {
+      const { key } = await createKey(alice.user, "no-consent-needed");
+      expect((await completionsCall(key, { model: modelId })).status).toBe(200);
     });
   });
 });

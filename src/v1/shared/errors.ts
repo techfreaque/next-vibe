@@ -9,6 +9,7 @@ import type { StreamingResponse } from "next-vibe/core/route/response.schema";
 export type OpenAiErrorKind =
   | "invalid_request_error"
   | "authentication_error"
+  | "permission_error"
   | "insufficient_quota"
   | "rate_limit_error"
   | "not_found_error"

@@ -14,6 +14,7 @@ import type { ModelMessage } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { calculateCreditCost } from "next-vibe/agent/models/models";
+import { UncensoredConsentRepository } from "next-vibe/agent/models/uncensored-consent/repository";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
@@ -162,6 +163,33 @@ export async function prepareV1Call(
         "invalid_request_error",
         "invalid_value",
         "tool_choice",
+      ),
+    };
+  }
+
+  // Uncensored models: the key's account must have confirmed 18+ and
+  // unfiltered output once (API keys page). 403, never charged.
+  const consentGate = await UncensoredConsentRepository.gate({
+    content: model.content,
+    modelName: model.name,
+    user: payer,
+    locale,
+    logger,
+    surface: "api",
+  });
+  if (!consentGate.success) {
+    return {
+      ok: false,
+      error: v1Error(
+        consentGate.errorType.errorCode,
+        consentGate.message,
+        consentGate.errorType.errorCode === 403
+          ? "permission_error"
+          : "server_error",
+        consentGate.errorType.errorCode === 403
+          ? "uncensored_consent_required"
+          : null,
+        "model",
       ),
     };
   }

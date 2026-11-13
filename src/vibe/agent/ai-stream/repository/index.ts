@@ -61,11 +61,13 @@ import {
 } from "../../skills/favorites/db";
 import { SkillsRepository } from "../../skills/repository";
 import { stripThinkTags } from "../../text-to-speech/content-processing";
+import { UncensoredConsentRepository } from "../../models/uncensored-consent/repository";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import type {
   AiStreamRunPostRequestOutput,
   AiStreamRunPostResponseOutput,
 } from "../run/definition";
+import { getChatModelById } from "../models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -223,6 +225,15 @@ export interface CreateAiStreamParams {
    * that scope. Absent in prod.
    */
   fixtureScopeId?: string;
+  /**
+   * Skip the uncensored-model consent gate. ONLY for work a person already
+   * passed the gate for, or that no person reads as a chat:
+   * - draining a queued message (gated when it was enqueued)
+   * - the refusal-index benchmark (platform measurement run)
+   * Revival, tool confirmations and relay/inference-provider receivers are
+   * continuations and skip on their own.
+   */
+  skipUncensoredConsentGate?: boolean;
 }
 
 export class AiStreamRepository {
@@ -807,6 +818,7 @@ export class AiStreamRepository {
     parentThreadId,
     fixtureScopeId,
     cronTaskId,
+    skipUncensoredConsentGate,
   }: CreateAiStreamParams & {
     awaitResult?: boolean;
   }): Promise<
@@ -878,6 +890,35 @@ export class AiStreamRepository {
         skill: resolved.data.skill,
         favoriteConfig: resolved.data.favoriteConfig,
       };
+    }
+
+    // ================================================================
+    // Uncensored-model consent: a person (account or guest lead) confirms
+    // once that they are 18+ and accept unfiltered output. Checked on the
+    // RESOLVED model, before relay/queue/intake write anything, so no path
+    // (UI, ai-run, CLI, MCP, cron) runs an uncensored model without it.
+    // Continuations of work that already started are not re-gated: revival,
+    // tool confirmations, and receivers of a remote caller (the origin
+    // instance gated its own user).
+    // ================================================================
+    if (
+      !skipUncensoredConsentGate &&
+      !isRevival &&
+      !relayReceiver &&
+      data.executionContext.mode === "local" &&
+      !(data.toolConfirmations && data.toolConfirmations.length > 0)
+    ) {
+      const gateModel = getChatModelById(data.model);
+      const consentGate = await UncensoredConsentRepository.gate({
+        content: gateModel?.content,
+        modelName: gateModel?.name ?? data.model,
+        user,
+        locale,
+        logger,
+      });
+      if (!consentGate.success) {
+        return consentGate;
+      }
     }
 
     // ================================================================

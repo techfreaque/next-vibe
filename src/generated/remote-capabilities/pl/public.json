@@ -1127,22 +1127,32 @@
       },
       "children": {
         "email": {
-          "type": "text",
+          "type": "form_field",
+          "fieldType": "email",
           "label": "Adres e-mail",
+          "description": "Adres e-mail, dla którego chcesz sprawdzić status subskrypcji",
+          "placeholder": "użytkownik@przykład.pl",
+          "helpText": "Zostaw puste, aby sprawdzić własną subskrypcję",
+          "columns": 12,
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "email",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
                 },
                 "type": "string"
               }
             },
             "type": "optional"
           },
+          "order": 1,
           "usage": {
-            "response": true
+            "request": "data"
           },
           "schemaType": "primitive"
         },
@@ -1182,6 +1192,26 @@
               "type": "boolean"
             },
             "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subscriptionEmail": {
+          "type": "text",
+          "label": "Adres e-mail",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -30232,6 +30262,211 @@
     "category": "ai",
     "tags": ["Modele"],
     "aliases": ["models", "list-models"],
+    "credits": 0
+  },
+  {
+    "toolName": "uncensored-consent",
+    "title": "Zgoda na modele bez cenzury",
+    "titleShort": "Zgoda: bez cenzury",
+    "description": "Pokazuje, czy to konto lub gość potwierdził pełnoletność i akceptuje niefiltrowane odpowiedzi modeli bez cenzury. Bez potwierdzenia te modele nie ruszą.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "consented": {
+          "type": "text",
+          "label": "Potwierdzone",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "consentedAt": {
+          "type": "text",
+          "label": "Potwierdzone dnia",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "version": {
+          "type": "text",
+          "label": "Wersja zgody",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Zgoda"],
+    "aliases": ["uncensored-consent"],
     "credits": 0
   },
   {

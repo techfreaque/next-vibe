@@ -378,6 +378,7 @@ type ErrorTypes =
   | "PAYMENT_ERROR"
   | "PARTIAL_FAILURE"
   | "PAYMENT_REQUIRED"
+  | "CONSENT_REQUIRED"
   | "CONFLICT";
 
 export type ErrorResponseTypesElements = {
@@ -401,6 +402,14 @@ export const ErrorResponseTypes: ErrorResponseTypesElements = {
   TWO_FACTOR_REQUIRED: {
     errorKey: "errorTypes.two_factor_required",
     errorCode: 202,
+  },
+  /**
+   * A one-time user confirmation is missing (e.g. 18+ consent before an
+   * uncensored model runs). Clients show the confirmation, never an error.
+   */
+  CONSENT_REQUIRED: {
+    errorKey: "errorTypes.consent_required",
+    errorCode: 403,
   },
   FORBIDDEN: {
     errorKey: "errorTypes.forbidden",

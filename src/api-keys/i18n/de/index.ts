@@ -47,6 +47,10 @@ export const translations: typeof enTranslations = {
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Erstellt {{created}} · {{rate}}",
     rateLimit: "{{n}} Anfr./Min.",
+    uncensoredLabel: "Unzensierte Modelle für meine Keys erlauben",
+    uncensoredHint:
+      "Ich bin 18+ und akzeptiere, dass unzensierte Modelle beleidigende, falsche, gefährliche, illegale oder bösartige Inhalte erzeugen können, ungefiltert. Für die Nutzung trage ich die Verantwortung. Ohne Haken liefern unzensierte Modell-IDs HTTP 403.",
+    uncensoredFailed: "Speichern fehlgeschlagen. Versuch es erneut.",
     billingNote:
       "Leere Credits liefern HTTP 402. Streaming funktioniert auf jedem Endpunkt.",
   },

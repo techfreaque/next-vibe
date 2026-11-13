@@ -354,6 +354,9 @@ export async function processNextQueuedMessage(
     request: undefined,
     t: aiStreamT,
     subAgentDepth,
+    // Consent was checked when the message was enqueued (the gate runs before
+    // the auto-queue branch) - never strand an accepted message here.
+    skipUncensoredConsentGate: true,
   });
 
   if (!streamResult.success) {

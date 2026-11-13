@@ -671,6 +671,8 @@ export class LeadsRepository {
           bouncedAt: leads.bouncedAt,
           invalidAt: leads.invalidAt,
           campaignStartedAt: leads.campaignStartedAt,
+          uncensoredConsentAt: leads.uncensoredConsentAt,
+          uncensoredConsentVersion: leads.uncensoredConsentVersion,
           // Subqueries for link counts
           linkedLeadsCount: sql<number>`(
             SELECT COUNT(*)::int FROM lead_lead_links

@@ -85,6 +85,11 @@ export const leads = pgTable("leads", {
   source: text("source", { enum: LeadSourceDB }).notNull(),
   notes: text("notes"),
 
+  // Uncensored-model consent for guests (copied to the user on signup/login).
+  // null = never agreed (or withdrawn). Version = consent text version agreed to.
+  uncensoredConsentAt: timestamp("uncensored_consent_at"),
+  uncensoredConsentVersion: integer("uncensored_consent_version"),
+
   convertedUserId: uuid("converted_user_id").references(() => users.id),
   convertedAt: timestamp("converted_at"),
 
