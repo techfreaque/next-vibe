@@ -5,9 +5,8 @@
  * replayed on every later run. Requires a server (Atlas dev): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { submitAndAwaitResponse } from "../ai-stream/testing/e2e-slow-submit";

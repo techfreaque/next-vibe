@@ -47,8 +47,8 @@ import {
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { isTransientErrorText } from "../errors/transient";
 import {
-  type DrainableLoop,
   deregisterActiveLoop,
+  type DrainableLoop,
   registerActiveLoop,
 } from "./active-loops";
 import {

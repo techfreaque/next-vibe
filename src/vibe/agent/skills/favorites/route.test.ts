@@ -25,11 +25,11 @@ import { IntelligenceLevel, ModelSelectionType } from "../enum";
 import favoriteSingleEndpoint from "./[id]/definition";
 import favoriteCreateEndpoint from "./create/definition";
 import { chatFavorites } from "./db";
-import favoriteDeleteBatchEndpoint from "./delete-batch/definition";
 // ── Definition imports ───────────────────────────────────────────────────────
 import favoritesListEndpoint from "./definition";
-import { ChatFavoritesRepository } from "./repository";
+import favoriteDeleteBatchEndpoint from "./delete-batch/definition";
 import favoriteReorderEndpoint from "./reorder/definition";
+import { ChatFavoritesRepository } from "./repository";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
 

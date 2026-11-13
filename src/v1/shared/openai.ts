@@ -6,11 +6,11 @@
 
 import "server-only";
 
-import type { WidgetData } from "next-vibe/core/utils/json";
 import {
   createStreamingResponse,
   type StreamingResponse,
 } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 
 import type { OpenAiErrorKind, V1Error } from "./errors";
 

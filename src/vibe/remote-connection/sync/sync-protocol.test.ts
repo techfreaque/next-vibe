@@ -34,13 +34,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
-import { cortexNodes } from "../../agent/cortex/db";
-import { CortexNodeType } from "../../agent/cortex/enum";
-import { defaultLocale } from "../../core/i18n/core/config";
-import { db } from "../../database";
-import type { JwtPrivatePayloadType } from "../../identity/auth/types";
-import { identityEnv } from "../../identity/env";
-import { createEndpointLogger } from "../../logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -57,6 +50,13 @@ import {
   triggerHermesPull,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import { cortexNodes } from "../../agent/cortex/db";
+import { CortexNodeType } from "../../agent/cortex/enum";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
+import { createEndpointLogger } from "../../logger/server";
 import type { SyncDomain } from "../../realtime/core/sync-domain";
 import type { SyncScope } from "../db";
 import { remoteConnections } from "../db";

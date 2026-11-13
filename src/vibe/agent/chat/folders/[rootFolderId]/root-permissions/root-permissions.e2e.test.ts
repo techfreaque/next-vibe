@@ -7,11 +7,10 @@
  * decide whether the customer may start a thread there.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "../../../../ai-stream/stream/i18n";
 import {

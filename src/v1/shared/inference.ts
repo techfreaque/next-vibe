@@ -11,9 +11,9 @@ import type { LanguageModel, ModelMessage, ProviderMetadata } from "ai";
 import {
   generateText,
   jsonSchema,
+  type JSONSchema7,
   streamText,
   tool,
-  type JSONSchema7,
   type ToolChoice,
   type ToolSet,
 } from "ai";

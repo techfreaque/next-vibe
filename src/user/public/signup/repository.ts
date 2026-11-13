@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -12,10 +13,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type {
   JwtPayloadType,
@@ -23,10 +20,10 @@ import type {
 } from "next-vibe/identity/auth/types";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import {
+  isUserPermissionRole,
   UserPermissionRole,
   UserRole,
   type UserRoleValue,
-  isUserPermissionRole,
 } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { SessionRepository } from "next-vibe/identity/session/repository";
@@ -39,6 +36,9 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { recordAntiFarmingEvent } from "@/credits/anti-farming/events";
 import { ipSubnetKey } from "@/credits/anti-farming/ip";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
+
 import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,

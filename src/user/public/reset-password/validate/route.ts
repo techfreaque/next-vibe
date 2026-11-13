@@ -2,8 +2,8 @@
  * Password reset token validation API route
  */
 
-import { endpointsHandler } from "next-vibe/core/route/multi";
 import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
 import { PasswordRepository } from "../repository";
 import resetPasswordValidateEndpoint from "./definition";

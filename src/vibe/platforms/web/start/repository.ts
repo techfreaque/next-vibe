@@ -7,15 +7,16 @@
 // CLI output messages don't need internationalization
 // Process environment access is required for server configuration
 
+// agentPublicFlags side-effect: populates process.env.NEXT_PUBLIC_AGENT_* from
+// server API keys so patchRuntimeEnvPlaceholders() can replace Docker-build
+// sentinels with the real derived values. Must be imported before that call.
+import "../../../agent/env";
+
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 
-// agentPublicFlags side-effect: populates process.env.NEXT_PUBLIC_AGENT_* from
-// server API keys so patchRuntimeEnvPlaceholders() can replace Docker-build
-// sentinels with the real derived values. Must be imported before that call.
-import "../../../agent/env";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {

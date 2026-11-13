@@ -7,8 +7,8 @@ import type {
   MetricCardTrend,
   MetricCardVariant,
 } from "../../web/components/metric-card";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type {
   MetricCardFormat,

@@ -4,9 +4,9 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as rolesTranslation } from "next-vibe/identity/roles/i18n";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";

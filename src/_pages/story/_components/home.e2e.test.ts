@@ -6,11 +6,10 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation } from "./i18n";
 

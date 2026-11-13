@@ -9,8 +9,8 @@
 
 import type { Metadata } from "next";
 import {
-  ChatModelId,
   chatModelDefinitions,
+  ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import {

@@ -4,8 +4,6 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
@@ -14,6 +12,7 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { describe, expect } from "vitest";
 
 import passwordEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";

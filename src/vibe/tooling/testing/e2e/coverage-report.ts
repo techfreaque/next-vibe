@@ -21,8 +21,8 @@ import "server-only";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { getEndpoint } from "@/generated/endpoints/endpoint";
 import { pathToAliasMap } from "@/generated/endpoints/alias-map";
+import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { UserRole } from "../../../identity/roles/enum";
 import { loadEnvironment } from "../../../platforms/cli/runtime/environment";

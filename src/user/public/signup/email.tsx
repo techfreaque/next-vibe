@@ -4,6 +4,9 @@
  */
 
 import { Button, Column, Row, Section, Text } from "@react-email/components";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   ErrorResponseType,
@@ -19,6 +22,8 @@ import {
   filterUserPermissionRoles,
   UserPermissionRole,
 } from "next-vibe/identity/roles/enum";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
 import React from "react";
@@ -31,12 +36,7 @@ import type {
   EmailResolvedData,
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
-import { coreEnv } from "next-vibe/core/env";
 
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { UserRepository } from "next-vibe/identity/user/repository";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {

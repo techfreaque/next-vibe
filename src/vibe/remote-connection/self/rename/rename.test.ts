@@ -27,16 +27,6 @@ import { randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatFolders } from "../../../agent/chat/db";
-import { chatFavorites } from "../../../agent/skills/favorites/db";
-import { db } from "../../../database";
-import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
-import { identityEnv } from "../../../identity/env";
-import {
-  instanceIdentities,
-  remoteConnections,
-} from "../../db";
-import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runTestStream } from "../../../agent/ai-stream/testing/headless-test-runner";
@@ -54,6 +44,16 @@ import {
   restoreHermesIdentity,
   unregisterDevFromHermes,
 } from "../../../agent/ai-stream/testing/remote-setup";
+import { chatFolders } from "../../../agent/chat/db";
+import { chatFavorites } from "../../../agent/skills/favorites/db";
+import { db } from "../../../database";
+import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
+import { identityEnv } from "../../../identity/env";
+import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
+import {
+  instanceIdentities,
+  remoteConnections,
+} from "../../db";
 import selfRenameDefinitions from "./definition";
 
 // ── Skip guard ─────────────────────────────────────────────────────────────────

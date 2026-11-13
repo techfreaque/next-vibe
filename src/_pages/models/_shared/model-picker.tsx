@@ -18,8 +18,8 @@ import {
   PopoverTrigger,
 } from "next-vibe/ui/components/popover";
 import { Span } from "next-vibe/ui/components/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { IconComponent } from "next-vibe/ui/lib/helper";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 

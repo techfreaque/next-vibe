@@ -44,11 +44,10 @@ import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 import { messengerAccounts } from "@/messenger/accounts/db";
-import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
-import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
-
 import { CampaignType } from "@/messenger/accounts/enum";
 import { MessageStatus } from "@/messenger/messages/enum";
+import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
+import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
 import { emailService } from "../emails";
 import { emailRendererService } from "../emails/services/renderer";

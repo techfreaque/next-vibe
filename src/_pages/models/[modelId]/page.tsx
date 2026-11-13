@@ -4,10 +4,10 @@
  */
 
 import type { Metadata } from "next";
+import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
+import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
-import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import { permanentRedirect } from "next-vibe/ui/lib/redirect";
@@ -16,15 +16,15 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
+  buildPickerModels,
   findModelPageAlias,
   findPublicModelId,
   formatTokenCount,
   getModelFacts,
   type ModelFacts,
   type ModelRef,
-  suggestComparisons,
-  buildPickerModels,
   type PickerModel,
+  suggestComparisons,
   toModelSlug,
 } from "../_shared/model-facts";
 import { formatNumber, tierName } from "../_shared/model-format";

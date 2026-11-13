@@ -15,9 +15,9 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { cortexNodes } from "../../../../../cortex/db";
 import { CortexNodeType } from "../../../../../cortex/enum";
-import { CortexWriteRepository } from "../../../../../cortex/write/repository";
 import { scopedTranslation as cortexWriteTranslation } from "../../../../../cortex/write/i18n";
-import { chatFolders, type ChatFolder } from "../../../../db";
+import { CortexWriteRepository } from "../../../../../cortex/write/repository";
+import { type ChatFolder, chatFolders } from "../../../../db";
 import {
   canManageFolder,
   canViewFolder,
@@ -26,9 +26,9 @@ import type {
   FolderProjectGetResponseOutput,
   FolderProjectUpdateResponseOutput,
 } from "./definition";
-import type { FolderProjectAddFileResponseOutput } from "./files/definition";
 import type { FolderProjectRemoveFileResponseOutput } from "./files/[fileId]/definition";
 import { scopedTranslation as removeFileTranslation } from "./files/[fileId]/i18n";
+import type { FolderProjectAddFileResponseOutput } from "./files/definition";
 import { scopedTranslation as filesTranslation } from "./files/i18n";
 import { scopedTranslation } from "./i18n";
 

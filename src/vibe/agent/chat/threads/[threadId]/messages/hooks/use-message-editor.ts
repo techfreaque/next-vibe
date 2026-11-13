@@ -7,11 +7,11 @@
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { DivRefObject } from "next-vibe/ui/components/div";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
 } from "next-vibe/ui/components/textarea";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   useCallback,
   useEffect,

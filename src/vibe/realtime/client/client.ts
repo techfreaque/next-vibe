@@ -18,8 +18,8 @@
  */
 
 import { addDocumentListener, addWindowListener } from "next-vibe/ui/lib/dom";
-import { isOnline } from "next-vibe/ui/lib/media";
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
+import { isOnline } from "next-vibe/ui/lib/media";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { EndpointLogger } from "../../logger/types";

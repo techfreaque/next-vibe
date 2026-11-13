@@ -14,12 +14,9 @@
  */
 
 import { eq } from "drizzle-orm";
-import type { BrowserContext, Locator, Page } from "playwright";
-import { expect } from "vitest";
-
+import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
@@ -32,17 +29,19 @@ import { userRoles, users } from "next-vibe/identity/user/db";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import type { BrowserContext, Locator, Page } from "playwright";
+import { expect } from "vitest";
 
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
-import { chatFolders, chatMessages, chatThreads } from "../db";
 import {
   getFolderTourAttr,
   getTourSelector,
   TOUR_DATA_ATTRS,
 } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
 import { TOUR_STORAGE_KEY } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-config";
+import { chatFolders, chatMessages, chatThreads } from "../db";
 import { ChatMessageRole, ThreadStreamingState } from "../enum";
 import { getStorageAdapter } from "../storage";
 

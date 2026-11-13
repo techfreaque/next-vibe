@@ -12,8 +12,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CreditsT } from "@/credits/i18n";
 
 import type { ToolExecutionContext } from "../../../../../core/execution-context";
-import type { AbortReason } from "../constants";
 import type { MessagesWsEmit } from "../../../../chat/threads/[threadId]/messages/emitter";
+import type { AbortReason } from "../constants";
 
 /** Callback for emitting thread-title-updated to sidebar channels. */
 export type EmitThreadTitleFn = (threadId: string, title: string) => void;

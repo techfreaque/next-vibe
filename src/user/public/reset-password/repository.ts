@@ -9,30 +9,29 @@ import { randomBytes } from "node:crypto";
 
 import { and, eq, gt } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
-
-import { RESET_TOKEN_EXPIRY } from "@/env/constants";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import { identityEnv } from "next-vibe/identity/env";
-
-import type { ResetPasswordT } from "./i18n";
-import { scopedTranslation } from "./i18n";
-
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { RESET_TOKEN_EXPIRY } from "@/env/constants";
+
 import { scopedTranslation as passwordScopedTranslation } from "../../private/me/password/i18n";
 import { PasswordUpdateRepository } from "../../private/me/password/repository";
 import type { ResetPasswordConfirmPostResponseOutput } from "./confirm/definition";
 import type { NewPasswordReset, PasswordReset } from "./db";
 import { insertPasswordResetSchema, passwordResets } from "./db";
+import type { ResetPasswordT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type { ResetPasswordRequestPostResponseOutput } from "./request/definition";
 import type { ResetPasswordValidateGetResponseOutput } from "./validate/definition";
 

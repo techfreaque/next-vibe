@@ -34,8 +34,8 @@ import { UserDetailLevel } from "../../../identity/user/enum";
 import { UserRepository } from "../../../identity/user/repository";
 import { createEndpointLogger } from "../../../logger/server";
 import { resolveTestAdminUser } from "../../../tooling/testing/testing-suite/resolve-test-user";
-import { ChatModelId } from "../models-definitions";
 import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
+import { ChatModelId } from "../models-definitions";
 
 const PASSWORD = "E2eCreditUser123";
 

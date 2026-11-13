@@ -3,20 +3,19 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
-import { identityEnv } from "next-vibe/identity/env";
-import { E2E_AUTH_COOKIE_NAME } from "next-vibe/tooling/testing/e2e/auth";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-import { clearLoginAttempts } from "next-vibe/tooling/testing/testing-suite/login-attempts";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { E2E_AUTH_COOKIE_NAME } from "next-vibe/tooling/testing/e2e/auth";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { clearLoginAttempts } from "next-vibe/tooling/testing/testing-suite/login-attempts";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { describe, expect } from "vitest";
+
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import twoFactorEndpoints from "../../private/me/two-factor/definition";

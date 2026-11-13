@@ -59,7 +59,7 @@ import {
   spendBetween,
   trailingSpendRate,
 } from "./logic";
-import { type FinanceDeps, FinanceRepository, defaultFinanceDeps } from "./repository";
+import { defaultFinanceDeps,type FinanceDeps, FinanceRepository } from "./repository";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
 import type { StripeLedgerPort } from "./sources/revenue";
 

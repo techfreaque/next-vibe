@@ -3,6 +3,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   filterRoleModels,
@@ -19,7 +20,6 @@ import {
   sharedFilterPropsSchema,
 } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
-import { ModelUtility } from "../models/enum";
 import {
   chatModelDefinitions,
   ChatModelId,

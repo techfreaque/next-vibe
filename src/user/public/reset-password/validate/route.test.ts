@@ -1,10 +1,10 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { beforeAll, describe, expect, it } from "vitest";
-
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { beforeAll, describe, expect, it } from "vitest";
+
 import resetPasswordValidateEndpoints from "./definition";
 
 const endpoint = resetPasswordValidateEndpoints.GET;

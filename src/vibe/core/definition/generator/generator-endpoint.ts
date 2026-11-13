@@ -7,6 +7,12 @@ import "server-only";
 
 import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
+import type { PlatformMarkerValue } from "../../../identity/roles/enum";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  type UserRoleValue,
+} from "../../../identity/roles/enum";
 import { formatWarning } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
 import {
@@ -26,12 +32,6 @@ import {
   toProjectRelativePath,
   writeGeneratedFile,
 } from "../../generators/shared/utils";
-import type { PlatformMarkerValue } from "../../../identity/roles/enum";
-import {
-  filterPlatformMarkers,
-  PlatformMarker,
-  type UserRoleValue,
-} from "../../../identity/roles/enum";
 import type { ApiSection } from "../endpoint-base";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/endpoints/endpoint.ts`;

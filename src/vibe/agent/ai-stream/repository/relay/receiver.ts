@@ -6,6 +6,7 @@
  */
 import "server-only";
 
+import type { ToolSet } from "ai";
 import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -24,7 +25,6 @@ import type {
 } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { ToolSet } from "ai";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 import { remoteConnections } from "next-vibe/remote-connection/db";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -34,13 +34,13 @@ import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatFolders, chatThreads } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { getChatModelById } from "../../models";
-import { getMissingProviderKeyMessage } from "../setup/model-credit-phase";
-import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../../stream/definition";
 import type { AiStreamT } from "../../stream/i18n";
+import { getMissingProviderKeyMessage } from "../setup/model-credit-phase";
+import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 
 /**
  * Rebuild the caller's sub-chain (leaf `subFolderId` and its content ancestors)

@@ -5,8 +5,8 @@ import type {
   DetailFieldProps,
   DetailGridProps,
 } from "../../web/components/detail-grid";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type {
   DetailFieldProps,

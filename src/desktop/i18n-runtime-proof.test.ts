@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
+import { scopedTranslation as pagesT } from "../_pages/[...notFound]/i18n";
 import { scopedTranslation as browserT } from "../browser/i18n";
 import { scopedTranslation as smsT } from "../sms/i18n";
-import { scopedTranslation as pagesT } from "../_pages/[...notFound]/i18n";
 import { scopedTranslation as desktopT } from "./i18n";
 
 const LOCALES = ["en-US", "de-DE", "pl-PL"] as const;

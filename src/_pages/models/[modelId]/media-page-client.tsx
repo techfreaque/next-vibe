@@ -1,7 +1,7 @@
 "use client";
 
-import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
+import { ModelCreditDisplay } from "next-vibe/agent/models/widget/model-credit-display";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
@@ -16,8 +16,8 @@ import {
   PageSection,
 } from "../../story/_shared/marketing";
 import {
-  modalityList,
   creditValueText,
+  modalityList,
   tierLine,
   tierName,
 } from "../_shared/model-format";

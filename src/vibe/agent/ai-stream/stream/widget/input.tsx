@@ -50,23 +50,31 @@ import {
   useRef,
 } from "react";
 
+import { isIncognitoFolder } from "../../../chat/config";
 import { getAgentMessageMaxLength } from "../../../chat/constants";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";
+import foldersDefinition from "../../../chat/folders/[rootFolderId]/definition";
+import rootPermissionsDefinition from "../../../chat/folders/[rootFolderId]/root-permissions/definition";
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatStore } from "../../../chat/hooks/store";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
-import foldersDefinition from "../../../chat/folders/[rootFolderId]/definition";
-import rootPermissionsDefinition from "../../../chat/folders/[rootFolderId]/root-permissions/definition";
-import { isIncognitoFolder } from "../../../chat/config";
 import {
   type MessageOperationsDeps,
   useMessageOperations,
 } from "../../../chat/threads/[threadId]/messages/hooks/use-operations";
+import { useTourState } from "../../../chat/tour-state";
 import { CortexButton } from "../../../cortex/widget/cortex-button";
 import { useProviderAvailability } from "../../../env-availability-store";
+import {
+  DEFAULT_INPUT_TOKENS,
+  DEFAULT_OUTPUT_TOKENS,
+} from "../../../models/constants";
+import { calculateCreditCost } from "../../../models/models";
+import { canSendWithModel } from "../../../models/uncensored-consent/hooks";
+import { UncensoredConsentGate } from "../../../models/uncensored-consent/widget/consent-gate";
 import type { FavoriteConfig } from "../../../skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "../../../skills/favorites/repository-client";
 import {
@@ -75,14 +83,6 @@ import {
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
 } from "../../constants";
 import { getChatModelById } from "../../models";
-import {
-  DEFAULT_INPUT_TOKENS,
-  DEFAULT_OUTPUT_TOKENS,
-} from "../../../models/constants";
-import { calculateCreditCost } from "../../../models/models";
-import { canSendWithModel } from "../../../models/uncensored-consent/hooks";
-import { UncensoredConsentGate } from "../../../models/uncensored-consent/widget/consent-gate";
-import { useTourState } from "../../../chat/tour-state";
 import {
   getBestAudioVisionModel,
   getBestImageVisionModel,
@@ -98,7 +98,6 @@ import {
 } from "../hooks/input-store";
 import { RecordingInputArea } from "../hooks/recording-input-area";
 import { useAIStreamStore } from "../hooks/store";
-import { OutOfCreditsCard } from "./out-of-credits-card";
 import { useAIStream } from "../hooks/use-ai-stream";
 import {
   getDraftKey,
@@ -111,6 +110,7 @@ import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 import { TOUR_DATA_ATTRS } from "./chat-ui/welcome-tour/tour-attrs";
+import { OutOfCreditsCard } from "./out-of-credits-card";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
 import { useInputHandlers } from "./use-input-handlers";

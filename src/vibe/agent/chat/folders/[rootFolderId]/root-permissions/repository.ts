@@ -21,8 +21,8 @@ import {
   hasRolePermission,
 } from "../../../permissions/permissions";
 import type {
-  RootPermissionsGetUrlVariablesOutput,
   RootPermissionsGetResponseOutput,
+  RootPermissionsGetUrlVariablesOutput,
 } from "./definition";
 
 /**

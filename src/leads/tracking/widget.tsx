@@ -4,6 +4,7 @@
  */
 
 "use client";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Activity } from "next-vibe/ui/components/icons/Activity";
@@ -16,7 +17,6 @@ import { User } from "next-vibe/ui/components/icons/User";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
 import { openInNewTab } from "next-vibe/ui/lib/location";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetContext,

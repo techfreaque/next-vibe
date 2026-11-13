@@ -6,8 +6,6 @@
  */
 
 import { and, eq, inArray } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
@@ -19,12 +17,13 @@ import {
 } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { createEndpointLogger } from "next-vibe/logger/server";
 import { users } from "next-vibe/identity/user/db";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   createTestUser as createUnverifiedTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { newsletterSubscriptions } from "@/newsletter/db";
 import {
@@ -35,9 +34,8 @@ import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { freePoolClaims } from "./anti-farming/db";
 import { creditTransactions, creditWallets } from "./db";
-import { FREE_GRANT_TIER_VERSION } from "./free-allowance";
 import { CreditTransactionType } from "./enum";
-import { publicFreeTierDailyCap } from "./public-cap/db";
+import { FREE_GRANT_TIER_VERSION } from "./free-allowance";
 import {
   computeFreeAllowance,
   computeFreeAvailable,
@@ -46,6 +44,7 @@ import {
   computeLegacyFreeAllowance,
 } from "./free-allowance";
 import { scopedTranslation } from "./i18n";
+import { publicFreeTierDailyCap } from "./public-cap/db";
 import { CreditRepository } from "./repository";
 
 const { guest, newsletterBonus } = FREE_CREDIT_ALLOWANCE;

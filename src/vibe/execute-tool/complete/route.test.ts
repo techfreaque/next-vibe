@@ -14,12 +14,12 @@
 
 import "server-only";
 
+import { describe, expect, it } from "vitest";
+
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import { CronTaskStatus } from "../../tasks/enum";
 import { sendTestRequest } from "../../tooling/testing/testing-suite/send-test-request";
-import { describe, expect, it } from "vitest";
-
 import { endpoints } from "./definition";
 
 const customerUser: JwtPrivatePayloadType = {

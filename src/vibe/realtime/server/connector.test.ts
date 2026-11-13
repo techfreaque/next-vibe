@@ -30,6 +30,8 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, sql } from "drizzle-orm";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import {
   ATLAS_INSTANCE_ID,
   closeProdDb,
@@ -50,8 +52,6 @@ import { identityEnv } from "../../identity/env";
 import type { SyncScope } from "../../remote-connection/db";
 import { remoteConnections } from "../../remote-connection/db";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import type { ConnectionConfig } from "./connector";
 import {
   acquireConnection,

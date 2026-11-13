@@ -24,6 +24,12 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { eq } from "drizzle-orm";
+import type { WidgetData } from "next-vibe/core/utils/json";
+import { db } from "next-vibe/database";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { identityEnv } from "next-vibe/identity/env";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatSettings } from "../../../chat/settings/db";
 import {
@@ -33,12 +39,6 @@ import {
   ModelSortField,
 } from "../../../skills/enum";
 import { chatFavorites } from "../../../skills/favorites/db";
-import type { WidgetData } from "next-vibe/core/utils/json";
-import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { identityEnv } from "next-vibe/identity/env";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { ChatModelId } from "../../models";
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {

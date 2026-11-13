@@ -16,9 +16,9 @@ import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Link } from "next-vibe/ui/components/link";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
-import { P } from "next-vibe/ui/components/typography";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,

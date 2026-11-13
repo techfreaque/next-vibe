@@ -6,13 +6,13 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { filterUserPermissionRoles } from "../../identity/roles/enum";
-import type { EndpointLogger } from "../../logger/types";
-import { Platform } from "../../platforms/platforms";
 import { z } from "zod";
 
 import productUpdateDefinition from "@/products/catalog/[productId]/update/definition";
 
+import { filterUserPermissionRoles } from "../../identity/roles/enum";
+import type { EndpointLogger } from "../../logger/types";
+import { Platform } from "../../platforms/platforms";
 import { extractSchemaDefaults, generateFormSchema } from "./utils";
 
 const noopLogger: EndpointLogger = {

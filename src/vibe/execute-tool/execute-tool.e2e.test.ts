@@ -4,12 +4,11 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Locator } from "playwright";
-import { describe, expect } from "vitest";
-
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import type { EndpointForm } from "next-vibe/tooling/testing/e2e/endpoint-form";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator } from "playwright";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation } from "../platforms/ai/i18n";
 import { scopedTranslation as uiScopedTranslation } from "../ui/web/i18n";

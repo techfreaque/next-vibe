@@ -13,9 +13,6 @@ import {
   CardTitle,
 } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
-import { useState } from "react";
-
-import { PasswordStrengthIndicator } from "@/user/public/signup/widget/password-strength-indicator";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -23,14 +20,17 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import AlertWidget from "next-vibe/unified-ui/widgets/display-only/alert/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { useState } from "react";
 
-import AlertWidget from "next-vibe/unified-ui/widgets/display-only/alert/widget";
+import { PasswordStrengthIndicator } from "@/user/public/signup/widget/password-strength-indicator";
+
 import type definition from "../definition";
 
 /**

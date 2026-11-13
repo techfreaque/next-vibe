@@ -11,6 +11,13 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+  JWTPublicPayloadType,
+} from "../../identity/auth/types";
+import { UserRole } from "../../identity/roles/enum";
+import { objectField } from "../../unified-ui/_shared/utils-i18n";
 import { createEndpoint } from "../definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -19,13 +26,6 @@ import {
   WidgetType,
 } from "../definition/enums";
 import type { InferJwtPayloadTypeFromRoles } from "../route/handler-roles";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-  JWTPublicPayloadType,
-} from "../../identity/auth/types";
-import { UserRole } from "../../identity/roles/enum";
-import { objectField } from "../../unified-ui/_shared/utils-i18n";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

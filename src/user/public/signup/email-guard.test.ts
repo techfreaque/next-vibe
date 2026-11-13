@@ -6,8 +6,6 @@
  */
 
 import { and, gte, inArray } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
@@ -19,6 +17,7 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { antiFarmingEvents } from "@/credits/anti-farming/db";
 

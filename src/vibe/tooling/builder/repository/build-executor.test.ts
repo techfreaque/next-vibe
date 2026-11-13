@@ -6,13 +6,12 @@
 import { resolve } from "node:path";
 
 import { afterEach, describe, expect, it } from "bun:test";
+
 import { defaultLocale } from "../../../core/i18n/core/config";
 import { createEndpointLogger } from "../../../logger/server";
 import type { EndpointLogger } from "../../../logger/types";
-
-import type { BuilderT } from "../i18n";
-
 import { BuildProfileEnum, ViteBuildTypeEnum } from "../enum";
+import type { BuilderT } from "../i18n";
 import { buildExecutor } from "./build-executor";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");

@@ -4,11 +4,10 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { chatMessages } from "../../../db";
 import { ChatMessageRole } from "../../../enum";

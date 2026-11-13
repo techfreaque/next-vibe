@@ -4,9 +4,8 @@
  * and replay on every later run (delete the folder to re-record).
  */
 
-import { describe, expect } from "vitest";
-
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import describeImageEndpoints from "./definition";

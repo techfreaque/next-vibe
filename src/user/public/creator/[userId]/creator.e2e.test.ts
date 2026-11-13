@@ -6,8 +6,6 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
@@ -18,6 +16,7 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { describe, expect } from "vitest";
 
 import creatorEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";

@@ -7,6 +7,7 @@
  */
 
 import React, { useCallback, useRef, useState } from "react";
+import type { TextInputInstance } from "react-native";
 import {
   ScrollView,
   Text as RNText,
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import type { TextInputInstance } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type {

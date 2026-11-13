@@ -1,12 +1,12 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { clearLoginAttempts } from "next-vibe/tooling/testing/testing-suite/login-attempts";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import loginEndpoints from "./definition";
 
 const endpoint = loginEndpoints.POST;

@@ -17,10 +17,12 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useCredits } from "@/credits/hooks";
+
 import type { ChatModelId } from "../../../../../ai-stream/models";
 import { getChatModelById } from "../../../../../ai-stream/models";
 import { answerAsAI as answerAsAIOp } from "../../../../../ai-stream/stream/hooks/answer-as-ai";
 import { branchMessage as branchMessageOp } from "../../../../../ai-stream/stream/hooks/branch-message";
+import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
 import { retryMessage as retryMessageOp } from "../../../../../ai-stream/stream/hooks/retry-message";
 import { sendMessage as sendMessageOp } from "../../../../../ai-stream/stream/hooks/send-message";
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
@@ -31,7 +33,6 @@ import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
 } from "../../../../../models/constants";
-import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
 import { calculateCreditCost } from "../../../../../models/models";
 import type { FavoriteConfig } from "../../../../../skills/favorites/db";
 import { NEW_MESSAGE_ID } from "../../../../enum";

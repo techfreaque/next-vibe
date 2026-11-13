@@ -16,7 +16,6 @@ import {
   useWidgetOnSubmit,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
-
 import type definition from "./definition";
 
 interface CustomWidgetProps {

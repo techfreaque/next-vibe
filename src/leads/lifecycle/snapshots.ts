@@ -6,13 +6,13 @@
 import "server-only";
 
 import { and, eq, inArray, isNotNull, max, or, sql } from "drizzle-orm";
+import { chatThreads } from "next-vibe/agent/chat/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { users } from "next-vibe/identity/user/db";
-import { chatThreads } from "next-vibe/agent/chat/db";
 
 import { creditTransactions, creditWallets } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
@@ -24,8 +24,8 @@ import { PaymentStatus } from "@/payment/enum";
 import { subscriptions } from "@/subscription/db";
 import { SubscriptionStatus } from "@/subscription/enum";
 
-import type { ContactSnapshot } from "./eligibility";
 import { lifecycleSends } from "./db";
+import type { ContactSnapshot } from "./eligibility";
 import { LifecycleSendStatus } from "./enum";
 
 export function normalizeEmail(email: string): string {

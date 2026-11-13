@@ -1,11 +1,10 @@
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { beforeAll, describe, expect, it } from "vitest";
-
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import signupEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";

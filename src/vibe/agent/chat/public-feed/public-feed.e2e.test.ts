@@ -6,12 +6,11 @@
  * re-query it server-side.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import {
   chatReady,

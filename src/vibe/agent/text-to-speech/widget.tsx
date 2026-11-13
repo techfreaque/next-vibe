@@ -30,10 +30,10 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { resolveMediaSrc } from "../chat/storage/media-src";
 import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
 import { tierName } from "@/_pages/models/_shared/model-format";
 
+import { resolveMediaSrc } from "../chat/storage/media-src";
 import {
   classifyPlayRejection,
   describeAudioElement,

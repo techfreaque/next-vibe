@@ -12,26 +12,25 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { BrowserContext, Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
-import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { CreditRepository } from "@/credits/repository";
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { BrowserContext, Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
+
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { formatSkillId } from "../../chat/slugify";
 import { scopedTranslation as threadsWidgetScopedTranslation } from "../../chat/threads/widget/i18n";
-import { COMPANION_SKILLS, type SkillVariant } from "../../skills/config";
 import { scopedTranslation as consentScopedTranslation } from "../../models/uncensored-consent/i18n";
 import { UncensoredConsentRepository } from "../../models/uncensored-consent/repository";
+import { COMPANION_SKILLS, type SkillVariant } from "../../skills/config";
 import { ModelSelectionType } from "../../skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
 import {

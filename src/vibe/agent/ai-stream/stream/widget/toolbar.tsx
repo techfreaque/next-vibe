@@ -11,8 +11,8 @@ import type { JSX } from "react";
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
-import { ReportThreadButton } from "../../../chat/threads/[threadId]/report/report-button";
 import { ViewModeToggle } from "../../../chat/threads/[threadId]/messages/widget/view-mode-toggle";
+import { ReportThreadButton } from "../../../chat/threads/[threadId]/report/report-button";
 import { useProviderAvailability } from "../../../env-availability-store";
 
 interface ChatToolbarProps {

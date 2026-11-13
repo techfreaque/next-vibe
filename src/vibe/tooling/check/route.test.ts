@@ -65,14 +65,18 @@ interface FileStat {
  * reports one rule per restriction instead of a single "restricted-syntax".
  */
 const NO_LSP_FILE_COUNTS: Record<string, FileStat> = {
-  "layer-c-errors.ts": { errors: 3, warnings: 0 },
+  // Import/export order (simple-import-sort via oxlint) in layer-b/layer-c and
+  // node-issues: ESLint had crashed on TS 7, so these went unreported until
+  // the rules moved into oxlint (2026-11-13).
+  "layer-b.ts": { errors: 1, warnings: 0 },
+  "layer-c-errors.ts": { errors: 5, warnings: 0 },
   "a11y-issues.tsx": { errors: 70, warnings: 2 },
   "eslint-issues.tsx": { errors: 8, warnings: 0 },
   "general-issues.ts": { errors: 34, warnings: 0 },
   "i18n-issues.tsx": { errors: 43, warnings: 1 },
   "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
   "nextjs-issues.tsx": { errors: 39, warnings: 1 },
-  "node-issues.ts": { errors: 13, warnings: 0 },
+  "node-issues.ts": { errors: 14, warnings: 0 },
   "promise-issues.ts": { errors: 12, warnings: 0 },
   "react-issues.tsx": { errors: 35, warnings: 2 },
   "restricted-syntax-issues.tsx": { errors: 38, warnings: 0 },
@@ -82,8 +86,8 @@ const NO_LSP_FILE_COUNTS: Record<string, FileStat> = {
 };
 
 const NO_LSP_TOTALS = {
-  dir: { files: 14, issues: 364, errors: 357, warnings: 7 },
-  subfolder: { files: 12, issues: 360, errors: 353, warnings: 7 },
+  dir: { files: 15, issues: 368, errors: 361, warnings: 7 },
+  subfolder: { files: 12, issues: 361, errors: 354, warnings: 7 },
   // folder+file: the 12 test-issues files + calculate.ts
   folderPlusFile: 13,
 };
@@ -98,8 +102,8 @@ const LSP_FILE_COUNTS: Record<string, FileStat> = {
 };
 
 const LSP_TOTALS = {
-  dir: { files: 15, issues: 365, errors: 358, warnings: 7 },
-  subfolder: { files: 12, issues: 360, errors: 353, warnings: 7 },
+  dir: { files: 16, issues: 369, errors: 362, warnings: 7 },
+  subfolder: { files: 12, issues: 361, errors: 354, warnings: 7 },
   // check.config.ts is only scanned when ./ is the root — not in subfolder+file combo
   folderPlusFile: 13,
 };
@@ -108,12 +112,19 @@ const LSP_TOTALS = {
 const OUTSIDE_SUBFOLDER = new Set([
   "calculate.ts",
   "check.config.ts",
+  "layer-b.ts",
   "layer-c-errors.ts",
 ]);
 
 /** Rules present in each file — same regardless of LSP mode */
 const FILE_RULES: Record<string, string[]> = {
-  "layer-c-errors.ts": ["2322", "2741"],
+  "layer-b.ts": ["simple-import-sort(imports)"],
+  "layer-c-errors.ts": [
+    "2322",
+    "2741",
+    "simple-import-sort(imports)",
+    "simple-import-sort(exports)",
+  ],
   "a11y-issues.tsx": [
     "jsx-capitalization(jsx-capitalization)",
     "jsx-a11y(alt-text)",
@@ -265,11 +276,13 @@ const FILE_RULES: Record<string, string[]> = {
 };
 
 /**
- * ESLint only runs simple-import-sort (every other rule lives in oxlint).
- * node-issues.ts imports node:fs, node:path, node:events out of order.
+ * Import sorting is eslint-plugin-simple-import-sort, run inside oxlint as a JS
+ * plugin (ESLint itself is off by default: typescript-eslint cannot load under
+ * TypeScript 7). node-issues.ts imports node:fs, node:path, node:events out of
+ * order.
  */
-const ESLINT_IMPORT_SORT_FILE = "node-issues.ts";
-const ESLINT_IMPORT_SORT_RULE = "simple-import-sort/imports";
+const IMPORT_SORT_FILE = "node-issues.ts";
+const IMPORT_SORT_RULE = "simple-import-sort(imports)";
 
 // ============================================================
 // HELPERS
@@ -348,15 +361,13 @@ function extractFileBlock(output: string, filename: string): string {
 function assertAllCheckersRan(out: string): void {
   // One summary row per checker, e.g. "❌ Oxlint      331 issues     0.2s"
   expect(out).toMatch(/Oxlint\s+\d+ issues?/);
-  expect(out).toMatch(/ESLint\s+\d+ issues?/);
   expect(out).toMatch(/TypeScript\s+\d+ issues?/);
+  // A checker that died renders "FAILED TO RUN" instead of an issue count.
+  expect(out).not.toContain("FAILED TO RUN");
 }
 
-function assertEslintWorked(out: string): void {
-  // A crashed ESLint prints no JSON and its row reads "0 issues"; the lint
-  // repository logs this warning so the false green is visible.
-  expect(out).not.toContain("ESLint crashed");
-  assertFileBlock(out, ESLINT_IMPORT_SORT_FILE, [ESLINT_IMPORT_SORT_RULE]);
+function assertImportSortWorked(out: string): void {
+  assertFileBlock(out, IMPORT_SORT_FILE, [IMPORT_SORT_RULE]);
 }
 
 function assertFileBlock(out: string, filename: string, rules: string[]): void {
@@ -512,7 +523,8 @@ function buildInvocationSuite(
 
     it("all three checkers ran", () => assertAllCheckersRan(out));
 
-    it("ESLint ran and detected import sorting", () => assertEslintWorked(out));
+    it("import sorting detected (simple-import-sort via oxlint)", () =>
+      assertImportSortWorked(out));
 
     it(`summary: ${totals.dir.files} files, ${totals.dir.issues} issues`, () => {
       const s = extractSummary(out);

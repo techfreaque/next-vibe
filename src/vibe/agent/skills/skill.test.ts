@@ -20,18 +20,8 @@
 import "server-only";
 
 import { and, eq, ilike } from "drizzle-orm";
-import {
-  fetchThreadMessages,
-  getOrCreateFolder,
-  runTestStream,
-  toolResultRecord,
-} from "../ai-stream/testing/headless-test-runner";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatFavorites } from "./favorites/db";
-import { scopedTranslation as favoritesScopedTranslation } from "./favorites/i18n";
-import { ChatFavoritesRepository } from "./favorites/repository";
-import { resolveFavorite } from "./resolver";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -44,9 +34,19 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
+import {
+  fetchThreadMessages,
+  getOrCreateFolder,
+  runTestStream,
+  toolResultRecord,
+} from "../ai-stream/testing/headless-test-runner";
 import { customSkills } from "./db";
 import { ContentLevel, IntelligenceLevel, SkillCategory } from "./enum";
+import { chatFavorites } from "./favorites/db";
+import { scopedTranslation as favoritesScopedTranslation } from "./favorites/i18n";
+import { ChatFavoritesRepository } from "./favorites/repository";
 import { SkillsRepository } from "./repository";
+import { resolveFavorite } from "./resolver";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

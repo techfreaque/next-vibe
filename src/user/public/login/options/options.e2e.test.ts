@@ -3,11 +3,10 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { identityEnv } from "next-vibe/identity/env";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation as loginScopedTranslation } from "../i18n";
 import loginOptionsEndpoints from "./definition";

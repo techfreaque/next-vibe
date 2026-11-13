@@ -52,19 +52,6 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, sql } from "drizzle-orm";
-import {
-  DefaultFolderId,
-  makeHeadlessContext,
-  rootlessToolExecutionContext,
-  type ToolExecutionContext,
-} from "../../../../core/execution-context";
-import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
-import {
-  ContentLevel,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-} from "../../../skills/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -78,8 +65,21 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { contacts } from "@/contact/db";
 import { ContactSubject } from "@/contact/enum";
 
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  rootlessToolExecutionContext,
+  type ToolExecutionContext,
+} from "../../../../core/execution-context";
+import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
 import type { ImageGenModelId } from "../../../image-generation/models";
 import type { MusicGenModelId } from "../../../music-generation/models";
+import {
+  ContentLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+} from "../../../skills/enum";
 import type { ChatModelId } from "../../models";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {

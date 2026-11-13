@@ -5,12 +5,11 @@
  */
 
 import { eq } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
-
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { lifecycleEnrollments } from "@/leads/lifecycle/db";
 import {
@@ -22,8 +21,8 @@ import { buildListUnsubscribeHeaders } from "@/messenger/providers/email/list-un
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
-import definitions from "./definition";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "../token";
+import definitions from "./definition";
 
 const RUN = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 const email = `oneclick-${RUN}@example-test.invalid`;

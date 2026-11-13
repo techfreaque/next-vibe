@@ -28,12 +28,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import { resolveMediaSrc } from "../chat/storage/media-src";
 import { useProviderAvailability } from "../env-availability-store";
+import type { AnyRoleModelSelection } from "../models/selection";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
-import type { AnyRoleModelSelection } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";

@@ -33,13 +33,13 @@ import { paymentEnv } from "@/payment/env";
 import { StripeProvider } from "@/payment/providers/stripe/repository";
 
 import { FINANCE_CONFIG } from "../config";
-import { financeEnv } from "../env";
 import {
   FinanceSource,
   type FinanceSourceValue,
   RevenueEventKind,
   type RevenueEventKindValue,
 } from "../enum";
+import { financeEnv } from "../env";
 import { minorToUsd } from "../logic";
 import type { FinanceHttp } from "./http";
 import type { RevenueEventInput } from "./types";

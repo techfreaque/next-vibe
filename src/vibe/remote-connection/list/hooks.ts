@@ -5,8 +5,8 @@
 
 "use client";
 
-import { UserRole } from "../../identity/roles/enum";
 import type { JwtPayloadType } from "../../identity/auth/types";
+import { UserRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type { EndpointReturn } from "../../unified-ui/hooks/endpoint-types";
 import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";

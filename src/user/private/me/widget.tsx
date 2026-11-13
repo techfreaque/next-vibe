@@ -1,10 +1,10 @@
 "use client";
 
-import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
-import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { LocaleSelectorContent } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
 import chatSettingsDef from "next-vibe/agent/chat/settings/definition";
 import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import skillsDef from "next-vibe/agent/skills/definition";
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import {
@@ -14,9 +14,9 @@ import {
 import { scopedTranslation as searchScopedTranslation } from "next-vibe/agent/web-search/i18n";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
-import { Platform } from "next-vibe/platforms/platforms";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as userRoleScopedTranslation } from "next-vibe/identity/roles/i18n";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   Avatar,
   AvatarFallback,
@@ -24,39 +24,39 @@ import {
 } from "next-vibe/ui/components/avatar";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
+import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Brain } from "next-vibe/ui/components/icons/Brain";
-import { Download } from "next-vibe/ui/components/icons/Download";
-import { Key } from "next-vibe/ui/components/icons/Key";
+import { Building } from "next-vibe/ui/components/icons/Building";
 import { Camera } from "next-vibe/ui/components/icons/Camera";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Instagram } from "next-vibe/ui/components/icons/Instagram";
+import { Key } from "next-vibe/ui/components/icons/Key";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
-import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { LogOut } from "next-vibe/ui/components/icons/LogOut";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
-import { Building } from "next-vibe/ui/components/icons/Building";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { Moon } from "next-vibe/ui/components/icons/Moon";
 import { Music } from "next-vibe/ui/components/icons/Music";
 import { Palette } from "next-vibe/ui/components/icons/Palette";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Search } from "next-vibe/ui/components/icons/Search";
-import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
-import { Sun } from "next-vibe/ui/components/icons/Sun";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Sun } from "next-vibe/ui/components/icons/Sun";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Twitter } from "next-vibe/ui/components/icons/Twitter";
 import { Youtube } from "next-vibe/ui/components/icons/Youtube";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
-import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import {
@@ -67,8 +67,8 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
-import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
@@ -109,6 +109,7 @@ import {
   ProfileBio,
   ProfileSocialPills,
 } from "@/_pages/creator/[userId]/_shared/profile-content";
+import apiKeysDef from "@/api-keys/definition";
 import creditsDef from "@/credits/definition";
 import configDef from "@/lead-magnet/config/definition";
 import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
@@ -119,12 +120,11 @@ import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
 import logoutDef from "@/user/private/logout/definition";
 import addressesDef from "@/user/private/me/addresses/definition";
-import passwordDef from "@/user/private/me/password/definition";
 import exportDef from "@/user/private/me/export/definition";
+import passwordDef from "@/user/private/me/password/definition";
 import twoFactorDef from "@/user/private/me/two-factor/definition";
-import verifyEmailDef from "@/user/public/verify-email/definition";
-import apiKeysDef from "@/api-keys/definition";
 import sessionsDef from "@/user/private/sessions/definition";
+import verifyEmailDef from "@/user/public/verify-email/definition";
 
 import avatarDef from "./avatar/definition";
 import type meDefinition from "./definition";

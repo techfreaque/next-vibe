@@ -5,6 +5,16 @@
  * is not assignable to CreateApiEndpointAny
  */
 
+import { z } from "zod";
+
+import type { UserRoleValue } from "../../identity/roles/enum";
+import type { UnifiedField } from "../../unified-ui/_shared/configs";
+import type {
+  AnyChildrenConstrain,
+  ConstrainedChildUsage,
+  FieldUsageConfig,
+} from "../../unified-ui/_shared/types";
+import { objectField, requestUrlPathParamsField } from "../../unified-ui/_shared/utils-i18n";
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
@@ -18,15 +28,6 @@ import type {
   Methods,
 } from "../definition/enums";
 import { FieldDataType, WidgetType } from "../definition/enums";
-import type { UserRoleValue } from "../../identity/roles/enum";
-import type { UnifiedField } from "../../unified-ui/_shared/configs";
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "../../unified-ui/_shared/types";
-import { objectField, requestUrlPathParamsField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",

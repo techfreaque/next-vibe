@@ -5,8 +5,8 @@
  */
 
 import {
-  ChatModelId,
   chatModelDefinitions,
+  ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
 
 import {

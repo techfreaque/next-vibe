@@ -21,7 +21,6 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { paymentTransactions } from "../../db";
-import { PaymentClawbackRepository } from "../../refund/clawback";
 import { InvoiceStatus } from "../../enum";
 import type {
   PaymentInvoiceRequestOutput,
@@ -33,6 +32,7 @@ import type {
   PaymentPortalResponseOutput,
 } from "../../portal/definition";
 import { scopedTranslation as portalScopedTranslation } from "../../portal/i18n";
+import { PaymentClawbackRepository } from "../../refund/clawback";
 import type {
   PaymentRefundRequestOutput,
   PaymentRefundResponseOutput,

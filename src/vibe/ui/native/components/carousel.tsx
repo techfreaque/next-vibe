@@ -1,6 +1,6 @@
 import React from "react";
 import type { ScrollViewInstance } from "react-native";
-import { Pressable, Text as RNText, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";

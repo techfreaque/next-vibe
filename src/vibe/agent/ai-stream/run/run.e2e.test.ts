@@ -9,14 +9,13 @@
  */
 
 import { eq } from "drizzle-orm";
-import type { Locator } from "playwright";
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator } from "playwright";
+import { describe, expect } from "vitest";
 
 import { chatThreads } from "../../chat/db";
 import { ChatModelId } from "../models";

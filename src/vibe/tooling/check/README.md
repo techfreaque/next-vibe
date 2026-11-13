@@ -10,16 +10,16 @@ Fast parallel checks. Clean output for humans and AI.
 
 ## What it runs
 
-| Tool       | Role                                                           | Speed (warm) |
-| ---------- | -------------------------------------------------------------- | ------------ |
-| **oxlint** | Rust linter - primary linter, handles most rules               | ~240ms       |
-| **oxfmt**  | Rust formatter - auto-formats on every run, no separate step   | ~50ms        |
-| **tsgo**   | Native TypeScript checker (`@typescript/native-preview`)       | ~130ms       |
-| **ESLint** | Optional bridge - rules not yet in oxlint (import sort, hooks) | ~830ms       |
+| Tool       | Role                                                         | Speed (warm) |
+| ---------- | ------------------------------------------------------------ | ------------ |
+| **oxlint** | Rust linter - primary linter, handles most rules             | ~240ms       |
+| **oxfmt**  | Rust formatter - auto-formats on every run, no separate step | ~50ms        |
+| **tsgo**   | Native TypeScript checker (`@typescript/native-preview`)     | ~130ms       |
+| **ESLint** | Optional bridge, off by default (see below)                  | ~830ms       |
 
 All four run in parallel. Total time = slowest tool, not the sum.
 
-**ESLint is optional.** It exists only for rules not yet ported to oxlint. Set `skipEslint: true` or drop the eslint peer deps entirely if you don't need import sorting or React hooks rules.
+**ESLint is optional and off by default.** Import sorting runs inside oxlint: `eslint-plugin-simple-import-sort` is loaded as an oxlint JS plugin (autofix included), and React hooks rules are native oxlint rules. ESLint stays available for custom rules, but typescript-eslint cannot load under TypeScript 7 (no compiler API until 7.1), so on TS 7 it crashes on startup. A checker that crashes fails the run with a `FAILED TO RUN` line; it never reports 0 issues.
 
 ## Performance
 
@@ -35,11 +35,10 @@ tsgo uses incremental builds (`tsbuildinfo`) - warm runs on unchanged files are 
 
 ```sh
 bun add -D @next-vibe/checker oxlint oxfmt @typescript/native-preview typescript \
-  eslint eslint-plugin-react-compiler eslint-plugin-react-hooks \
-  eslint-plugin-simple-import-sort typescript-eslint
+  eslint-plugin-simple-import-sort
 ```
 
-No ESLint needed? Skip the `eslint*` packages and set `skipEslint: true` in `check.config.ts`.
+Want ESLint for custom rules (TypeScript <= 6 only)? Add `eslint eslint-plugin-react-compiler eslint-plugin-react-hooks typescript-eslint` and set `skipEslint: false` in `check.config.ts`.
 
 | Package                            | Version    | Role                                                   |
 | ---------------------------------- | ---------- | ------------------------------------------------------ |
@@ -50,7 +49,7 @@ No ESLint needed? Skip the `eslint*` packages and set `skipEslint: true` in `che
 | `eslint`                           | `>=9.0.0`  | Optional - import sorting, React hooks rules           |
 | `eslint-plugin-react-compiler`     | `>=19.0.0` | React compiler rules                                   |
 | `eslint-plugin-react-hooks`        | `>=5.0.0`  | React hooks rules                                      |
-| `eslint-plugin-simple-import-sort` | `>=12.0.0` | Import sorting                                         |
+| `eslint-plugin-simple-import-sort` | `>=12.0.0` | Import sorting (runs as an oxlint JS plugin)           |
 | `typescript-eslint`                | `>=8.0.0`  | TypeScript ESLint parser                               |
 
 ## Quick Start
@@ -120,7 +119,7 @@ const config = (): CheckConfig => ({
     limit: 20000,
     mcpLimit: 20, // compact output for MCP/AI
     extensive: false, // true to also check test/generated files
-    skipEslint: false, // true to skip ESLint entirely
+    skipEslint: true, // ESLint off; import sorting runs in oxlint
     skipOxlint: false,
   },
   oxlint: {
@@ -128,17 +127,22 @@ const config = (): CheckConfig => ({
     plugins: ["typescript", "oxc", "unicorn", "react", "jsx-a11y", "nextjs"],
     jsPlugins: [
       "@next-vibe/checker/oxlint-plugins/restricted-syntax.js", // ban throw/unknown/object
+      "eslint-plugin-simple-import-sort", // ESLint plugin, run by oxlint
     ],
     categories: { correctness: "error", suspicious: "error" },
-    rules: { "typescript/no-explicit-any": "error" },
+    rules: {
+      "typescript/no-explicit-any": "error",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
+    },
   },
   typecheck: {
     enabled: true,
     tsgo: true, // @typescript/native-preview - 10× faster than tsc
   },
-  // ESLint: optional. Remove eslint peer deps + set skipEslint: true to go fully ESLint-free.
+  // ESLint: optional, for custom rules only (needs TypeScript <= 6).
   eslint: {
-    enabled: true,
+    enabled: false,
     buildFlatConfig(rc, hooks, importSort): EslintFlatConfigItem[] {
       return [
         {

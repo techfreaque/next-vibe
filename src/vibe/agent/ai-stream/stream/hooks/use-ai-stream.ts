@@ -11,12 +11,12 @@
  * on messagesDefinition.GET), NOT from this hook.
  */
 
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import {
   isBrowserNetworkLossMessage,
   isErrorResponseType,
   parseError,
 } from "next-vibe/core/utils/parse-error";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { preWarmChannel } from "next-vibe/realtime/client/client";
 import { buildWsChannel } from "next-vibe/realtime/core/channel";
 import { toast } from "next-vibe/ui/hooks/use-toast";

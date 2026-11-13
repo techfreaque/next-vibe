@@ -4,12 +4,12 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
+import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Locator, Page } from "playwright";
 import { describe, expect } from "vitest";
 
 import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
-import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 
 import helpEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";

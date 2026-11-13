@@ -38,19 +38,17 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "../../../../core/execution-context";
-import { ChatMessageRole } from "../../../chat/enum";
-import { NO_SKILL_ID } from "../../../skills/constants";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId } from "../../../../core/execution-context";
+import { ChatMessageRole } from "../../../chat/enum";
+import { NO_SKILL_ID } from "../../../skills/constants";
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";
-import type { AiStreamPostRequestOutput } from "../definition";
-import { scopedTranslation } from "../i18n";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
@@ -59,6 +57,8 @@ import {
   resolveUser,
   type SlimMessage,
 } from "../../testing/headless-test-runner";
+import type { AiStreamPostRequestOutput } from "../definition";
+import { scopedTranslation } from "../i18n";
 
 // ── Test timeouts ─────────────────────────────────────────────────────────────
 

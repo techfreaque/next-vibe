@@ -17,13 +17,13 @@
 import "server-only";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import vibeCheckEndpoints from "@/vibe/tooling/check/definition";
+
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
-
-import vibeCheckEndpoints from "@/vibe/tooling/check/definition";
-
 import { startCliEventTap } from "./cli-event-tap";
 import { createEndpointEmitter } from "./emitter";
 import {

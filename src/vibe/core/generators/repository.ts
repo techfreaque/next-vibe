@@ -23,9 +23,9 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
 import {
-  type ResponseType as BaseResponseType,
   ErrorResponseTypes,
   failInline,
+  type ResponseType as BaseResponseType,
   success,
 } from "../route/response.schema";
 import { parseError } from "../utils/parse-error";

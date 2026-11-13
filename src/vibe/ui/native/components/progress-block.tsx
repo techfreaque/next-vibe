@@ -5,8 +5,8 @@ import type {
   ProgressBlockProps,
   ProgressBlockVariant,
 } from "../../web/components/progress-block";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type {
   ProgressBlockProps,

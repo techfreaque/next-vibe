@@ -4,10 +4,8 @@
  * Tests constraint validation for endpoint creation and field configuration.
  */
 
-import type { CreateApiEndpoint } from "../definition/create";
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { Methods } from "../definition/enums";
-import { WidgetType } from "../definition/enums";
+import type { z } from "zod";
+
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { EndpointEventsMap } from "../../realtime/core/structured-events";
 import type { UnifiedField } from "../../unified-ui/_shared/configs";
@@ -17,7 +15,10 @@ import type {
   FieldUsageConfig,
 } from "../../unified-ui/_shared/types";
 import { objectField } from "../../unified-ui/_shared/utils-i18n";
-import type { z } from "zod";
+import type { CreateApiEndpoint } from "../definition/create";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
+import { WidgetType } from "../definition/enums";
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",
 };

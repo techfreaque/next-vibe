@@ -38,13 +38,13 @@ import type { JwtPayloadType } from "../../../identity/auth/types";
 import { createEndpointLogger } from "../../../logger/server";
 import { scopedTranslation as cliScopedTranslation } from "../../../platforms/cli/i18n";
 import { Platform } from "../../../platforms/platforms";
+import { isOverlayOpen } from "../../../ui/cli/components/dialog";
 import { areArrowsCaptured } from "../../../ui/cli/lib/focus-manager";
 import {
   isEnterCaptured,
   triggerSubmit,
   useLiveRequestValues,
 } from "../../../ui/cli/lib/live-request-values";
-import { isOverlayOpen } from "../../../ui/cli/components/dialog";
 import { QueryProvider } from "../../hooks/query-provider";
 import { EndpointsPage } from "../web/EndpointsPage";
 import { prewarmLazyWidgets } from "./response/result-formatter";

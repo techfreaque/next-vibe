@@ -34,8 +34,8 @@ import {
   chatThreads,
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
-import { ApiProvider } from "../../../models/models";
 import { getEnvAvailability } from "../../../env-availability";
+import { ApiProvider } from "../../../models/models";
 import { getChatModelForUser } from "../../models";
 import type {
   AiStreamPostRequestOutput,
@@ -44,8 +44,8 @@ import type {
 import type { AiStreamT } from "../../stream/i18n";
 import { buildSystemPrompt } from "../../system-prompt/builder";
 import { createUserMessageWithAttachments } from "../intake/messages";
-import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 import type { HeadlessAiStreamResult } from "../setup/setup";
+import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
 
 async function buildRelayToolSchemas(
   pinnedToolIds: ReadonlyArray<string>,

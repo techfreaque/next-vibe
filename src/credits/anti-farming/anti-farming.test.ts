@@ -9,8 +9,6 @@
  */
 
 import { eq, inArray, like } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -27,6 +25,7 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 

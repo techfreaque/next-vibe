@@ -10,8 +10,6 @@
  */
 
 import { eq } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -21,6 +19,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { DefaultFolderId } from "../../../core/execution-context";
 import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";

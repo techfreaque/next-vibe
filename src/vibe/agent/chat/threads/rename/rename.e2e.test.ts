@@ -3,11 +3,10 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2EUser, deleteE2EUser, seedThread, signInAs } from "../../testing/e2e-seed";
 import renameEndpoints from "./definition";

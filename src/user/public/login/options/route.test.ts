@@ -1,10 +1,10 @@
-import { beforeAll, describe, expect, it } from "vitest";
-
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { beforeAll, describe, expect, it } from "vitest";
+
 import loginOptionsEndpoints from "./definition";
 
 const endpoint = loginOptionsEndpoints.GET;

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { jsonSchema, tool, type JSONSchema7, type ToolSet } from "ai";
+import { jsonSchema, type JSONSchema7, tool, type ToolSet } from "ai";
 import { type ToolExecutionContext } from "next-vibe/core/execution-context";
 import { z } from "zod";
 
@@ -25,7 +25,7 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { FieldUsage } from "../../core/definition/enums";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { permissionsRegistry } from "../../core/permissions/registry";
-import { WidgetDataSchema, type WidgetData } from "../../core/utils/json";
+import { type WidgetData, WidgetDataSchema } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
 import type { JwtPayloadType } from "../../identity/auth/types";

@@ -2,7 +2,6 @@
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Span } from "next-vibe/ui/components/span";
-
 import {
   useWidgetForm,
   useWidgetTranslation,

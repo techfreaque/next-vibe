@@ -3,8 +3,8 @@
  * Unified Check Configuration
  *
  * Single source of truth for all code quality tools:
- * - Oxlint (fast Rust linter)
- * - ESLint (import sorting, react hooks)
+ * - Oxlint (fast Rust linter, incl. import sorting via JS plugins)
+ * - ESLint (off by default, see `skipEslint`)
  * - Prettier (code formatting)
  * - TypeScript (type checking)
  * - Testing (vitest)
@@ -23,7 +23,10 @@ import type {
 // --------------------------------------------------------
 const vibeCheck: CheckConfig["vibeCheck"] = {
   fix: true,
-  skipEslint: false,
+  // ESLint is off: its only rule set (simple-import-sort) runs inside oxlint as
+  // a JS plugin, and typescript-eslint cannot load under TypeScript 7 (no
+  // compiler API until 7.1), so ESLint would only crash on startup.
+  skipEslint: true,
   skipOxlint: false,
   skipTypecheck: false,
   timeout: 3600,
@@ -65,6 +68,7 @@ const features = {
   restrictedSyntax: true, // No throw, unknown, object types
   boilerplate: true, // Enforce route.ts and i18n boilerplate patterns
   vibeBoundary: true, // Enforce src/vibe/ internal boundary (no cross-boundary imports)
+  importSort: true, // simple-import-sort, run as an oxlint JS plugin
   // TypeScript
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
@@ -217,6 +221,10 @@ const oxlint: CheckConfig["oxlint"] = {
     ...(features.vibeBoundary
       ? ["next-vibe/tooling/checker/oxlint/oxlint-plugins/vibe-boundary.ts"]
       : []),
+    // Import/export ordering. The unmodified ESLint plugin, run through
+    // oxlint's ESLint-compatible JS plugin API (autofix included). oxlint's
+    // own sort-imports enforces a different, incompatible order.
+    ...(features.importSort ? ["eslint-plugin-simple-import-sort"] : []),
   ],
   categories: {
     correctness: "error",
@@ -389,6 +397,14 @@ const oxlint: CheckConfig["oxlint"] = {
     "unicorn/no-useless-switch-case": "off",
     "unicorn/no-array-callback-reference": "off",
     "unicorn/prefer-query-selector": "off",
+
+    // ── Import sorting (enabled via importSort flag) ──────────
+    ...(features.importSort
+      ? {
+          "simple-import-sort/imports": "error",
+          "simple-import-sort/exports": "error",
+        }
+      : {}),
 
     // ── Custom JS Plugins (enabled via feature flags) ────────
     // Options defined inline, plugins read from config.oxlint.rules
@@ -959,12 +975,9 @@ const config = (): CheckConfig => {
             i18n: createEslintStub(["no-literal-string"]),
           },
           rules: {
-            // ESLint earns its place for exactly one thing: import/export
-            // ordering. oxlint has no port of simple-import-sort (its core
-            // sort-imports enforces a different, incompatible order), so this
-            // stays here while every other rule lives in the oxlint block.
-            "simple-import-sort/imports": "error",
-            "simple-import-sort/exports": "error",
+            // No active rules: simple-import-sort runs inside oxlint (see the
+            // oxlint jsPlugins). Plugins stay registered so existing
+            // `eslint-disable` comments resolve if ESLint is switched back on.
             "no-unused-vars": "off",
             "no-console": "off",
             "no-template-curly-in-string": "off",
@@ -1009,8 +1022,6 @@ const config = (): CheckConfig => {
             i18n: createEslintStub(["no-literal-string"]),
           },
           rules: {
-            "simple-import-sort/imports": "error",
-            "simple-import-sort/exports": "error",
             "no-unused-vars": "off",
             "no-console": "off",
             "no-template-curly-in-string": "off",

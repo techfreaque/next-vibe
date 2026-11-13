@@ -8,7 +8,6 @@ import "server-only";
 import { execSync } from "node:child_process";
 import { freemem, totalmem } from "node:os";
 
-import { rawPool } from "..";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +16,7 @@ import {
 } from "../../core/route/response.schema";
 import type { EndpointLogger } from "../../logger/types";
 import type { TasksT } from "../../tasks/i18n";
+import { rawPool } from "..";
 import { DB_HEALTH_THRESHOLDS as THRESHOLDS } from "./constants";
 
 /** Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms. */

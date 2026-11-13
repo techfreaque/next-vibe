@@ -37,8 +37,8 @@ import { parseStorageUrl } from "../../../../chat/storage/url-utils";
 import { IMAGE_GEN_ALIAS } from "../../../../image-generation/constants";
 import { AUDIO_GEN_TOOL_NAME } from "../../../../music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "../../../../video-generation/constants";
-import type { SlimMessage } from "../../../testing/headless-test-runner";
 import { cacheDir } from "../../../testing/fetch-cache";
+import type { SlimMessage } from "../../../testing/headless-test-runner";
 import { toolResultRecord } from "../../../testing/headless-test-runner";
 import { stripReasoning } from "./prompts";
 

@@ -6,19 +6,20 @@
 
 import "server-only";
 
-import type { UserApiKey } from "@/api-keys/db";
-import {
-  API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
-  ApiKeyAuth,
-  type ApiKeyResolution,
-} from "@/api-keys/auth";
-import { consumeRateLimit } from "@/api-keys/keys";
-import { isPaidUser } from "@/api-keys/paid";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import {
+  API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
+  ApiKeyAuth,
+  type ApiKeyResolution,
+} from "@/api-keys/auth";
+import type { UserApiKey } from "@/api-keys/db";
+import { consumeRateLimit } from "@/api-keys/keys";
+import { isPaidUser } from "@/api-keys/paid";
 
 import type { V1T } from "../i18n";
 import { type V1Error, v1Error } from "./errors";

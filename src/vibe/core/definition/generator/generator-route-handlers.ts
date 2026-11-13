@@ -9,6 +9,12 @@ import { readFile, writeFile } from "node:fs/promises";
 
 import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
+import type { PlatformMarkerValue } from "../../../identity/roles/enum";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
+  type UserRoleValue,
+} from "../../../identity/roles/enum";
 import { formatCount, formatWarning } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
 import { PATH_SEPARATOR } from "../../core-utils/path";
@@ -29,12 +35,6 @@ import {
 } from "../../generators/shared/utils";
 import type { WidgetData } from "../../utils/json";
 import type { ApiSection } from "../endpoint-base";
-import type { PlatformMarkerValue } from "../../../identity/roles/enum";
-import {
-  filterPlatformMarkers,
-  PlatformMarker,
-  type UserRoleValue,
-} from "../../../identity/roles/enum";
 import { WsChannelsGenerator } from "./generator-ws-channels";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/routes/handlers.ts`;

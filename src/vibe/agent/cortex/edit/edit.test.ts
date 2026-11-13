@@ -18,9 +18,9 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cortexNodes } from "../db";
-import editEndpoint from "./definition";
 import readEndpoint from "../read/definition";
 import writeEndpoint from "../write/definition";
+import editEndpoint from "./definition";
 
 const TEST_PREFIX = "/documents/edit-test";
 const CLEANUP_PATTERN = `${TEST_PREFIX}%`;

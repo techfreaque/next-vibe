@@ -26,12 +26,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Button } from "next-vibe/ui/components/button";
-import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
-import { ArrowUp } from "next-vibe/ui/components/icons/ArrowUp";
-import { Div, type DivRefObject } from "next-vibe/ui/components/div";
-import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
-import { Compass } from "next-vibe/ui/components/icons/Compass";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +35,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "next-vibe/ui/components/alert-dialog";
+import { Button } from "next-vibe/ui/components/button";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,7 +44,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "next-vibe/ui/components/dropdown-menu";
+import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
+import { ArrowUp } from "next-vibe/ui/components/icons/ArrowUp";
 import { Check } from "next-vibe/ui/components/icons/Check";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { Compass } from "next-vibe/ui/components/icons/Compass";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { GripVertical } from "next-vibe/ui/components/icons/GripVertical";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
@@ -77,8 +77,8 @@ import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-t
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import { parseSkillId } from "../../chat/slugify";
 import { useTourState } from "../../chat/tour-state";
-import { ShareSkillDialog } from "../[id]/share-skill";
 import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
+import { ShareSkillDialog } from "../[id]/share-skill";
 import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";
 import { SkillCategory } from "../enum";

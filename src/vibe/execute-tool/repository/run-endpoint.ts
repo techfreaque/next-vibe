@@ -16,6 +16,7 @@ import {
 } from "next-vibe/core/execution-context";
 
 import { scopedTranslation as systemScopedTranslation } from "@/_pages/shared/i18n";
+
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { GenericHandlerReturnType } from "../../core/route/handler";

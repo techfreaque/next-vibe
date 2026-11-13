@@ -5,6 +5,8 @@
  * Per-type rendering: images (preview), video (player), audio (player), generic (icon row).
  * Handles server-stored files (URL) and incognito files (base64 → blob URL).
  */
+import { parseError } from "next-vibe/core/utils/parse-error";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { Audio } from "next-vibe/ui/components/audio";
 import { Div } from "next-vibe/ui/components/div";
 import { Download } from "next-vibe/ui/components/icons/Download";
@@ -16,8 +18,6 @@ import { Image } from "next-vibe/ui/components/image";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { Video } from "next-vibe/ui/components/video";
-import { parseError } from "next-vibe/core/utils/parse-error";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetLogger } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";

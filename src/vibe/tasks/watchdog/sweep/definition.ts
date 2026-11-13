@@ -19,8 +19,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { scopedTranslation } from "../i18n";
 import { TASK_WATCHDOG_SWEEP_ALIAS } from "../constants";
+import { scopedTranslation } from "../i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

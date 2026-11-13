@@ -12,14 +12,15 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { z } from "zod";
+
+import { objectField, objectOptionalField, requestDataArrayField, requestDataArrayOptionalField, requestField, responseArrayField, responseArrayOptionalField, responseField } from "../../unified-ui/_shared/utils-i18n";
 import {
   FieldDataType,
   type FieldUsage,
   LayoutType,
   WidgetType,
 } from "../definition/enums";
-import { objectField, objectOptionalField, requestDataArrayField, requestDataArrayOptionalField, requestField, responseArrayField, responseArrayOptionalField, responseField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

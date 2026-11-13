@@ -10,8 +10,6 @@
 import "server-only";
 
 import { eq, sql } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -20,6 +18,7 @@ import {
   deleteTestUser,
   type TestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { creditPacks, creditTransactions, creditWallets } from "./db";
 import { scopedTranslation as creditsScopedTranslation } from "./i18n";

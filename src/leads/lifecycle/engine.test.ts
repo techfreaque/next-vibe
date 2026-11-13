@@ -6,8 +6,7 @@
  */
 
 import { eq, inArray } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
+import { chatThreads } from "next-vibe/agent/chat/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -15,11 +14,11 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import { chatThreads } from "next-vibe/agent/chat/db";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";

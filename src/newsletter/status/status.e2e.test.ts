@@ -4,10 +4,9 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { describe, expect } from "vitest";
 
 import { NewsletterSubscriptionStatus } from "../enum";
 import subscribeEndpoints from "../subscribe/definition";

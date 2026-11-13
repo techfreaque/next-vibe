@@ -6,8 +6,8 @@
  * driver so business logic stays agnostic.
  */
 
-import { sql } from "drizzle-orm";
 import type { SQL, SQLWrapper } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import { isPglite } from "./client";
 

@@ -9,7 +9,6 @@
 
 "use client";
 
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
@@ -28,6 +27,8 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type React from "react";
+
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import type definition from "./definition";
 

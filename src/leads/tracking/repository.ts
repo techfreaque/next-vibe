@@ -39,14 +39,13 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 import { emails } from "@/messenger/messages/db";
 import { ReferralRepository } from "@/referral/repository";
 
-import { resolveSafeRedirect, signRedirectUrl } from "./redirect-signature";
-
 import type {
   ClickTrackingRequestOutput,
   ClickTrackingResponseOutput,
   LeadEngagementRequestOutput,
   LeadEngagementResponseOutput,
 } from "./definition";
+import { resolveSafeRedirect, signRedirectUrl } from "./redirect-signature";
 
 interface AnonymousLeadResult {
   leadId: string;

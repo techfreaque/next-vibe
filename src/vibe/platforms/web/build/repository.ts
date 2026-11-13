@@ -4,8 +4,8 @@
  */
 
 import { buildPackageRunnerCommand, coreEnv } from "../../../core/env";
-import { databaseEnv, usesPglite } from "../../../database/env";
-import { VibeMode } from "../../../env/env-util";
+import { GenerateAllRepository } from "../../../core/generators/repository";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,24 +13,21 @@ import {
   success,
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
-
-import type { CountryLanguage } from "../../../core/i18n/core/config";
-import type { JwtPayloadType } from "../../../identity/auth/types";
-import { SeedRepository } from "../../../database/seed/repository";
-import type { EndpointLogger } from "../../../logger/types";
-import { withRuntimeEnvPlaceholders } from "../../cli/runtime/runtime-env-placeholders";
-import { patchPublicUrlPort } from "../public-url";
-
-import { GenerateAllRepository } from "../../../core/generators/repository";
+import { databaseEnv, usesPglite } from "../../../database/env";
 import { DatabaseMigrationRepository } from "../../../database/migrate/repository";
+import { SeedRepository } from "../../../database/seed/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
-import type { ServerBuildT } from "./i18n";
+import { VibeMode } from "../../../env/env-util";
+import type { JwtPayloadType } from "../../../identity/auth/types";
+import type { EndpointLogger } from "../../../logger/types";
 import { scopedTranslation as builderScopedTranslation } from "../../../tooling/builder/i18n";
-
+import { withRuntimeEnvPlaceholders } from "../../cli/runtime/runtime-env-placeholders";
 import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
+import { patchPublicUrlPort } from "../public-url";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
+import type { ServerBuildT } from "./i18n";
 
 /**
  * Build Repository

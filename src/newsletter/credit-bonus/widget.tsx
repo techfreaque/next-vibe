@@ -9,10 +9,10 @@
 
 "use client";
 
+import { Methods } from "next-vibe/core/definition/enums";
 import { Div } from "next-vibe/ui/components/div";
 import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { P } from "next-vibe/ui/components/typography";
-import { Methods } from "next-vibe/core/definition/enums";
 import {
   useWidgetEndpoint,
   useWidgetLocale,

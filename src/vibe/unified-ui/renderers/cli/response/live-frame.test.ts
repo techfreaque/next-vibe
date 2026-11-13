@@ -21,10 +21,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { defaultLocale } from "../../../../core/i18n/core/config";
 import { createEndpointLogger } from "../../../../logger/server";
 import { Platform } from "../../../../platforms/platforms";
-
 import { createLiveFrame, wrapLine } from "./live-frame";
 
 const ESC = String.fromCharCode(27);

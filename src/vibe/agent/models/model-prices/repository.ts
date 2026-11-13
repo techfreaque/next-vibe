@@ -31,8 +31,8 @@ import {
   videoGenModelDefinitions,
 } from "../../video-generation/models";
 import type { Modality } from "../enum";
-import { ApiProvider } from "../models";
 import type { ModelDefinition } from "../models";
+import { ApiProvider } from "../models";
 import type { ModelPricesGetResponseOutput } from "./definition";
 import type { ModelPricesT } from "./i18n";
 import type {

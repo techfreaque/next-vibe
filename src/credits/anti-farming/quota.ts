@@ -26,7 +26,7 @@ import {
   GUEST_POOLS_PER_SUBNET_PER_DAY,
   SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
 } from "./config";
-import { freePoolClaims, type FreePoolClaimKind } from "./db";
+import { type FreePoolClaimKind, freePoolClaims } from "./db";
 import { recordAntiFarmingEvent } from "./events";
 
 /** Why an account pool gets (or does not get) its free tiers */

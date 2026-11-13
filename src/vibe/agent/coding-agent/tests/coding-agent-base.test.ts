@@ -26,8 +26,6 @@ globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, like, sql } from "drizzle-orm";
 import { DefaultFolderId, makeHeadlessContext } from "next-vibe/core/execution-context";
-import { chatThreads } from "../../chat/db";
-import { chatFavorites } from "../../skills/favorites/db";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -43,6 +41,8 @@ import {
   type SlimMessage,
   toolResultRecord,
 } from "../../ai-stream/testing/headless-test-runner";
+import { chatThreads } from "../../chat/db";
+import { chatFavorites } from "../../skills/favorites/db";
 
 // ── Mode configuration ────────────────────────────────────────────────────────
 

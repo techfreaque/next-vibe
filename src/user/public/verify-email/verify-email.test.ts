@@ -4,8 +4,8 @@
  * Mail is never sent (the test instance has no SMTP account; we only render).
  */
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { eq } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

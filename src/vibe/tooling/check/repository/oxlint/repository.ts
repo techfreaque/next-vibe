@@ -72,6 +72,28 @@ export interface OxlintResponseOutput {
 /**
  * Run Oxlint Repository
  */
+/**
+ * The JSON document in oxlint's stdout, or null when there is none.
+ *
+ * oxlint can print a plain-text notice before the JSON (e.g. "No files found to
+ * lint" when every path is ignored, exit 1), so the document starts at the
+ * first line that opens an object, not necessarily at byte 0.
+ */
+function extractOxlintJson(output: string): string | null {
+  const lines = output.split("\n");
+  const start = lines.findIndex((line) => line.trimStart().startsWith("{"));
+  if (start === -1) {
+    return null;
+  }
+  const candidate = lines.slice(start).join("\n");
+  try {
+    JSON.parse(candidate);
+    return candidate;
+  } catch {
+    return null;
+  }
+}
+
 export class OxlintRepository {
   static async execute(
     data: OxlintRequestOutput,
@@ -201,29 +223,9 @@ export class OxlintRepository {
       const errorMessage = parseError(error).message;
       logger.error(`[OXLINT] Execution failed: ${errorMessage}`);
 
-      return success({
-        items: [
-          {
-            file: "unknown",
-            severity: "error" as const,
-            message: errorMessage,
-          },
-        ],
-        files: [
-          {
-            file: "unknown",
-            errors: 1,
-            warnings: 0,
-            total: 1,
-          },
-        ],
-        totalIssues: 1,
-        totalFiles: 1,
-        totalErrors: 1,
-        displayedIssues: 1,
-        displayedFiles: 1,
-        currentPage: 1,
-        totalPages: 1,
+      return failInline({
+        message: `Oxlint did not run: ${errorMessage}`,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -796,7 +798,19 @@ export class OxlintRepository {
           reject(new Error(errorMsg));
           return;
         }
-        resolve(output);
+        // `--format=json` always prints a JSON document, even for zero files.
+        // No JSON means oxlint never got as far as linting (a JS plugin that
+        // failed to load, a bad config): that is a failed run, never "0 issues".
+        const json = extractOxlintJson(output);
+        if (json === null) {
+          reject(
+            new Error(
+              `Oxlint produced no JSON result (exit ${code}), so nothing was checked: ${stderrOutput.trim() || output.trim().slice(0, 300) || "empty output"}`,
+            ),
+          );
+          return;
+        }
+        resolve(json);
       });
 
       child.on("error", (error) => {

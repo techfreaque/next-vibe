@@ -35,7 +35,6 @@
 
 import "server-only";
 
-import { DefaultFolderId, makeHeadlessContext } from "../../../../core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
@@ -43,6 +42,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId, makeHeadlessContext } from "../../../../core/execution-context";
 import { seedCaseThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,

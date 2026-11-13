@@ -7,7 +7,6 @@
 import { z } from "zod";
 
 import { createEndpoint } from "../../../core/definition/create-i18n";
-import { objectField, requestField, responseField } from "../../../unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -16,10 +15,9 @@ import {
   WidgetType,
 } from "../../../core/definition/enums";
 import { UserRole } from "../../../identity/roles/enum";
-
-import { scopedTranslation } from "./i18n";
-
+import { objectField, requestField, responseField } from "../../../unified-ui/_shared/utils-i18n";
 import { ELECTRON_BUILD_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

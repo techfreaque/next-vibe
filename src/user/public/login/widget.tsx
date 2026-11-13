@@ -4,6 +4,8 @@
 
 "use client";
 
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
@@ -11,22 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
-import { Button } from "next-vibe/ui/components/button";
+import type { DivRefObject } from "next-vibe/ui/components/div";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
-import { Input } from "next-vibe/ui/components/input";
 import type { InputRefObject } from "next-vibe/ui/components/input";
-import type { DivRefObject } from "next-vibe/ui/components/div";
+import { Input } from "next-vibe/ui/components/input";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "next-vibe/ui/components/input-otp";
 import { P } from "next-vibe/ui/components/typography";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { useEffect, useRef, useState } from "react";
-
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -43,6 +41,7 @@ import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { useEffect, useRef, useState } from "react";
 
 import type definition from "./definition";
 

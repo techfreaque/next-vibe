@@ -14,7 +14,7 @@
  * VIBE_TEST_PG_URL. Tests no-op when it is unreachable.
  */
 
-import { createServer, type Server, type Socket, connect } from "node:net";
+import { connect,createServer, type Server, type Socket } from "node:net";
 
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";

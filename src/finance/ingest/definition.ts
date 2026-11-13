@@ -22,7 +22,6 @@ import {
 import { z } from "zod";
 
 import { FINANCE_INGEST_ALIAS } from "../constants";
-import { financeErrorTypes } from "../error-types";
 import {
   AlertSeverityDB,
   CostCoverageDB,
@@ -32,6 +31,7 @@ import {
   IngestScopeOptions,
   SourceRunStatusDB,
 } from "../enum";
+import { financeErrorTypes } from "../error-types";
 import { scopedTranslation } from "../i18n";
 
 const FinanceIngestContainer = lazyWidget(() =>

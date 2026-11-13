@@ -15,8 +15,8 @@ import "server-only";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 
-import { coreEnv } from "../env";
 import { Environment } from "../../env/env-util";
+import { coreEnv } from "../env";
 
 const PRIVATE_ADDRESS_PATTERNS = [
   /^localhost$/i,

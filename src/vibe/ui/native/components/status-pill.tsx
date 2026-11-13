@@ -5,8 +5,8 @@ import type {
   StatusPillProps,
   StatusPillVariant,
 } from "../../web/components/status-pill";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type {
   StatusPillProps,

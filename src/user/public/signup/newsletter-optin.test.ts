@@ -9,8 +9,6 @@
 
 import { render } from "@react-email/render";
 import { eq, inArray } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
@@ -25,7 +23,9 @@ import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { FREE_POOL_CLAIMS_START } from "@/credits/anti-farming/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { NewsletterConfirmRepository } from "@/newsletter/confirm/repository";
@@ -33,7 +33,6 @@ import creditBonusEndpoints from "@/newsletter/credit-bonus/definition";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
-import { FREE_POOL_CLAIMS_START } from "@/credits/anti-farming/config";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 

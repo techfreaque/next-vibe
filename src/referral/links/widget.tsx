@@ -8,7 +8,7 @@
 
 "use client";
 
-import { Platform, isCliPlatform } from "next-vibe/platforms/platforms";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";

@@ -6,12 +6,11 @@
  * endpoint is a tool page where a thread is picked from the customer's list.
  */
 
-import { describe, expect } from "vitest";
-
+import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { ThreadStreamingState } from "../../chat/enum";
 import {

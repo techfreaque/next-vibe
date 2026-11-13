@@ -1,7 +1,7 @@
-import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
 
 import { Glob } from "bun";
+import { describe, expect, it } from "bun:test";
 
 import { transformClientLocaleSource } from "./client-locale-loader.cjs";
 

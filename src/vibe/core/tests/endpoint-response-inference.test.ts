@@ -11,6 +11,10 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { z } from "zod";
+
+import { UserRole } from "../../identity/roles/enum";
+import { objectField, requestField, responseArrayField, responseField } from "../../unified-ui/_shared/utils-i18n";
 import { createEndpoint } from "../definition/create-i18n";
 import type { InferSchemaFromField } from "../definition/endpoint";
 import type { FieldUsage } from "../definition/enums";
@@ -21,9 +25,6 @@ import {
   Methods,
   WidgetType,
 } from "../definition/enums";
-import { UserRole } from "../../identity/roles/enum";
-import { objectField, requestField, responseArrayField, responseField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

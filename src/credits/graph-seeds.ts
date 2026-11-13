@@ -21,10 +21,10 @@ import { CREDITS_AVG_TRANSACTION_ALIAS } from "./data-sources/credits-avg-transa
 import { CREDITS_BALANCE_TOTAL_ALIAS } from "./data-sources/credits-balance-total/constants";
 import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
 import { CREDITS_EXPIRED_ALIAS } from "./data-sources/credits-expired/constants";
-import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
-import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-spend/constants";
 import { CREDITS_FARMING_BLOCKED_ALIAS } from "./data-sources/credits-farming-blocked/constants";
+import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
 import { CREDITS_FREE_POOL_UTILIZATION_ALIAS } from "./data-sources/credits-free-pool-utilization/constants";
+import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-spend/constants";
 import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
 import { CREDITS_REFUNDED_ALIAS } from "./data-sources/credits-refunded/constants";

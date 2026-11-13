@@ -7,42 +7,42 @@
  */
 
 import { eq } from "drizzle-orm";
+import {
+  createE2ECreditUser,
+  drainCredits,
+  type E2ECreditUser,
+} from "next-vibe/agent/ai-stream/testing/e2e-credit-user";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
+import uncensoredConsentEndpoints from "next-vibe/agent/models/uncensored-consent/definition";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type {
-  JWTPublicPayloadType,
   JwtPrivatePayloadType,
+  JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import revokeEndpoints from "@/api-keys/[id]/definition";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
-import revokeEndpoints from "@/api-keys/[id]/definition";
 import { findActiveKey, hashApiKey, resetRateLimit } from "@/api-keys/keys";
+import { generateApiKey } from "@/api-keys/keys";
+import { resetPaidCache } from "@/api-keys/paid";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import {
-  createE2ECreditUser,
-  drainCredits,
-  type E2ECreditUser,
-} from "next-vibe/agent/ai-stream/testing/e2e-credit-user";
 
+import type { V1ChatCompletionsPostRequestOutput } from "./chat/completions/definition";
 import { V1ChatCompletionsRepository } from "./chat/completions/repository";
 import { scopedTranslation } from "./i18n";
 import { V1ModelsRepository } from "./models/repository";
 import type { InferenceRequest, InferenceRunner } from "./shared/inference";
-import type { V1ChatCompletionsPostRequestOutput } from "./chat/completions/definition";
-import { generateApiKey } from "@/api-keys/keys";
-import { resetPaidCache } from "@/api-keys/paid";
 import { listUserChatModels } from "./shared/models";
-import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
-import uncensoredConsentEndpoints from "next-vibe/agent/models/uncensored-consent/definition";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);

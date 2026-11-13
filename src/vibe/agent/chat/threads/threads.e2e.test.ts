@@ -3,14 +3,13 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Page } from "playwright";
 import { describe, expect } from "vitest";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-
-import threadsEndpoints from "./definition";
 import { createE2EUser, deleteE2EUser, seedThread, signInAs } from "../testing/e2e-seed";
+import threadsEndpoints from "./definition";
 
 /** The list widget renders rows, not filter inputs — ready once `text` shows. */
 function visibleText(page: Page, text: string): Promise<void> {

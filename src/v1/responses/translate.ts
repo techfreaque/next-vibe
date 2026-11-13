@@ -11,7 +11,6 @@ import type {
   V1StreamEncoder,
   V1Totals,
 } from "../shared/execution";
-import { estimateTokens } from "../shared/tokens";
 import type {
   InferenceOutputPart,
   InferenceTool,
@@ -36,6 +35,7 @@ import {
   decodeReasoningReplay,
   encodeReasoningReplay,
 } from "../shared/reasoning-replay";
+import { estimateTokens } from "../shared/tokens";
 import type {
   ResponsesInputItem,
   ResponsesReasoningItem,

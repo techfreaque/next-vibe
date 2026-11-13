@@ -10,10 +10,10 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
 
 import type definition from "./definition";

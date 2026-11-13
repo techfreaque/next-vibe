@@ -38,7 +38,6 @@ import { DEV_WATCHER_TASK_NAME } from "../../../tasks/dev-watcher/constants";
 import { UnifiedTaskRunnerRepository } from "../../../tasks/unified-runner/repository";
 import type { Task } from "../../../tasks/unified-runner/types";
 import { ServerFramework } from "../enum";
-import { patchPublicUrlPort } from "../public-url";
 import {
   ATLAS_PID_FILE,
   cleanupPidFile,
@@ -48,6 +47,7 @@ import {
   LOCAL_BASE_PORT,
   writePidFile,
 } from "../pid";
+import { patchPublicUrlPort } from "../public-url";
 import type { DevRequestOutput } from "./definition";
 
 /**

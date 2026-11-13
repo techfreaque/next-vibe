@@ -14,8 +14,8 @@
 import "server-only";
 
 import { and, asc, count, eq, inArray, lte, sql } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { coreEnv } from "next-vibe/core/env";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { leads } from "next-vibe/identity/lead/db";

@@ -42,6 +42,8 @@ import {
   setSessionItem,
 } from "next-vibe/ui/lib/storage";
 
+import { defaultLocale } from "../../core/i18n/core/config";
+import { createLogger } from "../../logger/create-logger";
 import type {
   BridgeAction,
   BridgeResponse,
@@ -53,8 +55,6 @@ import type {
   TypedBridgeCall,
   TypedBridgeResponse,
 } from "./types";
-import { defaultLocale } from "../../core/i18n/core/config";
-import { createLogger } from "../../logger/create-logger";
 import {
   FREQUENCY_KEY_PREFIX,
   isBridgeCall,

@@ -9,8 +9,6 @@
  */
 
 import { eq, inArray } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
@@ -25,14 +23,15 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
+import confirmEndpoints from "../confirm/definition";
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
-import confirmEndpoints from "../confirm/definition";
 import creditBonusEndpoints from "./definition";
 import { NewsletterCreditOffer } from "./enum";
 import { decideCreditOffer, type SubscriptionRow } from "./repository";

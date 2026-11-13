@@ -7,15 +7,16 @@
  * finds it in the queue and restores it.
  */
 
+import { randomUUID } from "node:crypto";
+
 import { eq } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-import { randomUUID } from "node:crypto";
 import { describe, expect } from "vitest";
 
 import { chatThreads } from "../db";

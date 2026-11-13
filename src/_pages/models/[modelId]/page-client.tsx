@@ -26,8 +26,8 @@ import {
   modelHref,
   priceFootnote,
 } from "../_shared/model-format";
-import { ModelIcon, SampleAnswersSlot, TierBadge } from "../_shared/model-ui";
 import { ModelPicker } from "../_shared/model-picker";
+import { ModelIcon, SampleAnswersSlot, TierBadge } from "../_shared/model-ui";
 import { scopedTranslation } from "../i18n";
 import { MediaModelPageClient } from "./media-page-client";
 import type { ChatModelPageData, ModelPageData } from "./page";

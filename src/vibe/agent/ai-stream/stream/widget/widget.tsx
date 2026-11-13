@@ -10,6 +10,7 @@
 
 import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   AlertDialog,
@@ -23,11 +24,11 @@ import {
 } from "next-vibe/ui/components/alert-dialog";
 import { Button } from "next-vibe/ui/components/button";
 import { Div, type DivRefObject } from "next-vibe/ui/components/div";
+import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { KeyboardAvoidingView } from "next-vibe/ui/components/keyboard-avoiding-view";
 import { Link } from "next-vibe/ui/components/link";
 import { H2, P } from "next-vibe/ui/components/typography";
-import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
-import { KeyboardAvoidingView } from "next-vibe/ui/components/keyboard-avoiding-view";
 import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { useResizeObserver } from "next-vibe/ui/hooks/use-resize-observer";
 import { useSafeAreaInsets } from "next-vibe/ui/hooks/use-safe-area-insets";
@@ -41,7 +42,6 @@ import type { UseEndpointOptions } from "next-vibe/unified-ui/hooks/endpoint-typ
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX } from "react";
 import React, {
   useEffect,
@@ -51,18 +51,18 @@ import React, {
   useState,
 } from "react";
 
-import { parseChatUrl } from "@/_pages/chat/lib/url-parser";
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
+import { parseChatUrl } from "@/_pages/chat/lib/url-parser";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../../chat/enum";
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
 import publicFeedDefinition from "../../../chat/public-feed/definition";
+import { useChatSettings } from "../../../chat/settings/hooks";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
 import { scopedTranslation } from "../../../chat/threads/widget/i18n";
-import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "../../../cortex/widget/cortex-modal";
 import { useProviderAvailability } from "../../../env-availability-store";

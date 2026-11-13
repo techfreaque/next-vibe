@@ -7,13 +7,13 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
-import { scopedTranslation } from "../../web/i18n";
 // Import all types and constants from web (web is source of truth)
 import type {
   CountryData,
   PhoneFieldProps,
 } from "../../web/components/phone-field";
 import { COUNTRIES } from "../../web/components/phone-field";
+import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { ChevronDown, Phone } from "./icons";

@@ -19,12 +19,12 @@ import { ProductIds, productsRepository } from "@/products/repository-client";
 import { DEFAULT_FOLDER_CONFIGS } from "../../../../../chat/config";
 import type { ThreadsWidgetT } from "../../../../../chat/threads/widget/i18n";
 import { getTourSelector, TOUR_DATA_ATTRS } from "./tour-attrs";
+export type { TourDataAttr } from "./tour-attrs";
 export {
   getFolderTourAttr,
   getTourSelector,
   TOUR_DATA_ATTRS,
 } from "./tour-attrs";
-export type { TourDataAttr } from "./tour-attrs";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;

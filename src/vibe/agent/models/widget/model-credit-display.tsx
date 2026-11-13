@@ -28,9 +28,9 @@ import { useRef, useState } from "react";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 import {
-  FREE_PLAN_MONTHLY_CREDITS,
   formatCreditsAsMoney,
   formatCreditUnitPrice,
+  FREE_PLAN_MONTHLY_CREDITS,
   freePlanMessageCount,
 } from "@/products/credit-money";
 

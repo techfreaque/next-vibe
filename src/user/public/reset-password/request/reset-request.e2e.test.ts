@@ -3,10 +3,9 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { identityEnv } from "next-vibe/identity/env";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import resetRequestEndpoints from "./definition";
 

@@ -1,5 +1,10 @@
 "use client";
 
+import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import skillsDef from "next-vibe/agent/skills/definition";
+import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { CollapsibleSkillSection } from "next-vibe/agent/skills/widget";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
@@ -7,20 +12,6 @@ import { Link } from "next-vibe/ui/components/link";
 import { Nav } from "next-vibe/ui/components/nav";
 import { Span } from "next-vibe/ui/components/span";
 import { H2, P } from "next-vibe/ui/components/typography";
-import { useMemo, type JSX } from "react";
-
-import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
-import {
-  DEFAULT_ACCENT,
-  ProfileBio,
-  ProfileHero,
-  ProfileSocialPills,
-} from "@/_pages/creator/[userId]/_shared/profile-content";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
-import skillsDef from "next-vibe/agent/skills/definition";
-import { useChatFavorites } from "next-vibe/agent/skills/favorites/hooks/hooks";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
-import { CollapsibleSkillSection } from "next-vibe/agent/skills/widget";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   useWidgetLocale,
@@ -29,7 +20,15 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
+import { type JSX,useMemo } from "react";
 
+import { buildScopedPaletteStyle } from "@/_pages/creator/[userId]/_shared/palette-generator";
+import {
+  DEFAULT_ACCENT,
+  ProfileBio,
+  ProfileHero,
+  ProfileSocialPills,
+} from "@/_pages/creator/[userId]/_shared/profile-content";
 import { LeadCaptureForm } from "@/lead-magnet/capture/widget";
 
 import type { GET } from "./definition";

@@ -39,11 +39,11 @@ import type {
   InferenceUsage,
   OpenAiFinishReason,
 } from "./inference";
-import { resolveRequestedModel, type ModelResolveMode } from "./models";
+import { type ModelResolveMode, resolveRequestedModel } from "./models";
 import { sseResponse } from "./openai";
 import { CHARS_PER_TOKEN } from "./tokens";
 
-export { CHARS_PER_TOKEN, TOKENS_PER_IMAGE, estimateTokens } from "./tokens";
+export { CHARS_PER_TOKEN, estimateTokens, TOKENS_PER_IMAGE } from "./tokens";
 
 const DEFAULT_ESTIMATED_OUTPUT_TOKENS = 4_096;
 /** Idle gap after which a stream sends a heartbeat (clients have idle timeouts). */

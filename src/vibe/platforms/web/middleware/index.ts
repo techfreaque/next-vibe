@@ -15,7 +15,6 @@ import {
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { Environment } from "../../../env/env-util";
-import { createEndpointLogger } from "../../../logger/server";
 import {
   checkLeadId,
   createLeadId,
@@ -27,6 +26,7 @@ import {
   updateLeadLocale,
   UUID_REGEX,
 } from "../../../identity/middleware/lead-id/index";
+import { createEndpointLogger } from "../../../logger/server";
 import { VIBE_FRAME_MOUNT_API_PATH } from "../../vibe-frame/mount/constants";
 import type { LanguageMiddlewareOptions } from "./language/index";
 import { detectLocale } from "./language/index";

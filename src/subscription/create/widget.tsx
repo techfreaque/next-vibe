@@ -20,10 +20,10 @@ import {
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
-import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Database } from "next-vibe/ui/components/icons/Database";
@@ -64,8 +64,8 @@ import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purcha
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 
-import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import subscriptionDefinitions from "../definition";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
 import { useSubscription } from "../hooks";
 import type definition from "./definition";
 

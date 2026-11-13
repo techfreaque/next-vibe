@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 

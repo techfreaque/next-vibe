@@ -4,14 +4,14 @@
  */
 
 import type { Metadata } from "next";
+import type { LeaderboardResponseOutput } from "next-vibe/agent/refusal-index/leaderboard/definition";
+import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { JSX } from "react";
 
-import type { LeaderboardResponseOutput } from "next-vibe/agent/refusal-index/leaderboard/definition";
-import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./i18n";

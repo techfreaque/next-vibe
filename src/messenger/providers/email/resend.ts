@@ -28,8 +28,8 @@ import {
 import { messengerEnv } from "../../env";
 import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
-import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
 import { SendOnlyProvider } from "../send-only-base";
+import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
 
 /** Resend client cache keyed by api key */
 const clientCache = new Map<string, Resend>();

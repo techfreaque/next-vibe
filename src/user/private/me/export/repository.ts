@@ -13,12 +13,12 @@
 import "server-only";
 
 import { eq, getTableColumns, inArray, or } from "drizzle-orm";
-import { cortexNodes } from "next-vibe/agent/cortex/db";
 import {
   chatFolders,
   chatMessages,
   chatThreads,
 } from "next-vibe/agent/chat/db";
+import { cortexNodes } from "next-vibe/agent/cortex/db";
 import { customSkills } from "next-vibe/agent/skills/db";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import {

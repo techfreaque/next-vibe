@@ -8,7 +8,11 @@ import { dirname, relative } from "node:path";
 
 import { buildPackageRunnerCommand, coreEnv } from "../../../../core/env";
 import type { ResponseType as ApiResponseType } from "../../../../core/route/response.schema";
-import { success } from "../../../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  failInline,
+  success,
+} from "../../../../core/route/response.schema";
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
@@ -61,6 +65,16 @@ export interface VibeCheckResponseOutput {
 /**
  * Run ESLint Repository
  */
+/** True when ESLint's stdout is a complete JSON document. */
+function isJson(output: string): boolean {
+  try {
+    JSON.parse(output);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export class LintRepository {
   static async execute(
     data: LintRequestOutput,
@@ -184,29 +198,9 @@ export class LintRepository {
 
       logger.error(`[ESLINT] Execution failed: ${errorMessage}`);
 
-      return success({
-        items: [
-          {
-            file: "unknown",
-            severity: "error" as const,
-            message: errorMessage,
-          },
-        ],
-        files: [
-          {
-            file: "unknown",
-            errors: 1,
-            warnings: 0,
-            total: 1,
-          },
-        ],
-        totalIssues: 1,
-        totalFiles: 1,
-        totalErrors: 1,
-        displayedIssues: 1,
-        displayedFiles: 1,
-        currentPage: 1,
-        totalPages: 1,
+      return failInline({
+        message: `ESLint did not run: ${errorMessage}`,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -304,17 +298,25 @@ export class LintRepository {
           return;
         }
         // Exit 2 (or a bunx wrapper exiting 0 after ESLint crashed) prints no
-        // JSON at all. Never let that read as "0 issues" silently.
-        if (code === 2 || (!output.trim() && errorOutput.trim())) {
+        // JSON at all. That is a checker that never ran, not a clean lint: it
+        // must fail the run. Logging and resolving here is what let ESLint
+        // report "0 issues" for months while it crashed on every start.
+        const crashed =
+          code === 2 || code === null || !output.trim() || !isJson(output);
+        if (crashed) {
           const reason =
             errorOutput
               .split("\n")
               .map((line) => line.trim())
               .find((line) => line.startsWith("Error")) ??
-            errorOutput.trim().split("\n")[0];
-          logger.warn(
-            `[ESLINT] ESLint crashed (exit ${code}); no ESLint rules were checked: ${reason}`,
+            (errorOutput.trim().split("\n")[0] ||
+              "no JSON output was produced");
+          reject(
+            new Error(
+              `ESLint crashed (exit ${code ?? "signal"}), so no ESLint rule was checked: ${reason}`,
+            ),
           );
+          return;
         }
         resolve(output);
       });

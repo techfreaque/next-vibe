@@ -8,16 +8,16 @@
 
 import type { CountryLanguage } from "../core/i18n/core/config";
 import { colors, maybeColorize, semantic } from "./colors";
+import { enableDebugLogger, mcpSilentMode } from "./debug";
 import {
   colorizeLogMessage,
   formatConnectorMetadata,
   formatMetadata,
   usesCompactMetadata,
 } from "./formatters";
-import { enableDebugLogger, mcpSilentMode } from "./debug";
-import { formatElapsed } from "./uptime";
 import { serializeLogRecord } from "./serialize";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
+import { formatElapsed } from "./uptime";
 
 function serializeDebugMeta(meta: LoggerMetadata[], pretty: boolean): string {
   if (meta.length === 0) {

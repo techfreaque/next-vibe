@@ -4,16 +4,16 @@
  */
 
 import { Button, Section, Text } from "@react-email/components";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { coreEnv } from "next-vibe/core/env";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/core/route/response.schema";
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
 } from "next-vibe/core/route/response.schema";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -21,7 +21,6 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { configScopedTranslation } from "@/env/i18n";
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
@@ -32,6 +31,7 @@ import type {
   EmailResolvedData,
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import type signupDefinition from "../signup/definition";
 import type {

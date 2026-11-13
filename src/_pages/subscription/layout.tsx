@@ -16,10 +16,10 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/_pages/story/_components/footer";
 import { Navbar } from "@/_pages/story/_components/nav/navbar";
+import { accountNavItems } from "@/_pages/user/_components/account-nav-items";
 import { NewsletterStatusProvider } from "@/newsletter/_components/newsletter-status-provider";
 import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
 import { NewsletterStatusRepository } from "@/newsletter/status/repository";
-import { accountNavItems } from "@/_pages/user/_components/account-nav-items";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { SubscriptionRepository } from "@/subscription/repository";
 

@@ -10,6 +10,14 @@
  */
 
 import { describe, expect, it } from "bun:test";
+import { z } from "zod";
+
+import { UserRole } from "../../identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "../../unified-ui/_shared/utils";
 import { createEndpoint } from "../definition/create";
 import {
   EndpointErrorTypes,
@@ -18,13 +26,6 @@ import {
   Methods,
   WidgetType,
 } from "../definition/enums";
-import { UserRole } from "../../identity/roles/enum";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "../../unified-ui/_shared/utils";
-import { z } from "zod";
 
 // Helper types to assert exact type equality at compile time
 type Expect<T extends true> = T;

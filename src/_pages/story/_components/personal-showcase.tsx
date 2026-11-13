@@ -3,20 +3,13 @@ import type { ChatMessage } from "next-vibe/agent/chat/db";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import type codingAgentDefinitions from "next-vibe/agent/coding-agent/definition";
+import type cortexExecDefinitions from "next-vibe/agent/cortex/exec/definition";
+import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
-import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
-import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
-import type codingAgentDefinitions from "next-vibe/agent/coding-agent/definition";
-import type cortexExecDefinitions from "next-vibe/agent/cortex/exec/definition";
-import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
 import type cronTasksDefinitions from "next-vibe/tasks/cron/tasks/definition";
 import {
   CronTaskEnabledFilter,
@@ -26,6 +19,13 @@ import {
   TaskCategory,
   TaskOutputMode,
 } from "next-vibe/tasks/enum";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
+import { Span } from "next-vibe/ui/components/span";
+import { H3, P } from "next-vibe/ui/components/typography";
+import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 

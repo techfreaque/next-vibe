@@ -16,7 +16,6 @@ import { CampaignEmailLayout } from "@/messenger/providers/email/smtp-client/com
 import { HumanCTAButton } from "@/messenger/providers/email/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/messenger/providers/email/smtp-client/components/human_text.email";
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
-
 import {
   FREE_CREDIT_ALLOWANCE,
   FREE_CREDIT_MAX_TOTAL,

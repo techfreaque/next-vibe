@@ -33,19 +33,6 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import {
-  closeProdDb,
-  connectToHermes,
-  disconnectFromHermes,
-  HERMES_DEV_PID_FILE_PATH,
-  isServerRunning,
-  LOCAL_DEV_URL,
-  resolveProdAdminToken,
-  resolveProdUserId,
-  triggerHermesPull,
-  unregisterDevFromHermes,
-} from "../ai-stream/testing/remote-setup";
-import { skillsSyncProvider } from "../skills/sync-provider";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { resolveHermesDatabaseUrl } from "next-vibe/database/effective-url";
@@ -64,6 +51,19 @@ import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/re
 import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import {
+  closeProdDb,
+  connectToHermes,
+  disconnectFromHermes,
+  HERMES_DEV_PID_FILE_PATH,
+  isServerRunning,
+  LOCAL_DEV_URL,
+  resolveProdAdminToken,
+  resolveProdUserId,
+  triggerHermesPull,
+  unregisterDevFromHermes,
+} from "../ai-stream/testing/remote-setup";
+import { skillsSyncProvider } from "../skills/sync-provider";
 import { cortexNodes } from "./db";
 import { documentsSyncProvider } from "./sync-provider";
 

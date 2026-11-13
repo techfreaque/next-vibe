@@ -1,5 +1,4 @@
 import { describe, expect, it, spyOn } from "bun:test";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
 

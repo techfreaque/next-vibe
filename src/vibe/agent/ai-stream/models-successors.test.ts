@@ -19,10 +19,10 @@ import { DEFAULT_SKILLS } from "@/generated/skills";
 
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
-import { ApiProvider } from "../models/models";
 import { ModelsListRepository } from "../models/list/repository";
-import { getBestChatModelForFavorite } from "../skills/favorites/[id]/definition";
+import { ApiProvider } from "../models/models";
 import { IntelligenceLevel, ModelSelectionType } from "../skills/enum";
+import { getBestChatModelForFavorite } from "../skills/favorites/[id]/definition";
 import {
   chatModelDefinitions,
   ChatModelId,

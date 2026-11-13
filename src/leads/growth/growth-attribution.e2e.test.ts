@@ -7,8 +7,6 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -18,6 +16,7 @@ import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { describe, expect } from "vitest";
 
 import signupEndpoints from "@/user/public/signup/definition";
 import userDeleteDefinitions from "@/users/user/[id]/definition";

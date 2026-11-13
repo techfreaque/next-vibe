@@ -46,6 +46,7 @@ import { useMemo, useState } from "react";
 
 import { scopedTranslation } from "@/_pages/tools/i18n";
 import type { CountryLanguage } from "@/vibe/core/i18n/core/config";
+
 import { getDefaultToolIdsForUser } from "../../chat/constants";
 import type { EnabledTool } from "../../chat/hooks/store";
 

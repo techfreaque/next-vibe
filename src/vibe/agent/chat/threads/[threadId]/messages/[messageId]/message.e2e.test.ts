@@ -4,12 +4,11 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { chatMessages } from "../../../../db";
 import { createE2EUser, deleteE2EUser, seedMessage, seedThread, signInAs } from "../../../../testing/e2e-seed";

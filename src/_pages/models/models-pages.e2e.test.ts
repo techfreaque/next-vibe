@@ -8,14 +8,13 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { TOUR_SKIPPED_KEY } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-config";
+import { until } from "next-vibe/agent/ai-stream/testing/e2e-chat";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-import { until } from "next-vibe/agent/ai-stream/testing/e2e-chat";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import { getModelFacts, toModelSlug } from "./_shared/model-facts";
 import { listMediaFacts } from "./_shared/model-media-facts";

@@ -21,13 +21,15 @@ import "server-only";
 import { readFileSync } from "node:fs";
 
 import { and, eq } from "drizzle-orm";
+import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
 import { ChatModelId } from "../../../agent/ai-stream/models";
 import {
   getOrCreateFolder,
   resolveUserAndToken,
   runTestStream,
 } from "../../../agent/ai-stream/testing/headless-test-runner";
-import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { chatThreads } from "../../../agent/chat/db";
 import { NO_SKILL_ID } from "../../../agent/skills/constants";
 import { ModelSelectionType } from "../../../agent/skills/enum";
@@ -43,7 +45,6 @@ import {
 } from "../../../remote-connection/db";
 import { RemoteConnectionRepository } from "../../../remote-connection/repository";
 import { sendTestRequest } from "../../../tooling/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

@@ -22,11 +22,6 @@ import "server-only";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { chatFolders } from "../../agent/chat/db";
-import { defaultLocale } from "../../core/i18n/core/config";
-import { db } from "../../database";
-import type { JwtPrivatePayloadType } from "../../identity/auth/types";
-import { identityEnv } from "../../identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -41,6 +36,11 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import { chatFolders } from "../../agent/chat/db";
+import { defaultLocale } from "../../core/i18n/core/config";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
 import { instanceIdentities, remoteConnections } from "../db";
 
 // ── Skip guard ────────────────────────────────────────────────────────────────

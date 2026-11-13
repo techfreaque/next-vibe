@@ -26,8 +26,8 @@ import "server-only";
 import { z } from "zod";
 
 import {
-  ChatModelId,
   chatModelDefinitions,
+  ChatModelId,
 } from "@/vibe/agent/ai-stream/models-definitions";
 import { ApiProvider } from "@/vibe/agent/models/models";
 

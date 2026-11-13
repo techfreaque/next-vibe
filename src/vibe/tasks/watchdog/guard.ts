@@ -27,12 +27,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { AbortReason } from "../../agent/ai-stream/repository/core/constants";
 import { cronTasks } from "../cron/db";
-import { TASK_WATCHDOG_CONFIG, maxDurationFor } from "./config";
+import { maxDurationFor, TASK_WATCHDOG_CONFIG } from "./config";
 import {
   type IncidentMetadata,
   taskBudgetCaps,
-  taskIncidents,
   type TaskIncidentRow,
+  taskIncidents,
   taskSpendLedger,
 } from "./db";
 import {

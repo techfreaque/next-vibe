@@ -3,23 +3,22 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
-import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-import { recordPage } from "next-vibe/tooling/testing/e2e/coverage";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
+import { recordPage } from "next-vibe/tooling/testing/e2e/coverage";
 import {
   e2eEndpointId,
   EndpointForm,
 } from "next-vibe/tooling/testing/e2e/endpoint-form";
+import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { describe, expect } from "vitest";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";

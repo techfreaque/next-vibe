@@ -4,8 +4,8 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/components/div";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -13,8 +13,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";

@@ -8,9 +8,6 @@
 import { randomUUID } from "node:crypto";
 
 import { eq } from "drizzle-orm";
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { customSkills } from "next-vibe/agent/skills/db";
 import {
   SkillCategory,
@@ -20,6 +17,8 @@ import {
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import { db } from "../../vibe/database";
 import { leadMagnetCaptures, leadMagnetConfigs } from "../db";

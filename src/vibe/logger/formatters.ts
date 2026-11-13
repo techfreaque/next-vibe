@@ -4,8 +4,8 @@
  */
 
 import { bold, colors, dim, maybeColorize, semantic } from "./colors";
-import { formatElapsed } from "./uptime";
 import type { LoggerMetadata } from "./types";
+import { formatElapsed } from "./uptime";
 
 /**
  * Format a startup message

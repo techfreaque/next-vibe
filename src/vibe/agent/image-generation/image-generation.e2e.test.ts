@@ -8,17 +8,16 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { describe, expect } from "vitest";
 import { z } from "zod";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
-
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 
 import { until } from "../ai-stream/testing/e2e-chat";
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";

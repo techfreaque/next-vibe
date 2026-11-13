@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-
 import { Platform } from "next-vibe/platforms/platforms";
 
 import { keepsExplicitMediaModel } from "./media-generation";

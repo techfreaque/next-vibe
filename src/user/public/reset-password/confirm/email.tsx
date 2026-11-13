@@ -3,18 +3,19 @@
  */
 
 import { Button, Section, Text } from "@react-email/components";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import { coreEnv } from "next-vibe/core/env";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { ReactElement } from "react";
 import { z } from "zod";
-
-import type { EmailTemplateDefinition } from "@/messenger/registry/template";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { configScopedTranslation } from "@/env/i18n";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
@@ -22,14 +23,13 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { UserRepository } from "next-vibe/identity/user/repository";
-import { coreEnv } from "next-vibe/core/env";
+import type { EmailTemplateDefinition } from "@/messenger/registry/template";
+
+import type definition from "./definition";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
-import type definition from "./definition";
 import { scopedTranslation as confirmScopedTranslation } from "./i18n";
 
 // ============================================================================

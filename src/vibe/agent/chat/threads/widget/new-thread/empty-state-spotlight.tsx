@@ -27,8 +27,8 @@ import { Coffee } from "next-vibe/ui/components/icons/Coffee";
 import { Compass } from "next-vibe/ui/components/icons/Compass";
 import { Flame } from "next-vibe/ui/components/icons/Flame";
 import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
-import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { PenTool } from "next-vibe/ui/components/icons/PenTool";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
@@ -46,6 +46,7 @@ import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-fiel
 import type { JSX, ReactNode, RefObject } from "react";
 import { useRef, useState } from "react";
 
+import type { DefaultFolderId } from "../../../../../core/execution-context";
 import {
   ChatModelId,
   type ChatModelOption,
@@ -63,15 +64,14 @@ import { NO_SKILL_ID } from "../../../../skills/constants";
 import { ModelSelectionType } from "../../../../skills/enum";
 import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
 import {
-  type SkillsT,
   scopedTranslation as skillsScopedTranslation,
+  type SkillsT,
 } from "../../../../skills/i18n";
 import { getDefaultFolderConfig } from "../../../config";
-import type { DefaultFolderId } from "../../../../../core/execution-context";
 import { useChatSettings } from "../../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../settings/repository-client";
-import { useTourState } from "../../../tour-state";
 import { formatSkillId, parseSkillId } from "../../../slugify";
+import { useTourState } from "../../../tour-state";
 import { scopedTranslation, type ThreadsT } from "../../i18n";
 
 /* ========================================================================== *

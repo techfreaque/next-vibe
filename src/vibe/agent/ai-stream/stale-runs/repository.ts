@@ -39,8 +39,8 @@ import {
   lt,
   notExists,
   or,
-  sql,
   type SQL,
+  sql,
 } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {

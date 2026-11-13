@@ -3,10 +3,9 @@
  * Open the folder menu, add instructions, attach a knowledge file.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import {
   createE2EUser,

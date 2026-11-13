@@ -41,8 +41,6 @@
 
 import "server-only";
 
-import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext, type ToolExecutionContext } from "../../../../core/execution-context";
-import { ChatMessageRole } from "../../../chat/enum";
 // WS fixture record/replay — patches globalThis.WebSocket, must install
 // before any module opens a socket. HTTP fixtures need no install anymore
 // (explicit FixtureContext on each call), but WS interception is still global.
@@ -56,6 +54,8 @@ import {
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext, type ToolExecutionContext } from "../../../../core/execution-context";
+import { ChatMessageRole } from "../../../chat/enum";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,

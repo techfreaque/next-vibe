@@ -6,10 +6,9 @@
  * to another root tab is client-side and fetches that root's folders.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import {
   createE2EUser,

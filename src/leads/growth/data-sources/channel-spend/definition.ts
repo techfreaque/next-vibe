@@ -11,6 +11,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -18,7 +19,6 @@ import {
   resolutionRequestField,
   timeSeriesResponseField,
 } from "next-vibe/dataflow/shared/fields";
-import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";

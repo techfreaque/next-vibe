@@ -32,8 +32,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "../ai-stream/models";
 import { FOLDER_DENIED_TOOL_IDS } from "../chat/config";
-import { THREAD_RENAME_ALIAS } from "../chat/threads/rename/constants";
 import type { ToolConfigItem } from "../chat/settings/definition";
+import { THREAD_RENAME_ALIAS } from "../chat/threads/rename/constants";
 import type { AgentEnvAvailability } from "../env-availability";
 import { DEFAULT_SKILLS } from "./config";
 import { NO_SKILL_ID } from "./constants";

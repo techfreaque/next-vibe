@@ -4,8 +4,8 @@ import type { JSX, ReactNode } from "react";
 
 import {
   type SiteLayoutData,
-  TanstackPage as StoryLayoutPage,
   tanstackLoader as storyLayoutLoader,
+  TanstackPage as StoryLayoutPage,
 } from "../story/layout";
 
 export const dynamic = "force-dynamic";

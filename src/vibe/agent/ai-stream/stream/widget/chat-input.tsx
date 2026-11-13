@@ -19,13 +19,13 @@ import { Kbd } from "next-vibe/ui/components/kbd";
 import { Span } from "next-vibe/ui/components/span";
 import type { TextareaKeyboardEvent } from "next-vibe/ui/components/textarea";
 import { Textarea } from "next-vibe/ui/components/textarea";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
+import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { openInNewTab } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";

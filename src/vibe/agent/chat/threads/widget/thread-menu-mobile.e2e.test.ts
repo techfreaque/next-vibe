@@ -5,12 +5,11 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { isOnTop } from "next-vibe/tooling/testing/e2e/visibility";
+import { describe, expect } from "vitest";
 
 import {
   createE2EUser,

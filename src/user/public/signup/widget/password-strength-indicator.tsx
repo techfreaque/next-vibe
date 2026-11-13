@@ -2,11 +2,11 @@
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-
 import {
   useWidgetForm,
   useWidgetLocale,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+
 import { calculatePasswordStrength } from "./calculate-password-strength";
 import { scopedTranslation } from "./i18n";
 

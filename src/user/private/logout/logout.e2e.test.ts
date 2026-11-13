@@ -7,12 +7,6 @@
  */
 
 import { eq } from "drizzle-orm";
-import type { BrowserContext } from "playwright";
-import { describe, expect } from "vitest";
-
-import { scopedTranslation as navScopedTranslation } from "@/_pages/story/_components/i18n";
-import userDeleteDefinitions from "@/users/user/[id]/definition";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { sessions } from "next-vibe/identity/session/db";
@@ -24,6 +18,11 @@ import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { clearLoginAttempts } from "next-vibe/tooling/testing/testing-suite/login-attempts";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import type { BrowserContext } from "playwright";
+import { describe, expect } from "vitest";
+
+import { scopedTranslation as navScopedTranslation } from "@/_pages/story/_components/i18n";
+import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import loginEndpoints from "../../public/login/definition";
 import { scopedTranslation as loginScopedTranslation } from "../../public/login/i18n";

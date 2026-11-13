@@ -5,11 +5,10 @@
  * and replays on every later run (delete the folder to re-record).
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2ECreditUser } from "../../testing/e2e-credit-user";
 import debugEndpoints from "./definition";

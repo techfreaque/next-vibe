@@ -24,11 +24,6 @@ import "server-only";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { DefaultFolderId, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatFolders, chatThreads } from "../../agent/chat/db";
-import { chatFavorites } from "../../agent/skills/favorites/db";
-import { db } from "../../database";
-import type { JwtPrivatePayloadType } from "../../identity/auth/types";
-import { identityEnv } from "../../identity/env";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { runTestStream } from "../../agent/ai-stream/testing/headless-test-runner";
@@ -47,6 +42,11 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../agent/ai-stream/testing/remote-setup";
+import { chatFolders, chatThreads } from "../../agent/chat/db";
+import { chatFavorites } from "../../agent/skills/favorites/db";
+import { db } from "../../database";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { identityEnv } from "../../identity/env";
 
 // ── Remote URL — skip all suites if unreachable ───────────────────────────────
 

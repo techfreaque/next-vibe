@@ -10,14 +10,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { paymentTransactions } from "@/payment/db";
-import { PaymentStatus } from "@/payment/enum";
-import { REFERRAL_CONFIG } from "@/referral/config";
-import { referralCodes, userReferrals } from "@/referral/db";
-import { ReferralRepository } from "@/referral/repository";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
@@ -29,6 +21,14 @@ import {
   deleteTestUser,
   type TestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { paymentTransactions } from "@/payment/db";
+import { PaymentStatus } from "@/payment/enum";
+import { REFERRAL_CONFIG } from "@/referral/config";
+import { referralCodes, userReferrals } from "@/referral/db";
+import { ReferralRepository } from "@/referral/repository";
 
 import { notifications } from "./db";
 import { NotificationType } from "./enum";

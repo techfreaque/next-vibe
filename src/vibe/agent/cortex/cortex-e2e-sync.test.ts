@@ -24,21 +24,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { and, eq, like, sql } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
-import { ChatModelId } from "../ai-stream/models";
-import {
-  ATLAS_INSTANCE_ID,
-  closeProdDb,
-  getProdDb,
-  HERMES_INSTANCE_ID,
-  resolveDevUser,
-  resolveProdUserId,
-  resolveRemoteUrl,
-  triggerHermesPull,
-} from "../ai-stream/testing/remote-setup";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { ChatMessageRole, ThreadStatus } from "../chat/enum";
-import { SkillCategory } from "../skills/enum";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -59,6 +45,20 @@ import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/re
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
+import { ChatModelId } from "../ai-stream/models";
+import {
+  ATLAS_INSTANCE_ID,
+  closeProdDb,
+  getProdDb,
+  HERMES_INSTANCE_ID,
+  resolveDevUser,
+  resolveProdUserId,
+  resolveRemoteUrl,
+  triggerHermesPull,
+} from "../ai-stream/testing/remote-setup";
+import { ChatMessageRole, ThreadStatus } from "../chat/enum";
+import { SkillCategory } from "../skills/enum";
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
 import { resolveVirtualList, resolveVirtualRead } from "./mounts/resolver";

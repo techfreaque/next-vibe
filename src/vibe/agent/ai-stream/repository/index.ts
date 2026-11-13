@@ -22,8 +22,8 @@ import { CallbackMode } from "next-vibe/execute-tool/constants";
 import { runEndpointByName } from "next-vibe/execute-tool/repository/run-endpoint-by-name";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import { RemoteEventBridgeRepository } from "next-vibe/realtime/remote-event-bridge/repository";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -33,8 +33,8 @@ import {
   DefaultFolderId,
   makeHeadlessContext,
 } from "../../../core/execution-context";
-import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
 import { remoteConnections } from "../../../remote-connection/db";
+import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
 import {
   ChatMessageRole,
   ThreadStatus,
@@ -53,6 +53,7 @@ import {
 } from "../../chat/threads/emitter";
 import { getEnvAvailability } from "../../env-availability";
 import type { ImageGenModelSelection } from "../../image-generation/models";
+import { UncensoredConsentRepository } from "../../models/uncensored-consent/repository";
 import type { MusicGenModelSelection } from "../../music-generation/models";
 import {
   chatFavorites,
@@ -61,13 +62,12 @@ import {
 } from "../../skills/favorites/db";
 import { SkillsRepository } from "../../skills/repository";
 import { stripThinkTags } from "../../text-to-speech/content-processing";
-import { UncensoredConsentRepository } from "../../models/uncensored-consent/repository";
 import type { VideoGenModelSelection } from "../../video-generation/models";
+import { getChatModelById } from "../models";
 import type {
   AiStreamRunPostRequestOutput,
   AiStreamRunPostResponseOutput,
 } from "../run/definition";
-import { getChatModelById } from "../models";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,

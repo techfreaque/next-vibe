@@ -3,17 +3,14 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { createEndpointLogger } from "next-vibe/logger/server";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
-import { recordPage } from "next-vibe/tooling/testing/e2e/coverage";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   E2E_HYDRATION_TIMEOUT_MS,
   E2E_LOCALE,
 } from "next-vibe/tooling/testing/e2e/config";
+import { recordPage } from "next-vibe/tooling/testing/e2e/coverage";
 import type { E2ESubmitSent } from "next-vibe/tooling/testing/e2e/endpoint-form";
 import {
   e2eEndpointId,
@@ -24,6 +21,8 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import type { Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation } from "../i18n";
 import { CreditRepository } from "../repository";

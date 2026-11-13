@@ -3,8 +3,8 @@
  * Follows the same pattern as login for consistency
  */
 
-import { z } from "zod";
-
+import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
+import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -12,18 +12,17 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
-import { chatModelSelectionSchema } from "next-vibe/agent/ai-stream/models";
-import { voiceModelSelectionSchema } from "next-vibe/agent/text-to-speech/models";
+import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 const SignupFormContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.SignupFormContainer })),

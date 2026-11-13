@@ -8,12 +8,11 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { leadEngagements } from "next-vibe/identity/lead/db";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { db } from "../../vibe/database";
 import trackingEndpoints from "./definition";

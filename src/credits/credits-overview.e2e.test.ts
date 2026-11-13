@@ -3,8 +3,6 @@
  * the one step up — and fits a phone. Requires a server: `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
@@ -12,6 +10,7 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation } from "./i18n";
 

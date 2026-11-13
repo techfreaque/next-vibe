@@ -17,13 +17,13 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { chatFolders } from "../../../../db";
 import {
   createE2EUser,
   deleteE2EUser,
   type E2EAccount,
   seedFolder,
 } from "../../../../testing/e2e-seed";
-import { chatFolders } from "../../../../db";
 import { folderProjectFragment } from "../../../system-prompt";
 import projectDefinitions from "./definition";
 import removeFileDefinitions from "./files/[fileId]/definition";

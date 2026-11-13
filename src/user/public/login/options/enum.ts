@@ -1,4 +1,5 @@
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
+
 import { scopedTranslation } from "./i18n";
 
 export const {

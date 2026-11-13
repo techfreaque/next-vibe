@@ -1,9 +1,9 @@
 "use client";
 
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";

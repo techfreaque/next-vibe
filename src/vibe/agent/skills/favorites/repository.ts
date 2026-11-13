@@ -50,14 +50,14 @@ import {
   type FavoriteConfig,
 } from "./db";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
-import {
-  markCompanionsSubset,
-  reconcileAllFlaggedCompanions,
-} from "./variants-mode";
 import type { FavoriteSummaryItem } from "./favorites-formatter";
 import type { FavoritesT } from "./i18n";
 import reorderDefinitions from "./reorder/definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
+import {
+  markCompanionsSubset,
+  reconcileAllFlaggedCompanions,
+} from "./variants-mode";
 
 export function buildFavoriteConfig(
   overrides: Partial<FavoriteConfig> & Pick<FavoriteConfig, "id" | "skillId">,

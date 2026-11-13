@@ -20,8 +20,8 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { createEndpointEmitter } from "next-vibe/realtime/core/emitter";
 
-import { chatFavorites } from "../db";
 import { SingleFavoriteRepository } from "../[id]/repository";
+import { chatFavorites } from "../db";
 import { markCompanionsSubset } from "../variants-mode";
 import deleteBatchDefinitions, {
   type FavoritesDeleteBatchRequestOutput,

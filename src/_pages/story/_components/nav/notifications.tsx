@@ -29,8 +29,8 @@ import { P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
 
-import { useNotificationBell } from "@/notifications/hooks";
 import { NotificationType } from "@/notifications/enum";
+import { useNotificationBell } from "@/notifications/hooks";
 import { scopedTranslation } from "@/notifications/i18n";
 
 function TypeIcon({ type }: { type: string }): JSX.Element {

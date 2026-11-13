@@ -13,10 +13,10 @@
 import "server-only";
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
-
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type { RemoteEventBridgeRepository as RemoteEventBridgeRepositoryType } from "./repository";
 

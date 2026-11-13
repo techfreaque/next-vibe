@@ -89,6 +89,14 @@ import type {
 } from "../vibe/agent/ai-stream/vision-models";
 import { withTransaction } from "../vibe/database/utils/repository-helpers";
 import { createEndpointEmitter } from "../vibe/realtime/core/emitter";
+import { SIGNUP_GUEST_SPEND_LOOKBACK_HOURS } from "./anti-farming/config";
+import {
+  type AccountFreeAccess as FreeCreditsAccess,
+  claimGuestPool,
+  isGuestPoolBlocked,
+  resolveAccountFreeAccess,
+  signupGuestCarryover,
+} from "./anti-farming/quota";
 import {
   creditPacks,
   type CreditTransactionMetadata,
@@ -98,6 +106,15 @@ import {
   type UsageUpstreamCost,
 } from "./db";
 import { getPoolBalance } from "./db-functions";
+import type { CreditsGetResponseOutput } from "./definition";
+import creditsDefinitions from "./definition";
+import {
+  CreditPackType,
+  type CreditPackTypeValue,
+  CreditTransactionType,
+  FreeCreditsStatus,
+  type FreeCreditsStatusValue,
+} from "./enum";
 import {
   computeFreeAllowance,
   computeFreeAvailable,
@@ -109,28 +126,11 @@ import {
   type FreeTier,
   poolHasConfirmedNewsletter,
 } from "./free-allowance";
-import type { CreditsGetResponseOutput } from "./definition";
-import creditsDefinitions from "./definition";
-import {
-  CreditPackType,
-  type CreditPackTypeValue,
-  CreditTransactionType,
-  FreeCreditsStatus,
-  type FreeCreditsStatusValue,
-} from "./enum";
 import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
 import type { CreditsT } from "./i18n";
-import {
-  type AccountFreeAccess as FreeCreditsAccess,
-  claimGuestPool,
-  isGuestPoolBlocked,
-  resolveAccountFreeAccess,
-  signupGuestCarryover,
-} from "./anti-farming/quota";
-import { SIGNUP_GUEST_SPEND_LOOKBACK_HOURS } from "./anti-farming/config";
 import { guestPoolLeadIdsSql, userPoolLeadIdsSql } from "./pool-members";
 import { PublicCapRepository } from "./public-cap/repository";
 

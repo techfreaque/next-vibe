@@ -6,10 +6,9 @@
  */
 
 import { eq, inArray } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { db } from "next-vibe/database";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import {
   refusalIndexQuestions,

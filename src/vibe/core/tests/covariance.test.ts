@@ -11,13 +11,8 @@
  * 5. Type inference works through the entire chain
  */
 
-import type {
-  ApiEndpoint,
-  CreateApiEndpoint,
-} from "../definition/create";
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { Methods } from "../definition/enums";
-import { FieldDataType, WidgetType } from "../definition/enums";
+import { z } from "zod";
+
 import {
   type UserRole,
   type UserRoleValue,
@@ -39,7 +34,13 @@ import {
   responseArrayOptionalField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
+import type {
+  ApiEndpoint,
+  CreateApiEndpoint,
+} from "../definition/create";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
+import { FieldDataType, WidgetType } from "../definition/enums";
 
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",

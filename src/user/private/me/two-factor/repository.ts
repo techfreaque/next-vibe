@@ -24,11 +24,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { renderSVG } from "uqr";
 import { z } from "zod";
 
-import { TwoFactorAction } from "./enum";
 import type {
   TwoFactorPostRequestOutput,
   TwoFactorPostResponseOutput,
 } from "./definition";
+import { TwoFactorAction } from "./enum";
 import type { TwoFactorT } from "./i18n";
 import {
   buildOtpauthUri,

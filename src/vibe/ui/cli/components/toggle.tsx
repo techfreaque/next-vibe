@@ -1,7 +1,7 @@
+import { cva } from "class-variance-authority";
 import { Text } from "ink";
 import type { JSX } from "react";
 
-import { cva } from "class-variance-authority";
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
 import type { ToggleRootProps } from "../../web/components/toggle";
 

@@ -22,12 +22,12 @@ import { Users } from "next-vibe/ui/components/icons/Users";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { type JSX, useCallback, useState } from "react";
 
 import { useChatSettings } from "../../../../../chat/settings/hooks";

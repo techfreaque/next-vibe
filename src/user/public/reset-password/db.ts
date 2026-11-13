@@ -5,9 +5,8 @@
 
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import type { z } from "zod";
-
 import { users } from "next-vibe/identity/user/db";
+import type { z } from "zod";
 
 /**
  * Password resets table schema

@@ -15,7 +15,6 @@ import {
   type TestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";

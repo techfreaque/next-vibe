@@ -4,11 +4,10 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import skillsEndpoints from "./definition";
 import { SkillSourceFilter } from "./enum";

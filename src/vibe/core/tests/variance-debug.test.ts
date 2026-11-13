@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Test to debug variance issue with CreateApiEndpointAny
-import type { CreateApiEndpoint } from "../definition/create";
-import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { Methods } from "../definition/enums";
-import { FieldDataType, WidgetType } from "../definition/enums";
+import { z } from "zod";
+
 import type { UserRoleValue } from "../../identity/roles/enum";
 import type { EndpointEventsMap } from "../../realtime/core/structured-events";
 import type { UnifiedField } from "../../unified-ui/_shared/configs";
@@ -12,7 +10,10 @@ import type {
   FieldUsageConfig,
 } from "../../unified-ui/_shared/types";
 import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
+import type { CreateApiEndpoint } from "../definition/create";
+import type { CreateApiEndpointAny } from "../definition/endpoint-base";
+import type { Methods } from "../definition/enums";
+import { FieldDataType, WidgetType } from "../definition/enums";
 
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",

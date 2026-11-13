@@ -9,7 +9,6 @@
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import userCreateDefinitions, {
@@ -17,6 +16,7 @@ import userCreateDefinitions, {
 } from "@/users/create/definition";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { resolveTestAdminUser } from "./resolve-test-user";
 import { sendBrowserTestRequest } from "./send-browser-test-request";
 import { sendTestRequest } from "./send-test-request";

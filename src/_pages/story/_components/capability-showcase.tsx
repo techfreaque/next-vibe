@@ -2,13 +2,13 @@
 import { DEFAULT_CHAT_MODEL_ID } from "next-vibe/agent/ai-stream/constants";
 import { ChatModelId, FEATURED_MODELS } from "next-vibe/agent/ai-stream/models";
 import type { ChatMessage } from "next-vibe/agent/chat/db";
-import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
-import type fetchUrlDefinitions from "next-vibe/agent/fetch-url-content/definition";
-import type braveSearchDefinitions from "next-vibe/agent/web-search/brave/definition";
 import { GroupedAssistantMessage } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
 import type { MessageGroup } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { StaticUserMessageBubble } from "next-vibe/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
+import type cortexSearchDefinitions from "next-vibe/agent/cortex/search/definition";
+import type fetchUrlDefinitions from "next-vibe/agent/fetch-url-content/definition";
 import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-models";
+import type braveSearchDefinitions from "next-vibe/agent/web-search/brave/definition";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";

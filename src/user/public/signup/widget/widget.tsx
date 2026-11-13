@@ -4,7 +4,10 @@
 
 "use client";
 
+import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
+import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
   CardContent,
@@ -12,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
-import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
 import {
@@ -39,13 +41,6 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
 import { P } from "next-vibe/ui/components/typography";
-import { useEffect, useMemo, useState } from "react";
-
-import leadCurrentReferralDefinition, {
-  type LeadCurrentReferralGetResponseOutput,
-} from "@/referral/lead/current/definition";
-import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
-import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -55,11 +50,6 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import {
-  FREE_CREDIT_ALLOWANCE,
-  FREE_CREDIT_MAX_TOTAL,
-} from "@/products/constants";
-import { useNewsletterPromo } from "@/newsletter/hooks";
 import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
@@ -69,10 +59,20 @@ import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/pa
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { PasswordMatchIndicator } from "./password-match-indicator";
-import { PasswordStrengthIndicator } from "./password-strength-indicator";
+import { useEffect, useMemo, useState } from "react";
+
+import { useNewsletterPromo } from "@/newsletter/hooks";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
+} from "@/products/constants";
+import leadCurrentReferralDefinition, {
+  type LeadCurrentReferralGetResponseOutput,
+} from "@/referral/lead/current/definition";
 
 import type definition from "../definition";
+import { PasswordMatchIndicator } from "./password-match-indicator";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 /** Newsletter bonus copy reads the live tiers, never hardcoded numbers */
 const newsletterCredits = {

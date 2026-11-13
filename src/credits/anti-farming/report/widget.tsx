@@ -7,7 +7,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Platform, isCliPlatform } from "next-vibe/platforms/platforms";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";

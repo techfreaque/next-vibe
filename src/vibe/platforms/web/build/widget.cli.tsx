@@ -6,12 +6,11 @@ import chalk from "chalk";
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
-import { Platform } from "../../platforms";
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
 } from "../../../unified-ui/_shared/use-widget-context";
-
+import { Platform } from "../../platforms";
 import type { BuildResponseOutput } from "./definition";
 
 interface CliWidgetProps {

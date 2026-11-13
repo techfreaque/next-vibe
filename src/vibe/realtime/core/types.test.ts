@@ -19,6 +19,8 @@
  * DO NOT DELETE — prevents regressions in the definition-driven type system.
  */
 
+import type creditsDefinition from "@/credits/definition";
+
 import type messagesDefinition from "../../agent/chat/threads/[threadId]/messages/definition";
 import type skillIdDefinitions from "../../agent/skills/[id]/definition";
 import type favoritesDefinition from "../../agent/skills/favorites/definition";
@@ -27,9 +29,6 @@ import type {
   RemoteEventHandlerProps,
 } from "../../core/route/handler-realtime";
 import type executeDefinition from "../../execute-tool/definition";
-
-import type creditsDefinition from "@/credits/definition";
-
 import type { ChannelBinding } from "./emitter";
 import type { EmitData, EmitEventNamed } from "./structured-events";
 import type { EndpointEventEnvelope } from "./structured-events";

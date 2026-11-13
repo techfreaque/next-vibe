@@ -3,10 +3,6 @@
  * retry) must stop the stream — never silently hand out a free turn.
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { CreditRepository } from "@/credits/repository";
 import {
   DefaultFolderId,
   rootlessToolExecutionContext,
@@ -18,6 +14,10 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { createMessagesEmitter } from "../../../../chat/threads/[threadId]/messages/emitter";
 import { MessageDbWriter } from "../message-db-writer";

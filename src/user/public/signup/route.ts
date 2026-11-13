@@ -1,13 +1,13 @@
-import { endpointsHandler } from "next-vibe/core/route/multi";
 import { Methods } from "next-vibe/core/definition/enums";
+import { endpointsHandler } from "next-vibe/core/route/multi";
 
+import { verifyEmailSignupEmailTemplate } from "../verify-email/email";
 import signupEndpoints from "./definition";
 import {
   adminSignupNotificationEmailTemplate,
   signupWelcomeEmailTemplate,
 } from "./email";
 import { SignupRepository } from "./repository";
-import { verifyEmailSignupEmailTemplate } from "../verify-email/email";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: signupEndpoints,

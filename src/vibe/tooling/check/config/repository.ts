@@ -9,6 +9,7 @@
  */
 
 import { existsSync, promises as fs } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -116,7 +117,22 @@ export class ConfigRepositoryImpl {
     }
 
     const absolutePath = `${process.cwd()}/${pluginPath}`;
-    return existsSync(absolutePath) ? absolutePath : pluginPath;
+    if (existsSync(absolutePath)) {
+      return absolutePath;
+    }
+
+    // A bare package name (e.g. "eslint-plugin-simple-import-sort", an ESLint
+    // plugin run through oxlint's JS plugin API). Resolve it from the project
+    // so the generated config holds a real path: the stale-config check needs
+    // every jsPlugin to exist on disk, and oxlint would otherwise resolve it
+    // relative to the generated config in .tmp/.
+    try {
+      return createRequire(resolve(process.cwd(), "package.json")).resolve(
+        pluginPath,
+      );
+    } catch {
+      return pluginPath;
+    }
   }
 
   /**

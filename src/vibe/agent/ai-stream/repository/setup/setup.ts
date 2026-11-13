@@ -16,8 +16,8 @@ import {
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { Platform } from "next-vibe/platforms/platforms";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
+import { Platform } from "next-vibe/platforms/platforms";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 

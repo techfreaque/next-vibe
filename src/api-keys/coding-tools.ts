@@ -9,8 +9,8 @@
  */
 
 import {
-  ChatModelId,
   chatModelDefinitions,
+  ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
 
 import { API_KEY_PREFIX } from "./constants";

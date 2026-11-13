@@ -6,14 +6,6 @@
 import { z } from "zod";
 
 import { createEndpoint } from "../../../core/definition/create-i18n";
-import { VibeMode, VibeModeValues } from "../../../env/env-util";
-import { customWidgetObject } from "../../../unified-ui/_shared/utils";
-import {
-  objectField,
-  requestField,
-  responseArrayOptionalField,
-  responseField,
-} from "../../../unified-ui/_shared/utils-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -21,13 +13,19 @@ import {
   Methods,
   WidgetType,
 } from "../../../core/definition/enums";
+import { VibeMode, VibeModeValues } from "../../../env/env-util";
 import { UserRole } from "../../../identity/roles/enum";
-
-import { ServerFramework, ServerFrameworkOptions } from "../enum";
-import { scopedTranslation } from "./i18n";
-
 import { lazyWidget } from "../../../unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "../../../unified-ui/_shared/utils";
+import {
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+} from "../../../unified-ui/_shared/utils-i18n";
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { BUILD_ALIAS, BUILD_SERVER_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const BuildResultWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.BuildResultWidget })),

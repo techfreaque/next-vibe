@@ -54,7 +54,7 @@ import {
   OutreachDealStatus,
 } from "../enum";
 import type { OutreachT } from "../i18n";
-import { ANSWERED_STATUSES, angleGroup } from "../pipeline";
+import { angleGroup, ANSWERED_STATUSES } from "../pipeline";
 import type {
   OutreachCrmRequestOutput,
   OutreachCrmResponseOutput,

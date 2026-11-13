@@ -6,12 +6,12 @@
 
 "use client";
 
-import { Platform, isCliPlatform } from "next-vibe/platforms/platforms";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { Pre } from "next-vibe/ui/components/pre";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
-import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { P } from "next-vibe/ui/components/typography";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetForm,
   useWidgetLocale,

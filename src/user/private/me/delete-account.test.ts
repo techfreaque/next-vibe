@@ -9,11 +9,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-
-import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
-import { subscriptions } from "@/subscription/db";
-import { SubscriptionRepository } from "@/subscription/repository";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -29,6 +24,11 @@ import {
   deleteTestUser,
   type TestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+
+import { subscriptions } from "@/subscription/db";
+import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
+import { SubscriptionRepository } from "@/subscription/repository";
 
 import { scopedTranslation } from "./i18n";
 import { UserProfileRepository } from "./repository";

@@ -12,12 +12,12 @@ import {
 } from "next-vibe/ui/components/alert";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Pre } from "next-vibe/ui/components/pre";
+import { LoggerContext } from "next-vibe/ui/hooks/logger-provider";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 import { createClientLogger } from "../../../logger/client";
 import { reportRenderError } from "../../../logger/report-render-error";
 import type { EndpointLogger } from "../../../logger/types";
-import { LoggerContext } from "next-vibe/ui/hooks/logger-provider";
 import { type WidgetErrorBoundaryProps } from "../../_shared/react-types";
 import { scopedTranslation } from "../../hooks/i18n";
 /**

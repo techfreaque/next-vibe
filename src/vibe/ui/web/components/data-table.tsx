@@ -2,17 +2,17 @@
 
 import { flexRender, useTable } from "@tanstack/react-table";
 import {
+  type ColumnDef,
   columnSizingFeature,
   columnVisibilityFeature,
   createCoreRowModel,
   createSortedRowModel,
-  rowSelectionFeature,
-  rowSortingFeature,
-  tableFeatures,
-  type ColumnDef,
   type Row,
   type RowData,
+  rowSelectionFeature,
+  rowSortingFeature,
   type SortingState,
+  tableFeatures,
 } from "@tanstack/table-core";
 import type { ReactElement } from "react";
 import * as React from "react";

@@ -4,8 +4,8 @@
  * or nullable property values"), which failed every Gemini request carrying
  * execute-tool (its `input` is a record of the recursive WidgetDataSchema).
  */
-import { describe, expect, it } from "bun:test";
 import { type JSONSchema7 } from "ai";
+import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
 import { WidgetDataSchema } from "../../core/utils/json";

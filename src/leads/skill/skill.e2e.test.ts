@@ -6,9 +6,6 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
-import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import { customSkills } from "next-vibe/agent/skills/db";
 import {
   SkillCategory,
@@ -17,10 +14,13 @@ import {
 } from "next-vibe/agent/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import { leads } from "next-vibe/identity/lead/db";
-import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
+import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { describe, expect } from "vitest";
+
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
 import { db } from "../../vibe/database";
 import leadSkillEndpoints from "./definition";

@@ -9,16 +9,15 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { isOnTop } from "next-vibe/tooling/testing/e2e/visibility";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
 
 import { scopedTranslation as threadsT } from "../../../../chat/threads/i18n";
-import { scopedTranslation as favoritesT } from "../../../../skills/favorites/i18n";
 import { scopedTranslation as skillT } from "../../../../skills/[id]/i18n";
+import { scopedTranslation as favoritesT } from "../../../../skills/favorites/i18n";
 import { scopedTranslation as streamT } from "../../i18n";
 
 const { t: tStream } = streamT.scopedT(defaultLocale);

@@ -14,6 +14,12 @@
  * DO NOT DELETE.
  */
 
+import { z } from "zod";
+
+import { type ContactTranslationKey, scopedTranslation } from "@/contact/i18n";
+
+import { UserRole } from "../../identity/roles/enum";
+import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
 import { createEndpoint } from "../definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -25,11 +31,6 @@ import {
 import type { CountryLanguage } from "../i18n/core/config";
 import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 import type { ExtractScopedKeyType } from "../i18n/core/static-types";
-import { UserRole } from "../../identity/roles/enum";
-import { objectField, requestField } from "../../unified-ui/_shared/utils-i18n";
-import { z } from "zod";
-
-import { type ContactTranslationKey, scopedTranslation } from "@/contact/i18n";
 
 // ============================================================================
 // PROGRESSIVE TYPE TESTS - Isolating where property-level errors break

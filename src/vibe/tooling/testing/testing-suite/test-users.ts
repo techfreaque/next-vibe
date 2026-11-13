@@ -12,8 +12,8 @@ import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/language-utils";
-import { success } from "../../../core/route/response.schema";
 import type { ResponseType } from "../../../core/route/response.schema";
+import { success } from "../../../core/route/response.schema";
 import { db } from "../../../database";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import { leads, userLeadLinks } from "../../../identity/lead/db";

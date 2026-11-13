@@ -5,8 +5,9 @@
  * a real page behind it.
  */
 
+import type { AgentTranslationKey } from "next-vibe/agent/i18n";
 import { IMAGE_GEN_ALIAS } from "next-vibe/agent/image-generation/constants";
-import { ModelUtility, type Modality } from "next-vibe/agent/models/enum";
+import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
   type AnyModelId,
   apiProviderDisplayNames,
@@ -21,7 +22,6 @@ import type {
 import { TRANSCRIBE_AUDIO_ALIAS } from "next-vibe/agent/speech-to-text/constants";
 import { TEXT_TO_SPEECH_ALIAS } from "next-vibe/agent/text-to-speech/constants";
 import { VIDEO_GEN_ALIAS } from "next-vibe/agent/video-generation/constants";
-import type { AgentTranslationKey } from "next-vibe/agent/i18n";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import {

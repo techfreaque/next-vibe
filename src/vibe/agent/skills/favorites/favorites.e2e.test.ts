@@ -10,20 +10,19 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import type { Locator, Page } from "playwright";
-import { describe, expect } from "vitest";
-import { z } from "zod";
-
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator, Page } from "playwright";
+import { describe, expect } from "vitest";
+import { z } from "zod";
 
 import { createE2ECreditUser } from "../../ai-stream/testing/e2e-credit-user";
 import { STORAGE_KEYS } from "../../chat/constants";
 import { parseSkillId } from "../../chat/slugify";
-import { DEFAULT_SKILLS } from "../config";
 import { scopedTranslation as skillT } from "../[id]/i18n";
+import { DEFAULT_SKILLS } from "../config";
 import { scopedTranslation as skillsT } from "../i18n";
 import { FAVORITES_LIST_ALIAS } from "./constants";
 import { chatFavorites } from "./db";

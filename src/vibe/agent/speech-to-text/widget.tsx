@@ -13,10 +13,10 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mic } from "next-vibe/ui/components/icons/Mic";
 import { MicOff } from "next-vibe/ui/components/icons/MicOff";
-import { Download } from "next-vibe/ui/components/icons/Download";
 import { Square } from "next-vibe/ui/components/icons/Square";
 import { Upload } from "next-vibe/ui/components/icons/Upload";
 import type {
@@ -42,11 +42,11 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 import { useCallback, useRef, useState } from "react";
 
+import type { AnyRoleModelSelection } from "../models/selection";
 import {
   ModelSelector,
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
-import type { AnyRoleModelSelection } from "../models/selection";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_ID } from "./constants";
 import type definition from "./definition";

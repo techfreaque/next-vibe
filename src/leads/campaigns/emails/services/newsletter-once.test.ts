@@ -15,8 +15,6 @@
  */
 
 import { eq, inArray, or } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -33,6 +31,7 @@ import {
 } from "next-vibe/identity/lead/enum";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { CampaignType } from "@/messenger/accounts/enum";
 import { MessageStatus } from "@/messenger/messages/enum";

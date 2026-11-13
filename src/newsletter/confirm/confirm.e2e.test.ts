@@ -6,10 +6,9 @@
  */
 
 import { eq } from "drizzle-orm";
-import { describe, expect } from "vitest";
-
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { describe, expect } from "vitest";
 
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 

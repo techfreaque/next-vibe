@@ -21,16 +21,16 @@ import { invalidateRefusalIndexCaches } from "../cache";
 import { refusalIndexQuestions, refusalIndexResults } from "../db";
 import { scopedTranslation } from "../i18n";
 import type {
+  QuestionDeleteResponseOutput,
+  QuestionPatchRequestOutput,
+  QuestionPatchResponseOutput,
+} from "./[id]/definition";
+import type {
   QuestionsGetRequestOutput,
   QuestionsGetResponseOutput,
   QuestionsPostRequestOutput,
   QuestionsPostResponseOutput,
 } from "./definition";
-import type {
-  QuestionDeleteResponseOutput,
-  QuestionPatchRequestOutput,
-  QuestionPatchResponseOutput,
-} from "./[id]/definition";
 
 function emptyToNull(value: string | undefined): string | null | undefined {
   if (value === undefined) {

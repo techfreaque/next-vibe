@@ -29,19 +29,7 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, like } from "drizzle-orm";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
-import { seedCaseThread } from "../ai-stream/testing/fixture-seed";
-import {
-  getOrCreateFolder,
-  runTestStream,
-  type SlimMessage,
-  toolResultRecord,
-} from "../ai-stream/testing/headless-test-runner";
 import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatMessages, chatThreads } from "../chat/db";
-import { ChatMessageRole } from "../chat/enum";
-import { SkillCategory, SkillOwnershipType } from "../skills/enum";
-import { chatFavorites } from "../skills/favorites/db";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
@@ -53,6 +41,18 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
+import { DEFAULT_CHAT_MODEL_SELECTION } from "../ai-stream/constants";
+import { seedCaseThread } from "../ai-stream/testing/fixture-seed";
+import {
+  getOrCreateFolder,
+  runTestStream,
+  type SlimMessage,
+  toolResultRecord,
+} from "../ai-stream/testing/headless-test-runner";
+import { chatMessages, chatThreads } from "../chat/db";
+import { ChatMessageRole } from "../chat/enum";
+import { SkillCategory, SkillOwnershipType } from "../skills/enum";
+import { chatFavorites } from "../skills/favorites/db";
 import { cortexNodes } from "./db";
 import { CortexNodeType } from "./enum";
 import { parseFrontmatter } from "./repository";

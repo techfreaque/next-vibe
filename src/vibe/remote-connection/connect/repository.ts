@@ -28,13 +28,13 @@ import {
   type ResponseType,
   success,
 } from "../../core/route/response.schema";
-import { AuthRepository } from "../../identity/auth/repository";
-import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import {
   allowsPrivateTargets,
   isPrivateAddress,
 } from "../../core/utils/ssrf-guard";
 import { db } from "../../database";
+import { AuthRepository } from "../../identity/auth/repository";
+import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import registerEndpoints from "../connect-reverse/definition";
 import {

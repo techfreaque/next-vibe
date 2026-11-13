@@ -9,6 +9,14 @@
 import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import {
+  createTestUser,
+  deleteTestUser,
+  type TestUser,
+} from "next-vibe/tooling/testing/testing-suite/test-users";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
@@ -22,14 +30,6 @@ import {
 } from "@/referral/db";
 import { ReferralEarningStatus } from "@/referral/enum";
 import { ReferralRepository } from "@/referral/repository";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import {
-  createTestUser,
-  deleteTestUser,
-  type TestUser,
-} from "next-vibe/tooling/testing/testing-suite/test-users";
 
 import { paymentTransactions } from "../db";
 import { PaymentStatus } from "../enum";

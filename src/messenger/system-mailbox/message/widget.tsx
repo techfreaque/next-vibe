@@ -4,8 +4,8 @@
 
 "use client";
 
-import { Div } from "next-vibe/ui/components/div";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
+import { Div } from "next-vibe/ui/components/div";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { P } from "next-vibe/ui/components/typography";

@@ -3,7 +3,10 @@
  * Static class for parsing CLI arguments and handling input data processing
  */
 
-import { resolveInputPath } from "./input-path";
+import { readFileSync } from "node:fs";
+
+import type { z } from "zod";
+
 import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { FieldDataType } from "../../../core/definition/enums";
@@ -12,8 +15,7 @@ import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { hasChildren } from "../../../unified-ui/_shared/type-guards";
 import { SchemaUIHandler } from "../../../unified-ui/renderers/cli/response/schema-handler";
-import { readFileSync } from "node:fs";
-import type { z } from "zod";
+import { resolveInputPath } from "./input-path";
 
 /**
  * CLI Input Parser - Static class for all input parsing and handling

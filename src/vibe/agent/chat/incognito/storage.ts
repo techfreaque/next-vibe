@@ -11,7 +11,6 @@ import { largeStorage } from "next-vibe/ui/lib/storage";
 
 import { reportStorageFailure } from "../../../logger/storage-failure";
 import type { EndpointLogger } from "../../../logger/types";
-
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import {
   ThreadModerationStatus,

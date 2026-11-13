@@ -9,9 +9,6 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import type { Locator } from "playwright";
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -19,6 +16,8 @@ import { recordOutcome } from "next-vibe/tooling/testing/e2e/coverage";
 import { e2eEndpointId } from "next-vibe/tooling/testing/e2e/endpoint-form";
 import type { E2EFixtures } from "next-vibe/tooling/testing/e2e/harness";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import type { Locator } from "playwright";
+import { describe, expect } from "vitest";
 
 import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";

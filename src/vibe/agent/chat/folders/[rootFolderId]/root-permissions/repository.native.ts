@@ -10,8 +10,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { nativeEndpoint } from "next-vibe/platforms/react-native/native-endpoint";
 
 import type {
-  RootPermissionsGetUrlVariablesOutput,
   RootPermissionsGetResponseOutput,
+  RootPermissionsGetUrlVariablesOutput,
 } from "./definition";
 import definitions from "./definition";
 import type { RootFolderPermissionsRepositoryType } from "./repository";

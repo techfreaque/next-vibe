@@ -2,8 +2,8 @@ import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { WidgetHeaderProps } from "../../web/components/widget-header";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type { WidgetHeaderProps } from "../../web/components/widget-header";
 

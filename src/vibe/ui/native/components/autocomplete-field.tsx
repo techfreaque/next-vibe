@@ -3,7 +3,7 @@
  * Production-ready autocomplete with search, categories, and custom values
  */
 import React, { useMemo, useState } from "react";
-import { Pressable, Text as RNText, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";

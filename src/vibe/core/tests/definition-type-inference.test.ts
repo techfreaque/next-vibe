@@ -9,11 +9,10 @@
  * DO NOT DELETE - This prevents regressions in type inference logic.
  */
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-  SuccessResponseType,
-} from "../route/response.schema";
+import type { z } from "zod";
+
+import type imapAccountsListDefinition from "@/messenger/accounts/list/definition";
+
 import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
@@ -24,21 +23,23 @@ import {
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
 import type { EndpointReturn } from "../../unified-ui/hooks/endpoint-types";
-import type { z } from "zod";
-
-import type imapAccountsListDefinition from "@/messenger/accounts/list/definition";
+import type {
+  ErrorResponseType,
+  ResponseType,
+  SuccessResponseType,
+} from "../route/response.schema";
 
 const genericST: { ScopedTranslationKey: string } = {
   ScopedTranslationKey: "",
 };
-import type { InferSchemaFromField } from "../definition/endpoint";
-import type { FieldUsage } from "../definition/enums";
-import { LayoutType, WidgetType } from "../definition/enums";
 import type { UnifiedField } from "../../unified-ui/_shared/configs";
 import type {
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
 } from "../../unified-ui/_shared/configs";
+import type { InferSchemaFromField } from "../definition/endpoint";
+import type { FieldUsage } from "../definition/enums";
+import { LayoutType, WidgetType } from "../definition/enums";
 
 // Legacy ObjectField type alias for backward compatibility in tests
 // ObjectField<TChildren, TUsage, TKey> → ObjectWidgetConfig<TKey, TUsage, "object", TChildren>

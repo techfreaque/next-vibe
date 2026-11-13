@@ -6,8 +6,6 @@
  */
 
 import { eq, inArray } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
@@ -18,6 +16,7 @@ import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";

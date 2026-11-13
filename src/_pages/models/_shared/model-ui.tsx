@@ -5,18 +5,17 @@
  * and the reserved sample-answers slot.
  */
 
+import { scopedTranslation as refusalScopedTranslation } from "next-vibe/agent/refusal-index/i18n";
+import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import type { ContentLevelValue } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
+import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
+import { H3, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { JSX } from "react";
-
-import { scopedTranslation as refusalScopedTranslation } from "next-vibe/agent/refusal-index/i18n";
-import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
-import { Link } from "next-vibe/ui/components/link";
-import { H3, P } from "next-vibe/ui/components/typography";
 
 import { PageSection } from "../../story/_shared/marketing";
 import { scopedTranslation } from "../i18n";

@@ -18,11 +18,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { NewsletterUnsubscribeT } from "../../i18n";
 import { NewsletterUnsubscribeRepository } from "../../repository";
+import { verifyUnsubscribeToken } from "../token";
 import type {
   NewsletterOneClickPostResponseOutput,
   NewsletterOneClickPostUrlPathParams,
 } from "./definition";
-import { verifyUnsubscribeToken } from "../token";
 
 export class NewsletterOneClickRepository {
   static async unsubscribe(

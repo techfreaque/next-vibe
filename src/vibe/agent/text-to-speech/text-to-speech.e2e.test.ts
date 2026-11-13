@@ -8,10 +8,9 @@
  * the speaking test asserts whichever the server under test can do.
  */
 
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { getEnvAvailability } from "../env-availability";

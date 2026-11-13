@@ -23,8 +23,8 @@ import {
   modelHref,
   priceFootnote,
 } from "../../../_shared/model-format";
-import { ModelIcon, TierBadge } from "../../../_shared/model-ui";
 import { ModelPicker } from "../../../_shared/model-picker";
+import { ModelIcon, TierBadge } from "../../../_shared/model-ui";
 import { scopedTranslation } from "../../../i18n";
 import type { ComparePageData } from "./page";
 

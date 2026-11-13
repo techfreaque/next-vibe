@@ -2171,19 +2171,10 @@ export class TypecheckRepository {
             output.trim().split("\n")[0] ||
             "TypeScript exited without diagnostics";
           logger.error(`[TYPESCRIPT] Compiler failed: ${commandError}`);
-          return success(
-            TypecheckRepository.buildResponse(
-              [
-                {
-                  file: "tsconfig.json",
-                  severity: "error",
-                  message: commandError,
-                },
-              ],
-              effectiveData,
-              isMCP,
-            ),
-          );
+          return failInline({
+            message: `TypeScript exited ${combinedExitCode} without any diagnostics, so nothing was verified: ${commandError}`,
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
         }
       }
 

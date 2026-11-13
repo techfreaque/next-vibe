@@ -2,9 +2,8 @@
  * Lifecycle eligibility - pure rules (no DB).
  */
 
-import { describe, expect, it } from "vitest";
-
 import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { describe, expect, it } from "vitest";
 
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 

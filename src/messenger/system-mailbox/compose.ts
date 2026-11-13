@@ -6,8 +6,9 @@
 
 import "server-only";
 
-import { createTransport } from "nodemailer";
 import type { Readable } from "node:stream";
+
+import { createTransport } from "nodemailer";
 
 import type { SystemMailboxConfig } from "./config";
 

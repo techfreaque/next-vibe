@@ -9,6 +9,7 @@ import { randomUUID } from "node:crypto";
 
 import { eq } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPublicPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -18,8 +19,6 @@ import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/re
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { testEndpoint } from "next-vibe/tooling/testing/testing-suite/test-endpoint";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 
 import { chatThreads, threadReports, threadShareLinks } from "../db";
 import {
@@ -34,9 +33,9 @@ import {
   type E2EAccount,
   seedThread,
 } from "../testing/e2e-seed";
+import reportEndpoints from "../threads/[threadId]/report/definition";
 import { scopedTranslation as shareLinksTranslation } from "../threads/[threadId]/share-links/i18n";
 import { ShareLinksRepository } from "../threads/[threadId]/share-links/repository";
-import reportEndpoints from "../threads/[threadId]/report/definition";
 import {
   THREAD_AUTO_HIDE_REPORT_THRESHOLD,
   THREAD_AUTO_HIDE_SEVERE_THRESHOLD,

@@ -13,13 +13,13 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   EmailCampaignStage,

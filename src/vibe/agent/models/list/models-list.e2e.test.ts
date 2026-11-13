@@ -3,10 +3,9 @@
  * Static catalogue (no provider calls), so no fixtures.
  */
 
-import { describe, expect } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { IntelligenceLevel } from "../../skills/enum";
 import modelsListEndpoints from "./definition";

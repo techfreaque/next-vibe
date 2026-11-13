@@ -7,15 +7,15 @@
 import "server-only";
 
 import {
+  ChatModelId,
   type ChatModelOption,
   chatModelOptionsPool,
-  ChatModelId,
   filterChatModels,
   resolveChatModelForUser,
 } from "next-vibe/agent/ai-stream/models";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { ApiProvider, filterRoleModels } from "next-vibe/agent/models/models";
 import { ModelSelectionType } from "next-vibe/agent/skills/enum";
-import { filterRoleModels, ApiProvider } from "next-vibe/agent/models/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 /** Text-in / text-out chat models only (no image/audio generators). */

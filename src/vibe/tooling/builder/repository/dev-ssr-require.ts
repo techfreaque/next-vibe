@@ -14,8 +14,8 @@
  * first use of a specifier — one re-read per re-evaluation, nothing per call.
  */
 
-import { dirname } from "node:path";
 import { createRequire } from "node:module";
+import { dirname } from "node:path";
 
 function isProjectSource(path: string): boolean {
   return path.includes("/src/") && !path.includes("/node_modules/");

@@ -9,8 +9,8 @@
  */
 
 import { and, eq, inArray } from "drizzle-orm";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { createEndpointLogger } from "next-vibe/logger/server";

@@ -15,13 +15,13 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { isPglite, pgliteReady, pool } from "../client";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
 } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
+import { isPglite, pgliteReady, pool } from "../client";
 import { databaseEnv } from "../env";
 import type { MigrateResponseOutput } from "./definition";
 import type { MigrateT } from "./i18n";

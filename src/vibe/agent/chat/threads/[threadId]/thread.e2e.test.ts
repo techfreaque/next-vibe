@@ -4,18 +4,16 @@
  */
 
 import { eq } from "drizzle-orm";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { db } from "next-vibe/database";
+import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Page } from "playwright";
 import { describe, expect } from "vitest";
 
-import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { db } from "next-vibe/database";
-import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
-
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
-
 import { chatThreads } from "../../db";
-import { chatReady, createE2EUser, deleteE2EUser, seedThread, signInAs, suppressWelcomeTour } from "../../testing/e2e-seed";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
+import { chatReady, createE2EUser, deleteE2EUser, seedThread, signInAs, suppressWelcomeTour } from "../../testing/e2e-seed";
 import threadEndpoints from "./definition";
 
 const MISSING_THREAD_ID = "00000000-0000-4000-8000-00000000e2e0";

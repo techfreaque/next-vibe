@@ -1,12 +1,12 @@
 import { describe, expect, it } from "bun:test";
-
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import {
   DefaultFolderId,
   rootlessToolExecutionContext,
 } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
+
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import { createMessagesEmitter } from "../../../../chat/threads/[threadId]/messages/emitter";
 import { MessageDbWriter } from "../message-db-writer";

@@ -21,9 +21,6 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
-import { chatThreads } from "../../chat/db";
-import favoritesCreateDefinitions from "../../skills/favorites/create/definition";
-import favoritesDefinitions from "../../skills/favorites/definition";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import remoteConnectionByIdDefinitions from "next-vibe/remote-connection/[instanceId]/definition";
@@ -33,6 +30,9 @@ import {
   ATLAS_INSTANCE_ID,
   HERMES_INSTANCE_ID,
 } from "../../ai-stream/testing/remote-setup";
+import { chatThreads } from "../../chat/db";
+import favoritesCreateDefinitions from "../../skills/favorites/create/definition";
+import favoritesDefinitions from "../../skills/favorites/definition";
 import { describeCodingAgentSuite } from "./coding-agent-base.test";
 
 let _testUser: JwtPrivatePayloadType | null = null;

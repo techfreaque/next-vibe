@@ -3,10 +3,9 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { describe, expect } from "vitest";
-
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { describe, expect } from "vitest";
 
 import { createE2EUser, deleteE2EUser, seedMessage, seedThread, signInAs } from "../../../../testing/e2e-seed";
 import pathEndpoints from "./definition";

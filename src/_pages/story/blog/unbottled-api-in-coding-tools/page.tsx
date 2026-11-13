@@ -9,18 +9,18 @@
 
 import type { Metadata } from "next";
 import {
-  ChatModelId,
   chatModelDefinitions,
+  ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
-import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Plug } from "next-vibe/ui/components/icons/Plug";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";

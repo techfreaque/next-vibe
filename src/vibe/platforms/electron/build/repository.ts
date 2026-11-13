@@ -21,9 +21,7 @@ import {
   success,
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
-
 import type { EndpointLogger } from "../../../logger/types";
-
 import type {
   ElectronBuildRequestOutput,
   ElectronBuildResponseOutput,

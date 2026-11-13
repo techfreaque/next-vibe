@@ -19,8 +19,8 @@ import { type JSX } from "react";
 
 import { InvoiceStatus } from "@/payment/enum";
 import invoiceRecordPaymentDefinitions from "@/payment/invoice/[invoiceId]/record-payment/definition";
-import invoiceSendReminderDefinitions from "@/payment/invoice/[invoiceId]/send-reminder/definition";
 import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
+import invoiceSendReminderDefinitions from "@/payment/invoice/[invoiceId]/send-reminder/definition";
 import invoiceVoidDefinitions from "@/payment/invoice/[invoiceId]/void/definition";
 import invoiceLineAddDefinitions from "@/payment/invoice/line/add/definition";
 

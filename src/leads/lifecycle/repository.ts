@@ -24,8 +24,9 @@ import {
   runLifecycle,
   updateSettings,
 } from "./engine";
-import { LifecycleExitReason } from "./enum";
 import { exitAllForEmail } from "./engine";
+import { LifecycleExitReason } from "./enum";
+import type { LifecycleT } from "./i18n";
 import type { LifecycleOverviewGetResponseOutput } from "./overview/definition";
 import type {
   LifecycleRunPostRequestOutput,
@@ -36,7 +37,6 @@ import type {
   LifecycleSettingsPostResponseOutput,
 } from "./settings/definition";
 import { normalizeEmail } from "./snapshots";
-import type { LifecycleT } from "./i18n";
 
 export class LifecycleRepository {
   static async run(

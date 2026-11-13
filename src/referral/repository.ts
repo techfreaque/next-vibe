@@ -28,6 +28,7 @@ import { CreditRepository } from "@/credits/repository";
 import { NotificationType } from "@/notifications/enum";
 import { NotificationsRepository } from "@/notifications/repository";
 
+import { withTransaction } from "../vibe/database/utils/repository-helpers";
 import type {
   CodesListGetResponseOutput,
   ReferralCode,
@@ -56,7 +57,6 @@ import {
 import type { ReferralT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import type { StatsGetResponseOutput } from "./stats/definition";
-import { withTransaction } from "../vibe/database/utils/repository-helpers";
 
 /** Placeholder until a lock's release resolver is assigned */
 function noop(): void {

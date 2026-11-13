@@ -11,9 +11,9 @@ import { sttModelDefinitions } from "../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../text-to-speech/models";
 import { videoGenModelDefinitions } from "../../video-generation/models";
 import { ModelUtility } from "../enum";
+import type { PriceUpdate } from "../model-prices/providers/base";
 import type { ModelDefinition, ModelProviderConfig } from "../models";
 import { ApiProvider } from "../models";
-import type { PriceUpdate } from "../model-prices/providers/base";
 import {
   EMAIL_SECTION_LIMIT,
   PRICE_CHANGE_SUSPECT_PERCENT,

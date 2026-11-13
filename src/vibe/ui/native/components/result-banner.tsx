@@ -2,8 +2,8 @@ import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
 import type { ResultBannerProps } from "../../web/components/result-banner";
-import { Text } from "./text";
 import { styledNative } from "../utils/style-converter";
+import { Text } from "./text";
 
 export type {
   ResultBannerProps,

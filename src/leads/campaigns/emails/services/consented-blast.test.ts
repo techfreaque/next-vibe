@@ -12,13 +12,12 @@
  */
 
 import { inArray } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { users } from "next-vibe/identity/user/db";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { newsletterSubscriptions } from "../../../../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../../../../newsletter/enum";

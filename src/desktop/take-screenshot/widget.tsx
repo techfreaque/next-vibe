@@ -22,6 +22,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import type { JSX } from "react";
 
 import { resolveMediaSrc } from "@/vibe/agent/chat/storage/media-src";
+
 import { DesktopNavHeader } from "../shared/nav-header";
 import type definition from "./definition";
 import type { DesktopTakeScreenshotResponseOutput } from "./definition";

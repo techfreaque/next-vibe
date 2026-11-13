@@ -9,8 +9,8 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CreditRepository } from "@/credits/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 import { creditValidator } from "@/credits/validator";
 
 import {

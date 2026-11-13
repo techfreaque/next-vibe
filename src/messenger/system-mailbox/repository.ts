@@ -44,9 +44,9 @@ import {
   SYSTEM_MAILBOX_SMTP_PORT,
 } from "./config";
 import { systemMailboxEnv } from "./env";
+import type { SystemMailboxT } from "./i18n";
 import type { InboxMessageFull, InboxMessageSummary } from "./imap-ops";
 import { appendToSent, listInbox, readInboxMessage } from "./imap-ops";
-import type { SystemMailboxT } from "./i18n";
 
 const HOUR_MS = 3600000;
 export const MAX_INBOX_LIMIT = 50;

@@ -20,15 +20,14 @@ import { z } from "zod";
 import type { V1T } from "../../i18n";
 import {
   CHARS_PER_TOKEN,
-  TOKENS_PER_IMAGE,
   prepareV1Call,
   resolveV1Model,
   runV1Generate,
   runV1Stream,
+  TOKENS_PER_IMAGE,
   type V1StreamEncoder,
 } from "../../shared/execution";
 import { gateApiKeyRequest } from "../../shared/gate";
-import { orderToolResults } from "../../shared/model-messages";
 import {
   aiSdkRunner,
   type InferenceRunner,
@@ -36,6 +35,7 @@ import {
   type InferenceToolChoice,
   type OpenAiFinishReason,
 } from "../../shared/inference";
+import { orderToolResults } from "../../shared/model-messages";
 import {
   newCompletionId,
   openAiError,

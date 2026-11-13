@@ -1,14 +1,11 @@
 "use client";
 
-import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
-import {
-  formatNumber,
-  modelHref,
-  tierName,
-} from "@/_pages/models/_shared/model-format";
-import { TierBadge } from "@/_pages/models/_shared/model-ui";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { Info } from "next-vibe/ui/components/icons/Info";
+import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import {
   Table,
   TableBody,
@@ -17,14 +14,18 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe/ui/components/table";
-import { Link } from "next-vibe/ui/components/link";
-import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { type JSX, useMemo, useState } from "react";
 
-import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
-import { Info } from "next-vibe/ui/components/icons/Info";
+import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
+import {
+  formatNumber,
+  modelHref,
+  tierName,
+} from "@/_pages/models/_shared/model-format";
+import { TierBadge } from "@/_pages/models/_shared/model-ui";
+
 import {
   Callout,
   Cta,

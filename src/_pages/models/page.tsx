@@ -4,10 +4,10 @@
  */
 
 import type { Metadata } from "next";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";

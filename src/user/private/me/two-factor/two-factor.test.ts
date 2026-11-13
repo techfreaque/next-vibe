@@ -3,8 +3,8 @@
  * Real DB (test instance), no mail sent (signup mail failures are non-blocking).
  */
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { eq } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -17,10 +17,10 @@ import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/re
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import loginEndpoints from "../../../public/login/definition";
-import signupEndpoints from "../../../public/signup/definition";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
+import loginEndpoints from "../../../public/login/definition";
+import signupEndpoints from "../../../public/signup/definition";
 import twoFactorEndpoints from "./definition";
 import { TwoFactorAction } from "./enum";
 import { TwoFactorRepository } from "./repository";
