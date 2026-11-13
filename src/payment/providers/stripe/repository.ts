@@ -496,6 +496,48 @@ export class StripeProvider implements PaymentProvider {
           webhookData.charge = charge.id;
         }
       }
+      // Invoice / invoice payment: what was actually paid (renewal commission)
+      if (
+        "amount_paid" in eventData &&
+        typeof eventData.amount_paid === "number"
+      ) {
+        webhookData.amount_paid = eventData.amount_paid;
+      }
+      // Checkout session (subscription mode) / invoice payment: the invoice
+      if ("invoice" in eventData) {
+        const inv = eventData.invoice;
+        if (typeof inv === "string" && inv.length > 0) {
+          webhookData.invoice = inv;
+        } else if (
+          typeof inv === "object" &&
+          inv !== null &&
+          "id" in inv &&
+          typeof inv.id === "string"
+        ) {
+          webhookData.invoice = inv.id;
+        }
+      }
+      // invoice_payment.*: the payment intent sits under payment.payment_intent
+      // (invoices themselves no longer carry it since API 2025-03-31)
+      if (
+        !webhookData.payment_intent &&
+        "payment" in eventData &&
+        typeof eventData.payment === "object" &&
+        eventData.payment !== null &&
+        "payment_intent" in eventData.payment
+      ) {
+        const pi = eventData.payment.payment_intent;
+        if (typeof pi === "string" && pi.length > 0) {
+          webhookData.payment_intent = pi;
+        } else if (
+          typeof pi === "object" &&
+          pi !== null &&
+          "id" in pi &&
+          typeof pi.id === "string"
+        ) {
+          webhookData.payment_intent = pi.id;
+        }
+      }
       if ("created" in eventData && typeof eventData.created === "number") {
         webhookData.created = eventData.created;
       }

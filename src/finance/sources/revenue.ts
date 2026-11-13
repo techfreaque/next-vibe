@@ -4,8 +4,9 @@
  *  - Stripe: balance transactions (reporting_category charge / refund /
  *    dispute / payout / fee) plus ended subscriptions (status canceled,
  *    ended_at) as cancellations, via the existing Stripe client. Paginated,
- *    capped, idempotent by object id. Balance transactions carry renewals and
- *    fees; our payment_transactions do not, so the API is the source of truth.
+ *    capped, idempotent by object id. Balance transactions carry fees (and
+ *    renewals recorded before 2026-11); our payment_transactions do not, so
+ *    the API is the source of truth.
  *  - NOWPayments: GET /payment needs a JWT (email + password login), an API
  *    key alone is rejected. With NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD we
  *    pull the list; without them we fall back to the local IPN ledger
@@ -508,7 +509,7 @@ export async function pullLocalPaymentLedger(
   return {
     events,
     unconvertible,
-    note: "FALLBACK: local sales ledger (payment_transactions), not the processor API: succeeded checkouts only (subscription renewals, fees and payouts are NOT in it).",
+    note: "FALLBACK: local sales ledger (payment_transactions), not the processor API: succeeded checkouts and (since 2026-11) Stripe renewals; fees and payouts are NOT in it.",
     fallback: true,
   };
 }

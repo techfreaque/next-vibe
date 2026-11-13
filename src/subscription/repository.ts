@@ -49,6 +49,7 @@ import type {
 } from "./enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { subscriptionRenewalSessionKey } from "./renewal-key";
 import type {
   SubscriptionUpdatePutRequestOutput,
   SubscriptionUpdatePutResponseOutput,
@@ -113,7 +114,7 @@ export class SubscriptionRepository {
     providerSubscriptionId: string,
     periodEndMs: number,
   ): string {
-    return `renewal_${providerSubscriptionId}_${periodEndMs}`;
+    return subscriptionRenewalSessionKey(providerSubscriptionId, periodEndMs);
   }
 
   /**

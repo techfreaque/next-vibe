@@ -390,7 +390,10 @@ export class PaymentClawbackRepository {
    * Map a reversed charge to the user, wallet and packs its payment granted.
    * 1. Payment transaction by payment intent / provider session → its packs
    *    (pack.metadata.sessionId = the checkout session id).
-   * 2. Unmapped Stripe charge (subscription renewal, no local transaction):
+   *    Renewals are keyed by invoice id and their payment intent is linked
+   *    from invoice_payment.paid; their session id is the renewal grant key.
+   * 2. Unmapped Stripe charge (e.g. a renewal paid before renewals were
+   *    recorded):
    *    owner by customer id → the subscription pack granted closest to the
    *    charge time (within UNMAPPED_SUBSCRIPTION_MATCH_MS).
    */
@@ -450,86 +453,70 @@ export class PaymentClawbackRepository {
     // Grants are read from the immutable credit-transaction log: usage
     // deletes fully consumed packs, so packs alone would under-report what a
     // payment granted. Packs that still exist are what can be recovered.
-    if (transaction?.providerSessionId) {
-      const sessionId = transaction.providerSessionId;
-      const [granted] = await db
-        .select({
-          total: sql<string>`COALESCE(SUM(${creditTransactions.amount}), 0)`,
-        })
-        .from(creditTransactions)
-        .where(
-          and(
-            eq(creditTransactions.walletId, wallet.id),
-            inArray(creditTransactions.type, [
-              CreditTransactionType.PURCHASE,
-              CreditTransactionType.SUBSCRIPTION,
-            ]),
-            sql`${creditTransactions.metadata}->>'sessionId' = ${sessionId}`,
-          ),
-        );
-      const packs = await db
-        .select({ id: creditPacks.id })
-        .from(creditPacks)
-        .where(
-          and(
-            eq(creditPacks.walletId, wallet.id),
-            sql`${creditPacks.metadata}->>'sessionId' = ${sessionId}`,
-          ),
-        );
-      return {
-        userId,
-        walletId: wallet.id,
-        key: transaction.id,
-        transactionId: transaction.id,
-        packIds: packs.map((p) => p.id),
-        grantedCredits: Number(granted?.total ?? 0),
-      };
-    }
-
     if (transaction) {
-      // Payment exists but granted no pack (e.g. grant failed) — still reverse
-      // its referral earnings.
+      let packIds: string[] = [];
+      let grantedCredits = 0;
+      if (transaction.providerSessionId) {
+        const sessionId = transaction.providerSessionId;
+        const [granted] = await db
+          .select({
+            total: sql<string>`COALESCE(SUM(${creditTransactions.amount}), 0)`,
+          })
+          .from(creditTransactions)
+          .where(
+            and(
+              eq(creditTransactions.walletId, wallet.id),
+              inArray(creditTransactions.type, [
+                CreditTransactionType.PURCHASE,
+                CreditTransactionType.SUBSCRIPTION,
+              ]),
+              sql`${creditTransactions.metadata}->>'sessionId' = ${sessionId}`,
+            ),
+          );
+        const packs = await db
+          .select({ id: creditPacks.id })
+          .from(creditPacks)
+          .where(
+            and(
+              eq(creditPacks.walletId, wallet.id),
+              sql`${creditPacks.metadata}->>'sessionId' = ${sessionId}`,
+            ),
+          );
+        packIds = packs.map((p) => p.id);
+        grantedCredits = Number(granted?.total ?? 0);
+      }
+      // Invoice-keyed subscription payment whose grant key did not resolve
+      // (period changed, grant made by another path): the subscription grant
+      // nearest to the charge is what this payment bought.
+      if (grantedCredits <= 0 && transaction.providerInvoiceId) {
+        const grant = await PaymentClawbackRepository.nearestSubscriptionGrant(
+          wallet.id,
+          reversal.chargeCreatedAt ?? transaction.createdAt,
+        );
+        if (grant) {
+          packIds = grant.packId ? [grant.packId] : [];
+          grantedCredits = grant.amount;
+        }
+      }
+      // A payment that granted nothing (e.g. grant failed) still reverses its
+      // referral earnings.
       return {
         userId,
         walletId: wallet.id,
         key: transaction.id,
         transactionId: transaction.id,
-        packIds: [],
-        grantedCredits: 0,
+        packIds,
+        grantedCredits,
       };
     }
 
     if (!reversal.chargeCreatedAt) {
       return null;
     }
-    const chargeMs = reversal.chargeCreatedAt.getTime();
-    const [grant] = await db
-      .select({
-        id: creditTransactions.id,
-        amount: creditTransactions.amount,
-        packId: creditTransactions.packId,
-      })
-      .from(creditTransactions)
-      .where(
-        and(
-          eq(creditTransactions.walletId, wallet.id),
-          eq(creditTransactions.type, CreditTransactionType.SUBSCRIPTION),
-          gte(
-            creditTransactions.createdAt,
-            new Date(chargeMs - UNMAPPED_SUBSCRIPTION_MATCH_MS),
-          ),
-          lte(
-            creditTransactions.createdAt,
-            new Date(chargeMs + UNMAPPED_SUBSCRIPTION_MATCH_MS),
-          ),
-        ),
-      )
-      .orderBy(
-        desc(
-          sql`-ABS(EXTRACT(EPOCH FROM ${creditTransactions.createdAt}) - ${chargeMs / 1000})`,
-        ),
-      )
-      .limit(1);
+    const grant = await PaymentClawbackRepository.nearestSubscriptionGrant(
+      wallet.id,
+      reversal.chargeCreatedAt,
+    );
     if (!grant) {
       return null;
     }
@@ -541,5 +528,44 @@ export class PaymentClawbackRepository {
       packIds: grant.packId ? [grant.packId] : [],
       grantedCredits: grant.amount,
     };
+  }
+
+  /**
+   * The subscription credit grant closest to `at` (within
+   * UNMAPPED_SUBSCRIPTION_MATCH_MS).
+   */
+  private static async nearestSubscriptionGrant(
+    walletId: string,
+    at: Date,
+  ): Promise<{ id: string; amount: number; packId: string | null } | null> {
+    const atMs = at.getTime();
+    const [grant] = await db
+      .select({
+        id: creditTransactions.id,
+        amount: creditTransactions.amount,
+        packId: creditTransactions.packId,
+      })
+      .from(creditTransactions)
+      .where(
+        and(
+          eq(creditTransactions.walletId, walletId),
+          eq(creditTransactions.type, CreditTransactionType.SUBSCRIPTION),
+          gte(
+            creditTransactions.createdAt,
+            new Date(atMs - UNMAPPED_SUBSCRIPTION_MATCH_MS),
+          ),
+          lte(
+            creditTransactions.createdAt,
+            new Date(atMs + UNMAPPED_SUBSCRIPTION_MATCH_MS),
+          ),
+        ),
+      )
+      .orderBy(
+        desc(
+          sql`-ABS(EXTRACT(EPOCH FROM ${creditTransactions.createdAt}) - ${atMs / 1000})`,
+        ),
+      )
+      .limit(1);
+    return grant ?? null;
   }
 }

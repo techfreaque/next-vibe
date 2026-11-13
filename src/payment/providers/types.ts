@@ -91,6 +91,13 @@ export interface WebhookData {
   created?: number;
   /** Dispute reason */
   reason?: string;
+  /** Invoice / invoice payment: amount actually paid, smallest currency unit */
+  amount_paid?: number;
+  /**
+   * Invoice the object belongs to: checkout session (subscription mode, the
+   * first invoice) or invoice payment (`invoice_payment.paid`)
+   */
+  invoice?: string;
 }
 
 export interface WebhookEvent<T extends WebhookData = WebhookData> {

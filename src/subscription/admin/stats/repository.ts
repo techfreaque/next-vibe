@@ -205,8 +205,8 @@ export class SubscriptionAdminStatsRepository {
     // sum goes through the finance FX table, never a raw sum of mixed units.
     //
     // Revenue: the finance ledger (finance_revenue_events) is the processor's
-    // own record - it carries Stripe subscription RENEWALS, which never land in
-    // payment_transactions (that table only sees checkouts). Fall back to
+    // own record - it carries fees and every Stripe RENEWAL (payment_transactions
+    // records renewals only since 2026-11). Fall back to
     // payment_transactions only when the finance ledger has nothing in range.
     const revenue =
       await SubscriptionAdminStatsRepository.revenueInRange(dateRange);

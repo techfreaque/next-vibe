@@ -72,6 +72,13 @@ export const paymentTransactions = pgTable("payment_transactions", {
     .references(() => users.id, { onDelete: "cascade" }),
   providerSessionId: text("provider_session_id"),
   providerPaymentIntentId: text("provider_payment_intent_id"),
+  /**
+   * Provider invoice this payment settled (Stripe `in_...`): the first
+   * subscription invoice on checkout rows, the renewal invoice on renewal rows.
+   * Unique: the idempotency key that lets concurrent invoice.paid /
+   * invoice.payment_succeeded deliveries record a renewal exactly once.
+   */
+  providerInvoiceId: text("provider_invoice_id").unique(),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency", { enum: CurrencyDB }).notNull(),
   status: text("status", { enum: PaymentStatusDB })

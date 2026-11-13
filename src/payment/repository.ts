@@ -484,8 +484,37 @@ export class PaymentRepository {
           await this.handleInvoiceCreated(eventData, logger, locale);
           break;
         case "invoice.payment_succeeded":
-        case "invoice.paid":
-          await this.handleInvoicePaymentSucceeded(eventData, logger, locale);
+        case "invoice.paid": {
+          // Stripe sends both events for every paid invoice, often within
+          // milliseconds: the renewal record is keyed by invoice id, so the
+          // pair (and any retry) books the payment and its commission once.
+          // On failure the event stays unprocessed and Stripe retries.
+          const renewal = await this.handleInvoicePaymentSucceeded(
+            eventData,
+            logger,
+            locale,
+          );
+          if (!renewal.success) {
+            return fail({
+              message: t("errors.server.detail", { error: renewal.message }),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              cause: renewal,
+            });
+          }
+          break;
+        }
+        case "invoice_payment.paid":
+          // Carries the payment intent the invoice itself no longer has:
+          // link it so a later refund/dispute maps to the payment.
+          if (eventData.invoice && eventData.payment_intent) {
+            const { PaymentRenewalRepository } =
+              await import("./renewal/renewal");
+            await PaymentRenewalRepository.linkInvoicePaymentIntent(
+              eventData.invoice,
+              eventData.payment_intent,
+              logger,
+            );
+          }
           break;
         case "invoice.payment_failed":
           await this.handleInvoicePaymentFailed(eventData, logger, locale);
@@ -767,29 +796,29 @@ export class PaymentRepository {
     }
   }
 
+  /**
+   * Paid invoice: the subscription module renews the period and credits, then
+   * the payment is recorded and the referral commission booked on the amount
+   * actually paid. Only the recording can fail the webhook (provider retries);
+   * credit grants are idempotent on their own key.
+   */
   private static async handleInvoicePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<void> {
+  ): Promise<ResponseType<void>> {
+    logger.info("Invoice payment succeeded - extracting subscription ID", {
+      invoiceId: data.id,
+      hasRootSubscription: "subscription" in data,
+      hasParent: "parent" in data,
+    });
+
+    const subscriptionId = this.extractSubscriptionIdFromInvoice(data, logger);
+    if (!subscriptionId) {
+      return success();
+    }
+
     try {
-      const invoiceId = data.id;
-
-      logger.info("Invoice payment succeeded - extracting subscription ID", {
-        invoiceId,
-        hasRootSubscription: "subscription" in data,
-        hasParent: "parent" in data,
-      });
-
-      const subscriptionId = this.extractSubscriptionIdFromInvoice(
-        data,
-        logger,
-      );
-
-      if (!subscriptionId) {
-        return;
-      }
-
       // Subscription module handles its own business logic
       const { SubscriptionRepository } =
         await import("../subscription/repository");
@@ -800,17 +829,27 @@ export class PaymentRepository {
         locale,
       );
     } catch (error) {
-      if (typeof error === "object" && error && "id" in error) {
-        logger.error("Failed to process invoice payment succeeded", {
-          error: parseError(error),
-          invoiceId: String(error.id),
-        });
-      } else {
-        logger.error("Failed to process invoice payment succeeded", {
-          error: parseError(error),
-        });
-      }
+      logger.error("Failed to process invoice payment succeeded", {
+        error: parseError(error),
+        invoiceId: data.id,
+      });
     }
+
+    const { PaymentRenewalRepository } = await import("./renewal/renewal");
+    const recorded = await PaymentRenewalRepository.recordPaidRenewal(
+      {
+        invoiceId: data.id,
+        subscriptionId,
+        billingReason: data.billing_reason ?? null,
+        amountPaidMinor: data.amount_paid ?? null,
+        currency: data.currency ?? null,
+        customerId: data.customer ?? null,
+        paymentIntentId: data.payment_intent ?? null,
+      },
+      logger,
+      locale,
+    );
+    return recorded.success ? success() : recorded;
   }
 
   private static async handleInvoicePaymentFailed(
@@ -1129,6 +1168,18 @@ export class PaymentRepository {
         transactionId: transaction.id,
         sessionId,
       });
+
+      // Subscription checkouts carry no payment intent, only the first
+      // invoice: key the payment by it so invoice_payment.paid links the
+      // intent and a refund of the first payment maps back to it.
+      if (data.invoice) {
+        const { PaymentRenewalRepository } = await import("./renewal/renewal");
+        await PaymentRenewalRepository.linkCheckoutInvoice(
+          transaction.id,
+          data.invoice,
+          logger,
+        );
+      }
 
       // Growth funnel: first payment (write-once on the user's journey)
       if (type === "subscription" || type === "credit_pack") {

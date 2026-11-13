@@ -630,7 +630,7 @@ export class FinanceRepository {
    * One processor's revenue since `since`, from its API when configured, else
    * (flagged as FALLBACK) from our own payment records. Shared by the live
    * ingest and the backfill so both read the same source of truth: our
-   * payment_transactions lack Stripe renewals and fees, so the API wins.
+   * payment_transactions lack fees and pre-2026-11 renewals, so the API wins.
    */
   private static async pullSource(
     source: (typeof RevenueSources)[number],
