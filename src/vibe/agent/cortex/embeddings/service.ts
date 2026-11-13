@@ -168,9 +168,14 @@ async function callEmbeddingApi(
   });
 
   if (!response.ok) {
+    // The status line alone ("400 Bad Request") never says WHY: log the
+    // provider's error body and the input size so the cause is diagnosable
+    // (e.g. a chunk over the model's token limit).
+    const body = await response.text().catch(() => "");
     // eslint-disable-next-line no-console
     console.error(
       `[cortex-embedding] API returned ${response.status}: ${response.statusText}`,
+      { inputChars: text.length, body: body.slice(0, 500) },
     );
     return null;
   }
