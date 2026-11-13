@@ -43,18 +43,19 @@ export const translations = {
     },
     success: {
       title: "Email confirmed",
-      description: "Your free-credit bonus is live",
+      description: "Bonus applies to your free account",
     },
   },
   widget: {
     heroTitle: "One click. +{{bonusCredits}} credits every month.",
     heroDescription:
-      "Confirm your address and the bonus lands on your free allowance right away.",
+      "Confirm your address. On a free account the bonus lands on your allowance right away.",
     confirmButton: "Confirm my email",
     confirming: "Confirming...",
-    confirmedTitle: "Confirmed. +{{bonusCredits}} credits a month are yours.",
+    confirmedTitle:
+      "Confirmed. +{{bonusCredits}} credits a month on your free account.",
     confirmedDescription:
-      "The bonus is already in your free balance and renews every month while you stay subscribed.",
+      "Signed in? It is already in your free balance and renews monthly while you stay subscribed. No account yet? Sign up free in this browser to unlock it.",
     startChatting: "Start chatting",
   },
 };

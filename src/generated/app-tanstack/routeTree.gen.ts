@@ -136,6 +136,7 @@ import { Route as ApiLocaleLeadsStatsRouteImport } from './routes/api.$locale.le
 import { Route as ApiLocaleLeadsTrackingRouteImport } from './routes/api.$locale.leads.tracking'
 import { Route as ApiLocaleMessengerSendRouteImport } from './routes/api.$locale.messenger.send'
 import { Route as ApiLocaleNewsletterConfirmRouteImport } from './routes/api.$locale.newsletter.confirm'
+import { Route as ApiLocaleNewsletterCreditBonusRouteImport } from './routes/api.$locale.newsletter.credit-bonus'
 import { Route as ApiLocaleNewsletterStatusRouteImport } from './routes/api.$locale.newsletter.status'
 import { Route as ApiLocaleNewsletterSubscribeRouteImport } from './routes/api.$locale.newsletter.subscribe'
 import { Route as ApiLocaleNewsletterUnsubscribeRouteImport } from './routes/api.$locale.newsletter.unsubscribe'
@@ -1360,6 +1361,12 @@ const ApiLocaleNewsletterConfirmRoute =
   ApiLocaleNewsletterConfirmRouteImport.update({
     id: '/api/$locale/newsletter/confirm',
     path: '/api/$locale/newsletter/confirm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleNewsletterCreditBonusRoute =
+  ApiLocaleNewsletterCreditBonusRouteImport.update({
+    id: '/api/$locale/newsletter/credit-bonus',
+    path: '/api/$locale/newsletter/credit-bonus',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleNewsletterStatusRoute =
@@ -4661,6 +4668,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
+  '/api/$locale/newsletter/credit-bonus': typeof ApiLocaleNewsletterCreditBonusRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
@@ -5316,6 +5324,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
+  '/api/$locale/newsletter/credit-bonus': typeof ApiLocaleNewsletterCreditBonusRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
@@ -5979,6 +5988,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/tracking': typeof ApiLocaleLeadsTrackingRouteWithChildren
   '/api/$locale/messenger/send': typeof ApiLocaleMessengerSendRoute
   '/api/$locale/newsletter/confirm': typeof ApiLocaleNewsletterConfirmRoute
+  '/api/$locale/newsletter/credit-bonus': typeof ApiLocaleNewsletterCreditBonusRoute
   '/api/$locale/newsletter/status': typeof ApiLocaleNewsletterStatusRoute
   '/api/$locale/newsletter/subscribe': typeof ApiLocaleNewsletterSubscribeRoute
   '/api/$locale/newsletter/unsubscribe': typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
@@ -6642,6 +6652,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/confirm'
+    | '/api/$locale/newsletter/credit-bonus'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
@@ -7297,6 +7308,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/confirm'
+    | '/api/$locale/newsletter/credit-bonus'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
@@ -7959,6 +7971,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/tracking'
     | '/api/$locale/messenger/send'
     | '/api/$locale/newsletter/confirm'
+    | '/api/$locale/newsletter/credit-bonus'
     | '/api/$locale/newsletter/status'
     | '/api/$locale/newsletter/subscribe'
     | '/api/$locale/newsletter/unsubscribe'
@@ -8609,6 +8622,7 @@ export interface RootRouteChildren {
   ApiLocaleLeadsTrackingRoute: typeof ApiLocaleLeadsTrackingRouteWithChildren
   ApiLocaleMessengerSendRoute: typeof ApiLocaleMessengerSendRoute
   ApiLocaleNewsletterConfirmRoute: typeof ApiLocaleNewsletterConfirmRoute
+  ApiLocaleNewsletterCreditBonusRoute: typeof ApiLocaleNewsletterCreditBonusRoute
   ApiLocaleNewsletterStatusRoute: typeof ApiLocaleNewsletterStatusRoute
   ApiLocaleNewsletterSubscribeRoute: typeof ApiLocaleNewsletterSubscribeRoute
   ApiLocaleNewsletterUnsubscribeRoute: typeof ApiLocaleNewsletterUnsubscribeRouteWithChildren
@@ -9836,6 +9850,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/newsletter/confirm'
       fullPath: '/api/$locale/newsletter/confirm'
       preLoaderRoute: typeof ApiLocaleNewsletterConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/newsletter/credit-bonus': {
+      id: '/api/$locale/newsletter/credit-bonus'
+      path: '/api/$locale/newsletter/credit-bonus'
+      fullPath: '/api/$locale/newsletter/credit-bonus'
+      preLoaderRoute: typeof ApiLocaleNewsletterCreditBonusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/newsletter/status': {
@@ -14802,6 +14823,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleLeadsTrackingRoute: ApiLocaleLeadsTrackingRouteWithChildren,
   ApiLocaleMessengerSendRoute: ApiLocaleMessengerSendRoute,
   ApiLocaleNewsletterConfirmRoute: ApiLocaleNewsletterConfirmRoute,
+  ApiLocaleNewsletterCreditBonusRoute: ApiLocaleNewsletterCreditBonusRoute,
   ApiLocaleNewsletterStatusRoute: ApiLocaleNewsletterStatusRoute,
   ApiLocaleNewsletterSubscribeRoute: ApiLocaleNewsletterSubscribeRoute,
   ApiLocaleNewsletterUnsubscribeRoute:

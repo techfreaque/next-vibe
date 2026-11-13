@@ -244,8 +244,11 @@ export class NewsletterSubscribeRepository {
         leadId,
         subscriptionId: newSubscription[0].id,
         userId: newSubscription[0].userId || undefined,
-        // Fresh rows are never confirmed - the welcome email carries the link
-        creditBonus: NewsletterCreditBonus.PENDING_CONFIRMATION,
+        // Fresh rows are never confirmed - the welcome email carries the link.
+        // Guests get the newsletter but no credits: the bonus is account-only.
+        creditBonus: user.isPublic
+          ? NewsletterCreditBonus.ACCOUNT_REQUIRED
+          : NewsletterCreditBonus.PENDING_CONFIRMATION,
         bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       });
     } catch (error) {
@@ -348,11 +351,15 @@ export class NewsletterSubscribeRepository {
 
   /**
    * Where the free-credit bonus stands for this visitor.
+   * Account first: guests never earn the bonus (credits/free-allowance.ts).
    */
   private static async getCreditBonus(
     subscription: NewsletterSubscriptionRow,
     user: JwtPayloadType,
   ): Promise<typeof NewsletterCreditBonusValue> {
+    if (user.isPublic) {
+      return NewsletterCreditBonus.ACCOUNT_REQUIRED;
+    }
     const ownedByVisitor =
       subscription.leadId === user.leadId ||
       (!user.isPublic &&

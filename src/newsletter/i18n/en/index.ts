@@ -472,6 +472,7 @@ export const translations = {
       active: "Bonus active",
       pendingConfirmation: "Confirm your email to unlock",
       claimedElsewhere: "Already claimed by another account",
+      accountRequired: "Free account required",
     },
   },
   hooks: {

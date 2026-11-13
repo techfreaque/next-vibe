@@ -1395,6 +1395,10 @@
             {
               "value": "enum.creditBonus.claimedElsewhere",
               "label": "enum.creditBonus.claimedElsewhere"
+            },
+            {
+              "value": "enum.creditBonus.accountRequired",
+              "label": "enum.creditBonus.accountRequired"
             }
           ],
           "schema": {
@@ -1403,19 +1407,22 @@
               "entries": {
                 "ACTIVE": "enum.creditBonus.active",
                 "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
-                "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+                "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere",
+                "ACCOUNT_REQUIRED": "enum.creditBonus.accountRequired"
               }
             },
             "type": "enum",
             "enum": {
               "ACTIVE": "enum.creditBonus.active",
               "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
-              "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+              "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere",
+              "ACCOUNT_REQUIRED": "enum.creditBonus.accountRequired"
             },
             "options": [
               "enum.creditBonus.active",
               "enum.creditBonus.pendingConfirmation",
-              "enum.creditBonus.claimedElsewhere"
+              "enum.creditBonus.claimedElsewhere",
+              "enum.creditBonus.accountRequired"
             ]
           },
           "usage": {

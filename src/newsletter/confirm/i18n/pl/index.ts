@@ -46,19 +46,19 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "E-mail potwierdzony",
-      description: "Twój bonus darmowych kredytów działa",
+      description: "Bonus trafia na Twoje darmowe konto",
     },
   },
   widget: {
     heroTitle: "Jedno kliknięcie. +{{bonusCredits}} kredytów co miesiąc.",
     heroDescription:
-      "Potwierdź adres, a bonus od razu trafi do Twojej darmowej puli.",
+      "Potwierdź adres. Na darmowym koncie bonus od razu trafi do Twojej puli.",
     confirmButton: "Potwierdź mój e-mail",
     confirming: "Potwierdzam...",
     confirmedTitle:
-      "Gotowe. +{{bonusCredits}} kredytów miesięcznie jest Twoje.",
+      "Gotowe. +{{bonusCredits}} kredytów miesięcznie na Twoim darmowym koncie.",
     confirmedDescription:
-      "Bonus jest już w Twojej darmowej puli i odnawia się co miesiąc, dopóki jesteś zapisany.",
+      "Jesteś zalogowany? Bonus jest już w Twojej darmowej puli i odnawia się co miesiąc, dopóki jesteś zapisany. Nie masz konta? Załóż je za darmo w tej przeglądarce, żeby go odblokować.",
     startChatting: "Zacznij czatować",
   },
 };

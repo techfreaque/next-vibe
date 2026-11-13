@@ -67,4 +67,6 @@ export const {
   ACTIVE: "enum.creditBonus.active",
   PENDING_CONFIRMATION: "enum.creditBonus.pendingConfirmation",
   CLAIMED_ELSEWHERE: "enum.creditBonus.claimedElsewhere",
+  /** Public visitor: the bonus is account-only, the newsletter itself still works */
+  ACCOUNT_REQUIRED: "enum.creditBonus.accountRequired",
 });

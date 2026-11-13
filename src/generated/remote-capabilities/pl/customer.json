@@ -6319,6 +6319,470 @@
     "credits": 0
   },
   {
+    "toolName": "newsletter-credit-bonus",
+    "title": "Bonus kredytów za newsletter",
+    "titleShort": "Bonus za newsletter",
+    "description": "Sprawdza, czy Twoje konto może jeszcze dostać comiesięczny bonus kredytów za newsletter. Tylko dla kont.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "offer": {
+          "type": "badge",
+          "label": "Bonus za newsletter",
+          "enumOptions": [
+            {
+              "value": "enum.offer.available",
+              "label": "enum.offer.available"
+            },
+            {
+              "value": "enum.offer.pendingConfirmation",
+              "label": "enum.offer.pendingConfirmation"
+            },
+            {
+              "value": "enum.offer.active",
+              "label": "enum.offer.active"
+            },
+            {
+              "value": "enum.offer.notEligible",
+              "label": "enum.offer.notEligible"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "AVAILABLE": "enum.offer.available",
+                "PENDING_CONFIRMATION": "enum.offer.pendingConfirmation",
+                "ACTIVE": "enum.offer.active",
+                "NOT_ELIGIBLE": "enum.offer.notEligible"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "AVAILABLE": "enum.offer.available",
+              "PENDING_CONFIRMATION": "enum.offer.pendingConfirmation",
+              "ACTIVE": "enum.offer.active",
+              "NOT_ELIGIBLE": "enum.offer.notEligible"
+            },
+            "options": [
+              "enum.offer.available",
+              "enum.offer.pendingConfirmation",
+              "enum.offer.active",
+              "enum.offer.notEligible"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "email": {
+          "type": "text",
+          "label": "E-mail konta",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bonusCredits": {
+          "type": "text",
+          "label": "Kredyty bonusowe co miesiąc",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "freeRefillAt": {
+          "type": "text",
+          "label": "Darmowe kredyty odnowią się",
+          "schema": {
+            "def": {
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "out": {
+                "def": {
+                  "type": "transform"
+                },
+                "type": "transform"
+              }
+            },
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "type": "union",
+              "options": [
+                {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                {
+                  "def": {
+                    "type": "date"
+                  },
+                  "type": "date"
+                },
+                {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                }
+              ]
+            },
+            "out": {
+              "def": {
+                "type": "transform"
+              },
+              "type": "transform"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "newsletter",
+    "tags": ["Newsletter", "Kredyty"],
+    "aliases": ["newsletter-credit-bonus"],
+    "credits": 0
+  },
+  {
+    "toolName": "newsletter-credit-bonus-claim",
+    "title": "Odbierz bonus za newsletter",
+    "titleShort": "Odbierz bonus",
+    "description": "Zapisuje e-mail Twojego konta do newslettera i daje dodatkowe darmowe kredyty co miesiąc. Tylko dla kont, raz na konto.",
+    "fields": {
+      "usage": {
+        "response": true
+      },
+      "children": {
+        "offer": {
+          "type": "badge",
+          "label": "Bonus za newsletter",
+          "enumOptions": [
+            {
+              "value": "enum.offer.available",
+              "label": "enum.offer.available"
+            },
+            {
+              "value": "enum.offer.pendingConfirmation",
+              "label": "enum.offer.pendingConfirmation"
+            },
+            {
+              "value": "enum.offer.active",
+              "label": "enum.offer.active"
+            },
+            {
+              "value": "enum.offer.notEligible",
+              "label": "enum.offer.notEligible"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "AVAILABLE": "enum.offer.available",
+                "PENDING_CONFIRMATION": "enum.offer.pendingConfirmation",
+                "ACTIVE": "enum.offer.active",
+                "NOT_ELIGIBLE": "enum.offer.notEligible"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "AVAILABLE": "enum.offer.available",
+              "PENDING_CONFIRMATION": "enum.offer.pendingConfirmation",
+              "ACTIVE": "enum.offer.active",
+              "NOT_ELIGIBLE": "enum.offer.notEligible"
+            },
+            "options": [
+              "enum.offer.available",
+              "enum.offer.pendingConfirmation",
+              "enum.offer.active",
+              "enum.offer.notEligible"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "email": {
+          "type": "text",
+          "label": "E-mail konta",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "bonusCredits": {
+          "type": "text",
+          "label": "Kredyty bonusowe co miesiąc",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "freeRefillAt": {
+          "type": "text",
+          "label": "Darmowe kredyty odnowią się",
+          "schema": {
+            "def": {
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "out": {
+                "def": {
+                  "type": "transform"
+                },
+                "type": "transform"
+              }
+            },
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "type": "union",
+              "options": [
+                {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                {
+                  "def": {
+                    "type": "date"
+                  },
+                  "type": "date"
+                },
+                {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                }
+              ]
+            },
+            "out": {
+              "def": {
+                "type": "transform"
+              },
+              "type": "transform"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "newsletter",
+    "tags": ["Newsletter", "Kredyty"],
+    "aliases": ["newsletter-credit-bonus-claim"],
+    "credits": 0
+  },
+  {
     "toolName": "newsletter-status",
     "title": "Status newslettera",
     "titleShort": "Status newslettera",
@@ -6652,6 +7116,10 @@
             {
               "value": "enum.creditBonus.claimedElsewhere",
               "label": "enum.creditBonus.claimedElsewhere"
+            },
+            {
+              "value": "enum.creditBonus.accountRequired",
+              "label": "enum.creditBonus.accountRequired"
             }
           ],
           "schema": {
@@ -6660,19 +7128,22 @@
               "entries": {
                 "ACTIVE": "enum.creditBonus.active",
                 "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
-                "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+                "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere",
+                "ACCOUNT_REQUIRED": "enum.creditBonus.accountRequired"
               }
             },
             "type": "enum",
             "enum": {
               "ACTIVE": "enum.creditBonus.active",
               "PENDING_CONFIRMATION": "enum.creditBonus.pendingConfirmation",
-              "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere"
+              "CLAIMED_ELSEWHERE": "enum.creditBonus.claimedElsewhere",
+              "ACCOUNT_REQUIRED": "enum.creditBonus.accountRequired"
             },
             "options": [
               "enum.creditBonus.active",
               "enum.creditBonus.pendingConfirmation",
-              "enum.creditBonus.claimedElsewhere"
+              "enum.creditBonus.claimedElsewhere",
+              "enum.creditBonus.accountRequired"
             ]
           },
           "usage": {

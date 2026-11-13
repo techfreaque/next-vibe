@@ -1,8 +1,8 @@
 /**
- * Newsletter double opt-in -> free-credit bonus, end to end through the endpoints:
- * subscribe (guest email capture) -> PENDING_CONFIRMATION, token only in the DB,
- * confirm -> bonus live on the guest's pool, second pool claiming the same email
- * gets nothing. Requires the dev DB.
+ * Newsletter double opt-in, guest path, end to end through the endpoints:
+ * subscribe -> ACCOUNT_REQUIRED (newsletter yes, credits no), token only in the DB,
+ * confirm -> the guest pool stays at the guest cap (the bonus is account-only).
+ * The account path lives in ../credit-bonus/credit-bonus.test.ts. Requires the dev DB.
  */
 
 import { eq, inArray } from "drizzle-orm";
@@ -75,7 +75,7 @@ afterAll(async () => {
 });
 
 describe("newsletter double opt-in unlocks the free-credit bonus", () => {
-  it("guest email capture -> confirm -> +bonus; same email elsewhere gets nothing", async () => {
+  it("guest subscribe -> confirm keeps the newsletter but grants no credits", async () => {
     const email = `nl-confirm-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example-test.invalid`;
     createdEmails.push(email);
     const guest = await createGuest();
@@ -92,7 +92,7 @@ describe("newsletter double opt-in unlocks the free-credit bonus", () => {
       return;
     }
     expect(subscribed.data.creditBonus).toBe(
-      NewsletterCreditBonus.PENDING_CONFIRMATION,
+      NewsletterCreditBonus.ACCOUNT_REQUIRED,
     );
     expect(subscribed.data.bonusCredits).toBe(
       FREE_CREDIT_ALLOWANCE.newsletterBonus,
@@ -136,11 +136,10 @@ describe("newsletter double opt-in unlocks the free-credit bonus", () => {
       toolExecutionContext: undefined,
     });
     expect(confirmed.success, JSON.stringify(confirmed)).toBe(true);
-    expect(await freeBalance(guest)).toBe(
-      FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.newsletterBonus,
-    );
+    // Account first: a confirmed guest subscription adds nothing to a guest pool
+    expect(await freeBalance(guest)).toBe(FREE_CREDIT_ALLOWANCE.guest);
 
-    // Same address from the same visitor: bonus reported live
+    // Same address from the same visitor: still account-only
     const again = await sendTestRequest({
       endpoint: subscribeEndpoints.POST,
       data: { email },
@@ -148,10 +147,10 @@ describe("newsletter double opt-in unlocks the free-credit bonus", () => {
       toolExecutionContext: undefined,
     });
     expect(again.success && again.data.creditBonus).toBe(
-      NewsletterCreditBonus.ACTIVE,
+      NewsletterCreditBonus.ACCOUNT_REQUIRED,
     );
 
-    // Farming attempt: another browser enters the same address
+    // Another browser enters the same address: no credits either
     const other = await createGuest();
     const farmed = await sendTestRequest({
       endpoint: subscribeEndpoints.POST,
@@ -160,8 +159,8 @@ describe("newsletter double opt-in unlocks the free-credit bonus", () => {
       toolExecutionContext: undefined,
     });
     expect(farmed.success && farmed.data.creditBonus).toBe(
-      NewsletterCreditBonus.CLAIMED_ELSEWHERE,
+      NewsletterCreditBonus.ACCOUNT_REQUIRED,
     );
     expect(await freeBalance(other)).toBe(FREE_CREDIT_ALLOWANCE.guest);
-  });
+  }, 30_000);
 });

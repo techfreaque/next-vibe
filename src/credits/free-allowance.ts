@@ -9,9 +9,10 @@
  * - User pool (user + every linked lead):
  *   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn = lead 20 + user 50
  *   = 70 base.
- * - Either pool +FREE_CREDIT_ALLOWANCE.newsletterBonus once it holds a CONFIRMED
- *   newsletter subscription (double opt-in link clicked): guest pool 20 -> 40,
- *   user pool 70 -> 90.
+ * - User pool +FREE_CREDIT_ALLOWANCE.newsletterBonus once it holds a CONFIRMED
+ *   newsletter subscription (double opt-in link clicked): 70 -> 90. Account first:
+ *   guest pools never get the bonus. A guest's confirmed subscription stays on its
+ *   lead and starts counting the moment that lead joins a user pool (signup/login).
  *
  * Spending is counted per pool per period (credit_transactions.metadata.freeCreditsUsed),
  * so the cap is "allowance - spent" no matter how often the tier changes mid-month.
@@ -41,14 +42,16 @@ export interface FreeAllowanceInput {
 
 /**
  * Monthly free-credit cap for a pool.
+ * The newsletter bonus is account-only: a guest pool stays at the guest cap.
  */
 export function computeFreeAllowance({
   isUserPool,
   hasConfirmedNewsletter,
 }: FreeAllowanceInput): number {
-  const base = isUserPool
-    ? FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn
-    : FREE_CREDIT_ALLOWANCE.guest;
+  if (!isUserPool) {
+    return FREE_CREDIT_ALLOWANCE.guest;
+  }
+  const base = FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
   return hasConfirmedNewsletter
     ? base + FREE_CREDIT_ALLOWANCE.newsletterBonus
     : base;

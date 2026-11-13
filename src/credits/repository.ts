@@ -1164,6 +1164,14 @@ export class CreditRepository {
     pool: CreditPool,
   ): Promise<number> {
     const userId = pool.userWallet?.userId ?? null;
+    const isUserPool = pool.poolType === "USER_POOL" && userId !== null;
+    // Newsletter bonus is account-only: guest pools skip the lookup
+    if (!isUserPool) {
+      return computeFreeAllowance({
+        isUserPool,
+        hasConfirmedNewsletter: false,
+      });
+    }
     const leadIds = pool.leadWallets
       .map((w) => w.leadId)
       .filter((id): id is string => id !== null);
@@ -1171,10 +1179,7 @@ export class CreditRepository {
       userId,
       leadIds,
     });
-    return computeFreeAllowance({
-      isUserPool: pool.poolType === "USER_POOL" && userId !== null,
-      hasConfirmedNewsletter,
-    });
+    return computeFreeAllowance({ isUserPool, hasConfirmedNewsletter });
   }
 
   /**

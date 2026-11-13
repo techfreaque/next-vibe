@@ -26,7 +26,10 @@ import {
 } from "next-vibe/tooling/testing/testing-suite/test-users";
 
 import { newsletterSubscriptions } from "@/newsletter/db";
-import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
+import {
+  NewsletterSubscriptionStatus,
+  type NewsletterSubscriptionStatusValue,
+} from "@/newsletter/enum";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { creditTransactions, creditWallets } from "./db";
@@ -159,9 +162,10 @@ describe("free allowance math", () => {
     expect(
       computeFreeAllowance({ isUserPool: false, hasConfirmedNewsletter: false }),
     ).toBe(20);
+    // Account first: a guest pool never gets the newsletter bonus
     expect(
       computeFreeAllowance({ isUserPool: false, hasConfirmedNewsletter: true }),
-    ).toBe(40);
+    ).toBe(20);
     // User pool is ADDITIVE: lead 20 + user 50 = 70 base, +20 newsletter = 90.
     expect(
       computeFreeAllowance({ isUserPool: true, hasConfirmedNewsletter: false }),
@@ -212,7 +216,7 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(guestUser(leadId))).toBe(guest);
   });
 
-  it("unconfirmed newsletter adds nothing; confirmed adds the bonus once", async () => {
+  it("guest pool: even a confirmed newsletter adds nothing (account first)", async () => {
     const leadId = await createGuestLead();
     const user = guestUser(leadId);
     expect(await freeBalance(user)).toBe(guest);
@@ -224,9 +228,28 @@ describe("free allowance pools (DB)", () => {
       .update(newsletterSubscriptions)
       .set({ confirmedAt: new Date() })
       .where(eq(newsletterSubscriptions.email, email));
-    expect(await freeBalance(user)).toBe(guest + newsletterBonus);
+    expect(await freeBalance(user)).toBe(guest);
+  });
+
+  it("user pool: unconfirmed adds nothing; confirmed adds the bonus once", async () => {
+    const created = await createTestUser(uniqueEmail("user-nl"));
+    expect(created.success, JSON.stringify(created)).toBe(true);
+    if (!created.success) {
+      return;
+    }
+    const user = created.data.user;
+    createdUserIds.push(user.id);
+
+    const email = await addNewsletter({ userId: user.id }, false);
+    expect(await freeBalance(user)).toBe(userBase);
+
+    await db
+      .update(newsletterSubscriptions)
+      .set({ confirmedAt: new Date() })
+      .where(eq(newsletterSubscriptions.email, email));
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
     // Idempotent: repeated reads never stack a second bonus
-    expect(await freeBalance(user)).toBe(guest + newsletterBonus);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
   });
 
   it("signed-in user gets the user allowance, +bonus with a confirmed newsletter", async () => {
@@ -380,23 +403,32 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(user)).toBe(0);
   });
 
-  it("unsubscribing drops the bonus; spending already above the guest cap leaves 0", async () => {
-    const leadId = await createGuestLead();
-    const user = guestUser(leadId);
-    const email = await addNewsletter({ leadId }, true);
-    expect(await freeBalance(user)).toBe(guest + newsletterBonus);
+  it("unsubscribe + resubscribe never pays the bonus twice in a period", async () => {
+    const created = await createTestUser(uniqueEmail("user-resub"));
+    expect(created.success, JSON.stringify(created)).toBe(true);
+    if (!created.success) {
+      return;
+    }
+    const user = created.data.user;
+    createdUserIds.push(user.id);
+    const email = await addNewsletter({ userId: user.id }, true);
+    expect(await freeBalance(user)).toBe(userBase + newsletterBonus);
     await spend(user, 30);
-    expect(await freeBalance(user)).toBe(guest + newsletterBonus - 30);
+    const afterSpend = userBase + newsletterBonus - 30;
+    expect(await freeBalance(user)).toBe(afterSpend);
 
-    await db
-      .update(newsletterSubscriptions)
-      .set({ status: NewsletterSubscriptionStatus.UNSUBSCRIBED })
-      .where(
-        and(
-          eq(newsletterSubscriptions.email, email),
-          eq(newsletterSubscriptions.leadId, leadId),
-        ),
-      );
-    expect(await freeBalance(user)).toBe(0);
+    const setStatus = async (
+      status: typeof NewsletterSubscriptionStatusValue,
+    ): Promise<void> => {
+      await db
+        .update(newsletterSubscriptions)
+        .set({ status })
+        .where(eq(newsletterSubscriptions.email, email));
+    };
+    await setStatus(NewsletterSubscriptionStatus.UNSUBSCRIBED);
+    expect(await freeBalance(user)).toBe(userBase - 30);
+    // Back on: the cap returns, the spend still counts. No fresh +bonus.
+    await setStatus(NewsletterSubscriptionStatus.SUBSCRIBED);
+    expect(await freeBalance(user)).toBe(afterSpend);
   });
 });

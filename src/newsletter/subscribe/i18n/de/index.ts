@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
       active: "Bonus aktiv",
       pendingConfirmation: "E-Mail bestätigen zum Freischalten",
       claimedElsewhere: "Bereits von einem anderen Konto beansprucht",
+      accountRequired: "Nur mit kostenlosem Konto",
     },
   },
   tags: {

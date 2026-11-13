@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   heading: "Newsletter abonnieren",
   subheadingPublic: "Neue unzensierte Modelle, Produkt-Updates, kein Spam.",
   subheadingLoggedIn: "Neue unzensierte Modelle, Produkt-Updates, kein Spam.",
-  bonus: "E-Mail bestätigen und monatlich 20 Gratis-Credits sichern.",
+  bonus:
+    "Mit Gratis-Konto: E-Mail bestätigen und jeden Monat 20 Credits extra sichern.",
   emailPlaceholder: "du@beispiel.de",
   subscribe: "Abonnieren",
   subscribed: "Du bist dabei",

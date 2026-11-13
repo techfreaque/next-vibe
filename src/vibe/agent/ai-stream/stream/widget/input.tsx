@@ -459,9 +459,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const insufficientCredits =
     !noCredits && modelCost > 0 && messageOps.creditsTotal < modelCost;
   const isInputDisabled = !canPost || noCredits || insufficientCredits;
-  // Guests can't top up: an empty balance shows the email / sign-up card
-  const guestOutOfCredits =
-    user.isPublic && canPost && (noCredits || insufficientCredits);
+  // Empty balance (or a guest who can't afford the model): the out-of-credits
+  // card replaces the textarea. Members who can still afford a cheaper model
+  // keep the textarea with the "insufficient credits" notice.
+  const outOfCredits =
+    canPost && (noCredits || (user.isPublic && insufficientCredits));
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -671,7 +673,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // UI state
   const showMicButton =
     !voice.isRecording && !voice.isProcessing && !showStopButton;
-  const showTextarea = !voice.isRecording && !voice.isProcessing;
+  // No empty, disabled textarea under the out-of-credits card
+  const showTextarea =
+    !voice.isRecording && !voice.isProcessing && !outOfCredits;
 
   return (
     <Form
@@ -690,14 +694,15 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       <CallModeIndicator show={ttsAutoplay} locale={locale} />
 
       {/* Send refused for lack of credits (402): the way forward, not an error */}
-      {(creditRefusal || guestOutOfCredits) && (
+      {(creditRefusal || outOfCredits) && (
         <OutOfCreditsCard
           locale={locale}
           isGuest={user.isPublic}
+          variant="composer"
           onDismiss={
-            guestOutOfCredits ? undefined : (): void => setCreditRefusal(false)
+            outOfCredits ? undefined : (): void => setCreditRefusal(false)
           }
-          className="mb-2 max-w-none"
+          className="mb-2 @sm:mb-3"
         />
       )}
 
@@ -829,28 +834,22 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           )}
 
           {/* No credits / insufficient credits error */}
-          {canPost && (noCredits || insufficientCredits) && !creditRefusal && (
+          {/* Member can't afford this model but has credits: cheaper model or top up */}
+          {canPost && insufficientCredits && !creditRefusal && (
             // Opaque backdrop: a kept draft must not bleed through the notice
             <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-t-md bg-background/95">
-              {/* Guests: the out-of-credits card above the composer carries the actions */}
-              {!user.isPublic && (
-                <>
-                  <Div className="text-sm font-medium text-destructive">
-                    {noCredits
-                      ? t("input.noCredits.title")
-                      : t("input.insufficientCredits.title", {
-                          cost: modelCost,
-                          balance: messageOps.creditsTotal,
-                        })}
-                  </Div>
-                  <Link
-                    href={`/${locale}/subscription/buy`}
-                    className="pointer-events-auto text-xs text-primary underline underline-offset-2 hover:text-primary/80"
-                  >
-                    {t("input.noCredits.addCredits")}
-                  </Link>
-                </>
-              )}
+              <Div className="text-sm font-medium text-destructive">
+                {t("input.insufficientCredits.title", {
+                  cost: modelCost,
+                  balance: messageOps.creditsTotal,
+                })}
+              </Div>
+              <Link
+                href={`/${locale}/subscription/buy`}
+                className="pointer-events-auto text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+              >
+                {t("input.noCredits.addCredits")}
+              </Link>
             </Div>
           )}
         </Div>

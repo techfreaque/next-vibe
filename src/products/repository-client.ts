@@ -529,9 +529,6 @@ export function getPricingParams(
     freeCreditsGuest: String(FREE_CREDIT_ALLOWANCE.guest),
     freeCreditsSignedIn: String(FREE_CREDIT_SIGNED_IN_TOTAL),
     freeCreditsNewsletterBonus: String(FREE_CREDIT_ALLOWANCE.newsletterBonus),
-    freeCreditsGuestNewsletter: String(
-      FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.newsletterBonus,
-    ),
     freeCreditsMax: String(FREE_CREDIT_MAX_TOTAL),
     subscriptionCredits: String(sub.credits),
     packCredits: String(pack.credits),

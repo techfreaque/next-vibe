@@ -724,27 +724,24 @@ export const translations = {
     dismiss: "Dismiss",
     guest: {
       title: "Out of free credits",
-      description:
-        "Guest credits are used up. Add your email or sign up free to keep chatting.",
-      emailLabel: "Email",
-      emailPlaceholder: "you@example.com",
-      emailSubmit: "Get {{bonus}} more credits",
-      emailSubmitting: "Sending...",
-      invalidEmail: "Enter a valid email address.",
-      added: "{{bonus}} credits added. Keep chatting.",
-      confirm:
-        "Check your inbox. Confirm your email to unlock +{{bonus}} credits.",
-      claimed:
-        "That email already claimed its bonus. Sign up instead: {{signedIn}} credits/month free.",
-      or: "or",
-      signUp: "Sign up: {{signedIn}} credits/month free",
-      haveAccount: "Already have an account?",
+      description: "Sign up free and keep this chat going.",
+      signUp: "Sign up free: {{signedIn}} credits/month",
+      haveAccount: "Have an account?",
       logIn: "Log in",
     },
     member: {
       title: "You're out of credits",
-      description: "Top up and keep chatting right where you left off.",
+      description: "Free credits refill on {{date}}. Need more now? Top up.",
       getCredits: "Get credits",
+      newsletter: {
+        title: "+{{bonus}} free credits every month",
+        consent:
+          "Join the newsletter with {{email}}: product news and new models, unsubscribe anytime. We'll email a confirm link first.",
+        claim: "Join for +{{bonus}}/month",
+        claiming: "Sending...",
+        pending:
+          "Check {{email}} and click the confirm link to unlock +{{bonus}} credits/month.",
+      },
     },
   },
   imageGen: {

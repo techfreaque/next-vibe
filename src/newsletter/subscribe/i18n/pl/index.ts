@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
       active: "Bonus aktywny",
       pendingConfirmation: "Potwierdź e-mail, żeby odblokować",
       claimedElsewhere: "Już odebrany przez inne konto",
+      accountRequired: "Wymaga darmowego konta",
     },
   },
   tags: {

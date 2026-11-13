@@ -725,27 +725,25 @@ export const translations: typeof enTranslations = {
     dismiss: "Schließen",
     guest: {
       title: "Gratis-Credits aufgebraucht",
-      description:
-        "Deine Gast-Credits sind weg. E-Mail eintragen oder kostenlos registrieren und weiterchatten.",
-      emailLabel: "E-Mail",
-      emailPlaceholder: "du@beispiel.de",
-      emailSubmit: "{{bonus}} Credits extra holen",
-      emailSubmitting: "Wird gesendet …",
-      invalidEmail: "Bitte eine gültige E-Mail-Adresse eingeben.",
-      added: "{{bonus}} Credits gutgeschrieben. Weiter geht's.",
-      confirm:
-        "Schau in dein Postfach. Bestätige deine E-Mail, um +{{bonus}} Credits freizuschalten.",
-      claimed:
-        "Diese E-Mail hat ihren Bonus schon eingelöst. Registriere dich: {{signedIn}} Credits/Monat gratis.",
-      or: "oder",
-      signUp: "Registrieren: {{signedIn}} Credits/Monat gratis",
+      description: "Kostenlos registrieren und genau hier weiterchatten.",
+      signUp: "Gratis registrieren: {{signedIn}} Credits/Monat",
       haveAccount: "Schon ein Konto?",
       logIn: "Anmelden",
     },
     member: {
       title: "Keine Credits mehr",
-      description: "Credits aufladen und genau hier weiterchatten.",
+      description:
+        "Gratis-Credits kommen am {{date}} wieder. Jetzt schon mehr? Aufladen.",
       getCredits: "Credits aufladen",
+      newsletter: {
+        title: "+{{bonus}} Gratis-Credits jeden Monat",
+        consent:
+          "Newsletter an {{email}}: Produkt-News und neue Modelle, jederzeit abbestellbar. Zuerst kommt ein Bestätigungslink.",
+        claim: "Abonnieren: +{{bonus}}/Monat",
+        claiming: "Wird gesendet...",
+        pending:
+          "Schau in {{email}} nach und klick den Bestätigungslink. Dann gibt es +{{bonus}} Credits/Monat.",
+      },
     },
   },
   imageGen: {

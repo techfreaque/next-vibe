@@ -717,27 +717,25 @@ export const translations: typeof enTranslations = {
     dismiss: "Zamknij",
     guest: {
       title: "Darmowe kredyty się skończyły",
-      description:
-        "Kredyty gościa się wyczerpały. Podaj e-mail albo załóż darmowe konto i pisz dalej.",
-      emailLabel: "E-mail",
-      emailPlaceholder: "ty@przyklad.pl",
-      emailSubmit: "Odbierz +{{bonus}} kredytów",
-      emailSubmitting: "Wysyłanie…",
-      invalidEmail: "Podaj poprawny adres e-mail.",
-      added: "Dodano {{bonus}} kredytów. Pisz dalej.",
-      confirm:
-        "Sprawdź skrzynkę. Potwierdź e-mail, by odblokować +{{bonus}} kredytów.",
-      claimed:
-        "Ten e-mail już odebrał bonus. Załóż konto: {{signedIn}} kredytów miesięcznie za darmo.",
-      or: "lub",
+      description: "Załóż darmowe konto i pisz dalej w tym czacie.",
       signUp: "Załóż konto: {{signedIn}} kredytów/mies. za darmo",
       haveAccount: "Masz już konto?",
       logIn: "Zaloguj się",
     },
     member: {
       title: "Skończyły Ci się kredyty",
-      description: "Doładuj kredyty i pisz dalej od tego miejsca.",
+      description:
+        "Darmowe kredyty odnowią się {{date}}. Potrzebujesz teraz? Doładuj.",
       getCredits: "Doładuj kredyty",
+      newsletter: {
+        title: "+{{bonus}} darmowych kredytów co miesiąc",
+        consent:
+          "Newsletter na {{email}}: nowości i nowe modele, wypiszesz się w każdej chwili. Najpierw wyślemy link potwierdzający.",
+        claim: "Zapisz się: +{{bonus}}/mies.",
+        claiming: "Wysyłanie...",
+        pending:
+          "Sprawdź {{email}} i kliknij link potwierdzający, żeby odblokować +{{bonus}} kredytów/mies.",
+      },
     },
   },
   imageGen: {

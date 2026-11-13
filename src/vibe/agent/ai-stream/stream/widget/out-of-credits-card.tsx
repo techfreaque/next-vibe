@@ -5,12 +5,11 @@ import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
+import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { X } from "next-vibe/ui/components/icons/X";
-import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
@@ -23,44 +22,61 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
+import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
 import { getPricingParams } from "@/products/repository-client";
 
 import { scopedTranslation } from "../i18n";
-import {
-  type GuestCreditCaptureResult,
-  useGuestCreditCapture,
-} from "./guest-credit-capture";
 
 interface OutOfCreditsCardProps {
   locale: CountryLanguage;
-  /** Guests get email capture / sign up / log in; members are sent to top up. */
+  /** Guests: sign up / log in. Members: top up, refill date, newsletter bonus. */
   isGuest: boolean;
   /** Shows a close button (composer placement). */
   onDismiss?: () => void;
+  /**
+   * "composer": rendered inside the chat input's own border, no card chrome.
+   * "card": standalone bordered card (message list).
+   */
+  variant?: "composer" | "card";
   className?: string;
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** First day of next month: when the free allowance refills (credits/free-allowance.ts). */
+function nextFreeRefill(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+}
 
 /**
  * Shown instead of a raw error when a turn is refused for lack of credits
- * (402) or a guest's balance is empty. Guests: email for bonus credits first,
- * then sign up, then log in (back to this thread). Members: buy credits.
+ * (402) or the balance is empty.
+ * - Guests: account first. Sign up (primary) or log in, back to this thread.
+ * - Members: top up + when free credits refill. Accounts that never joined the
+ *   newsletter also get a one-click, explicit opt-in for the monthly bonus.
  */
 export function OutOfCreditsCard({
   locale,
   isGuest,
   onDismiss,
+  variant = "card",
   className,
 }: OutOfCreditsCardProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const Icon = isGuest ? Mail : Coins;
+  const Icon = isGuest ? Gift : Coins;
+  const refillDate = nextFreeRefill().toLocaleDateString(locale, {
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <Div
       data-testid="out-of-credits-card"
       className={cn(
-        "relative flex w-full max-w-md flex-col gap-3 rounded-2xl border border-primary/30 bg-card px-4 py-4 shadow-sm",
+        "@container/ooc relative w-full",
+        variant === "card"
+          ? "max-w-md rounded-2xl border border-border bg-card p-4 shadow-sm"
+          : "px-1 pb-3 pt-1 border-b border-border/60",
         className,
       )}
     >
@@ -68,193 +84,176 @@ export function OutOfCreditsCard({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
+          size="unset"
           onClick={onDismiss}
           title={t("outOfCredits.dismiss")}
           aria-label={t("outOfCredits.dismiss")}
-          className="absolute right-2 top-2 h-7 w-7 text-muted-foreground"
+          className="absolute right-0 top-0 h-7 w-7 rounded-md text-muted-foreground hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </Button>
       )}
-      <Div className="flex items-start gap-3">
-        <Div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Icon className="h-4 w-4" />
+      <Div
+        className={cn(
+          "flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6",
+          onDismiss && "pr-8",
+        )}
+      >
+        <Div className="flex min-w-0 flex-1 items-start gap-3">
+          <Div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
+            <Icon className="h-4 w-4" />
+          </Div>
+          <Div className="flex min-w-0 flex-col gap-0.5 pt-px">
+            <P className="m-0 text-sm font-semibold leading-tight text-foreground">
+              {isGuest
+                ? t("outOfCredits.guest.title")
+                : t("outOfCredits.member.title")}
+            </P>
+            <P className="m-0 text-sm leading-snug text-muted-foreground">
+              {isGuest
+                ? t("outOfCredits.guest.description")
+                : t("outOfCredits.member.description", { date: refillDate })}
+            </P>
+          </Div>
         </Div>
-        <Div className={cn("flex flex-col gap-1", onDismiss && "pr-7")}>
-          <P className="text-sm font-semibold leading-snug text-foreground">
-            {isGuest
-              ? t("outOfCredits.guest.title")
-              : t("outOfCredits.member.title")}
-          </P>
-          <P className="text-sm leading-snug text-muted-foreground">
-            {isGuest
-              ? t("outOfCredits.guest.description")
-              : t("outOfCredits.member.description")}
-          </P>
-        </Div>
-      </Div>
-      {isGuest ? (
-        <GuestActions locale={locale} />
-      ) : (
-        <Div className="flex sm:pl-12">
-          <Button asChild size="sm" className="w-full sm:w-auto">
+        {isGuest ? (
+          <GuestActions locale={locale} />
+        ) : (
+          <Button
+            asChild
+            size="sm"
+            className="w-full flex-shrink-0 @md/ooc:ml-11 @md/ooc:w-auto @md/ooc:self-start @2xl/ooc:ml-0 @2xl/ooc:self-center"
+          >
             <Link href={`/${locale}/subscription/buy`}>
+              <Coins className="mr-1.5 h-4 w-4" />
               {t("outOfCredits.member.getCredits")}
             </Link>
           </Button>
-        </Div>
-      )}
+        )}
+      </Div>
+      {!isGuest && <NewsletterBonus locale={locale} />}
     </Div>
   );
 }
 
-/** Email capture (primary) → sign up → log in. */
+/** Account first: sign up (primary) and log in back to this thread. */
 function GuestActions({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const pathname = usePathname();
-  const user = useWidgetUser();
-  const logger = useWidgetLogger();
-  const { capture, isSubmitting } = useGuestCreditCapture(user, logger);
-  const [email, setEmail] = useState("");
-  const [invalid, setInvalid] = useState(false);
-  const [result, setResult] = useState<GuestCreditCaptureResult | null>(null);
-
-  const pricing = getPricingParams(locale);
-  const bonusParams = { bonus: pricing.freeCreditsNewsletterBonus };
-  const signedInParams = { signedIn: pricing.freeCreditsSignedIn };
-
-  const submit = async (): Promise<void> => {
-    const trimmed = email.trim();
-    if (!EMAIL_PATTERN.test(trimmed)) {
-      setInvalid(true);
-      return;
-    }
-    setInvalid(false);
-    setResult(await capture(trimmed));
+  const signedInParams = {
+    signedIn: getPricingParams(locale).freeCreditsSignedIn,
   };
 
-  const done = result?.kind === "added" || result?.kind === "confirm";
-
   return (
-    <Div className="flex flex-col gap-3 sm:pl-12">
-      {result && (result.kind === "added" || result.kind === "confirm") ? (
-        <Div
-          data-testid="guest-credit-capture-result"
-          className="flex items-start gap-2 rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-sm text-foreground"
-        >
-          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
-          <Span>
-            {result.kind === "added"
-              ? t("outOfCredits.guest.added", {
-                  bonus:
-                    result.bonusCredits > 0
-                      ? String(result.bonusCredits)
-                      : bonusParams.bonus,
-                })
-              : t("outOfCredits.guest.confirm", {
-                  bonus:
-                    result.bonusCredits > 0
-                      ? String(result.bonusCredits)
-                      : bonusParams.bonus,
-                })}
-          </Span>
-        </Div>
-      ) : (
-        <Div className="flex flex-col gap-1.5">
-          <Div className="flex flex-col gap-2 sm:flex-row">
-            <Input
-              type="email"
-              name="guest-credit-email"
-              aria-label={t("outOfCredits.guest.emailLabel")}
-              placeholder={t("outOfCredits.guest.emailPlaceholder")}
-              autoComplete="email"
-              value={email}
-              disabled={isSubmitting}
-              onChangeText={(text): void => {
-                setEmail(text);
-                if (invalid) {
-                  setInvalid(false);
-                }
-              }}
-              onKeyDown={(e): void => {
-                // The card sits inside the composer's <form>: Enter must not send a chat message
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  void submit();
-                }
-              }}
-              className={cn(
-                "h-9 min-h-9 text-sm sm:flex-1",
-                invalid && "border-destructive focus-visible:ring-destructive",
-              )}
-            />
-            <Button
-              type="button"
-              size="sm"
-              disabled={isSubmitting}
-              onClick={(): void => {
-                void submit();
-              }}
-              className="h-9 w-full sm:w-auto"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                  {t("outOfCredits.guest.emailSubmitting")}
-                </>
-              ) : (
-                t("outOfCredits.guest.emailSubmit", bonusParams)
-              )}
-            </Button>
-          </Div>
-          {(invalid ||
-            result?.kind === "error" ||
-            result?.kind === "claimed") && (
-            <Div
-              role="alert"
-              className="flex items-start gap-1.5 text-xs text-destructive"
-            >
-              <AlertCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
-              <Span>
-                {invalid
-                  ? t("outOfCredits.guest.invalidEmail")
-                  : result?.kind === "error"
-                    ? result.message
-                    : t("outOfCredits.guest.claimed", signedInParams)}
-              </Span>
-            </Div>
-          )}
-        </Div>
-      )}
-
-      <Div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Div className="h-px flex-1 bg-border" />
-        <Span>{t("outOfCredits.guest.or")}</Span>
-        <Div className="h-px flex-1 bg-border" />
-      </Div>
-
-      <Button
-        asChild
-        size="sm"
-        variant={done ? "default" : "outline"}
-        className="w-full"
-      >
+    <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:ml-11 @md/ooc:flex-row @md/ooc:flex-wrap @md/ooc:items-center @md/ooc:gap-x-4 @md/ooc:gap-y-2 @2xl/ooc:ml-0">
+      <Button asChild size="sm" className="w-full @md/ooc:w-auto">
         <Link href={`/${locale}/user/signup`}>
+          <Gift className="mr-1.5 h-4 w-4" />
           {t("outOfCredits.guest.signUp", signedInParams)}
         </Link>
       </Button>
-
-      <P className="text-center text-xs text-muted-foreground">
+      <P className="m-0 whitespace-nowrap text-center text-xs text-muted-foreground @md/ooc:text-left">
         {t("outOfCredits.guest.haveAccount")}{" "}
         <Link
           href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(pathname)}`}
-          className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+          className="font-medium text-primary underline-offset-2 hover:underline"
         >
           {t("outOfCredits.guest.logIn")}
         </Link>
       </P>
+    </Div>
+  );
+}
+
+/**
+ * Newsletter bonus row: one-click explicit opt-in while the account never
+ * subscribed, a confirm reminder while the double opt-in is pending, nothing
+ * once claimed.
+ */
+function NewsletterBonus({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element | null {
+  const { t } = scopedTranslation.scopedT(locale);
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const { data, claim, isClaiming } = useNewsletterCreditBonus(
+    user,
+    logger,
+    !user.isPublic,
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  if (!data) {
+    return null;
+  }
+  const params = { bonus: String(data.bonusCredits), email: data.email };
+
+  if (data.offer === NewsletterCreditOffer.PENDING_CONFIRMATION) {
+    return (
+      <Div
+        data-testid="newsletter-credit-pending"
+        className="mt-3 flex items-start gap-2 border-t border-dashed border-border/70 pt-3 text-xs leading-snug text-muted-foreground @md/ooc:pl-11"
+      >
+        <Mail className="mt-px h-3.5 w-3.5 flex-shrink-0 text-primary" />
+        <Span>{t("outOfCredits.member.newsletter.pending", params)}</Span>
+      </Div>
+    );
+  }
+
+  if (data.offer !== NewsletterCreditOffer.AVAILABLE) {
+    return null;
+  }
+
+  return (
+    <Div
+      data-testid="newsletter-credit-offer"
+      className="mt-3 flex flex-col gap-2.5 border-t border-dashed border-border/70 pt-3 @md/ooc:pl-11 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6"
+    >
+      <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <P className="m-0 text-sm font-medium leading-tight text-foreground">
+          {t("outOfCredits.member.newsletter.title", params)}
+        </P>
+        <P className="m-0 text-xs leading-snug text-muted-foreground">
+          {t("outOfCredits.member.newsletter.consent", params)}
+        </P>
+        {error && (
+          <Div
+            role="alert"
+            className="mt-1 flex items-start gap-1.5 text-xs text-destructive"
+          >
+            <AlertCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
+            <Span>{error}</Span>
+          </Div>
+        )}
+      </Div>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={isClaiming}
+        onClick={async (): Promise<void> => {
+          setError(null);
+          const result = await claim();
+          if (result.kind === "error") {
+            setError(result.message);
+          }
+        }}
+        className="w-full flex-shrink-0 @md/ooc:w-auto @md/ooc:self-start @2xl/ooc:self-center"
+      >
+        {isClaiming ? (
+          <>
+            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+            {t("outOfCredits.member.newsletter.claiming")}
+          </>
+        ) : (
+          <>
+            <Mail className="mr-1.5 h-4 w-4" />
+            {t("outOfCredits.member.newsletter.claim", params)}
+          </>
+        )}
+      </Button>
     </Div>
   );
 }

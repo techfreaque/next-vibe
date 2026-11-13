@@ -45,19 +45,19 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "E-Mail bestätigt",
-      description: "Dein Gratis-Credit-Bonus ist aktiv",
+      description: "Der Bonus gilt für dein Gratis-Konto",
     },
   },
   widget: {
     heroTitle: "Ein Klick. +{{bonusCredits}} Credits jeden Monat.",
     heroDescription:
-      "Bestätige deine Adresse – der Bonus landet sofort auf deinem Gratis-Kontingent.",
+      "Bestätige deine Adresse. Mit Gratis-Konto landet der Bonus sofort auf deinem Kontingent.",
     confirmButton: "E-Mail bestätigen",
     confirming: "Wird bestätigt...",
     confirmedTitle:
-      "Bestätigt. +{{bonusCredits}} Credits pro Monat gehören dir.",
+      "Bestätigt. +{{bonusCredits}} Credits pro Monat auf deinem Gratis-Konto.",
     confirmedDescription:
-      "Der Bonus steckt bereits in deinem Gratis-Guthaben und erneuert sich jeden Monat, solange du angemeldet bleibst.",
+      "Angemeldet? Dann steckt der Bonus schon in deinem Gratis-Guthaben und erneuert sich monatlich, solange du dabei bleibst. Noch kein Konto? Registriere dich kostenlos in diesem Browser und schalte ihn frei.",
     startChatting: "Loschatten",
   },
 };
