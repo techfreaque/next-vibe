@@ -209,12 +209,7 @@ export const translations = {
     },
     structuredData: {
       organization: {
-        types: {
-          organization: "Organization",
-          contactPoint: "ContactPoint",
-        },
         contactPoint: {
-          telephone: "{{config.group.contact.telephone}}",
           contactType: "Customer Service",
         },
       },

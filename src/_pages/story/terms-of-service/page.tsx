@@ -78,7 +78,14 @@ export function TanstackPage({
       actions={
         <PrintButton label={t("printButton")} ariaLabel={t("printAriaLabel")} />
       }
-      intro={<LegalP>{t("introduction", { appName })}</LegalP>}
+      intro={
+        <LegalP>
+          {t("introduction", {
+            appName,
+            operator: configT("group.responsiblePerson.name"),
+          })}
+        </LegalP>
+      }
       sections={[
         {
           id: "agreement",
@@ -186,14 +193,7 @@ export function TanstackPage({
         {
           id: "governing-law",
           title: t("sections.governingLaw.title"),
-          content: (
-            <LegalP>
-              {t("sections.governingLaw.content", {
-                jurisdictionCountry: configT("group.jurisdiction.country"),
-                jurisdictionCity: configT("group.jurisdiction.city"),
-              })}
-            </LegalP>
-          ),
+          content: <LegalP>{t("sections.governingLaw.content")}</LegalP>,
         },
         {
           id: "contact",

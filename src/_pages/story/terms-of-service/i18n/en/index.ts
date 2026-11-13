@@ -15,9 +15,9 @@ export const translations = {
   onThisPage: "On this page",
   printButton: "Print",
   title: "Terms of Service",
-  lastUpdated: "Last updated: January 2025",
+  lastUpdated: "Last updated: November 2026",
   introduction:
-    "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully.",
+    "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully. {{appName}} is operated by {{operator}}, a private individual in Germany.",
   sections: {
     agreement: {
       title: "Agreement to Terms",
@@ -92,7 +92,7 @@ export const translations = {
     indemnification: {
       title: "Indemnification",
       content:
-        "You agree to indemnify and hold harmless {{appName}} and its affiliates from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
+        "You agree to indemnify and hold harmless {{appName}} from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
     },
     termination: {
       title: "Termination",
@@ -107,7 +107,7 @@ export const translations = {
     governingLaw: {
       title: "Governing Law",
       content:
-        "These Terms of Service shall be governed by and construed in accordance with the laws of {{jurisdictionCountry}}. Any disputes shall be resolved in the courts of {{jurisdictionCity}}, {{jurisdictionCountry}}.",
+        "These Terms of Service are governed by the laws of the Federal Republic of Germany. If you are a consumer, this choice of law does not take away the protection of mandatory provisions of the law of the country where you habitually reside. If you are a merchant, a legal entity under public law or a special fund under public law, the place of jurisdiction for all disputes arising from these terms is the operator's seat in Simbach am Inn, Germany. In all other cases, the statutory place of jurisdiction applies.",
     },
   },
   post: {

@@ -186,15 +186,23 @@ export function TanstackPage({
           id: "contact",
           title: configT("group.contact.title"),
           content: (
-            <LegalP>
-              {configT("group.contact.description")}{" "}
-              <ExternalLink
-                href={`mailto:${supportEmail}`}
-                className="font-medium text-primary underline-offset-4 hover:underline"
-              >
-                {supportEmail}
-              </ExternalLink>
-            </LegalP>
+            <>
+              <LegalP>
+                {t("sections.controller.description", {
+                  operator: configT("group.responsiblePerson.name"),
+                  address: configT("group.address.addressIn1Line"),
+                })}
+              </LegalP>
+              <LegalP>
+                {configT("group.contact.description")}{" "}
+                <ExternalLink
+                  href={`mailto:${supportEmail}`}
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {supportEmail}
+                </ExternalLink>
+              </LegalP>
+            </>
           ),
         },
         {

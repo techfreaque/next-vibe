@@ -11,7 +11,7 @@ export const translations = {
     company: "Company",
     about: {
       title: "About Us",
-      description: "Learn more about our company",
+      description: "Who we are and why we build this",
     },
     careers: {
       title: "Careers",

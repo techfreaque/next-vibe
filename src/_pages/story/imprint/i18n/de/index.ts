@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Impressum",
-  lastUpdated: "Stand: Januar 2025",
+  lastUpdated: "Stand: November 2026",
   introduction:
     "Dieses Impressum enthält die gesetzlich vorgeschriebenen Angaben zu {{appName}} nach dem geltenden Recht.",
   sections: {
@@ -29,7 +29,8 @@ export const translations: typeof enTranslations = {
     },
     companyInfo: {
       title: "Anbieter",
-      description: "Rechtliche Angaben zum Anbieter von {{appName}}.",
+      description:
+        "{{appName}} wird von einer Privatperson in Deutschland betrieben, nicht von einem eingetragenen Unternehmen.",
     },
     responsiblePerson: {
       title: "Verantwortlich für den Inhalt",
@@ -63,7 +64,7 @@ export const translations: typeof enTranslations = {
       description:
         "Angaben dazu, wie Streitigkeiten behandelt und beigelegt werden.",
       content:
-        "Streitigkeiten aus der Nutzung dieser Website werden nach dem anwendbaren Recht beigelegt.",
+        "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
     },
   },
   post: {

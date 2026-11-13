@@ -2,19 +2,19 @@ export const translations = {
   meta: {
     title: "Legal Notice - {{appName}}",
     category: "Legal",
-    description: "Legal information and company details for {{appName}}",
+    description: "Legal notice and provider details for {{appName}}",
     imageAlt: "Legal Notice",
-    keywords: "imprint, legal notice, company information, {{appName}} legal",
+    keywords: "imprint, legal notice, provider information, {{appName}} legal",
     ogTitle: "Legal Notice - {{appName}}",
-    ogDescription: "Legal information and company details for {{appName}}",
+    ogDescription: "Legal notice and provider details for {{appName}}",
     twitterTitle: "Legal Notice - {{appName}}",
-    twitterDescription: "Legal information and company details for {{appName}}",
+    twitterDescription: "Legal notice and provider details for {{appName}}",
   },
   printAriaLabel: "Print imprint",
   onThisPage: "On this page",
   printButton: "Print",
   title: "Legal Notice",
-  lastUpdated: "Last updated: January 2025",
+  lastUpdated: "Last updated: November 2026",
   introduction:
     "This imprint provides legally required information about {{appName}} in accordance with applicable laws.",
   sections: {
@@ -26,9 +26,9 @@ export const translations = {
         "{{appName}} maintains partnerships with leading AI providers to deliver the best possible service to our users.",
     },
     companyInfo: {
-      title: "Company Information",
+      title: "Provider",
       description:
-        "Legal information about {{appName}} and our registered business entity.",
+        "{{appName}} is run by a private individual in Germany, not by a registered company.",
     },
     responsiblePerson: {
       title: "Responsible Person",
@@ -61,7 +61,7 @@ export const translations = {
       title: "Dispute Resolution",
       description: "Information about how disputes are handled and resolved.",
       content:
-        "Any disputes arising from the use of this website shall be resolved in accordance with applicable law.",
+        "We are neither obliged nor willing to take part in dispute resolution proceedings before a consumer arbitration board.",
     },
   },
   post: {

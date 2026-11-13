@@ -6,13 +6,8 @@ export const translations = {
   websiteUrl: "https://unbottled.ai",
   group: {
     name: "Unbottled.ai",
-    legalForm: "Marcus Brandstätter",
-    registrationNumber: "",
+    legalStatus: "Private individual, sole operator of unbottled.ai",
     foundedYear: 2024,
-    jurisdiction: {
-      country: "Switzerland",
-      city: "Zurich",
-    },
     address: {
       title: "Address",
       street: "Bachstrasse 1",
@@ -24,8 +19,6 @@ export const translations = {
       name: "Marcus Brandstätter",
     },
     contact: {
-      phone: "+1 (555) 123-4567",
-      telephone: "+1-555-0123",
       title: "Contact",
       description:
         "If you have any questions about this Privacy Policy, please contact us at",

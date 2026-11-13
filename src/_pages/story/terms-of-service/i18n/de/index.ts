@@ -20,9 +20,9 @@ export const translations: typeof enTranslations = {
   onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Nutzungsbedingungen",
-  lastUpdated: "Zuletzt aktualisiert: Januar 2025",
+  lastUpdated: "Zuletzt aktualisiert: November 2026",
   introduction:
-    "Willkommen bei {{appName}}. Durch die Nutzung unserer KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie diese sorgfältig durch.",
+    "Willkommen bei {{appName}}. Durch die Nutzung unserer KI-Chat-Plattform stimmen Sie diesen Nutzungsbedingungen zu. Bitte lesen Sie diese sorgfältig durch. Anbieter von {{appName}} ist {{operator}}, eine Privatperson in Deutschland.",
   sections: {
     agreement: {
       title: "Zustimmung zu den Bedingungen",
@@ -97,7 +97,7 @@ export const translations: typeof enTranslations = {
     indemnification: {
       title: "Schadloshaltung",
       content:
-        "Sie stimmen zu, {{appName}} und seine verbundenen Unternehmen von Ansprüchen, Schäden oder Ausgaben freizustellen, die aus Ihrer Nutzung des Dienstes entstehen.",
+        "Sie stimmen zu, {{appName}} von Ansprüchen, Schäden oder Ausgaben freizustellen, die aus Ihrer Nutzung des Dienstes entstehen.",
     },
     termination: {
       title: "Kündigung",
@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
     governingLaw: {
       title: "Anwendbares Recht",
       content:
-        "Diese Nutzungsbedingungen unterliegen dem Recht der {{jurisdictionCountry}}. Gerichtsstand für alle Streitigkeiten ist {{jurisdictionCity}}, {{jurisdictionCountry}}.",
+        "Es gilt das Recht der Bundesrepublik Deutschland. Sind Sie Verbraucher, gilt diese Rechtswahl nur, soweit Ihnen dadurch nicht der Schutz zwingender Bestimmungen des Rechts des Staates entzogen wird, in dem Sie Ihren gewöhnlichen Aufenthalt haben. Sind Sie Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen, ist Gerichtsstand für alle Streitigkeiten aus diesen Nutzungsbedingungen der Sitz des Anbieters in Simbach am Inn, Deutschland. Im Übrigen gelten die gesetzlichen Gerichtsstände.",
     },
   },
   post: {

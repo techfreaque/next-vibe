@@ -13,7 +13,7 @@ export const translations: typeof enTranslations = {
     company: "Firma",
     about: {
       title: "O nas",
-      description: "Dowiedz się więcej o naszej firmie",
+      description: "Kim jesteśmy i dlaczego to budujemy",
     },
     careers: {
       title: "Kariera",

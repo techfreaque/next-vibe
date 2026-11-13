@@ -72,9 +72,9 @@ export const translations: typeof enTranslations = {
         "Wir können Ihre Informationen weitergeben, wenn dies gesetzlich vorgeschrieben ist.",
     },
     businessTransfers: {
-      title: "Unternehmensübertragungen",
+      title: "Betreiberwechsel",
       description:
-        "Im Falle einer Fusion, Übernahme oder eines Verkaufs von Vermögenswerten können Ihre Daten übertragen werden.",
+        "Geht der Dienst auf einen neuen Betreiber über, können Ihre Daten an diesen übertragen werden.",
     },
     thirdParty: {
       title: "Drittanbieterdienste",
@@ -124,6 +124,10 @@ export const translations: typeof enTranslations = {
       title: "Änderungen dieser Richtlinie",
       description:
         "Wir können diese Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über wesentliche Änderungen informieren.",
+    },
+    controller: {
+      description:
+        "Verantwortlicher im Sinne der DSGVO ist {{operator}} (Privatperson), {{address}}.",
     },
     gdpr: {
       title: "DSGVO-Konformität",

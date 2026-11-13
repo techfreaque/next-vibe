@@ -17,9 +17,9 @@ export const translations: typeof enTranslations = {
   onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Warunki korzystania z usługi",
-  lastUpdated: "Ostatnia aktualizacja: styczeń 2025",
+  lastUpdated: "Ostatnia aktualizacja: listopad 2026",
   introduction:
-    "Witamy w {{appName}}. Korzystając z naszej platformy czatu AI, zgadzasz się na niniejsze Warunki korzystania z usługi. Przeczytaj je uważnie.",
+    "Witamy w {{appName}}. Korzystając z naszej platformy czatu AI, zgadzasz się na niniejsze Warunki korzystania z usługi. Przeczytaj je uważnie. Serwis {{appName}} prowadzi {{operator}}, osoba prywatna z Niemiec.",
   sections: {
     agreement: {
       title: "Zgoda na warunki",
@@ -94,7 +94,7 @@ export const translations: typeof enTranslations = {
     indemnification: {
       title: "Odszkodowanie",
       content:
-        "Zgadzasz się zabezpieczyć {{appName}} i jego podmioty powiązane przed wszelkimi roszczeniami, szkodami lub wydatkami wynikającymi z korzystania z usługi.",
+        "Zgadzasz się zabezpieczyć {{appName}} przed wszelkimi roszczeniami, szkodami lub wydatkami wynikającymi z korzystania z usługi.",
     },
     termination: {
       title: "Rozwiązanie umowy",
@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
     governingLaw: {
       title: "Prawo właściwe",
       content:
-        "Niniejsze Warunki korzystania z usługi podlegają przepisom prawa {{jurisdictionCountry}}. Wszelkie spory będą rozstrzygane w sądach {{jurisdictionCity}}, {{jurisdictionCountry}}.",
+        "Niniejsze Warunki korzystania z usługi podlegają prawu Republiki Federalnej Niemiec. Jeśli jesteś konsumentem, ten wybór prawa nie pozbawia Cię ochrony, jaką dają bezwzględnie obowiązujące przepisy prawa państwa, w którym masz miejsce zwykłego pobytu. Jeśli jesteś kupcem w rozumieniu niemieckiego prawa handlowego (Kaufmann), osobą prawną prawa publicznego lub publicznoprawnym funduszem specjalnym, sądem właściwym dla wszystkich sporów wynikających z tych warunków jest sąd właściwy dla siedziby usługodawcy w Simbach am Inn w Niemczech. W pozostałych przypadkach obowiązuje właściwość ustawowa.",
     },
   },
   post: {

@@ -70,9 +70,9 @@ export const translations = {
         "We may disclose your information when required by law or to protect our rights and safety.",
     },
     businessTransfers: {
-      title: "Business Transfers",
+      title: "Change of Operator",
       description:
-        "In the event of a merger, acquisition, or sale of assets, your data may be transferred to the new entity.",
+        "If the service is handed over to a new operator, your data may be transferred to them.",
     },
     thirdParty: {
       title: "Third-Party Services",
@@ -121,6 +121,10 @@ export const translations = {
       title: "Changes to This Policy",
       description:
         "We may update this Privacy Policy from time to time. We will notify you of any significant changes.",
+    },
+    controller: {
+      description:
+        "The controller responsible for your data under the GDPR is {{operator}}, a private individual, {{address}}.",
     },
     gdpr: {
       title: "GDPR Compliance",

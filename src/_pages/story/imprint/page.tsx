@@ -91,9 +91,9 @@ export function TanstackPage({
                 {t("sections.companyInfo.description", { appName })}
               </LegalP>
               <LegalCard>
-                <Strong>{configT("group.name")}</Strong>
-                <P>{configT("group.legalForm")}</P>
-                <P>{configT("group.registrationNumber")}</P>
+                <Strong>{configT("group.responsiblePerson.name")}</Strong>
+                <P>{configT("group.legalStatus")}</P>
+                <P>{configT("group.address.addressIn1Line")}</P>
               </LegalCard>
             </>
           ),

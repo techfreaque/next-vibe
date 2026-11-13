@@ -70,9 +70,9 @@ export const translations: typeof enTranslations = {
         "Możemy ujawnić Twoje informacje, gdy wymagają tego przepisy prawa.",
     },
     businessTransfers: {
-      title: "Transfery biznesowe",
+      title: "Zmiana właściciela serwisu",
       description:
-        "W przypadku fuzji, przejęcia lub sprzedaży aktywów, Twoje dane mogą zostać przekazane nowej jednostce.",
+        "Jeśli serwis przejmie nowy właściciel, Twoje dane mogą zostać mu przekazane.",
     },
     thirdParty: {
       title: "Usługi stron trzecich",
@@ -122,6 +122,10 @@ export const translations: typeof enTranslations = {
       title: "Zmiany w polityce",
       description:
         "Możemy od czasu do czasu aktualizować tę politykę prywatności. Powiadomimy Cię o istotnych zmianach.",
+    },
+    controller: {
+      description:
+        "Administratorem Twoich danych w rozumieniu RODO jest {{operator}} (osoba prywatna), {{address}}.",
     },
     gdpr: {
       title: "Zgodność z RODO",

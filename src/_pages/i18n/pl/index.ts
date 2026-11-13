@@ -212,12 +212,7 @@ export const translations: typeof enTranslations = {
     },
     structuredData: {
       organization: {
-        types: {
-          organization: "Organizacja",
-          contactPoint: "Punkt kontaktowy",
-        },
         contactPoint: {
-          telephone: "{{config.group.contact.telephone}}",
           contactType: "Obsługa klienta",
         },
       },

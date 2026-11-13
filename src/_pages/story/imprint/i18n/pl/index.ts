@@ -4,20 +4,20 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Stopka redakcyjna - {{appName}}",
     category: "Prawne",
-    description: "Informacje prawne i dane firmy {{appName}}",
+    description: "Nota prawna i dane usługodawcy {{appName}}",
     imageAlt: "Stopka redakcyjna",
     keywords:
-      "stopka redakcyjna, nota prawna, informacje o firmie, {{appName}} prawne",
+      "stopka redakcyjna, nota prawna, informacje o usługodawcy, {{appName}} prawne",
     ogTitle: "Stopka redakcyjna - {{appName}}",
-    ogDescription: "Informacje prawne i dane firmy {{appName}}",
+    ogDescription: "Nota prawna i dane usługodawcy {{appName}}",
     twitterTitle: "Stopka redakcyjna - {{appName}}",
-    twitterDescription: "Informacje prawne i dane firmy {{appName}}",
+    twitterDescription: "Nota prawna i dane usługodawcy {{appName}}",
   },
   printAriaLabel: "Drukuj stopkę",
   onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Nota prawna",
-  lastUpdated: "Ostatnia aktualizacja: styczeń 2025",
+  lastUpdated: "Ostatnia aktualizacja: listopad 2026",
   introduction:
     "Niniejsza stopka redakcyjna zawiera informacje wymagane przez prawo dotyczące {{appName}} zgodnie z obowiązującymi przepisami.",
   sections: {
@@ -29,9 +29,9 @@ export const translations: typeof enTranslations = {
         "{{appName}} utrzymuje partnerstwa z wiodącymi dostawcami AI, aby zapewnić naszym użytkownikom najlepszą możliwą usługę.",
     },
     companyInfo: {
-      title: "Informacje o firmie",
+      title: "Usługodawca",
       description:
-        "Informacje prawne o {{appName}} i naszej zarejestrowanej jednostce biznesowej.",
+        "Serwis {{appName}} prowadzi osoba prywatna w Niemczech, a nie zarejestrowana firma.",
     },
     responsiblePerson: {
       title: "Osoba odpowiedzialna",
@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
       description:
         "Informacje o sposobie rozpatrywania i rozwiązywania sporów.",
       content:
-        "Wszelkie spory wynikające z korzystania z tej strony będą rozstrzygane zgodnie z obowiązującym prawem.",
+        "Nie jesteśmy zobowiązani ani gotowi do udziału w postępowaniu w sprawie pozasądowego rozwiązywania sporów przed konsumenckim organem polubownym.",
     },
   },
   post: {

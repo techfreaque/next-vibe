@@ -73,7 +73,7 @@ interface StructuredDataOrganization {
   sameAs: string[];
   contactPoint: {
     "@type": string;
-    telephone: string;
+    email: string;
     contactType: string;
     availableLanguage: string[];
   };
@@ -102,10 +102,10 @@ export async function tanstackLoader({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": t("structuredData.organization.types.organization"),
+    "@type": "Organization",
     name: configT("group.name"),
     url: envClient.NEXT_PUBLIC_APP_URL,
-    logo: `${envClient.NEXT_PUBLIC_APP_URL}/logo.png`,
+    logo: new URL("/logo.png", envClient.NEXT_PUBLIC_APP_URL).toString(),
     sameAs: [
       configT("social.facebookUrl"),
       configT("social.twitterUrl"),
@@ -113,8 +113,8 @@ export async function tanstackLoader({
       configT("social.linkedinUrl"),
     ],
     contactPoint: {
-      "@type": t("structuredData.organization.types.contactPoint"),
-      telephone: configT("group.contact.telephone"),
+      "@type": "ContactPoint",
+      email: configT("emails.support"),
       contactType: t("structuredData.organization.contactPoint.contactType"),
       availableLanguage: [
         t("constants.languages.en"),
