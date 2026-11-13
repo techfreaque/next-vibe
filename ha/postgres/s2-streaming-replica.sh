@@ -42,7 +42,7 @@ init)
     -v "$DATA":/var/lib/postgresql/data --entrypoint bash "$IMAGE" -c "
       set -e
       pg_basebackup -h $PRIMARY_HOST -p 5432 -U replicator -D /var/lib/postgresql/data \
-        -X stream -R -C -S $SLOT --checkpoint=spread --max-rate=30M -P -v
+        -X stream -R -C -S $SLOT --checkpoint=spread --max-rate=5M -P -v
       chown -R postgres:postgres /var/lib/postgresql/data
       chmod 700 /var/lib/postgresql/data"
   docker run -d --name "$NAME" --restart unless-stopped \

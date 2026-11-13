@@ -476,14 +476,16 @@ export class ImagePushRepository {
   }
 
   /**
-   * Ships the image Server 1 already holds to Server 2 box-to-box over the
-   * private WireGuard link, instead of uploading it a second time from this
+   * Ships the image Server 1 already holds to Server 2 box-to-box (SSH over
+   * the public IPs), instead of uploading it a second time from this
    * machine. Datacenter to datacenter is ~30x faster than a home uplink
    * (564 MB in 20 s vs ~1 h for the 6.5 GB app image).
    *
-   * Transport is plain SSH over WireGuard (`docker save | gzip | ssh`), using
-   * Server 1's dedicated key /root/.ssh/ha-image-relay, which Server 2 pins to
-   * `restrict,from="10.88.0.1",command="gunzip | docker load"`. Never use an
+   * Transport is plain SSH over TCP between the public IPs (`docker save |
+   * gzip | ssh`), using Server 1's dedicated key /root/.ssh/ha-image-relay,
+   * which Server 2 pins to `restrict,from="<Server 1 IPs>",command="gunzip |
+   * docker load"`. Not over WireGuard: a multi-GB burst over WG/UDP makes the
+   * provider's DDoS filter drop ALL UDP between the boxes (2026-11-13). Never use an
    * `nc -l` listener or any tunnel/relay binary (nc, socat, wstunnel, chisel,
    * ...) here: Hostinger's in-VM malware scanner flags such processes and
    * hard-stops the VPS (it did so to Server 1 on 2026-11-12 for wstunnel).

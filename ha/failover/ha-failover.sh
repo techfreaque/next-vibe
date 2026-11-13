@@ -361,7 +361,8 @@ Rejoin S1 as a standby: ha/README.md 'Rejoin after failover'."
 
 # WireGuard path failover: plain WG between the public IPv6 and IPv4
 # addresses (HA_WG_ENDPOINTS, preferred first). When the handshake is older
-# than HA_WG_STALE_AFTER (WG re-handshakes every 2 min while traffic flows),
+# than HA_WG_STALE_AFTER (default 300 s; a live link re-handshakes every 2-3 min,
+# observed up to ~200 s under one-way bulk traffic, so 180 s false-triggered),
 # point the peer at the next address. WG roams, so the peer follows as soon
 # as one handshake gets through. Added 2026-11-13 after the provider started
 # dropping IPv4 UDP S1->S2 while IPv6 kept working. No tunnel, no new port.
@@ -373,7 +374,7 @@ wg_path_check() {
   hs="$(wg show wg0 latest-handshakes 2>/dev/null | awk '{print $2}' | head -1)"
   age=$((now - ${hs:-0}))
   cur="$(wg show wg0 endpoints 2>/dev/null | awk '{print $2}' | head -1)"
-  if [ "$age" -lt "${HA_WG_STALE_AFTER:-180}" ]; then
+  if [ "$age" -lt "${HA_WG_STALE_AFTER:-300}" ]; then
     was_alerted wg-stale && alert "WireGuard link up again" "Handshake ${age}s ago via $cur."
     clear_once wg-stale
     return 0
