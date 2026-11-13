@@ -910,8 +910,18 @@ export const translations = {
         "Meta Muse Wonder - Meta's flagship. Frontier reasoning, code and creative work across every modality. 1M-token context.",
       mistralLarge4:
         "Mistral Large 4 - Mistral AI's new flagship. European, vision-capable, strong at code, cheaper than Medium 3.5. 1M-token context.",
+      gemini4Hydrogen:
+        "Gemini 4 Hydrogen - Google's Gemini 4 workhorse. Fast agentic coding and analysis, text, image, video and audio in. 1M-token context.",
+      gemini4Carbon:
+        "Gemini 4 Carbon - Google's strongest Gemini. Built for the hardest code, agent and reasoning work, reads every media type. 1M-token context.",
+      minimaxM31Flash:
+        "MiniMax M3.1 Flash - MiniMax's fast multimodal model. Beats M3 at agents and code for half the price or less. 1M-token context.",
+      metaMuseEmber:
+        "Meta Muse Ember - Meta's smallest Muse. Quick tool calls, routing and light coding for pennies, reads every media type. 1M-token context.",
       veniceDeepseekV41FlashUncensored:
         "DeepSeek V4.1 Flash Uncensored - DeepSeek V4.1 Flash with the refusals removed, served by Venice.ai. Real capability, no lectures, tools included. 1M-token context.",
+      drummerArtemis31b:
+        "Artemis 31B - TheDrummer's Gemma 4 roleplay finetune. Dark scenes, explicit fiction, characters that stay in voice. Cheap, 262K context, reads images, calls tools.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - xAI's latest image generation model with improved prompt adherence and visual quality.",
       qwenImage3:
@@ -930,6 +940,30 @@ export const translations = {
         "Lyria 3 Pro Preview - Google's premium music generation model for full-length songs with high production quality.",
       lyria3ClipPreview:
         "Lyria 3 Clip Preview - Google's fast music clip generator for short-form audio content.",
+      geminiNanoBanana21:
+        "Nano Banana 2.1 - Google's in-chat image generation and editing at half the image price of the original Nano Banana.",
+      seedream55:
+        "Seedream 5.5 - ByteDance's image generation and multi-reference editing model at 2 credits per image.",
+      flux3Image:
+        "FLUX.3 - Black Forest Labs' flagship image model with sharper detail and cleaner text than FLUX.2.",
+      flux3Klein:
+        "FLUX.3 Klein - Black Forest Labs' small, fast image model for drafts and bulk runs, under 1 credit per image.",
+      gptImage26Flare:
+        "GPT Image 2.6 Flare - OpenAI's fast image generation and editing model.",
+      gptImage26Sunburst:
+        "GPT Image 2.6 Sunburst - OpenAI's detail-focused image model for dense compositions and text-heavy layouts.",
+      geminiOmni12Flash:
+        "Gemini Omni 1.2 Flash - Google's video model with native audio, 3 to 15 second clips, up to 4K.",
+      grokImagineVideo15Lite:
+        "Grok Imagine Video 1.5 Lite - xAI's fast, low-cost video model, up to 1080p.",
+      wan30:
+        "Wan 3.0 - Alibaba's video model with native audio and clips up to 30 seconds.",
+      seedance2Mini:
+        "Seedance 2.0 Mini - ByteDance's budget video model with native audio at 480p and 720p.",
+      hailuo3Max:
+        "Hailuo 3 Max - MiniMax's faster, cheaper Hailuo 3 variant at 768p, no audio.",
+      runwayGen45:
+        "Runway Gen-4.5 - Runway's cinematic video model for text and image to video at 720p.",
     },
   },
   modelUtilities: {

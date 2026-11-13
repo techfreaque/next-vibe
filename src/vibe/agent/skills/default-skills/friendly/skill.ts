@@ -43,7 +43,7 @@ export const friendlySkill: Skill = {
       weakness: "skills.friendly.variantInfo.fast.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GROK_4_FAST,
+        manualModelId: ChatModelId.META_MUSE_EMBER,
         intelligenceRange: {
           min: IntelligenceLevel.QUICK,
           max: IntelligenceLevel.QUICK,

@@ -551,6 +551,7 @@ import { Route as ApiLocaleVibeAgentCortexTreeRouteImport } from './routes/api.$
 import { Route as ApiLocaleVibeAgentCortexWriteRouteImport } from './routes/api.$locale.vibe.agent.cortex.write'
 import { Route as ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content.cleanup'
 import { Route as ApiLocaleVibeAgentModelsListRouteImport } from './routes/api.$locale.vibe.agent.models.list'
+import { Route as ApiLocaleVibeAgentModelsModelCatalogScanRouteImport } from './routes/api.$locale.vibe.agent.models.model-catalog-scan'
 import { Route as ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.leaderboard'
 import { Route as ApiLocaleVibeAgentRefusalIndexQuestionsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.questions'
 import { Route as ApiLocaleVibeAgentRefusalIndexRunsRouteImport } from './routes/api.$locale.vibe.agent.refusal-index.runs'
@@ -3835,6 +3836,12 @@ const ApiLocaleVibeAgentModelsListRoute =
     path: '/api/$locale/vibe/agent/models/list',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentModelsModelCatalogScanRoute =
+  ApiLocaleVibeAgentModelsModelCatalogScanRouteImport.update({
+    id: '/api/$locale/vibe/agent/models/model-catalog-scan',
+    path: '/api/$locale/vibe/agent/models/model-catalog-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentRefusalIndexLeaderboardRoute =
   ApiLocaleVibeAgentRefusalIndexLeaderboardRouteImport.update({
     id: '/api/$locale/vibe/agent/refusal-index/leaderboard',
@@ -5135,6 +5142,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -5796,6 +5804,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -6465,6 +6474,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
+  '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/refusal-index/leaderboard': typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   '/api/$locale/vibe/agent/refusal-index/questions': typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   '/api/$locale/vibe/agent/refusal-index/runs': typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -7134,6 +7144,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -7795,6 +7806,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -8463,6 +8475,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
     | '/api/$locale/vibe/agent/models/list'
+    | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/refusal-index/leaderboard'
     | '/api/$locale/vibe/agent/refusal-index/questions'
     | '/api/$locale/vibe/agent/refusal-index/runs'
@@ -8964,6 +8977,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentCortexTreeRoute: typeof ApiLocaleVibeAgentCortexTreeRoute
   ApiLocaleVibeAgentCortexWriteRoute: typeof ApiLocaleVibeAgentCortexWriteRoute
   ApiLocaleVibeAgentModelsListRoute: typeof ApiLocaleVibeAgentModelsListRoute
+  ApiLocaleVibeAgentModelsModelCatalogScanRoute: typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   ApiLocaleVibeAgentRefusalIndexLeaderboardRoute: typeof ApiLocaleVibeAgentRefusalIndexLeaderboardRoute
   ApiLocaleVibeAgentRefusalIndexQuestionsRoute: typeof ApiLocaleVibeAgentRefusalIndexQuestionsRouteWithChildren
   ApiLocaleVibeAgentRefusalIndexRunsRoute: typeof ApiLocaleVibeAgentRefusalIndexRunsRouteWithChildren
@@ -12823,6 +12837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentModelsListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/models/model-catalog-scan': {
+      id: '/api/$locale/vibe/agent/models/model-catalog-scan'
+      path: '/api/$locale/vibe/agent/models/model-catalog-scan'
+      fullPath: '/api/$locale/vibe/agent/models/model-catalog-scan'
+      preLoaderRoute: typeof ApiLocaleVibeAgentModelsModelCatalogScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/refusal-index/leaderboard': {
       id: '/api/$locale/vibe/agent/refusal-index/leaderboard'
       path: '/api/$locale/vibe/agent/refusal-index/leaderboard'
@@ -15364,6 +15385,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleVibeAgentCortexTreeRoute: ApiLocaleVibeAgentCortexTreeRoute,
   ApiLocaleVibeAgentCortexWriteRoute: ApiLocaleVibeAgentCortexWriteRoute,
   ApiLocaleVibeAgentModelsListRoute: ApiLocaleVibeAgentModelsListRoute,
+  ApiLocaleVibeAgentModelsModelCatalogScanRoute:
+    ApiLocaleVibeAgentModelsModelCatalogScanRoute,
   ApiLocaleVibeAgentRefusalIndexLeaderboardRoute:
     ApiLocaleVibeAgentRefusalIndexLeaderboardRoute,
   ApiLocaleVibeAgentRefusalIndexQuestionsRoute:

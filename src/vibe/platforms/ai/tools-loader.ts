@@ -36,6 +36,7 @@ import {
   generateSchemaForUsage,
 } from "../../unified-ui/_shared/utils";
 import { Platform } from "../platforms";
+import { toolInputToJsonSchema } from "./tool-json-schema";
 
 /**
  * CoreTool type from AI SDK
@@ -71,21 +72,8 @@ function createToolFromEndpoint(
     permissionRoles,
   );
 
-  // Target draft-7 to ensure compatibility with AI SDK's JSONSchema7 type
-  // io:"input" converts the input side of transforms (what AI should pass, not the output)
-  // unrepresentable:"any" prevents throwing on types that can't be represented
-  // override handles edge cases: transform inputs and z.custom() types
-  const jsonSchemaObject = z.toJSONSchema(zodSchemaWithTransforms, {
-    target: "draft-7",
-    io: "input",
-    unrepresentable: "any",
-    override: (ctx) => {
-      // For custom types (e.g. z.custom<T>()), describe as generic JSON object
-      if (ctx.zodSchema._zod.def.type === "custom") {
-        ctx.jsonSchema.type = "object";
-      }
-    },
-  });
+  // Provider-safe draft-7 JSON Schema (recursive refs inlined, see tool-json-schema.ts)
+  const jsonSchemaObject = toolInputToJsonSchema(zodSchemaWithTransforms);
 
   // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
   const toolName = getPreferredToolName(endpoint);
@@ -145,49 +133,46 @@ function createToolFromEndpoint(
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
-  const inputSchema = jsonSchema<Record<string, WidgetData>>(
-    jsonSchemaObject as JSONSchema7,
-    {
-      validate: (value) => {
-        // Extract callbackMode before validation (not part of endpoint schema).
-        // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
-        // and by the execute handler below for async modes (detach, wakeUp).
-        const callbackModeRaw =
-          typeof value === "object" &&
-          value !== null &&
-          "callbackMode" in value &&
-          typeof value.callbackMode === "string"
-            ? value.callbackMode
-            : undefined;
+  const inputSchema = jsonSchema<Record<string, WidgetData>>(jsonSchemaObject, {
+    validate: (value) => {
+      // Extract callbackMode before validation (not part of endpoint schema).
+      // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
+      // and by the execute handler below for async modes (detach, wakeUp).
+      const callbackModeRaw =
+        typeof value === "object" &&
+        value !== null &&
+        "callbackMode" in value &&
+        typeof value.callbackMode === "string"
+          ? value.callbackMode
+          : undefined;
 
-        // Use the original Zod schema (with transforms) for validation
-        const result = zodSchemaWithTransforms.safeParse(value);
-        if (result.success) {
-          const typedResult = z
-            .record(z.string(), WidgetDataSchema)
-            .safeParse(result.data);
-          if (!typedResult.success) {
-            return {
-              success: false,
-              error: typedResult.error,
-            };
-          }
-          // Add callbackMode back to the validated data so it reaches tool-call-handler
+      // Use the original Zod schema (with transforms) for validation
+      const result = zodSchemaWithTransforms.safeParse(value);
+      if (result.success) {
+        const typedResult = z
+          .record(z.string(), WidgetDataSchema)
+          .safeParse(result.data);
+        if (!typedResult.success) {
           return {
-            success: true,
-            value:
-              callbackModeRaw !== undefined
-                ? { ...typedResult.data, callbackMode: callbackModeRaw }
-                : typedResult.data,
+            success: false,
+            error: typedResult.error,
           };
         }
+        // Add callbackMode back to the validated data so it reaches tool-call-handler
         return {
-          success: false,
-          error: result.error,
+          success: true,
+          value:
+            callbackModeRaw !== undefined
+              ? { ...typedResult.data, callbackMode: callbackModeRaw }
+              : typedResult.data,
         };
-      },
+      }
+      return {
+        success: false,
+        error: result.error,
+      };
     },
-  );
+  });
 
   return tool({
     description,

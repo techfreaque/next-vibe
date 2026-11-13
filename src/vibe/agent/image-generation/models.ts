@@ -56,6 +56,12 @@ export enum ImageGenModelId {
   GROK_IMAGINE_IMAGE_2 = "grok-imagine-image-2",
   QWEN_IMAGE_3 = "qwen-image-3",
   QWEN_IMAGE_3_PRO = "qwen-image-3-pro",
+  // Media refresh 2026-11-13
+  SEEDREAM_5_5 = "seedream-5.5",
+  FLUX_3_IMAGE = "flux-3-image",
+  FLUX_3_KLEIN = "flux-3-klein",
+  GPT_IMAGE_2_6_FLARE = "gpt-image-2.6-flare",
+  GPT_IMAGE_2_6_SUNBURST = "gpt-image-2.6-sunburst",
   // Uncensored image models via Venice.ai (added 2026-11-07)
   LUSTIFY_V8 = "lustify-v8",
   CHROMA = "chroma",
@@ -68,6 +74,7 @@ export enum ImageGenModelId {
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
   GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
+  GEMINI_NANO_BANANA_2_1 = "gemini-nano-banana-2.1",
   // END:llm-generated
 }
 
@@ -78,6 +85,7 @@ export const llmImageGenModelIds = [
   ImageGenModelId.GPT_5_IMAGE_MINI,
   ImageGenModelId.GPT_5_IMAGE,
   ImageGenModelId.GPT_5_4_IMAGE_2,
+  ImageGenModelId.GEMINI_NANO_BANANA_2_1,
 ] as const satisfies ImageGenModelId[];
 
 type DedicatedImageGenModelId = Exclude<
@@ -164,7 +172,9 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
+    // LEGACY 2026-11-13: superseded by FLUX.3 (newer, $0.048 vs $0.07 per 1K image).
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -208,7 +218,8 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    // LEGACY 2026-11-13: superseded by FLUX.3 Klein ($0.009 per 1K image).
+    utilities: [ModelUtility.LEGACY, ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -331,7 +342,9 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
+    // LEGACY 2026-11-13: superseded by Riverflow V2 Pro (preview id removed from OpenRouter).
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -372,7 +385,12 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-13: superseded by Riverflow V2 Pro (preview id removed from OpenRouter).
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -409,7 +427,8 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    // LEGACY 2026-11-13: superseded by Riverflow V2 Fast (preview id removed from OpenRouter).
+    utilities: [ModelUtility.LEGACY, ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -552,7 +571,12 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-13: superseded by Seedream 5.5 (newer, $0.02 vs $0.04 per image).
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -1146,6 +1170,175 @@ export const imageGenModelDefinitions: Record<
       streaming: false,
     },
   },
+
+  // ── Media refresh 2026-11-13 ──────────────────────────────────────────────
+
+  [ImageGenModelId.SEEDREAM_5_5]: {
+    name: "Seedream 5.5",
+    by: "byteDanceSeed",
+    description: "chat.models.descriptions.seedream55",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api (input_references 0-10)
+    outputs: ["image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.SEEDREAM_5_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "bytedance-seed/seedream-5-5",
+        creditCostPerImage: 2, // updated: 2026-11-13 from openrouter-api ($0.02/image, $0.035 high-res)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.FLUX_3_IMAGE]: {
+    name: "FLUX.3",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux3Image",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.FLUX_3_IMAGE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux-3-image",
+        creditCostPerImage: 4.8, // updated: 2026-11-13 from openrouter-api ($0.048/image at 1K)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.FLUX_3_KLEIN]: {
+    name: "FLUX.3 Klein",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux3Klein",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.FLUX_3_KLEIN,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux-3-image-klein",
+        creditCostPerImage: 0.9, // updated: 2026-11-13 from openrouter-api ($0.009/image at 1K)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.GPT_IMAGE_2_6_FLARE]: {
+    // Token-priced upstream: the per-image price updater cannot verify a flat
+    // price, so keep it enabled with the probed estimate below.
+    enabledWithoutPrice: true,
+    name: "GPT Image 2.6 Flare",
+    by: "openAI",
+    description: "chat.models.descriptions.gptImage26Flare",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.GPT_IMAGE_2_6_FLARE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-image-2.6-flare",
+        // Token-priced upstream ($30/M image tokens). Probe 2026-11-13, default
+        // quality 1K: 903 image tokens = $0.027. Flat price covers ~1.3k tokens.
+        creditCostPerImage: 4, // updated: 2026-11-13 from openrouter-api (probe $0.027/image)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.GPT_IMAGE_2_6_SUNBURST]: {
+    // Token-priced upstream: the per-image price updater cannot verify a flat
+    // price, so keep it enabled with the probed estimate below.
+    enabledWithoutPrice: true,
+    name: "GPT Image 2.6 Sunburst",
+    by: "openAI",
+    description: "chat.models.descriptions.gptImage26Sunburst",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.GPT_IMAGE_2_6_SUNBURST,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-image-2.6-sunburst",
+        // Token-priced upstream ($30/M image tokens). Probe 2026-11-13, default
+        // quality 1K text poster: 1558 image tokens = $0.047. Flat price covers ~2k tokens.
+        creditCostPerImage: 6, // updated: 2026-11-13 from openrouter-api (probe $0.047/image)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
   [ImageGenModelId.LUSTIFY_V8]: {
     name: "Lustify v8",
     by: "veniceAI",
@@ -1455,6 +1648,20 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 8, // released: 2026-04-21 from openrouter
           outputTokenCost: 15, // released: 2026-04-21 from openrouter
+        } satisfies ModelProviderConfigTokenBased,
+      ],
+    ),
+    chatModelToImageGenOption(
+      ImageGenModelId.GEMINI_NANO_BANANA_2_1,
+      ChatModelId.GEMINI_NANO_BANANA_2_1,
+      [
+        {
+          id: ImageGenModelId.GEMINI_NANO_BANANA_2_1,
+          apiProvider: ApiProvider.OPENROUTER,
+          providerModel: "google/gemini-nano-banana-2.1",
+          creditCost: calculateCreditCost,
+          inputTokenCost: 1.5, // updated: 2026-11-13 from openrouter-api
+          outputTokenCost: 7.5, // updated: 2026-11-13 from openrouter-api (image tokens $30/M, probe 1K image = $0.035)
         } satisfies ModelProviderConfigTokenBased,
       ],
     ),

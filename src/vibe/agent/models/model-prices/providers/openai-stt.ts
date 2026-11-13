@@ -81,7 +81,19 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
       waitForText: "whisper",
     });
 
-    const priceMap = pageText ? parseSttPricing(pageText, logger) : new Map();
+    if (!pageText) {
+      return {
+        provider: this.providerName,
+        modelsFound: 0,
+        modelsUpdated: 0,
+        updates,
+        failures,
+        error: `Could not render ${PRICING_URL}`,
+        // Could not check: keep prior verified state instead of disabling.
+        failedApiProviders: [ApiProvider.OPENAI_STT],
+      };
+    }
+    const priceMap = parseSttPricing(pageText, logger);
 
     for (const def of Object.values(sttModelDefinitions)) {
       for (const providerConfig of def.providers) {

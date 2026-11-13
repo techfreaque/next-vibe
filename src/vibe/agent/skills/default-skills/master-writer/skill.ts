@@ -102,7 +102,7 @@ export const masterWriterSkill: Skill = {
       weakness: "skills.masterWriter.variantInfo.poetic.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M3,
+        manualModelId: ChatModelId.MINIMAX_M3_1_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

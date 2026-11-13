@@ -1,15 +1,16 @@
 /**
  * Deepgram STT price fetcher.
  *
- * Scrapes pricing from https://deepgram.com/pricing
- * The page renders pricing tables in HTML with model names and $/min rates.
+ * Scrapes pricing from https://deepgram.com/pricing (server-rendered HTML).
  *
- * Pricing unit: USD per minute → converted to USD per second.
+ * Pricing unit: USD per minute (or per hour) → converted to USD per second.
  * We use pay-as-you-go (first price column) as the base rate.
  *
- * Known model name mappings (from Deepgram API model names → pricing page labels):
- *   nova-2  →  "Nova-1 & 2"  →  $0.0058/min
- *   nova-3  →  "Nova-3 (Monolingual)"  →  $0.0077/min
+ * Page formats (2026-11):
+ *   Table row:  "Nova-3 Monolingual $0.0048 was $0.0077 / min $0.0042 was $0.0065 / min -"
+ *               (first "$X" is the current pay-as-you-go price, "was $Y" the old one)
+ *   Nova-2 is no longer a table row; its rate lives in the FAQ (JSON-LD):
+ *               "Nova-2 streaming $0.35 an hour, Enhanced $0.99, Base $0.87."
  */
 
 import "server-only";
@@ -24,16 +25,76 @@ import { PriceFetcher } from "./base";
 
 const PRICING_URL = "https://deepgram.com/pricing";
 
-/** Maps providerModel (Deepgram API name) → pricing page label pattern */
-const MODEL_LABEL_MAP: Record<string, RegExp> = {
-  "nova-2": /Nova-?1\s*[&amp;]+\s*2/i,
-  "nova-3": /Nova-?3\s*\(Monolingual\)/i,
+/** providerModel (Deepgram API name) → pricing table row label */
+const TABLE_LABEL_MAP: Record<string, RegExp> = {
+  "nova-3": /^Nova-?3\s*\(?Monolingual\)?/i,
 };
+
+/** providerModel → per-hour rate stated in page copy (models dropped from the table) */
+const HOURLY_TEXT_MAP: Record<string, RegExp> = {
+  "nova-2": /Nova-?2 streaming \$(\d+(?:\.\d+)?) an hour/i,
+};
+
+/** First "$X / min" in a row, skipping a struck-through "was $Y". */
+const ROW_PRICE_REGEX =
+  /\$(\d+(?:\.\d+)?)(?:\s+was\s+\$\d+(?:\.\d+)?)?\s*\/\s*min\b/;
+
+function decodeEntities(text: string): string {
+  return text
+    .replaceAll("&amp;", "&")
+    .replaceAll("&nbsp;", " ")
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&quot;", '"');
+}
+
+function parsePricing(
+  html: string,
+  logger: EndpointLogger,
+): Map<string, number> {
+  const priceMap = new Map<string, number>();
+
+  // Table rows: model label + one or more "$X / min" prices
+  const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let rowMatch: RegExpExecArray | null;
+  while ((rowMatch = rowRegex.exec(html)) !== null) {
+    const rowText = decodeEntities(rowMatch[1].replaceAll(/<[^>]+>/g, " "))
+      .replaceAll(/\s+/g, " ")
+      .trim();
+    const priceMatch = ROW_PRICE_REGEX.exec(rowText);
+    if (!priceMatch) {
+      continue;
+    }
+    const usdPerMin = parseFloat(priceMatch[1]);
+    if (isNaN(usdPerMin) || usdPerMin <= 0) {
+      continue;
+    }
+    for (const [modelId, labelRegex] of Object.entries(TABLE_LABEL_MAP)) {
+      if (!priceMap.has(modelId) && labelRegex.test(rowText)) {
+        priceMap.set(modelId, usdPerMin / 60);
+        break;
+      }
+    }
+  }
+
+  // Per-hour rates stated in page copy
+  const plainText = decodeEntities(html);
+  for (const [modelId, textRegex] of Object.entries(HOURLY_TEXT_MAP)) {
+    const match = textRegex.exec(plainText);
+    const usdPerHour = match ? parseFloat(match[1]) : NaN;
+    if (!priceMap.has(modelId) && !isNaN(usdPerHour) && usdPerHour > 0) {
+      priceMap.set(modelId, usdPerHour / 3600);
+    }
+  }
+
+  logger.debug("Deepgram pricing scraped", {
+    models: [...priceMap.keys()].join(","),
+  });
+  return priceMap;
+}
 
 async function scrapePricing(
   logger: EndpointLogger,
 ): Promise<{ map: Map<string, number>; error?: string }> {
-  const priceMap = new Map<string, number>();
   try {
     // oxlint-disable-next-line restricted/no-raw-fetch -- external API
     const response = await fetch(PRICING_URL, {
@@ -41,47 +102,21 @@ async function scrapePricing(
     });
     if (!response.ok) {
       return {
-        map: priceMap,
+        map: new Map(),
         error: `Deepgram pricing page returned ${response.status.toString()}`,
       };
     }
-    const html = await response.text();
-
-    // Extract table rows: each row has a model label and one or more $/min prices
-    const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-    let rowMatch: RegExpExecArray | null;
-
-    while ((rowMatch = rowRegex.exec(html)) !== null) {
-      const rowHtml = rowMatch[1];
-      const rowText = rowHtml
-        .replaceAll(/<[^>]+>/g, " ")
-        .replaceAll(/\s+/g, " ")
-        .trim();
-
-      // Extract first $/min price (pay-as-you-go rate)
-      const priceMatch = rowText.match(/\$([\d.]+)\/min/);
-      if (!priceMatch) {
-        continue;
-      }
-      const usdPerMin = parseFloat(priceMatch[1]);
-      if (isNaN(usdPerMin) || usdPerMin <= 0) {
-        continue;
-      }
-
-      // Match against known model label patterns
-      for (const [modelId, labelRegex] of Object.entries(MODEL_LABEL_MAP)) {
-        if (labelRegex.test(rowText)) {
-          priceMap.set(modelId, usdPerMin / 60); // convert to per-second
-          break;
-        }
-      }
+    const map = parsePricing(await response.text(), logger);
+    if (map.size === 0) {
+      return {
+        map,
+        error: `No prices parsed from ${PRICING_URL} - page layout changed? Update TABLE_LABEL_MAP / HOURLY_TEXT_MAP in deepgram.ts`,
+      };
     }
-
-    logger.debug("Deepgram pricing scraped", { models: [...priceMap.keys()] });
+    return { map };
   } catch (err) {
-    return { map: priceMap, error: parseError(err).message };
+    return { map: new Map(), error: parseError(err).message };
   }
-  return { map: priceMap };
 }
 
 export class DeepgramPriceFetcher extends PriceFetcher {
@@ -100,6 +135,8 @@ export class DeepgramPriceFetcher extends PriceFetcher {
         updates,
         failures,
         error: scrapeError,
+        // Could not check: keep prior verified state instead of disabling.
+        failedApiProviders: [ApiProvider.DEEPGRAM],
       };
     }
 
@@ -117,7 +154,7 @@ export class DeepgramPriceFetcher extends PriceFetcher {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.DEEPGRAM,
-            reason: `Model "${providerConfig.providerModel}" not found on Deepgram pricing page - update MODEL_LABEL_MAP in deepgram.ts if the label changed`,
+            reason: `Model "${providerConfig.providerModel}" not found on Deepgram pricing page - update TABLE_LABEL_MAP / HOURLY_TEXT_MAP in deepgram.ts if the label changed`,
           });
           continue;
         }

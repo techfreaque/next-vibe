@@ -1,22 +1,17 @@
 /**
  * ElevenLabs TTS price fetcher.
  *
- * Uses the ElevenLabs authenticated API to fetch our actual subscription tier,
- * then computes the real per-character cost in USD based on plan overage rates.
+ * ElevenLabs API usage is billed in USD per 1K characters at one flat rate
+ * across plans (2026-11), published on the keyless, server-rendered page
+ * https://elevenlabs.io/pricing/api. Its FAQ (also in JSON-LD) states:
+ *   "Text to Speech $0.08 per 1,000 characters (multilingual models) or $0.04 (Flash/Turbo)."
  *
- * ElevenLabs pricing model:
- *   - Plans include a monthly character allowance
- *   - Overages (and API usage beyond the plan) are billed per character
- *   - Cost per character depends on subscription tier:
- *       Creator: $0.30/1K chars  → $0.0003/char
- *       Pro:     $0.24/1K chars  → $0.00024/char
- *       Scale:   $0.18/1K chars  → $0.00018/char
- *       Business:$0.12/1K chars  → $0.00012/char
+ * Our runtime synthesizes every ElevenLabs voice with a standard (non-Flash)
+ * model (`model_id` in text-to-speech/repository.ts and
+ * ai-stream/.../streaming-tts.ts), so the multilingual rate applies.
  *
- * If no API key is available, we fall back to the Creator (lowest) plan rate.
- *
- * API: GET https://api.elevenlabs.io/v1/user/subscription
- * Docs: https://elevenlabs.io/docs/api-reference/user/get-user-subscription
+ * Voice IDs can't be checked keylessly (the voices API needs xi-api-key), so
+ * this fetcher only verifies the price.
  */
 
 import "server-only";
@@ -24,71 +19,54 @@ import "server-only";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { agentEnv } from "../../../env";
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
-const SUBSCRIPTION_URL = "https://api.elevenlabs.io/v1/user/subscription";
+const PRICING_URL = "https://elevenlabs.io/pricing/api";
 
-interface ElevenLabsSubscription {
-  tier?: string;
-  character_count?: number;
-  character_limit?: number;
-  next_character_count_reset_unix?: number;
+/** Standard-model rate, FAQ wording first, model card as fallback. */
+const STANDARD_RATE_REGEXES = [
+  /Text to Speech \$(\d+(?:\.\d+)?) per 1,000 characters \(multilingual models\)/i,
+  /v2 Multilingual Text to Speech \$(\d+(?:\.\d+)?) Price per 1K characters/i,
+];
+
+function htmlToText(html: string): string {
+  return html
+    .replaceAll(/<[^>]+>/g, " ")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&nbsp;", " ")
+    .replaceAll(/\s+/g, " ");
 }
-
-/** USD per character by ElevenLabs plan tier */
-const TIER_USD_PER_CHAR: Record<string, number> = {
-  creator: 0.3 / 1000,
-  pro: 0.24 / 1000,
-  scale: 0.18 / 1000,
-  business: 0.12 / 1000,
-  enterprise: 0.12 / 1000, // enterprise ≤ business tier rate
-  // Free / Starter tiers don't support significant API usage
-  starter: 0.3 / 1000,
-  free: 0.3 / 1000,
-};
-
-/** Default fallback: Creator plan rate (most common entry tier) */
-const DEFAULT_USD_PER_CHAR = TIER_USD_PER_CHAR["creator"];
 
 async function fetchUsdPerChar(
   logger: EndpointLogger,
-): Promise<number | undefined> {
-  const apiKey = agentEnv.ELEVENLABS_API_KEY;
-  if (!apiKey) {
-    logger.debug("ElevenLabs: no API key - cannot fetch subscription tier");
-    return undefined;
-  }
-
+): Promise<{ usdPerChar: number } | { error: string }> {
   try {
-    // oxlint-disable-next-line restricted/no-raw-fetch
-    const response = await fetch(SUBSCRIPTION_URL, {
-      headers: { "xi-api-key": apiKey },
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external API
+    const response = await fetch(PRICING_URL, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; unbottled-ai/1.0)" },
     });
     if (!response.ok) {
-      logger.debug("ElevenLabs subscription API error", {
-        status: response.status,
-      });
-      return undefined;
+      return {
+        error: `ElevenLabs pricing page returned ${response.status.toString()}`,
+      };
     }
-
-    const data = (await response.json()) as ElevenLabsSubscription;
-    const tier = (data.tier ?? "creator").toLowerCase();
-    const rate = TIER_USD_PER_CHAR[tier] ?? DEFAULT_USD_PER_CHAR;
-
-    logger.debug("ElevenLabs subscription tier fetched", {
-      tier,
-      usdPerChar: rate,
-    });
-    return rate;
+    const text = htmlToText(await response.text());
+    for (const regex of STANDARD_RATE_REGEXES) {
+      const match = regex.exec(text);
+      const usdPer1k = match ? parseFloat(match[1]) : NaN;
+      if (!isNaN(usdPer1k) && usdPer1k > 0) {
+        logger.debug("ElevenLabs API rate parsed", { usdPer1k });
+        return { usdPerChar: usdPer1k / 1000 };
+      }
+    }
+    return {
+      error: `No Text to Speech rate found on ${PRICING_URL} - page layout changed? Update STANDARD_RATE_REGEXES in elevenlabs.ts`,
+    };
   } catch (err) {
-    logger.debug("ElevenLabs subscription fetch failed", {
-      error: parseError(err).message,
-    });
-    return undefined;
+    return { error: parseError(err).message };
   }
 }
 
@@ -99,7 +77,19 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const usdPerChar = await fetchUsdPerChar(logger);
+    const rate = await fetchUsdPerChar(logger);
+    if ("error" in rate) {
+      return {
+        provider: this.providerName,
+        modelsFound: 0,
+        modelsUpdated: 0,
+        updates,
+        failures,
+        error: rate.error,
+        // Could not check: keep prior verified state instead of disabling.
+        failedApiProviders: [ApiProvider.ELEVENLABS],
+      };
+    }
 
     for (const def of Object.values(ttsModelDefinitions)) {
       for (const providerConfig of def.providers) {
@@ -109,24 +99,13 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
         ) {
           continue;
         }
-
-        if (usdPerChar === undefined) {
-          failures.push({
-            modelId: providerConfig.id,
-            provider: ApiProvider.ELEVENLABS,
-            reason:
-              "ElevenLabs API key missing or subscription fetch failed - cannot verify price",
-          });
-          continue;
-        }
-
         updates.push({
           modelId: providerConfig.id,
           name: def.name,
           provider: ApiProvider.ELEVENLABS,
           field: "creditCostPerCharacter",
-          value: this.usdToCredits(usdPerChar),
-          source: SUBSCRIPTION_URL,
+          value: this.usdToCreditsPrecise(rate.usdPerChar),
+          source: PRICING_URL,
           providerModel: providerConfig.providerModel,
         });
       }
@@ -134,12 +113,12 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
 
     logger.debug("ElevenLabs TTS prices set", {
       count: updates.length,
-      usdPerChar,
+      usdPerChar: rate.usdPerChar,
     });
 
     return {
       provider: this.providerName,
-      modelsFound: updates.length + failures.length,
+      modelsFound: updates.length,
       modelsUpdated: updates.length,
       updates,
       failures,

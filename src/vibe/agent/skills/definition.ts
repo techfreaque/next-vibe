@@ -542,7 +542,7 @@ const { GET } = createEndpoint({
               {
                 skillId: "default",
                 icon: "robot-face",
-                modelId: ChatModelId.CLAUDE_SONNET_4_5,
+                modelId: ChatModelId.CLAUDE_SONNET_5_5,
                 category: SkillCategory.ASSISTANT,
                 name: "skills.thea.name",
                 tagline: "skills.thea.tagline",
@@ -567,7 +567,7 @@ const { GET } = createEndpoint({
               {
                 skillId: "hermes-code-reviewer",
                 icon: "direct-hit",
-                modelId: ChatModelId.GPT_5,
+                modelId: ChatModelId.GPT_6_1_SOL,
                 category: SkillCategory.CODING,
                 name: "skills.hermes.name",
                 tagline: "skills.hermes.tagline",

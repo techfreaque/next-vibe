@@ -16,6 +16,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { sttModelDefinitions } from "../../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
@@ -28,20 +29,22 @@ const API_URL = "https://api.edenai.run/v2/info/provider_subfeatures";
 /** Eden AI platform fee (5.5%) applied on top of provider prices */
 const PLATFORM_FEE_MULTIPLIER = 1.055;
 
-interface EdenAiPricing {
-  model_name: string;
-  price: string;
-  price_unit_quantity: number;
-  price_unit_type: string;
-}
+const edenAiSubfeatureSchema = z.object({
+  provider: z.object({ name: z.string() }),
+  feature: z.object({ name: z.string() }),
+  subfeature: z.object({ name: z.string() }),
+  pricings: z.array(
+    z.object({
+      model_name: z.string().nullish(),
+      price: z.string(),
+      price_unit_quantity: z.number(),
+      price_unit_type: z.string(),
+    }),
+  ),
+});
 
-interface EdenAiSubfeature {
-  name: string;
-  provider: { name: string };
-  feature: { name: string };
-  subfeature: { name: string };
-  pricings: EdenAiPricing[];
-}
+/** Items are validated one by one so a single odd entry can't sink the run. */
+const edenAiResponseSchema = z.array(z.looseObject({}));
 
 /**
  * Fetch TTS/STT pricing from Eden AI's public provider_subfeatures API.
@@ -50,6 +53,7 @@ interface EdenAiSubfeature {
 async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
   tts: Map<string, number>;
   stt: Map<string, number>;
+  error?: string;
 }> {
   const tts = new Map<string, number>();
   const stt = new Map<string, number>();
@@ -63,12 +67,28 @@ async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
       logger.debug("Eden AI API returned non-OK", {
         status: response.status,
       });
-      return { tts, stt };
+      return {
+        tts,
+        stt,
+        error: `Eden AI API returned ${response.status.toString()}`,
+      };
     }
 
-    const data = (await response.json()) as EdenAiSubfeature[];
+    const parsedList = edenAiResponseSchema.safeParse(await response.json());
+    if (!parsedList.success) {
+      return {
+        tts,
+        stt,
+        error: `Eden AI API returned an unexpected shape: ${parsedList.error.message}`,
+      };
+    }
 
-    for (const item of data) {
+    for (const rawItem of parsedList.data) {
+      const parsedItem = edenAiSubfeatureSchema.safeParse(rawItem);
+      if (!parsedItem.success) {
+        continue;
+      }
+      const item = parsedItem.data;
       const provider = item.provider.name;
       const subfeature = item.subfeature.name;
 
@@ -89,7 +109,7 @@ async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
                 tts.set(provider, usdPerChar);
                 logger.debug("Eden AI TTS price", {
                   provider,
-                  model: pricing.model_name,
+                  model: pricing.model_name ?? "default",
                   usdPerChar,
                 });
               }
@@ -118,7 +138,7 @@ async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
                 stt.set(provider, usdPerSec);
                 logger.debug("Eden AI STT price", {
                   provider,
-                  model: pricing.model_name,
+                  model: pricing.model_name ?? "default",
                   usdPerSec,
                 });
               }
@@ -128,9 +148,9 @@ async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
       }
     }
   } catch (err) {
-    logger.debug("Eden AI pricing fetch failed", {
-      error: parseError(err).message,
-    });
+    const error = parseError(err).message;
+    logger.debug("Eden AI pricing fetch failed", { error });
+    return { tts, stt, error };
   }
 
   return { tts, stt };
@@ -143,7 +163,19 @@ export class EdenAiPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const { tts, stt } = await fetchEdenAiPricing(logger);
+    const { tts, stt, error } = await fetchEdenAiPricing(logger);
+    if (error) {
+      return {
+        provider: this.providerName,
+        modelsFound: 0,
+        modelsUpdated: 0,
+        updates,
+        failures,
+        error,
+        // Could not check: keep prior verified state instead of disabling.
+        failedApiProviders: [ApiProvider.EDEN_AI_TTS, ApiProvider.EDEN_AI_STT],
+      };
+    }
 
     for (const def of [
       ...Object.values(ttsModelDefinitions),

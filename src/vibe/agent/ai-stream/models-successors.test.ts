@@ -311,6 +311,10 @@ describe("model browser", () => {
       ChatModelId.CLAUDE_OPUS_5_5,
       ChatModelId.GPT_6_1_SOL,
       ChatModelId.GEMINI_4_ARGON,
+      ChatModelId.GEMINI_4_CARBON,
+      ChatModelId.GEMINI_4_HYDROGEN,
+      ChatModelId.MINIMAX_M3_1_FLASH,
+      ChatModelId.META_MUSE_EMBER,
       ChatModelId.GROK_4_7,
       ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
       ChatModelId.GLM_5_3_UNCENSORED,
@@ -321,6 +325,8 @@ describe("model browser", () => {
       ChatModelId.CLAUDE_OPUS_5,
       ChatModelId.GPT_5_6_SOL,
       ChatModelId.GROK_4_6,
+      ChatModelId.GROK_4_FAST,
+      ChatModelId.MINIMAX_M3,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(false);
     }

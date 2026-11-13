@@ -239,6 +239,9 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.GPT_5_4_IMAGE_2]: makeImageVisionOption(
     ImageVisionModelId.GPT_5_4_IMAGE_2,
   ),
+  [ImageVisionModelId.GEMINI_NANO_BANANA_2_1]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_NANO_BANANA_2_1,
+  ),
   [ImageVisionModelId.KIMI_K2_6]: makeImageVisionOption(
     ImageVisionModelId.KIMI_K2_6,
   ),
@@ -371,10 +374,25 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.MISTRAL_LARGE_4]: makeImageVisionOption(
     ImageVisionModelId.MISTRAL_LARGE_4,
   ),
+  [ImageVisionModelId.GEMINI_4_HYDROGEN]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_4_HYDROGEN,
+  ),
+  [ImageVisionModelId.GEMINI_4_CARBON]: makeImageVisionOption(
+    ImageVisionModelId.GEMINI_4_CARBON,
+  ),
+  [ImageVisionModelId.MINIMAX_M3_1_FLASH]: makeImageVisionOption(
+    ImageVisionModelId.MINIMAX_M3_1_FLASH,
+  ),
+  [ImageVisionModelId.META_MUSE_EMBER]: makeImageVisionOption(
+    ImageVisionModelId.META_MUSE_EMBER,
+  ),
   [ImageVisionModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED]:
     makeImageVisionOption(
       ImageVisionModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
     ),
+  [ImageVisionModelId.DRUMMER_ARTEMIS_31B]: makeImageVisionOption(
+    ImageVisionModelId.DRUMMER_ARTEMIS_31B,
+  ),
 };
 
 const videoVisionModelOptionsIndex: Record<
@@ -460,6 +478,18 @@ const videoVisionModelOptionsIndex: Record<
   [VideoVisionModelId.META_MUSE_WONDER]: makeVideoVisionOption(
     VideoVisionModelId.META_MUSE_WONDER,
   ),
+  [VideoVisionModelId.GEMINI_4_HYDROGEN]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_4_HYDROGEN,
+  ),
+  [VideoVisionModelId.GEMINI_4_CARBON]: makeVideoVisionOption(
+    VideoVisionModelId.GEMINI_4_CARBON,
+  ),
+  [VideoVisionModelId.MINIMAX_M3_1_FLASH]: makeVideoVisionOption(
+    VideoVisionModelId.MINIMAX_M3_1_FLASH,
+  ),
+  [VideoVisionModelId.META_MUSE_EMBER]: makeVideoVisionOption(
+    VideoVisionModelId.META_MUSE_EMBER,
+  ),
 };
 
 const audioVisionModelOptionsIndex: Record<
@@ -514,6 +544,15 @@ const audioVisionModelOptionsIndex: Record<
   ),
   [AudioVisionModelId.META_MUSE_WONDER]: makeAudioVisionOption(
     AudioVisionModelId.META_MUSE_WONDER,
+  ),
+  [AudioVisionModelId.GEMINI_4_HYDROGEN]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_4_HYDROGEN,
+  ),
+  [AudioVisionModelId.GEMINI_4_CARBON]: makeAudioVisionOption(
+    AudioVisionModelId.GEMINI_4_CARBON,
+  ),
+  [AudioVisionModelId.META_MUSE_EMBER]: makeAudioVisionOption(
+    AudioVisionModelId.META_MUSE_EMBER,
   ),
 };
 

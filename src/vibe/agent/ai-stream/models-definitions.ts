@@ -91,6 +91,7 @@ export enum ChatModelId {
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
   GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
+  GEMINI_NANO_BANANA_2_1 = "gemini-nano-banana-2.1",
   KIMI_K2_6 = "kimi-k2.6",
   DEEPSEEK_V4_PRO = "deepseek-v4-pro",
   DEEPSEEK_V4_FLASH = "deepseek-v4-flash",
@@ -144,6 +145,13 @@ export enum ChatModelId {
   META_MUSE_WONDER = "meta-muse-wonder",
   MISTRAL_LARGE_4 = "mistral-large-4",
   VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED = "venice-deepseek-v4.1-flash-uncensored",
+  // Mainstream models added 2026-11-13
+  GEMINI_4_HYDROGEN = "gemini-4-hydrogen",
+  GEMINI_4_CARBON = "gemini-4-carbon",
+  MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
+  META_MUSE_EMBER = "meta-muse-ember",
+  // Uncensored models added 2026-11-13
+  DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
 }
 
 export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
@@ -1028,11 +1036,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.GROK_4_FAST,
         apiProvider: ApiProvider.OPENROUTER,
+        // x-ai/grok-4-fast is gone from OpenRouter; this id has been served
+        // by Grok 4.3, so it carries Grok 4.3's real price.
         providerModel: "x-ai/grok-4.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
-        outputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
-        cacheReadTokenCost: 0.05, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 1.25, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 2.5, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-11-13 from openrouter-api
       },
       {
         id: ChatModelId.GROK_4_FAST,
@@ -1045,7 +1055,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.LEGACY],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -2736,7 +2746,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
       },
     ],
+    // LEGACY 2026-11-13: superseded by Nano Banana 2.1 (half the image-token price).
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.CHAT,
       ModelUtility.CREATIVE,
       ModelUtility.IMAGE_GEN,
@@ -3175,6 +3187,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.REASONING,
+      ModelUtility.LEGACY,
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
@@ -3461,7 +3474,11 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
+    // LEGACY 2026-11-13: OpenRouter retires openai/gpt-5-image-mini on
+    // 2026-12-01. Chat-image successor: Nano Banana 2.1; for OpenAI quality use
+    // the dedicated GPT Image 2.6 Flare / Sunburst image models.
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.FAST,
@@ -3551,8 +3568,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     // LEGACY 2026-11-09: 502s upstream on OpenRouter ("Complexity 'none' is not
-    // supported for this image model" / provider_unavailable). Superseded by
-    // GPT-5 Image Mini, the only working OpenAI image model on OpenRouter (probed).
+    // supported for this image model" / provider_unavailable). Superseded
+    // 2026-11-13 by Nano Banana 2.1 (OpenAI's chat-image ids all expire in
+    // Dec 2026; dedicated GPT Image 2.6 lives in image-generation/models.ts).
     utilities: [
       ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
@@ -3568,6 +3586,36 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       streaming: false,
       supportsTemperature: false,
     },
+  },
+  // eslint-disable-next-line i18next/no-literal-string
+  [ChatModelId.GEMINI_NANO_BANANA_2_1]: {
+    name: "Nano Banana 2.1",
+    by: "google",
+    description: "chat.models.descriptions.geminiNanoBanana21",
+    parameterCount: undefined,
+    contextWindow: 65536,
+    icon: "si-googlegemini",
+    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GEMINI_NANO_BANANA_2_1,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-nano-banana-2.1",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 7.5, // updated: 2026-11-13 from openrouter-api (image tokens $30/M, probe 1K image = $0.035)
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, streaming: false },
   },
 
   // ── New models added 2026-08-16 ───────────────────────────────────────────
@@ -4396,6 +4444,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.REASONING,
+      ModelUtility.LEGACY,
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
@@ -5252,11 +5301,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       {
         id: ChatModelId.DEEPSEEK_V4_1_FLASH,
         apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "deepseek/deepseek-v4.1-flash",
+        // The 2026-10-17 snapshot is what DeepSeek serves as deepseek-flash
+        // (also behind ~deepseek/deepseek-flash-latest). The undated alias is
+        // now listed at 0.30 / 1.20, so pin the snapshot.
+        providerModel: "deepseek/deepseek-v4.1-flash-1017",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.05, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 0.57, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.02, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.04, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 0.5, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-13 from openrouter-api
       },
       {
         id: ChatModelId.DEEPSEEK_V4_1_FLASH,
@@ -5611,6 +5663,142 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
 
+  // Mainstream models added 2026-11-13
+  [ChatModelId.GEMINI_4_HYDROGEN]: {
+    name: "Gemini 4 Hydrogen",
+    by: "google",
+    description: "chat.models.descriptions.gemini4Hydrogen",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GEMINI_4_HYDROGEN,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-4-hydrogen",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 7.5, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
+        cacheWriteTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.FAST,
+      ModelUtility.ANALYSIS,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.GEMINI_4_CARBON]: {
+    name: "Gemini 4 Carbon",
+    by: "google",
+    description: "chat.models.descriptions.gemini4Carbon",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    inputs: ["text", "image", "video", "audio"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.GEMINI_4_CARBON,
+        apiProvider: ApiProvider.OPENROUTER,
+        // Google's introductory price runs to 2026-11-30, then $4 / $20.
+        providerModel: "google/gemini-4-carbon",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.1, // updated: 2026-11-13 from openrouter-api
+        cacheWriteTokenCost: 0.19, // updated: 2026-11-13 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.MINIMAX_M3_1_FLASH]: {
+    name: "MiniMax M3.1 Flash",
+    by: "miniMax",
+    description: "chat.models.descriptions.minimaxM31Flash",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-minimax",
+    inputs: ["text", "image", "video"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.MINIMAX_M3_1_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "minimax/minimax-m3.1-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 0.3, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-13 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.CHAT,
+      ModelUtility.FAST,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.META_MUSE_EMBER]: {
+    name: "Meta Muse Ember",
+    by: "meta",
+    description: "chat.models.descriptions.metaMuseEmber",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "cpu",
+    inputs: ["text", "image", "video", "audio"], // updated: 2026-11-13 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-13 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.META_MUSE_EMBER,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "meta/muse-ember",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1, // updated: 2026-11-13 from openrouter-api
+        outputTokenCost: 0.5, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0, // updated: 2026-11-13 from openrouter-api
+        cacheWriteTokenCost: 0.13, // updated: 2026-11-13 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.CHAT,
+      ModelUtility.FAST,
+      ModelUtility.CODING,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
   [ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED]: {
     name: "DeepSeek V4.1 Flash Uncensored",
     by: "veniceAI",
@@ -5632,14 +5820,18 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 1.32, // updated: 2026-11-07 from nano-gpt-api
         cacheReadTokenCost: 0.00825, // updated: 2026-11-07 from nano-gpt-api
       },
+      // Venice: the 2026-10-17 snapshot, Venice's default text model and the
+      // same snapshot the mainstream DeepSeek V4.1 Flash pins. Same price as
+      // the undated alias. (NanoGPT's 1017 route runs on a single host, so
+      // the multi-host undated route above stays primary.)
       {
         id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
         apiProvider: ApiProvider.VENICE_AI,
-        providerModel: "deepseek-v4-1-flash-uncensored",
+        providerModel: "deepseek-v4-1-flash-1017-uncensored",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.33, // updated: 2026-11-07 from venice-api
-        outputTokenCost: 1.32, // updated: 2026-11-07 from venice-api
-        cacheReadTokenCost: 0.00825, // updated: 2026-11-07 from venice-api
+        inputTokenCost: 0.33, // updated: 2026-11-13 from venice-api
+        outputTokenCost: 1.32, // updated: 2026-11-13 from venice-api
+        cacheReadTokenCost: 0.00825, // updated: 2026-11-13 from venice-api
       },
       {
         id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
@@ -5681,6 +5873,46 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     content: ContentLevel.UNCENSORED,
     features: { ...defaultFeatures, toolCalling: true },
   },
+  // Uncensored models added 2026-11-13
+  [ChatModelId.DRUMMER_ARTEMIS_31B]: {
+    // TheDrummer's Gemma 4 31B roleplay/fiction finetune. Probed 2026-11-13:
+    // writes explicit adult and grimdark scenes without refusing, native tool
+    // calls work. v1.1 kept over the newer v1.2 route (v1.2: 64K context, no
+    // tools, single host that timed out on the probe).
+    name: "Artemis 31B",
+    by: "theDrummer",
+    description: "chat.models.descriptions.drummerArtemis31b",
+    parameterCount: 31,
+    contextWindow: 262144, // updated: 2026-11-13 from nano-gpt-api
+    icon: "theater",
+    inputs: ["text", "image"], // updated: 2026-11-13 from nano-gpt-api
+    outputs: ["text"], // updated: 2026-11-13 from nano-gpt-api
+    providers: [
+      {
+        id: ChatModelId.DRUMMER_ARTEMIS_31B,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "TheDrummer/Artemis-v1.1",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1, // updated: 2026-11-13 from nano-gpt-api
+        outputTokenCost: 0.45, // updated: 2026-11-13 from nano-gpt-api
+        cacheReadTokenCost: 0.05, // updated: 2026-11-13 from nano-gpt-api
+      },
+    ],
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.ROLEPLAY,
+      ModelUtility.ROLEPLAY_DARK,
+      ModelUtility.CREATIVE,
+      ModelUtility.ADULT_EXPLICIT,
+      ModelUtility.CHAT,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.UNCENSORED,
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+  },
 };
 
 /**
@@ -5708,10 +5940,15 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GPT_5_2]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_4]: ChatModelId.GPT_6_1_SOL,
   // GPT image: gpt-5-image returns no image, gpt-5.4-image-2 502s upstream
-  // (probed 2026-11-09). gpt-5-image-mini is the only working OpenAI image
-  // model on OpenRouter, so both broken ids resolve to it.
-  [ChatModelId.GPT_5_IMAGE]: ChatModelId.GPT_5_IMAGE_MINI,
-  [ChatModelId.GPT_5_4_IMAGE_2]: ChatModelId.GPT_5_IMAGE_MINI,
+  // (probed 2026-11-09); gpt-5-image-mini expires on OpenRouter 2026-12-01.
+  // No OpenAI chat-image model remains (GPT Image 2.6 is images-API only), so
+  // all three resolve to Nano Banana 2.1 (probed working 2026-11-13). Nano
+  // Banana (3.1 Flash Image preview) also resolves to its newer, cheaper 2.1.
+  [ChatModelId.GPT_5_IMAGE]: ChatModelId.GEMINI_NANO_BANANA_2_1,
+  [ChatModelId.GPT_5_4_IMAGE_2]: ChatModelId.GEMINI_NANO_BANANA_2_1,
+  [ChatModelId.GPT_5_IMAGE_MINI]: ChatModelId.GEMINI_NANO_BANANA_2_1,
+  [ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW]:
+    ChatModelId.GEMINI_NANO_BANANA_2_1,
   [ChatModelId.GPT_5_5]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_6_SOL]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_1_SOL,
@@ -5727,9 +5964,9 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GPT_5_4_MINI]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_6_LUNA]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_6_LUNA_PRO]: ChatModelId.GPT_6_LUNA,
-  [ChatModelId.GPT_5_NANO]: ChatModelId.GPT_5_4_NANO,
-  [ChatModelId.GPT_5_CODEX]: ChatModelId.GPT_5_3_CODEX,
-  [ChatModelId.GPT_5_1_CODEX]: ChatModelId.GPT_5_3_CODEX,
+  [ChatModelId.GPT_5_NANO]: ChatModelId.GPT_6_LUNA,
+  [ChatModelId.GPT_5_CODEX]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GPT_5_1_CODEX]: ChatModelId.GPT_6_1_SOL,
   [ChatModelId.GEMINI_2_5_PRO]: ChatModelId.GEMINI_4_ARGON,
   [ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS]: ChatModelId.GEMINI_4_ARGON,
   [ChatModelId.GEMINI_2_5_FLASH]: ChatModelId.GEMINI_3_8_FLASH,
@@ -5741,6 +5978,8 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]:
     ChatModelId.GEMINI_3_5_FLASH_LITE,
   [ChatModelId.GROK_4]: ChatModelId.GROK_4_7,
+  // Removed upstream: xAI's cheap Fast tier is gone from OpenRouter.
+  [ChatModelId.GROK_4_FAST]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_3]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_20]: ChatModelId.GROK_4_7,
   [ChatModelId.GROK_4_5]: ChatModelId.GROK_4_7,
@@ -5759,7 +5998,8 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GLM_5_2]: ChatModelId.GLM_5_3,
   [ChatModelId.GLM_4_5V]: ChatModelId.GLM_5_3_FLASH,
   [ChatModelId.GLM_4_7_FLASH]: ChatModelId.GLM_5_3_FLASH,
-  [ChatModelId.MINIMAX_M2_7]: ChatModelId.MINIMAX_M3,
+  [ChatModelId.MINIMAX_M2_7]: ChatModelId.MINIMAX_M3_1_FLASH,
+  [ChatModelId.MINIMAX_M3]: ChatModelId.MINIMAX_M3_1_FLASH,
   [ChatModelId.MIMO_V2_PRO]: ChatModelId.MIMO_V2_6_PRO,
   [ChatModelId.MIMO_V2_5_PRO]: ChatModelId.MIMO_V2_6_PRO,
   [ChatModelId.MIMO_V2_5]: ChatModelId.MIMO_V2_6_FLASH,
@@ -5775,6 +6015,8 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.QWEN_2_5_7B]: ChatModelId.QWEN_3_8_FLASH,
   [ChatModelId.QWEN_3_7_FLASH]: ChatModelId.QWEN_3_8_FLASH,
   [ChatModelId.DEEPSEEK_R1]: ChatModelId.DEEPSEEK_V4_1_FLASH,
+  // Removed upstream: OpenRouter no longer lists the R1 Qwen-32B distill.
+  [ChatModelId.DEEPSEEK_R1_DISTILL]: ChatModelId.DEEPSEEK_V4_1_FLASH,
   [ChatModelId.MISTRAL_MEDIUM_3_5]: ChatModelId.MISTRAL_LARGE_4,
   [ChatModelId.GPT_5_4_NANO]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_3_CODEX]: ChatModelId.GPT_6_1_SOL,

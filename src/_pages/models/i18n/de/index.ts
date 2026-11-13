@@ -109,7 +109,8 @@ export const translations: typeof enTranslations = {
     hideLegacy: "Veraltete ausblenden",
   },
   index: {
-    eyebrow: "{{chat}} Chat-Modelle, dazu {{image}} Bild-, {{video}} Video-, {{music}} Musik- und {{voice}} Sprachmodelle",
+    eyebrow:
+      "{{chat}} Chat-Modelle, dazu {{image}} Bild-, {{video}} Video-, {{music}} Musik- und {{voice}} Sprachmodelle",
     title: "Jedes Modell. Ein Chat.",
     subtitle:
       "Mainstream, offen und unzensiert. Echte Preise pro Nachricht, echte Kontextgrößen. Den Filter bestimmst du. Nicht wir.",

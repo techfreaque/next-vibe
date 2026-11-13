@@ -137,4 +137,13 @@ export abstract class PriceFetcher {
     const rounded = Math.round(raw * 10000) / 10000;
     return rounded % 1 === 0 ? Math.round(rounded) : rounded;
   }
+
+  /**
+   * Like usdToCredits, but rounds to significant digits instead of 4 decimals.
+   * Per-character and per-second prices are tiny (e.g. $0.0017/1K chars =
+   * 0.00017 credits/char); 4-decimal rounding would turn them into 0.0002.
+   */
+  protected usdToCreditsPrecise(usd: number, significantDigits = 4): number {
+    return Number((usd / CREDIT_VALUE_USD).toPrecision(significantDigits));
+  }
 }

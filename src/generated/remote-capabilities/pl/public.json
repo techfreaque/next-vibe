@@ -4456,6 +4456,7 @@
                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                           "GPT_5_IMAGE": "gpt-5-image",
                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                           "KIMI_K2_6": "kimi-k2.6",
                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -4506,7 +4507,12 @@
                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                           "META_MUSE_WONDER": "meta-muse-wonder",
                           "MISTRAL_LARGE_4": "mistral-large-4",
-                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                          "META_MUSE_EMBER": "meta-muse-ember",
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                         }
                       },
                       "type": "enum",
@@ -4586,6 +4592,7 @@
                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                         "GPT_5_IMAGE": "gpt-5-image",
                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                         "KIMI_K2_6": "kimi-k2.6",
                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -4636,7 +4643,12 @@
                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                         "META_MUSE_WONDER": "meta-muse-wonder",
                         "MISTRAL_LARGE_4": "mistral-large-4",
-                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                        "META_MUSE_EMBER": "meta-muse-ember",
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                       },
                       "options": [
                         "gpt-55",
@@ -4714,6 +4726,7 @@
                         "gpt-5-image-mini",
                         "gpt-5-image",
                         "gpt-5.4-image-2",
+                        "gemini-nano-banana-2.1",
                         "kimi-k2.6",
                         "deepseek-v4-pro",
                         "deepseek-v4-flash",
@@ -4764,7 +4777,12 @@
                         "meta-muse-spark-1.3",
                         "meta-muse-wonder",
                         "mistral-large-4",
-                        "venice-deepseek-v4.1-flash-uncensored"
+                        "venice-deepseek-v4.1-flash-uncensored",
+                        "gemini-4-hydrogen",
+                        "gemini-4-carbon",
+                        "minimax-m3.1-flash",
+                        "meta-muse-ember",
+                        "drummer-artemis-31b"
                       ]
                     }
                   },
@@ -7555,6 +7573,7 @@
                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                               "GPT_5_IMAGE": "gpt-5-image",
                               "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                               "KIMI_K2_6": "kimi-k2.6",
                               "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                               "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -7605,7 +7624,12 @@
                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                               "META_MUSE_WONDER": "meta-muse-wonder",
                               "MISTRAL_LARGE_4": "mistral-large-4",
-                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                              "META_MUSE_EMBER": "meta-muse-ember",
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                             }
                           },
                           "type": "enum",
@@ -7685,6 +7709,7 @@
                             "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                             "GPT_5_IMAGE": "gpt-5-image",
                             "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                            "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                             "KIMI_K2_6": "kimi-k2.6",
                             "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                             "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -7735,7 +7760,12 @@
                             "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                             "META_MUSE_WONDER": "meta-muse-wonder",
                             "MISTRAL_LARGE_4": "mistral-large-4",
-                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                            "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                            "GEMINI_4_CARBON": "gemini-4-carbon",
+                            "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                            "META_MUSE_EMBER": "meta-muse-ember",
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                           },
                           "options": [
                             "gpt-55",
@@ -7813,6 +7843,7 @@
                             "gpt-5-image-mini",
                             "gpt-5-image",
                             "gpt-5.4-image-2",
+                            "gemini-nano-banana-2.1",
                             "kimi-k2.6",
                             "deepseek-v4-pro",
                             "deepseek-v4-flash",
@@ -7863,7 +7894,12 @@
                             "meta-muse-spark-1.3",
                             "meta-muse-wonder",
                             "mistral-large-4",
-                            "venice-deepseek-v4.1-flash-uncensored"
+                            "venice-deepseek-v4.1-flash-uncensored",
+                            "gemini-4-hydrogen",
+                            "gemini-4-carbon",
+                            "minimax-m3.1-flash",
+                            "meta-muse-ember",
+                            "drummer-artemis-31b"
                           ]
                         }
                       },
@@ -8585,6 +8621,10 @@
               "label": "models.names.GPT_5_4_IMAGE_2"
             },
             {
+              "value": "gemini-nano-banana-2.1",
+              "label": "models.names.GEMINI_NANO_BANANA_2_1"
+            },
+            {
               "value": "kimi-k2.6",
               "label": "models.names.KIMI_K2_6"
             },
@@ -8787,6 +8827,26 @@
             {
               "value": "venice-deepseek-v4.1-flash-uncensored",
               "label": "models.names.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED"
+            },
+            {
+              "value": "gemini-4-hydrogen",
+              "label": "models.names.GEMINI_4_HYDROGEN"
+            },
+            {
+              "value": "gemini-4-carbon",
+              "label": "models.names.GEMINI_4_CARBON"
+            },
+            {
+              "value": "minimax-m3.1-flash",
+              "label": "models.names.MINIMAX_M3_1_FLASH"
+            },
+            {
+              "value": "meta-muse-ember",
+              "label": "models.names.META_MUSE_EMBER"
+            },
+            {
+              "value": "drummer-artemis-31b",
+              "label": "models.names.DRUMMER_ARTEMIS_31B"
             }
           ],
           "columns": 6,
@@ -8873,6 +8933,7 @@
                     "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                     "GPT_5_IMAGE": "gpt-5-image",
                     "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                    "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                     "KIMI_K2_6": "kimi-k2.6",
                     "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                     "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -8923,7 +8984,12 @@
                     "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                     "META_MUSE_WONDER": "meta-muse-wonder",
                     "MISTRAL_LARGE_4": "mistral-large-4",
-                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                    "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                    "GEMINI_4_CARBON": "gemini-4-carbon",
+                    "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                    "META_MUSE_EMBER": "meta-muse-ember",
+                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                   }
                 },
                 "type": "enum",
@@ -9003,6 +9069,7 @@
                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                   "GPT_5_IMAGE": "gpt-5-image",
                   "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                   "KIMI_K2_6": "kimi-k2.6",
                   "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                   "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -9053,7 +9120,12 @@
                   "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                   "META_MUSE_WONDER": "meta-muse-wonder",
                   "MISTRAL_LARGE_4": "mistral-large-4",
-                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                  "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                  "GEMINI_4_CARBON": "gemini-4-carbon",
+                  "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                  "META_MUSE_EMBER": "meta-muse-ember",
+                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                 },
                 "options": [
                   "gpt-55",
@@ -9131,6 +9203,7 @@
                   "gpt-5-image-mini",
                   "gpt-5-image",
                   "gpt-5.4-image-2",
+                  "gemini-nano-banana-2.1",
                   "kimi-k2.6",
                   "deepseek-v4-pro",
                   "deepseek-v4-flash",
@@ -9181,7 +9254,12 @@
                   "meta-muse-spark-1.3",
                   "meta-muse-wonder",
                   "mistral-large-4",
-                  "venice-deepseek-v4.1-flash-uncensored"
+                  "venice-deepseek-v4.1-flash-uncensored",
+                  "gemini-4-hydrogen",
+                  "gemini-4-carbon",
+                  "minimax-m3.1-flash",
+                  "meta-muse-ember",
+                  "drummer-artemis-31b"
                 ]
               }
             },
@@ -10531,6 +10609,11 @@
                                     "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                     "QWEN_IMAGE_3": "qwen-image-3",
                                     "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                    "SEEDREAM_5_5": "seedream-5.5",
+                                    "FLUX_3_IMAGE": "flux-3-image",
+                                    "FLUX_3_KLEIN": "flux-3-klein",
+                                    "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                    "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -10539,7 +10622,8 @@
                                     "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                     "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                     "GPT_5_IMAGE": "gpt-5-image",
-                                    "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                    "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                    "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                   }
                                 },
                                 "type": "enum",
@@ -10570,6 +10654,11 @@
                                   "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                   "QWEN_IMAGE_3": "qwen-image-3",
                                   "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                  "SEEDREAM_5_5": "seedream-5.5",
+                                  "FLUX_3_IMAGE": "flux-3-image",
+                                  "FLUX_3_KLEIN": "flux-3-klein",
+                                  "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                  "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -10578,7 +10667,8 @@
                                   "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                   "GPT_5_IMAGE": "gpt-5-image",
-                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                 },
                                 "options": [
                                   "flux-pro",
@@ -10607,6 +10697,11 @@
                                   "grok-imagine-image-2",
                                   "qwen-image-3",
                                   "qwen-image-3-pro",
+                                  "seedream-5.5",
+                                  "flux-3-image",
+                                  "flux-3-klein",
+                                  "gpt-image-2.6-flare",
+                                  "gpt-image-2.6-sunburst",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -10615,7 +10710,8 @@
                                   "gemini-3-pro-image-preview",
                                   "gpt-5-image-mini",
                                   "gpt-5-image",
-                                  "gpt-5.4-image-2"
+                                  "gpt-5.4-image-2",
+                                  "gemini-nano-banana-2.1"
                                 ]
                               },
                               "intelligenceRange": {
@@ -11300,6 +11396,11 @@
                                   "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                   "QWEN_IMAGE_3": "qwen-image-3",
                                   "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                  "SEEDREAM_5_5": "seedream-5.5",
+                                  "FLUX_3_IMAGE": "flux-3-image",
+                                  "FLUX_3_KLEIN": "flux-3-klein",
+                                  "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                  "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -11308,7 +11409,8 @@
                                   "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                   "GPT_5_IMAGE": "gpt-5-image",
-                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                 }
                               },
                               "type": "enum",
@@ -11339,6 +11441,11 @@
                                 "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                 "QWEN_IMAGE_3": "qwen-image-3",
                                 "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                "SEEDREAM_5_5": "seedream-5.5",
+                                "FLUX_3_IMAGE": "flux-3-image",
+                                "FLUX_3_KLEIN": "flux-3-klein",
+                                "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -11347,7 +11454,8 @@
                                 "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                 "GPT_5_IMAGE": "gpt-5-image",
-                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                               },
                               "options": [
                                 "flux-pro",
@@ -11376,6 +11484,11 @@
                                 "grok-imagine-image-2",
                                 "qwen-image-3",
                                 "qwen-image-3-pro",
+                                "seedream-5.5",
+                                "flux-3-image",
+                                "flux-3-klein",
+                                "gpt-image-2.6-flare",
+                                "gpt-image-2.6-sunburst",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -11384,7 +11497,8 @@
                                 "gemini-3-pro-image-preview",
                                 "gpt-5-image-mini",
                                 "gpt-5-image",
-                                "gpt-5.4-image-2"
+                                "gpt-5.4-image-2",
+                                "gemini-nano-banana-2.1"
                               ]
                             },
                             "intelligenceRange": {
@@ -13498,7 +13612,13 @@
                                     "HAILUO_3": "hailuo-3",
                                     "SEEDANCE_2_5": "seedance-2-5",
                                     "FLUX_3_VIDEO": "flux-3-video",
-                                    "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                    "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                    "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                    "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                    "WAN_3_0": "wan-3-0",
+                                    "SEEDANCE_2_MINI": "seedance-2-mini",
+                                    "HAILUO_3_MAX": "hailuo-3-max",
+                                    "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                   }
                                 },
                                 "type": "enum",
@@ -13536,7 +13656,13 @@
                                   "HAILUO_3": "hailuo-3",
                                   "SEEDANCE_2_5": "seedance-2-5",
                                   "FLUX_3_VIDEO": "flux-3-video",
-                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                  "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                  "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                  "WAN_3_0": "wan-3-0",
+                                  "SEEDANCE_2_MINI": "seedance-2-mini",
+                                  "HAILUO_3_MAX": "hailuo-3-max",
+                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -13572,7 +13698,13 @@
                                   "hailuo-3",
                                   "seedance-2-5",
                                   "flux-3-video",
-                                  "grok-imagine-video-1.5"
+                                  "grok-imagine-video-1.5",
+                                  "gemini-omni-1.2-flash",
+                                  "grok-imagine-video-1.5-lite",
+                                  "wan-3-0",
+                                  "seedance-2-mini",
+                                  "hailuo-3-max",
+                                  "runway-gen-4-5"
                                 ]
                               },
                               "intelligenceRange": {
@@ -14264,7 +14396,13 @@
                                   "HAILUO_3": "hailuo-3",
                                   "SEEDANCE_2_5": "seedance-2-5",
                                   "FLUX_3_VIDEO": "flux-3-video",
-                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                  "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                  "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                  "WAN_3_0": "wan-3-0",
+                                  "SEEDANCE_2_MINI": "seedance-2-mini",
+                                  "HAILUO_3_MAX": "hailuo-3-max",
+                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                 }
                               },
                               "type": "enum",
@@ -14302,7 +14440,13 @@
                                 "HAILUO_3": "hailuo-3",
                                 "SEEDANCE_2_5": "seedance-2-5",
                                 "FLUX_3_VIDEO": "flux-3-video",
-                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                "WAN_3_0": "wan-3-0",
+                                "SEEDANCE_2_MINI": "seedance-2-mini",
+                                "HAILUO_3_MAX": "hailuo-3-max",
+                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -14338,7 +14482,13 @@
                                 "hailuo-3",
                                 "seedance-2-5",
                                 "flux-3-video",
-                                "grok-imagine-video-1.5"
+                                "grok-imagine-video-1.5",
+                                "gemini-omni-1.2-flash",
+                                "grok-imagine-video-1.5-lite",
+                                "wan-3-0",
+                                "seedance-2-mini",
+                                "hailuo-3-max",
+                                "runway-gen-4-5"
                               ]
                             },
                             "intelligenceRange": {
@@ -20203,6 +20353,7 @@
                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                         "GPT_5_IMAGE": "gpt-5-image",
                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                         "KIMI_K2_6": "kimi-k2.6",
                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -20253,7 +20404,12 @@
                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                         "META_MUSE_WONDER": "meta-muse-wonder",
                         "MISTRAL_LARGE_4": "mistral-large-4",
-                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                        "META_MUSE_EMBER": "meta-muse-ember",
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                       }
                     },
                     "type": "enum",
@@ -20333,6 +20489,7 @@
                       "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                       "GPT_5_IMAGE": "gpt-5-image",
                       "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                      "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                       "KIMI_K2_6": "kimi-k2.6",
                       "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                       "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -20383,7 +20540,12 @@
                       "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                       "META_MUSE_WONDER": "meta-muse-wonder",
                       "MISTRAL_LARGE_4": "mistral-large-4",
-                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                      "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                      "GEMINI_4_CARBON": "gemini-4-carbon",
+                      "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                      "META_MUSE_EMBER": "meta-muse-ember",
+                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                     },
                     "options": [
                       "gpt-55",
@@ -20461,6 +20623,7 @@
                       "gpt-5-image-mini",
                       "gpt-5-image",
                       "gpt-5.4-image-2",
+                      "gemini-nano-banana-2.1",
                       "kimi-k2.6",
                       "deepseek-v4-pro",
                       "deepseek-v4-flash",
@@ -20511,7 +20674,12 @@
                       "meta-muse-spark-1.3",
                       "meta-muse-wonder",
                       "mistral-large-4",
-                      "venice-deepseek-v4.1-flash-uncensored"
+                      "venice-deepseek-v4.1-flash-uncensored",
+                      "gemini-4-hydrogen",
+                      "gemini-4-carbon",
+                      "minimax-m3.1-flash",
+                      "meta-muse-ember",
+                      "drummer-artemis-31b"
                     ]
                   }
                 },
@@ -23188,6 +23356,7 @@
                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                           "GPT_5_IMAGE": "gpt-5-image",
                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                           "KIMI_K2_6": "kimi-k2.6",
                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -23238,7 +23407,12 @@
                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                           "META_MUSE_WONDER": "meta-muse-wonder",
                           "MISTRAL_LARGE_4": "mistral-large-4",
-                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                          "META_MUSE_EMBER": "meta-muse-ember",
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                         }
                       },
                       "type": "enum",
@@ -23318,6 +23492,7 @@
                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                         "GPT_5_IMAGE": "gpt-5-image",
                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                         "KIMI_K2_6": "kimi-k2.6",
                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -23368,7 +23543,12 @@
                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                         "META_MUSE_WONDER": "meta-muse-wonder",
                         "MISTRAL_LARGE_4": "mistral-large-4",
-                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                        "META_MUSE_EMBER": "meta-muse-ember",
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                       },
                       "options": [
                         "gpt-55",
@@ -23446,6 +23626,7 @@
                         "gpt-5-image-mini",
                         "gpt-5-image",
                         "gpt-5.4-image-2",
+                        "gemini-nano-banana-2.1",
                         "kimi-k2.6",
                         "deepseek-v4-pro",
                         "deepseek-v4-flash",
@@ -23496,7 +23677,12 @@
                         "meta-muse-spark-1.3",
                         "meta-muse-wonder",
                         "mistral-large-4",
-                        "venice-deepseek-v4.1-flash-uncensored"
+                        "venice-deepseek-v4.1-flash-uncensored",
+                        "gemini-4-hydrogen",
+                        "gemini-4-carbon",
+                        "minimax-m3.1-flash",
+                        "meta-muse-ember",
+                        "drummer-artemis-31b"
                       ]
                     }
                   },
@@ -24373,6 +24559,7 @@
                     "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                     "GPT_5_IMAGE": "gpt-5-image",
                     "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                    "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                     "KIMI_K2_6": "kimi-k2.6",
                     "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                     "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -24423,7 +24610,12 @@
                     "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                     "META_MUSE_WONDER": "meta-muse-wonder",
                     "MISTRAL_LARGE_4": "mistral-large-4",
-                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                    "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                    "GEMINI_4_CARBON": "gemini-4-carbon",
+                    "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                    "META_MUSE_EMBER": "meta-muse-ember",
+                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                   }
                 },
                 "type": "enum",
@@ -24503,6 +24695,7 @@
                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                   "GPT_5_IMAGE": "gpt-5-image",
                   "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                   "KIMI_K2_6": "kimi-k2.6",
                   "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                   "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -24553,7 +24746,12 @@
                   "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                   "META_MUSE_WONDER": "meta-muse-wonder",
                   "MISTRAL_LARGE_4": "mistral-large-4",
-                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                  "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                  "GEMINI_4_CARBON": "gemini-4-carbon",
+                  "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                  "META_MUSE_EMBER": "meta-muse-ember",
+                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                 },
                 "options": [
                   "gpt-55",
@@ -24631,6 +24829,7 @@
                   "gpt-5-image-mini",
                   "gpt-5-image",
                   "gpt-5.4-image-2",
+                  "gemini-nano-banana-2.1",
                   "kimi-k2.6",
                   "deepseek-v4-pro",
                   "deepseek-v4-flash",
@@ -24681,7 +24880,12 @@
                   "meta-muse-spark-1.3",
                   "meta-muse-wonder",
                   "mistral-large-4",
-                  "venice-deepseek-v4.1-flash-uncensored"
+                  "venice-deepseek-v4.1-flash-uncensored",
+                  "gemini-4-hydrogen",
+                  "gemini-4-carbon",
+                  "minimax-m3.1-flash",
+                  "meta-muse-ember",
+                  "drummer-artemis-31b"
                 ]
               }
             },
@@ -25358,6 +25562,7 @@
                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                           "GPT_5_IMAGE": "gpt-5-image",
                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                           "KIMI_K2_6": "kimi-k2.6",
                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -25408,7 +25613,12 @@
                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                           "META_MUSE_WONDER": "meta-muse-wonder",
                           "MISTRAL_LARGE_4": "mistral-large-4",
-                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                          "META_MUSE_EMBER": "meta-muse-ember",
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                         }
                       },
                       "type": "enum",
@@ -25488,6 +25698,7 @@
                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                         "GPT_5_IMAGE": "gpt-5-image",
                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                         "KIMI_K2_6": "kimi-k2.6",
                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -25538,7 +25749,12 @@
                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                         "META_MUSE_WONDER": "meta-muse-wonder",
                         "MISTRAL_LARGE_4": "mistral-large-4",
-                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                        "META_MUSE_EMBER": "meta-muse-ember",
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                       },
                       "options": [
                         "gpt-55",
@@ -25616,6 +25832,7 @@
                         "gpt-5-image-mini",
                         "gpt-5-image",
                         "gpt-5.4-image-2",
+                        "gemini-nano-banana-2.1",
                         "kimi-k2.6",
                         "deepseek-v4-pro",
                         "deepseek-v4-flash",
@@ -25666,7 +25883,12 @@
                         "meta-muse-spark-1.3",
                         "meta-muse-wonder",
                         "mistral-large-4",
-                        "venice-deepseek-v4.1-flash-uncensored"
+                        "venice-deepseek-v4.1-flash-uncensored",
+                        "gemini-4-hydrogen",
+                        "gemini-4-carbon",
+                        "minimax-m3.1-flash",
+                        "meta-muse-ember",
+                        "drummer-artemis-31b"
                       ]
                     }
                   },
@@ -28767,6 +28989,26 @@
               "label": "models.names.QWEN_IMAGE_3_PRO"
             },
             {
+              "value": "seedream-5.5",
+              "label": "models.names.SEEDREAM_5_5"
+            },
+            {
+              "value": "flux-3-image",
+              "label": "models.names.FLUX_3_IMAGE"
+            },
+            {
+              "value": "flux-3-klein",
+              "label": "models.names.FLUX_3_KLEIN"
+            },
+            {
+              "value": "gpt-image-2.6-flare",
+              "label": "models.names.GPT_IMAGE_2_6_FLARE"
+            },
+            {
+              "value": "gpt-image-2.6-sunburst",
+              "label": "models.names.GPT_IMAGE_2_6_SUNBURST"
+            },
+            {
               "value": "lustify-v8",
               "label": "models.names.LUSTIFY_V8"
             },
@@ -28801,6 +29043,10 @@
             {
               "value": "gpt-5.4-image-2",
               "label": "models.names.GPT_5_4_IMAGE_2"
+            },
+            {
+              "value": "gemini-nano-banana-2.1",
+              "label": "models.names.GEMINI_NANO_BANANA_2_1"
             }
           ],
           "schema": {
@@ -28836,6 +29082,11 @@
                     "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                     "QWEN_IMAGE_3": "qwen-image-3",
                     "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                    "SEEDREAM_5_5": "seedream-5.5",
+                    "FLUX_3_IMAGE": "flux-3-image",
+                    "FLUX_3_KLEIN": "flux-3-klein",
+                    "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                    "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                     "LUSTIFY_V8": "lustify-v8",
                     "CHROMA": "chroma",
                     "QWEN_EDIT": "qwen-edit",
@@ -28844,7 +29095,8 @@
                     "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                     "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                     "GPT_5_IMAGE": "gpt-5-image",
-                    "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                    "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                    "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                   }
                 },
                 "type": "enum",
@@ -28875,6 +29127,11 @@
                   "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                   "QWEN_IMAGE_3": "qwen-image-3",
                   "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                  "SEEDREAM_5_5": "seedream-5.5",
+                  "FLUX_3_IMAGE": "flux-3-image",
+                  "FLUX_3_KLEIN": "flux-3-klein",
+                  "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                  "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                   "LUSTIFY_V8": "lustify-v8",
                   "CHROMA": "chroma",
                   "QWEN_EDIT": "qwen-edit",
@@ -28883,7 +29140,8 @@
                   "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                   "GPT_5_IMAGE": "gpt-5-image",
-                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                 },
                 "options": [
                   "flux-pro",
@@ -28912,6 +29170,11 @@
                   "grok-imagine-image-2",
                   "qwen-image-3",
                   "qwen-image-3-pro",
+                  "seedream-5.5",
+                  "flux-3-image",
+                  "flux-3-klein",
+                  "gpt-image-2.6-flare",
+                  "gpt-image-2.6-sunburst",
                   "lustify-v8",
                   "chroma",
                   "qwen-edit",
@@ -28920,7 +29183,8 @@
                   "gemini-3-pro-image-preview",
                   "gpt-5-image-mini",
                   "gpt-5-image",
-                  "gpt-5.4-image-2"
+                  "gpt-5.4-image-2",
+                  "gemini-nano-banana-2.1"
                 ]
               }
             },
@@ -32185,6 +32449,7 @@
                                             "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                             "GPT_5_IMAGE": "gpt-5-image",
                                             "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                            "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                             "KIMI_K2_6": "kimi-k2.6",
                                             "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                             "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -32235,7 +32500,12 @@
                                             "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                             "META_MUSE_WONDER": "meta-muse-wonder",
                                             "MISTRAL_LARGE_4": "mistral-large-4",
-                                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                            "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                            "GEMINI_4_CARBON": "gemini-4-carbon",
+                                            "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                           }
                                         },
                                         "type": "enum",
@@ -32315,6 +32585,7 @@
                                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                           "GPT_5_IMAGE": "gpt-5-image",
                                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                           "KIMI_K2_6": "kimi-k2.6",
                                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -32365,7 +32636,12 @@
                                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                           "META_MUSE_WONDER": "meta-muse-wonder",
                                           "MISTRAL_LARGE_4": "mistral-large-4",
-                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -32443,6 +32719,7 @@
                                           "gpt-5-image-mini",
                                           "gpt-5-image",
                                           "gpt-5.4-image-2",
+                                          "gemini-nano-banana-2.1",
                                           "kimi-k2.6",
                                           "deepseek-v4-pro",
                                           "deepseek-v4-flash",
@@ -32493,7 +32770,12 @@
                                           "meta-muse-spark-1.3",
                                           "meta-muse-wonder",
                                           "mistral-large-4",
-                                          "venice-deepseek-v4.1-flash-uncensored"
+                                          "venice-deepseek-v4.1-flash-uncensored",
+                                          "gemini-4-hydrogen",
+                                          "gemini-4-carbon",
+                                          "minimax-m3.1-flash",
+                                          "meta-muse-ember",
+                                          "drummer-artemis-31b"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -33229,6 +33511,7 @@
                                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                           "GPT_5_IMAGE": "gpt-5-image",
                                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                           "KIMI_K2_6": "kimi-k2.6",
                                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -33279,7 +33562,12 @@
                                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                           "META_MUSE_WONDER": "meta-muse-wonder",
                                           "MISTRAL_LARGE_4": "mistral-large-4",
-                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                         }
                                       },
                                       "type": "enum",
@@ -33359,6 +33647,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -33409,7 +33698,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -33487,6 +33781,7 @@
                                         "gpt-5-image-mini",
                                         "gpt-5-image",
                                         "gpt-5.4-image-2",
+                                        "gemini-nano-banana-2.1",
                                         "kimi-k2.6",
                                         "deepseek-v4-pro",
                                         "deepseek-v4-flash",
@@ -33537,7 +33832,12 @@
                                         "meta-muse-spark-1.3",
                                         "meta-muse-wonder",
                                         "mistral-large-4",
-                                        "venice-deepseek-v4.1-flash-uncensored"
+                                        "venice-deepseek-v4.1-flash-uncensored",
+                                        "gemini-4-hydrogen",
+                                        "gemini-4-carbon",
+                                        "minimax-m3.1-flash",
+                                        "meta-muse-ember",
+                                        "drummer-artemis-31b"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -34953,6 +35253,7 @@
                                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                           "GPT_5_IMAGE": "gpt-5-image",
                                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                           "KIMI_K2_6": "kimi-k2.6",
                                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -35003,7 +35304,12 @@
                                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                           "META_MUSE_WONDER": "meta-muse-wonder",
                                           "MISTRAL_LARGE_4": "mistral-large-4",
-                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                         }
                                       },
                                       "type": "enum",
@@ -35083,6 +35389,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -35133,7 +35440,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -35211,6 +35523,7 @@
                                         "gpt-5-image-mini",
                                         "gpt-5-image",
                                         "gpt-5.4-image-2",
+                                        "gemini-nano-banana-2.1",
                                         "kimi-k2.6",
                                         "deepseek-v4-pro",
                                         "deepseek-v4-flash",
@@ -35261,7 +35574,12 @@
                                         "meta-muse-spark-1.3",
                                         "meta-muse-wonder",
                                         "mistral-large-4",
-                                        "venice-deepseek-v4.1-flash-uncensored"
+                                        "venice-deepseek-v4.1-flash-uncensored",
+                                        "gemini-4-hydrogen",
+                                        "gemini-4-carbon",
+                                        "minimax-m3.1-flash",
+                                        "meta-muse-ember",
+                                        "drummer-artemis-31b"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -35997,6 +36315,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -36047,7 +36366,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       }
                                     },
                                     "type": "enum",
@@ -36127,6 +36451,7 @@
                                       "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                       "GPT_5_IMAGE": "gpt-5-image",
                                       "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                      "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                       "KIMI_K2_6": "kimi-k2.6",
                                       "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                       "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -36177,7 +36502,12 @@
                                       "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                       "META_MUSE_WONDER": "meta-muse-wonder",
                                       "MISTRAL_LARGE_4": "mistral-large-4",
-                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                      "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                      "GEMINI_4_CARBON": "gemini-4-carbon",
+                                      "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                      "META_MUSE_EMBER": "meta-muse-ember",
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -36255,6 +36585,7 @@
                                       "gpt-5-image-mini",
                                       "gpt-5-image",
                                       "gpt-5.4-image-2",
+                                      "gemini-nano-banana-2.1",
                                       "kimi-k2.6",
                                       "deepseek-v4-pro",
                                       "deepseek-v4-flash",
@@ -36305,7 +36636,12 @@
                                       "meta-muse-spark-1.3",
                                       "meta-muse-wonder",
                                       "mistral-large-4",
-                                      "venice-deepseek-v4.1-flash-uncensored"
+                                      "venice-deepseek-v4.1-flash-uncensored",
+                                      "gemini-4-hydrogen",
+                                      "gemini-4-carbon",
+                                      "minimax-m3.1-flash",
+                                      "meta-muse-ember",
+                                      "drummer-artemis-31b"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -37679,6 +38015,11 @@
                                                   "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                                   "QWEN_IMAGE_3": "qwen-image-3",
                                                   "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                                  "SEEDREAM_5_5": "seedream-5.5",
+                                                  "FLUX_3_IMAGE": "flux-3-image",
+                                                  "FLUX_3_KLEIN": "flux-3-klein",
+                                                  "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                                  "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                                   "LUSTIFY_V8": "lustify-v8",
                                                   "CHROMA": "chroma",
                                                   "QWEN_EDIT": "qwen-edit",
@@ -37687,7 +38028,8 @@
                                                   "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                   "GPT_5_IMAGE": "gpt-5-image",
-                                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                                  "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                                 }
                                               },
                                               "type": "enum",
@@ -37718,6 +38060,11 @@
                                                 "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                                 "QWEN_IMAGE_3": "qwen-image-3",
                                                 "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                                "SEEDREAM_5_5": "seedream-5.5",
+                                                "FLUX_3_IMAGE": "flux-3-image",
+                                                "FLUX_3_KLEIN": "flux-3-klein",
+                                                "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                                "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -37726,7 +38073,8 @@
                                                 "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
-                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                               },
                                               "options": [
                                                 "flux-pro",
@@ -37755,6 +38103,11 @@
                                                 "grok-imagine-image-2",
                                                 "qwen-image-3",
                                                 "qwen-image-3-pro",
+                                                "seedream-5.5",
+                                                "flux-3-image",
+                                                "flux-3-klein",
+                                                "gpt-image-2.6-flare",
+                                                "gpt-image-2.6-sunburst",
                                                 "lustify-v8",
                                                 "chroma",
                                                 "qwen-edit",
@@ -37763,7 +38116,8 @@
                                                 "gemini-3-pro-image-preview",
                                                 "gpt-5-image-mini",
                                                 "gpt-5-image",
-                                                "gpt-5.4-image-2"
+                                                "gpt-5.4-image-2",
+                                                "gemini-nano-banana-2.1"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -38452,6 +38806,11 @@
                                                 "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                                 "QWEN_IMAGE_3": "qwen-image-3",
                                                 "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                                "SEEDREAM_5_5": "seedream-5.5",
+                                                "FLUX_3_IMAGE": "flux-3-image",
+                                                "FLUX_3_KLEIN": "flux-3-klein",
+                                                "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                                "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -38460,7 +38819,8 @@
                                                 "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
-                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                               }
                                             },
                                             "type": "enum",
@@ -38491,6 +38851,11 @@
                                               "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                               "QWEN_IMAGE_3": "qwen-image-3",
                                               "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                              "SEEDREAM_5_5": "seedream-5.5",
+                                              "FLUX_3_IMAGE": "flux-3-image",
+                                              "FLUX_3_KLEIN": "flux-3-klein",
+                                              "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                              "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -38499,7 +38864,8 @@
                                               "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
-                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                             },
                                             "options": [
                                               "flux-pro",
@@ -38528,6 +38894,11 @@
                                               "grok-imagine-image-2",
                                               "qwen-image-3",
                                               "qwen-image-3-pro",
+                                              "seedream-5.5",
+                                              "flux-3-image",
+                                              "flux-3-klein",
+                                              "gpt-image-2.6-flare",
+                                              "gpt-image-2.6-sunburst",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -38536,7 +38907,8 @@
                                               "gemini-3-pro-image-preview",
                                               "gpt-5-image-mini",
                                               "gpt-5-image",
-                                              "gpt-5.4-image-2"
+                                              "gpt-5.4-image-2",
+                                              "gemini-nano-banana-2.1"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -40652,7 +41024,13 @@
                                                   "HAILUO_3": "hailuo-3",
                                                   "SEEDANCE_2_5": "seedance-2-5",
                                                   "FLUX_3_VIDEO": "flux-3-video",
-                                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                                  "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                                  "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                                  "WAN_3_0": "wan-3-0",
+                                                  "SEEDANCE_2_MINI": "seedance-2-mini",
+                                                  "HAILUO_3_MAX": "hailuo-3-max",
+                                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                                 }
                                               },
                                               "type": "enum",
@@ -40690,7 +41068,13 @@
                                                 "HAILUO_3": "hailuo-3",
                                                 "SEEDANCE_2_5": "seedance-2-5",
                                                 "FLUX_3_VIDEO": "flux-3-video",
-                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                                "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                                "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                                "WAN_3_0": "wan-3-0",
+                                                "SEEDANCE_2_MINI": "seedance-2-mini",
+                                                "HAILUO_3_MAX": "hailuo-3-max",
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                               },
                                               "options": [
                                                 "wan-2-7-t2v",
@@ -40726,7 +41110,13 @@
                                                 "hailuo-3",
                                                 "seedance-2-5",
                                                 "flux-3-video",
-                                                "grok-imagine-video-1.5"
+                                                "grok-imagine-video-1.5",
+                                                "gemini-omni-1.2-flash",
+                                                "grok-imagine-video-1.5-lite",
+                                                "wan-3-0",
+                                                "seedance-2-mini",
+                                                "hailuo-3-max",
+                                                "runway-gen-4-5"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -41422,7 +41812,13 @@
                                                 "HAILUO_3": "hailuo-3",
                                                 "SEEDANCE_2_5": "seedance-2-5",
                                                 "FLUX_3_VIDEO": "flux-3-video",
-                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                                "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                                "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                                "WAN_3_0": "wan-3-0",
+                                                "SEEDANCE_2_MINI": "seedance-2-mini",
+                                                "HAILUO_3_MAX": "hailuo-3-max",
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                               }
                                             },
                                             "type": "enum",
@@ -41460,7 +41856,13 @@
                                               "HAILUO_3": "hailuo-3",
                                               "SEEDANCE_2_5": "seedance-2-5",
                                               "FLUX_3_VIDEO": "flux-3-video",
-                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                              "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                              "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                              "WAN_3_0": "wan-3-0",
+                                              "SEEDANCE_2_MINI": "seedance-2-mini",
+                                              "HAILUO_3_MAX": "hailuo-3-max",
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -41496,7 +41898,13 @@
                                               "hailuo-3",
                                               "seedance-2-5",
                                               "flux-3-video",
-                                              "grok-imagine-video-1.5"
+                                              "grok-imagine-video-1.5",
+                                              "gemini-omni-1.2-flash",
+                                              "grok-imagine-video-1.5-lite",
+                                              "wan-3-0",
+                                              "seedance-2-mini",
+                                              "hailuo-3-max",
+                                              "runway-gen-4-5"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -45100,6 +45508,7 @@
                                                   "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                   "GPT_5_IMAGE": "gpt-5-image",
                                                   "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                  "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                                   "KIMI_K2_6": "kimi-k2.6",
                                                   "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                                   "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -45144,7 +45553,12 @@
                                                   "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                                   "META_MUSE_WONDER": "meta-muse-wonder",
                                                   "MISTRAL_LARGE_4": "mistral-large-4",
-                                                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                                  "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                                  "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                  "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                  "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                                 }
                                               },
                                               "type": "enum",
@@ -45196,6 +45610,7 @@
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
                                                 "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                                 "KIMI_K2_6": "kimi-k2.6",
                                                 "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                                 "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -45240,7 +45655,12 @@
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                                 "META_MUSE_WONDER": "meta-muse-wonder",
                                                 "MISTRAL_LARGE_4": "mistral-large-4",
-                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                               },
                                               "options": [
                                                 "gpt-55",
@@ -45290,6 +45710,7 @@
                                                 "gpt-5-image-mini",
                                                 "gpt-5-image",
                                                 "gpt-5.4-image-2",
+                                                "gemini-nano-banana-2.1",
                                                 "kimi-k2.6",
                                                 "claude-opus-4.8",
                                                 "claude-sonnet-5",
@@ -45334,7 +45755,12 @@
                                                 "meta-muse-spark-1.3",
                                                 "meta-muse-wonder",
                                                 "mistral-large-4",
-                                                "venice-deepseek-v4.1-flash-uncensored"
+                                                "venice-deepseek-v4.1-flash-uncensored",
+                                                "gemini-4-hydrogen",
+                                                "gemini-4-carbon",
+                                                "minimax-m3.1-flash",
+                                                "meta-muse-ember",
+                                                "drummer-artemis-31b"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -46044,6 +46470,7 @@
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
                                                 "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                                 "KIMI_K2_6": "kimi-k2.6",
                                                 "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                                 "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -46088,7 +46515,12 @@
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                                 "META_MUSE_WONDER": "meta-muse-wonder",
                                                 "MISTRAL_LARGE_4": "mistral-large-4",
-                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                               }
                                             },
                                             "type": "enum",
@@ -46140,6 +46572,7 @@
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
                                               "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                               "KIMI_K2_6": "kimi-k2.6",
                                               "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                               "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -46184,7 +46617,12 @@
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                               "META_MUSE_WONDER": "meta-muse-wonder",
                                               "MISTRAL_LARGE_4": "mistral-large-4",
-                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -46234,6 +46672,7 @@
                                               "gpt-5-image-mini",
                                               "gpt-5-image",
                                               "gpt-5.4-image-2",
+                                              "gemini-nano-banana-2.1",
                                               "kimi-k2.6",
                                               "claude-opus-4.8",
                                               "claude-sonnet-5",
@@ -46278,7 +46717,12 @@
                                               "meta-muse-spark-1.3",
                                               "meta-muse-wonder",
                                               "mistral-large-4",
-                                              "venice-deepseek-v4.1-flash-uncensored"
+                                              "venice-deepseek-v4.1-flash-uncensored",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "minimax-m3.1-flash",
+                                              "meta-muse-ember",
+                                              "drummer-artemis-31b"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -46984,7 +47428,11 @@
                                                   "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                   "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                                   "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                                  "META_MUSE_WONDER": "meta-muse-wonder"
+                                                  "META_MUSE_WONDER": "meta-muse-wonder",
+                                                  "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                  "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                  "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                  "META_MUSE_EMBER": "meta-muse-ember"
                                                 }
                                               },
                                               "type": "enum",
@@ -47014,7 +47462,11 @@
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               },
                                               "options": [
                                                 "gemini-3.1-pro-preview-customtools",
@@ -47042,7 +47494,11 @@
                                                 "mimo-v2.6-pro",
                                                 "mimo-v2.6-flash",
                                                 "meta-muse-spark-1.3",
-                                                "meta-muse-wonder"
+                                                "meta-muse-wonder",
+                                                "gemini-4-hydrogen",
+                                                "gemini-4-carbon",
+                                                "minimax-m3.1-flash",
+                                                "meta-muse-ember"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -47730,7 +48186,11 @@
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               }
                                             },
                                             "type": "enum",
@@ -47760,7 +48220,11 @@
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -47788,7 +48252,11 @@
                                               "mimo-v2.6-pro",
                                               "mimo-v2.6-flash",
                                               "meta-muse-spark-1.3",
-                                              "meta-muse-wonder"
+                                              "meta-muse-wonder",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "minimax-m3.1-flash",
+                                              "meta-muse-ember"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -48484,7 +48952,10 @@
                                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                   "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                   "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                                  "META_MUSE_WONDER": "meta-muse-wonder"
+                                                  "META_MUSE_WONDER": "meta-muse-wonder",
+                                                  "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                  "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                  "META_MUSE_EMBER": "meta-muse-ember"
                                                 }
                                               },
                                               "type": "enum",
@@ -48504,7 +48975,10 @@
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               },
                                               "options": [
                                                 "gemini-3.1-pro-preview-customtools",
@@ -48522,7 +48996,10 @@
                                                 "gemini-3.8-flash",
                                                 "mimo-v2.6-pro",
                                                 "mimo-v2.6-flash",
-                                                "meta-muse-wonder"
+                                                "meta-muse-wonder",
+                                                "gemini-4-hydrogen",
+                                                "gemini-4-carbon",
+                                                "meta-muse-ember"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -49200,7 +49677,10 @@
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               }
                                             },
                                             "type": "enum",
@@ -49220,7 +49700,10 @@
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -49238,7 +49721,10 @@
                                               "gemini-3.8-flash",
                                               "mimo-v2.6-pro",
                                               "mimo-v2.6-flash",
-                                              "meta-muse-wonder"
+                                              "meta-muse-wonder",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "meta-muse-ember"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -50063,6 +50549,7 @@
                                           "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                           "GPT_5_IMAGE": "gpt-5-image",
                                           "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                           "KIMI_K2_6": "kimi-k2.6",
                                           "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                           "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -50113,7 +50600,12 @@
                                           "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                           "META_MUSE_WONDER": "meta-muse-wonder",
                                           "MISTRAL_LARGE_4": "mistral-large-4",
-                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                          "GEMINI_4_CARBON": "gemini-4-carbon",
+                                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                         }
                                       },
                                       "type": "enum",
@@ -50193,6 +50685,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -50243,7 +50736,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -50321,6 +50819,7 @@
                                         "gpt-5-image-mini",
                                         "gpt-5-image",
                                         "gpt-5.4-image-2",
+                                        "gemini-nano-banana-2.1",
                                         "kimi-k2.6",
                                         "deepseek-v4-pro",
                                         "deepseek-v4-flash",
@@ -50371,7 +50870,12 @@
                                         "meta-muse-spark-1.3",
                                         "meta-muse-wonder",
                                         "mistral-large-4",
-                                        "venice-deepseek-v4.1-flash-uncensored"
+                                        "venice-deepseek-v4.1-flash-uncensored",
+                                        "gemini-4-hydrogen",
+                                        "gemini-4-carbon",
+                                        "minimax-m3.1-flash",
+                                        "meta-muse-ember",
+                                        "drummer-artemis-31b"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -51107,6 +51611,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -51157,7 +51662,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       }
                                     },
                                     "type": "enum",
@@ -51237,6 +51747,7 @@
                                       "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                       "GPT_5_IMAGE": "gpt-5-image",
                                       "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                      "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                       "KIMI_K2_6": "kimi-k2.6",
                                       "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                       "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -51287,7 +51798,12 @@
                                       "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                       "META_MUSE_WONDER": "meta-muse-wonder",
                                       "MISTRAL_LARGE_4": "mistral-large-4",
-                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                      "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                      "GEMINI_4_CARBON": "gemini-4-carbon",
+                                      "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                      "META_MUSE_EMBER": "meta-muse-ember",
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -51365,6 +51881,7 @@
                                       "gpt-5-image-mini",
                                       "gpt-5-image",
                                       "gpt-5.4-image-2",
+                                      "gemini-nano-banana-2.1",
                                       "kimi-k2.6",
                                       "deepseek-v4-pro",
                                       "deepseek-v4-flash",
@@ -51415,7 +51932,12 @@
                                       "meta-muse-spark-1.3",
                                       "meta-muse-wonder",
                                       "mistral-large-4",
-                                      "venice-deepseek-v4.1-flash-uncensored"
+                                      "venice-deepseek-v4.1-flash-uncensored",
+                                      "gemini-4-hydrogen",
+                                      "gemini-4-carbon",
+                                      "minimax-m3.1-flash",
+                                      "meta-muse-ember",
+                                      "drummer-artemis-31b"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -52829,6 +53351,7 @@
                                         "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                         "GPT_5_IMAGE": "gpt-5-image",
                                         "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                         "KIMI_K2_6": "kimi-k2.6",
                                         "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                         "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -52879,7 +53402,12 @@
                                         "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                         "META_MUSE_WONDER": "meta-muse-wonder",
                                         "MISTRAL_LARGE_4": "mistral-large-4",
-                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                        "GEMINI_4_CARBON": "gemini-4-carbon",
+                                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                       }
                                     },
                                     "type": "enum",
@@ -52959,6 +53487,7 @@
                                       "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                       "GPT_5_IMAGE": "gpt-5-image",
                                       "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                      "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                       "KIMI_K2_6": "kimi-k2.6",
                                       "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                       "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -53009,7 +53538,12 @@
                                       "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                       "META_MUSE_WONDER": "meta-muse-wonder",
                                       "MISTRAL_LARGE_4": "mistral-large-4",
-                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                      "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                      "GEMINI_4_CARBON": "gemini-4-carbon",
+                                      "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                      "META_MUSE_EMBER": "meta-muse-ember",
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -53087,6 +53621,7 @@
                                       "gpt-5-image-mini",
                                       "gpt-5-image",
                                       "gpt-5.4-image-2",
+                                      "gemini-nano-banana-2.1",
                                       "kimi-k2.6",
                                       "deepseek-v4-pro",
                                       "deepseek-v4-flash",
@@ -53137,7 +53672,12 @@
                                       "meta-muse-spark-1.3",
                                       "meta-muse-wonder",
                                       "mistral-large-4",
-                                      "venice-deepseek-v4.1-flash-uncensored"
+                                      "venice-deepseek-v4.1-flash-uncensored",
+                                      "gemini-4-hydrogen",
+                                      "gemini-4-carbon",
+                                      "minimax-m3.1-flash",
+                                      "meta-muse-ember",
+                                      "drummer-artemis-31b"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -53871,6 +54411,7 @@
                                       "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                       "GPT_5_IMAGE": "gpt-5-image",
                                       "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                      "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                       "KIMI_K2_6": "kimi-k2.6",
                                       "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                       "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -53921,7 +54462,12 @@
                                       "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                       "META_MUSE_WONDER": "meta-muse-wonder",
                                       "MISTRAL_LARGE_4": "mistral-large-4",
-                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                      "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                      "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                      "GEMINI_4_CARBON": "gemini-4-carbon",
+                                      "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                      "META_MUSE_EMBER": "meta-muse-ember",
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                     }
                                   },
                                   "type": "enum",
@@ -54001,6 +54547,7 @@
                                     "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                     "GPT_5_IMAGE": "gpt-5-image",
                                     "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                    "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                     "KIMI_K2_6": "kimi-k2.6",
                                     "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                     "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -54051,7 +54598,12 @@
                                     "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                     "META_MUSE_WONDER": "meta-muse-wonder",
                                     "MISTRAL_LARGE_4": "mistral-large-4",
-                                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                    "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                    "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                    "GEMINI_4_CARBON": "gemini-4-carbon",
+                                    "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                    "META_MUSE_EMBER": "meta-muse-ember",
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -54129,6 +54681,7 @@
                                     "gpt-5-image-mini",
                                     "gpt-5-image",
                                     "gpt-5.4-image-2",
+                                    "gemini-nano-banana-2.1",
                                     "kimi-k2.6",
                                     "deepseek-v4-pro",
                                     "deepseek-v4-flash",
@@ -54179,7 +54732,12 @@
                                     "meta-muse-spark-1.3",
                                     "meta-muse-wonder",
                                     "mistral-large-4",
-                                    "venice-deepseek-v4.1-flash-uncensored"
+                                    "venice-deepseek-v4.1-flash-uncensored",
+                                    "gemini-4-hydrogen",
+                                    "gemini-4-carbon",
+                                    "minimax-m3.1-flash",
+                                    "meta-muse-ember",
+                                    "drummer-artemis-31b"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -55553,6 +56111,11 @@
                                                 "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                                 "QWEN_IMAGE_3": "qwen-image-3",
                                                 "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                                "SEEDREAM_5_5": "seedream-5.5",
+                                                "FLUX_3_IMAGE": "flux-3-image",
+                                                "FLUX_3_KLEIN": "flux-3-klein",
+                                                "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                                "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -55561,7 +56124,8 @@
                                                 "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
-                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                                "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                               }
                                             },
                                             "type": "enum",
@@ -55592,6 +56156,11 @@
                                               "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                               "QWEN_IMAGE_3": "qwen-image-3",
                                               "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                              "SEEDREAM_5_5": "seedream-5.5",
+                                              "FLUX_3_IMAGE": "flux-3-image",
+                                              "FLUX_3_KLEIN": "flux-3-klein",
+                                              "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                              "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -55600,7 +56169,8 @@
                                               "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
-                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                             },
                                             "options": [
                                               "flux-pro",
@@ -55629,6 +56199,11 @@
                                               "grok-imagine-image-2",
                                               "qwen-image-3",
                                               "qwen-image-3-pro",
+                                              "seedream-5.5",
+                                              "flux-3-image",
+                                              "flux-3-klein",
+                                              "gpt-image-2.6-flare",
+                                              "gpt-image-2.6-sunburst",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -55637,7 +56212,8 @@
                                               "gemini-3-pro-image-preview",
                                               "gpt-5-image-mini",
                                               "gpt-5-image",
-                                              "gpt-5.4-image-2"
+                                              "gpt-5.4-image-2",
+                                              "gemini-nano-banana-2.1"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -56326,6 +56902,11 @@
                                               "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                               "QWEN_IMAGE_3": "qwen-image-3",
                                               "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                              "SEEDREAM_5_5": "seedream-5.5",
+                                              "FLUX_3_IMAGE": "flux-3-image",
+                                              "FLUX_3_KLEIN": "flux-3-klein",
+                                              "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                              "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -56334,7 +56915,8 @@
                                               "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
-                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                              "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                             }
                                           },
                                           "type": "enum",
@@ -56365,6 +56947,11 @@
                                             "GROK_IMAGINE_IMAGE_2": "grok-imagine-image-2",
                                             "QWEN_IMAGE_3": "qwen-image-3",
                                             "QWEN_IMAGE_3_PRO": "qwen-image-3-pro",
+                                            "SEEDREAM_5_5": "seedream-5.5",
+                                            "FLUX_3_IMAGE": "flux-3-image",
+                                            "FLUX_3_KLEIN": "flux-3-klein",
+                                            "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
+                                            "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -56373,7 +56960,8 @@
                                             "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
                                             "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                             "GPT_5_IMAGE": "gpt-5-image",
-                                            "GPT_5_4_IMAGE_2": "gpt-5.4-image-2"
+                                            "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                            "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1"
                                           },
                                           "options": [
                                             "flux-pro",
@@ -56402,6 +56990,11 @@
                                             "grok-imagine-image-2",
                                             "qwen-image-3",
                                             "qwen-image-3-pro",
+                                            "seedream-5.5",
+                                            "flux-3-image",
+                                            "flux-3-klein",
+                                            "gpt-image-2.6-flare",
+                                            "gpt-image-2.6-sunburst",
                                             "lustify-v8",
                                             "chroma",
                                             "qwen-edit",
@@ -56410,7 +57003,8 @@
                                             "gemini-3-pro-image-preview",
                                             "gpt-5-image-mini",
                                             "gpt-5-image",
-                                            "gpt-5.4-image-2"
+                                            "gpt-5.4-image-2",
+                                            "gemini-nano-banana-2.1"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -58526,7 +59120,13 @@
                                                 "HAILUO_3": "hailuo-3",
                                                 "SEEDANCE_2_5": "seedance-2-5",
                                                 "FLUX_3_VIDEO": "flux-3-video",
-                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                                "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                                "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                                "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                                "WAN_3_0": "wan-3-0",
+                                                "SEEDANCE_2_MINI": "seedance-2-mini",
+                                                "HAILUO_3_MAX": "hailuo-3-max",
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                               }
                                             },
                                             "type": "enum",
@@ -58564,7 +59164,13 @@
                                               "HAILUO_3": "hailuo-3",
                                               "SEEDANCE_2_5": "seedance-2-5",
                                               "FLUX_3_VIDEO": "flux-3-video",
-                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                              "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                              "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                              "WAN_3_0": "wan-3-0",
+                                              "SEEDANCE_2_MINI": "seedance-2-mini",
+                                              "HAILUO_3_MAX": "hailuo-3-max",
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -58600,7 +59206,13 @@
                                               "hailuo-3",
                                               "seedance-2-5",
                                               "flux-3-video",
-                                              "grok-imagine-video-1.5"
+                                              "grok-imagine-video-1.5",
+                                              "gemini-omni-1.2-flash",
+                                              "grok-imagine-video-1.5-lite",
+                                              "wan-3-0",
+                                              "seedance-2-mini",
+                                              "hailuo-3-max",
+                                              "runway-gen-4-5"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -59296,7 +59908,13 @@
                                               "HAILUO_3": "hailuo-3",
                                               "SEEDANCE_2_5": "seedance-2-5",
                                               "FLUX_3_VIDEO": "flux-3-video",
-                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                              "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                              "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                              "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                              "WAN_3_0": "wan-3-0",
+                                              "SEEDANCE_2_MINI": "seedance-2-mini",
+                                              "HAILUO_3_MAX": "hailuo-3-max",
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                             }
                                           },
                                           "type": "enum",
@@ -59334,7 +59952,13 @@
                                             "HAILUO_3": "hailuo-3",
                                             "SEEDANCE_2_5": "seedance-2-5",
                                             "FLUX_3_VIDEO": "flux-3-video",
-                                            "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                                            "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                                            "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                                            "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                                            "WAN_3_0": "wan-3-0",
+                                            "SEEDANCE_2_MINI": "seedance-2-mini",
+                                            "HAILUO_3_MAX": "hailuo-3-max",
+                                            "RUNWAY_GEN_4_5": "runway-gen-4-5"
                                           },
                                           "options": [
                                             "wan-2-7-t2v",
@@ -59370,7 +59994,13 @@
                                             "hailuo-3",
                                             "seedance-2-5",
                                             "flux-3-video",
-                                            "grok-imagine-video-1.5"
+                                            "grok-imagine-video-1.5",
+                                            "gemini-omni-1.2-flash",
+                                            "grok-imagine-video-1.5-lite",
+                                            "wan-3-0",
+                                            "seedance-2-mini",
+                                            "hailuo-3-max",
+                                            "runway-gen-4-5"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -62974,6 +63604,7 @@
                                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                                 "GPT_5_IMAGE": "gpt-5-image",
                                                 "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                                 "KIMI_K2_6": "kimi-k2.6",
                                                 "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                                 "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -63018,7 +63649,12 @@
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                                 "META_MUSE_WONDER": "meta-muse-wonder",
                                                 "MISTRAL_LARGE_4": "mistral-large-4",
-                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                               }
                                             },
                                             "type": "enum",
@@ -63070,6 +63706,7 @@
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
                                               "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                               "KIMI_K2_6": "kimi-k2.6",
                                               "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                               "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -63114,7 +63751,12 @@
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                               "META_MUSE_WONDER": "meta-muse-wonder",
                                               "MISTRAL_LARGE_4": "mistral-large-4",
-                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -63164,6 +63806,7 @@
                                               "gpt-5-image-mini",
                                               "gpt-5-image",
                                               "gpt-5.4-image-2",
+                                              "gemini-nano-banana-2.1",
                                               "kimi-k2.6",
                                               "claude-opus-4.8",
                                               "claude-sonnet-5",
@@ -63208,7 +63851,12 @@
                                               "meta-muse-spark-1.3",
                                               "meta-muse-wonder",
                                               "mistral-large-4",
-                                              "venice-deepseek-v4.1-flash-uncensored"
+                                              "venice-deepseek-v4.1-flash-uncensored",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "minimax-m3.1-flash",
+                                              "meta-muse-ember",
+                                              "drummer-artemis-31b"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -63918,6 +64566,7 @@
                                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                               "GPT_5_IMAGE": "gpt-5-image",
                                               "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                               "KIMI_K2_6": "kimi-k2.6",
                                               "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                               "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -63962,7 +64611,12 @@
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                               "META_MUSE_WONDER": "meta-muse-wonder",
                                               "MISTRAL_LARGE_4": "mistral-large-4",
-                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                             }
                                           },
                                           "type": "enum",
@@ -64014,6 +64668,7 @@
                                             "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                             "GPT_5_IMAGE": "gpt-5-image",
                                             "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                            "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                             "KIMI_K2_6": "kimi-k2.6",
                                             "CLAUDE_OPUS_4_8": "claude-opus-4.8",
                                             "CLAUDE_SONNET_5": "claude-sonnet-5",
@@ -64058,7 +64713,12 @@
                                             "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                             "META_MUSE_WONDER": "meta-muse-wonder",
                                             "MISTRAL_LARGE_4": "mistral-large-4",
-                                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                            "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                            "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                            "GEMINI_4_CARBON": "gemini-4-carbon",
+                                            "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -64108,6 +64768,7 @@
                                             "gpt-5-image-mini",
                                             "gpt-5-image",
                                             "gpt-5.4-image-2",
+                                            "gemini-nano-banana-2.1",
                                             "kimi-k2.6",
                                             "claude-opus-4.8",
                                             "claude-sonnet-5",
@@ -64152,7 +64813,12 @@
                                             "meta-muse-spark-1.3",
                                             "meta-muse-wonder",
                                             "mistral-large-4",
-                                            "venice-deepseek-v4.1-flash-uncensored"
+                                            "venice-deepseek-v4.1-flash-uncensored",
+                                            "gemini-4-hydrogen",
+                                            "gemini-4-carbon",
+                                            "minimax-m3.1-flash",
+                                            "meta-muse-ember",
+                                            "drummer-artemis-31b"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -64858,7 +65524,11 @@
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               }
                                             },
                                             "type": "enum",
@@ -64888,7 +65558,11 @@
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -64916,7 +65590,11 @@
                                               "mimo-v2.6-pro",
                                               "mimo-v2.6-flash",
                                               "meta-muse-spark-1.3",
-                                              "meta-muse-wonder"
+                                              "meta-muse-wonder",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "minimax-m3.1-flash",
+                                              "meta-muse-ember"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -65604,7 +66282,11 @@
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             }
                                           },
                                           "type": "enum",
@@ -65634,7 +66316,11 @@
                                             "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                             "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
                                             "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                                            "META_MUSE_WONDER": "meta-muse-wonder"
+                                            "META_MUSE_WONDER": "meta-muse-wonder",
+                                            "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                            "GEMINI_4_CARBON": "gemini-4-carbon",
+                                            "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                            "META_MUSE_EMBER": "meta-muse-ember"
                                           },
                                           "options": [
                                             "gemini-3.1-pro-preview-customtools",
@@ -65662,7 +66348,11 @@
                                             "mimo-v2.6-pro",
                                             "mimo-v2.6-flash",
                                             "meta-muse-spark-1.3",
-                                            "meta-muse-wonder"
+                                            "meta-muse-wonder",
+                                            "gemini-4-hydrogen",
+                                            "gemini-4-carbon",
+                                            "minimax-m3.1-flash",
+                                            "meta-muse-ember"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -66358,7 +67048,10 @@
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                                 "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                                "META_MUSE_WONDER": "meta-muse-wonder"
+                                                "META_MUSE_WONDER": "meta-muse-wonder",
+                                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                                "META_MUSE_EMBER": "meta-muse-ember"
                                               }
                                             },
                                             "type": "enum",
@@ -66378,7 +67071,10 @@
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -66396,7 +67092,10 @@
                                               "gemini-3.8-flash",
                                               "mimo-v2.6-pro",
                                               "mimo-v2.6-flash",
-                                              "meta-muse-wonder"
+                                              "meta-muse-wonder",
+                                              "gemini-4-hydrogen",
+                                              "gemini-4-carbon",
+                                              "meta-muse-ember"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -67074,7 +67773,10 @@
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                               "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                              "META_MUSE_WONDER": "meta-muse-wonder"
+                                              "META_MUSE_WONDER": "meta-muse-wonder",
+                                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                                              "META_MUSE_EMBER": "meta-muse-ember"
                                             }
                                           },
                                           "type": "enum",
@@ -67094,7 +67796,10 @@
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                             "MIMO_V2_6_PRO": "mimo-v2.6-pro",
                                             "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                                            "META_MUSE_WONDER": "meta-muse-wonder"
+                                            "META_MUSE_WONDER": "meta-muse-wonder",
+                                            "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                            "GEMINI_4_CARBON": "gemini-4-carbon",
+                                            "META_MUSE_EMBER": "meta-muse-ember"
                                           },
                                           "options": [
                                             "gemini-3.1-pro-preview-customtools",
@@ -67112,7 +67817,10 @@
                                             "gemini-3.8-flash",
                                             "mimo-v2.6-pro",
                                             "mimo-v2.6-flash",
-                                            "meta-muse-wonder"
+                                            "meta-muse-wonder",
+                                            "gemini-4-hydrogen",
+                                            "gemini-4-carbon",
+                                            "meta-muse-ember"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -68430,7 +69138,7 @@
           "variant": "muted",
           "label": "Wybierz spośród {{count}} modeli z precyzyjną kontrolą inteligencji, szybkości i kosztów",
           "contentParams": {
-            "count": 226
+            "count": 243
           },
           "usage": {
             "response": true
@@ -68896,6 +69604,7 @@
                                 "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                                 "GPT_5_IMAGE": "gpt-5-image",
                                 "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                                "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                                 "KIMI_K2_6": "kimi-k2.6",
                                 "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                                 "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -68946,7 +69655,12 @@
                                 "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                                 "META_MUSE_WONDER": "meta-muse-wonder",
                                 "MISTRAL_LARGE_4": "mistral-large-4",
-                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                                "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                                "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                                "GEMINI_4_CARBON": "gemini-4-carbon",
+                                "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                                "META_MUSE_EMBER": "meta-muse-ember",
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                               }
                             },
                             "type": "enum",
@@ -69026,6 +69740,7 @@
                               "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
                               "GPT_5_IMAGE": "gpt-5-image",
                               "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
+                              "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
                               "KIMI_K2_6": "kimi-k2.6",
                               "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
                               "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
@@ -69076,7 +69791,12 @@
                               "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
                               "META_MUSE_WONDER": "meta-muse-wonder",
                               "MISTRAL_LARGE_4": "mistral-large-4",
-                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored"
+                              "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
+                              "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
+                              "GEMINI_4_CARBON": "gemini-4-carbon",
+                              "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
+                              "META_MUSE_EMBER": "meta-muse-ember",
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
                             },
                             "options": [
                               "gpt-55",
@@ -69154,6 +69874,7 @@
                               "gpt-5-image-mini",
                               "gpt-5-image",
                               "gpt-5.4-image-2",
+                              "gemini-nano-banana-2.1",
                               "kimi-k2.6",
                               "deepseek-v4-pro",
                               "deepseek-v4-flash",
@@ -69204,7 +69925,12 @@
                               "meta-muse-spark-1.3",
                               "meta-muse-wonder",
                               "mistral-large-4",
-                              "venice-deepseek-v4.1-flash-uncensored"
+                              "venice-deepseek-v4.1-flash-uncensored",
+                              "gemini-4-hydrogen",
+                              "gemini-4-carbon",
+                              "minimax-m3.1-flash",
+                              "meta-muse-ember",
+                              "drummer-artemis-31b"
                             ]
                           }
                         },
@@ -69570,7 +70296,13 @@
                     "HAILUO_3": "hailuo-3",
                     "SEEDANCE_2_5": "seedance-2-5",
                     "FLUX_3_VIDEO": "flux-3-video",
-                    "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                    "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                    "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                    "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                    "WAN_3_0": "wan-3-0",
+                    "SEEDANCE_2_MINI": "seedance-2-mini",
+                    "HAILUO_3_MAX": "hailuo-3-max",
+                    "RUNWAY_GEN_4_5": "runway-gen-4-5"
                   }
                 },
                 "type": "enum",
@@ -69608,7 +70340,13 @@
                   "HAILUO_3": "hailuo-3",
                   "SEEDANCE_2_5": "seedance-2-5",
                   "FLUX_3_VIDEO": "flux-3-video",
-                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5"
+                  "GROK_IMAGINE_VIDEO_1_5": "grok-imagine-video-1.5",
+                  "GEMINI_OMNI_1_2_FLASH": "gemini-omni-1.2-flash",
+                  "GROK_IMAGINE_VIDEO_1_5_LITE": "grok-imagine-video-1.5-lite",
+                  "WAN_3_0": "wan-3-0",
+                  "SEEDANCE_2_MINI": "seedance-2-mini",
+                  "HAILUO_3_MAX": "hailuo-3-max",
+                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
                 },
                 "options": [
                   "wan-2-7-t2v",
@@ -69644,7 +70382,13 @@
                   "hailuo-3",
                   "seedance-2-5",
                   "flux-3-video",
-                  "grok-imagine-video-1.5"
+                  "grok-imagine-video-1.5",
+                  "gemini-omni-1.2-flash",
+                  "grok-imagine-video-1.5-lite",
+                  "wan-3-0",
+                  "seedance-2-mini",
+                  "hailuo-3-max",
+                  "runway-gen-4-5"
                 ]
               }
             },

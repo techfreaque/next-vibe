@@ -2,7 +2,8 @@ export const translations = {
   meta: {
     category: "AI Models",
     index: {
-      title: "{{count}} AI chat models - prices, context, filters | {{appName}}",
+      title:
+        "{{count}} AI chat models - prices, context, filters | {{appName}}",
       description:
         "Every model on {{appName}} in one list: Claude, GPT, Gemini, Grok, DeepSeek, open and uncensored chat, plus image, voice, music and video. Real price per use, context window, inputs. Pick one, start now.",
       imageAlt: "AI model directory on {{appName}}",
@@ -106,7 +107,8 @@ export const translations = {
     hideLegacy: "Hide legacy",
   },
   index: {
-    eyebrow: "{{chat}} chat models, plus {{image}} image, {{video}} video, {{music}} music and {{voice}} voice models",
+    eyebrow:
+      "{{chat}} chat models, plus {{image}} image, {{video}} video, {{music}} music and {{voice}} voice models",
     title: "Every model. One chat.",
     subtitle:
       "Mainstream, open and uncensored. Real prices per message, real context sizes. You choose the filter. Not us.",

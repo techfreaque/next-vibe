@@ -1,22 +1,37 @@
 /**
  * ModelsLab price fetcher.
  *
- * Scrapes pricing data from individual model detail pages on modelslab.com,
- * and settings (durations, resolutions, aspect ratios) from each model's llms.txt.
+ * Prices come from the structured Inertia page data embedded in each model
+ * detail page (`<div id="app" data-page="{...}">` on modelslab.com/models/<slug>),
+ * never from the page's visible text: that text also carries subscription plan
+ * prices ("$149/month Open Source Unlimited plan") and hand-written blurbs that
+ * lag behind the billed price.
  *
- * Detail pages show prices in text like:
- *   "Cost for 720P: $0.10/second, 1080P: $0.15/second"
- *   "Per second video generation will cost $0.48"
- *   "Per image generation will cost 0.088$"
+ * `props.model` (the same record ModelsLab bills from):
+ *   model_price_type "per_generation" → model_price = USD per image / clip / video
+ *   model_price_type "per_second"     → model_price = USD per second
+ *   model_price_type "multiplier"     → price_rules.base_price, scaled by
+ *     price_rules.multipliers: a linear `duration` multiplier makes it USD per
+ *     second; a `resolution` lookup ({"720p": 1, "1080p": 1.5}) gives per-tier
+ *     prices (→ pricingByResolution).
+ * `props.model_facts.price` ("$0.054 per image", "From $0.1 per second of
+ * video") is the fallback when model_price_type is missing.
  *
- * llms.txt files list API parameters with types and allowed values.
+ * Every parsed price passes a plausibility guard (plan prices listed on the
+ * page, absolute USD caps, ratio to the current definition value); a value that
+ * fails it is reported as a failure, never emitted.
+ *
+ * Settings (durations, resolutions, aspect ratios) come from each model's llms.txt,
+ * which lists API parameters with types and allowed values.
  *
  * Maps providerModel → detail page URL slug via DETAIL_PAGE_SLUGS.
  */
 
 import "server-only";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { imageGenModelDefinitions } from "../../../image-generation/models";
 import { musicGenModelDefinitions } from "../../../music-generation/models";
@@ -60,7 +75,7 @@ const DETAIL_PAGE_SLUGS: Record<string, string> = {
   "omni-human-1.5": "byteplus/omnihuman-1.5",
   "sora-2-pro-t2v": "openai/sora-2-pro-t2v",
   gen4_aleph: "runway_ml/gen4_aleph",
-  "lipsync-2": "byteplus/lipsync-2",
+  "lipsync-2": "sync/lipsync-2",
 
   // === Image: Text-to-Image ===
   gen4_image_turbo: "runway_ml/gen4_image_turbo",
@@ -89,13 +104,286 @@ const DETAIL_PAGE_SLUGS: Record<string, string> = {
   "lyria-3": "google/lyria-3",
 };
 
+/**
+ * Plausibility caps in USD. ModelsLab per-generation prices are cents to low
+ * dollars; anything above these is a misparse (e.g. a plan price), not a price.
+ */
+const MAX_USD_PER_IMAGE = 5;
+const MAX_USD_PER_CLIP = 20;
+const MAX_USD_PER_SECOND = 3;
+/** A parsed price above this multiple of the current definition value is rejected */
+const MAX_RATIO_TO_CURRENT = 4;
+
+/** "0.054000" (DB decimal) or 0.054 */
+const usdAmountSchema = z.union([
+  z.number(),
+  z
+    .string()
+    .regex(/^\d+(?:\.\d+)?$/)
+    .transform(Number),
+]);
+
+const priceMultiplierSchema = z.object({
+  type: z.string(),
+  values: z.record(z.string(), z.number()).optional().catch(undefined),
+});
+
+const priceRulesSchema = z.object({
+  base_price: z.number(),
+  multipliers: z.record(z.string(), priceMultiplierSchema).optional(),
+});
+
+/** Inertia page props of a model detail page (only the fields read here) */
+const detailPageSchema = z.object({
+  props: z.object({
+    model: z.object({
+      model_id: z.string().nullish(),
+      model_price: usdAmountSchema.nullish(),
+      model_price_type: z.string().nullish(),
+      // null, [] (no rules) or a rules object
+      price_rules: priceRulesSchema.nullish().catch(null),
+    }),
+    model_facts: z.object({ price: z.string().nullish() }).nullish(),
+  }),
+});
+
+type DetailPage = z.infer<typeof detailPageSchema>;
+
 interface ParsedPrice {
   /** USD per second (for video/audio) or per generation (for image) */
   usdPrice: number;
   /** "per_second" or "per_generation" */
   priceType: "per_second" | "per_generation";
-  /** If resolution-based pricing exists, lowest tier price is used as base */
+  /** USD per resolution tier ("720p" → 0.1), same unit as usdPrice */
   resolutionPricing?: Record<string, number>;
+  /** The API model_id the page describes */
+  pageModelId: string | null;
+  /** Prices of subscription plans mentioned on the page ($/month, $/year) */
+  planPricesUsd: ReadonlySet<number>;
+}
+
+type PriceParseResult =
+  | { ok: true; price: ParsedPrice }
+  | { ok: false; reason: string };
+
+const NAMED_HTML_ENTITIES: Record<string, string> = {
+  quot: '"',
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  apos: "'",
+  nbsp: " ",
+};
+
+/** Decode the HTML entities of an attribute value (&quot; &#039; &#x2F; ...) */
+function decodeHtmlAttribute(value: string): string {
+  return value.replaceAll(
+    /&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,
+    (match: string, entity: string): string => {
+      if (entity.startsWith("#")) {
+        const isHex = entity[1] === "x" || entity[1] === "X";
+        const codePoint = parseInt(
+          entity.slice(isHex ? 2 : 1),
+          isHex ? 16 : 10,
+        );
+        return Number.isInteger(codePoint) && codePoint <= 0x10ffff
+          ? String.fromCodePoint(codePoint)
+          : match;
+      }
+      return NAMED_HTML_ENTITIES[entity.toLowerCase()] ?? match;
+    },
+  );
+}
+
+/** Subscription plan prices the page mentions ("$149/month") */
+function extractPlanPricesUsd(html: string): Set<number> {
+  const prices = new Set<number>();
+  for (const m of html.matchAll(
+    /\$\s*(\d+(?:\.\d+)?)\s*\/\s*(?:month|mo|year|yr)\b/gi,
+  )) {
+    const price = parseFloat(m[1] ?? "");
+    if (price > 0) {
+      prices.add(price);
+    }
+  }
+  return prices;
+}
+
+/** "$0.054 per image", "From $0.1 per second of video", "$0.05 per generation" */
+function parseFactsPrice(
+  factsPrice: string | null | undefined,
+): Pick<ParsedPrice, "usdPrice" | "priceType"> | null {
+  const m =
+    /^\s*(?:from\s+)?\$(\d+(?:\.\d+)?)\s+per\s+(image|generation|video|clip|second)\b/i.exec(
+      factsPrice ?? "",
+    );
+  if (!m) {
+    return null;
+  }
+  const usdPrice = parseFloat(m[1] ?? "");
+  if (!(usdPrice > 0)) {
+    return null;
+  }
+  return {
+    usdPrice,
+    priceType:
+      m[2]?.toLowerCase() === "second" ? "per_second" : "per_generation",
+  };
+}
+
+/**
+ * Resolution tiers from a price_rules `resolution` lookup. Only "720" / "720p" /
+ * "720P" keys map to our resolution labels; pixel sizes ("1920x1080") are skipped.
+ */
+function parseResolutionTiers(
+  basePrice: number,
+  values: Record<string, number> | undefined,
+): Record<string, number> | undefined {
+  if (!values) {
+    return undefined;
+  }
+  const tiers: Record<string, number> = {};
+  for (const [key, multiplier] of Object.entries(values)) {
+    const m = /^(\d{3,4})[pP]?$/.exec(key.trim());
+    if (m && multiplier > 0) {
+      tiers[`${m[1] ?? ""}p`] = basePrice * multiplier;
+    }
+  }
+  return Object.keys(tiers).length > 1 ? tiers : undefined;
+}
+
+/** Read the price from the structured Inertia props of a detail page */
+function parsePriceFromPageData(
+  page: DetailPage,
+  planPricesUsd: ReadonlySet<number>,
+): PriceParseResult {
+  const { model, model_facts: facts } = page.props;
+  const pageModelId = model.model_id ?? null;
+  const priceType = model.model_price_type;
+  const modelPrice = model.model_price;
+
+  if (
+    (priceType === "per_generation" || priceType === "per_second") &&
+    modelPrice !== null &&
+    modelPrice !== undefined &&
+    modelPrice > 0
+  ) {
+    return {
+      ok: true,
+      price: { usdPrice: modelPrice, priceType, pageModelId, planPricesUsd },
+    };
+  }
+
+  if (priceType === "multiplier") {
+    const rules = model.price_rules;
+    if (!rules || !(rules.base_price > 0)) {
+      return {
+        ok: false,
+        reason: `model_price_type "multiplier" without a usable price_rules.base_price`,
+      };
+    }
+    const multipliers = rules.multipliers ?? {};
+    return {
+      ok: true,
+      price: {
+        usdPrice: rules.base_price,
+        priceType:
+          multipliers["duration"]?.type === "linear"
+            ? "per_second"
+            : "per_generation",
+        resolutionPricing: parseResolutionTiers(
+          rules.base_price,
+          multipliers["resolution"]?.values,
+        ),
+        pageModelId,
+        planPricesUsd,
+      },
+    };
+  }
+
+  const fromFacts = parseFactsPrice(facts?.price);
+  if (fromFacts) {
+    return {
+      ok: true,
+      price: { ...fromFacts, pageModelId, planPricesUsd },
+    };
+  }
+
+  return {
+    ok: false,
+    reason: `no usable price in page data (model_price_type: ${String(priceType)}, model_price: ${String(modelPrice)}, model_facts.price: ${String(facts?.price)})`,
+  };
+}
+
+/** Parse the price from a ModelsLab model detail page's embedded Inertia data */
+function parsePriceFromDetailPage(html: string): PriceParseResult {
+  const match = /\sdata-page="([^"]*)"/.exec(html);
+  const encoded = match?.[1];
+  if (!encoded) {
+    return {
+      ok: false,
+      reason: "no Inertia data-page attribute (page layout changed)",
+    };
+  }
+  let page: DetailPage;
+  try {
+    const parsed = detailPageSchema.safeParse(
+      JSON.parse(decodeHtmlAttribute(encoded)),
+    );
+    if (!parsed.success) {
+      return {
+        ok: false,
+        reason: `unexpected data-page shape: ${parsed.error.message}`,
+      };
+    }
+    page = parsed.data;
+  } catch (err) {
+    return {
+      ok: false,
+      reason: `data-page is not valid JSON: ${parseError(err).message}`,
+    };
+  }
+  return parsePriceFromPageData(page, extractPlanPricesUsd(html));
+}
+
+/**
+ * Reject values that cannot be a per-generation / per-second price.
+ * @param usdRaw - the price as parsed (before per-clip / per-second conversion)
+ * @param usdValue - the price in the unit of `field`
+ */
+function implausiblePriceReason(params: {
+  field: "creditCostPerImage" | "creditCostPerClip" | "creditCostPerSecond";
+  usdRaw: number;
+  usdValue: number;
+  credits: number;
+  currentCredits: number | undefined;
+  planPricesUsd: ReadonlySet<number>;
+}): string | null {
+  const { field, usdRaw, usdValue, credits, currentCredits, planPricesUsd } =
+    params;
+  if (!(usdValue > 0) || !Number.isFinite(usdValue)) {
+    return `parsed ${field} is not a positive number (${String(usdValue)} USD)`;
+  }
+  if (planPricesUsd.has(usdRaw) || planPricesUsd.has(usdValue)) {
+    return `parsed $${String(usdRaw)} matches a subscription plan price on the page, not a per-generation price`;
+  }
+  const cap =
+    field === "creditCostPerImage"
+      ? MAX_USD_PER_IMAGE
+      : field === "creditCostPerClip"
+        ? MAX_USD_PER_CLIP
+        : MAX_USD_PER_SECOND;
+  if (usdValue > cap) {
+    return `parsed ${field} $${String(usdValue)} exceeds the $${String(cap)} sanity cap`;
+  }
+  if (
+    currentCredits !== undefined &&
+    currentCredits > 0 &&
+    credits > currentCredits * MAX_RATIO_TO_CURRENT
+  ) {
+    return `parsed ${field} ${String(credits)} credits is more than ${String(MAX_RATIO_TO_CURRENT)}x the current ${String(currentCredits)}`;
+  }
+  return null;
 }
 
 interface ParsedSettings {
@@ -107,109 +395,6 @@ interface ParsedSettings {
   aspectRatios?: string[];
   /** The API takes an `init_image` parameter (image-to-video / image input) */
   acceptsInitImage?: boolean;
-}
-
-/**
- * Parse pricing text from a ModelsLab model detail page.
- */
-function parsePriceFromDetailPage(html: string): ParsedPrice | null {
-  const text = html
-    .replaceAll("&quot;", '"')
-    .replaceAll("&amp;", "&")
-    .replaceAll("&#039;", "'")
-    .replaceAll(/<[^>]+>/g, " ");
-
-  // Pattern 1: Resolution-based pricing "Cost for 720P: $0.10/second, 1080P: $0.15/second"
-  const resolutionPattern =
-    /(\d+[Pp]|FHD|2K|4K|HD|480[Pp])[\s:]*\$?([\d.]+)\/?(?:second|sec)/gi;
-  const resMatches = [...text.matchAll(resolutionPattern)];
-  if (resMatches.length > 0) {
-    const resolutionPricing: Record<string, number> = {};
-    let minPrice = Infinity;
-    for (const m of resMatches) {
-      const resolution = m[1] ?? "";
-      const price = parseFloat(m[2] ?? "0");
-      if (!isNaN(price) && price > 0) {
-        resolutionPricing[resolution] = price;
-        if (price < minPrice) {
-          minPrice = price;
-        }
-      }
-    }
-    if (minPrice < Infinity) {
-      return {
-        usdPrice: minPrice,
-        priceType: "per_second",
-        resolutionPricing,
-      };
-    }
-  }
-
-  // Pattern 2: "Per sec(ond) ... will cost X.XX$" or "$X.XX" with per-second context
-  const perSecCostPattern =
-    /per sec(?:ond)?[^.]*?(?:cost|price)[^.]*?([\d.]+)\s*\$|per sec(?:ond)?[^.]*?\$([\d.]+)/gi;
-  const secCostMatch = perSecCostPattern.exec(text);
-  if (secCostMatch) {
-    const price = parseFloat(secCostMatch[1] ?? secCostMatch[2] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_second" };
-    }
-  }
-
-  // Pattern 3: "$X.XX/sec" or "$X.XX/second" or "$X.XX per second"
-  const simpleSecPattern =
-    /\$([\d.]+)\s*(?:\/\s*sec(?:ond)?|per sec(?:ond)?)/gi;
-  const simpleSecMatch = simpleSecPattern.exec(text);
-  if (simpleSecMatch) {
-    const price = parseFloat(simpleSecMatch[1] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_second" };
-    }
-  }
-
-  // Pattern 4: "Per second video generation will cost $X.XX"
-  const perSecondDollarFirst =
-    /(?:per sec(?:ond)?|per-second|\/second|\/sec)[^.]*?\$([\d.]+)/gi;
-  const secDollarMatch = perSecondDollarFirst.exec(text);
-  if (secDollarMatch) {
-    const price = parseFloat(secDollarMatch[1] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_second" };
-    }
-  }
-
-  // Pattern 5: "per image generation will cost X.XX$" or "cost $X.XX" (per generation)
-  const perGenCostPattern =
-    /per (?:image|generation)[^.]*?(?:cost|price)[^.]*?([\d.]+)\s*\$|(?:cost|price)[^.]*?\$([\d.]+)/gi;
-  const genCostMatch = perGenCostPattern.exec(text);
-  if (genCostMatch) {
-    const price = parseFloat(genCostMatch[1] ?? genCostMatch[2] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_generation" };
-    }
-  }
-
-  // Pattern 6: "X.XX$" standalone (number followed by dollar sign)
-  const trailingDollarPattern = /(?:^|\s)([\d.]+)\$/gm;
-  const trailingMatch = trailingDollarPattern.exec(text);
-  if (trailingMatch) {
-    const price = parseFloat(trailingMatch[1] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_generation" };
-    }
-  }
-
-  // Pattern 7: "$X.XX/video" → per_generation
-  const perVideoPattern = /\$([\d.]+)\s*\/\s*video/gi;
-  const vidMatch = perVideoPattern.exec(text);
-  if (vidMatch) {
-    const price = parseFloat(vidMatch[1] ?? "0");
-    if (!isNaN(price) && price > 0) {
-      return { usdPrice: price, priceType: "per_generation" };
-    }
-  }
-
-  return null;
 }
 
 /**
@@ -372,11 +557,15 @@ function parseSettingsFromLlmsTxt(text: string): ParsedSettings {
   return settings;
 }
 
-/** Fetch a URL with standard headers, returning text or null on failure */
+type PageFetchResult =
+  | { ok: true; text: string }
+  | { ok: false; reason: string };
+
+/** Fetch a URL with standard headers */
 async function fetchPage(
   url: string,
   logger: EndpointLogger,
-): Promise<string | null> {
+): Promise<PageFetchResult> {
   try {
     // oxlint-disable-next-line restricted/no-raw-fetch -- external API
     const response = await fetch(url, {
@@ -389,15 +578,19 @@ async function fetchPage(
         url,
         status: response.status,
       });
-      return null;
+      return {
+        ok: false,
+        reason:
+          response.status === 404
+            ? `${url} returned HTTP 404 (model removed or slug moved upstream)`
+            : `${url} returned HTTP ${String(response.status)}`,
+      };
     }
-    return await response.text();
+    return { ok: true, text: await response.text() };
   } catch (err) {
-    logger.warn("ModelsLab page fetch error", {
-      url,
-      error: err instanceof Error ? err.message : String(err),
-    });
-    return null;
+    const message = parseError(err).message;
+    logger.warn("ModelsLab page fetch error", { url, error: message });
+    return { ok: false, reason: `${url} fetch error: ${message}` };
   }
 }
 
@@ -424,6 +617,8 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       isAudio: boolean;
       isImage: boolean;
       defaultDurationSeconds: number;
+      /** Current credit cost in the definition (plausibility baseline) */
+      currentCredits: number | undefined;
     }> = [];
 
     for (const def of allDefs) {
@@ -448,12 +643,22 @@ export class ModelslabPriceFetcher extends PriceFetcher {
             "defaultDurationSeconds" in providerConfig
               ? (providerConfig.defaultDurationSeconds ?? 0)
               : 0,
+          currentCredits:
+            "creditCostPerSecond" in providerConfig
+              ? providerConfig.creditCostPerSecond
+              : "creditCostPerClip" in providerConfig
+                ? providerConfig.creditCostPerClip
+                : "creditCostPerImage" in providerConfig
+                  ? providerConfig.creditCostPerImage
+                  : undefined,
         });
       }
     }
 
+    const configuredProviderModels = new Set(Object.keys(DETAIL_PAGE_SLUGS));
+
     // De-duplicate fetches by slug
-    const slugToPrice = new Map<string, ParsedPrice | null>();
+    const slugToPrice = new Map<string, PriceParseResult>();
     const slugToSettings = new Map<string, ParsedSettings | null>();
     let modelsFound = 0;
 
@@ -468,113 +673,129 @@ export class ModelslabPriceFetcher extends PriceFetcher {
         continue;
       }
 
+      const detailUrl = `${BASE_URL}/${slug}`;
+
       // Fetch detail page + llms.txt (cached per slug)
-      if (!slugToPrice.has(slug)) {
-        const detailUrl = `${BASE_URL}/${slug}`;
+      let priceResult = slugToPrice.get(slug);
+      if (!priceResult) {
         const llmsUrl = `${detailUrl}/llms.txt`;
 
-        const detailHtml = await fetchPage(detailUrl, logger);
-        if (detailHtml) {
-          const parsed = parsePriceFromDetailPage(detailHtml);
-          slugToPrice.set(slug, parsed);
-          if (parsed) {
-            modelsFound++;
-          } else {
-            logger.warn("Could not parse price from detail page", {
-              slug,
-              url: detailUrl,
-            });
-          }
-        } else {
-          slugToPrice.set(slug, null);
+        const detailPage = await fetchPage(detailUrl, logger);
+        priceResult = detailPage.ok
+          ? parsePriceFromDetailPage(detailPage.text)
+          : detailPage;
+        slugToPrice.set(slug, priceResult);
+        if (priceResult.ok) {
+          modelsFound++;
+        } else if (detailPage.ok) {
+          logger.warn("Could not parse price from detail page", {
+            slug,
+            url: detailUrl,
+            reason: priceResult.reason,
+          });
         }
 
         // Fetch llms.txt for settings
-        const llmsText = await fetchPage(llmsUrl, logger);
-        if (llmsText) {
-          slugToSettings.set(slug, parseSettingsFromLlmsTxt(llmsText));
-        } else {
-          slugToSettings.set(slug, null);
-        }
+        const llmsPage = await fetchPage(llmsUrl, logger);
+        slugToSettings.set(
+          slug,
+          llmsPage.ok ? parseSettingsFromLlmsTxt(llmsPage.text) : null,
+        );
       }
 
-      const parsed = slugToPrice.get(slug);
-      if (!parsed) {
+      if (!priceResult.ok) {
         failures.push({
           modelId: config.id,
           provider: ApiProvider.MODELSLAB,
-          reason: `Could not parse price from detail page for "${config.providerModel}" (slug: "${slug}")`,
+          reason: `No price for "${config.providerModel}" (slug: "${slug}"): ${priceResult.reason}`,
+        });
+        continue;
+      }
+      const parsed = priceResult.price;
+
+      // A slug that now redirects to a sibling model's page (e.g. a retired
+      // model folded into its successor) must not price this model.
+      if (
+        parsed.pageModelId !== null &&
+        parsed.pageModelId !== config.providerModel &&
+        configuredProviderModels.has(parsed.pageModelId)
+      ) {
+        failures.push({
+          modelId: config.id,
+          provider: ApiProvider.MODELSLAB,
+          reason: `Detail page for "${config.providerModel}" (slug: "${slug}") now describes "${parsed.pageModelId}"; the model was likely retired or renamed upstream`,
         });
         continue;
       }
 
-      const detailUrl = `${BASE_URL}/${slug}`;
-
       // === Price updates ===
-      if (config.isImage) {
-        updates.push({
-          modelId: config.id,
-          name: config.def.name,
-          provider: ApiProvider.MODELSLAB,
-          field: "creditCostPerImage",
-          value: this.usdToCredits(parsed.usdPrice),
-          source: detailUrl,
-          providerModel: config.providerModel,
-        });
-      } else if (config.isVideo) {
-        if (parsed.priceType === "per_generation") {
-          const duration = config.defaultDurationSeconds || 5;
-          const perSecond = parsed.usdPrice / duration;
-          updates.push({
-            modelId: config.id,
-            name: config.def.name,
-            provider: ApiProvider.MODELSLAB,
-            field: "creditCostPerSecond",
-            value: this.usdToCredits(perSecond),
-            source: detailUrl,
-            providerModel: config.providerModel,
-          });
-        } else {
-          updates.push({
-            modelId: config.id,
-            name: config.def.name,
-            provider: ApiProvider.MODELSLAB,
-            field: "creditCostPerSecond",
-            value: this.usdToCredits(parsed.usdPrice),
-            source: detailUrl,
-            providerModel: config.providerModel,
-          });
+      // Convert the parsed price into the unit of the definition's cost field.
+      const videoDuration = config.defaultDurationSeconds || 5;
+      const audioDuration = config.defaultDurationSeconds || 30;
+      const toFieldUsd = (usd: number): number => {
+        if (config.isVideo) {
+          return parsed.priceType === "per_generation"
+            ? usd / videoDuration
+            : usd;
         }
+        if (config.isAudio && parsed.priceType === "per_second") {
+          return usd * audioDuration;
+        }
+        return usd;
+      };
+      const field = config.isImage
+        ? "creditCostPerImage"
+        : config.isVideo
+          ? "creditCostPerSecond"
+          : "creditCostPerClip";
+      const usdValue = toFieldUsd(parsed.usdPrice);
+      const credits = this.usdToCredits(usdValue);
 
-        // Resolution-based pricing → pricingByResolution
-        if (parsed.resolutionPricing) {
-          const pricingObj: Record<string, number> = {};
-          for (const [res, usd] of Object.entries(parsed.resolutionPricing)) {
-            pricingObj[normalizeResolution(res)] = this.usdToCredits(usd);
-          }
-          settingsUpdates.push({
-            providerModel: config.providerModel,
-            field: "pricingByResolution",
-            tsLiteral: JSON.stringify(pricingObj)
-              .replaceAll('"', '"')
-              .replaceAll(",", ", "),
-            source: detailUrl,
-          });
-        }
-      } else {
-        // Audio clip
-        const usdPerClip =
-          parsed.priceType === "per_second"
-            ? parsed.usdPrice * (config.defaultDurationSeconds || 30)
-            : parsed.usdPrice;
-        updates.push({
-          modelId: config.id,
-          name: config.def.name,
-          provider: ApiProvider.MODELSLAB,
-          field: "creditCostPerClip",
-          value: this.usdToCredits(usdPerClip),
-          source: detailUrl,
+      const implausible = implausiblePriceReason({
+        field,
+        usdRaw: parsed.usdPrice,
+        usdValue,
+        credits,
+        currentCredits: config.currentCredits,
+        planPricesUsd: parsed.planPricesUsd,
+      });
+      if (implausible) {
+        logger.warn("Rejected implausible ModelsLab price", {
           providerModel: config.providerModel,
+          url: detailUrl,
+          reason: implausible,
+        });
+        failures.push({
+          modelId: config.id,
+          provider: ApiProvider.MODELSLAB,
+          reason: `Rejected price for "${config.providerModel}" (slug: "${slug}"): ${implausible}`,
+        });
+        continue;
+      }
+
+      updates.push({
+        modelId: config.id,
+        name: config.def.name,
+        provider: ApiProvider.MODELSLAB,
+        field,
+        value: credits,
+        source: detailUrl,
+        providerModel: config.providerModel,
+      });
+
+      // Resolution-based pricing → pricingByResolution (video only)
+      if (config.isVideo && parsed.resolutionPricing) {
+        const pricingObj: Record<string, number> = {};
+        for (const [res, usd] of Object.entries(parsed.resolutionPricing)) {
+          pricingObj[normalizeResolution(res)] = this.usdToCredits(
+            toFieldUsd(usd),
+          );
+        }
+        settingsUpdates.push({
+          providerModel: config.providerModel,
+          field: "pricingByResolution",
+          tsLiteral: JSON.stringify(pricingObj).replaceAll(",", ", "),
+          source: detailUrl,
         });
       }
 
@@ -655,6 +876,10 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       }
     }
 
+    // Not a single page yielded a price: ModelsLab is down or changed its page
+    // layout. Flag the provider as unverifiable so its models are not disabled.
+    const providerDown = modelsLabConfigs.length > 0 && modelsFound === 0;
+
     return {
       provider: this.providerName,
       modelsFound,
@@ -662,6 +887,13 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       updates,
       settingsUpdates,
       failures,
+      ...(providerDown
+        ? {
+            error:
+              "No ModelsLab detail page yielded a price (site down or page layout changed)",
+            failedApiProviders: [ApiProvider.MODELSLAB],
+          }
+        : {}),
     };
   }
 }

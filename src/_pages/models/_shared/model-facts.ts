@@ -308,6 +308,7 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_FLASH_UNCENSORED],
   // Built uncensored vs the roleplay/fiction picks (dark and taboo scenes).
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.DRUMMER_ARTEMIS_31B],
   [
     ChatModelId.UNCENSORED_LM_V1_2,
     ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,

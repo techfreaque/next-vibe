@@ -36,7 +36,7 @@ export const FEATURED_MODELS = {
   mainstream: [
     chatModelDefinitions[ChatModelId.CLAUDE_OPUS_5_5].name,
     chatModelDefinitions[ChatModelId.GPT_6_ASTRA].name,
-    chatModelDefinitions[ChatModelId.GEMINI_4_ARGON].name,
+    chatModelDefinitions[ChatModelId.GEMINI_4_CARBON].name,
     chatModelDefinitions[ChatModelId.GROK_4_7].name,
   ],
   open: [

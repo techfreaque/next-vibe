@@ -1199,6 +1199,13 @@
       "when": 1794588761650,
       "tag": "20261113165241_credit_transactions_grant_key",
       "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1794589856190,
+      "tag": "20261113171056_model_catalog_scans",
+      "breakpoints": true
     }
   ]
 }

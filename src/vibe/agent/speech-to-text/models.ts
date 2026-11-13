@@ -57,13 +57,13 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.OPENAI_STT,
         providerModel: "whisper-1",
-        creditCostPerSecond: 0.01, // updated: 2026-04-03 from platform.openai.com
+        creditCostPerSecond: 0.01, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing ($0.006/min)
       },
       {
         id: SttModelId.OPENAI_WHISPER,
         apiProvider: ApiProvider.EDEN_AI_STT,
         providerModel: "openai",
-        creditCostPerSecond: 0.0106, // updated: 2026-04-03 from api.edenai.run
+        creditCostPerSecond: 0.0106, // updated: 2026-11-13 from api.edenai.run
       },
       {
         id: SttModelId.OPENAI_WHISPER,
@@ -74,7 +74,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     ],
   },
   [SttModelId.DEEPGRAM_NOVA_2]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Nova-2",
     by: "deepgram",
     description: "speechToText.models.descriptions.deepgramNova2",
@@ -97,7 +96,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.DEEPGRAM,
         providerModel: "nova-2",
-        creditCostPerSecond: 0.0097, // updated: 2026-03-31 from deepgram.com
+        creditCostPerSecond: 0.0097, // updated: 2026-11-13 from deepgram.com/pricing ($0.35/hour)
       },
       {
         id: SttModelId.DEEPGRAM_NOVA_2,
@@ -108,7 +107,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     ],
   },
   [SttModelId.WHISPER_LARGE_V3]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Whisper Large V3",
     by: "openAI",
     description: "speechToText.models.descriptions.whisperLargeV3",
@@ -131,7 +129,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.WHISPER_LARGE_V3,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Whisper-Large-V3",
-        creditCostPerSecond: 0.000825, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.000495/min)
+        creditCostPerSecond: 0.000825, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.000495/min)
       },
       {
         id: SttModelId.WHISPER_LARGE_V3,
@@ -142,7 +140,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     ],
   },
   [SttModelId.VOXTRAL_MINI_TRANSCRIBE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Voxtral Mini Transcribe",
     by: "mistral",
     description: "speechToText.models.descriptions.voxtralMini",
@@ -165,7 +162,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.VOXTRAL_MINI_TRANSCRIBE,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "voxtral-mini-transcribe-3-0",
-        creditCostPerSecond: 0.00642, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.00385/min)
+        creditCostPerSecond: 0.006417, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.00385/min)
       },
       {
         id: SttModelId.VOXTRAL_MINI_TRANSCRIBE,
@@ -176,7 +173,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     ],
   },
   [SttModelId.NEMOTRON_ASR]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Nemotron ASR",
     by: "nvidia",
     description: "speechToText.models.descriptions.nemotronAsr",
@@ -199,7 +195,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.NEMOTRON_ASR,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "nvidia/nemotron-asr-multilingual/asr",
-        creditCostPerSecond: 0.02267, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0136/min)
+        creditCostPerSecond: 0.02267, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0136/min)
       },
       {
         id: SttModelId.NEMOTRON_ASR,
@@ -210,7 +206,6 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
     ],
   },
   [SttModelId.GPT4O_MINI_TRANSCRIBE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "GPT-4o Mini Transcribe",
     by: "openAI",
     description: "speechToText.models.descriptions.gpt4oMiniTranscribe",
@@ -233,7 +228,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.GPT4O_MINI_TRANSCRIBE,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "gpt-4o-mini-transcribe",
-        creditCostPerSecond: 0.0085, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models ($0.0051/min)
+        creditCostPerSecond: 0.0085, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0051/min)
       },
       {
         id: SttModelId.GPT4O_MINI_TRANSCRIBE,

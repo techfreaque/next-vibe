@@ -52,6 +52,7 @@ export enum ImageVisionModelId {
   GPT_5_IMAGE_MINI = "gpt-5-image-mini",
   GPT_5_IMAGE = "gpt-5-image",
   GPT_5_4_IMAGE_2 = "gpt-5.4-image-2",
+  GEMINI_NANO_BANANA_2_1 = "gemini-nano-banana-2.1",
   KIMI_K2_6 = "kimi-k2.6",
   CLAUDE_OPUS_4_8 = "claude-opus-4.8",
   CLAUDE_SONNET_5 = "claude-sonnet-5",
@@ -97,6 +98,11 @@ export enum ImageVisionModelId {
   META_MUSE_WONDER = "meta-muse-wonder",
   MISTRAL_LARGE_4 = "mistral-large-4",
   VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED = "venice-deepseek-v4.1-flash-uncensored",
+  GEMINI_4_HYDROGEN = "gemini-4-hydrogen",
+  GEMINI_4_CARBON = "gemini-4-carbon",
+  MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
+  META_MUSE_EMBER = "meta-muse-ember",
+  DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
 }
 
 export enum VideoVisionModelId {
@@ -126,6 +132,10 @@ export enum VideoVisionModelId {
   MIMO_V2_6_FLASH = "mimo-v2.6-flash",
   META_MUSE_SPARK_1_3 = "meta-muse-spark-1.3",
   META_MUSE_WONDER = "meta-muse-wonder",
+  GEMINI_4_HYDROGEN = "gemini-4-hydrogen",
+  GEMINI_4_CARBON = "gemini-4-carbon",
+  MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
+  META_MUSE_EMBER = "meta-muse-ember",
 }
 
 export enum AudioVisionModelId {
@@ -145,4 +155,7 @@ export enum AudioVisionModelId {
   MIMO_V2_6_PRO = "mimo-v2.6-pro",
   MIMO_V2_6_FLASH = "mimo-v2.6-flash",
   META_MUSE_WONDER = "meta-muse-wonder",
+  GEMINI_4_HYDROGEN = "gemini-4-hydrogen",
+  GEMINI_4_CARBON = "gemini-4-carbon",
+  META_MUSE_EMBER = "meta-muse-ember",
 }

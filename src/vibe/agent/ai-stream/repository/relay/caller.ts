@@ -19,6 +19,7 @@ import { runEndpointRemote } from "next-vibe/execute-tool/repository/run-endpoin
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { filterUserPermissionRoles } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { toolInputToJsonSchema } from "next-vibe/platforms/ai/tool-json-schema";
 import { Platform } from "next-vibe/platforms/platforms";
 import { remoteConnections } from "next-vibe/remote-connection/db";
 import { z } from "zod";
@@ -76,20 +77,11 @@ async function buildRelayToolSchemas(
         const { generateInputSchema } =
           await import("next-vibe/platforms/ai/tools-loader");
         const zodSchema = generateInputSchema(endpoint, permissionRoles);
-        const parameters: JSONSchema7 = (
+        // Same provider-safe conversion as local tools (recursive refs inlined)
+        const parameters: JSONSchema7 =
           zodSchema instanceof z.ZodObject
-            ? z.toJSONSchema(zodSchema, {
-                target: "draft-7",
-                io: "input",
-                unrepresentable: "any",
-                override: (ctx) => {
-                  if (ctx.zodSchema._zod.def.type === "custom") {
-                    ctx.jsonSchema.type = "object";
-                  }
-                },
-              })
-            : {}
-        ) as JSONSchema7;
+            ? toolInputToJsonSchema(zodSchema)
+            : {};
 
         results.push({ name, description, parameters });
       } catch {

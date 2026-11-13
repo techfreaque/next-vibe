@@ -61,6 +61,13 @@ export enum VideoGenModelId {
   SEEDANCE_2_5 = "seedance-2-5",
   FLUX_3_VIDEO = "flux-3-video",
   GROK_IMAGINE_VIDEO_1_5 = "grok-imagine-video-1.5",
+  // Media refresh 2026-11-13
+  GEMINI_OMNI_1_2_FLASH = "gemini-omni-1.2-flash",
+  GROK_IMAGINE_VIDEO_1_5_LITE = "grok-imagine-video-1.5-lite",
+  WAN_3_0 = "wan-3-0",
+  SEEDANCE_2_MINI = "seedance-2-mini",
+  HAILUO_3_MAX = "hailuo-3-max",
+  RUNWAY_GEN_4_5 = "runway-gen-4-5",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   // END:llm-generated
 }
@@ -152,7 +159,12 @@ export const videoGenModelDefinitions: Record<
         ],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-13: superseded by Wan 3.0 (same 720p price, clips up to 30s, half-price 480p).
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -286,61 +298,17 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    // OpenRouter dropped bytedance/seedance-1-5-pro (2026-11-13); the ModelsLab
+    // t2v route is text-only.
+    inputs: ["text"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "bytedance/seedance-1-5-pro",
-        creditCostPerSecond: 5.184, // updated: 2026-11-08 from openrouter.ai video_tokens (24fps, 720p)
-        pricingByResolution: { "480p": 2.3058, "720p": 5.184, "1080p": 11.664 }, // updated: 2026-11-09 from openrouter.ai
-        allowedPassthroughParameters: ["watermark", "req_key"], // updated: 2026-11-09 from openrouter.ai
-        supportedSizes: [
-          "480x480",
-          "480x640",
-          "480x854",
-          "480x1120",
-          "640x480",
-          "720x720",
-          "720x960",
-          "720x1280",
-          "720x1680",
-          "854x480",
-          "960x720",
-          "1080x1080",
-          "1080x1440",
-          "1080x1920",
-          "1080x2520",
-          "1120x480",
-          "1280x720",
-          "1440x1080",
-          "1680x720",
-          "1920x1080",
-          "2520x1080",
-        ], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
-        maxDurationSeconds: 12, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 4, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: ["4", "5", "6", "7", "8", "9", "10", "11", "12"], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["480p", "720p", "1080p"], // updated: 2026-11-09 from openrouter.ai
-        supportedAspectRatios: [
-          "1:1",
-          "3:4",
-          "9:16",
-          "9:21",
-          "4:3",
-          "16:9",
-          "21:9",
-        ], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
-      {
-        id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 3, // updated: 2026-07-02 from modelslab.com
+        creditCostPerSecond: 6.24, // updated: 2026-11-13 from modelslab.com (720p; the 3/s rate is 480p, which this route does not offer)
+        pricingByResolution: { "720p": 6.24, "1080p": 13.92 }, // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["720p", "1080p"], // updated: 2026-07-10 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-07-10 from modelslab.com
         defaultDurationSeconds: 5,
@@ -479,17 +447,6 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["4", "6", "8"], // updated: 2026-11-09 from openrouter.ai
         supportedResolutions: ["720p", "1080p", "4K"], // updated: 2026-11-09 from openrouter.ai
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
-      {
-        id: VideoGenModelId.VEO_3_1,
-        apiProvider: ApiProvider.MODELSLAB,
-        providerModel: "veo-3.1",
-        creditCostPerSecond: 48, // updated: 2026-03-31 from modelslab.com
-        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-07-10 from modelslab.com
-        minDurationSeconds: 3, // updated: 2026-04-04 from modelslab.com
-        maxDurationSeconds: 8, // updated: 2026-07-10 from modelslab.com
-        supportedDurations: ["3", "4", "6", "8"], // updated: 2026-07-10 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
@@ -662,7 +619,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_5_TURBO_T2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v2-5-turbo-t2v",
-        creditCostPerSecond: 3.36, // updated: 2026-11-09 from modelslab.com
+        creditCostPerSecond: 4.2, // updated: 2026-11-13 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-07-10 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
@@ -818,7 +775,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_3_0_T2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v3-t2v",
-        creditCostPerSecond: 6.7, // updated: 2026-11-09 from modelslab.com
+        creditCostPerSecond: 8.4, // updated: 2026-11-13 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-04-04 from modelslab.com
         minDurationSeconds: 3, // updated: 2026-07-02 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-07-02 from modelslab.com
@@ -1146,22 +1103,6 @@ export const videoGenModelDefinitions: Record<
     providers: [
       {
         id: VideoGenModelId.SORA_2_PRO,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "openai/sora-2-pro",
-        creditCostPerSecond: 30, // updated: 2026-07-10 from openrouter.ai
-        allowedPassthroughParameters: ["quality", "style"], // updated: 2026-07-10 from openrouter.ai
-        supportedSizes: ["1280x720", "1080x1920", "1920x1080", "720x1280"], // updated: 2026-07-10 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        maxDurationSeconds: 20, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 4, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: ["4", "8", "12", "16", "20"], // updated: 2026-07-10 from openrouter.ai
-        supportedResolutions: ["720p", "1080p"], // updated: 2026-07-10 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-07-10 from openrouter.ai
-        pricingByResolution: { "720p": 30, "1024p": 50, "1080p": 50 }, // updated: 2026-07-10 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
-      {
-        id: VideoGenModelId.SORA_2_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "sora-2-pro-t2v",
         creditCostPerSecond: 36, // updated: 2026-03-31 from modelslab.com
@@ -1415,7 +1356,12 @@ export const videoGenModelDefinitions: Record<
         pricingByResolution: { "480p": 6.5, "720p": 9.1 }, // updated: 2026-11-09 from unbottled.ai
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-13: superseded by Grok Imagine Video 1.5 Lite (newer, cheaper per second).
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -1459,7 +1405,12 @@ export const videoGenModelDefinitions: Record<
         supportedResolutions: ["HD"],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-13: superseded by Grok Imagine Video 1.5 Lite (newer, cheaper per second).
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -2533,6 +2484,366 @@ export const videoGenModelDefinitions: Record<
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  // ── Media refresh 2026-11-13 ──────────────────────────────────────────────
+
+  [VideoGenModelId.GEMINI_OMNI_1_2_FLASH]: {
+    name: "Gemini Omni 1.2 Flash",
+    by: "google",
+    description: "chat.models.descriptions.geminiOmni12Flash",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.GEMINI_OMNI_1_2_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-omni-1.2-flash",
+        creditCostPerSecond: 10.4256, // updated: 2026-11-13 from openrouter.ai ($0.104256/s 1080p with audio)
+        pricingByResolution: {
+          "360p": 2.3172,
+          "720p": 6.9504,
+          "1080p": 10.4256,
+          "4k": 20.8512,
+        }, // updated: 2026-11-13 from openrouter.ai
+        allowedPassthroughParameters: ["task"], // updated: 2026-11-13 from openrouter.ai
+        generateAudio: true, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["720p", "1080p", "4K", "360p"], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: [
+          "1280x720",
+          "720x1280",
+          "1920x1080",
+          "1080x1920",
+          "3840x2160",
+          "2160x3840",
+          "640x360",
+          "360x640",
+        ], // updated: 2026-11-13 from openrouter.ai
+        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 3, // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 15, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: [
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+        ], // updated: 2026-11-13 from openrouter.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.GROK_IMAGINE_VIDEO_1_5_LITE]: {
+    name: "Grok Imagine Video 1.5 Lite",
+    by: "xAI",
+    description: "chat.models.descriptions.grokImagineVideo15Lite",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-x",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.GROK_IMAGINE_VIDEO_1_5_LITE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-imagine-video-1.5-lite",
+        creditCostPerSecond: 3, // updated: 2026-11-13 from openrouter.ai ($0.03/s 720p)
+        pricingByResolution: { "480p": 2, "720p": 3, "1080p": 14 }, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["480p", "720p", "1080p"], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: [],
+        supportedAspectRatios: [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:3",
+          "3:4",
+          "3:2",
+          "2:3",
+        ], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 1, // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 15, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+        ], // updated: 2026-11-13 from openrouter.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.WAN_3_0]: {
+    name: "Wan 3.0",
+    by: "alibaba",
+    description: "chat.models.descriptions.wan30",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.WAN_3_0,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "alibaba/wan-3.0",
+        creditCostPerSecond: 10, // updated: 2026-11-13 from openrouter.ai ($0.10/s 720p)
+        pricingByResolution: { "480p": 5, "720p": 10, "1080p": 20 }, // updated: 2026-11-13 from openrouter.ai
+        generateAudio: true, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["480p", "720p", "1080p"], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: [],
+        supportedAspectRatios: ["16:9", "4:3", "1:1", "3:4", "9:16"], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 2, // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 30, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: [
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+        ], // updated: 2026-11-13 from openrouter.ai
+      },
+    ],
+    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.SEEDANCE_2_MINI]: {
+    name: "Seedance 2.0 Mini",
+    by: "byteDanceSeed",
+    description: "chat.models.descriptions.seedance2Mini",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.SEEDANCE_2_MINI,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "bytedance/seedance-2.0-mini",
+        creditCostPerSecond: 7.56, // updated: 2026-11-13 from openrouter.ai video_tokens (24fps, 720p)
+        pricingByResolution: { "480p": 3.3626, "720p": 7.56 }, // updated: 2026-11-13 from openrouter.ai
+        allowedPassthroughParameters: [
+          "watermark",
+          "req_key",
+          "return_last_frame",
+        ], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: [
+          "480x480",
+          "480x640",
+          "480x854",
+          "640x480",
+          "854x480",
+          "1120x480",
+          "720x720",
+          "720x960",
+          "720x1280",
+          "720x1680",
+          "960x720",
+          "1280x720",
+          "1680x720",
+        ], // updated: 2026-11-13 from openrouter.ai
+        generateAudio: true, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 15, // updated: 2026-11-13 from openrouter.ai
+        minDurationSeconds: 4, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: [
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+        ], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["480p", "720p"], // updated: 2026-11-13 from openrouter.ai
+        supportedAspectRatios: [
+          "1:1",
+          "3:4",
+          "9:16",
+          "4:3",
+          "16:9",
+          "21:9",
+          "9:21",
+        ], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 5,
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.HAILUO_3_MAX]: {
+    name: "Hailuo 3 Max",
+    by: "miniMax",
+    description: "chat.models.descriptions.hailuo3Max",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.HAILUO_3_MAX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "minimax/hailuo-3-max",
+        creditCostPerSecond: 8, // updated: 2026-11-13 from openrouter.ai ($0.08/s 768p, $0.05/s 480p)
+        allowedPassthroughParameters: ["aigc_watermark"], // updated: 2026-11-13 from openrouter.ai
+        generateAudio: false, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["768p", "480p"], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: [],
+        supportedAspectRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 6,
+        minDurationSeconds: 5, // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 15, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: [
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+        ], // updated: 2026-11-13 from openrouter.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.RUNWAY_GEN_4_5]: {
+    name: "Runway Gen-4.5",
+    by: "runway",
+    description: "chat.models.descriptions.runwayGen45",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-13 from openrouter.ai
+    providers: [
+      {
+        id: VideoGenModelId.RUNWAY_GEN_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "runway/gen-4.5",
+        creditCostPerSecond: 12, // updated: 2026-11-13 from openrouter.ai ($0.12/s)
+        allowedPassthroughParameters: ["contentModeration"], // updated: 2026-11-13 from openrouter.ai
+        generateAudio: false, // updated: 2026-11-13 from openrouter.ai
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from openrouter.ai
+        supportedResolutions: ["720p"], // updated: 2026-11-13 from openrouter.ai
+        supportedSizes: ["1280x720", "720x1280"], // updated: 2026-11-13 from openrouter.ai
+        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-13 from openrouter.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 2, // updated: 2026-11-13 from openrouter.ai
+        maxDurationSeconds: 10, // updated: 2026-11-13 from openrouter.ai
+        supportedDurations: ["2", "3", "4", "5", "6", "7", "8", "9", "10"], // updated: 2026-11-13 from openrouter.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,

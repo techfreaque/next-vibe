@@ -110,7 +110,8 @@ export const translations: typeof enTranslations = {
     hideLegacy: "Ukryj starsze",
   },
   index: {
-    eyebrow: "{{chat}} modeli czatu, do tego modele obrazu: {{image}}, wideo: {{video}}, muzyki: {{music}}, głosu: {{voice}}",
+    eyebrow:
+      "{{chat}} modeli czatu, do tego modele obrazu: {{image}}, wideo: {{video}}, muzyki: {{music}}, głosu: {{voice}}",
     title: "Każdy model. Jeden czat.",
     subtitle:
       "Mainstream, otwarte i bez cenzury. Prawdziwe ceny za wiadomość, prawdziwe rozmiary kontekstu. Filtr wybierasz ty. Nie my.",

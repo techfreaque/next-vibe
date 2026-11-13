@@ -9,6 +9,11 @@
  *   tts-1:           $15.00 / 1M characters
  *   tts-1-hd:        $30.00 / 1M characters
  *   gpt-4o-mini-tts: token-based (Audio output $12.00/1M tokens)
+ *
+ * Our OPENAI_TTS providerModel is the VOICE ("alloy", "echo", ...), not the
+ * model: every voice is synthesized with RUNTIME_TTS_MODEL (hardcoded in
+ * text-to-speech/repository.ts and ai-stream/.../streaming-tts.ts), so each
+ * voice is priced at that model's per-character rate.
  */
 
 import "server-only";
@@ -22,6 +27,9 @@ import { PriceFetcher } from "./base";
 import { scrapeWithBrowser } from "./browser-scraper";
 
 const PRICING_URL = "https://developers.openai.com/api/docs/pricing";
+
+/** Model every OpenAI TTS voice runs on (see header). */
+const RUNTIME_TTS_MODEL = "tts-1";
 
 /**
  * Parse TTS pricing from the full page text (line-by-line).
@@ -71,7 +79,20 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
       waitForText: "tts-1",
     });
 
-    const priceMap = pageText ? parseTtsPricing(pageText, logger) : new Map();
+    if (!pageText) {
+      return {
+        provider: this.providerName,
+        modelsFound: 0,
+        modelsUpdated: 0,
+        updates,
+        failures,
+        error: `Could not render ${PRICING_URL}`,
+        // Could not check: keep prior verified state instead of disabling.
+        failedApiProviders: [ApiProvider.OPENAI_TTS],
+      };
+    }
+    const priceMap = parseTtsPricing(pageText, logger);
+    const usdPerChar = priceMap.get(RUNTIME_TTS_MODEL);
 
     for (const def of Object.values(ttsModelDefinitions)) {
       for (const providerConfig of def.providers) {
@@ -82,12 +103,11 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
           continue;
         }
 
-        const usdPerChar = priceMap.get(providerConfig.providerModel);
         if (usdPerChar === undefined) {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.OPENAI_TTS,
-            reason: `Model "${providerConfig.providerModel}" not found on pricing page - check ${PRICING_URL}`,
+            reason: `Model "${RUNTIME_TTS_MODEL}" (voice "${providerConfig.providerModel}") not found on pricing page - check ${PRICING_URL}`,
           });
           continue;
         }

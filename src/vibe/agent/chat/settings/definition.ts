@@ -256,7 +256,7 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       get: {
-        selectedModel: ChatModelId.CLAUDE_SONNET_4_5,
+        selectedModel: ChatModelId.CLAUDE_SONNET_5_5,
         selectedSkill: "default",
         activeFavoriteId: null,
         ttsAutoplay: false,
@@ -536,7 +536,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       update: {
-        selectedModel: ChatModelId.CLAUDE_SONNET_4_5,
+        selectedModel: ChatModelId.CLAUDE_SONNET_5_5,
         ttsAutoplay: true,
       },
     },

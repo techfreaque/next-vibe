@@ -74,13 +74,13 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "alloy",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
+        creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
         id: TtsModelId.OPENAI_ALLOY,
@@ -114,13 +114,13 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "nova",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
+        creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
         id: TtsModelId.OPENAI_NOVA,
@@ -154,13 +154,13 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "onyx",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.EDEN_AI_TTS,
         providerModel: "openai",
-        creditCostPerCharacter: 0.0016, // updated: 2026-04-03 from api.edenai.run
+        creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
         id: TtsModelId.OPENAI_ONYX,
@@ -171,7 +171,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.OPENAI_ECHO]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Echo",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiEcho",
@@ -195,7 +194,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_ECHO,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "echo",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_ECHO,
@@ -206,7 +205,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.OPENAI_SHIMMER]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Shimmer",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiShimmer",
@@ -230,7 +228,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_SHIMMER,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "shimmer",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_SHIMMER,
@@ -241,7 +239,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.OPENAI_FABLE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Fable",
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiFable",
@@ -265,7 +262,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.OPENAI_FABLE,
         apiProvider: ApiProvider.OPENAI_TTS,
         providerModel: "fable",
-        creditCostPerCharacter: 0.0015, // updated: 2026-03-31 from platform.openai.com
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-13 from developers.openai.com/api/docs/pricing (tts-1, $15/1M chars)
       },
       {
         id: TtsModelId.OPENAI_FABLE,
@@ -276,7 +273,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.ELEVENLABS_RACHEL]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Rachel",
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsRachel",
@@ -300,7 +296,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "21m00Tcm4TlvDq8ikWAM",
-        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_RACHEL,
@@ -311,7 +307,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.ELEVENLABS_JOSH]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Josh",
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsJosh",
@@ -335,7 +330,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "TxGEqnHWrfWFTfGW9XjX",
-        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_JOSH,
@@ -346,7 +341,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.ELEVENLABS_BELLA]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Bella",
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsBella",
@@ -370,7 +364,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "EXAVITQu4vr4xnSDxMaL",
-        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_BELLA,
@@ -381,7 +375,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.ELEVENLABS_ADAM]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Adam",
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsAdam",
@@ -405,7 +398,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.ELEVENLABS,
         providerModel: "pNInz6obpgDQGcFmaJgB",
-        creditCostPerCharacter: 0.03, // updated: 2026-03-31 from api.elevenlabs.io
+        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_ADAM,
@@ -416,7 +409,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_BELLA]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Bella (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroBella",
@@ -440,7 +432,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_BELLA,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:af_bella",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_BELLA,
@@ -451,7 +443,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_SARAH]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Sarah (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroSarah",
@@ -475,7 +466,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_SARAH,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:af_sarah",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_SARAH,
@@ -486,7 +477,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_NICOLE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Nicole (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroNicole",
@@ -510,7 +500,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_NICOLE,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:af_nicole",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_NICOLE,
@@ -521,7 +511,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_ADAM]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Adam (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroAdam",
@@ -545,7 +534,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_ADAM,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:am_adam",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_ADAM,
@@ -556,7 +545,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_MICHAEL]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Michael (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroMichael",
@@ -580,7 +568,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_MICHAEL,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:am_michael",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_MICHAEL,
@@ -591,7 +579,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_EMMA]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Emma (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroEmma",
@@ -615,7 +602,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_EMMA,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:bf_emma",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_EMMA,
@@ -626,7 +613,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.KOKORO_GEORGE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "George (Kokoro)",
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroGeorge",
@@ -650,7 +636,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.KOKORO_GEORGE,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "Kokoro-82m:bm_george",
-        creditCostPerCharacter: 0.00017, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00017, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0017/1K chars)
       },
       {
         id: TtsModelId.KOKORO_GEORGE,
@@ -661,7 +647,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.INWORLD_MINI_ASHLEY]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Ashley (Inworld)",
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldAshley",
@@ -685,7 +670,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.INWORLD_MINI_ASHLEY,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "inworld-tts-1.5-mini:Ashley",
-        creditCostPerCharacter: 0.00102, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00102, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0102/1K chars)
       },
       {
         id: TtsModelId.INWORLD_MINI_ASHLEY,
@@ -696,7 +681,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.INWORLD_MINI_CRAIG]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Craig (Inworld)",
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldCraig",
@@ -720,7 +704,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.INWORLD_MINI_CRAIG,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "inworld-tts-1.5-mini:Craig",
-        creditCostPerCharacter: 0.00102, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00102, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0102/1K chars)
       },
       {
         id: TtsModelId.INWORLD_MINI_CRAIG,
@@ -731,7 +715,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.XAI_EVE]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Eve (xAI)",
     by: "xai",
     description: "textToSpeech.models.descriptions.xaiEve",
@@ -755,7 +738,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.XAI_EVE,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "xai-tts:Eve",
-        creditCostPerCharacter: 0.00165, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.00165, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.0165/1K chars)
       },
       {
         id: TtsModelId.XAI_EVE,
@@ -766,7 +749,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.GEMINI_ZEPHYR]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Zephyr (Gemini)",
     by: "google",
     description: "textToSpeech.models.descriptions.geminiZephyr",
@@ -790,7 +772,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.GEMINI_ZEPHYR,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "google/gemini-3.8-flash-lite-tts:Zephyr",
-        creditCostPerCharacter: 0.003, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.003, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.03/1K chars)
       },
       {
         id: TtsModelId.GEMINI_ZEPHYR,
@@ -801,7 +783,6 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
     ],
   },
   [TtsModelId.GEMINI_PUCK]: {
-    enabled: false, // auto-disabled: price not verified
     name: "Puck (Gemini)",
     by: "google",
     description: "textToSpeech.models.descriptions.geminiPuck",
@@ -825,7 +806,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         id: TtsModelId.GEMINI_PUCK,
         apiProvider: ApiProvider.NANO_GPT,
         providerModel: "google/gemini-3.8-flash-lite-tts:Puck",
-        creditCostPerCharacter: 0.003, // updated: 2026-11-08 from api.nano-gpt.com/api/v1/audio-models
+        creditCostPerCharacter: 0.003, // updated: 2026-11-13 from nano-gpt.com/api/v1/audio-models ($0.03/1K chars)
       },
       {
         id: TtsModelId.GEMINI_PUCK,

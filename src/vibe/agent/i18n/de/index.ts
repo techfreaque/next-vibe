@@ -1408,7 +1408,7 @@ export const translations: typeof enTranslations = {
         gemini31ProPreviewCustomTools:
           "Die Custom-Tools-Preview von Gemini 3.1 Pro, darauf abgestimmt, eigene definierte Tools aufzurufen statt auf Bash auszuweichen. Gemacht für Coding-Agenten und Workflows mit vielen Tools, mit 1M Kontext und Eingabe von Text, Bild, Video und Audio. Ein Preview-Build. Gemini 4 Argon ist die neuere Pro-Klasse zum ähnlichen Preis.",
         gemini31FlashImagePreview:
-          "Googles Gemini 3.1 Flash Image, noch als Preview. Erzeugt und bearbeitet Bilder direkt im Chat, Text und Bild in derselben Antwort. Das günstigste Bildmodell im Katalog. Mainstream-Filter, keine Tool-Aufrufe, 64K Kontext. Für komplexe Prompts und saubereren Text im Bild ist Nano Banana Pro teurer, aber stärker.",
+          "Googles Gemini 3.1 Flash Image, noch als Preview. Erzeugt und bearbeitet Bilder direkt im Chat, Text und Bild in derselben Antwort. Das günstigste Bildmodell im Katalog. Mainstream-Filter, keine Tool-Aufrufe, 64K Kontext. Für komplexe Prompts und saubereren Text im Bild ist Nano Banana Pro teurer, aber stärker. Legacy: Nano Banana 2.1 löst es ab, zum etwa halben Bildpreis.",
         gemini31FlashLitePreview:
           "Googles Sparmodell für hohes Volumen, noch als Preview: Übersetzung, Ranking, Extraktion und schneller Chat über 1M Kontext, mit Text-, Bild-, Video- und Audioeingabe. Günstig und schnell, aber nicht für schweres Reasoning gebaut. Kostet weiterhin weniger als der Nachfolger Gemini 3.5 Flash Lite.",
         gemini3Pro:
@@ -1513,7 +1513,7 @@ export const translations: typeof enTranslations = {
         grok4:
           "xAIs Flaggschiff vom Juli 2025, ein Reasoning-Modell, das vor jeder Antwort nachdenkt. Stark in Mathematik, Naturwissenschaft und Analyse, mit lockereren Inhaltsfiltern als die meisten Mainstream-Modelle. Langsamer als reine Chat-Modelle. Aktueller Grok ist Grok 4.7, zu höherem Preis.",
         grok4Fast:
-          "Die auf Tempo getrimmte Grok-Variante von xAI. Schnelle Antworten, Bildeingabe, Tool-Aufrufe, 1M Kontext, Centbeträge pro Nachricht. Offene Inhaltsrichtlinie, daher weniger Verweigerungen als bei den Mainstream-Anbietern. Für harte Denkaufgaben besser Grok 4.7, für noch günstigeren Schnellchat DeepSeek V4.1 Flash.",
+          "Die frühere Tempo-Variante von Grok. xAI hat die günstige Fast-Stufe eingestellt, unter diesem Namen läuft jetzt Grok 4.3 zum Grok-4.3-Preis. Bildeingabe, Tool-Aufrufe, 1M Kontext, offene Inhaltsrichtlinie. Nachfolger ist Grok 4.7: deutlich stärkeres Reasoning bei etwa doppeltem Output-Preis. Für günstigen Schnellchat kosten MiniMax M3.1 Flash oder DeepSeek V4.1 Flash nur einen Bruchteil.",
         grok43:
           "Spätere Grok-4-Version mit dauerhaft aktivem Reasoning und 1M Kontext, ausgelegt auf Agenten-Workflows und tiefe Recherche. Lockere Filter, Tool-Nutzung, Bildeingabe. Gleicher Preis wie Grok 4 und günstiger als Grok 4.7, die neuere Wahl für alle, die das Aktuellste wollen.",
         grok420Beta:
@@ -1540,7 +1540,7 @@ export const translations: typeof enTranslations = {
         kimiK2Thinking:
           "Die Reasoning-Version von Kimi K2 vom November 2025, gebaut, um über Hunderte verketteter Tool-Aufrufe hinweg weiterzudenken, ohne den Faden zu verlieren. Gut für Recherche und mehrstufige Agentenarbeit zum kleinen Preis, lockere Filter. Nur Text und langsamer als das normale K2. Neuere Wahl: Kimi K3.",
         minimaxM27:
-          "MiniMax' agentenorientiertes Modell für praktische Arbeit: Debugging, Finanzmodellierung, Dokumenterstellung und Multi-Agenten-Läufe. Klug und günstig, 196K Kontext, nur Text, lockere Filter. MiniMax M3 ist die neuere Version, etwas teurer.",
+          "MiniMax' agentenorientiertes Modell für praktische Arbeit: Debugging, Finanzmodellierung, Dokumenterstellung und Multi-Agenten-Läufe. Klug und günstig, 196K Kontext, nur Text, lockere Filter. Nachfolger ist MiniMax M3.1 Flash: stärker, multimodal, 1M Kontext und günstiger.",
         mimoV2Pro:
           "Xiaomis Flaggschiff der MiMo-V2-Reihe, gebaut für Agenten-Orchestrierung und lange Engineering-Workflows mit 1M Kontext. Starkes Reasoning und Coding zum kleinen Preis, nur Text, lockere Filter. MiMo V2.6 Pro ist neuer und etwas günstiger.",
         glm45Air:
@@ -1560,7 +1560,7 @@ export const translations: typeof enTranslations = {
         qwen3235bFree:
           "Qwen3 235B von Alibaba: offene Gewichte, Mixture-of-Experts mit 22B aktiven Parametern. Solide bei Code und logischem Denken für wenig Geld, ruft Tools auf, 131K Kontext. Nur Text und eine Generation älter. Qwen 3.8 Flash ist neuer, liest Bilder und kostet etwa gleich viel.",
         deepseekR1Distill:
-          "DeepSeek R1 Distill - Kompakte destillierte Version von DeepSeek R1 mit effizienten Reasoning-Fähigkeiten",
+          "Kleines Destillat von DeepSeek R1 auf Qwen-Basis: günstiges Schritt-für-Schritt-Reasoning, nur Text, knapper 32K-Kontext. Kein Anbieter stellt es mehr bereit. Nachfolger ist DeepSeek V4.1 Flash: klüger, mit Bildverständnis, 1M Kontext und weiterhin fast kostenlos.",
         qwen257b:
           "Alibabas kleines Open-Weight-Modell mit 7B Parametern aus 2024. Günstig und flott für einfachen Chat, kurze Umformulierungen und Basis-Übersetzungen, 32K Kontext. Für heutige Verhältnisse schwach bei Code und Analyse. Qwen 3.8 Flash ist die neuere Alibaba-Wahl, klüger und etwas teurer.",
         dallE3:
@@ -1572,19 +1572,19 @@ export const translations: typeof enTranslations = {
         fluxPro:
           "Das bewährte Text-zu-Bild-Arbeitspferd von Black Forest Labs aus der FLUX.1-Generation. Saubere Bildkomposition, verlässliche Prompt-Treue, kurze Wartezeit. Nur Texteingabe, keine Bearbeitung von Referenzbildern. FLUX.2 Pro kostet etwa die Hälfte und verarbeitet Referenzbilder; dieses Modell lohnt sich vor allem für bereits darauf abgestimmte Prompts.",
         flux2Max:
-          "Die Spitzenstufe der FLUX.2-Familie von Black Forest Labs. Erzeugt Bilder aus Text oder bearbeitet Referenzbilder, mit dem meisten Detail und der höchsten Konsistenz der Reihe. Premiumpreis, ein Mehrfaches von FLUX.2 Pro. Für Hauptmotive und knifflige Bearbeitungen mit mehreren Referenzen; im Alltag liefert FLUX.2 Pro fast dasselbe für deutlich weniger.",
+          "Die Spitzenstufe der FLUX.2-Familie von Black Forest Labs. Erzeugt Bilder aus Text oder bearbeitet Referenzbilder, mit dem meisten Detail und der höchsten Konsistenz der Reihe. Premiumpreis, ein Mehrfaches von FLUX.2 Pro. Für Hauptmotive und knifflige Bearbeitungen mit mehreren Referenzen; im Alltag liefert FLUX.2 Pro fast dasselbe für deutlich weniger. Legacy: FLUX.3 löst es ab, schärfer und günstiger pro Bild.",
         flux2Klein4b:
-          "FLUX.2 Klein 4B - Black Forest Labs' schnellstes und kosteneffizientestes Bildmodell, optimiert für hohen Durchsatz",
+          "FLUX.2 Klein 4B - Black Forest Labs' schnellstes und kosteneffizientestes Bildmodell, optimiert für hohen Durchsatz. Legacy: FLUX.3 Klein löst es ab.",
         riverflowV2Pro:
           "Riverflow V2 Pro - Sourcefuls leistungsstärkstes Bildgenerierungsmodell mit erstklassiger Steuerung und perfekter Textwiedergabe",
         riverflowV2Fast:
           "Riverflow V2 Fast - Sourcefuls schnellstes Bildgenerierungsmodell, optimiert für Produktionsumgebungen und latenzempfindliche Workflows",
         riverflowV2MaxPreview:
-          "Riverflow V2 Max Preview - Sourcefuls leistungsstärkstes Preview-Modell, vereinheitlichtes Text-zu-Bild- und Bild-zu-Bild-Modell",
+          "Riverflow V2 Max Preview - Sourcefuls leistungsstärkstes Preview-Modell, vereinheitlichtes Text-zu-Bild- und Bild-zu-Bild-Modell. Legacy: Die Preview wurde beim Anbieter eingestellt; Riverflow V2 Pro nutzen.",
         riverflowV2StandardPreview:
-          "Riverflow V2 Standard Preview - Sourcefuls Standard-Preview-Variante mit verbesserter Leistung gegenüber der Riverflow 1-Familie",
+          "Riverflow V2 Standard Preview - Sourcefuls Standard-Preview-Variante mit verbesserter Leistung gegenüber der Riverflow 1-Familie. Legacy: Die Preview wurde beim Anbieter eingestellt; Riverflow V2 Pro nutzen.",
         riverflowV2FastPreview:
-          "Riverflow V2 Fast Preview - Sourcefuls schnellste Preview-Variante, vereinheitlichtes Text-zu-Bild- und Bild-zu-Bild-Modell zum günstigsten Preis",
+          "Riverflow V2 Fast Preview - Sourcefuls schnellste Preview-Variante, vereinheitlichtes Text-zu-Bild- und Bild-zu-Bild-Modell zum günstigsten Preis. Legacy: Die Preview wurde beim Anbieter eingestellt; Riverflow V2 Fast nutzen.",
         flux2Flex:
           "FLUX.2 Flex - Black Forest Labs' Bildmodell mit hervorragender Text- und Typografiewiedergabe sowie Multi-Referenz-Bearbeitung in einer einheitlichen Architektur",
         flux2Pro:
@@ -1592,13 +1592,13 @@ export const translations: typeof enTranslations = {
         gemini3ProImagePreview:
           "Googles Gemini 3 Pro Image, als Preview. Das stärkere Nano Banana: hält sich enger an komplexe Prompts, setzt gut lesbaren Text ins Bild und bearbeitet hochgeladene Fotos. Mainstream-Filter, keine Tool-Aufrufe, 64K Kontext. Kostet ein Vielfaches von Nano Banana, also für Arbeiten, bei denen Bildqualität zählt.",
         gpt5ImageMini:
-          "GPT-5 Image Mini von OpenAI: die Sprachfähigkeiten von GPT-5 Mini plus Bilderzeugung und Bildbearbeitung im selben Chat. Liest Bilder, 400K Kontext. Mainstream-Filter, keine Tool-Aufrufe. Teurer als Nano Banana und nah am Preis von Nano Banana Pro, ein Vergleich mit dem eigenen Prompt lohnt sich.",
+          "GPT-5 Image Mini von OpenAI: die Sprachfähigkeiten von GPT-5 Mini plus Bilderzeugung und Bildbearbeitung im selben Chat. Liest Bilder, 400K Kontext. Mainstream-Filter, keine Tool-Aufrufe. Teurer als Nano Banana und nah am Preis von Nano Banana Pro, ein Vergleich mit dem eigenen Prompt lohnt sich. Legacy: OpenRouter stellt es am 1. Dezember 2026 ein. Im Chat Nano Banana 2.1 nutzen, für OpenAI-Qualität GPT Image 2.6 Flare.",
         gpt5Image:
           "GPT-5 kombiniert mit OpenAIs Bildgenerator: chatten und im selben Gespräch Bilder erstellen oder bearbeiten, mit Bildeingabe. Gut, um Motive per Sprache Schritt für Schritt zu verfeinern. Keine Tool-Aufrufe und teuer pro Nachricht. GPT-5 Image Mini ist günstiger, ein Vergleich mit Nano Banana Pro lohnt sich.",
         gpt54Image2:
           "GPT-5.4-Reasoning kombiniert mit GPT Image 2, sodass ein Chat von Analyse oder Code direkt zu fertigen Bildern übergehen kann. Liest auch Bilder. Keine Tool-Aufrufe und teuer. GPT-5 Image Mini kostet deutlich weniger, Nano Banana und Nano Banana Pro sind die anderen aktuellen Bildmodelle.",
         seedream45:
-          "Das Bildmodell von ByteDance für Generierung und Bearbeitung in einem. Stark bei Porträts, bei konsistenten Motiven und beim Zusammenführen mehrerer Eingabebilder zu einer Szene. Mittleres Preisniveau, nah an FLUX.2 Pro. Open-Stufe: lockerere Filter als Mainstream-Modelle, aber nicht explizit. Eine gute Zweitmeinung, wenn FLUX.2 Pro den gewünschten Look verfehlt.",
+          "Das Bildmodell von ByteDance für Generierung und Bearbeitung in einem. Stark bei Porträts, bei konsistenten Motiven und beim Zusammenführen mehrerer Eingabebilder zu einer Szene. Mittleres Preisniveau, nah an FLUX.2 Pro. Open-Stufe: lockerere Filter als Mainstream-Modelle, aber nicht explizit. Eine gute Zweitmeinung, wenn FLUX.2 Pro den gewünschten Look verfehlt. Legacy: Seedream 5.5 löst es ab, zum halben Preis.",
         sdxl: "Stable Diffusion XL - Stability AIs hochwertiges Open-Source-Bildgenerierungsmodell",
         cassetteMusic:
           "CassetteAI Music - schnelle Text-zu-Musik-Generierung über Fal.ai mit Clips bis zu drei Minuten Länge",
@@ -1628,7 +1628,7 @@ export const translations: typeof enTranslations = {
         modelsLabWan25I2V:
           "Wan 2.5 I2V - ModelsLabs Wan 2.5 Bild-zu-Video-Generierungsmodell",
         modelsLabWan27T2V:
-          "Alibabas Videomodell Wan 2.7. Clips bis 10 Sekunden (über ModelsLab bis 15) in bis zu 1080p, viele Seitenverhältnisse, Ton direkt aus dem Modell und optionale Start- und Endbilder zur Steuerung. Mittlerer Preis pro Sekunde. Ein flexibler Allrounder; für günstige Tests Seedance 1.5 Pro, für maximalen Realismus Veo 3.1.",
+          "Alibabas Videomodell Wan 2.7. Clips bis 10 Sekunden (über ModelsLab bis 15) in bis zu 1080p, viele Seitenverhältnisse, Ton direkt aus dem Modell und optionale Start- und Endbilder zur Steuerung. Mittlerer Preis pro Sekunde. Ein flexibler Allrounder; für günstige Tests Seedance 1.5 Pro, für maximalen Realismus Veo 3.1. Legacy: Wan 3.0 löst es ab, gleicher 720p-Preis, Clips bis 30 Sekunden.",
         modelsLabWan26T2V:
           "Wan 2.6 T2V - ModelsLabs Wan 2.6 Text-zu-Video-Generierungsmodell",
         modelsLabWan26I2V:
@@ -1708,9 +1708,9 @@ export const translations: typeof enTranslations = {
         modelsLabLipsync2:
           "lipsync-2 von Sync passt die Mundbewegungen in einem vorhandenen Video an eine neue Tonspur an. Gemacht für Synchronisation, übersetzte Voiceovers und nachträgliche Dialogkorrekturen. Bearbeitet bestehendes Material, erfindet keine Szenen. Für eine sprechende Person aus einem einzelnen Foto Omnihuman 1.5 nutzen.",
         modelsLabGrokT2V:
-          "Grok Imagine Video von xAI aus Text. Clips von 1 bis 15 Sekunden in 480p oder 720p, optional mit Startbild. Mittleres Preisniveau, schnell und locker. Open-Stufe, also lockerere Filter als Veo oder Sora, aber nicht explizit. Grok Imagine Video 1.5 kann zusätzlich 1080p.",
+          "Grok Imagine Video von xAI aus Text. Clips von 1 bis 15 Sekunden in 480p oder 720p, optional mit Startbild. Mittleres Preisniveau, schnell und locker. Open-Stufe, also lockerere Filter als Veo oder Sora, aber nicht explizit. Grok Imagine Video 1.5 kann zusätzlich 1080p. Legacy: Grok Imagine Video 1.5 Lite löst es ab, für weniger als den halben Preis.",
         modelsLabGrokI2V:
-          "Grok Imagine von xAI für Bild zu Video. Macht aus einem Standbild einen HD-Clip mit bis zu 15 Sekunden. Etwas günstiger als Grok T2V. Gut für schnell animierte Standbilder; für höhere Auflösung auf Grok Imagine Video 1.5 wechseln.",
+          "Grok Imagine von xAI für Bild zu Video. Macht aus einem Standbild einen HD-Clip mit bis zu 15 Sekunden. Etwas günstiger als Grok T2V. Gut für schnell animierte Standbilder; für höhere Auflösung auf Grok Imagine Video 1.5 wechseln. Legacy: Grok Imagine Video 1.5 Lite animiert Standbilder günstiger.",
         klingV30Std:
           "Die Standardstufe von Kling 3.0 von Kuaishou. Dieselben Clips mit 3 bis 15 Sekunden, Ton aus dem Modell und Bildsteuerung wie Kling 3.0 T2V, die Pro-Stufe, aber günstiger pro Sekunde. Ausgabe in 720p. Die Preis-Leistungs-Wahl der Kling-3-Reihe; Pro nehmen, wenn feine Details zählen.",
         klingVideoO1:
@@ -1805,7 +1805,7 @@ export const translations: typeof enTranslations = {
         glm52:
           "Z.AIs GLM-5.2: starkes Reasoning bei schneller Inferenz und 1M Kontext. Gut für Code und Analyse langer Eingaben, nur Text, lockere Filter. GLM-5.3 ist neuer und kostet etwa ein Drittel.",
         minimaxM3:
-          "Das Flaggschiff von MiniMax. Gut bei Code, Reasoning und Analyse, liest Bilder und Videos, ruft Tools auf, 1M Kontext, Centbeträge pro Nachricht. Lockerere Filter als die Mainstream-Anbieter. Eine Stufe unter der Spitzenklasse. Für härtere Aufgaben zum weiterhin kleinen Preis kostet MiMo V2.6 Pro nur wenig mehr.",
+          "Das frühere Flaggschiff von MiniMax. Gut bei Code, Reasoning und Analyse, liest Bilder und Videos, ruft Tools auf, 1M Kontext, lockerere Filter als die Mainstream-Anbieter. Nachfolger ist MiniMax M3.1 Flash: spürbar stärker bei Agenten und Code, zum halben Preis oder weniger.",
         qwen37Flash:
           "Alibabas extrem günstiges Flash-Modell und eine der billigsten Optionen im Katalog: 1M Kontext, Eingabe von Text, Bild und Video, Tool-Aufrufe. Ideal für Massenaufgaben und schnellen Chat, flach bei schwerem Reasoning. Qwen 3.8 Flash ist neuer und klüger, kostet aber ein Mehrfaches.",
         qwen38Max:
@@ -1845,11 +1845,11 @@ export const translations: typeof enTranslations = {
         gpt6LunaPro:
           "GPT-6 Luna Pro - GPT-6 Luna mit mehr Denkleistung. Besserer Code und präzisere Befolgung, gleicher Niedrigpreis. 1,05M-Token-Kontext.",
         gemini4Argon:
-          "Das Gemini-Flaggschiff von Google. Nimmt Text, Bilder, Video und Audio auf und liefert Reasoning, Code und Analyse auf Spitzenniveau. Ruft Tools auf, 1M Kontext. Stark, wenn die Eingabe eine Aufnahme, ein Video oder ein Stapel Screenshots ist. Mainstream-Filter. Preisgleich mit Claude Sonnet 5.5 und GPT-6.1 Sol.",
+          "Das Gemini-Flaggschiff von Google. Nimmt Text, Bilder, Video und Audio auf und liefert Reasoning, Code und Analyse auf Spitzenniveau. Ruft Tools auf, 1M Kontext. Stark, wenn die Eingabe eine Aufnahme, ein Video oder ein Stapel Screenshots ist. Mainstream-Filter. Preisgleich mit Claude Sonnet 5.5 und GPT-6.1 Sol. Gemini 4 Carbon geht bei den härtesten Aufgaben tiefer, Gemini 4 Hydrogen ist schneller und ein Viertel günstiger.",
         gemini38Flash:
-          "Das aktuelle Flash von Google. Schnell, gut bei Code und Analyse, verarbeitet Text, Bilder, Video und Audio, ruft Tools auf, 1M Kontext. Mainstream-Filter. Mittleres Preisniveau: deutlich unter der Hälfte von Gemini 4 Argon, aber weit über offenen Schnellmodellen wie Qwen 3.8 Flash.",
+          "Das aktuelle Flash von Google. Schnell, gut bei Code und Analyse, verarbeitet Text, Bilder, Video und Audio, ruft Tools auf, 1M Kontext. Mainstream-Filter. Mittleres Preisniveau: deutlich unter der Hälfte von Gemini 4 Argon, aber weit über offenen Schnellmodellen wie Qwen 3.8 Flash. Gemini 4 Hydrogen ist deutlich klüger und schneller, kostet aber fast das Doppelte.",
         grok47:
-          "Das neueste Grok von xAI. Scharfes Reasoning und starker Code, liest Bilder, ruft Tools auf, 500K Kontext, halb so viel wie bei den meisten Flaggschiffen hier. Offene Inhaltsrichtlinie: beantwortet mehr als die Mainstream-Anbieter, ist aber nicht vollständig unzensiert. Preislich auf dem Niveau von Qwen 3.8 Max. Grok 4 Fast ist der günstige, schnelle Bruder.",
+          "Das neueste Grok von xAI. Scharfes Reasoning und starker Code, liest Bilder, ruft Tools auf, 500K Kontext, halb so viel wie bei den meisten Flaggschiffen hier. Offene Inhaltsrichtlinie: beantwortet mehr als die Mainstream-Anbieter, ist aber nicht vollständig unzensiert. Preislich auf dem Niveau von Qwen 3.8 Max. Eine günstige Fast-Stufe bietet xAI nicht mehr: Für schnellen, billigen Chat mit offenen Filtern MiniMax M3.1 Flash oder Meta Muse Ember testen.",
         kimiK31Pro:
           "Das stärkste Kimi von Moonshot AI. Reasoning, Code, kreatives Schreiben und lange Agentenläufe auf Spitzenniveau, liest Bilder und Videos, ruft Tools auf, 1M Kontext. Lockerere Filter als die US-Anbieter. Preisgleich mit Claude Sonnet 5.5. Kimi K3 kommt für gut die Hälfte des Preises nah heran.",
         deepseekV41Flash:
@@ -1870,8 +1870,18 @@ export const translations: typeof enTranslations = {
           "Das Muse-Flaggschiff von Meta. Reasoning, Code, Analyse und kreative Arbeit auf Spitzenniveau, verarbeitet Text, Bilder, Video und Audio. Ruft Tools auf, 1M Kontext, lockerere Filter als die Mainstream-Anbieter. Premium, preislich wie Claude Opus 5.5. Kimi K3.1 Pro und Gemini 4 Argon spielen in derselben Klasse zum halben Preis.",
         mistralLarge4:
           "Das Flaggschiff von Mistral AI, aus europäischem Haus. Gut bei Code und Analyse, liest Bilder, ruft Tools auf, 1M Kontext, zu moderatem Preis. Mainstream-Filter. Nicht ganz Spitzenklasse: DeepSeek V4 Pro kostet etwas mehr und denkt tiefer.",
+        gemini4Hydrogen:
+          "Das schnelle Gemini 4 von Google. Gebaut für Agentenschleifen, Coding und zügige Analyse, in Benchmarks trotzdem Spitzenklasse und rund 2,5-mal so schnell wie Gemini 3.8 Flash. Verarbeitet Text, Bilder, Video und Audio, ruft Tools auf, 1M Kontext. Mainstream-Filter. Lange, tiefe Denkketten besser Gemini 4 Carbon oder Argon überlassen. Ein Viertel günstiger als Argon, knapp doppelt so teuer wie Gemini 3.8 Flash.",
+        gemini4Carbon:
+          "Googles stärkstes Gemini und derzeit eines der besten Modelle überhaupt. Gemacht für den härtesten Code, lange Agentenläufe und komplexes Reasoning, nimmt Text, Bilder, Video und Audio auf. Ruft Tools auf, 1M Kontext. Mainstream-Filter. Verbraucht pro Aufgabe mehr Tokens als Argon und kostet in der Praxis daher mehr. Der Einführungspreis entspricht bis 30. November Argon, Claude Sonnet 5.5 und GPT-6.1 Sol, danach verdoppelt er sich auf das Niveau von Claude Opus 5.5.",
+        minimaxM31Flash:
+          "Das schnelle Modell von MiniMax und ein großer Sprung gegenüber M3: deutlich stärker bei Agenten, Code und Security-Aufgaben. Liest Bilder und Videos, ruft Tools auf, 1M Kontext, lockerere Filter als die Mainstream-Anbieter. Denkt vor jeder Antwort nach und schreibt ausführlich, daher langsamer und wortreicher als andere Flash-Modelle. Kostet die Hälfte von M3 oder weniger und spielt in derselben Budgetklasse wie DeepSeek V4.1 Flash und Qwen 3.8 Flash.",
+        metaMuseEmber:
+          "Metas kleinstes Muse-Modell, gebaut für die Arbeit, die Agenten den ganzen Tag wiederholen: Tool-Aufrufe, Routing, Datenextraktion und schneller Chat. Verarbeitet Text, Bilder, Video und Audio, 1M Kontext, lockerere Filter als die Mainstream-Anbieter. Für seine Größe stark bei Tool-Nutzung und Computer-Aufgaben, flach bei schwierigem Code und tiefem Reasoning. Preisgleich mit GPT-6 Luna und Claude Haiku 5.5, bei Prompts über 200K Tokens dreimal so teuer.",
         veniceDeepseekV41FlashUncensored:
           "DeepSeek V4.1 Flash ohne Verweigerungen, bereitgestellt über Venice. Echtes Programmieren und Analysieren, dazu Fiktion und Rollenspiel, ganz ohne Belehrungen. Liest Bilder, ruft Tools auf, 1M Kontext, günstig. Politische Antworten rahmt weiter das Training von DeepSeek, und die düstersten Szenen kann es entschärfen; dafür ist UncensoredLM von Grund auf unzensiert. Etwa viermal so teuer wie das normale DeepSeek V4.1 Flash. GLM 5.3 Flash Uncensored ist die günstigere ungefilterte Alternative.",
+        drummerArtemis31b:
+          "Das Gemma-4-31B-Finetune von TheDrummer für Rollenspiel und Fiktion. Bleibt in der Rolle, schreibt Grimdark und explizite Szenen für Erwachsene ohne Verweigerung und hält die Sprache lebendig statt glattgebügelt. Liest Bilder, ruft Tools auf, 262K Kontext. Schwach bei Code und harter Analyse: ein Erzähler, kein Denker. Ein Community-Finetune auf einem einzigen NanoGPT-Host, fällt also gelegentlich kurz aus. Kostet rund ein Fünftel von Venice Role Play Uncensored. Braucht die Geschichte echte Logik, ist DeepSeek V4.1 Flash Uncensored die klügere Wahl.",
         grokImagineImage2:
           "Die zweite Generation des Grok-Imagine-Bildmodells von xAI. Nimmt Text oder ein Referenzbild und beherrscht damit Bearbeitungen ebenso wie neue Bilder. Mittleres Preisniveau. Open-Stufe: lockerere Filter als Mainstream-Modelle, nicht explizit. Das Upgrade gegenüber Grok Imagine T2I, wenn Bearbeitung oder genauere Prompt-Treue gefragt ist.",
         qwenImage3:
@@ -1890,6 +1900,30 @@ export const translations: typeof enTranslations = {
           "Die Premiumstufe von Googles Lyria 3, noch im Preview-Status. Gebaut für Songs in voller Länge mit hoher Produktionsqualität. Mainstream: Googles Filter greifen. Etwa anderthalbmal so teuer wie Lyria 3. Preview heißt: Verhalten und Verfügbarkeit können sich noch ändern.",
         lyria3ClipPreview:
           "Lyria 3 Clip von Google für Kurzformate, im Preview-Status. Schnelle, günstige Musikclips für Intros, Jingles und Social-Posts. Mainstream-Filter greifen. Nur kurze Längen; für längere Tracks Lyria 3 oder Lyria 3 Pro Preview nutzen.",
+        geminiNanoBanana21:
+          "Nano Banana 2.1 von Google. Erzeugt und bearbeitet Bilder direkt im Chat, Text und Bild in derselben Antwort. Rund 3 bis 4 Credits pro Bild, halber Bildpreis des ursprünglichen Nano Banana, den es ablöst. Stark bei präzisen Bearbeitungen und lesbarem Text im Bild. Mainstream-Filter, keine Tool-Aufrufe. Bei komplexen Szenen bleibt Nano Banana Pro vorn, zum etwa vierfachen Preis.",
+        seedream55:
+          "Seedream 5.5 von ByteDance. Erzeugt Bilder aus Text oder bearbeitet bis zu zehn Referenzbilder. Stark bei Porträts, konsistenten Figuren und Szenen aus mehreren Bildern. 2 Credits pro Bild, halber Preis von Seedream 4.5, das es ablöst. Open-Stufe: lockerere Filter als Mainstream-Modelle, nicht explizit.",
+        flux3Image:
+          "FLUX.3 von Black Forest Labs. Schärfere Details, saubererer Text und genauere Prompt-Treue als FLUX.2, aus Text oder Referenzbildern. Rund 5 Credits pro Bild, günstiger als FLUX.2 Max, das es ablöst. Open-Stufe, nicht explizit. Für den Alltag bleibt FLUX.2 Pro günstiger; für Masse gibt es FLUX.3 Klein.",
+        flux3Klein:
+          "Das kleine, schnelle FLUX.3. Unter 1 Credit pro Bild, damit eines der günstigsten Modelle im Katalog, und es nimmt trotzdem Referenzbilder für Bearbeitungen. Gebaut für Entwürfe, Vorschaubilder und Serienläufe. Weniger Detail als das volle FLUX.3. Open-Stufe, nicht explizit.",
+        gptImage26Flare:
+          "GPT Image 2.6 von OpenAI in der Tempo-Variante. Text oder Referenzbild rein, schnell saubere Ergebnisse, stark bei Text und Layouts. Rund 4 Credits pro Bild. Mainstream: OpenAIs strenge Filter greifen. Für dichte Kompositionen und detailreiche Bearbeitungen ist Sunburst die Schwester.",
+        gptImage26Sunburst:
+          "GPT Image 2.6 von OpenAI, auf Detail getrimmt. Dichte Kompositionen, textlastige Plakate und Bearbeitungen, die Details über viele Runden halten. Rund 6 Credits pro Bild. Mainstream: OpenAIs strenge Filter greifen. Flare ist schneller und günstiger, wenn feine Details weniger zählen.",
+        geminiOmni12Flash:
+          "Gemini Omni 1.2 Flash, das Videomodell von Google. Clips von 3 bis 15 Sekunden mit Ton aus dem Modell, von 360p bis 4K, mit Steuerung über Start- und Endbild. Rund 7 Credits pro Sekunde in 720p und 10 in 1080p, günstiger als Veo 3.1 Fast bei gleicher Auflösung. Googles Filter greifen.",
+        grokImagineVideo15Lite:
+          "Die schnelle, günstige Fassung von Grok Imagine Video 1.5 von xAI. Clips von 1 bis 15 Sekunden in 480p, 720p oder 1080p, optional mit Startbild. 3 Credits pro Sekunde in 720p, weniger als die Hälfte des ursprünglichen Grok-Imagine-Videos, das es ablöst. Etwas Qualität gegen Tempo getauscht; das volle Grok Imagine Video 1.5 sieht besser aus. Open-Stufe, nicht explizit.",
+        wan30:
+          "Wan 3.0 von Alibaba. Clips von 2 bis 30 Sekunden mit Ton aus dem Modell, 480p bis 1080p, Steuerung über Start- und Endbild. 10 Credits pro Sekunde in 720p, so viel wie Wan 2.7, das es ablöst, dazu eine 480p-Stufe zum halben Preis. Lange Einstellungen mit kleinem Budget. Open-Stufe, nicht explizit.",
+        seedance2Mini:
+          "Das Sparmodell von Seedance 2.0. Text oder Bild zu Video, 4 bis 15 Sekunden, Ton aus dem Modell, Start- und Endbild-Steuerung, in 480p oder 720p. Rund 7,6 Credits pro Sekunde in 720p, unter Seedance 2.0 Fast. Gut für Entwürfe und Social-Clips; bei Bedarf liefert Seedance 2.0 bis 4K. Open-Stufe, nicht explizit.",
+        hailuo3Max:
+          "Hailuo 3 Max von MiniMax, eine auf Tempo nachtrainierte Fassung von Hailuo 3. Clips von 5 bis 15 Sekunden in 768p oder 480p mit Start- und Endbild-Steuerung, ohne Ton. 8 Credits pro Sekunde, deutlich unter Hailuo 3. Ideal für schnelle Iterationen; Hailuo 3 bringt 2K und Ton. Open-Stufe, nicht explizit.",
+        runwayGen45:
+          "Gen-4.5 von Runway. Kinoreife Bewegung und hohe Prompt-Treue, Text oder Startbild rein, Clips von 2 bis 10 Sekunden in 720p, ohne Ton. 12 Credits pro Sekunde, oberes Mittelfeld. Stark für filmische Einstellungen; wer Ton im Clip braucht, nimmt Veo 3.1 Fast oder Wan 3.0. Open-Stufe, nicht explizit.",
       },
     },
     modelUtilities: {

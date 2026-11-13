@@ -112,7 +112,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
       weakness: "skills.roleplaySkill.variantInfo.creative.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.MINIMAX_M3,
+        manualModelId: ChatModelId.MINIMAX_M3_1_FLASH,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,
