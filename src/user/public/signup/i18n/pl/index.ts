@@ -156,9 +156,14 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "+20 darmowych kredytów co miesiąc",
+      label: "Zapisz się do newslettera po bonusowe kredyty co miesiąc",
       description:
-        "Zapisz się do newslettera i odbieraj 20 bonusowych kredytów miesięcznie - a do tego nowe modele i funkcje jako pierwszy. Bez spamu, zrezygnujesz, kiedy chcesz.",
+        "Dopisuje e-mail konta do newslettera. Po kliknięciu linku w mailu weryfikacyjnym konto dostaje co miesiąc bonusowe darmowe kredyty, dopóki subskrypcja trwa. Jeden bonus na konto.",
+      checkboxLabel:
+        "Zapisz się do newslettera: +{{credits}} darmowych kredytów co miesiąc",
+      hint: "Nowe modele i nowości co kilka tygodni. Potwierdzasz go w mailu weryfikacyjnym. Wypiszesz się w każdej chwili.",
+      tooltip:
+        "Zaznacz, a dopiszemy Cię do newslettera. Gdy klikniesz link w mailu weryfikacyjnym, Twoje konto dostanie {{credits}} dodatkowych darmowych kredytów co miesiąc, łącznie {{total}}, dopóki subskrybujesz. Jeden bonus na konto.",
     },
 
     referralCode: {

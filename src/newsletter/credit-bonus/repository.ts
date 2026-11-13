@@ -4,9 +4,10 @@
  * Account first: the monthly newsletter credit bonus belongs to signed-in
  * accounts only (credits/free-allowance.ts). One bonus per account and email:
  * the claim always uses the account's own email, a subscription owned by another
- * pool is never re-assigned, and an account that ever had the bonus (or opted
- * in at signup) is never offered it again, so unsubscribe/resubscribe cannot
- * farm it.
+ * pool is never re-assigned, and an account that ever had the bonus is never
+ * offered it again, so unsubscribe/resubscribe cannot farm it. Ticking the
+ * newsletter box at signup creates a real (pending) subscription, so it shows
+ * up here as PENDING_CONFIRMATION / ACTIVE like any other.
  */
 
 import "server-only";
@@ -61,13 +62,11 @@ export function decideCreditOffer({
   userId,
   leadIds,
   accountEmail,
-  optedInAtSignup,
 }: {
   rows: SubscriptionRow[];
   userId: string;
   leadIds: string[];
   accountEmail: string;
-  optedInAtSignup: boolean;
 }): typeof NewsletterCreditOfferValue {
   const owned = rows.filter(
     (row) =>
@@ -97,10 +96,6 @@ export function decideCreditOffer({
   if (owned.some(isSubscribed)) {
     return NewsletterCreditOffer.PENDING_CONFIRMATION;
   }
-  // Opted into marketing at signup: they already said yes, no second ask
-  if (optedInAtSignup) {
-    return NewsletterCreditOffer.NOT_ELIGIBLE;
-  }
   return NewsletterCreditOffer.AVAILABLE;
 }
 
@@ -108,7 +103,6 @@ interface AccountContext {
   userId: string;
   email: string;
   leadIds: string[];
-  optedInAtSignup: boolean;
 }
 
 export class NewsletterCreditBonusRepository {
@@ -318,10 +312,7 @@ export class NewsletterCreditBonusRepository {
     }
     try {
       const [account] = await db
-        .select({
-          email: users.email,
-          optedInAtSignup: users.marketingConsent,
-        })
+        .select({ email: users.email })
         .from(users)
         .where(eq(users.id, user.id))
         .limit(1);
@@ -345,7 +336,6 @@ export class NewsletterCreditBonusRepository {
         userId: user.id,
         email: account.email,
         leadIds,
-        optedInAtSignup: account.optedInAtSignup,
       });
     } catch (error) {
       logger.error("Newsletter credit bonus: account lookup failed", {
@@ -383,7 +373,6 @@ export class NewsletterCreditBonusRepository {
       userId: account.userId,
       leadIds: account.leadIds,
       accountEmail: account.email,
-      optedInAtSignup: account.optedInAtSignup,
     });
   }
 }

@@ -25,7 +25,11 @@ import type {
   VerifyEmailPostResponseOutput,
 } from "./definition";
 import type { VerifyEmailT } from "./i18n";
-import { isValidVerificationToken, peekTokenUserId } from "./token";
+import {
+  getTokenIssuedAt,
+  isValidVerificationToken,
+  peekTokenUserId,
+} from "./token";
 
 export class VerifyEmailRepository {
   static async handle(
@@ -103,6 +107,16 @@ export class VerifyEmailRepository {
         .set({ emailVerified: true, updatedAt: new Date() })
         .where(eq(users.id, row.id));
       logger.debug("Email verified", { userId: row.id });
+    }
+    // Newsletter ticked at signup: this link is its double opt-in too
+    const linkIssuedAt = getTokenIssuedAt(token);
+    if (linkIssuedAt) {
+      const { NewsletterConfirmRepository } =
+        await import("@/newsletter/confirm/repository");
+      await NewsletterConfirmRepository.confirmForVerifiedAccount(
+        { userId: row.id, email: row.email, linkIssuedAt },
+        logger,
+      );
     }
     return success({
       verified: true,

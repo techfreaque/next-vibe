@@ -32,6 +32,8 @@ export const translations = {
     previewText: "One click to verify your {{appName}} address",
     greeting: "Hi {{name}},",
     body: "Confirm this address so we can reach you about your account, credits and security.",
+    newsletter:
+      "This same click also confirms your newsletter subscription: your account gets {{credits}} extra free credits every month while you stay subscribed.",
     button: "Verify my email",
     expiry:
       "This link works for {{days}} days. If you didn't create an account, ignore this email.",

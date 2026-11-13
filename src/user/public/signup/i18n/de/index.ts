@@ -158,9 +158,14 @@ export const translations: typeof enTranslations = {
       },
     },
     subscribeToNewsletter: {
-      label: "+20 Gratis-Credits pro Monat",
+      label: "Newsletter abonnieren für monatliche Bonus-Credits",
       description:
-        "Newsletter abonnieren und monatlich 20 Bonus-Credits sichern - plus neue Modelle und Features zuerst. Kein Spam, jederzeit kündbar.",
+        "Trägt die Konto-E-Mail in den Newsletter ein. Sobald der Link in der Verifizierungs-Mail geklickt ist, bekommt das Konto jeden Monat Bonus-Credits, solange das Abo läuft. Ein Bonus pro Konto.",
+      checkboxLabel:
+        "Newsletter abonnieren: +{{credits}} Gratis-Credits jeden Monat",
+      hint: "Neue Modelle und Produkt-News alle paar Wochen. Bestätigt wird über deine Verifizierungs-Mail. Jederzeit abbestellbar.",
+      tooltip:
+        "Mit dem Häkchen trägst du dich in den Newsletter ein. Sobald du den Link in deiner Verifizierungs-Mail klickst, bekommt dein Konto jeden Monat {{credits}} zusätzliche Gratis-Credits, insgesamt {{total}}, solange du abonniert bleibst. Ein Bonus pro Konto.",
     },
 
     referralCode: {
@@ -193,7 +198,7 @@ export const translations: typeof enTranslations = {
     description: "Jedes Modell. Deine Regeln. Kostenlos starten.",
   },
   footer: {
-    alreadyHaveAccount: "Haben Sie bereits ein Konto? Anmelden",
+    alreadyHaveAccount: "Schon ein Konto? Anmelden",
   },
 
   errors: {

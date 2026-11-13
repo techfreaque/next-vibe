@@ -557982,6 +557982,198 @@
           },
           "schemaType": "primitive"
         },
+        "DATABASE_POOL_MAX": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Max connections in the app's Postgres pool (ignored for PGlite file: URLs).",
+          "description": "Max connections in the app's Postgres pool (ignored for PGlite file: URLs).",
+          "placeholder": "10",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_CONNECT_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Max wait for a pooled Postgres connection (new TCP connect or a free pool slot), in ms. Fail fast instead of piling up requests on a dead link.",
+          "description": "Max wait for a pooled Postgres connection (new TCP connect or a free pool slot), in ms. Fail fast instead of piling up requests on a dead link.",
+          "placeholder": "10000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_IDLE_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Close pooled Postgres connections idle this long, in ms.",
+          "description": "Close pooled Postgres connections idle this long, in ms.",
+          "placeholder": "30000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_KEEPALIVE_DELAY_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "TCP keepalive initial delay for Postgres sockets, in ms. Detects silently dropped links (WireGuard/NAT) on idle connections.",
+          "description": "TCP keepalive initial delay for Postgres sockets, in ms. Detects silently dropped links (WireGuard/NAT) on idle connections.",
+          "placeholder": "10000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_STATEMENT_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Server-side statement_timeout for normal app queries, in ms (0 = off). Long jobs use getLongRunningDb() instead.",
+          "description": "Server-side statement_timeout for normal app queries, in ms (0 = off). Long jobs use getLongRunningDb() instead.",
+          "placeholder": "30000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_QUERY_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Client-side read timeout per query, in ms (0 = off). Catches black-holed connections where the server's cancel never arrives; the connection is then destroyed. Always kept at least 5 s above the statement timeout.",
+          "description": "Client-side read timeout per query, in ms (0 = off). Catches black-holed connections where the server's cancel never arrives; the connection is then destroyed. Always kept at least 5 s above the statement timeout.",
+          "placeholder": "45000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_IDLE_IN_TRANSACTION_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Server-side idle_in_transaction_session_timeout, in ms (0 = off). Kills sessions that sit in an open transaction (e.g. after the client vanished) so their locks are released.",
+          "description": "Server-side idle_in_transaction_session_timeout, in ms (0 = off). Kills sessions that sit in an open transaction (e.g. after the client vanished) so their locks are released.",
+          "placeholder": "60000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "DATABASE_LONG_STATEMENT_TIMEOUT_MS": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "statement_timeout for the separate long-running pool (getLongRunningDb: admin SQL, backfills, maintenance), in ms (0 = off).",
+          "description": "statement_timeout for the separate long-running pool (getLongRunningDb: admin SQL, backfills, maintenance), in ms (0 = off).",
+          "placeholder": "900000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "JWT_SECRET_KEY": {
           "type": "form_field",
           "fieldType": "text",
@@ -558633,9 +558825,9 @@
         "SSH_SERVER2_RELAY_ADDR": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Private (WireGuard) address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over SSH with its restricted /root/.ssh/ha-image-relay key (see ha/README.md). Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
-          "description": "Private (WireGuard) address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over SSH with its restricted /root/.ssh/ha-image-relay key (see ha/README.md). Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
-          "placeholder": "10.88.0.2",
+          "label": "Public address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over plain SSH/TCP with its restricted /root/.ssh/ha-image-relay key, which SSH_SERVER2 only accepts from SSH_SERVER's IPs (see ha/README.md). Deliberately NOT the WireGuard IP: multi-GB transfers over WireGuard/UDP trip the provider's DDoS filter, which then drops all UDP between the boxes. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+          "description": "Public address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over plain SSH/TCP with its restricted /root/.ssh/ha-image-relay key, which SSH_SERVER2 only accepts from SSH_SERVER's IPs (see ha/README.md). Deliberately NOT the WireGuard IP: multi-GB transfers over WireGuard/UDP trip the provider's DDoS filter, which then drops all UDP between the boxes. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+          "placeholder": "179.198.214.41",
           "columns": 12,
           "schema": {
             "def": {

@@ -34,6 +34,8 @@ export const translations: typeof enTranslations = {
     previewText: "Jedno kliknięcie potwierdza Twój adres w {{appName}}",
     greeting: "Cześć {{name}},",
     body: "Potwierdź ten adres, abyśmy mogli się z Tobą skontaktować w sprawie konta, kredytów i bezpieczeństwa.",
+    newsletter:
+      "Ten sam klik potwierdza też Twoją subskrypcję newslettera: konto dostaje co miesiąc dodatkowe {{credits}} darmowych kredytów, dopóki subskrybujesz.",
     button: "Potwierdź mój e-mail",
     expiry:
       "Link działa przez {{days}} dni. Jeśli nie zakładałeś konta, zignoruj tę wiadomość.",

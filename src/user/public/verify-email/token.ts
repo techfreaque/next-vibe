@@ -50,6 +50,20 @@ export function peekTokenUserId(token: string): string | null {
   return dot > 0 ? decoded.slice(0, dot) : null;
 }
 
+/**
+ * When the link was issued (expiry minus TTL). Only meaningful after
+ * isValidVerificationToken() accepted the token.
+ */
+export function getTokenIssuedAt(token: string): Date | null {
+  const [head] = token.split(".");
+  if (!head) {
+    return null;
+  }
+  const decoded = Buffer.from(head, "base64url").toString("utf8");
+  const expiresAt = Number(decoded.slice(decoded.lastIndexOf(".") + 1));
+  return Number.isFinite(expiresAt) ? new Date(expiresAt - TTL_MS) : null;
+}
+
 export function isValidVerificationToken(
   token: string,
   userId: string,

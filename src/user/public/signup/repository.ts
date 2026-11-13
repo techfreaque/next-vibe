@@ -317,6 +317,15 @@ export class SignupRepository {
         );
       }
 
+      if (subscribeToNewsletter) {
+        await SignupRepository.subscribeToNewsletterAtSignup(
+          email,
+          { id: userData.id, leadId: leadIdResult.leadId, roles },
+          locale,
+          logger,
+        );
+      }
+
       // Migrate local favorites from localStorage to DB (fire-and-forget, best-effort)
       if (data.localFavorites && data.localFavorites.length > 0) {
         try {
@@ -578,6 +587,59 @@ export class SignupRepository {
           error: parseError(error).message,
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Newsletter ticked at signup: subscribe the account email through the
+   * normal subscribe path (pending, unconfirmed). No separate confirm email:
+   * the account verification email says its link confirms the newsletter too
+   * (verify-email/email.tsx), and clicking it sets confirmedAt
+   * (NewsletterConfirmRepository.confirmForVerifiedAccount). The +20 then
+   * follows the usual rules (credits/free-allowance.ts): once per account.
+   * Never blocks signup.
+   */
+  private static async subscribeToNewsletterAtSignup(
+    email: string,
+    account: { id: string; leadId: string; roles: JwtPayloadType["roles"] },
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const { NewsletterSubscribeRepository } =
+        await import("@/newsletter/subscribe/repository");
+      const { scopedTranslation: subscribeScopedTranslation } =
+        await import("@/newsletter/subscribe/i18n");
+      const { t: subscribeT } = subscribeScopedTranslation.scopedT(locale);
+      const subscribed = await NewsletterSubscribeRepository.subscribe(
+        { email },
+        {
+          id: account.id,
+          leadId: account.leadId,
+          isPublic: false as const,
+          roles: account.roles,
+        },
+        locale,
+        logger,
+        subscribeT,
+      );
+      if (!subscribed.success) {
+        logger.error("Signup: newsletter opt-in could not be subscribed", {
+          userId: account.id,
+          error: subscribed.message,
+        });
+        return;
+      }
+      logger.debug("Signup: newsletter opt-in subscribed", {
+        userId: account.id,
+        subscriptionId: subscribed.data.subscriptionId,
+        creditBonus: subscribed.data.creditBonus,
+      });
+    } catch (error) {
+      logger.error("Signup: newsletter opt-in failed", {
+        userId: account.id,
+        error: parseError(error).message,
       });
     }
   }

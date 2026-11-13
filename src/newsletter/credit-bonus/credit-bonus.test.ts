@@ -4,7 +4,7 @@
  * - an account that never subscribed is offered it; claiming subscribes the
  *   ACCOUNT email (double opt-in), confirming makes it live on the user pool
  * - after unsubscribing it is never offered again, and a second claim grants nothing
- * - an account that opted in at signup is not asked again
+ * - a legacy signup opt-in (consent recorded, no subscription row) can still claim
  * Requires the dev DB.
  */
 
@@ -61,7 +61,11 @@ async function createGuest(): Promise<JwtPayloadType> {
     })
     .returning({ id: leads.id });
   createdLeadIds.push(lead.id);
-  return { isPublic: true, leadId: lead.id, roles: [UserPermissionRole.PUBLIC] };
+  return {
+    isPublic: true,
+    leadId: lead.id,
+    roles: [UserPermissionRole.PUBLIC],
+  };
 }
 
 async function createAccount(tag: string): Promise<JwtPayloadType | null> {
@@ -76,9 +80,7 @@ async function createAccount(tag: string): Promise<JwtPayloadType | null> {
   return created.data.user;
 }
 
-async function getOffer(
-  user: JwtPayloadType,
-): Promise<string | undefined> {
+async function getOffer(user: JwtPayloadType): Promise<string | undefined> {
   const res = await sendTestRequest({
     endpoint: creditBonusEndpoints.GET,
     user,
@@ -134,20 +136,16 @@ describe("decideCreditOffer", () => {
     userId: "u1",
     leadIds: ["l1"],
     accountEmail: "a@example.com",
-    optedInAtSignup: false,
   };
   const row = (patch: Partial<SubscriptionRow>): SubscriptionRow => ({
     ...base,
     ...patch,
   });
 
-  it("no subscription -> AVAILABLE; signup opt-in -> NOT_ELIGIBLE", () => {
+  it("no subscription -> AVAILABLE (also for legacy signup opt-ins without a row)", () => {
     expect(decideCreditOffer({ ...ctx, rows: [] })).toBe(
       NewsletterCreditOffer.AVAILABLE,
     );
-    expect(
-      decideCreditOffer({ ...ctx, rows: [], optedInAtSignup: true }),
-    ).toBe(NewsletterCreditOffer.NOT_ELIGIBLE);
   });
 
   it("owned unconfirmed -> PENDING; confirmed -> ACTIVE; confirmed then unsubscribed -> NOT_ELIGIBLE", () => {
@@ -259,7 +257,7 @@ describe("newsletter credit bonus endpoint (DB)", () => {
     expect(after?.status).toBe(NewsletterSubscriptionStatus.UNSUBSCRIBED);
   });
 
-  it("account that opted in at signup is not asked again", async () => {
+  it("legacy signup opt-in without a subscription row can still claim", async () => {
     const user = await createAccount("optin");
     if (!user || user.isPublic) {
       return;
@@ -268,6 +266,6 @@ describe("newsletter credit bonus endpoint (DB)", () => {
       .update(users)
       .set({ marketingConsent: true })
       .where(eq(users.id, user.id));
-    expect(await getOffer(user)).toBe(NewsletterCreditOffer.NOT_ELIGIBLE);
+    expect(await getOffer(user)).toBe(NewsletterCreditOffer.AVAILABLE);
   });
 });

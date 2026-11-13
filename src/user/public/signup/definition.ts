@@ -191,7 +191,8 @@ const { POST } = createEndpoint({
           descriptionStyle: "tooltip",
         },
         order: 13,
-        schema: z.boolean().optional().default(true),
+        // Active opt-in (GDPR/UWG): never pre-ticked
+        schema: z.boolean().optional().default(false),
       }),
 
       acceptTerms: requestField(scopedTranslation, {

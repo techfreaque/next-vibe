@@ -145,9 +145,14 @@ export const translations = {
       },
     },
     subscribeToNewsletter: {
-      label: "+20 free credits every month",
+      label: "Join the newsletter for bonus free credits every month",
       description:
-        "Subscribe to the newsletter and get 20 bonus credits a month, plus first word on new models and features. No spam, leave anytime.",
+        "Adds the account email to the newsletter. Once the verification email link is clicked, the account gets bonus free credits every month while subscribed. One bonus per account.",
+      checkboxLabel:
+        "Join the newsletter: +{{credits}} free credits every month",
+      hint: "New models and product news every few weeks. Your verification email confirms it. Unsubscribe anytime.",
+      tooltip:
+        "Tick it and we add you to the newsletter. Once you click the link in your verification email, your account gets {{credits}} extra free credits every month, {{total}} in total, for as long as you stay subscribed. One bonus per account.",
     },
     acceptTerms: {
       label: "I accept the terms",

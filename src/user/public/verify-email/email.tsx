@@ -21,6 +21,7 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 
 import { configScopedTranslation } from "@/env/i18n";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
@@ -48,6 +49,8 @@ import { createVerificationToken, VERIFY_TOKEN_TTL_DAYS } from "./token";
 const propsSchema = z.object({
   name: z.string(),
   verifyUrl: z.string(),
+  /** Newsletter ticked at signup and not yet confirmed: this link confirms it too */
+  newsletterBonusCredits: z.number().optional(),
 });
 
 type VerifyEmailProps = z.infer<typeof propsSchema>;
@@ -88,6 +91,19 @@ function VerifyEmail({
       >
         {t("email.body")}
       </Text>
+      {props.newsletterBonusCredits !== undefined && (
+        <Text
+          style={{
+            fontSize: "16px",
+            lineHeight: "1.6",
+            color: "#374151",
+            marginTop: "-12px",
+            marginBottom: "28px",
+          }}
+        >
+          {t("email.newsletter", { credits: props.newsletterBonusCredits })}
+        </Text>
+      )}
       <Section style={{ textAlign: "center", marginBottom: "28px" }}>
         <Button
           href={props.verifyUrl}
@@ -143,13 +159,26 @@ async function buildVerificationEmail(
     });
   }
   const verifyUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/verify-email/${encodeURIComponent(token)}`;
+  const { NewsletterConfirmRepository } =
+    await import("@/newsletter/confirm/repository");
+  const newsletterPending =
+    await NewsletterConfirmRepository.hasPendingForAccount(
+      recipient.id,
+      recipient.email,
+    );
   return success({
     toEmail: recipient.email,
     toName: recipient.name,
     subject: t("email.subject", { appName: globalT("appName") }),
     leadId: recipient.leadId,
     jsx: template.component({
-      props: { name: recipient.name, verifyUrl },
+      props: {
+        name: recipient.name,
+        verifyUrl,
+        ...(newsletterPending
+          ? { newsletterBonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus }
+          : {}),
+      },
       t,
       locale,
       recipientEmail: recipient.email,

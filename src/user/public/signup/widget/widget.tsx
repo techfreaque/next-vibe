@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
+import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
 import {
@@ -23,6 +24,7 @@ import {
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Heart } from "next-vibe/ui/components/icons/Heart";
+import { Info } from "next-vibe/ui/components/icons/Info";
 import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
 import {
@@ -30,6 +32,12 @@ import {
   RadioGroupItem,
 } from "next-vibe/ui/components/radio-group";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe/ui/components/tooltip";
 import { P } from "next-vibe/ui/components/typography";
 import { useEffect, useMemo, useState } from "react";
 
@@ -47,11 +55,14 @@ import {
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
+} from "@/products/constants";
 import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
 import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -61,6 +72,12 @@ import { PasswordMatchIndicator } from "./password-match-indicator";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 import type definition from "../definition";
+
+/** Newsletter bonus copy reads the live tiers, never hardcoded numbers */
+const newsletterCredits = {
+  credits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+  total: FREE_CREDIT_MAX_TOTAL,
+};
 
 /** Radio value for "support nobody" (radix items need a non-empty value) */
 const NO_SUPPORTED_SKILL = "__none__";
@@ -239,12 +256,73 @@ export function SignupFormContainer({
         />
         <PasswordMatchIndicator />
 
-        {/* Checkboxes */}
-        <BooleanFieldWidget
-          fieldName="subscribeToNewsletter"
-          field={children.subscribeToNewsletter}
+        {/* Newsletter opt-in: explicit, never pre-ticked, details in the tooltip */}
+        <FormField
+          control={form.control}
+          name="subscribeToNewsletter"
+          render={({ field: formField }) => (
+            <FormItem className="space-y-2">
+              <Div className="flex items-start gap-3">
+                <FormControl>
+                  <Checkbox
+                    id={formField.name}
+                    name={formField.name}
+                    checked={formField.value === true}
+                    onCheckedChange={(checked) =>
+                      formField.onChange(checked === true)
+                    }
+                    className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                </FormControl>
+                <Div className="flex flex-col gap-0.5">
+                  <Div className="flex items-start gap-1.5">
+                    <Label
+                      htmlFor={formField.name}
+                      className="cursor-pointer text-sm font-medium leading-snug"
+                    >
+                      {t(
+                        "fields.subscribeToNewsletter.checkboxLabel",
+                        newsletterCredits,
+                      )}
+                    </Label>
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="mt-0.5 inline-flex h-auto shrink-0 cursor-help p-0"
+                            aria-label={t(
+                              "fields.subscribeToNewsletter.tooltip",
+                              newsletterCredits,
+                            )}
+                          >
+                            <Info className="h-3.5 w-3.5 text-muted-foreground transition-colors hover:text-foreground" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[260px]">
+                          <Span className="text-sm">
+                            {t(
+                              "fields.subscribeToNewsletter.tooltip",
+                              newsletterCredits,
+                            )}
+                          </Span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </Div>
+                  <Label
+                    htmlFor={formField.name}
+                    className="cursor-pointer text-xs font-normal leading-snug text-muted-foreground"
+                  >
+                    {t("fields.subscribeToNewsletter.hint")}
+                  </Label>
+                </Div>
+              </Div>
+            </FormItem>
+          )}
         />
-        {/* Accept Terms - matches BooleanFieldWidget layout with linked terms/conditions */}
+        {/* Accept Terms - same layout as the newsletter opt-in, with linked terms/conditions */}
         <FormField
           control={form.control}
           name="acceptTerms"
