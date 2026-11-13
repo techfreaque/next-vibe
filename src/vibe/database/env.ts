@@ -49,6 +49,69 @@ export const {
       "Preview app port for local mode (vibe build/start). Derives NEXT_PUBLIC_APP_URL by swapping the port.",
     fieldType: "number",
   },
+  DATABASE_POOL_MAX: {
+    schema: z.coerce.number().int().positive().optional().default(10),
+    example: "10",
+    comment:
+      "Max connections in the app's Postgres pool (ignored for PGlite file: URLs).",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_CONNECT_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(10_000),
+    example: "10000",
+    comment:
+      "Max wait for a pooled Postgres connection (new TCP connect or a free pool slot), in ms. Fail fast instead of piling up requests on a dead link.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_IDLE_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(30_000),
+    example: "30000",
+    comment: "Close pooled Postgres connections idle this long, in ms.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_KEEPALIVE_DELAY_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(10_000),
+    example: "10000",
+    comment:
+      "TCP keepalive initial delay for Postgres sockets, in ms. Detects silently dropped links (WireGuard/NAT) on idle connections.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_STATEMENT_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(30_000),
+    example: "30000",
+    comment:
+      "Server-side statement_timeout for normal app queries, in ms (0 = off). Long jobs use getLongRunningDb() instead.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_QUERY_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(45_000),
+    example: "45000",
+    comment:
+      "Client-side read timeout per query, in ms (0 = off). Catches black-holed connections where the server's cancel never arrives; the connection is then destroyed. Always kept at least 5 s above the statement timeout.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_IDLE_IN_TRANSACTION_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(60_000),
+    example: "60000",
+    comment:
+      "Server-side idle_in_transaction_session_timeout, in ms (0 = off). Kills sessions that sit in an open transaction (e.g. after the client vanished) so their locks are released.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_LONG_STATEMENT_TIMEOUT_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(900_000),
+    example: "900000",
+    comment:
+      "statement_timeout for the separate long-running pool (getLongRunningDb: admin SQL, backfills, maintenance), in ms (0 = off).",
+    commented: true,
+    fieldType: "number",
+  },
 });
 
 /**

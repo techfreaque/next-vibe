@@ -18,6 +18,7 @@ import { Pool } from "pg";
 import { parseError } from "../core/utils/parse-error";
 import { resolveEffectiveDatabaseUrl } from "./effective-url";
 import { databaseEnv } from "./env";
+import { createStandardPool, guardPool, LONG_RUNNING_POOL_MAX } from "./pool";
 
 /**
  * Shared database connection primitives.
@@ -147,31 +148,27 @@ function removeStalePgliteLock(resolvedUrl: string): void {
 
 // ─── Pool factory ─────────────────────────────────────────────────────────────
 
-const STANDARD_POOL_CONFIG = {
-  connectionString: DATABASE_URL,
-  // `timestamp` columns hold UTC wall-clock (Drizzle writes Dates as UTC), so
-  // `DEFAULT now()` must run in UTC too — a host-local server zone skews
-  // default-stamped rows (user messages) by the zone offset.
-  options: "-c timezone=UTC",
-  max: 10,
-  idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 30_000,
-};
-
-/**
- * An idle pooled client whose backend dies (database restart, network drop)
- * emits 'error' on the pool; with no listener Node treats it as an uncaught
- * exception and takes the whole server down. The pool already discards the
- * dead client and opens a fresh one on the next checkout, so swallowing is
- * the correct handling.
- */
-function guardPool(p: Pool): Pool {
-  p.on("error", () => undefined);
-  return p;
+/** The app's request pool (real Postgres). */
+export function createPool(): Pool {
+  return createStandardPool({
+    connectionString: DATABASE_URL,
+    max: databaseEnv.DATABASE_POOL_MAX,
+    statementTimeoutMs: databaseEnv.DATABASE_STATEMENT_TIMEOUT_MS,
+  });
 }
 
-export function createPool(): Pool {
-  return guardPool(new Pool(STANDARD_POOL_CONFIG));
+/**
+ * Separate pool for work that legitimately runs statements past the normal
+ * statement timeout (admin SQL, embedding backfills, bulk maintenance).
+ * Same keepalive / dead-client handling, longer statement timeout.
+ * Real Postgres only: PGlite callers use the main pool.
+ */
+export function createLongRunningPool(): Pool {
+  return createStandardPool({
+    connectionString: DATABASE_URL,
+    max: LONG_RUNNING_POOL_MAX,
+    statementTimeoutMs: databaseEnv.DATABASE_LONG_STATEMENT_TIMEOUT_MS,
+  });
 }
 
 function createSocketPool(port: number): Pool {

@@ -11,7 +11,7 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db } from "..";
+import { getLongRunningDb } from "..";
 import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
 import type { SqlT } from "./i18n";
 
@@ -122,8 +122,10 @@ export class SqlRepository {
       finalQuery = `${query} LIMIT ${limit}`;
     }
 
-    // Execute the query using Drizzle
-    const result = await db.execute(finalQuery);
+    // Ad-hoc admin SQL may be maintenance work past the normal statement
+    // timeout: run it on the long-running pool so it never ties up the
+    // request pool either.
+    const result = await getLongRunningDb().execute(finalQuery);
     const rows = result.rows || [];
 
     return {

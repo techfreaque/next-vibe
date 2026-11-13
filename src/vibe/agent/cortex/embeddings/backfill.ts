@@ -8,7 +8,7 @@ import "server-only";
  */
 import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
-import { db } from "next-vibe/database";
+import { db, getLongRunningDb } from "next-vibe/database";
 
 import { cortexNodes } from "../db";
 import { CortexNodeType } from "../enum";
@@ -225,7 +225,8 @@ async function materializeVirtualMounts(userId: string): Promise<number> {
  * Returns the number of rows cleaned.
  */
 async function reclaimVirtualMountContent(): Promise<number> {
-  const cleared = await db
+  // Whole-table UPDATE: may exceed the normal statement timeout.
+  const cleared = await getLongRunningDb()
     .update(cortexNodes)
     .set({ content: null, size: 0 })
     .where(
@@ -278,7 +279,9 @@ export async function backfillEmbeddings(force = false): Promise<{
 }> {
   // Force mode: clear all existing embeddings so they get regenerated
   if (force) {
-    await db
+    // Whole-table UPDATE touching the vector index: may exceed the normal
+    // statement timeout.
+    await getLongRunningDb()
       .update(cortexNodes)
       .set({ embedding: null, contentHash: null })
       .where(

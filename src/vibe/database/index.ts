@@ -5,7 +5,13 @@ import type { Pool } from "pg";
 
 import { parseError } from "../core/utils/parse-error";
 import type { EndpointLogger } from "../logger/types";
-import { isPglite, onPgliteReopen, pool, recreatePool } from "./client";
+import {
+  createLongRunningPool,
+  isPglite,
+  onPgliteReopen,
+  pool,
+  recreatePool,
+} from "./client";
 
 export {
   getLivePgliteClient,
@@ -54,12 +60,50 @@ if (isPglite) {
   });
 }
 
+// ─── Long-running pool ───────────────────────────────────────────────────────
+
+let longRunningPool: Pool | null = null;
+let longRunningDb: NodePgDatabase<Record<string, never>> | null = null;
+
+/**
+ * Drizzle client for work whose single statements may legitimately run past
+ * the normal statement timeout (DATABASE_STATEMENT_TIMEOUT_MS): admin SQL,
+ * embedding backfills, bulk maintenance. Backed by a separate small pool with
+ * DATABASE_LONG_STATEMENT_TIMEOUT_MS, so a long job never starves the request
+ * pool. Created lazily on first use. PGlite: the normal `db` (no timeouts).
+ */
+export function getLongRunningDb(): NodePgDatabase<Record<string, never>> {
+  if (isPglite) {
+    return db;
+  }
+  if (!longRunningDb) {
+    longRunningPool = createLongRunningPool();
+    longRunningDb = drizzle(longRunningPool);
+  }
+  return longRunningDb;
+}
+
+async function closeLongRunningPool(logger: EndpointLogger): Promise<void> {
+  const p = longRunningPool;
+  longRunningPool = null;
+  longRunningDb = null;
+  if (!p || p.ending || p.ended) {
+    return;
+  }
+  try {
+    await p.end();
+  } catch (error) {
+    logger.error("Long-running database pool close failed", parseError(error));
+  }
+}
+
 let databaseClosed = false;
 
 export async function closeDatabase(logger: EndpointLogger): Promise<void> {
   if (databaseClosed) {
     return;
   }
+  await closeLongRunningPool(logger);
   if (rawPool.ending || rawPool.ended) {
     databaseClosed = true;
     return;
