@@ -1178,6 +1178,13 @@
       "when": 1794576606203,
       "tag": "20261113133006_credit_packs_unique_session",
       "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1794577922502,
+      "tag": "20261113135202_email_send_log",
+      "breakpoints": true
     }
   ]
 }

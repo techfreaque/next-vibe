@@ -27,9 +27,11 @@ export const translations = {
       scheduled: "Newly enqueued",
       alreadyPending: "Already queued",
       cancelled: "Cancelled (no consent)",
-      skipped: "Skipped (already sent)",
+      alreadySent: "Skipped (already got it)",
+      duplicates: "Duplicate rows cancelled",
       errors: "Errors",
       sent: "Sent",
+      sendSkipped: "Skipped at send (already got it)",
       sendFailed: "Send failed",
     },
     success: {

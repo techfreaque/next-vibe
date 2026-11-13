@@ -16,11 +16,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import type {
-  Countries,
-  CountryLanguage,
-  Languages,
-} from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   getLanguageAndCountryFromLocale,
@@ -28,7 +24,11 @@ import {
 } from "next-vibe/core/i18n/core/language-utils";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
+import {
+  emailCampaigns,
+  emailSendLog,
+  leads,
+} from "next-vibe/identity/lead/db";
 import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
@@ -52,6 +52,26 @@ import { newsletterSubscriptions } from "../../../../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../../../../newsletter/enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
+
+/** A PENDING send-log claim older than this belongs to a crashed send. */
+const STALE_CLAIM_MS = 60 * 60 * 1000;
+
+/** Dedupe key for an address: lowercased, trimmed. */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/** One newsletter recipient: one per normalized email, one locale. */
+export interface ConsentedNewsletterRecipient {
+  /** normalizeEmail(email) */
+  key: string;
+  /** Address to send to (trimmed, original casing) */
+  email: string;
+  userId: string | null;
+  subscriptionLeadId: string | null;
+  /** The single locale this recipient is mailed in */
+  locale: CountryLanguage;
+}
 
 /**
  * Campaign Scheduling Rules
@@ -369,6 +389,7 @@ export class CampaignSchedulerService {
     limit = 100,
     logger: EndpointLogger,
     journeyVariant?: typeof EmailJourneyVariantValue,
+    campaignIds?: string[],
   ): Promise<
     Array<{
       id: string;
@@ -411,6 +432,7 @@ export class CampaignSchedulerService {
             ...(journeyVariant
               ? [eq(emailCampaigns.journeyVariant, journeyVariant)]
               : []),
+            ...(campaignIds ? [inArray(emailCampaigns.id, campaignIds)] : []),
             isNull(emailCampaigns.sentAt),
             // Lead or linked user must have an email
             or(isNotNull(leads.email), isNotNull(users.email)),
@@ -777,21 +799,23 @@ export class CampaignSchedulerService {
   }
 
   /**
-   * The consented newsletter audience. A recipient qualifies through either
-   * consent record, and only with a confirmed address:
+   * The consented newsletter audience: exactly ONE entry per normalized email
+   * (lowercased, trimmed), however many user / subscription / lead rows carry
+   * that address. A recipient qualifies through either consent record, and
+   * only with a confirmed address:
    * - account holder: users.marketing_consent AND users.email_verified, or
    * - newsletter double opt-in: newsletter_subscriptions SUBSCRIBED AND
    *   confirmed_at set AND marketing_consent.
-   * Anyone in {@link getSuppressedEmails} is removed. Deduplicated by
-   * lowercased email; the account row wins (carries userId + locale).
+   * Anyone in {@link getSuppressedEmails} is removed.
+   *
+   * `locale` is the ONE language the recipient is mailed in, resolved as
+   * account locale > subscription (its lead's) locale > any lead locale for
+   * the address > {@link defaultLocale}. The dispatcher sends newsletter rows
+   * in this locale, never in the locale of whichever lead row the campaign
+   * row happens to point at.
    */
   async getConsentedNewsletterAudience(): Promise<
-    Array<{
-      email: string;
-      userId: string | null;
-      subscriptionLeadId: string | null;
-      locale: CountryLanguage | null;
-    }>
+    ConsentedNewsletterRecipient[]
   > {
     const [accountHolders, confirmedSubscribers, suppressed] =
       await Promise.all([
@@ -825,85 +849,333 @@ export class CampaignSchedulerService {
         this.getSuppressedEmails(),
       ]);
 
-    const audience = new Map<
+    // Collect candidates per normalized email: account row first (carries the
+    // account locale), subscription rows merged in.
+    const candidates = new Map<
       string,
       {
         email: string;
         userId: string | null;
         subscriptionLeadId: string | null;
-        locale: CountryLanguage | null;
+        accountLocale: CountryLanguage | null;
       }
     >();
     for (const user of accountHolders) {
-      const key = user.email.trim().toLowerCase();
-      if (!suppressed.has(key) && !audience.has(key)) {
-        audience.set(key, {
-          email: user.email,
+      const key = normalizeEmail(user.email);
+      if (!suppressed.has(key) && !candidates.has(key)) {
+        candidates.set(key, {
+          email: user.email.trim(),
           userId: user.id,
           subscriptionLeadId: null,
-          locale: user.locale,
+          accountLocale: user.locale,
         });
       }
     }
     for (const sub of confirmedSubscribers) {
-      const key = sub.email.trim().toLowerCase();
+      const key = normalizeEmail(sub.email);
       if (suppressed.has(key)) {
         continue;
       }
-      const existing = audience.get(key);
+      const existing = candidates.get(key);
       if (existing) {
-        existing.subscriptionLeadId = sub.leadId;
+        existing.subscriptionLeadId ??= sub.leadId;
         continue;
       }
-      audience.set(key, {
-        email: sub.email,
+      candidates.set(key, {
+        email: sub.email.trim(),
         userId: sub.userId,
         subscriptionLeadId: sub.leadId,
-        locale: null,
+        accountLocale: null,
       });
     }
-    return [...audience.values()];
+
+    if (candidates.size === 0) {
+      return [];
+    }
+
+    // Locale sources for recipients without an account locale: a linked
+    // (non-qualifying) account, the subscription's lead, any lead by address.
+    const linkedUserIds = [...candidates.values()].flatMap((c) =>
+      !c.accountLocale && c.userId ? [c.userId] : [],
+    );
+    const subscriptionLeadIds = [...candidates.values()].flatMap((c) =>
+      !c.accountLocale && c.subscriptionLeadId ? [c.subscriptionLeadId] : [],
+    );
+    const keysWithoutAccount = [...candidates.entries()]
+      .filter(([, c]) => !c.accountLocale)
+      .map(([key]) => key);
+
+    const [linkedUsers, subscriptionLeads, addressLeads] = await Promise.all([
+      linkedUserIds.length > 0
+        ? db
+            .select({ id: users.id, locale: users.locale })
+            .from(users)
+            .where(inArray(users.id, linkedUserIds))
+        : Promise.resolve([]),
+      subscriptionLeadIds.length > 0
+        ? db
+            .select({
+              id: leads.id,
+              language: leads.language,
+              country: leads.country,
+            })
+            .from(leads)
+            .where(inArray(leads.id, subscriptionLeadIds))
+        : Promise.resolve([]),
+      keysWithoutAccount.length > 0
+        ? db
+            .select({
+              key: sql<string>`lower(btrim(${leads.email}))`,
+              language: leads.language,
+              country: leads.country,
+            })
+            .from(leads)
+            .where(
+              inArray(sql`lower(btrim(${leads.email}))`, keysWithoutAccount),
+            )
+            .orderBy(leads.createdAt)
+        : Promise.resolve([]),
+    ]);
+    const userLocaleById = new Map(linkedUsers.map((u) => [u.id, u.locale]));
+    const leadLocaleById = new Map(
+      subscriptionLeads.map((l) => [
+        l.id,
+        getLocaleFromLanguageAndCountry(l.language, l.country),
+      ]),
+    );
+    const leadLocaleByKey = new Map<string, CountryLanguage>();
+    for (const l of addressLeads) {
+      if (!leadLocaleByKey.has(l.key)) {
+        leadLocaleByKey.set(
+          l.key,
+          getLocaleFromLanguageAndCountry(l.language, l.country),
+        );
+      }
+    }
+
+    return [...candidates.entries()].map(([key, c]) => ({
+      key,
+      email: c.email,
+      userId: c.userId,
+      subscriptionLeadId: c.subscriptionLeadId,
+      locale:
+        c.accountLocale ??
+        (c.userId ? userLocaleById.get(c.userId) : undefined) ??
+        (c.subscriptionLeadId
+          ? leadLocaleById.get(c.subscriptionLeadId)
+          : undefined) ??
+        leadLocaleByKey.get(key) ??
+        defaultLocale,
+    }));
   }
 
   /**
    * Send-time consent gate for NEWSLETTER campaign rows. Re-evaluated right
    * before each send so a row enqueued under an older/looser gate (or whose
-   * recipient opted out since) is never mailed.
+   * recipient opted out since) is never mailed. Returns the audience entry
+   * (with the one locale to mail in) or null.
    */
-  async isConsentedNewsletterRecipient(email: string): Promise<boolean> {
-    const key = email.trim().toLowerCase();
+  async getConsentedNewsletterRecipient(
+    email: string,
+  ): Promise<ConsentedNewsletterRecipient | null> {
+    const key = normalizeEmail(email);
     const audience = await this.getConsentedNewsletterAudience();
-    return audience.some((r) => r.email.trim().toLowerCase() === key);
+    return audience.find((r) => r.key === key) ?? null;
+  }
+
+  async isConsentedNewsletterRecipient(email: string): Promise<boolean> {
+    return (await this.getConsentedNewsletterRecipient(email)) !== null;
+  }
+
+  /**
+   * Atomically claim the right to send (variant, stage) to an address.
+   * Must be called right before the mail is handed to SMTP. Returns false if
+   * that address already got (or is getting) this mail from any campaign
+   * row, lead, locale, dispatcher or rerun. A FAILED claim (the previous
+   * attempt never reached SMTP) may be re-claimed.
+   * Returns "claimed" (go ahead), "duplicate" (another row already sent it
+   * to this address), "in_flight" (this very row is held by a concurrent
+   * dispatcher) or "stale" (this row's earlier send crashed mid-flight).
+   */
+  async claimSend(
+    claim: {
+      journeyVariant: typeof EmailJourneyVariantValue;
+      stage: typeof EmailCampaignStageValue;
+      email: string;
+      campaignId: string | null;
+      leadId: string | null;
+      locale: CountryLanguage | null;
+    },
+    logger: EndpointLogger,
+  ): Promise<"claimed" | "duplicate" | "in_flight" | "stale"> {
+    const now = new Date();
+    const [row] = await db
+      .insert(emailSendLog)
+      .values({
+        journeyVariant: claim.journeyVariant,
+        stage: claim.stage,
+        email: normalizeEmail(claim.email),
+        campaignId: claim.campaignId,
+        leadId: claim.leadId,
+        locale: claim.locale,
+        status: MessageStatus.PENDING,
+        claimedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [
+          emailSendLog.journeyVariant,
+          emailSendLog.stage,
+          emailSendLog.email,
+        ],
+        set: {
+          campaignId: claim.campaignId,
+          leadId: claim.leadId,
+          locale: claim.locale,
+          status: MessageStatus.PENDING,
+          error: null,
+          claimedAt: now,
+          sentAt: null,
+        },
+        // Only a failed attempt may be retried; SENT / in-flight claims win.
+        setWhere: eq(emailSendLog.status, MessageStatus.FAILED),
+      })
+      .returning({ id: emailSendLog.id });
+    if (row) {
+      return "claimed";
+    }
+    const [holder] = await db
+      .select({
+        campaignId: emailSendLog.campaignId,
+        status: emailSendLog.status,
+        claimedAt: emailSendLog.claimedAt,
+      })
+      .from(emailSendLog)
+      .where(
+        and(
+          eq(emailSendLog.journeyVariant, claim.journeyVariant),
+          eq(emailSendLog.stage, claim.stage),
+          eq(emailSendLog.email, normalizeEmail(claim.email)),
+        ),
+      )
+      .limit(1);
+    logger.info("campaign.send_log.already_claimed", {
+      campaignId: claim.campaignId,
+      holderCampaignId: holder?.campaignId ?? null,
+      journeyVariant: claim.journeyVariant,
+      stage: claim.stage,
+    });
+    if (!claim.campaignId || holder?.campaignId !== claim.campaignId) {
+      return "duplicate";
+    }
+    // This very row: a concurrent dispatcher is sending it, or a send
+    // crashed mid-flight (claim still PENDING long after). The outcome of a
+    // crashed send is unknown, so it is never retried.
+    return holder.status === MessageStatus.PENDING &&
+      now.getTime() - holder.claimedAt.getTime() > STALE_CLAIM_MS
+      ? "stale"
+      : "in_flight";
+  }
+
+  /** Settle a claim after the send attempt. */
+  async settleSendClaim(
+    claim: {
+      journeyVariant: typeof EmailJourneyVariantValue;
+      stage: typeof EmailCampaignStageValue;
+      email: string;
+    },
+    outcome: { sent: true } | { sent: false; error: string },
+  ): Promise<void> {
+    await db
+      .update(emailSendLog)
+      .set(
+        outcome.sent
+          ? { status: MessageStatus.SENT, sentAt: new Date(), error: null }
+          : { status: MessageStatus.FAILED, error: outcome.error },
+      )
+      .where(
+        and(
+          eq(emailSendLog.journeyVariant, claim.journeyVariant),
+          eq(emailSendLog.stage, claim.stage),
+          eq(emailSendLog.email, normalizeEmail(claim.email)),
+          eq(emailSendLog.status, MessageStatus.PENDING),
+        ),
+      );
+  }
+
+  /**
+   * Normalized addresses that already got (or are being sent) this mail:
+   * SENT or in-flight claims in the send log.
+   */
+  async getClaimedEmails(
+    journeyVariant: typeof EmailJourneyVariantValue,
+    stage: typeof EmailCampaignStageValue,
+  ): Promise<Set<string>> {
+    const rows = await db
+      .select({ email: emailSendLog.email })
+      .from(emailSendLog)
+      .where(
+        and(
+          eq(emailSendLog.journeyVariant, journeyVariant),
+          eq(emailSendLog.stage, stage),
+          ne(emailSendLog.status, MessageStatus.FAILED),
+        ),
+      );
+    return new Set(rows.map((r) => r.email));
+  }
+
+  /** Mark still-pending campaign rows FAILED with a reason (never delete). */
+  private async cancelPendingRows(ids: string[], error: string): Promise<void> {
+    if (ids.length === 0) {
+      return;
+    }
+    await db
+      .update(emailCampaigns)
+      .set({ status: MessageStatus.FAILED, error, updatedAt: new Date() })
+      .where(
+        and(
+          inArray(emailCampaigns.id, ids),
+          eq(emailCampaigns.status, MessageStatus.PENDING),
+        ),
+      );
   }
 
   /**
    * Bootstrap a consent-filtered one-off newsletter blast.
    *
-   * Audience: {@link getConsentedNewsletterAudience} (verified account holders
-   * with marketing consent, plus confirmed double-opt-in subscribers, minus
-   * every opt-out / bounce / invalid address).
+   * Audience: {@link getConsentedNewsletterAudience}: one entry per
+   * normalized email, one locale each.
    *
-   * For a recipient without a lead row yet, one is created so the campaign row
-   * has an owner.
+   * Pending rows of this variant are reconciled per normalized address
+   * (an address can sit on several leads, or on a lead and a linked user):
+   * - recipient outside the audience → cancelled ("consent_gate:not_in_audience"),
+   * - address already got this newsletter (send log or a sent row) or a
+   *   second pending row for the same address → cancelled as a duplicate
+   *   ("duplicate:already_sent" / "duplicate:recipient"). Rows are marked
+   *   FAILED, never deleted.
    *
-   * Pending rows of this variant whose recipient is NOT in the audience (e.g.
-   * enqueued under an older, looser gate) are cancelled (status FAILED,
-   * error "consent_gate:not_in_audience").
+   * Then every audience address without a live row and without a send-log
+   * claim is enqueued once (a lead row is created when none exists).
+   * Addresses that already got it are counted in `alreadySent` and skipped.
    *
-   * Idempotent: skips any (lead, variant) that already has a campaign row, so
-   * running it twice never double-sends. dryRun writes nothing and reports what
-   * a real run would do, including `byLocale`: the locale each recipient will
-   * be mailed in (lead language-country, as the dispatcher resolves it).
+   * Idempotent: running it twice enqueues nothing new; the send-time claim in
+   * email_send_log is the hard guarantee on top. dryRun writes nothing and
+   * reports what a real run would do, including `byLocale`: the one locale
+   * each recipient is mailed in.
    */
   async bootstrapConsentedNewsletterBlast(
     journeyVariant: typeof EmailJourneyVariantValue,
     logger: EndpointLogger,
-    options: { dryRun?: boolean } = {},
+    options: {
+      dryRun?: boolean;
+      /** Only these addresses (tests): audience and reconciliation scope. */
+      onlyEmails?: string[];
+    } = {},
   ): Promise<{
     audience: number;
     scheduled: number;
     alreadyPending: number;
-    skipped: number;
+    alreadySent: number;
+    duplicates: number;
     cancelled: number;
     errors: number;
     byLocale: Record<string, number>;
@@ -914,7 +1186,8 @@ export class CampaignSchedulerService {
       audience: 0,
       scheduled: 0,
       alreadyPending: 0,
-      skipped: 0,
+      alreadySent: 0,
+      duplicates: 0,
       cancelled: 0,
       errors: 0,
       byLocale,
@@ -922,13 +1195,20 @@ export class CampaignSchedulerService {
     const countLocale = (locale: CountryLanguage): void => {
       result.byLocale[locale] = (result.byLocale[locale] ?? 0) + 1;
     };
+    const stage = EmailCampaignStage.INITIAL;
 
     try {
-      const audience = await this.getConsentedNewsletterAudience();
+      const onlyKeys = options.onlyEmails
+        ? new Set(options.onlyEmails.map(normalizeEmail))
+        : null;
+      const inScope = (key: string): boolean => !onlyKeys || onlyKeys.has(key);
+      const [fullAudience, claimedKeys] = await Promise.all([
+        this.getConsentedNewsletterAudience(),
+        this.getClaimedEmails(journeyVariant, stage),
+      ]);
+      const audience = fullAudience.filter((r) => inScope(r.key));
       result.audience = audience.length;
-      const audienceEmails = new Set(
-        audience.map((r) => r.email.trim().toLowerCase()),
-      );
+      const audienceKeys = new Set(audience.map((r) => r.key));
 
       logger.info("newsletter.blast.consented.start", {
         journeyVariant,
@@ -936,10 +1216,11 @@ export class CampaignSchedulerService {
         dryRun,
       });
 
-      // 1. Cancel pending rows of this variant that are outside the audience.
-      const pendingRows = await db
+      // 1. Reconcile live (non-failed) rows of this variant by address.
+      const liveRows = await db
         .select({
           id: emailCampaigns.id,
+          status: emailCampaigns.status,
           leadEmail: leads.email,
           userEmail: users.email,
         })
@@ -949,51 +1230,71 @@ export class CampaignSchedulerService {
         .where(
           and(
             eq(emailCampaigns.journeyVariant, journeyVariant),
-            eq(emailCampaigns.status, MessageStatus.PENDING),
-            isNull(emailCampaigns.sentAt),
+            eq(emailCampaigns.stage, stage),
+            ne(emailCampaigns.status, MessageStatus.FAILED),
           ),
-        );
-      const staleIds = pendingRows
-        .filter((row) => {
-          const email = (row.leadEmail ?? row.userEmail ?? "")
-            .trim()
-            .toLowerCase();
-          return !email || !audienceEmails.has(email);
-        })
-        .map((row) => row.id);
+        )
+        .orderBy(emailCampaigns.createdAt, emailCampaigns.id);
+
+      const rowKey = (row: (typeof liveRows)[number]): string =>
+        normalizeEmail(row.leadEmail ?? row.userEmail ?? "");
+      const sentKeys = new Set(claimedKeys);
+      for (const row of liveRows) {
+        if (row.status !== MessageStatus.PENDING) {
+          sentKeys.add(rowKey(row));
+        }
+      }
+      const pendingKeys = new Set<string>();
+      const staleIds: string[] = [];
+      const alreadySentIds: string[] = [];
+      const duplicateIds: string[] = [];
+      for (const row of liveRows) {
+        if (row.status !== MessageStatus.PENDING) {
+          continue;
+        }
+        const key = rowKey(row);
+        if (!inScope(key)) {
+          continue;
+        }
+        if (!key || !audienceKeys.has(key)) {
+          staleIds.push(row.id);
+        } else if (sentKeys.has(key)) {
+          alreadySentIds.push(row.id);
+        } else if (pendingKeys.has(key)) {
+          duplicateIds.push(row.id);
+        } else {
+          pendingKeys.add(key);
+        }
+      }
       result.cancelled = staleIds.length;
-      if (!dryRun && staleIds.length > 0) {
-        await db
-          .update(emailCampaigns)
-          .set({
-            status: MessageStatus.FAILED,
-            error: "consent_gate:not_in_audience",
-            updatedAt: new Date(),
-          })
-          .where(inArray(emailCampaigns.id, staleIds));
+      result.duplicates = alreadySentIds.length + duplicateIds.length;
+      if (!dryRun) {
+        await this.cancelPendingRows(staleIds, "consent_gate:not_in_audience");
+        await this.cancelPendingRows(alreadySentIds, "duplicate:already_sent");
+        await this.cancelPendingRows(duplicateIds, "duplicate:recipient");
       }
 
-      // 2. Enqueue everyone in the audience who has no row for this variant.
+      // 2. Enqueue each audience address once.
       for (const recipient of audience) {
         try {
-          let leadRow:
-            | {
-                id: string;
-                language: Languages;
-                country: Countries;
-              }
-            | undefined;
-          const leadCols = {
-            id: leads.id,
-            language: leads.language,
-            country: leads.country,
-          };
+          if (sentKeys.has(recipient.key)) {
+            result.alreadySent++;
+            continue;
+          }
+          if (pendingKeys.has(recipient.key)) {
+            result.alreadyPending++;
+            countLocale(recipient.locale);
+            continue;
+          }
 
+          const leadCols = { id: leads.id };
+          let leadRow: { id: string } | undefined;
           if (recipient.userId) {
             [leadRow] = await db
               .select(leadCols)
               .from(leads)
               .where(eq(leads.convertedUserId, recipient.userId))
+              .orderBy(leads.createdAt)
               .limit(1);
           }
           if (!leadRow && recipient.subscriptionLeadId) {
@@ -1007,34 +1308,30 @@ export class CampaignSchedulerService {
             [leadRow] = await db
               .select(leadCols)
               .from(leads)
-              .where(eq(leads.email, recipient.email))
+              .where(sql`lower(btrim(${leads.email})) = ${recipient.key}`)
+              .orderBy(leads.createdAt)
               .limit(1);
           }
 
-          const fallback = getLanguageAndCountryFromLocale(
-            recipient.locale ?? defaultLocale,
-          );
+          if (dryRun) {
+            result.scheduled++;
+            countLocale(recipient.locale);
+            continue;
+          }
 
           if (!leadRow) {
-            if (dryRun) {
-              result.scheduled++;
-              countLocale(
-                getLocaleFromLanguageAndCountry(
-                  fallback.language,
-                  fallback.country,
-                ),
-              );
-              continue;
-            }
             const now = new Date();
+            const { language, country } = getLanguageAndCountryFromLocale(
+              recipient.locale,
+            );
             const [newLead] = await db
               .insert(leads)
               .values({
                 email: recipient.email,
                 businessName: "",
                 convertedUserId: recipient.userId,
-                language: fallback.language,
-                country: fallback.country,
+                language,
+                country,
                 status: recipient.userId
                   ? LeadStatus.SIGNED_UP
                   : LeadStatus.NEWSLETTER_SUBSCRIBER,
@@ -1063,56 +1360,59 @@ export class CampaignSchedulerService {
             continue;
           }
 
-          const recipientLocale = getLocaleFromLanguageAndCountry(
-            leadRow.language,
-            leadRow.country,
-          );
-
-          // Idempotency: any live row (pending or sent) blocks a second one.
-          // FAILED rows never went out (halted, consent-gated, retries
-          // exhausted), so a recipient who qualifies now is enqueued again.
-          const [existing] = await db
-            .select({ id: emailCampaigns.id, status: emailCampaigns.status })
+          // A FAILED row on this lead (consent-gated earlier, retries
+          // exhausted, ...) never went out: re-arm it instead of a new row,
+          // because scheduleEmail would return that dead row.
+          const [deadRow] = await db
+            .select({ id: emailCampaigns.id })
             .from(emailCampaigns)
             .where(
               and(
                 eq(emailCampaigns.leadId, leadRow.id),
                 eq(emailCampaigns.journeyVariant, journeyVariant),
-                ne(emailCampaigns.status, MessageStatus.FAILED),
+                eq(emailCampaigns.stage, stage),
+                eq(emailCampaigns.status, MessageStatus.FAILED),
+                isNull(emailCampaigns.sentAt),
               ),
             )
+            .orderBy(emailCampaigns.createdAt)
             .limit(1);
+          const [revived] = deadRow
+            ? await db
+                .update(emailCampaigns)
+                .set({
+                  status: MessageStatus.PENDING,
+                  error: null,
+                  retryCount: 0,
+                  scheduledAt: new Date(),
+                  updatedAt: new Date(),
+                })
+                .where(
+                  and(
+                    eq(emailCampaigns.id, deadRow.id),
+                    eq(emailCampaigns.status, MessageStatus.FAILED),
+                  ),
+                )
+                .returning({ id: emailCampaigns.id })
+            : [];
 
-          if (existing) {
-            if (existing.status === MessageStatus.PENDING) {
-              result.alreadyPending++;
-              countLocale(recipientLocale);
-            } else {
-              result.skipped++;
-            }
-            continue;
-          }
-
-          if (dryRun) {
-            result.scheduled++;
-            countLocale(recipientLocale);
-            continue;
-          }
-
-          const campaignId = await this.scheduleEmail(
-            {
-              leadId: leadRow.id,
-              campaignType: CampaignType.NEWSLETTER,
-              journeyVariant,
-              stage: EmailCampaignStage.INITIAL,
-              scheduledAt: new Date(),
-            },
-            logger,
-          );
+          const campaignId =
+            revived?.id ??
+            (await this.scheduleEmail(
+              {
+                leadId: leadRow.id,
+                campaignType: CampaignType.NEWSLETTER,
+                journeyVariant,
+                stage,
+                scheduledAt: new Date(),
+              },
+              logger,
+            ));
 
           if (campaignId) {
+            pendingKeys.add(recipient.key);
             result.scheduled++;
-            countLocale(recipientLocale);
+            countLocale(recipient.locale);
           } else {
             result.errors++;
           }

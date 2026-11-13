@@ -3,6 +3,12 @@
  * Enqueues a one-off, consent-filtered newsletter to confirmed opt-ins and,
  * with send=true, dispatches exactly that newsletter's rows in the same run.
  * The general email-campaigns dispatcher is never needed for this.
+ *
+ * Never twice: one row per normalized address (one locale), addresses that
+ * already got this newsletter are skipped, and every send first claims
+ * (variant, stage, address) in email_send_log under a unique index, so
+ * reruns, deploys, re-fired cron tasks, retries and concurrent dispatchers
+ * can never mail the same newsletter to the same address again.
  */
 
 import "server-only";
@@ -57,6 +63,7 @@ export class NewsletterBlastRepository {
 
       let sent = 0;
       let sendFailed = 0;
+      let sendSkipped = 0;
       if (data.send && !data.dryRun) {
         const campaignsT = emailCampaignsScopedTranslation.scopedT(locale).t;
         for (let batch = 0; batch < MAX_SEND_BATCHES; batch++) {
@@ -79,9 +86,12 @@ export class NewsletterBlastRepository {
           }
           sent += stage.data.emailsSent;
           sendFailed += stage.data.emailsFailed;
+          sendSkipped += stage.data.duplicatesSkipped;
           // Sent rows leave PENDING, failed ones are retried later or
-          // cancelled, consent-gated ones are halted: an empty batch means done.
-          if (stage.data.leadsProcessed === 0) {
+          // cancelled, consent-gated ones are halted, rows whose address
+          // already got this newsletter are marked duplicate (send-log
+          // claim): an empty batch means done.
+          if (stage.data.leadsProcessed <= stage.data.inFlightSkipped) {
             break;
           }
         }
@@ -98,6 +108,7 @@ export class NewsletterBlastRepository {
         send: data.send,
         ...result,
         sent,
+        sendSkipped,
         sendFailed,
       });
 
@@ -107,9 +118,11 @@ export class NewsletterBlastRepository {
         scheduled: result.scheduled,
         alreadyPending: result.alreadyPending,
         cancelled: result.cancelled,
-        skipped: result.skipped,
+        alreadySent: result.alreadySent,
+        duplicates: result.duplicates,
         errors: result.errors,
         sent,
+        sendSkipped,
         sendFailed,
       });
     } catch (error) {

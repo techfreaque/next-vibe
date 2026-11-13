@@ -2,8 +2,10 @@
  * Newsletter Blast API Definition
  * POST: enqueue a one-off, consent-filtered newsletter to confirmed opt-ins,
  * cancel pending rows that fall outside the audience, and (send=true) dispatch
- * exactly this newsletter's rows right away. dryRun reports counts per locale
- * and writes nothing.
+ * exactly this newsletter's rows right away. One mail per normalized address,
+ * in one locale; addresses that already got this newsletter are skipped
+ * (email_send_log guarantees it at the DB level). dryRun reports counts per
+ * locale and writes nothing.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -88,9 +90,14 @@ const { POST } = createEndpoint({
         label: "post.response.cancelled",
         schema: z.number(),
       }),
-      skipped: responseField(scopedTranslation, {
+      alreadySent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "post.response.skipped",
+        label: "post.response.alreadySent",
+        schema: z.number(),
+      }),
+      duplicates: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.duplicates",
         schema: z.number(),
       }),
       errors: responseField(scopedTranslation, {
@@ -101,6 +108,11 @@ const { POST } = createEndpoint({
       sent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.sent",
+        schema: z.number(),
+      }),
+      sendSkipped: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.sendSkipped",
         schema: z.number(),
       }),
       sendFailed: responseField(scopedTranslation, {
@@ -130,9 +142,11 @@ const { POST } = createEndpoint({
         scheduled: 6,
         alreadyPending: 1,
         cancelled: 193,
-        skipped: 0,
+        alreadySent: 0,
+        duplicates: 0,
         errors: 0,
         sent: 0,
+        sendSkipped: 0,
         sendFailed: 0,
       },
       send: {
@@ -141,9 +155,11 @@ const { POST } = createEndpoint({
         scheduled: 6,
         alreadyPending: 1,
         cancelled: 193,
-        skipped: 0,
+        alreadySent: 0,
+        duplicates: 0,
         errors: 0,
         sent: 7,
+        sendSkipped: 0,
         sendFailed: 0,
       },
     },

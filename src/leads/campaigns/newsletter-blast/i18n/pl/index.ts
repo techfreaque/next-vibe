@@ -30,9 +30,11 @@ export const translations: typeof enTranslations = {
       scheduled: "Nowo zakolejkowane",
       alreadyPending: "Już w kolejce",
       cancelled: "Anulowane (brak zgody)",
-      skipped: "Pominięte (już wysłane)",
+      alreadySent: "Pominięte (już otrzymali)",
+      duplicates: "Anulowane duplikaty",
       errors: "Błędy",
       sent: "Wysłane",
+      sendSkipped: "Pominięte przy wysyłce (już otrzymali)",
       sendFailed: "Wysyłka nieudana",
     },
     success: {

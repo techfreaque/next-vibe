@@ -8,7 +8,10 @@ import "server-only";
 import { render } from "@react-email/render";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
-import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
+import {
+  getLanguageAndCountryFromLocale,
+  getLocaleFromLanguageAndCountry,
+} from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,7 +22,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { Environment } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { emailJourneyVariants, leads } from "next-vibe/identity/lead/db";
+import {
+  emailCampaigns,
+  emailJourneyVariants,
+  leads,
+} from "next-vibe/identity/lead/db";
 import type {
   EmailCampaignStageValue,
   EmailJourneyVariantValue,
@@ -41,6 +48,7 @@ import { scopedTranslation as smtpScopedTranslation } from "@/messenger/provider
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
 import { CampaignType } from "@/messenger/accounts/enum";
+import { MessageStatus } from "@/messenger/messages/enum";
 
 import { emailService } from "../emails";
 import { emailRendererService } from "../emails/services/renderer";
@@ -79,7 +87,17 @@ interface StageProcessOptions {
   dryRun: boolean;
   /** Only dispatch rows of this journey (one-off newsletter send). */
   journeyVariant?: typeof EmailJourneyVariantValue;
+  /** Only dispatch these campaign rows (tests, targeted resends). */
+  campaignIds?: string[];
 }
+
+/** processStage result: the endpoint counters plus send-log skips. */
+export type StageProcessResult = EmailCampaignsPostResponseOutput & {
+  /** Rows not sent because the address already got this mail. */
+  duplicatesSkipped: number;
+  /** Rows left alone because a concurrent dispatcher is sending them. */
+  inFlightSkipped: number;
+};
 
 const EMAIL_CAMPAIGNS_TASK_ID = "email-campaigns";
 
@@ -375,13 +393,13 @@ export class EmailCampaignsRepository {
     options: StageProcessOptions,
     t: EmailCampaignsT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailCampaignsPostResponseOutput>> {
+  ): Promise<ResponseType<StageProcessResult>> {
     try {
       logger.debug(
         `Processing stage: ${stage} (batch=${options.batchSize}, dryRun=${options.dryRun})`,
       );
 
-      const result: EmailCampaignsPostResponseOutput & {
+      const result: StageProcessResult & {
         errors: Array<{
           leadId: string;
           email: string;
@@ -394,6 +412,8 @@ export class EmailCampaignsRepository {
         emailsSent: 0,
         emailsFailed: 0,
         leadsProcessed: 0,
+        duplicatesSkipped: 0,
+        inFlightSkipped: 0,
         errors: [],
         stageTransitions: {},
       };
@@ -402,6 +422,7 @@ export class EmailCampaignsRepository {
         options.batchSize,
         logger,
         options.journeyVariant,
+        options.campaignIds,
       );
 
       result.leadsProcessed = pendingEmails.length;
@@ -412,6 +433,14 @@ export class EmailCampaignsRepository {
       }
 
       for (const campaign of pendingEmails) {
+        // Send-log claim for this row: set once claimed, so a failure before
+        // SMTP releases it and a crash after SMTP keeps the address blocked.
+        let claim: {
+          journeyVariant: typeof EmailJourneyVariantValue;
+          stage: typeof EmailCampaignStageValue;
+          email: string;
+        } | null = null;
+        let handedToSmtp = false;
         try {
           logger.info("campaign.process.start", {
             campaignId: campaign.id,
@@ -455,13 +484,6 @@ export class EmailCampaignsRepository {
             continue;
           }
 
-          const leadLocale = getLocaleFromLanguageAndCountry(
-            fullLead.language,
-            fullLead.country,
-          );
-          const { t: configLocalT } =
-            configScopedTranslation.scopedT(leadLocale);
-
           // Use resolved email from getPendingEmails (joins users table for converted leads)
           const resolvedEmail = fullLead.email ?? campaign.lead.email;
           if (!resolvedEmail) {
@@ -479,11 +501,15 @@ export class EmailCampaignsRepository {
           // recipient is in the consented audience right now (verified +
           // opted in, never unsubscribed/bounced). Rows enqueued under an
           // older gate, or whose recipient opted out since, are cancelled.
+          const newsletterRecipient =
+            campaign.campaignType === CampaignType.NEWSLETTER
+              ? await campaignSchedulerService.getConsentedNewsletterRecipient(
+                  resolvedEmail,
+                )
+              : null;
           if (
             campaign.campaignType === CampaignType.NEWSLETTER &&
-            !(await campaignSchedulerService.isConsentedNewsletterRecipient(
-              resolvedEmail,
-            ))
+            !newsletterRecipient
           ) {
             await campaignSchedulerService.haltCampaign(
               campaign.leadId,
@@ -500,6 +526,18 @@ export class EmailCampaignsRepository {
             });
             continue;
           }
+
+          // A newsletter goes out in the recipient's ONE resolved locale
+          // (account > subscription > lead), never in whichever lead row
+          // this campaign row points at.
+          const leadLocale =
+            newsletterRecipient?.locale ??
+            getLocaleFromLanguageAndCountry(
+              fullLead.language,
+              fullLead.country,
+            );
+          const { t: configLocalT } =
+            configScopedTranslation.scopedT(leadLocale);
 
           const leadWithEmail: LeadWithEmailType = {
             ...fullLead,
@@ -576,7 +614,58 @@ export class EmailCampaignsRepository {
           const text =
             rendered.text ?? (await render(rendered.jsx, { plainText: true }));
 
+          // At-most-once per (journey, stage, address): claim before SMTP.
+          // Loses when this address already got this mail via another row,
+          // lead, locale, rerun, retry or a concurrent dispatcher.
+          const claimResult = await campaignSchedulerService.claimSend(
+            {
+              journeyVariant: campaign.journeyVariant,
+              stage: campaign.stage,
+              email: resolvedEmail,
+              campaignId: campaign.id,
+              leadId: campaign.leadId,
+              locale: leadLocale,
+            },
+            logger,
+          );
+          if (claimResult === "in_flight") {
+            result.inFlightSkipped++;
+            continue;
+          }
+          if (claimResult !== "claimed") {
+            await db
+              .update(emailCampaigns)
+              .set({
+                status: MessageStatus.FAILED,
+                error:
+                  claimResult === "stale"
+                    ? "send_log:outcome_unknown"
+                    : "duplicate:already_sent",
+                updatedAt: new Date(),
+              })
+              .where(
+                and(
+                  eq(emailCampaigns.id, campaign.id),
+                  eq(emailCampaigns.status, MessageStatus.PENDING),
+                ),
+              );
+            result.duplicatesSkipped++;
+            logger.info("campaign.process.duplicate_skip", {
+              campaignId: campaign.id,
+              leadId: campaign.leadId,
+              journeyVariant: campaign.journeyVariant,
+              stage: campaign.stage,
+            });
+            continue;
+          }
+          claim = {
+            journeyVariant: campaign.journeyVariant,
+            stage: campaign.stage,
+            email: resolvedEmail,
+          };
+
           const smtpT = smtpScopedTranslation.scopedT(leadLocale).t;
+          handedToSmtp = true;
           const sendResult = await SmtpSendingRepository.sendEmail(
             {
               to: resolvedEmail,
@@ -592,8 +681,8 @@ export class EmailCampaignsRepository {
                 campaignType: campaign.campaignType,
                 emailJourneyVariant: campaign.journeyVariant,
                 emailCampaignStage: campaign.stage,
-                country: fullLead.country,
-                language: fullLead.language,
+                country: getLanguageAndCountryFromLocale(leadLocale).country,
+                language: getLanguageAndCountryFromLocale(leadLocale).language,
               },
               leadId: campaign.leadId,
               campaignId: campaign.id,
@@ -604,6 +693,12 @@ export class EmailCampaignsRepository {
 
           if (!sendResult.success) {
             const errorMsg = sendResult.message ?? "Unknown send error";
+            // SMTP refused it: the address did not get the mail, so a retry
+            // may claim it again.
+            await campaignSchedulerService.settleSendClaim(claim, {
+              sent: false,
+              error: errorMsg,
+            });
             const retried = await campaignSchedulerService.scheduleRetry(
               campaign.id,
               campaign.retryCount,
@@ -629,6 +724,7 @@ export class EmailCampaignsRepository {
             continue;
           }
 
+          await campaignSchedulerService.settleSendClaim(claim, { sent: true });
           await campaignSchedulerService.markEmailAsSent(
             campaign.id,
             logger,
@@ -642,6 +738,14 @@ export class EmailCampaignsRepository {
             (result.stageTransitions[campaign.stage] ?? 0) + 1;
         } catch (error) {
           const errorMsg = parseError(error).message;
+          // Release the claim only if the mail never reached SMTP. After the
+          // hand-off the outcome is unknown: keep the address blocked.
+          if (claim && !handedToSmtp) {
+            await campaignSchedulerService.settleSendClaim(claim, {
+              sent: false,
+              error: errorMsg,
+            });
+          }
           await campaignSchedulerService.scheduleRetry(
             campaign.id,
             campaign.retryCount,

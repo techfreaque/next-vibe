@@ -13,6 +13,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -174,6 +175,58 @@ export const emailCampaigns = pgTable("email_campaigns", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Email Send Log
+ * At-most-once delivery guard for campaign mail: one row per
+ * (journey variant, stage, normalized recipient email). A one-off newsletter
+ * is a journey variant, so its key is (variant, INITIAL, email).
+ *
+ * The dispatcher claims the row (INSERT ... ON CONFLICT DO NOTHING) BEFORE it
+ * hands a mail to SMTP. The unique index makes the claim atomic across
+ * duplicate campaign rows (one address on several leads), locales, cron
+ * reruns, deploys, re-fired run-once tasks, concurrent dispatchers and
+ * repeated blasts: whoever loses the claim never sends.
+ *
+ * status PENDING = claimed and being sent, SENT = handed to SMTP,
+ * FAILED = the send attempt failed before reaching SMTP; only a FAILED claim
+ * may be re-claimed by a retry. A claim stuck in PENDING (crash mid-send)
+ * stays blocked on purpose: never risk a second copy.
+ */
+export const emailSendLog = pgTable(
+  "email_send_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    journeyVariant: text("journey_variant", {
+      enum: EmailJourneyVariantDB,
+    }).notNull(),
+    stage: text("stage", { enum: EmailCampaignStageDB }).notNull(),
+    // lower(trim(address)): the dedupe key, never the display address
+    email: text("email").notNull(),
+    campaignId: uuid("campaign_id").references(() => emailCampaigns.id, {
+      onDelete: "set null",
+    }),
+    leadId: uuid("lead_id").references(() => leads.id, {
+      onDelete: "set null",
+    }),
+    // Locale the mail was rendered in (language-country)
+    locale: text("locale"),
+    status: text("status", { enum: EmailStatusDB })
+      .notNull()
+      .default(EmailStatus.PENDING),
+    error: text("error"),
+    claimedAt: timestamp("claimed_at").defaultNow().notNull(),
+    sentAt: timestamp("sent_at"),
+  },
+  (table) => [
+    uniqueIndex("uq_email_send_log_variant_stage_email").on(
+      table.journeyVariant,
+      table.stage,
+      table.email,
+    ),
+    index("idx_email_send_log_campaign").on(table.campaignId),
+  ],
+);
 
 /**
  * Lead Engagements Table

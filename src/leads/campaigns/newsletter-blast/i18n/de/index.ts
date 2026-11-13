@@ -29,9 +29,11 @@ export const translations: typeof enTranslations = {
       scheduled: "Neu eingereiht",
       alreadyPending: "Bereits eingereiht",
       cancelled: "Storniert (keine Einwilligung)",
-      skipped: "Übersprungen (bereits gesendet)",
+      alreadySent: "Übersprungen (schon erhalten)",
+      duplicates: "Doppelte Einträge storniert",
       errors: "Fehler",
       sent: "Gesendet",
+      sendSkipped: "Beim Versand übersprungen (schon erhalten)",
       sendFailed: "Versand fehlgeschlagen",
     },
     success: {
