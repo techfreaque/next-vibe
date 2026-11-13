@@ -596,7 +596,7 @@ export class SignupRepository {
    * normal subscribe path (pending, unconfirmed). No separate confirm email:
    * the account verification email says its link confirms the newsletter too
    * (verify-email/email.tsx), and clicking it sets confirmedAt
-   * (NewsletterConfirmRepository.confirmForVerifiedAccount). The +20 then
+   * (NewsletterConfirmRepository.confirmForVerifiedAccount). The newsletter bonus then
    * follows the usual rules (credits/free-allowance.ts): once per account.
    * Never blocks signup.
    */

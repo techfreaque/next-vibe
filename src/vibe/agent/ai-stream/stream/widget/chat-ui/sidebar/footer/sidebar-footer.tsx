@@ -32,6 +32,7 @@ import type { JSX } from "react";
 
 import { useCredits } from "@/credits/hooks";
 import { useNewsletterManager } from "@/newsletter/hooks";
+import { FREE_CREDIT_MAX_TOTAL } from "@/products/constants";
 import { useUser } from "@/user/private/me/hooks";
 
 import { useChatBootContext } from "../../../../../../chat/hooks/context";
@@ -253,7 +254,9 @@ export function SidebarFooter({
                     aria-label="Subscribe to the newsletter"
                   >
                     <Mail className="h-3.5 w-3.5 mr-2" />
-                    {t("components.navigation.newsletter")}
+                    {t("components.navigation.newsletter", {
+                      freeCreditsMax: FREE_CREDIT_MAX_TOTAL,
+                    })}
                   </Button>
                 </Link>
               )}

@@ -75,5 +75,5 @@ export function freePlanMessageCount(creditsPerMessage: number): number | null {
   return count > 0 ? count : null;
 }
 
-/** Signed-in free allowance per month (credits): lead 20 + user 50 = 70. */
+/** Signed-in free allowance per month (credits), before the newsletter bonus. */
 export const FREE_PLAN_MONTHLY_CREDITS = FREE_CREDIT_SIGNED_IN_TOTAL;

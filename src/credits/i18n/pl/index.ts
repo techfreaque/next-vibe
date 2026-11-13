@@ -221,7 +221,7 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Zobacz plany",
       freePlanHint:
-        "{{count}} darmowych kredytów miesięcznie, +{{bonus}} z newsletterem. Z subskrypcją {{subCredits}}, albo po prostu kup pakiet. Subskrypcja niepotrzebna.",
+        "{{count}} darmowych kredytów miesięcznie, z newsletterem {{max}}. Z subskrypcją {{subCredits}}, albo po prostu kup pakiet. Subskrypcja niepotrzebna.",
       lowBalance: {
         title: "Zostało {{count}} kredytów",
         emptyTitle: "Skończyły Ci się kredyty",
@@ -252,11 +252,11 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Darmowe kredyty",
-        description: "{{count}} za darmo co miesiąc, +{{bonus}} z newsletterem",
+        description: "{{count}} za darmo co miesiąc, z newsletterem {{max}}",
         descriptionGuest:
-          "{{guest}} za darmo co miesiąc. Z kontem {{signedIn}}.",
+          "{{guest}} za darmo co miesiąc. Z kontem {{signedIn}}, z kontem i newsletterem {{max}}.",
         adminDescription:
-          "Darmowy limit na pulę/miesiąc (wspólny dla urządzeń): {{guest}} gość, {{signedIn}} zalogowany, +{{bonus}} newsletter",
+          "Darmowy limit na pulę/miesiąc (wspólny dla urządzeń): {{guest}} gość, {{signedIn}} zalogowany, {{max}} zalogowany z newsletterem",
       },
       earned: {
         title: "Zarobione kredyty",

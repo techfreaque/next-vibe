@@ -1113,7 +1113,7 @@ export const translations: typeof enTranslations = {
         subscriptionButton: {
           title: "Credits & Abonnement",
           description:
-            "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, +{{bonusCredits}} mit dem Newsletter.",
+            "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, mit Newsletter {{freeCreditsMax}}.",
         },
         chatInput: {
           title: "Ihre Nachricht eingeben",

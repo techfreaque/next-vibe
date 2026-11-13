@@ -3,7 +3,7 @@ export const translations = {
   subheadingPublic: "New uncensored models, product drops, no spam.",
   subheadingLoggedIn: "New uncensored models, product drops, no spam.",
   bonus:
-    "Have a free account? Confirm your email and it gets +20 credits every month.",
+    "Have a free account? Confirm your email and it gets {{freeCreditsMax}} free credits a month instead of {{freeCreditsSignedIn}}.",
   emailPlaceholder: "you@example.com",
   subscribe: "Subscribe",
   subscribed: "You are subscribed",

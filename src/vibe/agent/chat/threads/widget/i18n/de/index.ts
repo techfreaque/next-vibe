@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
       help: "Feedback & Support",
       about: "Über uns",
       websiteBlog: "Geschichten",
-      newsletter: "Newsletter (+20 Gratis-Credits)",
+      newsletter: "Newsletter: bis zu {{freeCreditsMax}} Gratis-Credits/Monat",
       admin: "Admin-Dashboard",
     },
     confirmations: {
@@ -202,7 +202,7 @@ export const translations: typeof enTranslations = {
       subscriptionButton: {
         title: "Credits & Abonnement",
         description:
-          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, +{{bonusCredits}} mit dem Newsletter.",
+          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, mit Newsletter {{freeCreditsMax}}.",
       },
       chatInput: {
         title: "Ihre Nachricht eingeben",

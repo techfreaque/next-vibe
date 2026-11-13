@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
   pricing: {
     title: "Was kostet das?",
     intro: "Credits. Ein Guthaben für alle Modelle.",
-    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} nach der Anmeldung. Genug, um mehrere Modelle mit deinen eigenen Prompts zu testen.",
+    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit Gratis-Konto, {{maxCredits}} mit Konto und Newsletter. Genug, um mehrere Modelle mit deinen eigenen Prompts zu testen.",
     sub: "Abo: {{subCredits}} Credits im Monat für {{subPrice}}.",
     pack: "Credit-Pakete: {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Per Karte oder Krypto.",
     oneBalance:
@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
     title: "Häufige Fragen",
     free: {
       q: "Ist {{appName}} kostenlos?",
-      a: "Ohne Konto bekommst du {{guestCredits}} kostenlose Credits im Monat, mit Konto {{freeCredits}}. Danach: ein Abo für {{subPrice}} im Monat oder ein Credit-Paket.",
+      a: "Ohne Konto: {{guestCredits}} Gratis-Credits im Monat. Gratis-Konto: {{freeCredits}}. Konto plus Newsletter: {{maxCredits}}. Danach: ein Abo für {{subPrice}} im Monat oder ein Credit-Paket.",
     },
     account: {
       q: "Brauche ich ein Konto?",

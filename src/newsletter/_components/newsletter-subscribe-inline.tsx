@@ -17,6 +17,10 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { useNewsletterManager } from "@/newsletter/hooks";
+import {
+  FREE_CREDIT_MAX_TOTAL,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 
 import { scopedTranslation } from "./i18n";
 
@@ -38,7 +42,7 @@ interface NewsletterSubscribeInlineProps {
    * `card` — stacked heading/subheading/form, for panels like the profile hub.
    */
   variant?: "compact" | "card";
-  /** Show the +20 free credits/month line (true by default). */
+  /** Show the account + newsletter free-credit line (true by default). */
   showBonus?: boolean;
   className?: string;
 }
@@ -163,7 +167,10 @@ export function NewsletterSubscribeInline({
       {showBonus && (
         <Span className="inline-flex items-start gap-2 text-xs leading-snug text-muted-foreground">
           <Gift className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-          {t("bonus")}
+          {t("bonus", {
+            freeCreditsSignedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
+            freeCreditsMax: FREE_CREDIT_MAX_TOTAL,
+          })}
         </Span>
       )}
 

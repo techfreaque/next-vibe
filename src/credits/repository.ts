@@ -10,7 +10,7 @@
  *    - Linked Leads: All leads linked to a user maintain separate wallets
  *
  * 2. FREE CREDIT POOL (one monthly allowance shared, see free-allowance.ts):
- *    - Guest pool 20, user pool 50, +20 with a confirmed newsletter subscription
+ *    - Tiers from FREE_CREDIT_ALLOWANCE: guest pool, user pool, user pool + confirmed newsletter
  *    - All linked leads share ONE allowance - NOT per lead - prevents gaming the system
  *    - Free credits stored in lead wallets only (never in user wallets)
  *    - Monthly renewal: entire pool resets to 20 total (not per lead)
@@ -97,6 +97,9 @@ import {
   computeFreeAllowance,
   computeFreeAvailable,
   computeFreeTopUp,
+  computeGrandfatheredFreeCap,
+  computeLegacyFreeAllowance,
+  FREE_GRANT_TIER_VERSION,
   poolHasConfirmedNewsletter,
 } from "./free-allowance";
 import type { CreditsGetResponseOutput } from "./definition";
@@ -1116,6 +1119,7 @@ export class CreditRepository {
               freePeriodId: periodId,
               metadata: {
                 reason: "initial_grant",
+                tierVersion: FREE_GRANT_TIER_VERSION,
                 freeCreditsRemaining: initialCredits,
               },
             });
@@ -1167,34 +1171,68 @@ export class CreditRepository {
   }
 
   /**
-   * Resolve the pool's monthly free allowance (tier + confirmed newsletter bonus).
+   * Resolve the pool's monthly free allowance (tier + confirmed newsletter bonus),
+   * plus what the same pool would have had under the pre-2026-11 tiers.
    */
   private static async resolvePoolFreeAllowance(
     pool: CreditPool,
-  ): Promise<number> {
+  ): Promise<{ allowance: number; legacyAllowance: number }> {
     const userId = pool.userWallet?.userId ?? null;
     const isUserPool = pool.poolType === "USER_POOL" && userId !== null;
     // Newsletter bonus is account-only: guest pools skip the lookup
-    if (!isUserPool) {
-      return computeFreeAllowance({
-        isUserPool,
-        hasConfirmedNewsletter: false,
-      });
-    }
     const leadIds = pool.leadWallets
       .map((w) => w.leadId)
       .filter((id): id is string => id !== null);
-    const hasConfirmedNewsletter = await poolHasConfirmedNewsletter({
-      userId,
-      leadIds,
-    });
-    return computeFreeAllowance({ isUserPool, hasConfirmedNewsletter });
+    const hasConfirmedNewsletter = isUserPool
+      ? await poolHasConfirmedNewsletter({ userId, leadIds })
+      : false;
+    const input = { isUserPool, hasConfirmedNewsletter };
+    return {
+      allowance: computeFreeAllowance(input),
+      legacyAllowance: computeLegacyFreeAllowance(input),
+    };
+  }
+
+  /**
+   * Free credits granted to these lead wallets in the period under the
+   * pre-2026-11 tiers (no tierVersion stamp; admin grants excluded).
+   */
+  private static async sumLegacyFreeGrantedThisPeriod(
+    leadWalletIds: string[],
+    periodId: string,
+  ): Promise<number> {
+    if (leadWalletIds.length === 0) {
+      return 0;
+    }
+    const grants = await db
+      .select({
+        amount: creditTransactions.amount,
+        metadata: creditTransactions.metadata,
+      })
+      .from(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, leadWalletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+          eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        ),
+      );
+    return grants.reduce(
+      (sum, row) =>
+        "reason" in row.metadata &&
+        row.metadata.reason !== "admin_grant" &&
+        !("tierVersion" in row.metadata && row.metadata.tierVersion)
+          ? sum + row.amount
+          : sum,
+      0,
+    );
   }
 
   /**
    * Keep the pool's free credits current and return its monthly allowance.
    * 1. New calendar month -> reset the pool to the allowance.
    * 2. Allowance rose mid-month (signup, newsletter confirmed) -> top up the difference once.
+   * 3. Tier cut mid-month -> keep what was already granted until the next refill.
    * The returned allowance is the cap every balance/deduction path must use.
    */
   private static async ensureMonthlyFreeCreditsForPool(
@@ -1203,14 +1241,32 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- kept for call-site stability; allowance no longer depends on locale
     locale: CountryLanguage,
   ): Promise<number> {
-    const allowance = await CreditRepository.resolvePoolFreeAllowance(pool);
+    const { allowance, legacyAllowance } =
+      await CreditRepository.resolvePoolFreeAllowance(pool);
     await CreditRepository.resetMonthlyFreeCreditsIfNeeded(
       pool,
       allowance,
       logger,
     );
-    await CreditRepository.topUpFreeAllowanceForPool(pool, allowance, logger);
-    return allowance;
+    // Tier cut (2026-11): a pool already granted the old, higher cap this month
+    // keeps it until its next monthly refill. Only pools whose tier went down
+    // pay for the extra lookup.
+    let cap = allowance;
+    if (legacyAllowance > allowance) {
+      const now = new Date();
+      const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      cap = computeGrandfatheredFreeCap({
+        allowance,
+        legacyAllowance,
+        legacyGrantedThisPeriod:
+          await CreditRepository.sumLegacyFreeGrantedThisPeriod(
+            pool.leadWallets.map((w) => w.id),
+            periodId,
+          ),
+      });
+    }
+    await CreditRepository.topUpFreeAllowanceForPool(pool, cap, logger);
+    return cap;
   }
 
   /**
@@ -1324,6 +1380,7 @@ export class CreditRepository {
         freePeriodId: periodId,
         metadata: {
           reason: "allowance_topup",
+          tierVersion: FREE_GRANT_TIER_VERSION,
           freeCreditsRemaining: freeAfter,
           totalPoolFreeCredits: allowance,
         },
@@ -1478,6 +1535,7 @@ export class CreditRepository {
         freePeriodId: newPeriodId,
         metadata: {
           reason: "monthly_reset",
+          tierVersion: FREE_GRANT_TIER_VERSION,
           freeCreditsRemaining: maxFreeCreditsPerPool,
           totalPoolFreeCredits: maxFreeCreditsPerPool,
         },

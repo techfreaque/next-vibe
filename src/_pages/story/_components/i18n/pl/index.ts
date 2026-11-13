@@ -282,7 +282,7 @@ export const translations: typeof enTranslations = {
           name: "Darmowy",
           note: "na zawsze",
           p1: "{{freeCreditsGuest}} kredytów miesięcznie, bez rejestracji",
-          p2: "{{freeCreditsSignedIn}} z darmowym kontem, +{{freeCreditsNewsletterBonus}} z newsletterem",
+          p2: "{{freeCreditsSignedIn}} z darmowym kontem, {{freeCreditsMax}} z newsletterem",
           p3: "Wszystkie trzy poziomy filtra. Bez karty.",
         },
         sub: {
@@ -320,7 +320,7 @@ export const translations: typeof enTranslations = {
           },
           cost: {
             q: "Ile to kosztuje?",
-            a: "Za darmo dostajesz {{freeCreditsGuest}} kredytów miesięcznie jako gość, {{freeCreditsSignedIn}} z kontem, +{{freeCreditsNewsletterBonus}} z newsletterem. Subskrypcja to {{subscriptionPrice}} miesięcznie za {{subscriptionCredits}} kredytów, a doładujesz pakietami ({{packCredits}} kredytów za {{packPrice}}). Każda wiadomość kosztuje kredyty zależnie od modelu.",
+            a: "Za darmo dostajesz {{freeCreditsGuest}} kredytów miesięcznie jako gość, {{freeCreditsSignedIn}} z kontem, {{freeCreditsMax}} z kontem i newsletterem. Subskrypcja to {{subscriptionPrice}} miesięcznie za {{subscriptionCredits}} kredytów, a doładujesz pakietami ({{packCredits}} kredytów za {{packPrice}}). Każda wiadomość kosztuje kredyty zależnie od modelu.",
           },
           models: {
             q: "Z jakich modeli mogę korzystać?",
@@ -816,7 +816,7 @@ export const translations: typeof enTranslations = {
     newsletter: {
       title: "Bądź na bieżąco",
       subtitle:
-        "Nowe nieocenzurowane modele i nowości prosto na Twoją skrzynkę. Potwierdź e-mail i odbieraj +20 darmowych kredytów co miesiąc.",
+        "Nowe nieocenzurowane modele i nowości prosto na Twoją skrzynkę.",
     },
     tagline: "Rozmawiaj, twórz i łącz się - tekst, obrazy, wideo i muzyka",
     privacyTagline:

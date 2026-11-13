@@ -62,6 +62,11 @@ export interface FreeGrantMetadata {
   reason: "initial_grant" | "admin_grant" | "monthly_reset" | "allowance_topup";
   freeCreditsRemaining: number;
   totalPoolFreeCredits?: number;
+  /**
+   * Set on every grant made under the current free tiers (see
+   * FREE_GRANT_TIER_VERSION). Grants without it predate the 2026-11 tier cut.
+   */
+  tierVersion?: number;
 }
 
 export interface FreeResetMetadata {
@@ -212,7 +217,7 @@ export interface CreditPackMetadata {
  *    - Lead-to-user: via userLeadLinks table
  *
  * 4. Free Credit Pool:
- *    - Monthly cap per pool: guest 20, signed-in 50, +20 with a confirmed newsletter
+ *    - Monthly cap per pool: see FREE_CREDIT_ALLOWANCE / computeFreeAllowance (guest, account, account + confirmed newsletter)
  *      (FREE_CREDIT_ALLOWANCE in products, math in credits/free-allowance.ts)
  *    - Enforced at deduction time by tracking spending
  *

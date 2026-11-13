@@ -4,7 +4,7 @@
  *
  * Month-to-date free allowance utilization:
  *   free credits consumed / free credits granted, both since the 1st of the (UTC) month.
- * Independent of the per-wallet tier (guest 20 / user 50 / +20 newsletter) because the
+ * Independent of the per-wallet tier (guest / account / account + newsletter) because the
  * denominator is what was actually granted (FREE_GRANT transactions), not a fixed constant.
  * Resets on the 1st with the free allowance period. See ../free-tier-series.ts.
  */

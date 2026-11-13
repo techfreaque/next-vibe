@@ -28,6 +28,7 @@ import {
 import { scopedTranslation as subscriptionT } from "@/_pages/subscription/i18n";
 import {
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 import {
@@ -117,7 +118,7 @@ export function CreditsBalanceContainer(): JSX.Element {
       description: tSub("subscription.overview.howItWorks.free.description", {
         guest: FREE_CREDIT_ALLOWANCE.guest,
         signedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
-        bonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+        max: FREE_CREDIT_MAX_TOTAL,
       }),
     },
   ];

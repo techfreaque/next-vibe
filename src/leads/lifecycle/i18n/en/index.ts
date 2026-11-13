@@ -116,11 +116,11 @@ export const translations = {
     },
     inviteSignup: {
       subject: "You're on the list. Now get the account.",
-      preview: "Free account. 70 credits every month.",
+      preview: "Free account. Up to {{freeCreditsMax}} credits a month.",
       body1:
-        "A free account gives you 70 credits every month and access to {{modelCount}} models, with the filter level set by you.",
+        "A free account gives you {{freeCreditsSignedIn}} credits every month and access to {{modelCount}} models, with the filter level set by you.",
       body2:
-        "Newsletter subscribers get a +20 credit bonus on top, every month.",
+        "No account: {{freeCreditsGuest}} a month. Free account: {{freeCreditsSignedIn}}. Account + newsletter: {{freeCreditsMax}}.",
       cta: "Create free account",
     },
     inviteReminder: {
@@ -129,7 +129,7 @@ export const translations = {
       body1:
         "You read us by email. You can use us directly: pick a model, ask anything, decide your own filter.",
       body2:
-        "Free accounts get 70 credits per month. Newsletter subscribers get 20 more.",
+        "Free accounts get {{freeCreditsSignedIn}} credits a month. Keep the newsletter on the account and it's {{freeCreditsMax}}.",
       cta: "Create free account",
     },
   },

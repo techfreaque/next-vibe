@@ -445,7 +445,7 @@ export const translations: typeof enTranslations = {
     free: {
       title: "Was du kostenlos bekommst, für immer:",
       credits:
-        "{{freeCreditsSignedIn}} Gratis-Credits jeden Monat, +{{freeCreditsNewsletterBonus}} mit dem Newsletter - ohne Karte",
+        "{{freeCreditsSignedIn}} Gratis-Credits jeden Monat, +{{freeCreditsNewsletterBonus}} mit dem Newsletter. Keine Karte nötig",
       allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
       uncensored:
         "4 unzensierte Modelle, die deine Fragen wirklich beantworten",

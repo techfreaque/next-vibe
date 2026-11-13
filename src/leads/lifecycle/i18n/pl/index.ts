@@ -119,11 +119,11 @@ export const translations: typeof enTranslations = {
     },
     inviteSignup: {
       subject: "Jesteś na liście. Teraz czas na konto.",
-      preview: "Darmowe konto. 70 kredytów co miesiąc.",
+      preview: "Darmowe konto. Do {{freeCreditsMax}} kredytów miesięcznie.",
       body1:
-        "Darmowe konto daje 70 kredytów miesięcznie i dostęp do {{modelCount}} modeli, z filtrem ustawianym przez ciebie.",
+        "Darmowe konto daje {{freeCreditsSignedIn}} kredytów miesięcznie i dostęp do {{modelCount}} modeli, z filtrem ustawianym przez ciebie.",
       body2:
-        "Subskrybenci newslettera dostają co miesiąc dodatkowy bonus +20 kredytów.",
+        "Bez konta: {{freeCreditsGuest}} miesięcznie. Darmowe konto: {{freeCreditsSignedIn}}. Konto z newsletterem: {{freeCreditsMax}}.",
       cta: "Załóż darmowe konto",
     },
     inviteReminder: {
@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
       body1:
         "Czytasz nas w mailu. Możesz korzystać z nas bezpośrednio: wybierz model, pytaj o wszystko, sam decyduj o filtrze.",
       body2:
-        "Darmowe konta dostają 70 kredytów miesięcznie. Subskrybenci newslettera dostają 20 więcej.",
+        "Darmowe konta dostają {{freeCreditsSignedIn}} kredytów miesięcznie. Z newsletterem na koncie masz {{freeCreditsMax}}.",
       cta: "Załóż darmowe konto",
     },
   },

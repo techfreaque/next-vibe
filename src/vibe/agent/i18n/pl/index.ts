@@ -1103,7 +1103,7 @@ export const translations: typeof enTranslations = {
         subscriptionButton: {
           title: "Kredyty i subskrypcja",
           description:
-            "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, +{{bonusCredits}} z newsletterem.",
+            "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, z newsletterem {{freeCreditsMax}}.",
         },
         chatInput: {
           title: "Wpisz swoją wiadomość",

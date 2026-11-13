@@ -11,7 +11,7 @@ import { getRootCssVar } from "next-vibe/ui/lib/css-vars";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 
 import {
-  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/repository-client";
@@ -436,7 +436,7 @@ export const getTourSteps = (
               credits: String(sub.credits),
               price: formatCurrency(sub.price, sub.currency, locale),
               freeCredits: String(FREE_CREDIT_SIGNED_IN_TOTAL),
-              bonusCredits: String(FREE_CREDIT_ALLOWANCE.newsletterBonus),
+              freeCreditsMax: String(FREE_CREDIT_MAX_TOTAL),
             })}
           </P>
         </Div>

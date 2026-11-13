@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Oferujemy plany Darmowy ({{freeCredits}} kredytów/miesiąc jako gość, {{freeCreditsSignedIn}} po zalogowaniu, +{{freeCreditsNewsletterBonus}} z newsletterem), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów), które każdy kupi bez subskrypcji.",
+    "Oferujemy plany Darmowy (bez konta: {{freeCredits}} kredytów/miesiąc, darmowe konto: {{freeCreditsSignedIn}}, konto z newsletterem: {{freeCreditsMax}}), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów), które każdy kupi bez subskrypcji.",
 
   // Free tier product
   free: {

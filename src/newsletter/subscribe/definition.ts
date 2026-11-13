@@ -20,6 +20,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+
 import {
   NewsletterCreditBonus,
   NewsletterCreditBonusOptions,
@@ -202,7 +204,7 @@ const { POST } = createEndpoint({
         subscriptionId: "sub_123456789",
         userId: "user_987654321",
         creditBonus: NewsletterCreditBonus.ACTIVE,
-        bonusCredits: 20,
+        bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       },
       minimal: {
         success: true,
@@ -210,7 +212,7 @@ const { POST } = createEndpoint({
         leadId: "123e4567-e89b-12d3-a456-426614174000",
         subscriptionId: "sub_123456789",
         creditBonus: NewsletterCreditBonus.PENDING_CONFIRMATION,
-        bonusCredits: 20,
+        bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       },
     },
   },

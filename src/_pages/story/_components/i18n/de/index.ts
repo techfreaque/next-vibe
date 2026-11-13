@@ -282,7 +282,7 @@ export const translations: typeof enTranslations = {
           name: "Kostenlos",
           note: "für immer",
           p1: "{{freeCreditsGuest}} Credits pro Monat, ohne Anmeldung",
-          p2: "{{freeCreditsSignedIn}} mit kostenlosem Konto, +{{freeCreditsNewsletterBonus}} mit dem Newsletter",
+          p2: "{{freeCreditsSignedIn}} mit kostenlosem Konto, {{freeCreditsMax}} mit dem Newsletter",
           p3: "Alle drei Filterstufen. Keine Karte.",
         },
         sub: {
@@ -319,7 +319,7 @@ export const translations: typeof enTranslations = {
           },
           cost: {
             q: "Was kostet das?",
-            a: "Kostenlos bekommst du {{freeCreditsGuest}} Credits im Monat als Gast, {{freeCreditsSignedIn}} mit Konto, +{{freeCreditsNewsletterBonus}} mit dem Newsletter. Das Abo kostet {{subscriptionPrice}} im Monat für {{subscriptionCredits}} Credits, aufladen geht mit Paketen ({{packCredits}} Credits für {{packPrice}}). Jede Nachricht kostet je nach Modell Credits.",
+            a: "Kostenlos bekommst du {{freeCreditsGuest}} Credits im Monat als Gast, {{freeCreditsSignedIn}} mit Konto, {{freeCreditsMax}} mit Konto und Newsletter. Das Abo kostet {{subscriptionPrice}} im Monat für {{subscriptionCredits}} Credits, aufladen geht mit Paketen ({{packCredits}} Credits für {{packPrice}}). Jede Nachricht kostet je nach Modell Credits.",
           },
           models: {
             q: "Welche Modelle gibt es?",
@@ -814,7 +814,7 @@ export const translations: typeof enTranslations = {
     newsletter: {
       title: "Bleib auf dem Laufenden",
       subtitle:
-        "Neue unzensierte Modelle und Produkt-Updates direkt in dein Postfach. E-Mail bestätigen und monatlich 20 Gratis-Credits sichern.",
+        "Neue unzensierte Modelle und Produkt-Updates direkt in dein Postfach.",
     },
     tagline: "Chatten, erschaffen, verbinden - Text, Bilder, Videos und Musik",
     privacyTagline:

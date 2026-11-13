@@ -18,6 +18,8 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+
 import { NewsletterCreditOffer, NewsletterCreditOfferOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 
@@ -75,7 +77,7 @@ const errorTypes = {
 const exampleResponse = {
   offer: NewsletterCreditOffer.AVAILABLE,
   email: "user@example.com",
-  bonusCredits: 20,
+  bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
   freeRefillAt: "2026-12-01T00:00:00.000Z",
 };
 

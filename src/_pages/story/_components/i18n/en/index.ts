@@ -280,7 +280,7 @@ export const translations = {
           name: "Free",
           note: "forever",
           p1: "{{freeCreditsGuest}} credits a month, no signup",
-          p2: "{{freeCreditsSignedIn}} with a free account, +{{freeCreditsNewsletterBonus}} with the newsletter",
+          p2: "{{freeCreditsSignedIn}} with a free account, {{freeCreditsMax}} with the newsletter",
           p3: "All three filter tiers. No card.",
         },
         sub: {
@@ -317,7 +317,7 @@ export const translations = {
           },
           cost: {
             q: "What does it cost?",
-            a: "Free gets you {{freeCreditsGuest}} credits a month as a guest, {{freeCreditsSignedIn}} with an account, +{{freeCreditsNewsletterBonus}} with the newsletter. The subscription is {{subscriptionPrice}} a month for {{subscriptionCredits}} credits, and you can top up with packs ({{packCredits}} credits for {{packPrice}}). Each message costs credits depending on the model.",
+            a: "Free gets you {{freeCreditsGuest}} credits a month as a guest, {{freeCreditsSignedIn}} with an account, {{freeCreditsMax}} with an account and the newsletter. The subscription is {{subscriptionPrice}} a month for {{subscriptionCredits}} credits, and you can top up with packs ({{packCredits}} credits for {{packPrice}}). Each message costs credits depending on the model.",
           },
           models: {
             q: "Which models can I use?",
@@ -807,7 +807,7 @@ export const translations = {
     newsletter: {
       title: "Stay in the loop",
       subtitle:
-        "New uncensored models and product drops, straight to your inbox. Confirm your email for +20 free credits every month.",
+        "New uncensored models and product drops, straight to your inbox.",
     },
     tagline: "Chat, create, and connect - text, images, video, and music",
     privacyTagline:

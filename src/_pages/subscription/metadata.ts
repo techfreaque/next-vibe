@@ -12,7 +12,7 @@ import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 
 import { configScopedTranslation } from "@/env/i18n";
-import { FREE_CREDIT_SIGNED_IN_TOTAL } from "@/products/constants";
+import { FREE_CREDIT_MAX_TOTAL } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { scopedTranslation } from "./i18n";
@@ -39,7 +39,7 @@ export async function generateSubscriptionMetadata(
     productsRepository.getProducts(locale)[ProductIds.SUBSCRIPTION];
   const values = {
     appName,
-    freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
+    freeCredits: FREE_CREDIT_MAX_TOTAL,
     subCredits: subscription.credits,
     subPrice: formatCurrency(subscription.price, subscription.currency, locale),
     modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),

@@ -57,7 +57,7 @@ export const NewsletterSubscriptionStatusDB = [
 
 /**
  * Free-credit newsletter bonus state, returned by subscribe so the UI can say
- * whether the +20/month is live or waits on the confirmation email.
+ * whether the monthly bonus is live or waits on the confirmation email.
  */
 export const {
   enum: NewsletterCreditBonus,

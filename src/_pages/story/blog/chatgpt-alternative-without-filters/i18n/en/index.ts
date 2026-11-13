@@ -97,7 +97,7 @@ export const translations = {
   pricing: {
     title: "How much does it cost?",
     intro: "Credits. One balance for every model.",
-    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} once you sign up. Enough to try several models on your own prompts.",
+    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with an account and the newsletter. Enough to try several models on your own prompts.",
     sub: "Subscription: {{subCredits}} credits a month for {{subPrice}}.",
     pack: "Credit packs: {{packCredits}} credits for {{packPrice}}. They never expire. Card or crypto.",
     oneBalance:
@@ -134,7 +134,7 @@ export const translations = {
     title: "FAQ",
     free: {
       q: "Is {{appName}} free?",
-      a: "You get {{guestCredits}} free credits a month without an account and {{freeCredits}} with one. After that: a subscription at {{subPrice}} a month or a credit pack.",
+      a: "No account: {{guestCredits}} free credits a month. Free account: {{freeCredits}}. Account + newsletter: {{maxCredits}}. After that: a subscription at {{subPrice}} a month or a credit pack.",
     },
     account: {
       q: "Do I need an account?",

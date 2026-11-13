@@ -450,7 +450,8 @@ export const translations: typeof enTranslations = {
   widget: {
     newsletter: {
       title: "Newsletter",
-      subtitle: "Updates in dein Postfach, plus 20 Gratis-Credits pro Monat",
+      subtitle:
+        "Updates in dein Postfach, plus {{bonusCredits}} Gratis-Credits extra im Monat",
     },
     loadState: {
       loading: "Wird geladen...",

@@ -445,7 +445,8 @@ export const translations: typeof enTranslations = {
   widget: {
     newsletter: {
       title: "Newsletter",
-      subtitle: "Aktualności na skrzynkę i 20 darmowych kredytów miesięcznie",
+      subtitle:
+        "Aktualności na skrzynkę i dodatkowe {{bonusCredits}} darmowych kredytów miesięcznie",
     },
     loadState: {
       loading: "Ładowanie...",

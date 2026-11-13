@@ -100,7 +100,7 @@ export const translations: typeof enTranslations = {
   pricing: {
     title: "Ile to kosztuje?",
     intro: "Kredyty. Jedno saldo dla wszystkich modeli.",
-    free: "Za darmo: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} po rejestracji. Wystarczy, żeby sprawdzić kilka modeli na własnych promptach.",
+    free: "Za darmo: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z kontem i newsletterem. Wystarczy, żeby sprawdzić kilka modeli na własnych promptach.",
     sub: "Subskrypcja: {{subCredits}} kredytów miesięcznie za {{subPrice}}.",
     pack: "Pakiety kredytów: {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta albo krypto.",
     oneBalance:
@@ -137,7 +137,7 @@ export const translations: typeof enTranslations = {
     title: "Najczęstsze pytania",
     free: {
       q: "Czy {{appName}} jest darmowe?",
-      a: "Bez konta dostajesz {{guestCredits}} darmowych kredytów miesięcznie, z kontem {{freeCredits}}. Potem: subskrypcja za {{subPrice}} miesięcznie albo pakiet kredytów.",
+      a: "Bez konta: {{guestCredits}} darmowych kredytów miesięcznie. Darmowe konto: {{freeCredits}}. Konto z newsletterem: {{maxCredits}}. Potem: subskrypcja za {{subPrice}} miesięcznie albo pakiet kredytów.",
     },
     account: {
       q: "Czy potrzebuję konta?",

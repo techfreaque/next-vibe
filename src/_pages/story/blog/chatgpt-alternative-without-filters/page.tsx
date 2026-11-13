@@ -35,6 +35,7 @@ import { toModelSlug } from "@/_pages/models/_shared/model-facts";
 import { configScopedTranslation } from "@/env/i18n";
 import {
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/platform-products";
@@ -129,8 +130,9 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
   {
     key: "fiction",
     models: [
-      ChatModelId.VENICE_UNCENSORED,
+      ChatModelId.UNCENSORED_LM_V1_2,
       ChatModelId.VENICE_UNCENSORED_ROLEPLAY,
+      ChatModelId.VENICE_UNCENSORED,
     ],
   },
   {
@@ -146,11 +148,12 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
 
 /**
  * Side-by-side pairs worth a look: the built-uncensored model against
- * ChatGPT's model and a refusal-stripped flagship, then a mainstream pick vs
+ * ChatGPT's model, the roleplay pick and a refusal-stripped flagship, then a mainstream pick vs
  * its unfiltered rival. Same URL order as the sitemap (FEATURED_COMPARISON_PAIRS).
  */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.GPT_6_1_SOL, ChatModelId.KIMI_K3_1_PRO],
@@ -228,6 +231,7 @@ export function TanstackPage({
   const prices = {
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
+    maxCredits: FREE_CREDIT_MAX_TOTAL,
     subPrice,
     subCredits,
     packPrice,

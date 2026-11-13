@@ -456,7 +456,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   /**
    * Get a summary of all products in a single sentence
    * Single source of truth for product summary text
-   * Example: "We offer Free (20-70 credits/month), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
+   * Example: "We offer Free (20/40/90 credits/month by tier), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
    */
   getProductsSummary(
     locale: CountryLanguage,
@@ -485,7 +485,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     return t("summary", {
       freeCredits: freeTier.credits,
       freeCreditsSignedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
-      freeCreditsNewsletterBonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+      freeCreditsMax: FREE_CREDIT_MAX_TOTAL,
       packCurrency: packCurrencySymbol,
       packPrice: packPrice,
       packCredits: creditPack.credits,

@@ -7,18 +7,18 @@
  * - Guest pool (public leads, linked via lead_lead_links): FREE_CREDIT_ALLOWANCE.guest
  *   (20).
  * - User pool (user + every linked lead):
- *   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn = lead 20 + user 50
- *   = 70 base.
+ *   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn = lead 20 + user 20
+ *   = 40 base.
  * - User pool +FREE_CREDIT_ALLOWANCE.newsletterBonus once it holds a CONFIRMED
- *   newsletter subscription (double opt-in link clicked): 70 -> 90. Account first:
+ *   newsletter subscription (double opt-in link clicked): 40 -> 90. Account first:
  *   guest pools never get the bonus. A guest's confirmed subscription stays on its
  *   lead and starts counting the moment that lead joins a user pool (signup/login).
  *
  * Spending is counted per pool per period (credit_transactions.metadata.freeCreditsUsed),
  * so the cap is "allowance - spent" no matter how often the tier changes mid-month.
  * The lead's 20 stays the SAME 20 it had as a guest: when a guest converts to a
- * user, its pool and period-spend are unchanged, only the ceiling rises (20 -> 70),
- * so any guest spend already made on another device/IP still counts against the 70
+ * user, its pool and period-spend are unchanged, only the ceiling rises (20 -> 40),
+ * so any guest spend already made on another device/IP still counts against the 40
  * (and 90 with newsletter). One IP cannot mass-signup to farm fresh credits.
  * Unsubscribing lowers the cap; re-subscribing never grants a second bonus.
  */
@@ -55,6 +55,60 @@ export function computeFreeAllowance({
   return hasConfirmedNewsletter
     ? base + FREE_CREDIT_ALLOWANCE.newsletterBonus
     : base;
+}
+
+/**
+ * Stamped on every free grant made under the current tiers (metadata.tierVersion).
+ * Grants without it were made under the pre-2026-11 tiers (account 70, newsletter +20).
+ */
+export const FREE_GRANT_TIER_VERSION = 2;
+
+/**
+ * Tier caps before the 2026-11 change. Only used by computeGrandfatheredFreeCap.
+ */
+const LEGACY_FREE_CREDIT_ALLOWANCE = {
+  guest: 20,
+  signedIn: 50,
+  newsletterBonus: 20,
+} as const;
+
+/** Monthly cap the pool would have had under the pre-2026-11 tiers. */
+export function computeLegacyFreeAllowance({
+  isUserPool,
+  hasConfirmedNewsletter,
+}: FreeAllowanceInput): number {
+  if (!isUserPool) {
+    return LEGACY_FREE_CREDIT_ALLOWANCE.guest;
+  }
+  const base =
+    LEGACY_FREE_CREDIT_ALLOWANCE.guest + LEGACY_FREE_CREDIT_ALLOWANCE.signedIn;
+  return hasConfirmedNewsletter
+    ? base + LEGACY_FREE_CREDIT_ALLOWANCE.newsletterBonus
+    : base;
+}
+
+/**
+ * Cap for the current period after the 2026-11 tier cut: lower tiers apply from
+ * the next monthly refill on, never as a mid-month clawback.
+ * What the pool was granted THIS period under the old tiers (grants without
+ * tierVersion) stays spendable until that refill, bounded by the old tier cap so
+ * merged guest pools never stack past what one pool could have held.
+ * New-tier grants never count, so the grace ends by itself after one refill.
+ * Safe to delete (with computeLegacyFreeAllowance) from 2027-01 on.
+ */
+export function computeGrandfatheredFreeCap({
+  allowance,
+  legacyAllowance,
+  legacyGrantedThisPeriod,
+}: {
+  allowance: number;
+  legacyAllowance: number;
+  legacyGrantedThisPeriod: number;
+}): number {
+  return Math.max(
+    allowance,
+    Math.min(legacyGrantedThisPeriod, legacyAllowance),
+  );
 }
 
 /**

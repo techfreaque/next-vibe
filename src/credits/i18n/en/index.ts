@@ -140,7 +140,7 @@ export const translations = {
     balance: {
       subscribe: "See plans",
       freePlanHint:
-        "{{count}} free credits a month, +{{bonus}} with the newsletter. Subscribe for {{subCredits}}, or just buy a pack. No subscription needed.",
+        "{{count}} free credits a month, {{max}} with the newsletter. Subscribe for {{subCredits}}, or just buy a pack. No subscription needed.",
       lowBalance: {
         title: "{{count}} credits left",
         emptyTitle: "You're out of credits",
@@ -171,12 +171,11 @@ export const translations = {
       },
       free: {
         title: "Free Credits",
-        description:
-          "{{count}} free every month, +{{bonus}} with the newsletter",
+        description: "{{count}} free every month, {{max}} with the newsletter",
         descriptionGuest:
-          "{{guest}} free every month. Sign up for {{signedIn}}.",
+          "{{guest}} free every month. Sign up for {{signedIn}}, {{max}} with the newsletter.",
         adminDescription:
-          "Free cap per pool/month (shared across devices): {{guest}} guest, {{signedIn}} signed in, +{{bonus}} newsletter",
+          "Free cap per pool/month (shared across devices): {{guest}} guest, {{signedIn}} signed in, {{max}} signed in + newsletter",
       },
       earned: {
         title: "Earned Credits",

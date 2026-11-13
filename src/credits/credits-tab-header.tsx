@@ -31,6 +31,7 @@ import type { JSX } from "react";
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
 import {
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 import {
@@ -115,7 +116,7 @@ export function CreditsTabHeader({
   const freeTiers = {
     guest: FREE_CREDIT_ALLOWANCE.guest,
     signedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
-    bonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+    max: FREE_CREDIT_MAX_TOTAL,
   };
 
   const totalFormatted = data ? formatCredits(data.total) : "—";
@@ -256,7 +257,7 @@ export function CreditsTabHeader({
                   : isAuthenticated
                     ? t("get.balance.free.description", {
                         count: freeTiers.signedIn,
-                        bonus: freeTiers.bonus,
+                        max: freeTiers.max,
                       })
                     : t("get.balance.free.descriptionGuest", freeTiers)
               }
@@ -363,7 +364,7 @@ export function CreditsTabHeader({
                 <Span className="text-sm text-muted-foreground">
                   {t("get.balance.freePlanHint", {
                     count: freeTiers.signedIn,
-                    bonus: freeTiers.bonus,
+                    max: freeTiers.max,
                     subCredits: subProduct.credits,
                   })}
                 </Span>

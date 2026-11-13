@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Wir bieten Kostenlos ({{freeCredits}} Credits/Monat als Gast, {{freeCreditsSignedIn}} angemeldet, +{{freeCreditsNewsletterBonus}} mit Newsletter), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits), die jeder ohne Abonnement kaufen kann, an.",
+    "Wir bieten Kostenlos (ohne Konto: {{freeCredits}} Credits/Monat, Gratis-Konto: {{freeCreditsSignedIn}}, Konto plus Newsletter: {{freeCreditsMax}}), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits), die jeder ohne Abonnement kaufen kann, an.",
 
   // Free tier product
   free: {

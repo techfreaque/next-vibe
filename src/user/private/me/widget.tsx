@@ -112,6 +112,7 @@ import {
 import creditsDef from "@/credits/definition";
 import configDef from "@/lead-magnet/config/definition";
 import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
@@ -1513,7 +1514,9 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
       {/* ── NEWSLETTER ── */}
       <HubSection
         title={t("widget.newsletter.title")}
-        subtitle={t("widget.newsletter.subtitle")}
+        subtitle={t("widget.newsletter.subtitle", {
+          bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+        })}
       >
         <Div className="p-3.5">
           <NewsletterSubscribeInline

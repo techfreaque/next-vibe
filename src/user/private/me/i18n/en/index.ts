@@ -438,7 +438,8 @@ export const translations = {
   widget: {
     newsletter: {
       title: "Newsletter",
-      subtitle: "Updates in your inbox, plus 20 free credits a month",
+      subtitle:
+        "Updates in your inbox, plus {{bonusCredits}} extra free credits a month",
     },
     loadState: {
       loading: "Loading...",

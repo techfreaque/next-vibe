@@ -20,6 +20,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+
 import { scopedTranslation } from "./i18n";
 
 const NewsletterConfirmWidget = lazyWidget(() =>
@@ -135,7 +137,7 @@ const { POST } = createEndpoint({
       default: {
         confirmed: true,
         email: "user@example.com",
-        bonusCredits: 20,
+        bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
       },
     },
   },

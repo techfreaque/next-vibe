@@ -75,7 +75,7 @@ export const translations = {
       help: "Feedback & Support",
       about: "About",
       websiteBlog: "Stories",
-      newsletter: "Newsletter (+20 free credits)",
+      newsletter: "Newsletter: up to {{freeCreditsMax}} free credits/month",
       admin: "Admin Dashboard",
     },
     confirmations: {
@@ -199,7 +199,7 @@ export const translations = {
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, +{{bonusCredits}} with the newsletter.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, {{freeCreditsMax}} with the newsletter.",
       },
       chatInput: {
         title: "Type Your Message",

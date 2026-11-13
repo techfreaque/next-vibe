@@ -13,7 +13,7 @@ export const translations = {
 
   // Product summary (single source of truth)
   summary:
-    "We offer Free ({{freeCredits}} credits/month as a guest, {{freeCreditsSignedIn}} signed in, +{{freeCreditsNewsletterBonus}} with the newsletter), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits) that anyone can buy without a subscription.",
+    "We offer Free (no account: {{freeCredits}} credits/month, free account: {{freeCreditsSignedIn}}, account + newsletter: {{freeCreditsMax}}), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits) that anyone can buy without a subscription.",
 
   // Free tier product
   free: {

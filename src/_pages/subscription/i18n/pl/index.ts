@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       free: {
         title: "Darmowe miesięczne kredyty",
         description:
-          "{{guest}} darmowych kredytów miesięcznie jako gość, {{signedIn}} po zalogowaniu, +{{bonus}} z newsletterem",
+          "Bez konta: {{guest}} darmowych kredytów/mies. Darmowe konto: {{signedIn}}/mies. Konto z newsletterem: {{max}}/mies.",
       },
       earned: {
         title: "Zarobione kredyty",
@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Darmowe kredyty",
           description:
-            "{{guest}} miesięcznie jako gość. {{signedIn}} z darmowym kontem, +{{bonus}} z newsletterem. Bez karty.",
+            "Bez konta: {{guest}}/mies. Darmowe konto: {{signedIn}}/mies. Konto z newsletterem: {{max}}/mies. Bez karty.",
         },
       },
       costs: {
@@ -267,7 +267,7 @@ export const translations: typeof enTranslations = {
     overview: {
       title: "Cennik - płacisz za wiadomość, bez zobowiązań | {{appName}}",
       description:
-        "{{freeCredits}} darmowych kredytów co miesiąc. {{subCredits}} kredytów za {{subPrice}} miesięcznie albo pakiet, który nigdy nie wygasa. Jedno saldo na {{modelCount}} modeli, od mainstreamu po bez cenzury.",
+        "Do {{freeCredits}} darmowych kredytów co miesiąc. {{subCredits}} kredytów za {{subPrice}} miesięcznie albo pakiet, który nigdy nie wygasa. Jedno saldo na {{modelCount}} modeli, od mainstreamu po bez cenzury.",
     },
     buyCredits: {
       title: "Kup kredyty - subskrypcja lub pakiety | {{appName}}",

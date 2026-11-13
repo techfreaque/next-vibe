@@ -224,7 +224,7 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Pläne ansehen",
       freePlanHint:
-        "{{count}} Gratis-Credits pro Monat, +{{bonus}} mit dem Newsletter. Mit Abo {{subCredits}}, oder kauf einfach ein Paket. Kein Abo nötig.",
+        "{{count}} Gratis-Credits pro Monat, mit Newsletter {{max}}. Mit Abo {{subCredits}}, oder kauf einfach ein Paket. Kein Abo nötig.",
       lowBalance: {
         title: "Noch {{count}} Credits",
         emptyTitle: "Deine Credits sind aufgebraucht",
@@ -255,12 +255,11 @@ export const translations: typeof enTranslations = {
       },
       free: {
         title: "Kostenlose Credits",
-        description:
-          "{{count}} gratis jeden Monat, +{{bonus}} mit dem Newsletter",
+        description: "{{count}} gratis jeden Monat, mit Newsletter {{max}}",
         descriptionGuest:
-          "{{guest}} gratis jeden Monat. Mit Konto {{signedIn}}.",
+          "{{guest}} gratis jeden Monat. Mit Konto {{signedIn}}, mit Konto und Newsletter {{max}}.",
         adminDescription:
-          "Gratis-Limit pro Pool/Monat (geteilt über Geräte): {{guest}} Gast, {{signedIn}} angemeldet, +{{bonus}} Newsletter",
+          "Gratis-Limit pro Pool/Monat (geteilt über Geräte): {{guest}} Gast, {{signedIn}} angemeldet, {{max}} angemeldet mit Newsletter",
       },
       earned: {
         title: "Verdiente Credits",

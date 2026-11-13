@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       free: {
         title: "Kostenlose monatliche Credits",
         description:
-          "{{guest}} Gratis-Credits pro Monat als Gast, {{signedIn}} angemeldet, +{{bonus}} mit dem Newsletter",
+          "Ohne Konto: {{guest}} Gratis-Credits/Monat. Gratis-Konto: {{signedIn}}/Monat. Konto plus Newsletter: {{max}}/Monat.",
       },
       earned: {
         title: "Verdiente Credits",
@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
         free: {
           title: "Gratis-Credits",
           description:
-            "{{guest}} pro Monat als Gast. {{signedIn}} mit kostenlosem Konto, +{{bonus}} mit dem Newsletter. Keine Karte.",
+            "Ohne Konto: {{guest}}/Monat. Gratis-Konto: {{signedIn}}/Monat. Konto plus Newsletter: {{max}}/Monat. Keine Karte.",
         },
       },
       costs: {
@@ -265,7 +265,7 @@ export const translations: typeof enTranslations = {
       title:
         "Preise - pro Nachricht zahlen, ohne Vertragsbindung | {{appName}}",
       description:
-        "{{freeCredits}} Gratis-Credits pro Monat. {{subCredits}} Credits für {{subPrice}} im Monat oder ein Paket, das nie verfällt. Ein Guthaben für {{modelCount}} Modelle, vom Mainstream bis unzensiert.",
+        "Bis zu {{freeCredits}} Gratis-Credits pro Monat. {{subCredits}} Credits für {{subPrice}} im Monat oder ein Paket, das nie verfällt. Ein Guthaben für {{modelCount}} Modelle, vom Mainstream bis unzensiert.",
     },
     buyCredits: {
       title: "Credits kaufen - Abo oder Pakete | {{appName}}",

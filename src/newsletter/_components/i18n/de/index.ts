@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   subheadingPublic: "Neue unzensierte Modelle, Produkt-Updates, kein Spam.",
   subheadingLoggedIn: "Neue unzensierte Modelle, Produkt-Updates, kein Spam.",
   bonus:
-    "Mit Gratis-Konto: E-Mail bestätigen und jeden Monat 20 Credits extra sichern.",
+    "Mit Gratis-Konto: E-Mail bestätigen und jeden Monat {{freeCreditsMax}} statt {{freeCreditsSignedIn}} Gratis-Credits sichern.",
   emailPlaceholder: "du@beispiel.de",
   subscribe: "Abonnieren",
   subscribed: "Du bist dabei",

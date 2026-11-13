@@ -49,7 +49,7 @@ export const translations = {
       free: {
         title: "Free Monthly Credits",
         description:
-          "{{guest}} free credits a month as a guest, {{signedIn}} signed in, +{{bonus}} with the newsletter",
+          "No account: {{guest}} free credits/month. Free account: {{signedIn}}/month. Account + newsletter: {{max}}/month.",
       },
       earned: {
         title: "Earned Credits",
@@ -74,7 +74,7 @@ export const translations = {
         free: {
           title: "Free credits",
           description:
-            "{{guest}} a month as a guest. {{signedIn}} with a free account, +{{bonus}} with the newsletter. No card.",
+            "No account: {{guest}}/month. Free account: {{signedIn}}/month. Account + newsletter: {{max}}/month. No card.",
         },
       },
       costs: {
@@ -259,7 +259,7 @@ export const translations = {
     overview: {
       title: "Pricing - pay per message, no lock-in | {{appName}}",
       description:
-        "{{freeCredits}} free credits a month. {{subCredits}} credits for {{subPrice}} a month, or buy a pack that never expires. One balance for {{modelCount}} models, mainstream to uncensored.",
+        "Up to {{freeCredits}} free credits a month. {{subCredits}} credits for {{subPrice}} a month, or buy a pack that never expires. One balance for {{modelCount}} models, mainstream to uncensored.",
     },
     buyCredits: {
       title: "Buy credits - subscription or packs | {{appName}}",

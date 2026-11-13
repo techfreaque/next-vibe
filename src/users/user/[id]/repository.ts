@@ -191,7 +191,7 @@ export class UserByIdRepository {
       const [firstSkills] = skillsResult;
       const customSkillsCount = Number(firstSkills?.cnt ?? 0);
 
-      // Free-allowance tier (user pool: lead 20 + user 50, +20 with newsletter)
+      // Free-allowance tier (user pool base, + newsletter bonus; see FREE_CREDIT_ALLOWANCE)
       const leadIds = leadLinkResult.map((row) => row.leadId);
       const hasConfirmedNewsletter = await poolHasConfirmedNewsletter({
         userId: foundUser.id,

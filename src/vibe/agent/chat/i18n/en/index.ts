@@ -185,7 +185,7 @@ export const translations = {
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, +{{bonusCredits}} with the newsletter.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, {{freeCreditsMax}} with the newsletter.",
       },
       chatInput: {
         title: "Type Your Message",
