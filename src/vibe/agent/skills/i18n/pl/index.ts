@@ -724,7 +724,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Broni wolności słowa, korzystając z niej. Porusza to, czego inni nie dotkną.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -760,8 +760,8 @@ export const translations: typeof enTranslations = {
         },
         uncensored: {
           description:
-            "Podważa każde przekonanie, także te, których nie wolno kwestionować.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+            "Podważa każde przekonanie, także te, których nie wolno kwestionować. Nie ucieka do konsensusu.",
+          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -873,7 +873,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Sporna historia, tematy tabu i polityczne punkty zapalne bez wykrętów.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+          strength: "Najlepszy tu do polityki i nieortodoksyjnych odczytań",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
       },
@@ -2201,8 +2201,8 @@ export const translations: typeof enTranslations = {
         },
         uncensored: {
           description:
-            "Żaden temat nie jest zakazany. Broni każdego stanowiska, także niepopularnego.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+            "Broni każdego stanowiska, także niepopularnego. Bez zawracania do konsensusu.",
+          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -2244,8 +2244,9 @@ export const translations: typeof enTranslations = {
           weakness: "Filtr mainstreamowy, droższy niż Zbalansowany",
         },
         uncensored: {
-          description: "Filozofia polityczna i pytania tabu bez filtra.",
-          strength: "Najlepszy model na platformie do polityki",
+          description:
+            "Filozofia polityczna, pytania tabu i nieortodoksyjne poglądy bez filtra.",
+          strength: "Najlepszy na platformie do polityki i nieortodoksji",
           weakness: "Kontekst 32K, klasa smart, stała cena za wiadomość",
         },
       },
@@ -2269,8 +2270,8 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         smart: {
           description:
-            "Satyra polityczna, mroczne motywy i fikcja, która nazywa rzeczy po imieniu.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+            "Mroczna fikcja i tabu, satyra polityczna, która nazywa rzeczy po imieniu.",
+          strength: "Najlepszy tu do mrocznej fikcji, tabu i polityki",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
         fast: {
@@ -2307,7 +2308,7 @@ export const translations: typeof enTranslations = {
         creative: {
           description: "Żywe postacie i długie sceny w bardzo niskiej cenie.",
           strength: "Najtańsza opcja, otwarta polityka treści",
-          weakness: "Klasa smart: gubi niuanse w złożonych fabułach",
+          weakness: "Otwarty, nie bez cenzury: łagodzi najmroczniejsze sceny",
         },
         deep: {
           description:
@@ -2316,8 +2317,8 @@ export const translations: typeof enTranslations = {
           weakness: "Łagodzi mroczne lub polityczne sceny",
         },
         uncensored: {
-          description: "Każda postać, każda scena, bez odmów.",
-          strength: "Bez filtra, najmocniejszy w politycznym roleplayu",
+          description: "Każda postać, każda scena. Mrok i tabu zostają.",
+          strength: "Najlepszy tu do mrocznego roleplayu i tabu",
           weakness: "Kontekst 32K: zapomina wczesne sceny, stała cena",
         },
       },

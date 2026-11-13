@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
         "Filtry bezpieczeństwa dużych firm. Omija drażliwe tematy.",
       openHelp: "Lekkie filtry. Podejmie większość drażliwych tematów.",
       uncensoredHelp:
-        "Bez filtrów, granice ustalasz Ty. Do polityki wybierz UncensoredLM: zbudowany bez cenzury. Reszta ma tylko usunięte odmowy.",
+        "Bez filtrów, granice ustalasz Ty. Mroczny roleplay, polityka, inne poglądy: wybierz UncensoredLM, zbudowany bez cenzury. Reszta ma tylko usunięte odmowy.",
     },
   },
   sort: {

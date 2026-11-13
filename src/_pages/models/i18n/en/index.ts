@@ -45,7 +45,7 @@ export const translations = {
     },
     uncensored: {
       name: "Uncensored",
-      line: "No refusals, no lectures. UncensoredLM is built uncensored; the rest are existing models with refusals removed, so their base framing stays.",
+      line: "No refusals, no lectures. For dark roleplay, politics and other viewpoints pick UncensoredLM, the one built uncensored. The rest had refusals removed and keep their base framing.",
     },
   },
   modality: {

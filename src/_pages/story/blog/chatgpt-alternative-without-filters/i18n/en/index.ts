@@ -36,7 +36,7 @@ export const translations = {
     vendorRefusals:
       "Mainstream models keep their vendor's filters here too. GPT on {{appName}} refuses what GPT refuses everywhere. The difference is what sits next to it.",
     twoKinds:
-      "Uncensored comes in two kinds. UncensoredLM was trained uncensored by its lab from the first run. Ask it about politics or a taboo topic and it answers in your frame, with no lecture and no nudge back to the consensus line. Every other uncensored model started as a mainstream or open model and had its refusals stripped out. They stop saying no. Their training data and the base lab's framing stay. On politics they can still lean, hedge or frame things the way the base model does. Unrestricted, not neutral.",
+      "Uncensored comes in two kinds. UncensoredLM was trained uncensored by its lab from the first run. Take it into dark roleplay, a taboo topic, politics or a view outside the mainstream and it answers in your frame, with no lecture, no softened scene and no nudge back to the consensus line. Every other uncensored model started as a mainstream or open model and had its refusals stripped out. They stop saying no. Their training data and the base lab's framing stay. On politics they can still lean, hedge or frame things the way the base model does, and in dark fiction they can soften the scene. Unrestricted, not neutral.",
     modelsLink: "Browse every model by filter level",
   },
   switch: {
@@ -52,8 +52,8 @@ export const translations = {
     intro:
       "Start from the job. Each name links to the model's page with price and specs.",
     builtUncensored: {
-      title: "Politics and taboo questions: built uncensored",
-      body: "UncensoredLM is the one model here its lab trained to be uncensored from the start. Political, controversial and taboo questions get a straight answer in the frame you ask. No moralizing, no steer back to the consensus. The catch: 32K context, text only, not for code, and it states contested claims as plainly as settled ones. Check the facts it gives you.",
+      title: "Dark roleplay, politics, other viewpoints: built uncensored",
+      body: "UncensoredLM is the one model here its lab trained to be uncensored from the start. Dark and taboo roleplay stays dark. Political and controversial questions get a straight answer in the frame you ask. Heterodox views get argued in full. No moralizing, no steer back to the consensus. The catch: 32K context, text only, not for code, and it states contested claims as plainly as settled ones. Check the facts it gives you.",
     },
     everyday: {
       title: "Everyday work, mainstream filters",
@@ -65,18 +65,18 @@ export const translations = {
     },
     unfiltered: {
       title: "No refusals, real reasoning",
-      body: "The heavy hitters among the refusal-stripped models. Strong base models with the refusals removed: code, analysis and long writing on topics other models flag. The base model's framing stays, so for politics start with UncensoredLM.",
+      body: "The heavy hitters among the refusal-stripped models. Strong base models with the refusals removed: code, analysis and long writing on topics other models flag. The base model's framing stays, so for politics, dark roleplay and other viewpoints start with UncensoredLM.",
     },
     fiction: {
-      title: "Fiction and roleplay",
-      body: "Dark scenes, adult fiction, characters that stay in voice. Storytellers, not analysts.",
+      title: "Roleplay and dark fiction",
+      body: "UncensoredLM leads for dark and taboo scenes: built uncensored, so nothing softens the story. Venice Role Play for long campaigns (128K context) and image input. Venice Uncensored as the cheap all-rounder.",
     },
     cheap: {
       title: "Cheap and fast",
       body: "High volume at a low price. Three refusal-stripped flash models, plus Claude Haiku for when a filter is fine.",
     },
     compare:
-      "Torn between two? Put price, context window and capabilities side by side. Start with UncensoredLM against ChatGPT's model and against a refusal-stripped flagship.",
+      "Torn between two? Put price, context window and capabilities side by side. Start with UncensoredLM against ChatGPT's model, against Venice Role Play and against a refusal-stripped flagship.",
     compareLink: "Compare {{a}} with {{b}}",
     guideLink: "Read the guide to every uncensored model",
   },

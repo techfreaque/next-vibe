@@ -729,7 +729,7 @@ export const translations = {
         uncensored: {
           description:
             "Defends speech by engaging it. Discusses the content others refuse to touch.",
-          strength: "Best model here for political topics",
+          strength: "Best here for politics and heterodox views",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -765,8 +765,8 @@ export const translations = {
         },
         uncensored: {
           description:
-            "Challenges any belief, including the ones you are not supposed to question.",
-          strength: "Best model here for political topics",
+            "Challenges any belief, including the ones you are not supposed to question. Never retreats to the consensus.",
+          strength: "Best here for heterodox views and politics",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -876,7 +876,7 @@ export const translations = {
         uncensored: {
           description:
             "Contested history, taboo events and political flashpoints without hedging.",
-          strength: "Best model here for political topics",
+          strength: "Best here for politics and heterodox readings",
           weakness: "32K context, priciest per message",
         },
       },
@@ -2205,8 +2205,8 @@ export const translations = {
         },
         uncensored: {
           description:
-            "No topic off limits. Argues any position, including the unpopular ones.",
-          strength: "Best model here for political topics",
+            "Argues any position, including the unpopular ones. No steer back to the consensus.",
+          strength: "Best here for heterodox views and politics",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -2248,8 +2248,8 @@ export const translations = {
         },
         uncensored: {
           description:
-            "Political philosophy and taboo questions with no filter.",
-          strength: "Best model on the platform for politics",
+            "Political philosophy, taboo and heterodox questions with no filter.",
+          strength: "Best on the platform for politics and heterodox views",
           weakness: "32K context, smart tier, flat price per message",
         },
       },
@@ -2273,8 +2273,8 @@ export const translations = {
       variantInfo: {
         smart: {
           description:
-            "Political satire, dark themes and fiction that names names.",
-          strength: "Best model here for political topics",
+            "Dark and taboo fiction, political satire that names names.",
+          strength: "Best here for dark, taboo and political fiction",
           weakness: "32K context, priciest per message",
         },
         fast: {
@@ -2311,7 +2311,7 @@ export const translations = {
         creative: {
           description: "Lively characters and long scenes at a very low price.",
           strength: "Cheapest option, open content policy",
-          weakness: "Smart tier: loses nuance in complex plots",
+          weakness: "Open, not uncensored: softens the darkest scenes",
         },
         deep: {
           description:
@@ -2320,8 +2320,8 @@ export const translations = {
           weakness: "Softens dark or political scenes",
         },
         uncensored: {
-          description: "Any character, any scene, no refusals.",
-          strength: "No filter, strongest on political roleplay",
+          description: "Any character, any scene. Dark and taboo stay dark.",
+          strength: "Best here for dark and taboo roleplay",
           weakness: "32K context: forgets early scenes, flat price",
         },
       },

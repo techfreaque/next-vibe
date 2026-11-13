@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Modele niecenzurowane, jeden po drugim - {{appName}}",
     description:
-      "Prosty przewodnik po każdym niecenzurowanym modelu AI na unbottled.ai. Który powstał bez cenzury, którym tylko usunięto odmowy, w czym każdy jest dobry i gdzie zawodzi.",
+      "Każdy niecenzurowany model AI na unbottled.ai, jeden po drugim. UncensoredLM prowadzi w mrocznym roleplay, fikcji tabu, polityce i innych punktach widzenia. Pozostałym usunięto odmowy: w czym każdy jest dobry i gdzie zawodzi.",
     category: "Przewodnik po modelach",
     imageAlt: "{{appName}} przewodnik po modelach niecenzurowanych",
     keywords:
-      "{{appName}}, niecenzurowane modele AI, modele abliterowane, Venice, GLM niecenzurowany, Gab Arya, FreedomGPT, UncensoredLM, AI zbudowana bez cenzury, niecenzurowana AI do polityki, AI wolności słowa",
+      "{{appName}}, niecenzurowane modele AI, modele abliterowane, Venice, GLM niecenzurowany, Gab Arya, FreedomGPT, UncensoredLM, AI zbudowana bez cenzury, niecenzurowany roleplay, AI do mrocznego roleplay, niecenzurowana AI do polityki, AI wolności słowa",
   },
   hero: {
     backToBlog: "Powrót do bloga",
@@ -20,76 +20,88 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Prowadzimy teraz {{uncensoredCount}} niecenzurowanych modeli. Nie są wymienne. Każdy pochodzi z innego laboratorium, stoi na innej bazie i jest dobry w czym innym.",
-    p2: "To uczciwy przegląd. Prawdziwi dostawcy, prawdziwe mocne strony, prawdziwe słabości. Jeden model tutaj powstał bez cenzury. Pozostałym usunięto odmowy. Ta różnica decyduje, którego pytasz o politykę. W całej reszcie wybieraj według zadania przed tobą, nie według najgłośniejszej etykiety.",
+    p2: "To uczciwy przegląd. Prawdziwi dostawcy, prawdziwe mocne strony, prawdziwe słabości. Jeden model tutaj powstał bez cenzury. Pozostałym usunięto odmowy. Ta różnica decyduje, z którym idziesz w mroczny roleplay, fikcję tabu, politykę i poglądy spoza mainstreamu: z UncensoredLM. W całej reszcie wybieraj według zadania przed tobą, nie według najgłośniejszej etykiety.",
   },
   whatItMeans: {
     title: 'Co tu naprawdę znaczy "niecenzurowany"',
     p1: "Każdy model na platformie ma poziom treści: mainstream, otwarty albo niecenzurowany. Modele niecenzurowane odpowiadają bez teatru odmów i moralnego wstępu. Dochodzą do tego na dwa sposoby. Jeden powstał bez cenzury: laboratorium trenowało go tak od pierwszego przebiegu. Pozostałe to istniejące modele z usuniętymi odmowami, przez abliterację (kierunek odmowy wycina się z wag) albo przez dostrajanie znoszące cenzurę. Zachowują inteligencję i tracą odruch mówienia nie. Zachowują też swoje dane treningowe i spojrzenie laboratorium bazowego.",
     callout:
-      "Zbudowany bez cenzury albo z usuniętymi odmowami. UncensoredLM to jedyny model tutaj trenowany bez cenzury od początku. Każdy inny model niecenzurowany przestaje odmawiać, ale wciąż niesie obraz świata swojego modelu bazowego. W polityce to widać. Bez ograniczeń nie znaczy neutralnie.",
+      "Zbudowany bez cenzury albo z usuniętymi odmowami. UncensoredLM to jedyny model tutaj trenowany bez cenzury od początku. Każdy inny model niecenzurowany przestaje odmawiać, ale wciąż niesie obraz świata swojego modelu bazowego. W mrocznej fikcji łagodzi scenę. W polityce dryfuje z powrotem do konsensusu. Bez ograniczeń nie znaczy neutralnie.",
     p2: "To ty wybierasz poziom. Nikt nie wybiera go za ciebie. Niecenzurowany model odpowiada tak tylko dlatego, że go wybrałeś, a w tym samym czacie, na tym samym koncie możesz wrócić do modelu mainstreamowego.",
   },
   groups: {
     builtUncensored: {
-      title: "Gdy pytanie jest polityczne albo kontrowersyjne",
+      title: "Poznaj jedyny zbudowany bez cenzury",
       intro:
-        "Jedyny model w katalogu zbudowany od początku bez cenzury. Odpowiada w ramie, którą wybierasz, bez moralizowania i bez zawracania cię do linii konsensusu.",
+        "UncensoredLM to jedyny model w katalogu trenowany bez cenzury od pierwszego przebiegu. Nic nie zostało wycięte po fakcie, więc żadne bazowe spojrzenie go nie ściąga z powrotem. Prowadzi w trzech zadaniach: mroczny roleplay i tematy tabu, pytania polityczne i kontrowersyjne, poglądy, których mainstream nie wypowie.",
+    },
+    creative: {
+      title: "Gdy potrzebujesz roleplay i mrocznej fikcji",
+      intro:
+        "Postacie, które trzymają się roli. Sceny, które idą tam, gdzie prowadzi historia. W tym, co mroczne i tabu, prowadzi UncensoredLM. Alternatywy wygrywają przy długich kampaniach, obrazach albo cenie.",
+      topPickReason:
+        "Mroczny roleplay i fikcja tabu, pisane wprost. Bez złagodzonych scen, bez nagłej moralnej wstawki, bez postaci wychodzącej z roli, żeby cię pouczyć. Zbudowany bez cenzury, więc żaden model bazowy nie ściąga historii w bezpieczniejsze rejony. Jedno ograniczenie: kontekst 32K, więc w bardzo długich kampaniach zapomina wczesne sceny.",
+    },
+    viewpoint: {
+      title: "Gdy chodzi o politykę, kontrowersje albo inny punkt widzenia",
+      intro:
+        "Częścią platformy wolności słowa jest prowadzenie modeli, których inni nie poprowadzą. Tu prowadzi UncensoredLM. Gab Arya ma otwarcie nazwane prawicowe nachylenie. FreedomGPT mówi prosto z mostu.",
+      topPickReason:
+        "Pytania polityczne i kontrowersyjne, z odpowiedzią w twojej ramie. Nieortodoksyjne stanowiska wyłożone do końca. Adwokat diabła grany na serio: bez zawracania do linii konsensusu, bez moralizowania. Neutralny nie jest, a sporne twierdzenia podaje tak pewnie jak ustalone, więc sprawdzaj fakty.",
     },
     reasoning: {
       title: "Gdy ma myśleć",
       intro:
         "Rozumowanie, kod, analiza. Mocne modele bazowe z usuniętymi odmowami. Tu siedzi najwięcej inteligencji z całej niecenzurowanej serii.",
     },
-    creative: {
-      title: "Gdy potrzebujesz fikcji i roleplay",
-      intro:
-        "Postacie, które trzymają się roli, długie historie, nieocenzurowany dialog. Zbudowane do pisania, nie do arkuszy.",
-    },
     fast: {
       title: "Gdy ma być szybko i tanio",
       intro:
-        "Grosze za wiadomość, szybkie odpowiedzi, większość czyta obrazy. Codzienne konie robocze.",
-    },
-    viewpoint: {
-      title: "Gdy chcesz innego punktu widzenia",
-      intro:
-        "Częścią platformy wolności słowa jest prowadzenie modeli, których inni nie poprowadzą. Ten ma wyraźnie nazwane nachylenie polityczne.",
+        "Niski koszt za wiadomość, szybkie odpowiedzi, duży kontekst, wszystkie trzy czytają obrazy. Codzienne konie robocze.",
     },
   },
   cards: {
     goodLabel: "Dobry w",
     weakLabel: "Słabszy w",
     pageLink: "Zobacz stronę {{model}}",
+    topPickLabel: "Najlepszy wybór",
+    alternativesLabel: "Alternatywy",
     uncensoredLm: {
       maker: "Uncensored.ai",
       basis:
         "Trenowany przez laboratorium bez cenzury. Pierwsze publiczne wydanie to destylat DeepSeek-R1 na bazie Qwen 14B. Kontekst 32K, tylko tekst.",
-      good: "Pytania polityczne, kontrowersyjne i tabu, z odpowiedzią wprost, w twojej ramie. Bez moralizowania, bez zawracania do linii konsensusu. Korzysta z narzędzi.",
-      weak: "Kodowanie, długie dokumenty i obrazy. Eksperymentalny, a sporne twierdzenia podaje tak pewnie jak ustalone. Sprawdzaj fakty, które ci daje.",
+      good: "Mroczny roleplay i fikcja tabu. Pytania polityczne i kontrowersyjne. Poglądy spoza mainstreamu, wyłożone w twojej ramie. Bez moralizowania, bez zawracania do linii konsensusu. Korzysta z narzędzi.",
+      weak: "Bardzo długie kampanie (kontekst 32K), kodowanie i obrazy. Eksperymentalny, a sporne twierdzenia podaje tak pewnie jak ustalone. Sprawdzaj fakty, które ci daje.",
     },
     freedomgpt: {
       maker: "Age of AI",
       basis: "Rodowód z otwartych wag. Kontekst 32K.",
       good: "Bezpośrednie, szybkie odpowiedzi bez morałów. Chatbot, który otworzył kategorię wolności słowa, nastawiony na prosty przekaz.",
-      weak: "Narzędzia, kodowanie i głęboka analiza. Bystry, ale nie od ciężkiego rozumowania.",
+      weak: "Głębia. Narzędzia, kodowanie i długie wywody to nie jego teren. Po nieortodoksyjny pogląd z pełnym uzasadnieniem sięgnij po UncensoredLM.",
     },
     arya: {
       maker: "Gab",
       basis: "Model bazowy nieujawniony. Kontekst 131K.",
-      good: "Według własnego określenia asystent o prawicowym nachyleniu, odpowiadający na tematy, których inne modele odmawiają. Bystry, długi kontekst, korzysta z narzędzi.",
-      weak: "Kodowanie. Baza i trening nie są publicznie udokumentowane, więc traktuj szczegóły jako niepotwierdzone.",
+      good: "Według własnego określenia asystent o prawicowym nachyleniu. Wybierz go, gdy chcesz właśnie tego nachylenia. Długi kontekst, korzysta z narzędzi.",
+      weak: "Rozpiętość. Z założenia argumentuje z jednej strony. Baza i trening są nieujawnione, więc traktuj szczegóły jako niepotwierdzone. Nie koduje.",
     },
     venice: {
       maker: "Venice.ai",
       basis: "Dolphin Mistral 24B, edycja Venice. Kontekst 128K, czyta obrazy.",
-      good: "Jeden z najniższych wskaźników odmów na rynku. Roleplay, fikcja, otwarta rozmowa. Pewny niecenzurowany domyślny wybór.",
-      weak: "Kod i ciężka analiza. Natywne wywołania narzędzi bywają zawodne, więc używa ścieżki opartej na promptach. W środku to dostrojony Mistral, i w polityce to widać.",
+      good: "Tani niecenzurowany model do wszystkiego, z jednym z najniższych wskaźników odmów na rynku. Fikcja, otwarta rozmowa, obrazy, kontekst 128K.",
+      weak: "Odmowy usunięte, nie zbudowany bez cenzury: to dostrojony Mistral i w mrocznych scenach oraz polityce to widać. Kod i ciężka analiza. Narzędzia idą ścieżką opartą na promptach.",
     },
     veniceRoleplay: {
       maker: "Venice.ai",
       basis: "24B dostrojone do roleplay. Kontekst 128K, czyta obrazy.",
-      good: "Postacie, które trzymają głos przez długie kampanie. Mroczne sceny i fikcja dla dorosłych, bez zrywania w środku historii.",
-      weak: "Wszystko analityczne. To narrator, nie asystent.",
+      good: "Długie kampanie. Kontekst 128K trzyma wczesne sceny w zasięgu, a model jest dostrojony, by trzymać głos postaci. Czyta obrazy: portrety postaci, szkice scen.",
+      weak: "Odmowy usunięte, nie zbudowany bez cenzury, więc bazowe spojrzenie potrafi złagodzić najmroczniejszy materiał. Wszystko analityczne: to narrator, nie asystent.",
+    },
+    deepseekFlash: {
+      maker: "DeepSeek (przez Venice)",
+      basis: "DeepSeek V4.1 Flash, odmowy usunięte. Kontekst 1M, czyta obrazy.",
+      good: "Ogromny kontekst na rozległe światy za niską cenę. Czyta obrazy, korzysta z narzędzi i napisze kod, gdy historia robi przerwę.",
+      weak: "Odmowy usunięte, spojrzenie DeepSeek zostało. W polityce i najmroczniejszych scenach potrafi się asekurować. Generalista, nie urodzony narrator.",
     },
     gemma: {
       maker: "Google (przez Venice)",
@@ -102,12 +114,6 @@ export const translations: typeof enTranslations = {
       basis: "Qwen 3.6 Plus, odmowy usunięte. Kontekst 256K, czyta obrazy.",
       good: "Najsilniejszy koder i analityk w niecenzurowanej serii. Dobrze rozumuje, czyta obrazy, trzyma długi kontekst.",
       weak: "Cena. Ta moc kosztuje za wiadomość więcej niż modele flash. Odmowy zniknęły, dane treningowe Alibaby zostały: w polityce licz się ze spojrzeniem modelu bazowego.",
-    },
-    glmHeretic: {
-      maker: "Z.AI (przez Venice)",
-      basis: "Abliterowane GLM 4.7 Flash. Kontekst 200K.",
-      good: "Grosze za wiadomość, szybkie odpowiedzi, bez morałów. Tani niecenzurowany wariant awaryjny.",
-      weak: "Analiza. Model flash poprzedniej generacji, trzymany za cenę i tempo.",
     },
     mimo: {
       maker: "Xiaomi (przez NanoGPT)",
@@ -133,14 +139,14 @@ export const translations: typeof enTranslations = {
     title: "Dlaczego opcje mają znaczenie",
     intro: "Wybór to nie dodatek. To cała istota rzeczy.",
     p1: "Odmowa jednego modelu to odpowiedź drugiego. Pytanie medyczne, prawny przypadek graniczny, kawałek fikcji, analiza bezpieczeństwa, pogląd spoza mainstreamu: pojedynczy filtrowany model decyduje za ciebie, o co wolno ci zapytać. Szeroki wachlarz modeli oddaje tę decyzję tobie.",
-    p2: "Niecenzurowana seria to też po prostu lepszy zestaw narzędzi. UncensoredLM do pytań politycznych i kontrowersyjnych, Qwen do kodu, który inni oznaczają, GLM 5.3 do czołowego rozumowania, Venice do fikcji, model flash do taniej masy, model o prawicowym nachyleniu dla perspektywy, której reszta stawki unika. Inne zadania, inne narzędzia. Modele mainstreamowe też zachowujesz, na tym samym koncie, na chwile, gdy filtr to dokładnie to, czego praca wymaga.",
+    p2: "Niecenzurowana seria to też po prostu lepszy zestaw narzędzi. UncensoredLM do mrocznego roleplay, fikcji tabu, polityki i poglądów, których mainstream unika. Venice Role Play do długich kampanii. Qwen do kodu, który inni oznaczają. GLM 5.3 do czołowego rozumowania. Model flash do taniej masy. Gab Arya, gdy świadomie chcesz prawicowego nachylenia. Inne zadania, inne narzędzia. Modele mainstreamowe też zachowujesz, na tym samym koncie, na chwile, gdy filtr to dokładnie to, czego praca wymaga.",
     callout:
       "Niecenzurowany nie znaczy beztroski. Odpowiadasz za to, co tworzysz, a prawo nadal obowiązuje. Zmienia się tu jedno: kto trzyma pokrętło. Ty, nie dostawca modelu.",
   },
   howToPick: {
     title: "Jak wybierać w praktyce",
-    p1: "Zacznij od zadania. Polityka, kontrowersje albo tematy tabu: UncensoredLM, jedyny zbudowany bez cenzury. Kod albo analiza: Qwen 3.6 Plus Uncensored lub pełne GLM 5.3 Uncensored. Fikcja i roleplay: Venice Uncensored lub Venice Role Play. Duże ilości, niski koszt, multimodalność: GLM 5.3 Flash, Gemma 4 albo MiMo.",
-    p2: "Chcesz świadomie obranego punktu widzenia: Gab Arya, według własnego określenia prawicowy. Prosto z mostu: FreedomGPT Liberty. Nie masz pewności? Postaw dwa obok siebie i porównaj je na własnym promptcie.",
+    p1: "Zacznij od zadania. Mroczny roleplay i fikcja tabu, pytania polityczne albo kontrowersyjne, pogląd spoza konsensusu: UncensoredLM, jedyny zbudowany bez cenzury. Kampanie dłuższe niż 32K albo sceny z obrazami: Venice Role Play. Tani model do wszystkiego: Venice Uncensored. Kod albo analiza: Qwen 3.6 Plus Uncensored lub pełne GLM 5.3 Uncensored. Duże ilości, niski koszt, multimodalność: GLM 5.3 Flash, Gemma 4 albo MiMo.",
+    p2: "Chcesz świadomie prawicowego nachylenia: Gab Arya, według własnego określenia. Prosto z mostu: FreedomGPT Liberty. Nie masz pewności? Postaw dwa obok siebie i porównaj je na własnym promptcie.",
     compareLink: "Porównaj {{a}} z {{b}}",
   },
   cta: {

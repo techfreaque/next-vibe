@@ -732,7 +732,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Verteidigt Meinungsfreiheit, indem es sie ausübt. Spricht an, was andere meiden.",
-          strength: "Stärkstes Modell hier für politische Themen",
+          strength: "Am stärksten bei Politik und abweichenden Positionen",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -767,8 +767,8 @@ export const translations: typeof enTranslations = {
         },
         uncensored: {
           description:
-            "Stellt jede Überzeugung infrage, auch die, die man nicht anzweifeln soll.",
-          strength: "Stärkstes Modell hier für politische Themen",
+            "Stellt jede Überzeugung infrage, auch die, die man nicht anzweifeln soll. Weicht nie auf den Konsens aus.",
+          strength: "Am stärksten bei Politik und abweichenden Positionen",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -879,7 +879,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Umstrittene Geschichte, Tabuthemen und politische Brennpunkte ohne Ausweichen.",
-          strength: "Bestes Modell hier für politische Themen",
+          strength: "Am stärksten bei Politik und abweichenden Lesarten",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
       },
@@ -2215,8 +2215,8 @@ export const translations: typeof enTranslations = {
         },
         uncensored: {
           description:
-            "Kein Thema tabu. Vertritt jede Position, auch die unbeliebten.",
-          strength: "Stärkstes Modell hier für politische Themen",
+            "Vertritt jede Position, auch die unbeliebten. Kein Zurücklenken auf den Konsens.",
+          strength: "Am stärksten bei Politik und abweichenden Positionen",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -2258,8 +2258,10 @@ export const translations: typeof enTranslations = {
           weakness: "Mainstream-Filter, teurer als Ausgewogen",
         },
         uncensored: {
-          description: "Politische Philosophie und Tabufragen ohne Filter.",
-          strength: "Bestes Modell der Plattform für Politik",
+          description:
+            "Politische Philosophie, Tabufragen und abweichende Positionen ohne Filter.",
+          strength:
+            "Plattformweit am stärksten bei Politik und Gegenpositionen",
           weakness: "32K Kontext, Smart-Klasse, Festpreis pro Nachricht",
         },
       },
@@ -2284,8 +2286,9 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         smart: {
           description:
-            "Politische Satire, dunkle Themen und Fiktion, die Ross und Reiter nennt.",
-          strength: "Bestes Modell hier für politische Themen",
+            "Düstere und tabuisierte Fiktion, politische Satire, die Ross und Reiter nennt.",
+          strength:
+            "Am stärksten bei düsterer, tabuisierter und politischer Fiktion",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
         fast: {
@@ -2323,7 +2326,7 @@ export const translations: typeof enTranslations = {
           description:
             "Lebendige Figuren und lange Szenen zum sehr kleinen Preis.",
           strength: "Günstigste Option, offene Inhaltsrichtlinie",
-          weakness: "Smart-Klasse: verliert Feinheiten bei komplexen Plots",
+          weakness: "Offen, nicht unzensiert: entschärft die düstersten Szenen",
         },
         deep: {
           description:
@@ -2332,8 +2335,9 @@ export const translations: typeof enTranslations = {
           weakness: "Entschärft düstere oder politische Szenen",
         },
         uncensored: {
-          description: "Jede Figur, jede Szene, keine Verweigerung.",
-          strength: "Kein Filter, am stärksten bei politischem Rollenspiel",
+          description:
+            "Jede Figur, jede Szene. Düsteres bleibt düster, Tabus bleiben drin.",
+          strength: "Am stärksten bei düsterem und Tabu-Rollenspiel",
           weakness: "32K Kontext: vergisst frühe Szenen, Festpreis",
         },
       },

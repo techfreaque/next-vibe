@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
     vendorRefusals:
       "Mainstream-Modelle behalten auch hier die Filter ihres Anbieters. GPT lehnt auf {{appName}} ab, was GPT überall ablehnt. Der Unterschied ist, was daneben zur Wahl steht.",
     twoKinds:
-      "Unzensiert gibt es in zwei Ausprägungen. UncensoredLM hat sein Labor vom ersten Trainingslauf an unzensiert trainiert. Fragst du nach Politik oder einem Tabuthema, antwortet es in deinem Rahmen, ohne Belehrung und ohne dich zur Konsenslinie zurückzulotsen. Jedes andere unzensierte Modell war zuerst ein Mainstream- oder offenes Modell, dem die Verweigerungen nachträglich entfernt wurden. Es sagt nicht mehr nein. Trainingsdaten und Grundhaltung des Ursprungslabors bleiben aber. Bei Politik kann es weiter einseitig gewichten, ausweichen oder die Sicht des Basismodells übernehmen. Uneingeschränkt heißt nicht neutral.",
+      "Unzensiert gibt es in zwei Ausprägungen. UncensoredLM hat sein Labor vom ersten Trainingslauf an unzensiert trainiert. Nimm es mit in düsteres Rollenspiel, ein Tabuthema, Politik oder eine Sicht abseits des Mainstreams, und es antwortet in deinem Rahmen, ohne Belehrung, ohne entschärfte Szene und ohne dich zur Konsenslinie zurückzulotsen. Jedes andere unzensierte Modell war zuerst ein Mainstream- oder offenes Modell, dem die Verweigerungen nachträglich entfernt wurden. Es sagt nicht mehr nein. Trainingsdaten und Grundhaltung des Ursprungslabors bleiben aber. Bei Politik kann es weiter einseitig gewichten, ausweichen oder die Sicht des Basismodells übernehmen, und in düsterer Fiktion entschärft es gern die Szene. Uneingeschränkt heißt nicht neutral.",
     modelsLink: "Alle Modelle nach Filterstufe ansehen",
   },
   switch: {
@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
     intro:
       "Entscheide nach der Aufgabe. Jeder Name führt zur Modellseite mit Preis und Eckdaten.",
     builtUncensored: {
-      title: "Politik und Tabufragen: von Grund auf unzensiert",
-      body: "UncensoredLM ist das einzige Modell hier, das sein Labor von Anfang an unzensiert trainiert hat. Politische, kontroverse und tabuisierte Fragen bekommen eine klare Antwort in dem Rahmen, den du vorgibst. Keine Moralpredigt, kein Zurücklenken auf den Konsens. Der Haken: 32K Kontext, nur Text, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte. Prüf die Fakten, die es dir liefert.",
+      title:
+        "Düsteres Rollenspiel, Politik, andere Perspektiven: von Grund auf unzensiert",
+      body: "UncensoredLM ist das einzige Modell hier, das sein Labor von Anfang an unzensiert trainiert hat. Düsteres und tabuisiertes Rollenspiel bleibt düster. Politische und kontroverse Fragen bekommen eine klare Antwort in dem Rahmen, den du vorgibst. Abweichende Positionen werden voll ausargumentiert. Keine Moralpredigt, kein Zurücklenken auf den Konsens. Der Haken: 32K Kontext, nur Text, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte. Prüf die Fakten, die es dir liefert.",
     },
     everyday: {
       title: "Alltagsarbeit, Mainstream-Filter",
@@ -67,18 +68,18 @@ export const translations: typeof enTranslations = {
     },
     unfiltered: {
       title: "Keine Absagen, echtes Denkvermögen",
-      body: "Die Schwergewichte unter den Modellen mit entfernten Verweigerungen. Starke Basismodelle ohne Absagereflex: Code, Analyse und lange Texte zu Themen, bei denen andere Modelle abblocken. Die Grundhaltung des Basismodells bleibt, für Politik daher zuerst UncensoredLM.",
+      body: "Die Schwergewichte unter den Modellen mit entfernten Verweigerungen. Starke Basismodelle ohne Absagereflex: Code, Analyse und lange Texte zu Themen, bei denen andere Modelle abblocken. Die Grundhaltung des Basismodells bleibt, für Politik, düsteres Rollenspiel und andere Perspektiven daher zuerst UncensoredLM.",
     },
     fiction: {
-      title: "Fiktion und Rollenspiel",
-      body: "Düstere Szenen, Erotik, Figuren, die ihre Stimme halten. Erzähler, keine Analysten.",
+      title: "Rollenspiel und düstere Fiktion",
+      body: "Für düstere und tabuisierte Szenen führt UncensoredLM: von Grund auf unzensiert, nichts entschärft die Geschichte. Venice Role Play für lange Kampagnen (128K Kontext) und Bildeingabe. Venice Uncensored als günstiger Allrounder.",
     },
     cheap: {
       title: "Günstig und schnell",
       body: "Viel Volumen für wenig Geld. Drei Flash-Modelle ohne Verweigerungen, dazu Claude Haiku, wenn ein Filter nicht stört.",
     },
     compare:
-      "Unentschlossen zwischen zwei Modellen? Preis, Kontextfenster und Fähigkeiten im direkten Vergleich. Am aufschlussreichsten: UncensoredLM gegen das Modell hinter ChatGPT und gegen ein Flaggschiff ohne Verweigerungen.",
+      "Unentschlossen zwischen zwei Modellen? Preis, Kontextfenster und Fähigkeiten im direkten Vergleich. Am aufschlussreichsten: UncensoredLM gegen das Modell hinter ChatGPT, gegen Venice Role Play und gegen ein Flaggschiff ohne Verweigerungen.",
     compareLink: "{{a}} mit {{b}} vergleichen",
     guideLink: "Zum Ratgeber über alle unzensierten Modelle",
   },

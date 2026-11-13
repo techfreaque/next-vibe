@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Unzensiert",
-      line: "Keine Verweigerung, keine Moralpredigt. UncensoredLM ist von Grund auf unzensiert, die übrigen sind bestehende Modelle ohne Verweigerungen, mit der Grundhaltung ihres Basismodells.",
+      line: "Keine Verweigerung, keine Moralpredigt. Für düsteres Rollenspiel, Politik und andere Perspektiven: UncensoredLM, als einziges von Grund auf unzensiert. Den übrigen wurden die Verweigerungen entfernt, die Grundhaltung ihres Basismodells bleibt.",
     },
   },
   modality: {

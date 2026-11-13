@@ -306,6 +306,12 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_FLASH_UNCENSORED],
+  // Built uncensored vs the roleplay/fiction picks (dark and taboo scenes).
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
+  [
+    ChatModelId.UNCENSORED_LM_V1_2,
+    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+  ],
   // Built uncensored vs the mainstream and open flagships.
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],

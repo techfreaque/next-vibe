@@ -1405,11 +1405,11 @@ export const translations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Uncensored.ai's model, the one in the catalog built uncensored from the start rather than stripped after the fact. Political, controversial and taboo questions get a straight answer in the frame you ask, with no moralizing and no steer back to the consensus line. Calls tools, 32K context, text only. Experimental, not for code, and it states contested claims as plainly as settled ones, so check its facts.",
+          "Uncensored.ai's model, the one in the catalog built uncensored from the start rather than stripped after the fact. The pick for dark and taboo roleplay and fiction, political and controversial questions, and views outside the mainstream: no softened scenes, no moralizing, no steer back to the consensus line. Calls tools, 32K context, text only. Experimental, not for code, and it states contested claims as plainly as settled ones, so check its facts.",
         freedomgptLiberty:
-          "Age of AI's flagship uncensored model, the free-speech chatbot that started the category. Built on open weights, tuned for blunt answers with no lecture. Fast and quick-witted, 32K context. Light on tools, coding and deep analysis. For those, Qwen 3.6 Plus Uncensored is the stronger pick.",
+          "Age of AI's flagship uncensored model, the free-speech chatbot that started the category. Built on open weights, tuned for blunt answers with no lecture. Fast and quick-witted, 32K context. Light on tools, coding and deep analysis: Qwen 3.6 Plus Uncensored is stronger there. For a heterodox view argued in full, UncensoredLM goes further.",
         gabAiArya:
-          "Gab's uncensored assistant, positioned on the political right by its maker and built to answer without the usual guardrails. Smart, 131K context, reads images and video, calls tools. A deliberately different viewpoint in the catalog. Weaker at coding, and its base model is undisclosed.",
+          "Gab's uncensored assistant, positioned on the political right by its maker and built to answer without the usual guardrails. Smart, 131K context, reads images and video, calls tools. Pick it when you want that slant on purpose; for other viewpoints without a house line, UncensoredLM is built uncensored. Weaker at coding, and its base model is undisclosed.",
         gemini31ProPreviewCustomTools:
           "The custom-tools preview of Gemini 3.1 Pro, tuned to call the tools you define instead of falling back to bash. Built for coding agents and multi-tool workflows, with 1M context and text, image, video and audio input. A preview build. Gemini 4 Argon is the newer Pro-class pick at a similar price.",
         gemini31FlashImagePreview:
@@ -1451,13 +1451,13 @@ export const translations = {
         dolphinLlama3_70B:
           "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
         veniceUncensored:
-          "Venice's own uncensored model, Dolphin Mistral 24B in a Venice edition. Among the lowest refusal rates anywhere: roleplay, fiction, open-ended unfiltered talk. Reads images, 128K context, cheap. A decensoring fine-tune, so Mistral's framing still shows on politics; UncensoredLM is the built-uncensored pick there. Weak at code and heavy analysis. For that, take Qwen 3.6 Plus Uncensored.",
+          "Venice's own uncensored model, Dolphin Mistral 24B in a Venice edition. Among the lowest refusal rates anywhere: fiction, open-ended unfiltered talk. Reads images, 128K context, cheap. A decensoring fine-tune, so Mistral's framing still shows on politics and the darkest scenes; UncensoredLM is the built-uncensored pick for dark roleplay, politics and other viewpoints. Weak at code and heavy analysis. For that, take Qwen 3.6 Plus Uncensored.",
         veniceUncensoredRoleplay:
-          "Venice's 24B model tuned for roleplay, with refusals trained out. Characters hold their voice across long campaigns, through dark scenes and adult fiction, with no moral break mid-story. Reads images, 128K context. A storyteller, not an assistant, so skip it for analysis or code. Venice Uncensored is the cheaper all-round pick.",
+          "Venice's 24B model tuned for roleplay, with refusals trained out. Characters hold their voice across long campaigns, with no moral break mid-story. Reads images, 128K context. Refusals removed, not built uncensored, so for the darkest and most taboo material UncensoredLM goes further; this one wins on long campaigns and image input. A storyteller, not an assistant, so skip it for analysis or code.",
         gemma4Uncensored:
           "Google's Gemma 4 26B mixture-of-experts with the filter stripped, served by Venice. Fast, cheap, reads images, calls tools, 256K context. Refusals are gone, Google's training is not, so its take on hot topics still follows the base model. For harder reasoning without refusals, GLM 5.3 Flash Uncensored costs a little more and goes further.",
         qwen36PlusUncensored:
-          "Alibaba's Qwen 3.6 Plus reasoning model with the refusals removed, served by Venice. One of the strongest coders and analysts in the uncensored set. Reads images, calls tools, 256K context. It no longer refuses, but Qwen's training still frames politics; for that, UncensoredLM is built uncensored. Costs more than the flash models. GLM 5.3 Uncensored is the other heavy hitter, with 1M context but text only.",
+          "Alibaba's Qwen 3.6 Plus reasoning model with the refusals removed, served by Venice. One of the strongest coders and analysts in the uncensored set. Reads images, calls tools, 256K context. It no longer refuses, but Qwen's training still frames politics; for politics, dark roleplay and other viewpoints, UncensoredLM is built uncensored. Costs more than the flash models. GLM 5.3 Uncensored is the other heavy hitter, with 1M context but text only.",
         glm47FlashHeretic:
           "An abliterated GLM 4.7 Flash: refusal behavior stripped out, so it answers instead of lecturing. Pennies per message, fast, calls tools, good for unfiltered chat and creative writing. Base GLM's training still shapes its views. Weak at deep analysis. GLM 5.3 Flash Uncensored is the newer, smarter uncensored pick for a bit more.",
         glm53Abliterated:
@@ -1467,7 +1467,7 @@ export const translations = {
         mimoV26FlashAbliterated:
           "Xiaomi's MiMo V2.6 Flash with the refusal direction ablated. Fast, reads images, calls tools, 1M context. Good for high-volume unfiltered work, but it trades depth for speed, and the base model's framing stays. Costs more than twice as much as GLM 5.3 Flash Uncensored, which covers similar ground.",
         glm53Uncensored:
-          "The full GLM 5.3 reasoning model from Z.AI with its refusals removed. The heavy hitter of the uncensored set: code, long-form writing, analysis and tools, 1M context. Unrestricted, not neutral: on politics it can still hedge the way base GLM does, so take UncensoredLM there. Text only, slower than the flash models, still experimental. GLM 5.3 Flash Uncensored is the cheaper, faster everyday option.",
+          "The full GLM 5.3 reasoning model from Z.AI with its refusals removed. The heavy hitter of the uncensored set: code, long-form writing, analysis and tools, 1M context. Unrestricted, not neutral: on politics it can still hedge the way base GLM does, so take UncensoredLM for politics, dark roleplay and other viewpoints. Text only, slower than the flash models, still experimental. GLM 5.3 Flash Uncensored is the cheaper, faster everyday option.",
         glm53FlashUncensored:
           "Z.AI's GLM 5.3 Flash with the refusals removed: a 320B mixture-of-experts. Fast, cheap, reads images, calls tools, 1M context. The daily driver for unfiltered work, with base GLM's framing intact on politics. For the hardest reasoning, step up to the full GLM 5.3 Uncensored.",
         veniceLustifyV8:
@@ -1876,7 +1876,7 @@ export const translations = {
         mistralLarge4:
           "Mistral AI's flagship, from a European lab. Good at code and analysis, reads images, calls tools, 1M context, at a moderate price. Mainstream filters. Not top tier: DeepSeek V4 Pro costs a little more and reasons deeper.",
         veniceDeepseekV41FlashUncensored:
-          "DeepSeek V4.1 Flash with the refusals removed, served by Venice. Real coding and analysis plus fiction and roleplay, no lectures. Reads images, calls tools, 1M context, cheap. DeepSeek's training still frames political answers. Around four times the price of plain DeepSeek V4.1 Flash. GLM 5.3 Flash Uncensored is the cheaper unfiltered alternative.",
+          "DeepSeek V4.1 Flash with the refusals removed, served by Venice. Real coding and analysis plus fiction and roleplay, no lectures. Reads images, calls tools, 1M context, cheap. DeepSeek's training still frames political answers and can soften the darkest scenes; UncensoredLM is built uncensored for that. Around four times the price of plain DeepSeek V4.1 Flash. GLM 5.3 Flash Uncensored is the cheaper unfiltered alternative.",
         grokImagineImage2:
           "xAI's second-generation Grok Imagine image model. Takes text or a reference image, so it handles edits as well as fresh images. Mid-range price. Open tier: lighter filters than mainstream, not explicit. The upgrade over Grok Imagine T2I when you need edits or tighter prompt adherence.",
         qwenImage3:

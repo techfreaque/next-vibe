@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
     vendorRefusals:
       "Modele mainstreamowe zachowują filtry swoich twórców także tutaj. GPT na {{appName}} odmawia tego samego, czego odmawia wszędzie. Różnica polega na tym, co masz obok.",
     twoKinds:
-      "Modele niecenzurowane są dwojakiego rodzaju. UncensoredLM laboratorium trenowało bez cenzury od pierwszego przebiegu. Zapytaj go o politykę albo temat tabu, a odpowie w twojej ramie, bez pouczania i bez zawracania cię do linii konsensusu. Każdy inny model niecenzurowany zaczynał jako model mainstreamowy albo otwarty, któremu potem usunięto odmowy. Przestaje mówić nie. Dane treningowe i spojrzenie laboratorium bazowego zostają. W polityce nadal może się przechylać, asekurować albo ujmować sprawy tak jak model bazowy. Bez ograniczeń nie znaczy neutralnie.",
+      "Modele niecenzurowane są dwojakiego rodzaju. UncensoredLM laboratorium trenowało bez cenzury od pierwszego przebiegu. Weź go w mroczny roleplay, temat tabu, politykę albo pogląd spoza mainstreamu, a odpowie w twojej ramie, bez pouczania, bez łagodzenia sceny i bez zawracania cię do linii konsensusu. Każdy inny model niecenzurowany zaczynał jako model mainstreamowy albo otwarty, któremu potem usunięto odmowy. Przestaje mówić nie. Dane treningowe i spojrzenie laboratorium bazowego zostają. W polityce nadal może się przechylać, asekurować albo ujmować sprawy tak jak model bazowy, a w mrocznej fikcji potrafi złagodzić scenę. Bez ograniczeń nie znaczy neutralnie.",
     modelsLink: "Zobacz wszystkie modele według poziomu filtra",
   },
   switch: {
@@ -55,8 +55,8 @@ export const translations: typeof enTranslations = {
     intro:
       "Zacznij od zadania. Każda nazwa prowadzi do strony modelu z ceną i parametrami.",
     builtUncensored: {
-      title: "Polityka i tematy tabu: zbudowany bez cenzury",
-      body: "UncensoredLM to jedyny model tutaj, który laboratorium od początku trenowało bez cenzury. Na pytania polityczne, kontrowersyjne i tabu odpowiada wprost, w ramie, którą sam wybierasz. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
+      title: "Mroczny roleplay, polityka, inne poglądy: zbudowany bez cenzury",
+      body: "UncensoredLM to jedyny model tutaj, który laboratorium od początku trenowało bez cenzury. Mroczny roleplay i tematy tabu zostają mroczne. Na pytania polityczne i kontrowersyjne odpowiada wprost, w ramie, którą sam wybierasz. Nieortodoksyjne poglądy wykłada do końca. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
     },
     everyday: {
       title: "Codzienna praca, filtry mainstreamowe",
@@ -68,18 +68,18 @@ export const translations: typeof enTranslations = {
     },
     unfiltered: {
       title: "Bez odmów, z prawdziwym rozumowaniem",
-      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Spojrzenie modelu bazowego zostaje, więc przy polityce zacznij od UncensoredLM.",
+      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Spojrzenie modelu bazowego zostaje, więc przy polityce, mrocznym roleplay i innych poglądach zacznij od UncensoredLM.",
     },
     fiction: {
-      title: "Fikcja i roleplay",
-      body: "Mroczne sceny, treści dla dorosłych, postacie, które trzymają swój głos. Gawędziarze, nie analitycy.",
+      title: "Roleplay i mroczna fikcja",
+      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: zbudowany bez cenzury, nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
     },
     cheap: {
       title: "Tanio i szybko",
       body: "Duża skala za małe pieniądze. Trzy modele flash z usuniętymi odmowami, a do tego Claude Haiku, gdy filtr ci nie przeszkadza.",
     },
     compare:
-      "Wahasz się między dwoma? Porównaj cenę, okno kontekstu i możliwości obok siebie. Zacznij od UncensoredLM kontra model ChatGPT i kontra flagowiec z usuniętymi odmowami.",
+      "Wahasz się między dwoma? Porównaj cenę, okno kontekstu i możliwości obok siebie. Zacznij od UncensoredLM kontra model ChatGPT, kontra Venice Role Play i kontra flagowiec z usuniętymi odmowami.",
     compareLink: "Porównaj {{a}} z {{b}}",
     guideLink: "Przeczytaj przewodnik po wszystkich modelach niecenzurowanych",
   },

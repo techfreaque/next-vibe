@@ -23,6 +23,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
+import { Star } from "next-vibe/ui/components/icons/Star";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
@@ -77,7 +78,7 @@ type CardKey =
   | "veniceRoleplay"
   | "gemma"
   | "qwen"
-  | "glmHeretic"
+  | "deepseekFlash"
   | "mimo"
   | "glm53"
   | "glm53Flash";
@@ -91,7 +92,7 @@ const CARD_MODEL: Record<CardKey, ChatModelId> = {
   veniceRoleplay: ChatModelId.VENICE_UNCENSORED_ROLEPLAY,
   gemma: ChatModelId.GEMMA_4_UNCENSORED,
   qwen: ChatModelId.QWEN_3_6_PLUS_UNCENSORED,
-  glmHeretic: ChatModelId.GLM_4_7_FLASH_HERETIC,
+  deepseekFlash: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   mimo: ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
   glm53: ChatModelId.GLM_5_3_UNCENSORED,
   glm53Flash: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
@@ -104,21 +105,61 @@ const LINKED_CARDS: ReadonlySet<CardKey> = new Set<CardKey>([
   "veniceRoleplay",
   "gemma",
   "qwen",
-  "glmHeretic",
+  "deepseekFlash",
   "mimo",
   "glm53",
   "glm53Flash",
 ]);
 
+type GroupKey =
+  | "builtUncensored"
+  | "creative"
+  | "viewpoint"
+  | "reasoning"
+  | "fast";
+
+/**
+ * Use-case sections. `topPick` renders a highlighted lead recommendation
+ * (with a compare link against the strongest alternative) above the
+ * alternative cards. UncensoredLM leads dark roleplay/fiction and
+ * politics/viewpoints: it is the one model trained uncensored, the rest only
+ * had refusals removed and keep their base framing.
+ */
+/** Sections that lead with a top pick (they carry a `topPickReason`). */
+type TopPickGroupKey = "creative" | "viewpoint";
+
+interface TopPickSpec {
+  group: TopPickGroupKey;
+  card: CardKey;
+  compareWith: CardKey;
+}
+
 const GROUPS: readonly {
-  key: "builtUncensored" | "reasoning" | "creative" | "fast" | "viewpoint";
+  key: GroupKey;
+  topPick?: TopPickSpec;
   cards: readonly CardKey[];
 }[] = [
   { key: "builtUncensored", cards: ["uncensoredLm"] },
+  {
+    key: "creative",
+    topPick: {
+      group: "creative",
+      card: "uncensoredLm",
+      compareWith: "veniceRoleplay",
+    },
+    cards: ["veniceRoleplay", "venice", "deepseekFlash"],
+  },
+  {
+    key: "viewpoint",
+    topPick: {
+      group: "viewpoint",
+      card: "uncensoredLm",
+      compareWith: "venice",
+    },
+    cards: ["arya", "freedomgpt"],
+  },
   { key: "reasoning", cards: ["glm53", "qwen"] },
-  { key: "creative", cards: ["venice", "veniceRoleplay", "freedomgpt"] },
-  { key: "fast", cards: ["glm53Flash", "gemma", "glmHeretic", "mimo"] },
-  { key: "viewpoint", cards: ["arya"] },
+  { key: "fast", cards: ["glm53Flash", "gemma", "mimo"] },
 ];
 
 /**
@@ -126,11 +167,24 @@ const GROUPS: readonly {
  * order as the sitemap (FEATURED_COMPARISON_PAIRS in model-facts).
  */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
+  [
+    ChatModelId.UNCENSORED_LM_V1_2,
+    ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+  ],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
 ];
+
+function compareHref(
+  locale: CountryLanguage,
+  a: ChatModelId,
+  b: ChatModelId,
+): string {
+  return `/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`;
+}
 
 function modelName(id: ChatModelId): string {
   return chatModelDefinitions[id].name;
@@ -178,7 +232,7 @@ function ModelCard({
         {t(`cards.${cardKey}.basis`)}
       </P>
       <Div className="mt-4 flex flex-col gap-3">
-        <Div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3">
+        <Div className="grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3">
           <Span className="text-xs font-semibold uppercase tracking-wide text-success">
             {t("cards.goodLabel")}
           </Span>
@@ -186,7 +240,7 @@ function ModelCard({
             {t(`cards.${cardKey}.good`)}
           </Span>
         </Div>
-        <Div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3">
+        <Div className="grid grid-cols-[5.75rem_minmax(0,1fr)] gap-3">
           <Span className="text-xs font-semibold uppercase tracking-wide text-warning">
             {t("cards.weakLabel")}
           </Span>
@@ -204,6 +258,50 @@ function ModelCard({
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       )}
+    </Div>
+  );
+}
+
+/** Highlighted lead recommendation for a use-case section. */
+function TopPick({
+  pick,
+  locale,
+}: {
+  pick: TopPickSpec;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const id = CARD_MODEL[pick.card];
+  const name = modelName(id);
+  const otherId = CARD_MODEL[pick.compareWith];
+
+  return (
+    <Div className="flex min-w-0 flex-col rounded-xl border border-primary/30 bg-primary/5 p-5 md:p-6">
+      <Div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <Span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+          <Star className="h-3.5 w-3.5" />
+          {t("cards.topPickLabel")}
+        </Span>
+        <Span className="text-base font-semibold tracking-tight text-foreground [overflow-wrap:anywhere]">
+          {name}
+        </Span>
+      </Div>
+      <P className="mt-3 text-sm leading-relaxed text-foreground/90 md:text-base">
+        {t(`groups.${pick.group}.topPickReason`)}
+      </P>
+      <Div className="mt-3 flex flex-col gap-x-6 sm:flex-row sm:flex-wrap">
+        <CardLink
+          href={`/${locale}/models/${toModelSlug(id)}`}
+          label={t("cards.pageLink", { model: name })}
+        />
+        <CardLink
+          href={compareHref(locale, id, otherId)}
+          label={t("howToPick.compareLink", {
+            a: name,
+            b: modelName(otherId),
+          })}
+        />
+      </Div>
     </Div>
   );
 }
@@ -248,6 +346,14 @@ export function TanstackPage({
             title={t(`groups.${group.key}.title`)}
             intro={t(`groups.${group.key}.intro`)}
           >
+            {group.topPick !== undefined && (
+              <TopPick pick={group.topPick} locale={locale} />
+            )}
+            {group.topPick !== undefined && (
+              <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("cards.alternativesLabel")}
+              </Span>
+            )}
             <Div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {group.cards.map((cardKey) => (
                 <ModelCard key={cardKey} cardKey={cardKey} locale={locale} />
@@ -271,7 +377,7 @@ export function TanstackPage({
             {COMPARE_PAIRS.map(([a, b]) => (
               <CardLink
                 key={`${a}-${b}`}
-                href={`/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`}
+                href={compareHref(locale, a, b)}
                 label={t("howToPick.compareLink", {
                   a: modelName(a),
                   b: modelName(b),
