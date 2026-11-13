@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
   filter: {
     title: "Co tu znaczy „bez cenzury”",
     intro: "Trzy poziomy. Ty wybierasz.",
-    p1: "Każdy model ma poziom treści. Modele mainstreamowe zostawiają filtry dostawcy. Otwarte są luźniejsze. Modele bez cenzury odpowiadają bez umoralniania.",
+    p1: "Każdy model ma poziom treści. Modele mainstreamowe zostawiają filtry dostawcy. Otwarte są luźniejsze. Modele bez cenzury odpowiadają bez umoralniania. Jeden z nich, UncensoredLM, powstał bez cenzury; pozostałe to istniejące modele z usuniętymi odmowami, więc ich bazowy trening nadal kształtuje odpowiedzi.",
     p2: "Nikt nie wybiera poziomu za Ciebie. Mainstream do pracy, bez cenzury do pytania, na które nikt inny nie odpowie - ten sam czat, to samo konto.",
     mainstream: "Mainstream",
     open: "Otwarte",

@@ -6,7 +6,7 @@ export const translations = {
     category: "Guide",
     imageAlt: "{{appName}}: a ChatGPT alternative without filters",
     keywords:
-      "ChatGPT alternative, ChatGPT alternative without filters, uncensored ChatGPT alternative, ChatGPT without restrictions, unfiltered AI chat, uncensored AI, {{appName}}, Claude, GPT, Gemini, DeepSeek, Venice",
+      "ChatGPT alternative, ChatGPT alternative without filters, uncensored ChatGPT alternative, ChatGPT without restrictions, unfiltered AI chat, uncensored AI, UncensoredLM, uncensored AI for politics, {{appName}}, Claude, GPT, Gemini, DeepSeek, Venice",
   },
   hero: {
     backToBlog: "Back to Blog",
@@ -23,7 +23,7 @@ export const translations = {
   exists: {
     title: "Is there a ChatGPT without filters?",
     p1: "Not from OpenAI. GPT models follow OpenAI's usage policies wherever you run them. Claude and Gemini follow their own vendors' rules. Any app that promises an unfiltered GPT is overselling.",
-    p2: "What a real alternative does is put other models next to them. {{appName}} runs the mainstream models and, in the same chat, open models with light filters and uncensored models with none. You decide which one answers.",
+    p2: "What a real alternative does is put other models next to them. {{appName}} runs the mainstream models and, in the same chat, open models with light filters and uncensored models with no filter at all. One of them, UncensoredLM, was built uncensored from the start. You decide which one answers.",
   },
   tiers: {
     title: 'What does "without filters" actually mean?',
@@ -32,9 +32,11 @@ export const translations = {
       "Mainstream ({{count}} models): Claude, GPT, Gemini, Mistral. Big-lab safety filters. They decline sensitive topics.",
     open: "Open ({{count}} models): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax and more. Light filters. They take on most edgy topics.",
     uncensored:
-      "Uncensored ({{count}} models): Venice, plus uncensored builds of GLM, Qwen, Gemma and DeepSeek. No filter. You set the limits.",
+      "Uncensored ({{count}} models): UncensoredLM, built uncensored from the start. Plus Venice and uncensored builds of GLM, Qwen, Gemma and DeepSeek: existing models with their refusals removed. No filter. You set the limits.",
     vendorRefusals:
       "Mainstream models keep their vendor's filters here too. GPT on {{appName}} refuses what GPT refuses everywhere. The difference is what sits next to it.",
+    twoKinds:
+      "Uncensored comes in two kinds. UncensoredLM was trained uncensored by its lab from the first run. Ask it about politics or a taboo topic and it answers in your frame, with no lecture and no nudge back to the consensus line. Every other uncensored model started as a mainstream or open model and had its refusals stripped out. They stop saying no. Their training data and the base lab's framing stay. On politics they can still lean, hedge or frame things the way the base model does. Unrestricted, not neutral.",
     modelsLink: "Browse every model by filter level",
   },
   switch: {
@@ -49,6 +51,10 @@ export const translations = {
     title: "Which model should I use instead of ChatGPT?",
     intro:
       "Start from the job. Each name links to the model's page with price and specs.",
+    builtUncensored: {
+      title: "Politics and taboo questions: built uncensored",
+      body: "UncensoredLM is the one model here its lab trained to be uncensored from the start. Political, controversial and taboo questions get a straight answer in the frame you ask. No moralizing, no steer back to the consensus. The catch: 32K context, text only, not for code, and it states contested claims as plainly as settled ones. Check the facts it gives you.",
+    },
     everyday: {
       title: "Everyday work, mainstream filters",
       body: "Writing, research, code, analysis. The closest match to ChatGPT, with the same kind of filters.",
@@ -58,8 +64,8 @@ export const translations = {
       body: "Strong open models with light filters. They answer most of what a mainstream model dodges and hold up on code and reasoning.",
     },
     unfiltered: {
-      title: "No filter, real reasoning",
-      body: "The heavy hitters of the uncensored tier. Code, analysis and long writing on topics other models flag.",
+      title: "No refusals, real reasoning",
+      body: "The heavy hitters among the refusal-stripped models. Strong base models with the refusals removed: code, analysis and long writing on topics other models flag. The base model's framing stays, so for politics start with UncensoredLM.",
     },
     fiction: {
       title: "Fiction and roleplay",
@@ -67,10 +73,10 @@ export const translations = {
     },
     cheap: {
       title: "Cheap and fast",
-      body: "High volume at a low price. Three unfiltered flash models, plus Claude Haiku for when a filter is fine.",
+      body: "High volume at a low price. Three refusal-stripped flash models, plus Claude Haiku for when a filter is fine.",
     },
     compare:
-      "Torn between two? Put price, context window and capabilities side by side.",
+      "Torn between two? Put price, context window and capabilities side by side. Start with UncensoredLM against ChatGPT's model and against a refusal-stripped flagship.",
     compareLink: "Compare {{a}} with {{b}}",
     guideLink: "Read the guide to every uncensored model",
   },
@@ -116,7 +122,7 @@ export const translations = {
     title: "What are the downsides?",
     intro: "Unfiltered comes with tradeoffs. Know them before you switch.",
     smaller:
-      "Most uncensored models are smaller than the frontier models. Several are built for conversation and fiction, not hard analysis. On the toughest reasoning and long coding jobs, top mainstream models still win.",
+      "Most uncensored models are smaller than the frontier models. Several are built for conversation and fiction, not hard analysis. UncensoredLM is built for frank answers, not for code. On the toughest reasoning and long coding jobs, top mainstream models still win.",
     tools:
       "Not every uncensored model supports tool calls. Check the model page before you count on web search or other tools.",
     vendor:

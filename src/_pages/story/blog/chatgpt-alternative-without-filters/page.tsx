@@ -85,13 +85,23 @@ export const generateMetadata = async ({
   });
 };
 
-type PickGroup = "everyday" | "open" | "unfiltered" | "fiction" | "cheap";
+type PickGroup =
+  | "builtUncensored"
+  | "everyday"
+  | "open"
+  | "unfiltered"
+  | "fiction"
+  | "cheap";
 
 /**
  * Model picks per job. All public, enabled, non-admin models.
  * Ids, names and page slugs are read from the registry.
  */
 const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
+  {
+    key: "builtUncensored",
+    models: [ChatModelId.UNCENSORED_LM_V1_2],
+  },
   {
     key: "everyday",
     models: [
@@ -134,8 +144,14 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
   },
 ];
 
-/** Side-by-side pairs worth a look: a mainstream pick vs its unfiltered rival. */
+/**
+ * Side-by-side pairs worth a look: the built-uncensored model against
+ * ChatGPT's model and a refusal-stripped flagship, then a mainstream pick vs
+ * its unfiltered rival. Same URL order as the sitemap (FEATURED_COMPARISON_PAIRS).
+ */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.GPT_6_1_SOL, ChatModelId.KIMI_K3_1_PRO],
 ];
@@ -251,6 +267,7 @@ export function TanstackPage({
           <Callout icon={AlertTriangle} tone="warning">
             {t("tiers.vendorRefusals", { appName })}
           </Callout>
+          <ArticleP>{t("tiers.twoKinds")}</ArticleP>
           <CardLink href={`/${locale}/models`} label={t("tiers.modelsLink")} />
         </ArticleSection>
 

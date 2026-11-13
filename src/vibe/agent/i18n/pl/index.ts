@@ -1388,7 +1388,7 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Model rozumujący od Uncensored.ai, destylat DeepSeek-R1 na bazie Qwen 14B. Myśli na głos, odpowiada wprost, wywołuje narzędzia. 32K kontekstu. Eksperymentalny i nie do kodu. Z tym lepiej i taniej poradzi sobie GLM 5.3 Uncensored.",
+          "Model od Uncensored.ai i jedyny w katalogu zbudowany bez cenzury od początku, a nie odblokowany po fakcie. Na pytania polityczne, kontrowersyjne i tabu odpowiada wprost, w ramie, którą wybierasz, bez moralizowania i bez zawracania do linii konsensusu. Wywołuje narzędzia, 32K kontekstu, tylko tekst. Eksperymentalny, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone, więc sprawdzaj fakty.",
         freedomgptLiberty:
           "Flagowy model bez cenzury od Age of AI, czatbot wolności słowa, od którego zaczęła się cała kategoria. Zbudowany na otwartych wagach, nastawiony na dosadne odpowiedzi bez moralizowania. Szybki i błyskotliwy, 32K kontekstu. Słabszy w narzędziach, kodzie i głębokiej analizie. Do tego lepiej sprawdzi się Qwen 3.6 Plus Uncensored.",
         gabAiArya:
@@ -1434,25 +1434,25 @@ export const translations: typeof enTranslations = {
         dolphinLlama3_70B:
           "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
         veniceUncensored:
-          "Własny model Venice bez cenzury, czyli Dolphin Mistral 24B w edycji Venice. Jeden z najniższych wskaźników odmów na rynku: roleplay, fikcja, swobodne rozmowy bez filtra. Czyta obrazy, 128K kontekstu, tani. Słaby w kodzie i cięższej analizie. Do tego weź Qwen 3.6 Plus Uncensored.",
+          "Własny model Venice bez cenzury, czyli Dolphin Mistral 24B w edycji Venice. Jeden z najniższych wskaźników odmów na rynku: roleplay, fikcja, swobodne rozmowy bez filtra. Czyta obrazy, 128K kontekstu, tani. To dostrojenie znoszące cenzurę, więc w polityce nadal widać spojrzenie Mistrala; tam lepszy jest UncensoredLM, zbudowany bez cenzury. Słaby w kodzie i cięższej analizie. Do tego weź Qwen 3.6 Plus Uncensored.",
         veniceUncensoredRoleplay:
-          "Model Venice 24B dostrojony do roleplayu. Postacie trzymają swój głos przez długie kampanie, w mrocznych scenach i fikcji dla dorosłych, bez moralnych przerw w połowie historii. Czyta obrazy, 128K kontekstu. To narrator, nie asystent, więc do analizy i kodu się nie nadaje. Venice Uncensored to tańszy wybór na co dzień.",
+          "Model Venice 24B dostrojony do roleplayu, z odmowami usuniętymi w treningu. Postacie trzymają swój głos przez długie kampanie, w mrocznych scenach i fikcji dla dorosłych, bez moralnych przerw w połowie historii. Czyta obrazy, 128K kontekstu. To narrator, nie asystent, więc do analizy i kodu się nie nadaje. Venice Uncensored to tańszy wybór na co dzień.",
         gemma4Uncensored:
-          "Gemma 4 26B od Google w architekturze mixture-of-experts, z usuniętym filtrem, dostarczana przez Venice. Szybka, tania, czyta obrazy, wywołuje narzędzia, 256K kontekstu. Odpowiada błyskawicznie, ale głęboko nie myśli. Do trudniejszego rozumowania bez odmów weź GLM 5.3 Flash Uncensored: trochę droższy, ale sięga dalej.",
+          "Gemma 4 26B od Google w architekturze mixture-of-experts, z usuniętym filtrem, dostarczana przez Venice. Szybka, tania, czyta obrazy, wywołuje narzędzia, 256K kontekstu. Odmowy zniknęły, trening Google został, więc gorące tematy ujmuje nadal jak model bazowy. Do trudniejszego rozumowania bez odmów weź GLM 5.3 Flash Uncensored: trochę droższy, ale sięga dalej.",
         qwen36PlusUncensored:
-          "Model rozumujący Qwen 3.6 Plus od Alibaby bez odmów, dostarczany przez Venice. Jeden z najmocniejszych programistów i analityków wśród modeli bez cenzury. Czyta obrazy, wywołuje narzędzia, 256K kontekstu. Droższy od modeli flash. Drugi ciężki zawodnik to GLM 5.3 Uncensored: 1M kontekstu, ale tylko tekst.",
+          "Model rozumujący Qwen 3.6 Plus od Alibaby bez odmów, dostarczany przez Venice. Jeden z najmocniejszych programistów i analityków wśród modeli bez cenzury. Czyta obrazy, wywołuje narzędzia, 256K kontekstu. Już nie odmawia, ale trening Qwena wciąż kształtuje jego spojrzenie na politykę; do tego jest UncensoredLM, zbudowany bez cenzury. Droższy od modeli flash. Drugi ciężki zawodnik to GLM 5.3 Uncensored: 1M kontekstu, ale tylko tekst.",
         glm47FlashHeretic:
-          "Zabliterowany GLM 4.7 Flash: odmowy usunięte, więc odpowiada zamiast prawić kazania. Grosze za wiadomość, szybki, obsługuje narzędzia, dobry do niefiltrowanych rozmów i pisania twórczego. Słaby w głębokiej analizie. GLM 5.3 Flash Uncensored to nowszy i bystrzejszy wybór bez cenzury, trochę droższy.",
+          "Zabliterowany GLM 4.7 Flash: odmowy usunięte, więc odpowiada zamiast prawić kazania. Grosze za wiadomość, szybki, obsługuje narzędzia, dobry do niefiltrowanych rozmów i pisania twórczego. Trening bazowego GLM nadal kształtuje jego poglądy. Słaby w głębokiej analizie. GLM 5.3 Flash Uncensored to nowszy i bystrzejszy wybór bez cenzury, trochę droższy.",
         glm53Abliterated:
-          "GLM 5.3 Abliterated - Pełny GLM-5.3, któremu Abliteration.ai wycięło odmowy prosto z wag. Czołowe rozumowanie, narzędzia, kontekst 1M. Najcięższy kaliber.",
+          "Pełny GLM 5.3, któremu Abliteration.ai wycięło odmowy prosto z wag. Czołowe rozumowanie, narzędzia, kontekst 1M. Najcięższy kaliber. Odmów brak, ale trening i spojrzenie bazowego GLM zostają.",
         deepseekV41FlashAbliterated:
-          "DeepSeek V4.1 Flash Abliterated - DeepSeek V4.1 Flash bez odmów od Abliteration.ai. MoE 552B, mocne rozumowanie, rozumie obrazy, używa narzędzi. Kontekst 1M.",
+          "DeepSeek V4.1 Flash bez odmów od Abliteration.ai. MoE 552B, mocne rozumowanie, rozumie obrazy, używa narzędzi. Kontekst 1M. Przestaje mówić nie, ale spojrzenie DeepSeeka zostaje.",
         mimoV26FlashAbliterated:
-          "MiMo V2.6 Flash od Xiaomi z wyciętym kierunkiem odmów (abliteracja). Szybki, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Dobry do dużych ilości pracy bez filtra, ale głębię oddaje za szybkość. Kosztuje ponad dwa razy więcej niż GLM 5.3 Flash Uncensored, który robi podobne rzeczy.",
+          "MiMo V2.6 Flash od Xiaomi z wyciętym kierunkiem odmów (abliteracja). Szybki, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Dobry do dużych ilości pracy bez filtra, ale głębię oddaje za szybkość, a spojrzenie modelu bazowego zostaje. Kosztuje ponad dwa razy więcej niż GLM 5.3 Flash Uncensored, który robi podobne rzeczy.",
         glm53Uncensored:
-          "Pełny model rozumujący GLM 5.3 od Z.AI, bez cenzury. Najcięższy zawodnik wśród modeli bez cenzury: kod, długie teksty, analiza i narzędzia bez odmów, 1M kontekstu. Tylko tekst, wolniejszy od modeli flash i wciąż oznaczony jako eksperymentalny. Na co dzień taniej i szybciej wyjdzie GLM 5.3 Flash Uncensored.",
+          "Pełny model rozumujący GLM 5.3 od Z.AI z usuniętymi odmowami. Najcięższy zawodnik wśród modeli bez cenzury: kod, długie teksty, analiza i narzędzia, 1M kontekstu. Bez ograniczeń nie znaczy neutralnie: w polityce nadal potrafi się asekurować jak bazowy GLM, więc tam weź UncensoredLM. Tylko tekst, wolniejszy od modeli flash i wciąż eksperymentalny. Na co dzień taniej i szybciej wyjdzie GLM 5.3 Flash Uncensored.",
         glm53FlashUncensored:
-          "GLM 5.3 Flash od Z.AI bez cenzury: mixture-of-experts z 320B parametrów. Szybki, tani, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Model na co dzień do pracy bez filtra. Do najtrudniejszego rozumowania przesiądź się na pełny GLM 5.3 Uncensored.",
+          "GLM 5.3 Flash od Z.AI z usuniętymi odmowami: mixture-of-experts z 320B parametrów. Szybki, tani, czyta obrazy, wywołuje narzędzia, 1M kontekstu. Model na co dzień do pracy bez filtra, w polityce ze spojrzeniem bazowego GLM. Do najtrudniejszego rozumowania przesiądź się na pełny GLM 5.3 Uncensored.",
         veniceLustifyV8:
           "Checkpoint SDXL dostrojony do fotorealistycznych treści dla dorosłych, udostępniany przez Venice.ai. Bez cenzury: bez rozmycia, bez odmów. Jeden z najtańszych modeli obrazów w ofercie. Stworzony do ciał i skóry, nie do tekstu na obrazie, złożonych scen czy stylów artystycznych; Chroma ma szerszy zakres artystyczny.",
         veniceChroma:
@@ -1855,7 +1855,7 @@ export const translations: typeof enTranslations = {
         mistralLarge4:
           "Flagowiec Mistral AI, europejskiego laboratorium. Dobry w kodzie i analizie, czyta obrazy, wywołuje narzędzia, 1M kontekstu, w umiarkowanej cenie. Filtry mainstreamowe. To jeszcze nie najwyższa półka: DeepSeek V4 Pro kosztuje odrobinę więcej i rozumuje głębiej.",
         veniceDeepseekV41FlashUncensored:
-          "DeepSeek V4.1 Flash bez odmów, dostarczany przez Venice. Prawdziwe kodowanie i analiza, a do tego fikcja i roleplay, bez pouczania. Czyta obrazy, wywołuje narzędzia, 1M kontekstu, tani. Mniej więcej cztery razy droższy niż zwykły DeepSeek V4.1 Flash. Tańszą alternatywą bez filtra jest GLM 5.3 Flash Uncensored.",
+          "DeepSeek V4.1 Flash bez odmów, dostarczany przez Venice. Prawdziwe kodowanie i analiza, a do tego fikcja i roleplay, bez pouczania. Czyta obrazy, wywołuje narzędzia, 1M kontekstu, tani. Odpowiedzi polityczne nadal ujmuje trening DeepSeeka. Mniej więcej cztery razy droższy niż zwykły DeepSeek V4.1 Flash. Tańszą alternatywą bez filtra jest GLM 5.3 Flash Uncensored.",
         grokImagineImage2:
           "Druga generacja modelu obrazów Grok Imagine od xAI. Przyjmuje tekst albo obraz referencyjny, więc ogarnia edycje i nowe obrazy. Średnia półka cenowa. Poziom open: łagodniejsze filtry niż mainstream, bez treści dosadnych. Krok wyżej od Grok Imagine T2I, gdy potrzebujesz edycji albo wierniejszego trzymania się promptu.",
         qwenImage3:

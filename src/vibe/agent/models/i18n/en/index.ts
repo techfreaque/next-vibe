@@ -70,7 +70,8 @@ export const translations = {
       uncensoredDesc: "No restrictions",
       mainstreamHelp: "Big-lab safety filters. Declines sensitive topics.",
       openHelp: "Light filters. Takes on most edgy topics.",
-      uncensoredHelp: "No filters. Answers anything - you set the limits.",
+      uncensoredHelp:
+        "No filters, you set the limits. For politics pick UncensoredLM: built uncensored. The rest have refusals removed.",
     },
   },
   sort: {

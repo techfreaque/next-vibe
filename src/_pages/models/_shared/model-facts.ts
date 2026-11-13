@@ -285,14 +285,79 @@ export function listModelFacts(): ModelFacts[] {
 }
 
 /**
+ * The model built to be uncensored (trained that way by its lab), as opposed
+ * to the refusal-stripped variants of mainstream/open models in the same tier.
+ * Every other uncensored-tier text model links to it first.
+ */
+export const BUILT_UNCENSORED_MODEL_ID: ChatModelId =
+  ChatModelId.UNCENSORED_LM_V1_2;
+
+/**
+ * Hand-picked comparison pairs, linked from both model pages ahead of the
+ * price-based suggestions (and therefore sitemapped). Order inside a pair is
+ * the canonical URL order: /models/compare/<a>/<b>.
+ */
+export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
+  ChatModelId,
+  ChatModelId,
+])[] = [
+  // Built uncensored vs refusals removed.
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_FLASH_UNCENSORED],
+  // Built uncensored vs the mainstream and open flagships.
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GROK_4_7],
+];
+
+/** Featured partners of a model, in pair order, public text models only. */
+function featuredComparisons(facts: ModelFacts): ModelRef[] {
+  const ids: ChatModelId[] = [];
+  for (const [a, b] of FEATURED_COMPARISON_PAIRS) {
+    if (a === facts.id) {
+      ids.push(b);
+    } else if (b === facts.id) {
+      ids.push(a);
+    }
+  }
+  if (
+    facts.id !== BUILT_UNCENSORED_MODEL_ID &&
+    facts.content === ContentLevel.UNCENSORED &&
+    !ids.includes(BUILT_UNCENSORED_MODEL_ID)
+  ) {
+    ids.unshift(BUILT_UNCENSORED_MODEL_ID);
+  }
+  const refs: ModelRef[] = [];
+  for (const id of ids) {
+    const other = getModelFacts(id);
+    if (
+      other !== null &&
+      !other.isLegacy &&
+      other.outputs.join() === facts.outputs.join()
+    ) {
+      refs.push({ id: other.id, slug: other.slug, name: other.name });
+    }
+  }
+  return refs;
+}
+
+/**
  * Comparison suggestions for a model page: its successor first (legacy), then
- * the current same-tier models with the same outputs, closest in price.
- * Feeds internal links.
+ * the featured pairs (always shown, may exceed `limit`), then the current
+ * same-tier models with the same outputs, closest in price.
+ * Feeds internal links and the sitemap.
  */
 export function suggestComparisons(facts: ModelFacts, limit = 3): ModelRef[] {
   const picks: ModelRef[] = [];
   if (facts.successor !== null) {
     picks.push(facts.successor);
+  }
+  for (const featured of featuredComparisons(facts)) {
+    if (!picks.some((pick) => pick.id === featured.id)) {
+      picks.push(featured);
+    }
   }
   const candidates = listModelFacts()
     .filter(

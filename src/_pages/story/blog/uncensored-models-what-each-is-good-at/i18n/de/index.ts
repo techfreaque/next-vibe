@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Die unzensierten Modelle, eins nach dem anderen - {{appName}}",
     description:
-      "Ein klarer Leitfaden zu jedem unzensierten KI-Modell auf unbottled.ai. Worin jedes gut ist, wo es schwächelt und warum die volle Auswahl der eigentliche Punkt ist.",
+      "Ein klarer Leitfaden zu jedem unzensierten KI-Modell auf unbottled.ai. Welches von Grund auf unzensiert ist, welchen nur die Verweigerungen entfernt wurden, worin jedes gut ist und wo es schwächelt.",
     category: "Modell-Guide",
     imageAlt: "{{appName}} Guide zu unzensierten Modellen",
     keywords:
-      "{{appName}}, unzensierte KI-Modelle, abliterierte Modelle, Venice, GLM unzensiert, Gab Arya, FreedomGPT, UncensoredLM, Free-Speech-KI",
+      "{{appName}}, unzensierte KI-Modelle, abliterierte Modelle, Venice, GLM unzensiert, Gab Arya, FreedomGPT, UncensoredLM, von Grund auf unzensierte KI, unzensierte KI für Politik, Free-Speech-KI",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
@@ -20,18 +20,25 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Wir betreiben aktuell {{uncensoredCount}} unzensierte Modelle. Austauschbar sind sie nicht. Jedes kommt aus einem anderen Labor, sitzt auf einer anderen Basis und kann anderes.",
-    p2: "Das ist die ehrliche Tour. Echte Anbieter, echte Stärken, echte Schwächen. Wählen Sie nach der Aufgabe vor Ihnen, nicht nach dem lautesten Label.",
+    p2: "Das ist die ehrliche Tour. Echte Anbieter, echte Stärken, echte Schwächen. Ein Modell hier ist von Grund auf unzensiert. Den übrigen wurden die Verweigerungen entfernt. Dieser Unterschied entscheidet, welches Sie zu Politik befragen. Für alles andere wählen Sie nach der Aufgabe vor Ihnen, nicht nach dem lautesten Label.",
   },
   whatItMeans: {
     title: 'Was "unzensiert" hier wirklich heißt',
-    p1: "Jedes Modell auf der Plattform trägt eine Inhaltsstufe: Mainstream, Offen oder Unzensiert. Unzensierte Modelle antworten ohne Verweigerungstheater und ohne moralische Vorrede. Sie entstehen auf zwei Wegen. Manche sind von Anfang an darauf trainiert. Andere sind abliteriert: Die Verweigerungsrichtung wird aus den Gewichten eines bestehenden Modells entfernt, sodass ein starkes Mainstream-Modell seine Intelligenz behält, aber den Reflex zum Nein verliert.",
+    p1: "Jedes Modell auf der Plattform trägt eine Inhaltsstufe: Mainstream, Offen oder Unzensiert. Unzensierte Modelle antworten ohne Verweigerungstheater und ohne moralische Vorrede. Dahin führen zwei Wege. Einer ist von Grund auf unzensiert: Sein Labor hat es vom ersten Trainingslauf an so trainiert. Die übrigen sind bestehende Modelle mit entfernten Verweigerungen, per Abliteration (die Verweigerungsrichtung wird aus den Gewichten geschnitten) oder per Feintuning gegen Zensur. Sie behalten ihre Intelligenz und verlieren den Reflex zum Nein. Ihre Trainingsdaten und die Grundhaltung des Ursprungslabors behalten sie ebenfalls.",
+    callout:
+      "Von Grund auf unzensiert oder Verweigerungen entfernt. UncensoredLM ist das einzige Modell hier, das von Anfang an unzensiert trainiert wurde. Jedes andere unzensierte Modell verweigert nicht mehr, trägt aber das Weltbild seines Basismodells weiter. Bei Politik merkt man das. Uneingeschränkt heißt nicht neutral.",
     p2: "Sie wählen die Stufe. Niemand wählt sie für Sie. Ein unzensiertes Modell antwortet nur so, weil Sie es ausgewählt haben, und Sie können im selben Chat, mit demselben Konto, jederzeit zu einem Mainstream-Modell zurückwechseln.",
   },
   groups: {
+    builtUncensored: {
+      title: "Wenn die Frage politisch oder kontrovers ist",
+      intro:
+        "Das einzige Modell im Katalog, das von Grund auf unzensiert gebaut ist. Es antwortet in dem Rahmen, den Sie vorgeben, ohne Moralpredigt und ohne Sie zur Konsenslinie zurückzulotsen.",
+    },
     reasoning: {
       title: "Wenn es denken soll",
       intro:
-        "Reasoning, Code, Analyse. Hier sitzt die meiste Intelligenz der unzensierten Reihe.",
+        "Reasoning, Code, Analyse. Starke Basismodelle mit entfernten Verweigerungen. Hier sitzt die meiste Intelligenz der unzensierten Reihe.",
     },
     creative: {
       title: "Wenn es um Fiktion und Rollenspiel geht",
@@ -55,9 +62,10 @@ export const translations: typeof enTranslations = {
     pageLink: "Zur Seite von {{model}}",
     uncensoredLm: {
       maker: "Uncensored.ai",
-      basis: "DeepSeek-R1-Distill auf 14B-Qwen-Basis. 32K Kontext.",
-      good: "Schrittweises, sichtbares Reasoning, unzensiert. Nutzt Tools. Ein kleines, günstiges Modell, das trotzdem seinen Weg zeigt.",
-      weak: "Coding. Experimentelle Preview mit kurzem Kontext, also Aufgaben fokussiert halten.",
+      basis:
+        "Vom Labor unzensiert trainiert. Die erste öffentliche Version war ein DeepSeek-R1-Distill auf 14B-Qwen-Basis. 32K Kontext, nur Text.",
+      good: "Politische, kontroverse und tabuisierte Fragen, direkt beantwortet in Ihrem Rahmen. Keine Moralpredigt, kein Zurücklenken auf die Konsenslinie. Nutzt Tools.",
+      weak: "Coding, lange Dokumente und Bilder. Experimentell, und umstrittene Behauptungen formuliert es so sicher wie belegte. Prüfen Sie die Fakten, die es liefert.",
     },
     freedomgpt: {
       maker: "Age of AI",
@@ -75,7 +83,7 @@ export const translations: typeof enTranslations = {
       maker: "Venice.ai",
       basis: "Dolphin Mistral 24B, Venice-Edition. 128K Kontext, liest Bilder.",
       good: "Eine der niedrigsten Verweigerungsraten am Markt. Rollenspiel, Fiktion, offener Austausch. Ein verlässlicher unzensierter Standard.",
-      weak: "Code und schwere Analyse. Native Tool-Aufrufe wackeln, daher ein promptbasierter Tool-Pfad.",
+      weak: "Code und schwere Analyse. Native Tool-Aufrufe wackeln, daher ein promptbasierter Tool-Pfad. Im Kern ein Mistral-Feintuning, und bei Politik merkt man das.",
     },
     veniceRoleplay: {
       maker: "Venice.ai",
@@ -87,14 +95,14 @@ export const translations: typeof enTranslations = {
       maker: "Google (über Venice)",
       basis: "Gemma 4 26B MoE, Filter entfernt. 256K Kontext, liest Bilder.",
       good: "Schnell, günstig, multimodal. Für den Preis ein großes Kontextfenster.",
-      weak: "Tiefes Reasoning. Schneller Antworter, kein Grübler.",
+      weak: "Tiefes Reasoning. Schneller Antworter, kein Grübler. Googles Training prägt weiter, wie es heikle Themen einordnet.",
     },
     qwen: {
       maker: "Alibaba (über Venice)",
       basis:
         "Qwen 3.6 Plus, Verweigerungen entfernt. 256K Kontext, liest Bilder.",
       good: "Der stärkste Coder und Analyst der unzensierten Reihe. Denkt gut, liest Bilder, hält langen Kontext.",
-      weak: "Der Preis. Diese Leistung kostet pro Nachricht mehr als die Flash-Modelle.",
+      weak: "Der Preis. Diese Leistung kostet pro Nachricht mehr als die Flash-Modelle. Die Verweigerungen sind weg, Alibabas Trainingsdaten nicht: Bei Politik ist mit der Sicht des Basismodells zu rechnen.",
     },
     glmHeretic: {
       maker: "Z.AI (über Venice)",
@@ -113,7 +121,7 @@ export const translations: typeof enTranslations = {
       maker: "Z.AI (über NanoGPT)",
       basis: "Volles GLM-5.3-Reasoning-Modell, unzensiert. 1M Kontext.",
       good: "Code, Text und Tools auf Spitzenniveau, unzensiert, zu einem Bruchteil des Preises eines abliterierten Flaggschiffs. Der schwere Hammer.",
-      weak: "Tempo. Ein großes Modell, und noch als experimentell markiert.",
+      weak: "Tempo. Ein großes Modell, und noch als experimentell markiert. Es verweigert nicht mehr, kann bei politischen Fragen aber weiter ausweichen wie das Basis-GLM.",
     },
     glm53Flash: {
       maker: "Z.AI (über NanoGPT)",
@@ -126,14 +134,15 @@ export const translations: typeof enTranslations = {
     title: "Warum die Auswahl zählt",
     intro: "Auswahl ist kein Nebenfeature. Sie ist der ganze Punkt.",
     p1: "Die Verweigerung des einen Modells ist die Antwort des anderen. Eine medizinische Frage, ein juristischer Grenzfall, ein Stück Fiktion, eine Security-Analyse, eine Position jenseits des Mainstreams: Ein einzelnes gefiltertes Modell entscheidet für Sie, was Sie fragen dürfen. Eine Bandbreite an Modellen gibt diese Entscheidung an Sie zurück.",
-    p2: "Die unzensierte Reihe ist außerdem schlicht der bessere Werkzeugkasten. Qwen für Code, den andere blockieren, GLM 5.3 für Spitzen-Reasoning, Venice für Fiktion, ein Flash-Modell für günstige Masse, ein rechts geprägtes Modell für eine Perspektive, die der Rest des Felds meidet. Andere Aufgaben, andere Werkzeuge. Die Mainstream-Modelle behalten Sie dabei, im selben Konto, für die Fälle, in denen ein Filter genau das Richtige ist.",
+    p2: "Die unzensierte Reihe ist außerdem schlicht der bessere Werkzeugkasten. UncensoredLM für politische und kontroverse Fragen, Qwen für Code, den andere blockieren, GLM 5.3 für Spitzen-Reasoning, Venice für Fiktion, ein Flash-Modell für günstige Masse, ein rechts geprägtes Modell für eine Perspektive, die der Rest des Felds meidet. Andere Aufgaben, andere Werkzeuge. Die Mainstream-Modelle behalten Sie dabei, im selben Konto, für die Fälle, in denen ein Filter genau das Richtige ist.",
     callout:
       "Unzensiert heißt nicht sorglos. Sie verantworten, was Sie erzeugen, und das Gesetz gilt weiter. Was sich hier ändert, ist, wer am Regler sitzt: Sie, nicht der Modellanbieter.",
   },
   howToPick: {
     title: "Wie Sie in der Praxis wählen",
-    p1: "Gehen Sie von der Aufgabe aus. Code oder Analyse: Qwen 3.6 Plus Uncensored oder volles GLM 5.3 Uncensored. Fiktion und Rollenspiel: Venice Uncensored oder Venice Role Play. Große Mengen, geringe Kosten, multimodal: GLM 5.3 Flash, Gemma 4 oder MiMo. Ein Reasoning-Modell, das seinen Weg zeigt, mit kleinem Budget: UncensoredLM.",
-    p2: "Sie wollen eine bestimmte Perspektive oder ein Modell rund um freie Meinungsäußerung: Gab Arya oder FreedomGPT Liberty. Unsicher? Öffnen Sie zwei nebeneinander auf der Modellseite und vergleichen Sie sie an Ihrem eigenen Prompt.",
+    p1: "Gehen Sie von der Aufgabe aus. Politik, Kontroverses oder Tabuthemen: UncensoredLM, das einzige von Grund auf unzensierte Modell. Code oder Analyse: Qwen 3.6 Plus Uncensored oder volles GLM 5.3 Uncensored. Fiktion und Rollenspiel: Venice Uncensored oder Venice Role Play. Große Mengen, geringe Kosten, multimodal: GLM 5.3 Flash, Gemma 4 oder MiMo.",
+    p2: "Sie wollen eine bewusst gesetzte Perspektive: Gab Arya, nach eigener Verortung rechts geprägt. Klartext ohne Umschweife: FreedomGPT Liberty. Unsicher? Stellen Sie zwei nebeneinander und vergleichen Sie sie an Ihrem eigenen Prompt.",
+    compareLink: "{{a}} mit {{b}} vergleichen",
   },
   cta: {
     title: "Modell wählen. Filter setzen.",

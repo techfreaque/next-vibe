@@ -23,7 +23,7 @@ export const translations = {
   filter: {
     title: 'What "uncensored" means here',
     intro: "Three levels. You choose.",
-    p1: "Every model carries a content level. Mainstream models keep their provider's filters. Open models are looser. Uncensored models answer without the lecture.",
+    p1: "Every model carries a content level. Mainstream models keep their provider's filters. Open models are looser. Uncensored models answer without the lecture. One of them, UncensoredLM, was built uncensored; the others are existing models with their refusals removed, so their base training still shapes the answers.",
     p2: "Nobody picks the level for you. Pick a mainstream model for work, an uncensored one for the question nobody else will answer - same chat, same account.",
     mainstream: "Mainstream",
     open: "Open",

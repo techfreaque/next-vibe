@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
     category: "Poradnik",
     imageAlt: "{{appName}}: alternatywa dla ChatGPT bez filtrów",
     keywords:
-      "alternatywa dla ChatGPT, alternatywa dla ChatGPT bez filtrów, niecenzurowany ChatGPT, ChatGPT bez ograniczeń, ChatGPT bez cenzury, czat AI bez filtrów, niecenzurowana AI, {{appName}}, Claude, GPT, Gemini, DeepSeek, Venice",
+      "alternatywa dla ChatGPT, alternatywa dla ChatGPT bez filtrów, niecenzurowany ChatGPT, ChatGPT bez ograniczeń, ChatGPT bez cenzury, czat AI bez filtrów, niecenzurowana AI, UncensoredLM, niecenzurowana AI do polityki, {{appName}}, Claude, GPT, Gemini, DeepSeek, Venice",
   },
   hero: {
     backToBlog: "Wróć do bloga",
@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
   exists: {
     title: "Czy istnieje ChatGPT bez filtrów?",
     p1: "Nie od OpenAI. Modele GPT podlegają zasadom OpenAI, gdziekolwiek działają. Claude i Gemini podlegają zasadom swoich twórców. Kto obiecuje GPT bez filtrów, obiecuje za dużo.",
-    p2: "Prawdziwa alternatywa stawia obok nich inne modele. {{appName}} daje ci modele mainstreamowe, a w tym samym czacie także modele otwarte z lekkimi filtrami i niecenzurowane bez żadnych. To ty decydujesz, który odpowie.",
+    p2: "Prawdziwa alternatywa stawia obok nich inne modele. {{appName}} daje ci modele mainstreamowe, a w tym samym czacie także modele otwarte z lekkimi filtrami i niecenzurowane bez żadnych. Jeden z nich, UncensoredLM, od początku powstał jako niecenzurowany. To ty decydujesz, który odpowie.",
   },
   tiers: {
     title: "Co właściwie znaczy „bez filtrów”?",
@@ -34,9 +34,11 @@ export const translations: typeof enTranslations = {
       "Mainstream (liczba modeli: {{count}}): Claude, GPT, Gemini, Mistral. Filtry bezpieczeństwa wielkich laboratoriów. Drażliwe tematy odrzucają.",
     open: "Otwarte (liczba modeli: {{count}}): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax i inne. Lekkie filtry. Podejmują większość kontrowersyjnych tematów.",
     uncensored:
-      "Niecenzurowane (liczba modeli: {{count}}): Venice oraz niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek. Zero filtra. Granice wyznaczasz ty.",
+      "Niecenzurowane (liczba modeli: {{count}}): UncensoredLM, od początku zbudowany bez cenzury. Do tego Venice oraz niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek, czyli istniejące modele z usuniętymi odmowami. Zero filtra. Granice wyznaczasz ty.",
     vendorRefusals:
       "Modele mainstreamowe zachowują filtry swoich twórców także tutaj. GPT na {{appName}} odmawia tego samego, czego odmawia wszędzie. Różnica polega na tym, co masz obok.",
+    twoKinds:
+      "Modele niecenzurowane są dwojakiego rodzaju. UncensoredLM laboratorium trenowało bez cenzury od pierwszego przebiegu. Zapytaj go o politykę albo temat tabu, a odpowie w twojej ramie, bez pouczania i bez zawracania cię do linii konsensusu. Każdy inny model niecenzurowany zaczynał jako model mainstreamowy albo otwarty, któremu potem usunięto odmowy. Przestaje mówić nie. Dane treningowe i spojrzenie laboratorium bazowego zostają. W polityce nadal może się przechylać, asekurować albo ujmować sprawy tak jak model bazowy. Bez ograniczeń nie znaczy neutralnie.",
     modelsLink: "Zobacz wszystkie modele według poziomu filtra",
   },
   switch: {
@@ -52,6 +54,10 @@ export const translations: typeof enTranslations = {
     title: "Jakiego modelu używać zamiast ChatGPT?",
     intro:
       "Zacznij od zadania. Każda nazwa prowadzi do strony modelu z ceną i parametrami.",
+    builtUncensored: {
+      title: "Polityka i tematy tabu: zbudowany bez cenzury",
+      body: "UncensoredLM to jedyny model tutaj, który laboratorium od początku trenowało bez cenzury. Na pytania polityczne, kontrowersyjne i tabu odpowiada wprost, w ramie, którą sam wybierasz. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
+    },
     everyday: {
       title: "Codzienna praca, filtry mainstreamowe",
       body: "Teksty, research, kod, analiza. Najbliżej ChatGPT, z tym samym rodzajem filtrów.",
@@ -61,8 +67,8 @@ export const translations: typeof enTranslations = {
       body: "Mocne modele otwarte z lekkimi filtrami. Odpowiadają na większość tego, czego modele mainstreamowe unikają, i dobrze radzą sobie z kodem i rozumowaniem.",
     },
     unfiltered: {
-      title: "Bez filtra, z prawdziwym rozumowaniem",
-      body: "Najcięższa artyleria wśród modeli niecenzurowanych. Kod, analiza i długie teksty na tematy, które inne modele blokują.",
+      title: "Bez odmów, z prawdziwym rozumowaniem",
+      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Spojrzenie modelu bazowego zostaje, więc przy polityce zacznij od UncensoredLM.",
     },
     fiction: {
       title: "Fikcja i roleplay",
@@ -70,10 +76,10 @@ export const translations: typeof enTranslations = {
     },
     cheap: {
       title: "Tanio i szybko",
-      body: "Duża skala za małe pieniądze. Trzy modele flash bez filtrów, a do tego Claude Haiku, gdy filtr ci nie przeszkadza.",
+      body: "Duża skala za małe pieniądze. Trzy modele flash z usuniętymi odmowami, a do tego Claude Haiku, gdy filtr ci nie przeszkadza.",
     },
     compare:
-      "Wahasz się między dwoma? Porównaj cenę, okno kontekstu i możliwości obok siebie.",
+      "Wahasz się między dwoma? Porównaj cenę, okno kontekstu i możliwości obok siebie. Zacznij od UncensoredLM kontra model ChatGPT i kontra flagowiec z usuniętymi odmowami.",
     compareLink: "Porównaj {{a}} z {{b}}",
     guideLink: "Przeczytaj przewodnik po wszystkich modelach niecenzurowanych",
   },
@@ -119,7 +125,7 @@ export const translations: typeof enTranslations = {
     title: "Jakie są minusy?",
     intro: "Brak filtrów ma swoją cenę. Poznaj ją, zanim się przesiądziesz.",
     smaller:
-      "Większość modeli niecenzurowanych jest mniejsza od modeli z czołówki. Kilka powstało do rozmowy i fikcji, nie do ciężkiej analizy. Przy najtrudniejszym rozumowaniu i długich zadaniach programistycznych najlepsze modele mainstreamowe wciąż wygrywają.",
+      "Większość modeli niecenzurowanych jest mniejsza od modeli z czołówki. Kilka powstało do rozmowy i fikcji, nie do ciężkiej analizy. UncensoredLM jest od szczerych odpowiedzi, nie od kodu. Przy najtrudniejszym rozumowaniu i długich zadaniach programistycznych najlepsze modele mainstreamowe wciąż wygrywają.",
     tools:
       "Nie każdy model niecenzurowany obsługuje wywołania narzędzi. Sprawdź stronę modelu, zanim oprzesz się na wyszukiwaniu w sieci albo innych narzędziach.",
     vendor:

@@ -45,7 +45,7 @@ export const translations = {
     },
     uncensored: {
       name: "Uncensored",
-      line: "No refusals, no lectures. Fiction, roleplay and hard questions answered straight.",
+      line: "No refusals, no lectures. UncensoredLM is built uncensored; the rest are existing models with refusals removed, so their base framing stays.",
     },
   },
   modality: {

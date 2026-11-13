@@ -73,7 +73,8 @@ export const translations: typeof enTranslations = {
       mainstreamHelp:
         "Sicherheitsfilter der großen Anbieter. Weicht heiklen Themen aus.",
       openHelp: "Leichte Filter. Geht auf die meisten heiklen Themen ein.",
-      uncensoredHelp: "Keine Filter. Antwortet auf alles - Grenzen setzen Sie.",
+      uncensoredHelp:
+        "Keine Filter, die Grenzen setzen Sie. Für Politik UncensoredLM: von Grund auf unzensiert. Den übrigen wurden Verweigerungen entfernt.",
     },
   },
   sort: {

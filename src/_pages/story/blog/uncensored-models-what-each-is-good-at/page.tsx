@@ -39,7 +39,7 @@ import {
   ArticleP,
   ArticleSection,
 } from "../../_shared/article";
-import { Callout, Cta } from "../../_shared/marketing";
+import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
@@ -111,13 +111,25 @@ const LINKED_CARDS: ReadonlySet<CardKey> = new Set<CardKey>([
 ]);
 
 const GROUPS: readonly {
-  key: "reasoning" | "creative" | "fast" | "viewpoint";
+  key: "builtUncensored" | "reasoning" | "creative" | "fast" | "viewpoint";
   cards: readonly CardKey[];
 }[] = [
-  { key: "reasoning", cards: ["glm53", "qwen", "uncensoredLm"] },
+  { key: "builtUncensored", cards: ["uncensoredLm"] },
+  { key: "reasoning", cards: ["glm53", "qwen"] },
   { key: "creative", cards: ["venice", "veniceRoleplay", "freedomgpt"] },
   { key: "fast", cards: ["glm53Flash", "gemma", "glmHeretic", "mimo"] },
   { key: "viewpoint", cards: ["arya"] },
+];
+
+/**
+ * Built-uncensored vs refusal-stripped, then vs ChatGPT's model. Same URL
+ * order as the sitemap (FEATURED_COMPARISON_PAIRS in model-facts).
+ */
+const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
 ];
 
 function modelName(id: ChatModelId): string {
@@ -224,6 +236,9 @@ export function TanstackPage({
 
         <ArticleSection title={t("whatItMeans.title")}>
           <ArticleP>{t("whatItMeans.p1")}</ArticleP>
+          <Callout icon={Scale} tone="neutral">
+            {t("whatItMeans.callout")}
+          </Callout>
           <ArticleP>{t("whatItMeans.p2")}</ArticleP>
         </ArticleSection>
 
@@ -252,6 +267,18 @@ export function TanstackPage({
         <ArticleSection title={t("howToPick.title")}>
           <ArticleP>{t("howToPick.p1")}</ArticleP>
           <ArticleP>{t("howToPick.p2")}</ArticleP>
+          <Div className="flex flex-col">
+            {COMPARE_PAIRS.map(([a, b]) => (
+              <CardLink
+                key={`${a}-${b}`}
+                href={`/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`}
+                label={t("howToPick.compareLink", {
+                  a: modelName(a),
+                  b: modelName(b),
+                })}
+              />
+            ))}
+          </Div>
         </ArticleSection>
 
         <ArticleEnd

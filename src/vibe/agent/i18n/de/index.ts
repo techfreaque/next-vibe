@@ -1400,7 +1400,7 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Das Reasoning-Modell von Uncensored.ai, ein DeepSeek-R1-Destillat auf einer 14B-Qwen-Basis. Denkt laut, antwortet direkt, ruft Tools auf. 32K Kontext. Experimentell und nicht die erste Wahl für Code. Das erledigt GLM 5.3 Uncensored besser und günstiger.",
+          "Das Modell von Uncensored.ai und das einzige im Katalog, das von Grund auf unzensiert gebaut wurde, statt nachträglich entschärft. Politische, kontroverse und tabuisierte Fragen beantwortet es klar in dem Rahmen, den du vorgibst, ohne Moralpredigt und ohne Rücklenkung auf die Konsenslinie. Ruft Tools auf, 32K Kontext, nur Text. Experimentell, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte, also Fakten prüfen.",
         freedomgptLiberty:
           "Das unzensierte Flaggschiff von Age of AI und der Free-Speech-Chatbot, mit dem die Kategorie begann. Basiert auf offenen Gewichten, abgestimmt auf direkte Antworten ohne Belehrung. Schnell und schlagfertig, 32K Kontext. Schwach bei Tools, Code und tiefer Analyse. Dafür ist Qwen 3.6 Plus Uncensored die stärkere Wahl.",
         gabAiArya:
@@ -1446,25 +1446,25 @@ export const translations: typeof enTranslations = {
         dolphinLlama3_70B:
           "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
         veniceUncensored:
-          "Das hauseigene unzensierte Modell von Venice: Dolphin Mistral 24B in der Venice Edition. Eine der niedrigsten Verweigerungsraten überhaupt. Rollenspiel, Fiktion, offene Gespräche ohne Filter. Liest Bilder, 128K Kontext, günstig. Schwach bei Code und anspruchsvoller Analyse, dafür eignet sich Qwen 3.6 Plus Uncensored.",
+          "Das hauseigene unzensierte Modell von Venice: Dolphin Mistral 24B in der Venice Edition. Eine der niedrigsten Verweigerungsraten überhaupt. Rollenspiel, Fiktion, offene Gespräche ohne Filter. Liest Bilder, 128K Kontext, günstig. Ein Feintuning gegen Zensur, die Grundhaltung von Mistral zeigt sich bei Politik weiter; dort ist UncensoredLM die von Grund auf unzensierte Wahl. Schwach bei Code und anspruchsvoller Analyse, dafür eignet sich Qwen 3.6 Plus Uncensored.",
         veniceUncensoredRoleplay:
-          "Das 24B-Modell von Venice, abgestimmt auf Rollenspiel. Figuren behalten ihre Stimme über lange Kampagnen, auch in düsteren Szenen und erotischer Fiktion, ohne moralischen Abbruch mitten in der Geschichte. Liest Bilder, 128K Kontext. Ein Erzähler, kein Assistent, also nichts für Analyse oder Code. Venice Uncensored ist die günstigere Allround-Wahl.",
+          "Das 24B-Modell von Venice, abgestimmt auf Rollenspiel, Verweigerungen abtrainiert. Figuren behalten ihre Stimme über lange Kampagnen, auch in düsteren Szenen und erotischer Fiktion, ohne moralischen Abbruch mitten in der Geschichte. Liest Bilder, 128K Kontext. Ein Erzähler, kein Assistent, also nichts für Analyse oder Code. Venice Uncensored ist die günstigere Allround-Wahl.",
         gemma4Uncensored:
-          "Googles Gemma 4 26B als Mixture-of-Experts, Filter entfernt, bereitgestellt über Venice. Schnell, günstig, liest Bilder, ruft Tools auf, 256K Kontext. Liefert flotte Antworten, ist aber kein tiefer Denker. Für anspruchsvolleres Reasoning ohne Verweigerungen kostet GLM 5.3 Flash Uncensored etwas mehr und leistet deutlich mehr.",
+          "Googles Gemma 4 26B als Mixture-of-Experts, Filter entfernt, bereitgestellt über Venice. Schnell, günstig, liest Bilder, ruft Tools auf, 256K Kontext. Die Verweigerungen sind weg, Googles Training nicht: Bei heiklen Themen folgt die Einordnung weiter dem Basismodell. Für anspruchsvolleres Reasoning ohne Verweigerungen kostet GLM 5.3 Flash Uncensored etwas mehr und leistet deutlich mehr.",
         qwen36PlusUncensored:
-          "Alibabas Reasoning-Modell Qwen 3.6 Plus ohne Verweigerungen, bereitgestellt über Venice. Einer der stärksten Programmierer und Analysten unter den unzensierten Modellen. Liest Bilder, ruft Tools auf, 256K Kontext. Teurer als die Flash-Modelle. Das andere Schwergewicht ist GLM 5.3 Uncensored, mit 1M Kontext, aber nur Text.",
+          "Alibabas Reasoning-Modell Qwen 3.6 Plus ohne Verweigerungen, bereitgestellt über Venice. Einer der stärksten Programmierer und Analysten unter den unzensierten Modellen. Liest Bilder, ruft Tools auf, 256K Kontext. Es verweigert nicht mehr, doch Qwens Training prägt weiter den Blick auf Politik; dafür ist UncensoredLM von Grund auf unzensiert. Teurer als die Flash-Modelle. Das andere Schwergewicht ist GLM 5.3 Uncensored, mit 1M Kontext, aber nur Text.",
         glm47FlashHeretic:
-          "Ein abliteriertes GLM 4.7 Flash: Verweigerungen herausgelöst, es antwortet statt zu belehren. Centbeträge pro Nachricht, schnell, mit Tools, gut für ungefilterten Chat und kreatives Schreiben. Schwach bei tiefer Analyse. GLM 5.3 Flash Uncensored ist die neuere, klügere unzensierte Wahl, etwas teurer.",
+          "Ein abliteriertes GLM 4.7 Flash: Verweigerungen herausgelöst, es antwortet statt zu belehren. Centbeträge pro Nachricht, schnell, mit Tools, gut für ungefilterten Chat und kreatives Schreiben. Das Training des Basis-GLM prägt weiter seine Sicht. Schwach bei tiefer Analyse. GLM 5.3 Flash Uncensored ist die neuere, klügere unzensierte Wahl, etwas teurer.",
         glm53Abliterated:
-          "GLM 5.3 Abliterated - Das volle GLM-5.3, dem Abliteration.ai die Verweigerungen direkt aus den Gewichten entfernt hat. Spitzen-Reasoning, Tools, 1M Kontext. Das Schwergewicht.",
+          "Das volle GLM 5.3, dem Abliteration.ai die Verweigerungen direkt aus den Gewichten entfernt hat. Spitzen-Reasoning, Tools, 1M Kontext. Das Schwergewicht. Keine Absagen mehr, Training und Grundhaltung des Basis-GLM bleiben.",
         deepseekV41FlashAbliterated:
-          "DeepSeek V4.1 Flash Abliterated - DeepSeek V4.1 Flash ohne Verweigerungen, von Abliteration.ai. 552B-MoE, starkes Reasoning, versteht Bilder, nutzt Tools. 1M Kontext.",
+          "DeepSeek V4.1 Flash ohne Verweigerungen, von Abliteration.ai. 552B-MoE, starkes Reasoning, versteht Bilder, nutzt Tools. 1M Kontext. Es sagt nicht mehr nein, die Sichtweise von DeepSeek bleibt.",
         mimoV26FlashAbliterated:
-          "Xiaomis MiMo V2.6 Flash mit entfernter Verweigerungsrichtung (abliterated). Schnell, liest Bilder, ruft Tools auf, 1M Kontext. Gut für ungefilterte Arbeit in großen Mengen, tauscht aber Tiefe gegen Tempo. Kostet mehr als das Doppelte von GLM 5.3 Flash Uncensored, das ein ähnliches Feld abdeckt.",
+          "Xiaomis MiMo V2.6 Flash mit entfernter Verweigerungsrichtung (abliterated). Schnell, liest Bilder, ruft Tools auf, 1M Kontext. Gut für ungefilterte Arbeit in großen Mengen, tauscht aber Tiefe gegen Tempo, und die Grundhaltung des Basismodells bleibt. Kostet mehr als das Doppelte von GLM 5.3 Flash Uncensored, das ein ähnliches Feld abdeckt.",
         glm53Uncensored:
-          "Das vollständige Reasoning-Modell GLM 5.3 von Z.AI, unzensiert. Das Schwergewicht unter den unzensierten Modellen: Code, lange Texte, Analyse und Tools ohne Verweigerungen, 1M Kontext. Nur Text, langsamer als die Flash-Modelle und weiterhin als experimentell markiert. GLM 5.3 Flash Uncensored ist die günstigere, schnellere Alltagswahl.",
+          "Das vollständige Reasoning-Modell GLM 5.3 von Z.AI, Verweigerungen entfernt. Das Schwergewicht unter den unzensierten Modellen: Code, lange Texte, Analyse und Tools, 1M Kontext. Uneingeschränkt heißt nicht neutral: Bei Politik kann es weiter ausweichen wie das Basis-GLM, dort ist UncensoredLM die bessere Wahl. Nur Text, langsamer als die Flash-Modelle, weiterhin experimentell. GLM 5.3 Flash Uncensored ist die günstigere, schnellere Alltagswahl.",
         glm53FlashUncensored:
-          "GLM 5.3 Flash von Z.AI, unzensiert: ein Mixture-of-Experts mit 320B Parametern. Schnell, günstig, liest Bilder, ruft Tools auf, 1M Kontext. Das Alltagsmodell für ungefilterte Arbeit. Für die härtesten Denkaufgaben lieber zum vollen GLM 5.3 Uncensored greifen.",
+          "GLM 5.3 Flash von Z.AI ohne Verweigerungen: ein Mixture-of-Experts mit 320B Parametern. Schnell, günstig, liest Bilder, ruft Tools auf, 1M Kontext. Das Alltagsmodell für ungefilterte Arbeit, bei Politik mit der Grundhaltung des Basis-GLM. Für die härtesten Denkaufgaben lieber zum vollen GLM 5.3 Uncensored greifen.",
         veniceLustifyV8:
           "Ein SDXL-Checkpoint, getrimmt auf fotorealistische Erwachseneninhalte, bereitgestellt über Venice.ai. Unzensiert: kein Weichzeichner, keine Ablehnungen. Eines der günstigsten Bildmodelle im Angebot. Gebaut für Körper und Haut, nicht für Text im Bild, komplexe Szenen oder Kunststile; Chroma bietet mehr künstlerische Bandbreite.",
         veniceChroma:
@@ -1871,7 +1871,7 @@ export const translations: typeof enTranslations = {
         mistralLarge4:
           "Das Flaggschiff von Mistral AI, aus europäischem Haus. Gut bei Code und Analyse, liest Bilder, ruft Tools auf, 1M Kontext, zu moderatem Preis. Mainstream-Filter. Nicht ganz Spitzenklasse: DeepSeek V4 Pro kostet etwas mehr und denkt tiefer.",
         veniceDeepseekV41FlashUncensored:
-          "DeepSeek V4.1 Flash ohne Verweigerungen, bereitgestellt über Venice. Echtes Programmieren und Analysieren, dazu Fiktion und Rollenspiel, ganz ohne Belehrungen. Liest Bilder, ruft Tools auf, 1M Kontext, günstig. Etwa viermal so teuer wie das normale DeepSeek V4.1 Flash. GLM 5.3 Flash Uncensored ist die günstigere ungefilterte Alternative.",
+          "DeepSeek V4.1 Flash ohne Verweigerungen, bereitgestellt über Venice. Echtes Programmieren und Analysieren, dazu Fiktion und Rollenspiel, ganz ohne Belehrungen. Liest Bilder, ruft Tools auf, 1M Kontext, günstig. Politische Antworten rahmt weiter das Training von DeepSeek. Etwa viermal so teuer wie das normale DeepSeek V4.1 Flash. GLM 5.3 Flash Uncensored ist die günstigere ungefilterte Alternative.",
         grokImagineImage2:
           "Die zweite Generation des Grok-Imagine-Bildmodells von xAI. Nimmt Text oder ein Referenzbild und beherrscht damit Bearbeitungen ebenso wie neue Bilder. Mittleres Preisniveau. Open-Stufe: lockerere Filter als Mainstream-Modelle, nicht explizit. Das Upgrade gegenüber Grok Imagine T2I, wenn Bearbeitung oder genauere Prompt-Treue gefragt ist.",
         qwenImage3:

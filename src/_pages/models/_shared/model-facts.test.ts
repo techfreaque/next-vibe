@@ -1,15 +1,20 @@
 import { describe, expect, test } from "bun:test";
 
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { ContentLevel } from "next-vibe/agent/skills/enum";
 
 import { collectSitemapEntries } from "../../_root/sitemap.xml/build-sitemap";
 import { listCatalogEntries } from "./model-catalog-entries";
 import {
+  BUILT_UNCENSORED_MODEL_ID,
+  FEATURED_COMPARISON_PAIRS,
   findModelPageAlias,
   findPublicModelId,
+  getModelFacts,
   isModelPageAlias,
   listModelFacts,
   PUBLIC_CHAT_MODEL_IDS,
+  suggestComparisons,
   toModelSlug,
 } from "./model-facts";
 
@@ -56,6 +61,42 @@ describe("one public page per model", () => {
       expect(
         paths.some((p) => p.includes(`/${toModelSlug(alias)}`)),
       ).toBe(false);
+    }
+  });
+});
+
+describe("built-uncensored model comparisons", () => {
+  test("the built-uncensored model has a public page", () => {
+    expect(PUBLIC_CHAT_MODEL_IDS).toContain(BUILT_UNCENSORED_MODEL_ID);
+  });
+
+  test("every uncensored-tier text model links to it first", () => {
+    for (const facts of listModelFacts()) {
+      if (
+        facts.isLegacy ||
+        facts.id === BUILT_UNCENSORED_MODEL_ID ||
+        facts.content !== ContentLevel.UNCENSORED ||
+        facts.outputs.join() !== "text"
+      ) {
+        continue;
+      }
+      expect(suggestComparisons(facts)[0]?.id).toBe(BUILT_UNCENSORED_MODEL_ID);
+    }
+  });
+
+  test("its page links every featured pair, and the sitemap lists them", () => {
+    const facts = getModelFacts(BUILT_UNCENSORED_MODEL_ID);
+    expect(facts).not.toBeNull();
+    if (facts === null) {
+      return;
+    }
+    const linked = suggestComparisons(facts).map((pick) => pick.id);
+    const paths = new Set(collectSitemapEntries().map((entry) => entry.path));
+    for (const [a, b] of FEATURED_COMPARISON_PAIRS) {
+      expect(linked).toContain(a === facts.id ? b : a);
+      expect(
+        paths.has(`/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`),
+      ).toBe(true);
     }
   });
 });

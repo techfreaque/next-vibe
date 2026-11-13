@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Bez cenzury",
-      line: "Bez odmów, bez pouczania. Fikcja, roleplay i trudne pytania - odpowiedź wprost.",
+      line: "Bez odmów, bez pouczania. UncensoredLM powstał bez cenzury, reszta to istniejące modele z usuniętymi odmowami i spojrzeniem modelu bazowego.",
     },
   },
   modality: {
