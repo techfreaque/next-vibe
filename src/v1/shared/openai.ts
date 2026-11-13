@@ -12,13 +12,9 @@ import {
   type StreamingResponse,
 } from "next-vibe/core/route/response.schema";
 
-export type OpenAiErrorKind =
-  | "invalid_request_error"
-  | "authentication_error"
-  | "insufficient_quota"
-  | "rate_limit_error"
-  | "not_found_error"
-  | "server_error";
+import type { OpenAiErrorKind, V1Error } from "./errors";
+
+export type { OpenAiErrorKind } from "./errors";
 
 // eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that makes this assignable to WidgetData when passed to openAiJson.
 export type OpenAiErrorBody = {
@@ -67,9 +63,38 @@ export function openAiError(
   );
 }
 
+/** V1ErrorRenderer for the OpenAI formats (chat completions, responses, models). */
+export function openAiErrorResponse(error: V1Error): StreamingResponse {
+  return openAiError(
+    error.status,
+    error.message,
+    error.type,
+    error.code,
+    error.param,
+    error.headers,
+  );
+}
+
 export function newCompletionId(): string {
   return `chatcmpl-${crypto.randomUUID().replaceAll("-", "")}`;
 }
 
 /** Fixed `created` for model objects (OpenAI requires an integer). */
 export const MODEL_CREATED_AT = 1_735_689_600;
+
+/** SSE response with the headers every /v1 stream uses. */
+export function sseResponse(
+  body: ReadableStream<Uint8Array>,
+): StreamingResponse {
+  return createStreamingResponse(
+    new Response(body, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      },
+    }),
+  );
+}

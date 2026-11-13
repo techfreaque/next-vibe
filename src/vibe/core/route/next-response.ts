@@ -11,6 +11,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
 
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
+import { V1_API_PATH_REGEX } from "../../platforms/web/middleware/utils";
 import { validateData } from "../core-utils/validation";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { CountryLanguage } from "../i18n/core/config";
@@ -133,6 +134,75 @@ function describeRequestForLog(request: NextRequest): {
  * Builds clean error chains. Messages arrive already translated and, for
  * validation failures, already formatted by validateData.
  */
+/** OpenAI error `type` for an HTTP status. */
+function openAiErrorKind(status: number): string {
+  if (status === 401) {
+    return "authentication_error";
+  }
+  if (status === 402) {
+    return "insufficient_quota";
+  }
+  if (status === 403) {
+    return "permission_error";
+  }
+  if (status === 404) {
+    return "not_found_error";
+  }
+  if (status === 429) {
+    return "rate_limit_error";
+  }
+  return status >= 500 ? "server_error" : "invalid_request_error";
+}
+
+/** Anthropic error `type` for an HTTP status. */
+function anthropicErrorKind(status: number): string {
+  if (status === 400 || status === 422) {
+    return "invalid_request_error";
+  }
+  if (status === 402) {
+    return "billing_error";
+  }
+  if (status === 403) {
+    return "permission_error";
+  }
+  if (status === 413) {
+    return "request_too_large";
+  }
+  return status < 500 ? openAiErrorKind(status) : "api_error";
+}
+
+/**
+ * The public OpenAI/Anthropic-compatible API (/api/<locale>/v1/*) is called by
+ * stock SDKs and coding agents that only understand their own error envelope.
+ * Framework-level failures there (schema validation, CSRF, unexpected throws)
+ * are answered in that envelope instead of {success:false,...}.
+ */
+function v1WireErrorResponse(
+  request: NextRequest,
+  status: number,
+  message: string,
+): NextResponse<ErrorResponseType> | undefined {
+  const pathname = new URL(request.url).pathname;
+  if (!V1_API_PATH_REGEX.test(pathname)) {
+    return undefined;
+  }
+  const anthropic = /\/v1\/messages(\/|$)/.test(pathname);
+  const body = anthropic
+    ? { type: "error", error: { type: anthropicErrorKind(status), message } }
+    : {
+        error: {
+          message,
+          type: openAiErrorKind(status),
+          param: null,
+          code: status === 400 ? "invalid_request" : null,
+        },
+      };
+  return new NextResponse<ErrorResponseType>(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 export function wrapErrorResponse(
   error: ErrorResponseType,
   logger: EndpointLogger,
@@ -142,7 +212,7 @@ export function wrapErrorResponse(
   request?: NextRequest | null,
 ): NextResponse<ErrorResponseType> {
   // Build clean error chain
-  const { logChain } = buildErrorChain(error);
+  const { logChain, humanReadable } = buildErrorChain(error);
 
   // 4xx: delivered to the caller - usually expected (bad input, auth, no
   // credits), but several real client bugs only ever surfaced here (guest UI
@@ -172,6 +242,17 @@ export function wrapErrorResponse(
     logger.error(`API Error:\n${logChain.join("\n")}`, logMeta);
   } else {
     logger.warn(`API Error:\n${logChain.join("\n")}`, logMeta);
+  }
+
+  const wireError = request
+    ? v1WireErrorResponse(
+        request,
+        error.errorType.errorCode,
+        humanReadable.replaceAll(/\n\s*/g, " ").trim(),
+      )
+    : undefined;
+  if (wireError) {
+    return wireError;
   }
 
   // Validate error response format

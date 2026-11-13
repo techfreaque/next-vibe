@@ -7,7 +7,7 @@ export const translations = {
 
   openai: {
     missingKey:
-      "Missing API key. Send it as 'Authorization: Bearer <key>'. Create a key under Settings > API keys.",
+      "Missing API key. Send it as 'Authorization: Bearer <key>' or 'x-api-key: <key>'. Create a key under Settings > API keys.",
     invalidKey:
       "Invalid or revoked API key. Check the key or create a new one under Settings > API keys.",
     authUnavailable:
@@ -113,6 +113,166 @@ export const translations = {
       success: {
         title: "Completion created",
         description: "The model answered",
+      },
+    },
+  },
+
+  responses: {
+    previousResponseUnsupported:
+      "previous_response_id is not supported: responses are not stored. Send the full conversation in 'input' with store: false (Codex CLI does this by default).",
+    badInputItem:
+      "{{param}} is not usable: images must be http(s) or base64 data: URLs and tool items need a call_id.",
+    post: {
+      title: "OpenAI Responses API",
+      titleShort: "v1 responses",
+      description:
+        "Call any model with the OpenAI Responses format, the one Codex CLI speaks. Stateless: send the full conversation in input. Supports streaming, function, custom and local_shell tools, and reasoning items.",
+      fields: {
+        model: { label: "Model", description: "Model ID from GET /v1/models" },
+        input: {
+          label: "Input",
+          description:
+            "A string, or the conversation as Responses items (message, function_call, function_call_output, reasoning, ...)",
+        },
+        instructions: {
+          label: "Instructions",
+          description: "System instructions for the model",
+        },
+        stream: {
+          label: "Stream",
+          description: "Send the answer as Responses server-sent events",
+        },
+        tools: {
+          label: "Tools",
+          description:
+            "function, custom and local_shell tools. Hosted tools (web_search, ...) are skipped.",
+        },
+        toolChoice: {
+          label: "Tool choice",
+          description: "none, auto, required, or {type:'function', name}",
+        },
+        parallelToolCalls: {
+          label: "Parallel tool calls",
+          description: "Accepted for compatibility; the model decides",
+        },
+        maxOutputTokens: {
+          label: "Max output tokens",
+          description: "Upper bound on generated tokens",
+        },
+        temperature: {
+          label: "Temperature",
+          description: "Sampling temperature, 0 to 2",
+        },
+        topP: { label: "Top P", description: "Nucleus sampling, 0 to 1" },
+        reasoning: {
+          label: "Reasoning",
+          description:
+            "Accepted for compatibility. Reasoning models return reasoning items either way.",
+        },
+        text: {
+          label: "Text format",
+          description:
+            "{format:{type:'json_schema', schema}} asks for JSON output",
+        },
+        store: {
+          label: "Store",
+          description: "Responses are never stored; send false",
+        },
+        previousResponseId: {
+          label: "Previous response ID",
+          description: "Not supported: send the full conversation instead",
+        },
+        include: {
+          label: "Include",
+          description:
+            "Accepted for compatibility. Reasoning items always carry encrypted_content for replay.",
+        },
+      },
+      response: { object: "Object type" },
+      success: {
+        title: "Response created",
+        description: "The model answered",
+      },
+    },
+  },
+
+  messages: {
+    badContentBlock:
+      "{{param}} has a content block we cannot use: images must be base64 or http(s) URLs.",
+    post: {
+      title: "Anthropic Messages API",
+      titleShort: "v1 messages",
+      description:
+        "Call any model with the Anthropic Messages format, the one Claude Code speaks. Key as x-api-key or Authorization: Bearer. Supports streaming, tools and thinking blocks.",
+      fields: {
+        model: {
+          label: "Model",
+          description:
+            "Model ID from GET /v1/models. Claude ids like claude-sonnet-4-5-20250929 map to our matching Claude model.",
+        },
+        messages: {
+          label: "Messages",
+          description:
+            "Anthropic messages: user and assistant turns with text, image, tool_use, tool_result and thinking blocks",
+        },
+        system: {
+          label: "System",
+          description: "System prompt: a string or text blocks",
+        },
+        maxTokens: {
+          label: "Max tokens",
+          description: "Upper bound on generated tokens",
+        },
+        stream: {
+          label: "Stream",
+          description: "Send the answer as Anthropic server-sent events",
+        },
+        tools: {
+          label: "Tools",
+          description:
+            "Client tools: [{name, description, input_schema}]. Server tools (web_search, ...) are skipped.",
+        },
+        toolChoice: {
+          label: "Tool choice",
+          description: "{type: auto | any | none | tool, name}",
+        },
+        stopSequences: {
+          label: "Stop sequences",
+          description: "Strings that end the answer",
+        },
+        temperature: {
+          label: "Temperature",
+          description: "Sampling temperature",
+        },
+        topP: { label: "Top P", description: "Nucleus sampling, 0 to 1" },
+        thinking: {
+          label: "Thinking",
+          description:
+            "Accepted for compatibility. Reasoning models return thinking blocks either way.",
+        },
+      },
+      response: { type: "Object type" },
+      success: { title: "Message created", description: "The model answered" },
+    },
+  },
+
+  countTokens: {
+    post: {
+      title: "Anthropic token count",
+      titleShort: "v1 count tokens",
+      description:
+        "Estimate the input tokens of an Anthropic Messages request. Free: no model call, no credits.",
+      fields: {
+        action: { label: "Action", description: "Always count_tokens" },
+        model: { label: "Model", description: "Model ID" },
+        messages: { label: "Messages", description: "Anthropic messages" },
+        system: { label: "System", description: "System prompt" },
+        tools: { label: "Tools", description: "Tool definitions" },
+      },
+      response: { inputTokens: "Input tokens" },
+      success: {
+        title: "Tokens counted",
+        description: "Estimated input tokens",
       },
     },
   },

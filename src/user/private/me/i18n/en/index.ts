@@ -564,7 +564,7 @@ export const translations = {
       off: "Off",
       sessionsHint: "See every device and sign them out",
       apiKeys: "API keys",
-      apiKeysHint: "Call {{modelCount}} models from your own code",
+      apiKeysHint: "{{modelCount}} models in your code, Codex or Claude Code",
       exportData: "Export my data",
       exportDataHint: "Download a copy of everything we hold about you",
       creator: "Creator",

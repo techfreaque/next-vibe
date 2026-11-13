@@ -1,6 +1,7 @@
 /**
  * Request gate shared by every /v1 endpoint: API-key identity + per-key rate
- * limit. Returns the OpenAI-shaped error response when the call must stop.
+ * limit. Returns a format-neutral V1Error when the call must stop; the caller
+ * renders it in its own wire format (OpenAI or Anthropic).
  */
 
 import "server-only";
@@ -13,7 +14,6 @@ import {
 } from "@/api-keys/auth";
 import { consumeRateLimit } from "@/api-keys/keys";
 import { isPaidUser } from "@/api-keys/paid";
-import type { StreamingResponse } from "next-vibe/core/route/response.schema";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -21,17 +21,26 @@ import type {
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { V1T } from "../i18n";
-import { openAiError } from "./openai";
+import { type V1Error, v1Error } from "./errors";
 
 export type GateResult =
   | { ok: true; user: JwtPrivatePayloadType; key: UserApiKey }
-  | { ok: false; response: StreamingResponse };
+  | { ok: false; error: V1Error };
+
+export interface GateOptions {
+  /**
+   * false = authenticate without consuming the per-minute budget (free,
+   * local-only calls such as token counting that clients fire constantly).
+   */
+  consumeRateLimit?: boolean;
+}
 
 export async function gateApiKeyRequest(
   user: JwtPayloadType,
   request: Request | undefined,
   t: V1T,
   logger: EndpointLogger,
+  options: GateOptions = {},
 ): Promise<GateResult> {
   const resolution: ApiKeyResolution = request
     ? await ApiKeyAuth.keyForRequest(request, logger)
@@ -41,7 +50,7 @@ export async function gateApiKeyRequest(
   if (resolution.status === "unavailable") {
     return {
       ok: false,
-      response: openAiError(
+      error: v1Error(
         503,
         t("openai.authUnavailable", {
           seconds: API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
@@ -57,7 +66,7 @@ export async function gateApiKeyRequest(
     const missing = resolution.status === "missing";
     return {
       ok: false,
-      response: openAiError(
+      error: v1Error(
         401,
         missing ? t("openai.missingKey") : t("openai.invalidKey"),
         "authentication_error",
@@ -70,7 +79,7 @@ export async function gateApiKeyRequest(
     // Defence in depth: the key must belong to the resolved user.
     return {
       ok: false,
-      response: openAiError(
+      error: v1Error(
         401,
         t("openai.invalidKey"),
         "authentication_error",
@@ -83,7 +92,7 @@ export async function gateApiKeyRequest(
   if (!(await isPaidUser(user.id))) {
     return {
       ok: false,
-      response: openAiError(
+      error: v1Error(
         402,
         t("openai.paidRequired"),
         "insufficient_quota",
@@ -91,11 +100,14 @@ export async function gateApiKeyRequest(
       ),
     };
   }
+  if (options.consumeRateLimit === false) {
+    return { ok: true, user, key };
+  }
   const limit = consumeRateLimit(key.id, key.rateLimitPerMinute);
   if (!limit.allowed) {
     return {
       ok: false,
-      response: openAiError(
+      error: v1Error(
         429,
         t("openai.rateLimited", {
           limit: key.rateLimitPerMinute,

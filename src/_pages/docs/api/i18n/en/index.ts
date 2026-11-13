@@ -1,12 +1,12 @@
 export const translations = {
   meta: {
-    title: "{{appName}} API Docs - OpenAI-Compatible /v1",
+    title: "{{appName}} API Docs - OpenAI and Anthropic compatible",
     description:
-      "One endpoint, {{modelCount}} models. Drop-in OpenAI API: chat completions, streaming, tool calling. Authenticate with an sk-unb key, pay per token in credits.",
+      "One base URL, {{modelCount}} models. OpenAI chat completions and Responses API, Anthropic Messages API, streaming, tool calling. Codex CLI and Claude Code connect directly. Pay per token in credits.",
     category: "API",
     imageAlt: "{{appName}} OpenAI-compatible API docs",
     keywords:
-      "api, openai compatible, chat completions, streaming, function calling, tools, {{appName}}",
+      "api, openai compatible, anthropic compatible, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, {{appName}}",
   },
   nav: {
     quickstart: "Quickstart",
@@ -14,25 +14,30 @@ export const translations = {
     models: "Models",
     chat: "Chat completions",
     tools: "Tool calling",
+    responses: "Responses API",
+    messages: "Messages API",
     billing: "Credits and billing",
     limits: "Rate limits",
     errors: "Errors",
     codingTools: "Coding tools",
   },
   hero: {
-    badge: "OpenAI-compatible API",
+    badge: "OpenAI and Anthropic compatible",
     title: "One base URL.",
     titleHighlight: "Every model.",
     subtitle:
-      "Point any OpenAI SDK at {{appName}}. {{modelCount}} models, streaming, tool calling. Your key, your credits, no new client to learn.",
+      "Point any OpenAI or Anthropic SDK at {{appName}}. Codex CLI and Claude Code too. {{modelCount}} models, streaming, tool calling. Your key, your credits, no new client to learn.",
     ctaKey: "Get an API key",
     ctaPricing: "See plans",
   },
   quickstart: {
     title: "Call a model in 60 seconds",
     intro:
-      "The API speaks the OpenAI wire format. If your code runs against OpenAI, it runs here after two changes: the base URL and the key.",
+      "The API speaks the OpenAI and the Anthropic wire format. If your code runs against either, it runs here after two changes: the base URL and the key.",
     baseUrlLabel: "Base URL",
+    anthropicBaseUrlLabel: "Anthropic base URL",
+    anthropicBaseUrlNote:
+      "For Claude Code and Anthropic SDKs. Same URL without /v1: they add /v1/messages themselves.",
     baseUrlNote:
       "Any locale works in the path (en-US, de-DE, pl-PL). It only changes the language of error messages.",
     step1: {
@@ -58,12 +63,13 @@ export const translations = {
   auth: {
     title: "Authentication",
     intro:
-      "Send your key as a Bearer token on every request. Keys start with sk-unb-.",
+      "Send your key as a Bearer token on every request. Keys start with sk-unb-. Anthropic clients send it as x-api-key, and that works too.",
     header: "Authorization: Bearer sk-unb-YOUR_KEY",
+    headerAnthropic: "x-api-key: sk-unb-YOUR_KEY",
     points: {
       hash: "We store a hash, not the key. Lose it and you create a new one.",
       scope:
-        "A key works on /v1 only. It cannot touch your account, payments or settings.",
+        "A key works on the API only: /v1/models, /v1/chat/completions, /v1/responses and /v1/messages. It cannot touch your account, payments or settings.",
       limit:
         "Up to 20 active keys per account. Revoke any key at any time: it stops working at once.",
       missing:
@@ -74,7 +80,7 @@ export const translations = {
     title: "GET /v1/models",
     intro:
       "Lists the models your key can call right now, with context size, tool support and credit prices per million tokens. Use the id as the model field in requests.",
-    note: "The list depends on your account. Unknown or unavailable ids return 404 model_not_found. The API never silently swaps your model.",
+    note: "The list depends on your account. Unknown or unavailable ids return 404 model_not_found. The one mapping: on /v1/messages, Claude ids that Claude Code sends by default go to our newest Claude of the same family.",
   },
   chat: {
     title: "POST /v1/chat/completions",
@@ -164,7 +170,8 @@ export const translations = {
       "Errors use the OpenAI envelope, so SDKs raise their usual exceptions. Branch on error.code, not on the message.",
     columns: { status: "HTTP", code: "code", meaning: "Meaning" },
     rows: {
-      missingKey: "No Authorization header. Send Bearer sk-unb-...",
+      missingKey:
+        "No key sent. Send Authorization: Bearer sk-unb-..., or x-api-key.",
       invalidKey: "Key is wrong or revoked.",
       paid: "Account has no paid plan. Subscribe or buy credits.",
       credits: "Balance too low for this call. Top up.",
@@ -180,15 +187,61 @@ export const translations = {
     streamNote:
       "Errors that happen mid-stream arrive as a data: event with the same error object, followed by data: [DONE].",
   },
+  responses: {
+    title: "POST /v1/responses",
+    intro:
+      "The OpenAI Responses API, the format Codex CLI speaks. Same models, key, credits and rate limits as chat completions.",
+    request: {
+      title: "Request",
+      body: "input is a string or a list of input items. instructions is the system prompt. The answer arrives as output items. Every OpenAI SDK also gives you output_text.",
+    },
+    stream: {
+      title: "Streaming",
+      body: "Set stream: true for the Responses event stream: response.created, text deltas, then response.completed with usage.",
+    },
+    points: {
+      tools:
+        "Tools: function, custom and local_shell. The model's calls come back as output items. Send each result back as a function_call_output item with the same call_id.",
+      reasoning: "Reasoning models return reasoning items next to the answer.",
+      billing:
+        "Billing, model ids, errors and rate limits work exactly like chat completions.",
+    },
+    sdkTitle: "With the OpenAI Python SDK",
+  },
+  messages: {
+    title: "POST /v1/messages",
+    intro:
+      "The Anthropic Messages API, the format Claude Code and the Anthropic SDKs speak. Use the base URL without /v1: clients add /v1/messages themselves.",
+    request: {
+      title: "Request",
+      body: "Standard Messages request: model, max_tokens, system, messages. Text and image blocks in, text and tool_use blocks out.",
+    },
+    stream: {
+      title: "Streaming",
+      body: "Set stream: true for Anthropic server-sent events, from message_start to message_stop.",
+    },
+    points: {
+      auth: "Auth: x-api-key or Authorization: Bearer. Both take your sk-unb key.",
+      models:
+        "Model: any id from GET /v1/models. The Anthropic ids Claude Code sends by default, like claude-sonnet-4-5-20250929, map to our matching Claude model.",
+      tools:
+        "Tools: tool_use blocks out, tool_result blocks back, as in the Anthropic API.",
+      billing:
+        "Same credits, same prices, same rate limits as every other endpoint.",
+    },
+    countTokens: {
+      title: "POST /v1/messages/count_tokens",
+      body: "Counts the input tokens of a Messages request without running the model. Claude Code calls it to manage its context.",
+    },
+    sdkTitle: "With the Anthropic Python SDK",
+  },
   codingTools: {
     title: "Use it in your coding agent",
     intro:
-      "Same base URL, same key. OpenCode and Continue connect directly. Add any id from GET /v1/models to the config.",
-    opencodeTitle: "OpenCode",
-    continueTitle: "Continue",
-    bridgeTitle: "Codex CLI and Claude Code",
-    bridgeBody:
-      "Codex only speaks the Responses API, Claude Code only the Anthropic Messages API. Both work through a local LiteLLM bridge that converts to chat completions. The guide has tested configs for all four tools.",
+      "One base URL, one key. Codex CLI and Claude Code connect natively. OpenCode, Continue, Aider and Cline use chat completions. Copy a block, run it.",
+    keyPage:
+      "The API keys page shows the same blocks with your key already filled in.",
+    keyPageCta: "Get them with your key",
     guide: "Read the coding tools guide",
   },
   cta: {

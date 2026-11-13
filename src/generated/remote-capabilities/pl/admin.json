@@ -545874,10 +545874,12 @@
               "checks": [
                 {
                   "def": {
-                    "type": "custom",
-                    "check": "custom"
+                    "type": "string",
+                    "format": "url",
+                    "check": "string_format",
+                    "abort": false
                   },
-                  "type": "custom"
+                  "type": "string"
                 }
               ]
             },

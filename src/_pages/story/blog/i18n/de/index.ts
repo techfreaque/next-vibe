@@ -24,11 +24,11 @@ export const translations: typeof enTranslations = {
       readTime: "7 Min. Lesezeit",
     },
     codingTools: {
-      title: "Ein Key. Jedes Modell. Direkt im Coding-Agent.",
+      title: "Ein Key. Jedes Modell. Codex und Claude Code inklusive.",
       category: "Entwickler-Guide",
       excerpt:
-        "OpenCode, Continue, Codex CLI und Claude Code mit einem API-Key, unzensierte Modelle inklusive. Getestete Configs, die Brücke, die zwei davon brauchen, und unsere Stolperfallen.",
-      readTime: "9 Min. Lesezeit",
+        "Codex CLI, Claude Code, OpenCode, Continue, Aider und Cline mit einem API-Key, unzensierte Modelle inklusive. Eine Basis-URL, ein Befehl pro Tool, unsere Stolperfallen.",
+      readTime: "8 Min. Lesezeit",
     },
     uncensoredGuide: {
       title: "Die unzensierten Modelle, eins nach dem anderen.",

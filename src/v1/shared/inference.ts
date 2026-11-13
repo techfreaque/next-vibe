@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import type { LanguageModel, ModelMessage } from "ai";
+import type { LanguageModel, ModelMessage, ProviderMetadata } from "ai";
 import {
   generateText,
   jsonSchema,
@@ -63,7 +63,22 @@ export interface InferenceUsage {
   inputTokens: number;
   outputTokens: number;
   cachedInputTokens: number;
+  /** Part of outputTokens spent on reasoning (0 when unknown). */
+  reasoningTokens: number;
 }
+
+/**
+ * Provider replay data of a reasoning block (signatures, encrypted reasoning).
+ * Handed back to the client opaquely and restored as the reasoning part's
+ * providerOptions on the next turn.
+ */
+export type ReasoningReplay = ProviderMetadata;
+
+/** One piece of the model's answer, in the order the model produced it. */
+export type InferenceOutputPart =
+  | { type: "text"; text: string }
+  | { type: "reasoning"; text: string; replay: ReasoningReplay | undefined }
+  | ({ type: "tool-call" } & InferenceToolCall);
 
 export type OpenAiFinishReason =
   | "stop"
@@ -74,6 +89,8 @@ export type OpenAiFinishReason =
 export interface InferenceResult {
   text: string;
   toolCalls: InferenceToolCall[];
+  /** text, reasoning and tool calls in output order */
+  parts: InferenceOutputPart[];
   finishReason: OpenAiFinishReason;
   /** undefined when the provider reported no usage (billing falls back to an estimate). */
   usage: InferenceUsage | undefined;
@@ -81,8 +98,13 @@ export interface InferenceResult {
 
 export type InferenceStreamEvent =
   | { type: "text"; text: string }
+  | { type: "reasoning"; text: string }
+  /** closes the current reasoning block; replay = its provider metadata */
+  | { type: "reasoning-end"; replay: ReasoningReplay | undefined }
   | { type: "tool-call-start"; id: string; name: string }
   | { type: "tool-call-delta"; id: string; argumentsDelta: string }
+  /** the call's arguments are complete */
+  | { type: "tool-call-end"; id: string }
   | { type: "error"; message: string }
   | {
       type: "finish";
@@ -112,6 +134,7 @@ interface RawUsage {
   inputTokens: number | undefined;
   outputTokens: number | undefined;
   inputTokenDetails?: { cacheReadTokens?: number | undefined } | undefined;
+  outputTokenDetails?: { reasoningTokens?: number | undefined } | undefined;
 }
 
 function mapUsage(usage: RawUsage): InferenceUsage | undefined {
@@ -122,10 +145,26 @@ function mapUsage(usage: RawUsage): InferenceUsage | undefined {
     inputTokens: usage.inputTokens ?? 0,
     outputTokens: usage.outputTokens ?? 0,
     cachedInputTokens: usage.inputTokenDetails?.cacheReadTokens ?? 0,
+    reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? 0,
   };
 }
 
-type JsonValue = z.infer<ReturnType<typeof z.json>>;
+/** Merges per-delta provider metadata of one reasoning block (later wins per key). */
+function mergeReplay(
+  into: ReasoningReplay | undefined,
+  next: ProviderMetadata | undefined,
+): ReasoningReplay | undefined {
+  if (!next) {
+    return into;
+  }
+  const merged: ReasoningReplay = { ...into };
+  for (const [provider, values] of Object.entries(next)) {
+    merged[provider] = { ...merged[provider], ...values };
+  }
+  return merged;
+}
+
+export type JsonValue = z.infer<ReturnType<typeof z.json>>;
 
 const EMPTY_PARAMETERS: JSONSchema7 = { type: "object", properties: {} };
 
@@ -207,13 +246,33 @@ function buildCall(request: InferenceRequest): {
 export const aiSdkRunner: InferenceRunner = {
   async generate(request) {
     const result = await generateText(buildCall(request));
+    const parts: InferenceOutputPart[] = [];
+    for (const part of result.content) {
+      if (part.type === "text" && part.text !== "") {
+        parts.push({ type: "text", text: part.text });
+      } else if (part.type === "reasoning") {
+        parts.push({
+          type: "reasoning",
+          text: part.text,
+          replay: part.providerMetadata,
+        });
+      } else if (part.type === "tool-call") {
+        parts.push({
+          type: "tool-call",
+          id: part.toolCallId,
+          name: part.toolName,
+          arguments: JSON.stringify(part.input ?? {}),
+        });
+      }
+    }
     return {
       text: result.text,
       toolCalls: result.toolCalls.map((call) => ({
         id: call.toolCallId,
         name: call.toolName,
-        arguments: JSON.stringify(call.input),
+        arguments: JSON.stringify(call.input ?? {}),
       })),
+      parts,
       finishReason: mapFinishReason(result.finishReason),
       usage: mapUsage(result.usage),
     };
@@ -223,9 +282,28 @@ export const aiSdkRunner: InferenceRunner = {
     const result = streamText(buildCall(request));
     // Providers differ: some stream argument deltas, some only emit the final call.
     const streamedCalls = new Set<string>();
+    let replay: ReasoningReplay | undefined;
+    let inReasoning = false;
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         yield { type: "text", text: part.text };
+      } else if (part.type === "reasoning-start") {
+        inReasoning = true;
+        replay = mergeReplay(undefined, part.providerMetadata);
+      } else if (part.type === "reasoning-delta") {
+        replay = mergeReplay(replay, part.providerMetadata);
+        if (part.text !== "") {
+          yield { type: "reasoning", text: part.text };
+        }
+      } else if (part.type === "reasoning-end") {
+        if (inReasoning) {
+          inReasoning = false;
+          yield {
+            type: "reasoning-end",
+            replay: mergeReplay(replay, part.providerMetadata),
+          };
+          replay = undefined;
+        }
       } else if (part.type === "tool-input-start") {
         streamedCalls.add(part.id);
         yield { type: "tool-call-start", id: part.id, name: part.toolName };
@@ -235,6 +313,8 @@ export const aiSdkRunner: InferenceRunner = {
           id: part.id,
           argumentsDelta: part.delta,
         };
+      } else if (part.type === "tool-input-end") {
+        yield { type: "tool-call-end", id: part.id };
       } else if (part.type === "tool-call") {
         if (!streamedCalls.has(part.toolCallId)) {
           yield {
@@ -245,8 +325,9 @@ export const aiSdkRunner: InferenceRunner = {
           yield {
             type: "tool-call-delta",
             id: part.toolCallId,
-            argumentsDelta: JSON.stringify(part.input),
+            argumentsDelta: JSON.stringify(part.input ?? {}),
           };
+          yield { type: "tool-call-end", id: part.toolCallId };
         }
       } else if (part.type === "error") {
         // Surface provider errors to the caller (becomes an SSE error + billing of what ran).

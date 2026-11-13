@@ -577,7 +577,8 @@ export const translations: typeof enTranslations = {
       off: "Aus",
       sessionsHint: "Alle Geräte sehen und abmelden",
       apiKeys: "API-Schlüssel",
-      apiKeysHint: "{{modelCount}} Modelle aus dem eigenen Code nutzen",
+      apiKeysHint:
+        "{{modelCount}} Modelle in deinem Code, Codex oder Claude Code",
       exportData: "Meine Daten exportieren",
       exportDataHint:
         "Lade eine Kopie aller Daten herunter, die wir über dich speichern",

@@ -1,24 +1,24 @@
 export const translations = {
   meta: {
-    title: "Every model in your coding agent - {{appName}} API",
+    title: "Codex CLI and Claude Code on every model - {{appName}} API",
     description:
-      "Run OpenCode, Continue, Codex CLI and Claude Code on one {{appName}} key. Claude, GPT, DeepSeek, GLM and uncensored models. Tested configs, real gotchas.",
+      "Codex CLI, Claude Code, OpenCode, Continue, Aider and Cline on one {{appName}} key. Claude, GPT, DeepSeek, GLM and uncensored models. One base URL, one command per tool.",
     category: "Developer Guide",
     imageAlt: "{{appName}} API inside coding tools",
     keywords:
-      "{{appName}}, OpenAI compatible API, OpenCode, Codex CLI, Claude Code, Continue, LiteLLM, coding agent, uncensored models, custom provider",
+      "{{appName}}, Codex CLI, Claude Code, OpenCode, Continue, Aider, Cline, OpenAI compatible API, Responses API, Anthropic Messages API, coding agent, uncensored models, custom provider",
   },
   hero: {
     backToBlog: "Back to Blog",
     category: "Developer Guide",
-    readTime: "9 min read",
-    title: "One key. Every model. Inside your coding agent.",
+    readTime: "8 min read",
+    title: "One key. Every model. Codex and Claude Code included.",
     subtitle:
-      "Plug the {{appName}} API into OpenCode, Continue, Codex CLI and Claude Code. Every config below ran end to end before we published it.",
+      "Codex CLI and Claude Code now connect to {{appName}} directly, next to OpenCode, Continue, Aider and Cline. One base URL, one key, one command per tool.",
   },
   intro: {
     lead: "Your coding agent is locked to one vendor's models. Want a second opinion from another lab, a cheaper model for grunt work, or a model that does not refuse? That means another account, another key, another bill.",
-    p2: "{{appName}} speaks the OpenAI chat completions format. Point a tool at it once and you can switch between Claude, GPT, DeepSeek, GLM, Kimi, Qwen and the uncensored models by changing one model id. Two tools connect directly. Two need a small local bridge. Here is exactly how, with the versions we tested.",
+    p2: "{{appName}} speaks all three formats coding agents use: OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API. Nothing to install in between. Point a tool at us once, then switch between Claude, GPT, DeepSeek, GLM, Kimi, Qwen and the uncensored models by changing one model id.",
   },
   why: {
     title: "Why bother",
@@ -29,75 +29,67 @@ export const translations = {
     switch:
       "Right model per task. A frontier model for the hard refactor, a flash model for renames and test scaffolding. Same config, different id.",
     billing:
-      "Same credits as the chat app, same prices. Every response reports what it cost in usage.credits_charged.",
+      "Same credits as the chat app, same prices. Every response reports what it cost.",
   },
   setup: {
     title: "Get a key and a base URL",
     intro: "Two values. Every tool below needs exactly these.",
     p1: "Create a key under Settings > API keys. It starts with sk-unb- and is shown once. The API is part of every paid plan: an active subscription or any credit pack unlocks it.",
+    shortcut:
+      "Fastest path: right after you create a key, the API keys page shows every block below with your key already filled in. Pick your tool, copy, run.",
     baseUrlLabel: "Base URL",
     baseUrlNote:
-      "The locale in the path only changes the language of error messages. Any locale works.",
-    p2: "Put the key in an environment variable, never in a file you commit. The curl call proves the key works and lists every model id your account can call, with context size, tool support and credit prices.",
+      "For OpenAI-style tools: Codex, OpenCode, Continue, Aider, Cline. The locale in the path only changes the language of error messages.",
+    anthropicBaseUrlLabel: "Anthropic base URL",
+    anthropicBaseUrlNote:
+      "For Claude Code and Anthropic SDKs. Same URL without /v1: they add /v1/messages themselves.",
+    p2: "Keep the key in an environment variable, never in a file you commit. The curl call proves the key works and lists every model id your account can call, with context size, tool support and credit prices.",
   },
   compat: {
-    title: "What connects how",
+    title: "Every tool connects directly",
     intro:
-      "Coding agents speak three different wire formats. We serve one of them, chat completions. That decides the setup.",
-    opencode:
-      "OpenCode: direct. Speaks chat completions through its OpenAI-compatible provider.",
-    continue:
-      "Continue (CLI and IDE extension): direct. provider: openai with a custom apiBase.",
-    codex:
-      "Codex CLI: needs a bridge. Current Codex only speaks the OpenAI Responses API. Chat completions support was removed in early 2026.",
-    claudeCode:
-      "Claude Code: needs a bridge. It speaks the Anthropic Messages API, not the OpenAI format.",
+      "Coding agents speak three different wire formats. We serve all three, on the same key and the same models.",
+    codex: "Codex CLI: OpenAI Responses API.",
+    claudeCode: "Claude Code: Anthropic Messages API.",
+    chat: "OpenCode, Continue, Aider, Cline: OpenAI chat completions.",
     other:
-      "Anything else with an OpenAI base URL field follows the OpenCode pattern: base URL, key, model id. We only list tools we ran ourselves.",
+      "Anything else with a base URL field works the same way: base URL, key, model id.",
+  },
+  wire: {
+    responses: "Responses API",
+    messages: "Messages API",
+    chat: "Chat completions",
+  },
+  codex: {
+    intro:
+      "OpenAI's terminal agent. Reads your repo, runs commands, edits files.",
+    p1: "Codex speaks the Responses API, and so do we. The one command defines the provider inline: nothing to edit, nothing to install. For daily use, append the config once and start Codex with the profile.",
+    p2: 'Switch models with -m or the model line in the profile. Keep wire_api = "responses": current Codex accepts nothing else.',
+  },
+  claudeCode: {
+    intro:
+      "Anthropic's terminal agent. Plans, edits, runs tests, spawns subagents.",
+    p1: "Claude Code reads its gateway from environment variables. ANTHROPIC_BASE_URL is the base URL without /v1. ANTHROPIC_MODEL sets the main model. The OPUS and SONNET defaults cover the model picker and plan mode, the HAIKU default moves background jobs such as session titles to a cheap model, and CLAUDE_CODE_SUBAGENT_MODEL covers subagents. CLAUDE_CODE_MAX_CONTEXT_TOKENS tells Claude Code the real context size of a non-Claude model, so it compacts at the right point.",
+    p2: "Want Claude itself? Drop the model lines. Claude Code asks for its usual Claude ids and we route them to our matching Claude model, billed in credits.",
+    p3: "Claude Code sends a big system prompt, over 30k input tokens even for a trivial task. A cheap default model keeps that affordable.",
   },
   opencode: {
-    label: "Direct",
-    title: "OpenCode",
-    intro:
-      "Tested with OpenCode 1.19.5. Tool calls, file reads and edits work.",
-    p1: "Add a custom provider to opencode.json in your project, or to ~/.config/opencode/opencode.json for every project. The key stays in your environment. Add any id from GET /models to the models map.",
-    p2: "Then run it, or pick the model with /models in the TUI:",
+    intro: "Open-source terminal agent with a TUI and a headless run mode.",
+    p1: "Save the config as opencode.json in your project, or as ~/.config/opencode/opencode.json for every project. The key stays in your environment. Add any id from GET /v1/models to the models map, then pick one with /models in the TUI.",
     gotcha:
       "Update OpenCode first. Old 1.0.x builds pull the newest @ai-sdk/openai-compatible package and crash after the first tool call with DecimalError: Invalid argument. 1.19.5 runs the same config clean.",
   },
   continue: {
-    label: "Direct",
-    title: "Continue",
-    intro:
-      "Tested with the Continue CLI 1.5.47. The IDE extension reads the same config.yaml.",
-    p1: "secrets.UNBOTTLED_API_KEY resolves from your environment. Run headless with -p, or drop -p for the interactive session:",
+    intro: "Coding assistant for VS Code and JetBrains, plus the cn CLI.",
+    p1: "secrets.UNBOTTLED_API_KEY resolves from your environment. Add -p with a prompt for a headless run. The IDE extension reads ~/.continue/config.yaml: put the same model entry there.",
   },
-  bridge: {
-    label: "Bridge",
-    title: "The LiteLLM bridge",
-    intro:
-      "Codex and Claude Code need a translator. LiteLLM runs on your machine and converts their formats to chat completions.",
-    p1: "One LiteLLM proxy serves both tools. It exposes /v1/responses for Codex and /v1/messages for Claude Code, and forwards everything to {{appName}} as chat completions. List each model you want to use. Tested with LiteLLM 1.109.1.",
-    gotcha:
-      "Use the custom_openai/ prefix, not openai/. With openai/, LiteLLM forwards Codex calls as native Responses requests, and our API answers 404. LiteLLM also refuses to start without LITELLM_MASTER_KEY. That value is the key your tools send to the bridge. Your sk-unb key never leaves the proxy.",
+  aider: {
+    intro: "Pair programming in your terminal, commits included.",
+    p1: "One command, no config file. Aider wants openai/ in front of the model id and strips it before it calls us. --edit-format diff keeps edits small; without it Aider falls back to resending whole files for model ids it does not know. Name the files to edit on the command line, as usual with Aider.",
   },
-  codex: {
-    label: "Via bridge",
-    title: "Codex CLI",
-    intro:
-      "Tested with codex-cli 0.118.0. It ran a shell command and answered from its output.",
-    p1: 'Point a custom provider at the bridge. wire_api must be "responses". Codex rejects "chat" at startup with a hard error. env_key names the variable that holds your bridge key.',
-    p2: "Use the model ids from litellm.yaml. To switch models, add the id to the bridge config and change model in config.toml, or pass -m on the command line.",
-  },
-  claudeCode: {
-    label: "Via bridge",
-    title: "Claude Code",
-    intro:
-      "Tested with Claude Code 2.1.322. It used its Read tool across three turns and answered correctly.",
-    p1: "Claude Code reads the gateway from environment variables. ANTHROPIC_MODEL sets the main model. ANTHROPIC_DEFAULT_HAIKU_MODEL moves background jobs such as session titles to a cheap model, so they do not burn the main one.",
-    p2: "Claude Code warns that it does not recognize the model id and assumes a 200k context window. That is expected and harmless. The cost it prints is its own estimate. Your real cost is the credits charged on {{appName}}.",
-    caveat:
-      "Anthropic does not support running Claude Code on non-Claude models through a gateway. It works, and we tested it, but treat it as experimental: a Claude Code update can break it. Claude Code also sends a large system prompt, over 30k input tokens for a trivial task. Pick a cheap model or watch your balance.",
+  cline: {
+    intro: "Autonomous coding agent, in VS Code and as a CLI.",
+    p1: "Two commands with the Cline CLI: save the provider once, then run cline. Base URL, key and model id are the same three values as everywhere else.",
   },
   models: {
     title: "Which model for which job",
@@ -116,27 +108,27 @@ export const translations = {
       body: "Same agent workflow, no refusal reflex. Exploit analysis, red-team tooling, adult fiction pipelines, scrapers other models lecture you about. You stay responsible for what you build.",
     },
     listNote:
-      "Ids change as models get replaced. GET /models is the source of truth: if an id is not listed for your key, the API returns 404 model_not_found and never swaps in a different model.",
+      "Ids change as models get replaced. GET /v1/models is the source of truth: if an id is not listed for your key, the API returns 404 model_not_found. The one mapping is for Claude Code: its built-in Claude ids go to our newest Claude of the same family.",
   },
   gotchas: {
     title: "Gotchas we hit",
     intro: "So you do not have to.",
     localeUrl:
       "Copy the base URL exactly, /api/<locale>/v1 included. Without the locale you get a redirect that some clients drop. Without /api you get an HTML page instead of JSON.",
+    anthropicUrl:
+      "Claude Code gets the base URL without /v1. With /v1 it calls /v1/v1/messages and gets a 404.",
     modelId:
-      "Use the exact id from GET /models, like deepseek-v4.1-flash. Provider prefixes such as openai/ belong in the LiteLLM config only, never in the request.",
+      "Use the exact id from GET /v1/models, like deepseek-v4.1-flash. Aider wants openai/ in front. Claude Code's built-in Claude ids are mapped for you to our newest Claude of the same family. Any other unknown id returns 404 model_not_found.",
     paid: "HTTP 402 with paid_plan_required means the account has no paid plan yet. Any credit pack fixes it.",
     tools:
-      "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /models.",
-    bridgeKey:
-      "Behind the bridge, a 401 can come from either side. LiteLLM rejects a wrong master key. {{appName}} rejects a wrong sk-unb key. The LiteLLM log says which.",
+      "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /v1/models.",
     rateLimit:
       "Each key allows 60 requests per minute. Agents fire many small calls. If you hit 429, give the agent its own key.",
   },
   cta: {
-    title: "Wire it up in five minutes.",
+    title: "Wired up in one command.",
     subtitle:
-      "Create a key, paste one config, pick a model. The API docs cover every field, error code and streaming detail.",
+      "Create a key, copy the block for your tool, pick a model. The API docs cover every endpoint, field, error code and streaming detail.",
     key: "Create an API key",
     docs: "Read the API docs",
   },

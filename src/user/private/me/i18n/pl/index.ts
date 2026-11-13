@@ -571,7 +571,8 @@ export const translations: typeof enTranslations = {
       off: "Wył.",
       sessionsHint: "Zobacz urządzenia i wyloguj je",
       apiKeys: "Klucze API",
-      apiKeysHint: "{{modelCount}} modeli z własnego kodu",
+      apiKeysHint:
+        "{{modelCount}} modeli w twoim kodzie, Codex albo Claude Code",
       exportData: "Eksportuj moje dane",
       exportDataHint: "Pobierz kopię wszystkiego, co o Tobie przechowujemy",
       creator: "Twórca",

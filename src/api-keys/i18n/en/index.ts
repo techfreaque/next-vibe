@@ -4,23 +4,30 @@ export const translations = {
   widget: {
     upgradeTitle: "API access is a paid feature",
     upgradeBody:
-      "Subscribe or buy a credit pack to unlock API keys and the OpenAI-compatible /v1 endpoint. Free-tier accounts can still read the docs.",
+      "Subscribe or buy a credit pack to unlock API keys. One key runs your own code, Codex CLI, Claude Code and every OpenAI-compatible tool. Free-tier accounts can still read the docs.",
     upgradeCta: "Upgrade to unlock",
     docsLink: "Read the API docs",
     back: "Back",
     loading: "Loading API keys…",
     intro:
-      "Call {{modelCount}} models from your own code. OpenAI-compatible. Billed against your credits at the same price as chat.",
+      "Call {{modelCount}} models from your code and your coding agent. OpenAI and Anthropic formats. Billed against your credits at the same price as chat.",
     baseUrlTitle: "Base URL",
-    baseUrlHint: "Point any OpenAI SDK here and use a key below.",
-    exampleTitle: "Example",
+    baseUrlHint: "OpenAI SDKs, Codex, OpenCode, Continue, Aider, Cline.",
+    anthropicBaseUrlTitle: "Anthropic base URL",
+    anthropicBaseUrlHint:
+      "Claude Code and Anthropic SDKs. Same URL without /v1: they add /v1/messages themselves.",
+    setupTitle: "Connect a tool",
+    setupKeyFilled:
+      "Your new key is already in every block. Copy, paste, run. After you dismiss it, the blocks go back to the placeholder.",
+    setupKeyMissing:
+      "Blocks show {{placeholder}}. Create a key and they fill in with it.",
     copy: "Copy",
     copied: "Copied",
     keysTitle: "Your keys",
     empty: "No API keys yet",
     emptyHint: "Create one to start calling the API.",
     nameLabel: "Key name",
-    namePlaceholder: "e.g. Production backend",
+    namePlaceholder: "e.g. Claude Code laptop",
     create: "Create key",
     creating: "Creating…",
     createFailed: "Couldn't create the key. Try again.",
@@ -36,17 +43,56 @@ export const translations = {
     revokeFailed: "Couldn't revoke that key. Try again.",
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Created {{created}} · {{rate}}",
-    keyPlaceholder: "sk-unb-YOUR_KEY",
     rateLimit: "{{n}} req/min",
     billingNote:
-      "Out of credits returns HTTP 402. Streaming is supported (stream: true).",
+      "Out of credits returns HTTP 402. Streaming works on every endpoint.",
+  },
+
+  codingTools: {
+    blocks: {
+      oneCommand: "One command",
+      config: "Permanent setup",
+      run: "Then start it",
+      fields: "Settings",
+      check: "Check your key",
+      request: "First request",
+    },
+    tested: "Tested with {{name}} {{version}}",
+    anyModel:
+      "Swap {{model}} for any id from GET /v1/models, like {{examples}}.",
+    tools: {
+      codex: {
+        hint: "Paste the command and Codex runs on unbottled.ai. To keep it, append the block to ~/.codex/config.toml and start Codex with --profile unbottled.",
+      },
+      claudeCode: {
+        hint: "Paste the command and Claude Code runs on unbottled.ai. To keep it, put the same values in the env block of ~/.claude/settings.json, next to what is already there. Drop the model lines and Claude Code runs on our Claude models under the names it already knows.",
+      },
+      opencode: {
+        hint: "Save as opencode.json in your project, or as ~/.config/opencode/opencode.json for every project. Add any model id to the models map.",
+      },
+      continue: {
+        hint: "Runs the Continue CLI. The IDE extension reads ~/.continue/config.yaml: add the same model entry there.",
+      },
+      aider: {
+        hint: "One command. Aider wants openai/ in front of the model id. Name the files to edit after the command, as usual.",
+      },
+      cline: {
+        hint: "Two commands with the Cline CLI: save the provider once, then run cline.",
+      },
+      openaiCompatible: {
+        hint: "Any tool or SDK with a base URL field. OpenAI-style tools take the /v1 URL. Anthropic-style tools take the URL without /v1. Same key, same models.",
+      },
+      curl: {
+        hint: "Prove the key works and list every model id you can call. Then send a first request.",
+      },
+    },
   },
 
   list: {
     title: "API keys",
     titleShort: "API keys",
     description:
-      "Create and revoke keys for the OpenAI-compatible API. Shows the base URL and your keys.",
+      "Create and revoke API keys. Shows the base URLs, ready setups for coding tools and your keys.",
     tag: "API",
     response: {
       baseUrl: "Base URL",
@@ -63,7 +109,7 @@ export const translations = {
     title: "Create API key",
     titleShort: "New key",
     description:
-      "Create a key for the OpenAI-compatible API. The full key is returned once.",
+      "Create a key for the API. Works with OpenAI and Anthropic clients. The full key is returned once.",
     tag: "API",
     form: {
       name: "Key name",

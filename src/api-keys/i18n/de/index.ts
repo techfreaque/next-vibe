@@ -6,24 +6,30 @@ export const translations: typeof enTranslations = {
   widget: {
     upgradeTitle: "API-Zugang ist ein Bezahlfeature",
     upgradeBody:
-      "Abonniere oder kaufe ein Credit-Paket, um API-Schlüssel und den OpenAI-kompatiblen /v1-Endpunkt freizuschalten. Die Doku kannst du auch im kostenlosen Tarif lesen.",
+      "Abonniere oder kaufe ein Credit-Paket, um API-Schlüssel freizuschalten. Ein Schlüssel für deinen eigenen Code, Codex CLI, Claude Code und jedes OpenAI-kompatible Tool. Die Doku kannst du auch im kostenlosen Tarif lesen.",
     upgradeCta: "Jetzt freischalten",
     docsLink: "API-Doku lesen",
     back: "Zurück",
     loading: "API-Schlüssel werden geladen…",
     intro:
-      "{{modelCount}} Modelle aus dem eigenen Code. OpenAI-kompatibel. Abrechnung über deine Credits, zum selben Preis wie im Chat.",
+      "{{modelCount}} Modelle für deinen Code und deinen Coding-Agent. OpenAI- und Anthropic-Format. Abrechnung über deine Credits, zum selben Preis wie im Chat.",
     baseUrlTitle: "Basis-URL",
-    baseUrlHint:
-      "Trag sie in jedes OpenAI-SDK ein und nutze einen Schlüssel unten.",
-    exampleTitle: "Beispiel",
+    baseUrlHint: "OpenAI-SDKs, Codex, OpenCode, Continue, Aider, Cline.",
+    anthropicBaseUrlTitle: "Anthropic-Basis-URL",
+    anthropicBaseUrlHint:
+      "Claude Code und Anthropic-SDKs. Dieselbe URL ohne /v1: /v1/messages hängen sie selbst an.",
+    setupTitle: "Tool verbinden",
+    setupKeyFilled:
+      "Dein neuer Schlüssel steckt schon in jedem Block. Kopieren, einfügen, starten. Nach „Gespeichert“ zeigen die Blöcke wieder den Platzhalter.",
+    setupKeyMissing:
+      "Die Blöcke zeigen {{placeholder}}. Erstell einen Schlüssel, dann steht er hier drin.",
     copy: "Kopieren",
     copied: "Kopiert",
     keysTitle: "Deine Schlüssel",
     empty: "Noch keine API-Schlüssel",
     emptyHint: "Erstelle einen, um die API zu nutzen.",
     nameLabel: "Name des Schlüssels",
-    namePlaceholder: "z. B. Produktiv-Backend",
+    namePlaceholder: "z. B. Claude Code Laptop",
     create: "Schlüssel erstellen",
     creating: "Wird erstellt…",
     createFailed: "Schlüssel konnte nicht erstellt werden. Versuch es erneut.",
@@ -40,17 +46,56 @@ export const translations: typeof enTranslations = {
       "Schlüssel konnte nicht widerrufen werden. Versuch es erneut.",
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Erstellt {{created}} · {{rate}}",
-    keyPlaceholder: "sk-unb-DEIN_SCHLUESSEL",
     rateLimit: "{{n}} Anfr./Min.",
     billingNote:
-      "Leere Credits liefern HTTP 402. Streaming wird unterstützt (stream: true).",
+      "Leere Credits liefern HTTP 402. Streaming funktioniert auf jedem Endpunkt.",
+  },
+
+  codingTools: {
+    blocks: {
+      oneCommand: "Ein Befehl",
+      config: "Dauerhaft einrichten",
+      run: "Dann starten",
+      fields: "Einstellungen",
+      check: "Schlüssel prüfen",
+      request: "Erste Anfrage",
+    },
+    tested: "Getestet mit {{name}} {{version}}",
+    anyModel:
+      "Statt {{model}} geht jede ID aus GET /v1/models, etwa {{examples}}.",
+    tools: {
+      codex: {
+        hint: "Befehl einfügen, und Codex läuft auf unbottled.ai. Für dauerhaft: Block an ~/.codex/config.toml anhängen und Codex mit --profile unbottled starten.",
+      },
+      claudeCode: {
+        hint: "Befehl einfügen, und Claude Code läuft auf unbottled.ai. Für dauerhaft: dieselben Werte in den env-Block von ~/.claude/settings.json, neben die vorhandenen Einträge. Ohne die Modellzeilen nutzt Claude Code unsere Claude-Modelle unter den Namen, die es ohnehin kennt.",
+      },
+      opencode: {
+        hint: "Als opencode.json ins Projekt legen, oder als ~/.config/opencode/opencode.json für alle Projekte. Jede Modell-ID passt in die models-Liste.",
+      },
+      continue: {
+        hint: "Startet die Continue CLI. Die IDE-Erweiterung liest ~/.continue/config.yaml: denselben Modelleintrag dort ergänzen.",
+      },
+      aider: {
+        hint: "Ein Befehl. Aider will openai/ vor der Modell-ID. Die zu bearbeitenden Dateien hängst du wie gewohnt an.",
+      },
+      cline: {
+        hint: "Zwei Befehle mit der Cline-CLI: Provider einmal speichern, dann cline starten.",
+      },
+      openaiCompatible: {
+        hint: "Jedes Tool und jedes SDK mit einem Feld für die Basis-URL. OpenAI-Tools bekommen die URL mit /v1, Anthropic-Tools die URL ohne /v1. Gleicher Schlüssel, gleiche Modelle.",
+      },
+      curl: {
+        hint: "Prüft den Schlüssel und listet jede Modell-ID, die du aufrufen darfst. Danach die erste Anfrage.",
+      },
+    },
   },
 
   list: {
     title: "API-Schlüssel",
     titleShort: "API-Schlüssel",
     description:
-      "Schlüssel für die OpenAI-kompatible API erstellen und widerrufen. Zeigt Basis-URL und deine Schlüssel.",
+      "API-Schlüssel erstellen und widerrufen. Zeigt die Basis-URLs, fertige Setups für Coding-Tools und deine Schlüssel.",
     tag: "API",
     response: {
       baseUrl: "Basis-URL",
@@ -67,7 +112,7 @@ export const translations: typeof enTranslations = {
     title: "API-Schlüssel erstellen",
     titleShort: "Neuer Schlüssel",
     description:
-      "Erstellt einen Schlüssel für die OpenAI-kompatible API. Der volle Schlüssel wird nur einmal ausgegeben.",
+      "Erstellt einen API-Schlüssel. Funktioniert mit OpenAI- und Anthropic-Clients. Der volle Schlüssel wird nur einmal ausgegeben.",
     tag: "API",
     form: {
       name: "Name des Schlüssels",

@@ -10,13 +10,20 @@ import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Key } from "next-vibe/ui/components/icons/Key";
-import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 
+import {
+  buildCodingToolSnippets,
+  buildPublicApiBaseUrl,
+  CODING_TOOL_EXAMPLE_MODELS,
+  CODING_TOOL_IDS,
+  CODING_TOOL_MODEL,
+} from "@/api-keys/coding-tools";
+import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -28,7 +35,6 @@ import {
   StepList,
 } from "../../story/_shared/marketing";
 import { scopedTranslation } from "./i18n";
-import { buildCodingToolSnippets } from "../../story/blog/unbottled-api-in-coding-tools/snippets";
 import { buildDocsSnippets } from "./snippets";
 
 export interface ApiDocsPageData {
@@ -47,7 +53,7 @@ export async function tanstackLoader({
   return {
     locale,
     modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
-    baseUrl: `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}/v1`,
+    baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
     platform: Platform.NEXT_PAGE,
   };
 }
@@ -207,8 +213,9 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const { t: toolT } = apiKeysScopedTranslation.scopedT(locale);
   const snippets = buildDocsSnippets(baseUrl);
-  const toolSnippets = buildCodingToolSnippets(baseUrl);
+  const toolSnippets = buildCodingToolSnippets({ baseUrl });
 
   return (
     <Div className="min-h-screen bg-background">
@@ -257,9 +264,22 @@ export function TanstackPage({
                 <Span className="font-semibold">
                   {t("quickstart.baseUrlLabel")}:
                 </Span>{" "}
-                <Span className="font-mono text-sm">{baseUrl}</Span>
+                <Span className="font-mono text-sm [overflow-wrap:anywhere]">
+                  {toolSnippets.baseUrl}
+                </Span>
                 <P className="mt-2 mb-0 text-sm text-muted-foreground">
                   {t("quickstart.baseUrlNote")}
+                </P>
+                <P className="mt-3 mb-0">
+                  <Span className="font-semibold">
+                    {t("quickstart.anthropicBaseUrlLabel")}:
+                  </Span>{" "}
+                  <Span className="font-mono text-sm [overflow-wrap:anywhere]">
+                    {toolSnippets.anthropicBaseUrl}
+                  </Span>
+                </P>
+                <P className="mt-2 mb-0 text-sm text-muted-foreground">
+                  {t("quickstart.anthropicBaseUrlNote")}
                 </P>
               </Callout>
             </Step>
@@ -305,6 +325,7 @@ export function TanstackPage({
       >
         <Div className="flex flex-col gap-6">
           <Code code={t("auth.header")} filename="header" />
+          <Code code={t("auth.headerAnthropic")} filename="header" />
           <Bullets
             items={[
               t("auth.points.hash"),
@@ -443,6 +464,99 @@ export function TanstackPage({
       </PageSection>
 
       <PageSection
+        id="responses"
+        tone="muted"
+        label={t("nav.responses")}
+        title={t("responses.title")}
+        intro={t("responses.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("responses.request.title")}>
+            <Prose>{t("responses.request.body")}</Prose>
+            <Code code={snippets.responses} filename="request" />
+            <Code
+              code={snippets.responsesResponse}
+              language="json"
+              filename="200"
+            />
+          </Block>
+          <Block title={t("responses.stream.title")}>
+            <Prose>{t("responses.stream.body")}</Prose>
+            <Code
+              code={snippets.responsesStream}
+              language="text"
+              filename="200"
+            />
+          </Block>
+          <Block title={t("responses.sdkTitle")}>
+            <Code
+              code={snippets.responsesPython}
+              language="python"
+              filename={t("quickstart.step3.python")}
+            />
+          </Block>
+          <Bullets
+            items={[
+              t("responses.points.tools"),
+              t("responses.points.reasoning"),
+              t("responses.points.billing"),
+            ]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="messages"
+        label={t("nav.messages")}
+        title={t("messages.title")}
+        intro={t("messages.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("messages.request.title")}>
+            <Prose>{t("messages.request.body")}</Prose>
+            <Code code={snippets.messages} filename="request" />
+            <Code
+              code={snippets.messagesResponse}
+              language="json"
+              filename="200"
+            />
+          </Block>
+          <Block title={t("messages.stream.title")}>
+            <Prose>{t("messages.stream.body")}</Prose>
+            <Code
+              code={snippets.messagesStream}
+              language="text"
+              filename="200"
+            />
+          </Block>
+          <Block title={t("messages.sdkTitle")}>
+            <Code
+              code={snippets.messagesPython}
+              language="python"
+              filename={t("quickstart.step3.python")}
+            />
+          </Block>
+          <Block title={t("messages.countTokens.title")}>
+            <Prose>{t("messages.countTokens.body")}</Prose>
+            <Code code={snippets.countTokens} filename="request" />
+            <Code
+              code={snippets.countTokensResponse}
+              language="json"
+              filename="200"
+            />
+          </Block>
+          <Bullets
+            items={[
+              t("messages.points.auth"),
+              t("messages.points.models"),
+              t("messages.points.tools"),
+              t("messages.points.billing"),
+            ]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
         id="billing"
         tone="muted"
         label={t("nav.billing")}
@@ -481,6 +595,11 @@ export function TanstackPage({
       >
         <Div className="flex flex-col gap-6">
           <Code code={snippets.errorShape} language="json" filename="error" />
+          <Code
+            code={snippets.errorShapeAnthropic}
+            language="json"
+            filename="error: /v1/messages"
+          />
           <Div className="overflow-hidden rounded-xl border border-border bg-card">
             <Row
               header
@@ -516,27 +635,52 @@ export function TanstackPage({
         intro={t("codingTools.intro")}
       >
         <Div className="flex flex-col gap-10">
-          <Block title={t("codingTools.opencodeTitle")}>
-            <Code
-              code={toolSnippets.opencode}
-              language="json"
-              filename="opencode.json"
-            />
-          </Block>
-          <Block title={t("codingTools.continueTitle")}>
-            <Code
-              code={toolSnippets.continueConfig}
-              language="yaml"
-              filename="config.yaml"
-            />
-          </Block>
-          <Callout icon={Terminal} tone="neutral">
+          {CODING_TOOL_IDS.map((id) => {
+            const tool = toolSnippets.tools[id];
+            return (
+              <Block key={id} title={tool.name}>
+                <Prose>{toolT(`codingTools.tools.${id}.hint`)}</Prose>
+                {tool.blocks.map((block) => (
+                  <Div
+                    key={`${id}-${block.kind}`}
+                    className="flex min-w-0 flex-col gap-2"
+                  >
+                    <Span className="text-sm font-semibold text-foreground">
+                      {toolT(`codingTools.blocks.${block.kind}`)}
+                    </Span>
+                    <Code
+                      code={block.code}
+                      language={block.language}
+                      filename={block.filename}
+                    />
+                  </Div>
+                ))}
+                {tool.tested ? (
+                  <P className="m-0 text-sm text-muted-foreground">
+                    {toolT("codingTools.tested", {
+                      name: tool.name,
+                      version: tool.tested.version,
+                    })}
+                  </P>
+                ) : undefined}
+              </Block>
+            );
+          })}
+          <Callout icon={Key} tone="neutral">
             <Span className="font-semibold">
-              {t("codingTools.bridgeTitle")}.{" "}
-            </Span>
-            {t("codingTools.bridgeBody")}
+              {toolT("codingTools.anyModel", {
+                model: CODING_TOOL_MODEL,
+                examples: CODING_TOOL_EXAMPLE_MODELS.join(", "),
+              })}
+            </Span>{" "}
+            {t("codingTools.keyPage")}
           </Callout>
-          <Div>
+          <Div className="flex flex-col gap-3 sm:flex-row">
+            <Cta
+              href={`/${locale}/tools/api-keys`}
+              label={t("codingTools.keyPageCta")}
+              icon={Key}
+            />
             <Cta
               href={`/${locale}/story/blog/unbottled-api-in-coding-tools`}
               label={t("codingTools.guide")}

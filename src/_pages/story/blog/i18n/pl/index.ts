@@ -24,11 +24,11 @@ export const translations: typeof enTranslations = {
       readTime: "7 min czytania",
     },
     codingTools: {
-      title: "Jeden klucz. Każdy model. Prosto w twoim agencie.",
+      title: "Jeden klucz. Każdy model. Codex i Claude Code też.",
       category: "Przewodnik dla programistów",
       excerpt:
-        "OpenCode, Continue, Codex CLI i Claude Code na jednym kluczu API, modele niecenzurowane w zestawie. Sprawdzone konfiguracje, most, którego potrzebują dwa z nich, i pułapki, na które wpadliśmy.",
-      readTime: "9 min czytania",
+        "Codex CLI, Claude Code, OpenCode, Continue, Aider i Cline na jednym kluczu API, modele niecenzurowane w zestawie. Jeden adres bazowy, jedno polecenie na narzędzie, pułapki, na które wpadliśmy.",
+      readTime: "8 min czytania",
     },
     uncensoredGuide: {
       title: "Modele niecenzurowane, jeden po drugim.",

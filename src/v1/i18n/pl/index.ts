@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
 
   openai: {
     missingKey:
-      "Brak klucza API. Wyślij go jako 'Authorization: Bearer <klucz>'. Utwórz klucz w Ustawienia > Klucze API.",
+      "Brak klucza API. Wyślij go jako 'Authorization: Bearer <klucz>' albo 'x-api-key: <klucz>'. Utwórz klucz w Ustawienia > Klucze API.",
     invalidKey:
       "Nieprawidłowy lub unieważniony klucz API. Sprawdź klucz albo utwórz nowy w Ustawienia > Klucze API.",
     authUnavailable:
@@ -118,6 +118,169 @@ export const translations: typeof enTranslations = {
       success: {
         title: "Completion utworzone",
         description: "Model odpowiedział",
+      },
+    },
+  },
+
+  responses: {
+    previousResponseUnsupported:
+      "previous_response_id nie jest obsługiwane: odpowiedzi nie są zapisywane. Wyślij całą rozmowę w 'input' z store: false (Codex CLI robi to domyślnie).",
+    badInputItem:
+      "{{param}} nie nadaje się do użycia: obrazy muszą mieć adres http(s) lub base64 data:, a elementy narzędzi call_id.",
+    post: {
+      title: "OpenAI Responses API",
+      titleShort: "v1 responses",
+      description:
+        "Wywołaj dowolny model w formacie OpenAI Responses, którym mówi Codex CLI. Bezstanowo: cała rozmowa idzie w input. Obsługuje streaming, narzędzia function, custom i local_shell oraz elementy reasoning.",
+      fields: {
+        model: { label: "Model", description: "ID modelu z GET /v1/models" },
+        input: {
+          label: "Wejście",
+          description:
+            "Tekst albo rozmowa jako elementy Responses (message, function_call, function_call_output, reasoning, ...)",
+        },
+        instructions: {
+          label: "Instrukcje",
+          description: "Instrukcje systemowe dla modelu",
+        },
+        stream: {
+          label: "Stream",
+          description: "Wyślij odpowiedź jako zdarzenia Responses (SSE)",
+        },
+        tools: {
+          label: "Narzędzia",
+          description:
+            "Narzędzia function, custom i local_shell. Narzędzia hostowane (web_search, ...) są pomijane.",
+        },
+        toolChoice: {
+          label: "Wybór narzędzia",
+          description: "none, auto, required albo {type:'function', name}",
+        },
+        parallelToolCalls: {
+          label: "Równoległe wywołania narzędzi",
+          description: "Akceptowane dla zgodności; decyduje model",
+        },
+        maxOutputTokens: {
+          label: "Maks. tokenów wyjścia",
+          description: "Górny limit generowanych tokenów",
+        },
+        temperature: {
+          label: "Temperatura",
+          description: "Temperatura próbkowania, od 0 do 2",
+        },
+        topP: { label: "Top P", description: "Próbkowanie nucleus, od 0 do 1" },
+        reasoning: {
+          label: "Reasoning",
+          description:
+            "Akceptowane dla zgodności. Modele rozumujące i tak zwracają elementy reasoning.",
+        },
+        text: {
+          label: "Format tekstu",
+          description:
+            "{format:{type:'json_schema', schema}} prosi o odpowiedź w JSON",
+        },
+        store: {
+          label: "Zapis",
+          description: "Odpowiedzi nigdy nie są zapisywane; wyślij false",
+        },
+        previousResponseId: {
+          label: "ID poprzedniej odpowiedzi",
+          description: "Nieobsługiwane: wyślij całą rozmowę",
+        },
+        include: {
+          label: "Include",
+          description:
+            "Akceptowane dla zgodności. Elementy reasoning zawsze mają encrypted_content do ponownego użycia.",
+        },
+      },
+      response: { object: "Typ obiektu" },
+      success: {
+        title: "Odpowiedź utworzona",
+        description: "Model odpowiedział",
+      },
+    },
+  },
+
+  messages: {
+    badContentBlock:
+      "{{param}} zawiera blok, którego nie da się użyć: obrazy muszą być w base64 albo pod adresem http(s).",
+    post: {
+      title: "Anthropic Messages API",
+      titleShort: "v1 messages",
+      description:
+        "Wywołaj dowolny model w formacie Anthropic Messages, którym mówi Claude Code. Klucz jako x-api-key albo Authorization: Bearer. Obsługuje streaming, narzędzia i bloki thinking.",
+      fields: {
+        model: {
+          label: "Model",
+          description:
+            "ID modelu z GET /v1/models. ID Claude, np. claude-sonnet-4-5-20250929, trafiają do pasującego modelu Claude.",
+        },
+        messages: {
+          label: "Wiadomości",
+          description:
+            "Wiadomości Anthropic: tury user i assistant z blokami text, image, tool_use, tool_result i thinking",
+        },
+        system: {
+          label: "System",
+          description: "Prompt systemowy: tekst albo bloki tekstu",
+        },
+        maxTokens: {
+          label: "Maks. tokenów",
+          description: "Górny limit generowanych tokenów",
+        },
+        stream: {
+          label: "Stream",
+          description: "Wyślij odpowiedź jako zdarzenia Anthropic (SSE)",
+        },
+        tools: {
+          label: "Narzędzia",
+          description:
+            "Narzędzia klienta: [{name, description, input_schema}]. Narzędzia serwerowe (web_search, ...) są pomijane.",
+        },
+        toolChoice: {
+          label: "Wybór narzędzia",
+          description: "{type: auto | any | none | tool, name}",
+        },
+        stopSequences: {
+          label: "Sekwencje stopu",
+          description: "Ciągi znaków, które kończą odpowiedź",
+        },
+        temperature: {
+          label: "Temperatura",
+          description: "Temperatura próbkowania",
+        },
+        topP: { label: "Top P", description: "Próbkowanie nucleus, od 0 do 1" },
+        thinking: {
+          label: "Thinking",
+          description:
+            "Akceptowane dla zgodności. Modele rozumujące i tak zwracają bloki thinking.",
+        },
+      },
+      response: { type: "Typ obiektu" },
+      success: {
+        title: "Wiadomość utworzona",
+        description: "Model odpowiedział",
+      },
+    },
+  },
+
+  countTokens: {
+    post: {
+      title: "Liczenie tokenów Anthropic",
+      titleShort: "v1 count tokens",
+      description:
+        "Szacuje tokeny wejściowe zapytania Anthropic Messages. Za darmo: bez wywołania modelu, bez kredytów.",
+      fields: {
+        action: { label: "Akcja", description: "Zawsze count_tokens" },
+        model: { label: "Model", description: "ID modelu" },
+        messages: { label: "Wiadomości", description: "Wiadomości Anthropic" },
+        system: { label: "System", description: "Prompt systemowy" },
+        tools: { label: "Narzędzia", description: "Definicje narzędzi" },
+      },
+      response: { inputTokens: "Tokeny wejściowe" },
+      success: {
+        title: "Tokeny policzone",
+        description: "Szacowana liczba tokenów wejściowych",
       },
     },
   },

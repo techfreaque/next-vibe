@@ -6,23 +6,30 @@ export const translations: typeof enTranslations = {
   widget: {
     upgradeTitle: "Dostęp do API jest funkcją płatną",
     upgradeBody:
-      "Wykup subskrypcję albo kup pakiet kredytów, aby odblokować klucze API i endpoint /v1 zgodny z OpenAI. Dokumentację możesz czytać także na darmowym koncie.",
+      "Wykup subskrypcję albo kup pakiet kredytów, aby odblokować klucze API. Jeden klucz do twojego kodu, Codex CLI, Claude Code i każdego narzędzia zgodnego z OpenAI. Dokumentację możesz czytać także na darmowym koncie.",
     upgradeCta: "Odblokuj",
     docsLink: "Czytaj dokumentację API",
     back: "Wstecz",
     loading: "Wczytywanie kluczy API…",
     intro:
-      "{{modelCount}} modeli z własnego kodu. Zgodne z OpenAI. Rozliczane z Twoich kredytów, w tej samej cenie co czat.",
+      "{{modelCount}} modeli w twoim kodzie i w twoim agencie kodującym. Format OpenAI i Anthropic. Rozliczane z twoich kredytów, w tej samej cenie co czat.",
     baseUrlTitle: "Adres bazowy",
-    baseUrlHint: "Wpisz go w dowolnym SDK OpenAI i użyj klucza poniżej.",
-    exampleTitle: "Przykład",
+    baseUrlHint: "SDK OpenAI, Codex, OpenCode, Continue, Aider, Cline.",
+    anthropicBaseUrlTitle: "Adres bazowy Anthropic",
+    anthropicBaseUrlHint:
+      "Claude Code i SDK Anthropic. Ten sam adres bez /v1: /v1/messages dopisują same.",
+    setupTitle: "Podłącz narzędzie",
+    setupKeyFilled:
+      "Twój nowy klucz jest już w każdym bloku. Kopiujesz, wklejasz, odpalasz. Gdy zamkniesz klucz, bloki wrócą do symbolu zastępczego.",
+    setupKeyMissing:
+      "Bloki pokazują {{placeholder}}. Utwórz klucz, a pojawi się tutaj.",
     copy: "Kopiuj",
     copied: "Skopiowano",
     keysTitle: "Twoje klucze",
     empty: "Brak kluczy API",
     emptyHint: "Utwórz klucz i zacznij wywoływać API.",
     nameLabel: "Nazwa klucza",
-    namePlaceholder: "np. Backend produkcyjny",
+    namePlaceholder: "np. Claude Code na laptopie",
     create: "Utwórz klucz",
     creating: "Tworzenie…",
     createFailed: "Nie udało się utworzyć klucza. Spróbuj ponownie.",
@@ -38,17 +45,56 @@ export const translations: typeof enTranslations = {
     revokeFailed: "Nie udało się unieważnić klucza. Spróbuj ponownie.",
     maskedKey: "{{prefix}}…",
     meta: "{{lastUsed}} · Utworzony {{created}} · {{rate}}",
-    keyPlaceholder: "sk-unb-TWOJ_KLUCZ",
     rateLimit: "{{n}} zapytań/min",
     billingNote:
-      "Brak kredytów zwraca HTTP 402. Streaming działa (stream: true).",
+      "Brak kredytów zwraca HTTP 402. Streaming działa na każdym endpoincie.",
+  },
+
+  codingTools: {
+    blocks: {
+      oneCommand: "Jedno polecenie",
+      config: "Na stałe",
+      run: "Potem uruchom",
+      fields: "Ustawienia",
+      check: "Sprawdź klucz",
+      request: "Pierwsze żądanie",
+    },
+    tested: "Testowane na {{name}} {{version}}",
+    anyModel:
+      "Zamiast {{model}} wpisz dowolne ID z GET /v1/models, na przykład {{examples}}.",
+    tools: {
+      codex: {
+        hint: "Wklej polecenie i Codex działa na unbottled.ai. Na stałe: dopisz blok do ~/.codex/config.toml i uruchamiaj Codex z --profile unbottled.",
+      },
+      claudeCode: {
+        hint: "Wklej polecenie i Claude Code działa na unbottled.ai. Na stałe: wpisz te same wartości do bloku env w ~/.claude/settings.json, obok tego, co już tam jest. Bez linii z modelami Claude Code używa naszych modeli Claude pod nazwami, które już zna.",
+      },
+      opencode: {
+        hint: "Zapisz jako opencode.json w projekcie albo jako ~/.config/opencode/opencode.json dla wszystkich projektów. Do mapy models dodasz dowolne ID modelu.",
+      },
+      continue: {
+        hint: "Uruchamia Continue CLI. Rozszerzenie IDE czyta ~/.continue/config.yaml: dodaj tam ten sam wpis modelu.",
+      },
+      aider: {
+        hint: "Jedno polecenie. Aider chce openai/ przed ID modelu. Pliki do edycji dopisz na końcu, jak zwykle.",
+      },
+      cline: {
+        hint: "Dwa polecenia w Cline CLI: raz zapisujesz dostawcę, potem uruchamiasz cline.",
+      },
+      openaiCompatible: {
+        hint: "Każde narzędzie i SDK z polem na adres bazowy. Narzędzia w stylu OpenAI dostają adres z /v1, narzędzia w stylu Anthropic adres bez /v1. Ten sam klucz, te same modele.",
+      },
+      curl: {
+        hint: "Sprawdza klucz i wypisuje każde ID modelu, które możesz wywołać. Potem pierwsze żądanie.",
+      },
+    },
   },
 
   list: {
     title: "Klucze API",
     titleShort: "Klucze API",
     description:
-      "Twórz i unieważniaj klucze do API zgodnego z OpenAI. Pokazuje adres bazowy i Twoje klucze.",
+      "Twórz i unieważniaj klucze API. Pokazuje adresy bazowe, gotowe konfiguracje narzędzi do kodowania i twoje klucze.",
     tag: "API",
     response: {
       baseUrl: "Adres bazowy",
@@ -65,7 +111,7 @@ export const translations: typeof enTranslations = {
     title: "Utwórz klucz API",
     titleShort: "Nowy klucz",
     description:
-      "Tworzy klucz do API zgodnego z OpenAI. Pełny klucz zwracany jest tylko raz.",
+      "Tworzy klucz API. Działa z klientami OpenAI i Anthropic. Pełny klucz zwracany jest tylko raz.",
     tag: "API",
     form: {
       name: "Nazwa klucza",

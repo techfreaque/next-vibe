@@ -22,11 +22,11 @@ export const translations = {
       readTime: "7 min read",
     },
     codingTools: {
-      title: "One key. Every model. Inside your coding agent.",
+      title: "One key. Every model. Codex and Claude Code included.",
       category: "Developer Guide",
       excerpt:
-        "Run OpenCode, Continue, Codex CLI and Claude Code on one API key, uncensored models included. Tested configs, the bridge two of them need, and the gotchas we hit.",
-      readTime: "9 min read",
+        "Codex CLI, Claude Code, OpenCode, Continue, Aider and Cline on one API key, uncensored models included. One base URL, one command per tool, the gotchas we hit.",
+      readTime: "8 min read",
     },
     uncensoredGuide: {
       title: "The uncensored models, one by one.",

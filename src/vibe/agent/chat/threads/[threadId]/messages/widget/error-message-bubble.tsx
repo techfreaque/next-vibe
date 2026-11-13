@@ -142,7 +142,19 @@ export function ErrorMessageBubble({
     rootFolderId,
   ]);
 
-  // User-cancelled streams get a compact "stopped" indicator, not an error bubble
+  // The turn that failed: nearest user message up the parent chain. Retry
+  // re-sends it through the same op as the user-message retry button.
+  const failedUserMessageId = findParentUserMessageId(message, messages);
+  const canRetry = retryMessage !== null && failedUserMessageId !== null;
+
+  const handleRetry = (): void => {
+    if (retryMessage && failedUserMessageId) {
+      void retryMessage(failedUserMessageId, undefined);
+    }
+  };
+
+  // Stopped streams (user stop, server restart mid-answer) get a compact
+  // "stopped" indicator with a retry, not an error bubble
   if (message.errorType === StreamErrorType.STREAM_INTERRUPTED) {
     return (
       <Div className={cn("flex items-start gap-3", group)}>
@@ -163,6 +175,18 @@ export function ErrorMessageBubble({
                   {ts("streamInterrupted.hint")}
                 </Span>
               </Div>
+              {canRetry && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 gap-1.5 px-2 flex-shrink-0"
+                  onClick={handleRetry}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  {ts("errorActions.retry")}
+                </Button>
+              )}
             </Div>
           </Div>
           <Div
@@ -236,17 +260,6 @@ export function ErrorMessageBubble({
       </Div>
     );
   }
-
-  // The turn that failed: nearest user message up the parent chain. Retry
-  // re-sends it through the same op as the user-message retry button.
-  const failedUserMessageId = findParentUserMessageId(message, messages);
-  const canRetry = retryMessage !== null && failedUserMessageId !== null;
-
-  const handleRetry = (): void => {
-    if (retryMessage && failedUserMessageId) {
-      void retryMessage(failedUserMessageId, undefined);
-    }
-  };
 
   const handleTryAnotherModel = (): void => {
     setModelSelectorOpen(true);

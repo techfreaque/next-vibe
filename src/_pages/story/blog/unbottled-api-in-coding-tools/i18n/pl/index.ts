@@ -2,25 +2,25 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Każdy model w twoim agencie kodującym - {{appName}} API",
+    title: "Codex CLI i Claude Code na każdym modelu - {{appName}} API",
     description:
-      "OpenCode, Continue, Codex CLI i Claude Code na jednym kluczu {{appName}}. Claude, GPT, DeepSeek, GLM i modele niecenzurowane. Sprawdzone konfiguracje, prawdziwe pułapki.",
+      "Codex CLI, Claude Code, OpenCode, Continue, Aider i Cline na jednym kluczu {{appName}}. Claude, GPT, DeepSeek, GLM i modele niecenzurowane. Jeden adres bazowy, jedno polecenie na narzędzie.",
     category: "Przewodnik dla programistów",
     imageAlt: "{{appName}} API w narzędziach do kodowania",
     keywords:
-      "{{appName}}, API zgodne z OpenAI, OpenCode, Codex CLI, Claude Code, Continue, LiteLLM, agent kodujący, modele niecenzurowane, własny dostawca",
+      "{{appName}}, Codex CLI, Claude Code, OpenCode, Continue, Aider, Cline, API zgodne z OpenAI, Responses API, Anthropic Messages API, agent kodujący, modele niecenzurowane, własny dostawca",
   },
   hero: {
     backToBlog: "Wróć do bloga",
     category: "Przewodnik dla programistów",
-    readTime: "9 min czytania",
-    title: "Jeden klucz. Każdy model. Prosto w twoim agencie.",
+    readTime: "8 min czytania",
+    title: "Jeden klucz. Każdy model. Codex i Claude Code też.",
     subtitle:
-      "Podłącz API {{appName}} do OpenCode, Continue, Codex CLI i Claude Code. Każdą konfigurację poniżej uruchomiliśmy od początku do końca, zanim ją opublikowaliśmy.",
+      "Codex CLI i Claude Code łączą się teraz z {{appName}} bezpośrednio, tak jak OpenCode, Continue, Aider i Cline. Jeden adres bazowy, jeden klucz, jedno polecenie na narzędzie.",
   },
   intro: {
     lead: "Twój agent kodujący jest przywiązany do modeli jednego dostawcy. Chcesz drugiej opinii z innego laboratorium, taniego modelu do czarnej roboty albo takiego, który nie odmawia? To kolejne konto, kolejny klucz, kolejny rachunek.",
-    p2: "{{appName}} mówi formatem OpenAI chat completions. Podłączasz narzędzie raz i przełączasz się między Claude, GPT, DeepSeek, GLM, Kimi, Qwen i modelami niecenzurowanymi, zmieniając jedno ID modelu. Dwa narzędzia łączą się bezpośrednio, dwa potrzebują małego lokalnego mostu. Poniżej dokładnie jak, z wersjami, które testowaliśmy.",
+    p2: "{{appName}} mówi wszystkimi trzema formatami, których używają agenci kodujący: OpenAI chat completions, OpenAI Responses API i Anthropic Messages API. Nic pośrodku, nic do instalowania. Podłączasz narzędzie raz i przełączasz się między Claude, GPT, DeepSeek, GLM, Kimi, Qwen i modelami niecenzurowanymi, zmieniając jedno ID modelu.",
   },
   why: {
     title: "Po co to wszystko",
@@ -31,75 +31,67 @@ export const translations: typeof enTranslations = {
     switch:
       "Właściwy model do zadania. Model z górnej półki do trudnego refaktoru, model flash do zmiany nazw i szkieletów testów. Ta sama konfiguracja, inne ID.",
     billing:
-      "Te same kredyty co w aplikacji czatu, te same ceny. Każda odpowiedź podaje swój koszt w usage.credits_charged.",
+      "Te same kredyty co w aplikacji czatu, te same ceny. Każda odpowiedź podaje, ile kosztowała.",
   },
   setup: {
-    title: "Zdobądź klucz i bazowy URL",
+    title: "Zdobądź klucz i adres bazowy",
     intro: "Dwie wartości. Każde narzędzie poniżej potrzebuje dokładnie ich.",
     p1: "Utwórz klucz w Ustawienia > Klucze API. Zaczyna się od sk-unb- i zobaczysz go tylko raz. API jest w każdym płatnym planie: aktywna subskrypcja albo dowolny pakiet kredytów je odblokowuje.",
-    baseUrlLabel: "Bazowy URL",
+    shortcut:
+      "Najszybciej: zaraz po utworzeniu klucza strona Klucze API pokazuje każdy blok z tego wpisu, z twoim kluczem już wpisanym. Wybierasz narzędzie, kopiujesz, odpalasz.",
+    baseUrlLabel: "Adres bazowy",
     baseUrlNote:
-      "Locale w ścieżce zmienia tylko język komunikatów o błędach. Działa każde.",
+      "Dla narzędzi w stylu OpenAI: Codex, OpenCode, Continue, Aider, Cline. Locale w ścieżce zmienia tylko język komunikatów o błędach.",
+    anthropicBaseUrlLabel: "Adres bazowy Anthropic",
+    anthropicBaseUrlNote:
+      "Dla Claude Code i SDK Anthropic. Ten sam adres bez /v1: /v1/messages dopisują same.",
     p2: "Trzymaj klucz w zmiennej środowiskowej, nigdy w pliku, który commitujesz. Wywołanie curl potwierdza, że klucz działa, i wypisuje każde ID modelu dostępne dla twojego konta, z rozmiarem kontekstu, obsługą narzędzi i cenami w kredytach.",
   },
   compat: {
-    title: "Co łączy się jak",
+    title: "Każde narzędzie łączy się bezpośrednio",
     intro:
-      "Agenci kodujący mówią trzema różnymi formatami. My obsługujemy jeden z nich: chat completions. To przesądza o konfiguracji.",
-    opencode:
-      "OpenCode: bezpośrednio. Mówi chat completions przez swojego dostawcę zgodnego z OpenAI.",
-    continue:
-      "Continue (CLI i rozszerzenie IDE): bezpośrednio. provider: openai z własnym apiBase.",
-    codex:
-      "Codex CLI: potrzebuje mostu. Aktualny Codex mówi tylko OpenAI Responses API. Obsługę chat completions usunięto na początku 2026.",
-    claudeCode:
-      "Claude Code: potrzebuje mostu. Mówi Anthropic Messages API, nie formatem OpenAI.",
+      "Agenci kodujący mówią trzema różnymi formatami. Obsługujemy wszystkie trzy, na tym samym kluczu i tych samych modelach.",
+    codex: "Codex CLI: OpenAI Responses API.",
+    claudeCode: "Claude Code: Anthropic Messages API.",
+    chat: "OpenCode, Continue, Aider, Cline: OpenAI chat completions.",
     other:
-      "Każde inne narzędzie z polem na bazowy URL OpenAI działa jak OpenCode: bazowy URL, klucz, ID modelu. Wymieniamy tylko narzędzia, które sami uruchomiliśmy.",
+      "Każde inne narzędzie z polem na adres bazowy działa tak samo: adres bazowy, klucz, ID modelu.",
+  },
+  wire: {
+    responses: "Responses API",
+    messages: "Messages API",
+    chat: "Chat completions",
+  },
+  codex: {
+    intro:
+      "Terminalowy agent od OpenAI. Czyta repo, uruchamia polecenia, edytuje pliki.",
+    p1: "Codex mówi Responses API, my też. Jedno polecenie definiuje dostawcę w locie: nic do edycji, nic do instalowania. Na co dzień dopisz konfigurację raz i uruchamiaj Codex z profilem.",
+    p2: 'Model zmieniasz przez -m albo linię model w profilu. Zostaw wire_api = "responses": aktualny Codex nie przyjmuje niczego innego.',
+  },
+  claudeCode: {
+    intro:
+      "Terminalowy agent od Anthropic. Planuje, edytuje, odpala testy, wysyła subagentów.",
+    p1: "Claude Code czyta bramkę ze zmiennych środowiskowych. ANTHROPIC_BASE_URL to adres bazowy bez /v1. ANTHROPIC_MODEL ustawia główny model. Domyślne OPUS i SONNET obsługują wybór modelu i tryb planowania, domyślny HAIKU przenosi zadania w tle, na przykład tytuły sesji, na tani model, a CLAUDE_CODE_SUBAGENT_MODEL dotyczy subagentów. CLAUDE_CODE_MAX_CONTEXT_TOKENS podaje Claude Code prawdziwy rozmiar kontekstu modelu spoza rodziny Claude, więc kompaktuje rozmowę we właściwym momencie.",
+    p2: "Wolisz samego Claude? Usuń linie z modelami. Claude Code poprosi o swoje zwykłe ID Claude, a my skierujemy je do naszego odpowiadającego modelu Claude, rozliczanego w kredytach.",
+    p3: "Claude Code wysyła duży prompt systemowy, ponad 30k tokenów wejściowych nawet przy banalnym zadaniu. Tani model domyślny trzyma koszty w ryzach.",
   },
   opencode: {
-    label: "Bezpośrednio",
-    title: "OpenCode",
-    intro:
-      "Testowane na OpenCode 1.19.5. Wywołania narzędzi, czytanie i edycja plików działają.",
-    p1: "Dodaj własnego dostawcę do opencode.json w projekcie albo do ~/.config/opencode/opencode.json dla wszystkich projektów. Klucz zostaje w twoim środowisku. Do mapy models możesz dodać dowolne ID z GET /models.",
-    p2: "Potem uruchom albo wybierz model w TUI przez /models:",
+    intro: "Otwartoźródłowy agent do terminala, z TUI i trybem bez interfejsu.",
+    p1: "Zapisz konfigurację jako opencode.json w projekcie albo jako ~/.config/opencode/opencode.json dla wszystkich projektów. Klucz zostaje w twoim środowisku. Do mapy models dodasz dowolne ID z GET /v1/models, a w TUI wybierzesz je przez /models.",
     gotcha:
       "Najpierw zaktualizuj OpenCode. Stare wersje 1.0.x pobierają najnowszy pakiet @ai-sdk/openai-compatible i padają po pierwszym wywołaniu narzędzia z DecimalError: Invalid argument. 1.19.5 uruchamia tę samą konfigurację bez błędów.",
   },
   continue: {
-    label: "Bezpośrednio",
-    title: "Continue",
-    intro:
-      "Testowane na Continue CLI 1.5.47. Rozszerzenie IDE czyta ten sam config.yaml.",
-    p1: "secrets.UNBOTTLED_API_KEY jest brany z twojego środowiska. Z -p działa bez interfejsu, bez -p startuje sesja interaktywna:",
+    intro: "Asystent kodowania dla VS Code i JetBrains, do tego CLI cn.",
+    p1: "secrets.UNBOTTLED_API_KEY jest brany z twojego środowiska. Dodaj -p z promptem, a działa bez interfejsu. Rozszerzenie IDE czyta ~/.continue/config.yaml: wpisz tam ten sam model.",
   },
-  bridge: {
-    label: "Most",
-    title: "Most LiteLLM",
-    intro:
-      "Codex i Claude Code potrzebują tłumacza. LiteLLM działa na twoim komputerze i zamienia ich formaty na chat completions.",
-    p1: "Jeden proxy LiteLLM obsługuje oba narzędzia. Wystawia /v1/responses dla Codex i /v1/messages dla Claude Code, a wszystko przekazuje do {{appName}} jako chat completions. Wpisz każdy model, którego chcesz używać. Testowane na LiteLLM 1.109.1.",
-    gotcha:
-      "Użyj prefiksu custom_openai/, nie openai/. Z openai/ LiteLLM przekazuje wywołania Codex jako natywne żądania Responses, a nasze API odpowiada 404. Bez LITELLM_MASTER_KEY LiteLLM w ogóle nie wystartuje. Ta wartość to klucz, który twoje narzędzia wysyłają do mostu. Twój klucz sk-unb nigdy nie opuszcza proxy.",
+  aider: {
+    intro: "Programowanie w parze w terminalu, razem z commitami.",
+    p1: "Jedno polecenie, zero plików konfiguracyjnych. Aider chce openai/ przed ID modelu i sam je usuwa, zanim nas wywoła. --edit-format diff trzyma zmiany w ryzach; bez tego przy nieznanym ID modelu Aider wysyła całe pliki od nowa. Pliki do edycji podajesz w poleceniu, jak zwykle w Aiderze.",
   },
-  codex: {
-    label: "Przez most",
-    title: "Codex CLI",
-    intro:
-      "Testowane na codex-cli 0.118.0. Uruchomił polecenie powłoki i odpowiedział na podstawie wyniku.",
-    p1: 'Skieruj własnego dostawcę na most. wire_api musi mieć wartość "responses". Na "chat" Codex odpowiada twardym błędem już przy starcie. env_key wskazuje zmienną z kluczem do mostu.',
-    p2: "Używaj ID modeli z litellm.yaml. Żeby zmienić model, dodaj jego ID do konfiguracji mostu i zmień model w config.toml albo podaj -m w wierszu poleceń.",
-  },
-  claudeCode: {
-    label: "Przez most",
-    title: "Claude Code",
-    intro:
-      "Testowane na Claude Code 2.1.322. Użył narzędzia Read w trzech turach i odpowiedział poprawnie.",
-    p1: "Claude Code czyta bramkę ze zmiennych środowiskowych. ANTHROPIC_MODEL ustawia główny model. ANTHROPIC_DEFAULT_HAIKU_MODEL przenosi zadania w tle, na przykład tytuły sesji, na tani model, żeby nie zjadały głównego.",
-    p2: "Claude Code ostrzeże, że nie zna ID modelu, i przyjmie okno kontekstu 200k. To normalne i nieszkodliwe. Koszt, który pokazuje, to jego własny szacunek. Twój prawdziwy koszt to kredyty pobrane przez {{appName}}.",
-    caveat:
-      "Anthropic oficjalnie nie wspiera Claude Code z modelami innymi niż Claude przez bramkę. Działa, przetestowaliśmy to, ale traktuj to jako eksperyment: aktualizacja Claude Code może to zepsuć. Claude Code wysyła też duży prompt systemowy, ponad 30k tokenów wejściowych nawet przy banalnym zadaniu. Wybierz tani model albo pilnuj salda.",
+  cline: {
+    intro: "Autonomiczny agent kodujący, w VS Code i jako CLI.",
+    p1: "Dwa polecenia w Cline CLI: raz zapisujesz dostawcę, potem uruchamiasz cline. Adres bazowy, klucz i ID modelu to te same trzy wartości co wszędzie.",
   },
   models: {
     title: "Jaki model do jakiej roboty",
@@ -118,27 +110,27 @@ export const translations: typeof enTranslations = {
       body: "Ten sam sposób pracy agenta, bez odruchu odmowy. Analiza exploitów, narzędzia red-teamowe, potoki fikcji dla dorosłych, scrapery, przy których inne modele prawią kazania. Za to, co budujesz, odpowiadasz ty.",
     },
     listNote:
-      "ID zmieniają się, gdy modele są zastępowane. Źródłem prawdy jest GET /models: jeśli ID nie ma na liście dla twojego klucza, API zwraca 404 model_not_found i nigdy po cichu nie podmienia modelu.",
+      "ID zmieniają się, gdy modele są zastępowane. Źródłem prawdy jest GET /v1/models: jeśli ID nie ma na liście dla twojego klucza, API zwraca 404 model_not_found. Jedyne mapowanie dotyczy Claude Code: jego wbudowane ID Claude trafiają do naszego najnowszego Claude z tej samej rodziny.",
   },
   gotchas: {
     title: "Pułapki, na które wpadliśmy",
     intro: "Żebyś ty nie musiał.",
     localeUrl:
-      "Skopiuj bazowy URL dokładnie, razem z /api/<locale>/v1. Bez locale dostaniesz przekierowanie, które część klientów gubi. Bez /api dostaniesz stronę HTML zamiast JSON.",
+      "Skopiuj adres bazowy dokładnie, razem z /api/<locale>/v1. Bez locale dostaniesz przekierowanie, które część klientów gubi. Bez /api dostaniesz stronę HTML zamiast JSON.",
+    anthropicUrl:
+      "Claude Code dostaje adres bazowy bez /v1. Z /v1 wywoła /v1/v1/messages i trafi na 404.",
     modelId:
-      "Używaj dokładnie ID z GET /models, na przykład deepseek-v4.1-flash. Prefiksy dostawców jak openai/ należą tylko do konfiguracji LiteLLM, nigdy do żądania.",
+      "Używaj dokładnie ID z GET /v1/models, na przykład deepseek-v4.1-flash. Aider chce openai/ z przodu. Wbudowane ID Claude z Claude Code trafiają same do naszego najnowszego Claude z tej samej rodziny. Każde inne nieznane ID zwraca 404 model_not_found.",
     paid: "HTTP 402 z paid_plan_required znaczy, że konto nie ma jeszcze płatnego planu. Naprawia to dowolny pakiet kredytów.",
     tools:
-      "Model bez obsługi narzędzi zwraca 400 tools_not_supported, gdy tylko agent wyśle narzędzia. Sprawdź supports_tools w GET /models.",
-    bridgeKey:
-      "Za mostem 401 może przyjść z obu stron. LiteLLM odrzuca zły klucz główny, {{appName}} odrzuca zły klucz sk-unb. Log LiteLLM powie ci, który.",
+      "Model bez obsługi narzędzi zwraca 400 tools_not_supported, gdy tylko agent wyśle narzędzia. Sprawdź supports_tools w GET /v1/models.",
     rateLimit:
       "Każdy klucz to 60 żądań na minutę. Agenci strzelają wieloma małymi wywołaniami. Jeśli trafisz na 429, daj agentowi osobny klucz.",
   },
   cta: {
-    title: "Podłączysz to w pięć minut.",
+    title: "Podłączone jednym poleceniem.",
     subtitle:
-      "Utwórz klucz, wklej jedną konfigurację, wybierz model. Dokumentacja API opisuje każde pole, każdy kod błędu i każdy szczegół streamingu.",
+      "Utwórz klucz, skopiuj blok dla swojego narzędzia, wybierz model. Dokumentacja API opisuje każdy endpoint, każde pole, każdy kod błędu i każdy szczegół streamingu.",
     key: "Utwórz klucz API",
     docs: "Przeczytaj dokumentację API",
   },

@@ -43,12 +43,20 @@ export const API_KEY_LOOKUP_RETRY_AFTER_SECONDS = 5;
 /** Resolution per request, so the handler does not hit the DB twice. */
 const resolutions = new WeakMap<Request, ApiKeyResolution>();
 
+/**
+ * The key a client sent: `Authorization: Bearer <key>` (OpenAI clients,
+ * Claude Code with ANTHROPIC_AUTH_TOKEN) or `x-api-key: <key>` (Anthropic
+ * clients, Claude Code with ANTHROPIC_API_KEY).
+ */
 function bearerOf(request: Request): string | undefined {
   const header = request.headers.get("authorization");
-  if (!header?.startsWith("Bearer ")) {
-    return undefined;
+  if (header && /^bearer\s/i.test(header)) {
+    const token = header.slice(7).trim();
+    if (token) {
+      return token;
+    }
   }
-  return header.slice(7).trim() || undefined;
+  return request.headers.get("x-api-key")?.trim() || undefined;
 }
 
 export class ApiKeyAuth {

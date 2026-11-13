@@ -607,3 +607,9 @@ textarea {
 .container {
   margin: 0 auto;
 }
+
+/* Prism tokens share names with Tailwind utilities (.token.table is a TOML
+   section header, but .table means display: table). Keep tokens inline. */
+pre code .token.table {
+  display: inline;
+}

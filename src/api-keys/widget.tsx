@@ -7,13 +7,21 @@ import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
 import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -32,17 +40,18 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import revokeEndpoints from "./[id]/definition";
+import {
+  API_KEY_PLACEHOLDER,
+  buildCodingToolSnippets,
+  CODING_TOOL_EXAMPLE_MODELS,
+  CODING_TOOL_IDS,
+  CODING_TOOL_MODEL,
+  type SnippetBlock,
+} from "./coding-tools";
 import { API_DOCS_PATH } from "./constants";
 import apiKeysEndpoints from "./definition";
 
-function buildCurl(baseUrl: string, key: string): string {
-  return [
-    `curl ${baseUrl}/chat/completions \\`,
-    `  -H "Authorization: Bearer ${key}" \\`,
-    `  -H "Content-Type: application/json" \\`,
-    `  -d '{"model":"kimi-k2","messages":[{"role":"user","content":"Hello"}]}'`,
-  ].join("\n");
-}
+const COPIED_RESET_MS = 2000;
 
 /** Monospace block with a copy action. */
 function CopyBlock({
@@ -75,6 +84,62 @@ function CopyBlock({
         <Copy className="h-4 w-4" />
         {copied ? copiedLabel : copyLabel}
       </Button>
+    </Div>
+  );
+}
+
+/** One setup block: caption, file name, highlighted code, labelled copy button. */
+function SnippetCard({
+  block,
+  caption,
+  copyLabel,
+  copiedLabel,
+}: {
+  block: SnippetBlock;
+  caption: string;
+  copyLabel: string;
+  copiedLabel: string;
+}): JSX.Element {
+  const [copied, setCopied] = useState(false);
+  const logger = useWidgetLogger();
+  return (
+    <Div className="flex min-w-0 flex-col gap-1.5">
+      <Span className="text-xs font-semibold text-foreground">{caption}</Span>
+      <Div className="min-w-0 overflow-hidden rounded-lg border border-border/60 bg-slate-950">
+        <Div className="flex items-center justify-between gap-2 border-b border-white/10 bg-slate-900/70 py-1 pr-1 pl-3">
+          <Span className="min-w-0 truncate font-mono text-[11px] text-slate-400">
+            {block.filename}
+          </Span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 shrink-0 gap-1.5 text-slate-200 hover:bg-white/10 hover:text-white"
+            onClick={(): void => {
+              void (async (): Promise<void> => {
+                const ok = await copyToClipboard(block.code, logger);
+                setCopied(ok);
+                if (ok) {
+                  setTimeout(() => setCopied(false), COPIED_RESET_MS);
+                }
+              })();
+            }}
+          >
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+            {copied ? copiedLabel : copyLabel}
+          </Button>
+        </Div>
+        <CodeSnippet
+          code={block.code}
+          language={block.language}
+          variant="bare"
+          noCopy
+        />
+      </Div>
     </Div>
   );
 }
@@ -148,6 +213,11 @@ export function ApiKeysContainer(): JSX.Element {
     return <LoadingBlock message={t("widget.loading")} />;
   }
 
+  const snippets = buildCodingToolSnippets({
+    baseUrl: data.baseUrl,
+    apiKey: newKey,
+  });
+
   return (
     <WidgetShell className="gap-4">
       <WidgetHeader
@@ -197,63 +267,6 @@ export function ApiKeysContainer(): JSX.Element {
         </Div>
       )}
 
-      {newKey ? (
-        <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">
-          <Span className="text-sm font-semibold">
-            {t("widget.newKeyTitle")}
-          </Span>
-          <P className="m-0 text-xs text-muted-foreground">
-            {t("widget.newKeyHint")}
-          </P>
-          <CopyBlock
-            text={newKey}
-            copyLabel={t("widget.copy")}
-            copiedLabel={t("widget.copied")}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 self-start"
-            onClick={(): void => {
-              setNewKey(null);
-            }}
-          >
-            {t("widget.dismiss")}
-          </Button>
-        </Div>
-      ) : undefined}
-
-      <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
-        <Span className="text-sm font-semibold">
-          {t("widget.baseUrlTitle")}
-        </Span>
-        <CopyBlock
-          text={data.baseUrl}
-          copyLabel={t("widget.copy")}
-          copiedLabel={t("widget.copied")}
-        />
-        <P className="m-0 text-xs text-muted-foreground">
-          {t("widget.baseUrlHint")}
-        </P>
-        <Span className="mt-2 text-sm font-semibold">
-          {t("widget.exampleTitle")}
-        </Span>
-        <CopyBlock
-          text={buildCurl(data.baseUrl, newKey ?? t("widget.keyPlaceholder"))}
-          copyLabel={t("widget.copy")}
-          copiedLabel={t("widget.copied")}
-        />
-        <P className="m-0 text-xs text-muted-foreground">
-          {t("widget.billingNote")}
-        </P>
-        <Link
-          href={`/${locale}/${API_DOCS_PATH}`}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          {t("widget.docsLink")}
-        </Link>
-      </Div>
-
       {data.isPaid ? (
         <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
           <Span className="text-sm font-semibold">{t("widget.nameLabel")}</Span>
@@ -284,6 +297,133 @@ export function ApiKeysContainer(): JSX.Element {
           </Div>
         </Div>
       ) : undefined}
+
+      {newKey ? (
+        <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">
+          <Span className="text-sm font-semibold">
+            {t("widget.newKeyTitle")}
+          </Span>
+          <P className="m-0 text-xs text-muted-foreground">
+            {t("widget.newKeyHint")}
+          </P>
+          <CopyBlock
+            text={newKey}
+            copyLabel={t("widget.copy")}
+            copiedLabel={t("widget.copied")}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 self-start"
+            onClick={(): void => {
+              setNewKey(null);
+            }}
+          >
+            {t("widget.dismiss")}
+          </Button>
+        </Div>
+      ) : undefined}
+
+      <Div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm">
+        <Div className="grid min-w-0 gap-3 @lg:grid-cols-2">
+          <Div className="flex min-w-0 flex-col gap-1.5">
+            <Span className="text-sm font-semibold">
+              {t("widget.baseUrlTitle")}
+            </Span>
+            <CopyBlock
+              text={snippets.baseUrl}
+              copyLabel={t("widget.copy")}
+              copiedLabel={t("widget.copied")}
+            />
+            <P className="m-0 text-xs text-muted-foreground">
+              {t("widget.baseUrlHint")}
+            </P>
+          </Div>
+          <Div className="flex min-w-0 flex-col gap-1.5">
+            <Span className="text-sm font-semibold">
+              {t("widget.anthropicBaseUrlTitle")}
+            </Span>
+            <CopyBlock
+              text={snippets.anthropicBaseUrl}
+              copyLabel={t("widget.copy")}
+              copiedLabel={t("widget.copied")}
+            />
+            <P className="m-0 text-xs text-muted-foreground">
+              {t("widget.anthropicBaseUrlHint")}
+            </P>
+          </Div>
+        </Div>
+
+        <Span className="mt-2 text-sm font-semibold">
+          {t("widget.setupTitle")}
+        </Span>
+        <P
+          className={
+            snippets.hasRealKey
+              ? "m-0 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-foreground"
+              : "m-0 text-xs text-muted-foreground"
+          }
+        >
+          {snippets.hasRealKey
+            ? t("widget.setupKeyFilled")
+            : t("widget.setupKeyMissing", { placeholder: API_KEY_PLACEHOLDER })}
+        </P>
+        <Tabs defaultValue={snippets.tools.codex.name} className="min-w-0">
+          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
+            {CODING_TOOL_IDS.map((id) => (
+              <TabsTrigger
+                key={id}
+                value={snippets.tools[id].name}
+                className="h-9 px-3"
+              >
+                {snippets.tools[id].name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {CODING_TOOL_IDS.map((id) => {
+            const tool = snippets.tools[id];
+            return (
+              <TabsContent key={id} value={tool.name} className="mt-3 min-w-0">
+                <Div className="flex min-w-0 flex-col gap-3">
+                  <P className="m-0 text-sm text-muted-foreground">
+                    {t(`codingTools.tools.${id}.hint`)}
+                  </P>
+                  {tool.blocks.map((block) => (
+                    <SnippetCard
+                      key={`${id}-${block.kind}`}
+                      block={block}
+                      caption={t(`codingTools.blocks.${block.kind}`)}
+                      copyLabel={t("widget.copy")}
+                      copiedLabel={t("widget.copied")}
+                    />
+                  ))}
+                  <P className="m-0 text-xs text-muted-foreground">
+                    {tool.tested
+                      ? `${t("codingTools.tested", {
+                          name: tool.name,
+                          version: tool.tested.version,
+                        })}. `
+                      : ""}
+                    {t("codingTools.anyModel", {
+                      model: CODING_TOOL_MODEL,
+                      examples: CODING_TOOL_EXAMPLE_MODELS.join(", "),
+                    })}
+                  </P>
+                </Div>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
+        <P className="m-0 text-xs text-muted-foreground">
+          {t("widget.billingNote")}
+        </P>
+        <Link
+          href={`/${locale}/${API_DOCS_PATH}`}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          {t("widget.docsLink")}
+        </Link>
+      </Div>
 
       <Span className="px-1 text-sm font-semibold">
         {t("widget.keysTitle")}

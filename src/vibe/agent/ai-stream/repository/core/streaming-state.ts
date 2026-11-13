@@ -32,10 +32,11 @@ import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatThreads } from "../../../chat/db";
-import type { ThreadStreamingState } from "../../../chat/enum";
+import { ThreadStreamingState } from "../../../chat/enum";
 import { createFolderContentsEmitter } from "../../../chat/folder-contents/[rootFolderId]/emitter";
 import { createMessagesGetEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import { createThreadsGetEmitter } from "../../../chat/threads/emitter";
+import { registerOwnedRun } from "./run-heartbeat";
 
 /** Everything the 3-channel fan-out needs. When rootFolderId/subFolderId are
  *  omitted they are loaded from the thread row (one round-trip). */
@@ -160,12 +161,18 @@ export async function transitionStreamingState(params: {
     resolvedRelayContext,
   } = params;
   const updatedAt = new Date();
+  // Taking a STREAMING claim: stamp its first heartbeat in the same write and
+  // keep beating while this process owns it (see run-heartbeat.ts).
+  const claimsRun =
+    state === ThreadStreamingState.STREAMING &&
+    typeof streamingRunId === "string";
   const [row] = await db
     .update(chatThreads)
     .set({
       streamingState: state,
       updatedAt,
       ...(streamingRunId !== undefined ? { streamingRunId } : {}),
+      ...(claimsRun ? { streamingHeartbeatAt: updatedAt } : {}),
     })
     .where(eq(chatThreads.id, threadId))
     .returning({
@@ -175,6 +182,9 @@ export async function transitionStreamingState(params: {
 
   const rootFolderId = row?.rootFolderId ?? null;
   const subFolderId = row?.folderId ?? null;
+  if (claimsRun && row) {
+    registerOwnedRun(streamingRunId, threadId, logger);
+  }
   await emitStreamingState({
     threadId,
     state,

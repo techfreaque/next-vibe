@@ -51,8 +51,9 @@ const fakeRunner: InferenceRunner = {
     Promise.resolve({
       text: "Hello from the fake model",
       toolCalls: [],
+      parts: [{ type: "text", text: "Hello from the fake model" }],
       finishReason: "stop",
-      usage: { inputTokens: 20_000, outputTokens: 2_000, cachedInputTokens: 0 },
+      usage: { inputTokens: 20_000, outputTokens: 2_000, cachedInputTokens: 0, reasoningTokens: 0 },
     }),
   async *stream() {
     yield { type: "text", text: "Hello " };
@@ -60,7 +61,7 @@ const fakeRunner: InferenceRunner = {
     yield {
       type: "finish",
       finishReason: "stop",
-      usage: { inputTokens: 20_000, outputTokens: 2_000, cachedInputTokens: 0 },
+      usage: { inputTokens: 20_000, outputTokens: 2_000, cachedInputTokens: 0, reasoningTokens: 0 },
     };
   },
 };
@@ -443,8 +444,9 @@ describe("OpenAI-compatible API", () => {
         return Promise.resolve({
           text: "",
           toolCalls: [{ id: "call_1", name: "get_weather", arguments: '{"city":"Berlin"}' }],
+          parts: [{ type: "tool-call", id: "call_1", name: "get_weather", arguments: '{"city":"Berlin"}' }],
           finishReason: "tool_calls",
-          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0 },
+          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0, reasoningTokens: 0 },
         });
       },
       async *stream(request) {
@@ -455,7 +457,7 @@ describe("OpenAI-compatible API", () => {
         yield {
           type: "finish",
           finishReason: "tool_calls",
-          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0 },
+          usage: { inputTokens: 100, outputTokens: 20, cachedInputTokens: 0, reasoningTokens: 0 },
         };
       },
     };

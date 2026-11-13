@@ -2,8 +2,9 @@
  * Blog post: the unbottled.ai API inside coding tools.
  * /[locale]/story/blog/unbottled-api-in-coding-tools
  *
- * Every config was run end to end on 2026-11-12 (versions in snippets.ts).
- * Base URL comes from the live app URL, model ids and names from the registry.
+ * Every snippet comes from src/api-keys/coding-tools.ts (shared with the API
+ * key page and /docs/api). "Tested with" lines only render for tools listed in
+ * CODING_TOOLS_TESTED there. Base URL comes from the live app URL.
  */
 
 import type { Metadata } from "next";
@@ -16,6 +17,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Plug } from "next-vibe/ui/components/icons/Plug";
@@ -23,6 +25,13 @@ import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import {
+  buildCodingToolSnippets,
+  buildPublicApiBaseUrl,
+  type CodingToolId,
+  type CodingToolSetup,
+} from "@/api-keys/coding-tools";
+import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -40,7 +49,6 @@ import {
 import { Callout, Cta } from "../../_shared/marketing";
 import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
-import { buildCodingToolSnippets } from "./snippets";
 
 export const revalidate = 3600;
 
@@ -114,7 +122,7 @@ export async function tanstackLoader({
   const { locale } = await params;
   return {
     locale,
-    baseUrl: `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}/v1`,
+    baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
   };
 }
 
@@ -129,6 +137,52 @@ function ModelPick({ id }: { id: ChatModelId }): JSX.Element {
   );
 }
 
+/** Captioned code blocks for one tool, straight from the shared builder. */
+function ToolBlocks({
+  tool,
+  locale,
+}: {
+  tool: CodingToolSetup;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t: toolT } = apiKeysScopedTranslation.scopedT(locale);
+  return (
+    <>
+      {tool.blocks.map((block) => (
+        <Div
+          key={`${tool.id}-${block.kind}`}
+          className="flex min-w-0 flex-col gap-2"
+        >
+          <Span className="text-sm font-semibold text-foreground">
+            {toolT(`codingTools.blocks.${block.kind}`)}
+          </Span>
+          <ArticleCode
+            code={block.code}
+            language={block.language}
+            filename={block.filename}
+          />
+        </Div>
+      ))}
+    </>
+  );
+}
+
+/** Tool standfirst plus the "Tested with" line when CODING_TOOLS_TESTED has one. */
+function toolIntro(
+  intro: string,
+  tool: CodingToolSetup,
+  locale: CountryLanguage,
+): string {
+  if (!tool.tested) {
+    return intro;
+  }
+  const { t: toolT } = apiKeysScopedTranslation.scopedT(locale);
+  return `${intro} ${toolT("codingTools.tested", {
+    name: tool.name,
+    version: tool.tested.version,
+  })}.`;
+}
+
 export function TanstackPage({
   locale,
   baseUrl,
@@ -136,8 +190,10 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const snippets = buildCodingToolSnippets(baseUrl);
+  const snippets = buildCodingToolSnippets({ baseUrl });
+  const tools = snippets.tools;
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
+  const wireLabel = (id: CodingToolId): string => t(`wire.${tools[id].wire}`);
 
   return (
     <Div className="min-h-screen bg-background">
@@ -172,50 +228,73 @@ export function TanstackPage({
           <Callout icon={Key} tone="neutral">
             <Span className="font-semibold">{t("setup.baseUrlLabel")}:</Span>{" "}
             <Span className="font-mono text-sm [overflow-wrap:anywhere]">
-              {baseUrl}
+              {snippets.baseUrl}
             </Span>
             <P className="mt-2 mb-0 text-sm text-muted-foreground">
               {t("setup.baseUrlNote")}
             </P>
+            <P className="mt-4 mb-0">
+              <Span className="font-semibold">
+                {t("setup.anthropicBaseUrlLabel")}:
+              </Span>{" "}
+              <Span className="font-mono text-sm [overflow-wrap:anywhere]">
+                {snippets.anthropicBaseUrl}
+              </Span>
+            </P>
+            <P className="mt-2 mb-0 text-sm text-muted-foreground">
+              {t("setup.anthropicBaseUrlNote")}
+            </P>
           </Callout>
-          <ArticleCode
-            code={snippets.key}
-            language="bash"
-            filename="terminal"
-          />
+          <ToolBlocks tool={tools.curl} locale={locale} />
           <ArticleP>{t("setup.p2")}</ArticleP>
+          <Callout icon={Sparkles} tone="neutral">
+            {t("setup.shortcut")}
+          </Callout>
         </ArticleSection>
 
         <ArticleSection title={t("compat.title")} intro={t("compat.intro")}>
           <ArticleList
             items={[
-              t("compat.opencode"),
-              t("compat.continue"),
               t("compat.codex"),
               t("compat.claudeCode"),
+              t("compat.chat"),
             ]}
           />
           <ArticleP>{t("compat.other")}</ArticleP>
+          <ToolBlocks tool={tools.openaiCompatible} locale={locale} />
+        </ArticleSection>
+
+        <ArticleSection
+          id="codex"
+          label={wireLabel("codex")}
+          title={tools.codex.name}
+          intro={toolIntro(t("codex.intro"), tools.codex, locale)}
+        >
+          <ArticleP>{t("codex.p1")}</ArticleP>
+          <ToolBlocks tool={tools.codex} locale={locale} />
+          <ArticleP>{t("codex.p2")}</ArticleP>
+        </ArticleSection>
+
+        <ArticleSection
+          id="claude-code"
+          label={wireLabel("claudeCode")}
+          title={tools.claudeCode.name}
+          intro={toolIntro(t("claudeCode.intro"), tools.claudeCode, locale)}
+        >
+          <ArticleP>{t("claudeCode.p1")}</ArticleP>
+          <ToolBlocks tool={tools.claudeCode} locale={locale} />
+          <ArticleP>{t("claudeCode.p2")}</ArticleP>
+          <ArticleP>{t("claudeCode.p3")}</ArticleP>
         </ArticleSection>
 
         <ArticleSection
           id="opencode"
-          label={t("opencode.label")}
-          title={t("opencode.title")}
-          intro={t("opencode.intro")}
+          label={wireLabel("opencode")}
+          title={tools.opencode.name}
+          intro={toolIntro(t("opencode.intro"), tools.opencode, locale)}
         >
           <ArticleP>{t("opencode.p1")}</ArticleP>
-          <ArticleCode
-            code={snippets.opencode}
-            language="json"
-            filename="opencode.json"
-          />
-          <ArticleP>{t("opencode.p2")}</ArticleP>
-          <ArticleCode
-            code={snippets.opencodeRun}
-            language="bash"
-            filename="terminal"
-          />
+          <ToolBlocks tool={tools.opencode} locale={locale} />
           <Callout icon={AlertTriangle} tone="warning">
             {t("opencode.gotcha")}
           </Callout>
@@ -223,81 +302,32 @@ export function TanstackPage({
 
         <ArticleSection
           id="continue"
-          label={t("continue.label")}
-          title={t("continue.title")}
-          intro={t("continue.intro")}
+          label={wireLabel("continue")}
+          title={tools.continue.name}
+          intro={toolIntro(t("continue.intro"), tools.continue, locale)}
         >
-          <ArticleCode
-            code={snippets.continueConfig}
-            language="yaml"
-            filename="config.yaml"
-          />
+          <ToolBlocks tool={tools.continue} locale={locale} />
           <ArticleP>{t("continue.p1")}</ArticleP>
-          <ArticleCode
-            code={snippets.continueRun}
-            language="bash"
-            filename="terminal"
-          />
         </ArticleSection>
 
         <ArticleSection
-          id="bridge"
-          label={t("bridge.label")}
-          title={t("bridge.title")}
-          intro={t("bridge.intro")}
+          id="aider"
+          label={wireLabel("aider")}
+          title={tools.aider.name}
+          intro={toolIntro(t("aider.intro"), tools.aider, locale)}
         >
-          <ArticleP>{t("bridge.p1", { appName })}</ArticleP>
-          <ArticleCode
-            code={snippets.litellmConfig}
-            language="yaml"
-            filename="litellm.yaml"
-          />
-          <ArticleCode
-            code={snippets.litellmRun}
-            language="bash"
-            filename="terminal"
-          />
-          <Callout icon={AlertTriangle} tone="warning">
-            {t("bridge.gotcha")}
-          </Callout>
+          <ArticleP>{t("aider.p1")}</ArticleP>
+          <ToolBlocks tool={tools.aider} locale={locale} />
         </ArticleSection>
 
         <ArticleSection
-          id="codex"
-          label={t("codex.label")}
-          title={t("codex.title")}
-          intro={t("codex.intro")}
+          id="cline"
+          label={wireLabel("cline")}
+          title={tools.cline.name}
+          intro={toolIntro(t("cline.intro"), tools.cline, locale)}
         >
-          <ArticleP>{t("codex.p1")}</ArticleP>
-          <ArticleCode
-            code={snippets.codex}
-            language="toml"
-            filename="~/.codex/config.toml"
-          />
-          <ArticleCode
-            code={snippets.codexRun}
-            language="bash"
-            filename="terminal"
-          />
-          <ArticleP>{t("codex.p2")}</ArticleP>
-        </ArticleSection>
-
-        <ArticleSection
-          id="claude-code"
-          label={t("claudeCode.label")}
-          title={t("claudeCode.title")}
-          intro={t("claudeCode.intro")}
-        >
-          <ArticleP>{t("claudeCode.p1")}</ArticleP>
-          <ArticleCode
-            code={snippets.claudeCode}
-            language="bash"
-            filename="terminal"
-          />
-          <ArticleP>{t("claudeCode.p2", { appName })}</ArticleP>
-          <Callout icon={AlertTriangle} tone="warning">
-            {t("claudeCode.caveat")}
-          </Callout>
+          <ArticleP>{t("cline.p1")}</ArticleP>
+          <ToolBlocks tool={tools.cline} locale={locale} />
         </ArticleSection>
 
         <ArticleSection title={t("models.title")} intro={t("models.intro")}>
@@ -321,10 +351,10 @@ export function TanstackPage({
           <ArticleList
             items={[
               t("gotchas.localeUrl"),
+              t("gotchas.anthropicUrl"),
               t("gotchas.modelId"),
               t("gotchas.paid"),
               t("gotchas.tools"),
-              t("gotchas.bridgeKey", { appName }),
               t("gotchas.rateLimit"),
             ]}
           />

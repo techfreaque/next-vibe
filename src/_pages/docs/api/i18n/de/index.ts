@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} API-Doku - OpenAI-kompatibles /v1",
+    title: "{{appName}} API-Doku - OpenAI- und Anthropic-kompatibel",
     description:
-      "Ein Endpunkt, {{modelCount}} Modelle. Drop-in-OpenAI-API: Chat Completions, Streaming, Tool-Aufrufe. Mit sk-unb-Schlüssel anmelden, pro Token in Credits zahlen.",
+      "Eine Base-URL, {{modelCount}} Modelle. OpenAI Chat Completions und Responses API, Anthropic Messages API, Streaming, Tool-Aufrufe. Codex CLI und Claude Code verbinden sich direkt. Pro Token in Credits zahlen.",
     category: "API",
     imageAlt: "{{appName}} OpenAI-kompatible API-Doku",
     keywords:
-      "api, openai-kompatibel, chat completions, streaming, function calling, tools, {{appName}}",
+      "api, openai-kompatibel, anthropic-kompatibel, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, {{appName}}",
   },
   nav: {
     quickstart: "Schnellstart",
@@ -16,25 +16,30 @@ export const translations: typeof enTranslations = {
     models: "Modelle",
     chat: "Chat Completions",
     tools: "Tool-Aufrufe",
+    responses: "Responses API",
+    messages: "Messages API",
     billing: "Credits und Abrechnung",
     limits: "Rate Limits",
     errors: "Fehler",
     codingTools: "Coding-Tools",
   },
   hero: {
-    badge: "OpenAI-kompatible API",
+    badge: "OpenAI- und Anthropic-kompatibel",
     title: "Eine Base-URL.",
     titleHighlight: "Jedes Modell.",
     subtitle:
-      "Richte ein beliebiges OpenAI-SDK auf {{appName}}. {{modelCount}} Modelle, Streaming, Tool-Aufrufe. Dein Schlüssel, deine Credits, kein neuer Client.",
+      "Richte ein beliebiges OpenAI- oder Anthropic-SDK auf {{appName}}. Codex CLI und Claude Code ebenso. {{modelCount}} Modelle, Streaming, Tool-Aufrufe. Dein Schlüssel, deine Credits, kein neuer Client.",
     ctaKey: "API-Schlüssel holen",
     ctaPricing: "Tarife ansehen",
   },
   quickstart: {
     title: "In 60 Sekunden zum ersten Aufruf",
     intro:
-      "Die API spricht das OpenAI-Format. Läuft dein Code gegen OpenAI, läuft er auch hier, nach zwei Änderungen: Base-URL und Schlüssel.",
+      "Die API spricht das OpenAI- und das Anthropic-Format. Läuft dein Code gegen eines davon, läuft er auch hier, nach zwei Änderungen: Base-URL und Schlüssel.",
     baseUrlLabel: "Base-URL",
+    anthropicBaseUrlLabel: "Anthropic-Base-URL",
+    anthropicBaseUrlNote:
+      "Für Claude Code und Anthropic-SDKs. Dieselbe URL ohne /v1: /v1/messages hängen sie selbst an.",
     baseUrlNote:
       "Jede Sprache im Pfad funktioniert (en-US, de-DE, pl-PL). Sie bestimmt nur die Sprache der Fehlermeldungen.",
     step1: {
@@ -60,12 +65,13 @@ export const translations: typeof enTranslations = {
   auth: {
     title: "Authentifizierung",
     intro:
-      "Sende deinen Schlüssel bei jeder Anfrage als Bearer-Token. Schlüssel beginnen mit sk-unb-.",
+      "Sende deinen Schlüssel bei jeder Anfrage als Bearer-Token. Schlüssel beginnen mit sk-unb-. Anthropic-Clients schicken ihn als x-api-key, auch das funktioniert.",
     header: "Authorization: Bearer sk-unb-DEIN_SCHLUESSEL",
+    headerAnthropic: "x-api-key: sk-unb-DEIN_SCHLUESSEL",
     points: {
       hash: "Wir speichern einen Hash, nicht den Schlüssel. Verloren heißt: neuen erstellen.",
       scope:
-        "Ein Schlüssel gilt nur für /v1. Auf Konto, Zahlungen oder Einstellungen kommt er nicht.",
+        "Ein Schlüssel gilt nur für die API: /v1/models, /v1/chat/completions, /v1/responses und /v1/messages. Auf Konto, Zahlungen oder Einstellungen kommt er nicht.",
       limit:
         "Bis zu 20 aktive Schlüssel pro Konto. Jeden Schlüssel kannst du jederzeit widerrufen: Er stoppt sofort.",
       missing:
@@ -76,7 +82,7 @@ export const translations: typeof enTranslations = {
     title: "GET /v1/models",
     intro:
       "Listet die Modelle, die dein Schlüssel jetzt aufrufen kann, mit Kontextgröße, Tool-Unterstützung und Credit-Preisen pro Million Token. Die id nutzt du als model-Feld.",
-    note: "Die Liste hängt von deinem Konto ab. Unbekannte oder nicht verfügbare IDs liefern 404 model_not_found. Die API tauscht dein Modell nie heimlich aus.",
+    note: "Die Liste hängt von deinem Konto ab. Unbekannte oder nicht verfügbare IDs liefern 404 model_not_found. Einzige Zuordnung: Auf /v1/messages landen die Claude-IDs, die Claude Code standardmäßig schickt, beim neuesten Claude derselben Familie.",
   },
   chat: {
     title: "POST /v1/chat/completions",
@@ -168,7 +174,8 @@ export const translations: typeof enTranslations = {
       "Fehler nutzen den OpenAI-Umschlag, die SDKs werfen also ihre gewohnten Exceptions. Werte error.code aus, nicht die Meldung.",
     columns: { status: "HTTP", code: "code", meaning: "Bedeutung" },
     rows: {
-      missingKey: "Kein Authorization-Header. Sende Bearer sk-unb-...",
+      missingKey:
+        "Kein Schlüssel gesendet. Sende Authorization: Bearer sk-unb-... oder x-api-key.",
       invalidKey: "Schlüssel ist falsch oder widerrufen.",
       paid: "Das Konto hat keinen bezahlten Tarif. Abonniere oder kaufe Credits.",
       credits: "Guthaben reicht für diesen Aufruf nicht. Auffüllen.",
@@ -186,15 +193,61 @@ export const translations: typeof enTranslations = {
     streamNote:
       "Fehler mitten im Stream kommen als data:-Event mit demselben Fehlerobjekt, gefolgt von data: [DONE].",
   },
+  responses: {
+    title: "POST /v1/responses",
+    intro:
+      "Die OpenAI Responses API, das Format von Codex CLI. Dieselben Modelle, derselbe Schlüssel, dieselben Credits und Rate Limits wie bei Chat Completions.",
+    request: {
+      title: "Anfrage",
+      body: "input ist ein String oder eine Liste von Input-Items. instructions ist der Systemprompt. Die Antwort kommt als Output-Items, jedes OpenAI-SDK liefert zusätzlich output_text.",
+    },
+    stream: {
+      title: "Streaming",
+      body: "Mit stream: true kommt der Responses-Eventstream: response.created, Text-Deltas, am Ende response.completed mit Usage.",
+    },
+    points: {
+      tools:
+        "Tools: function, custom und local_shell. Die Aufrufe des Modells kommen als Output-Items. Jedes Ergebnis geht als function_call_output-Item mit derselben call_id zurück.",
+      reasoning: "Reasoning-Modelle liefern Reasoning-Items neben der Antwort.",
+      billing:
+        "Abrechnung, Modell-IDs, Fehler und Rate Limits funktionieren exakt wie bei Chat Completions.",
+    },
+    sdkTitle: "Mit dem OpenAI-Python-SDK",
+  },
+  messages: {
+    title: "POST /v1/messages",
+    intro:
+      "Die Anthropic Messages API, das Format von Claude Code und den Anthropic-SDKs. Nimm die Base-URL ohne /v1: Clients hängen /v1/messages selbst an.",
+    request: {
+      title: "Anfrage",
+      body: "Standard-Messages-Anfrage: model, max_tokens, system, messages. Text- und Bildblöcke rein, Text- und tool_use-Blöcke raus.",
+    },
+    stream: {
+      title: "Streaming",
+      body: "Mit stream: true kommen Anthropic-Server-Sent-Events, von message_start bis message_stop.",
+    },
+    points: {
+      auth: "Authentifizierung: x-api-key oder Authorization: Bearer. Beide nehmen deinen sk-unb-Schlüssel.",
+      models:
+        "Modell: jede ID aus GET /v1/models. Die Anthropic-IDs, die Claude Code standardmäßig schickt, etwa claude-sonnet-4-5-20250929, landen auf unserem passenden Claude-Modell.",
+      tools:
+        "Tools: tool_use-Blöcke raus, tool_result-Blöcke zurück, wie in der Anthropic API.",
+      billing:
+        "Dieselben Credits, dieselben Preise, dieselben Rate Limits wie an jedem anderen Endpunkt.",
+    },
+    countTokens: {
+      title: "POST /v1/messages/count_tokens",
+      body: "Zählt die Input-Tokens einer Messages-Anfrage, ohne das Modell laufen zu lassen. Claude Code nutzt das, um seinen Kontext zu steuern.",
+    },
+    sdkTitle: "Mit dem Anthropic-Python-SDK",
+  },
   codingTools: {
     title: "Direkt im Coding-Agent nutzen",
     intro:
-      "Gleiche Basis-URL, gleicher Key. OpenCode und Continue verbinden sich direkt. Jede ID aus GET /v1/models kommt in die Config.",
-    opencodeTitle: "OpenCode",
-    continueTitle: "Continue",
-    bridgeTitle: "Codex CLI und Claude Code",
-    bridgeBody:
-      "Codex spricht nur die Responses API, Claude Code nur die Anthropic Messages API. Beide laufen über eine lokale LiteLLM-Brücke, die in Chat Completions übersetzt. Der Guide enthält getestete Configs für alle vier Tools.",
+      "Eine Base-URL, ein Schlüssel. Codex CLI und Claude Code verbinden sich nativ. OpenCode, Continue, Aider und Cline laufen über Chat Completions. Block kopieren, ausführen.",
+    keyPage:
+      "Die Seite API-Schlüssel zeigt dieselben Blöcke, mit deinem Schlüssel schon eingesetzt.",
+    keyPageCta: "Mit eigenem Schlüssel holen",
     guide: "Zum Coding-Tools-Guide",
   },
   cta: {

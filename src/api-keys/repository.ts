@@ -13,6 +13,7 @@ import {
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
+import { coreClientEnv } from "next-vibe/core/env-client";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
@@ -40,7 +41,9 @@ export function buildApiBaseUrl(
     ? `${forwardedProto}://${forwardedHost}`
     : request
       ? new URL(request.url).origin
-      : "";
+      : // CLI / MCP / in-process calls have no request: use the public app URL
+        // so printed snippets stay copy-pasteable.
+        coreClientEnv.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "");
   return `${origin}/api/${locale}/v1`;
 }
 

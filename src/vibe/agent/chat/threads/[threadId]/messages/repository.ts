@@ -543,6 +543,9 @@ export class MessagesRepository {
       authorId: params.user.id ?? null,
       isAI: false,
       sequenceId: params.sequenceId ?? null,
+      // The column is what reloads read (message.errorType); metadata alone
+      // turned a reloaded "stopped" indicator into a generic error bubble.
+      errorType: params.errorType,
       metadata,
     });
 

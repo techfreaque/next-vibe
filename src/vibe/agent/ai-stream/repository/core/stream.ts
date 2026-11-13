@@ -31,6 +31,7 @@ import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/e
 import type { WakeUpPayload } from "../revival/revival";
 import { AbortReason, StreamAbortError } from "./constants";
 import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
+import { registerOwnedRun, releaseOwnedRun } from "./run-heartbeat";
 import {
   emitStreamingState,
   transitionStreamingState,
@@ -489,6 +490,10 @@ export async function clearStreamingState(
   ownerRunId: string | undefined,
 ): Promise<ClearStreamingResult> {
   const now = new Date();
+  // The finishing owner stops beating for its claim, cleared or superseded.
+  if (ownerRunId !== undefined) {
+    releaseOwnedRun(ownerRunId);
+  }
 
   // Fetch rootFolderId for WS channel routing — needed to match the client's
   // includeInCacheKey subscription channel. streamingRunId rides along for
@@ -680,6 +685,7 @@ export async function claimRevivalSlot(
     .set({
       streamingState: ThreadStreamingState.STREAMING,
       streamingRunId: claimRunId,
+      streamingHeartbeatAt: new Date(),
     })
     .where(
       and(
@@ -694,6 +700,7 @@ export async function claimRevivalSlot(
   if (!claimed) {
     return false;
   }
+  registerOwnedRun(claimRunId, threadId, logger);
   // Won the claim → fan the STREAMING transition out so the sidebar shows the
   // spinner during the revival (previously emitted nothing).
   await emitStreamingState({

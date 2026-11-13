@@ -54,18 +54,101 @@ export function listUserCallableModels(
       continue;
     }
     seen.add(candidate.id);
-    const served = resolveRequestedModel(candidate.id, user, availability);
+    const served = resolveExactModel(candidate.id, user, availability);
     models.push(served?.id === candidate.id ? served : candidate);
   }
   return models;
 }
 
 /**
- * Strict resolution of the `model` string from a request: exact id (legacy ids
- * map to their successor). Returns undefined when the model is unknown or not
- * servable for this user - never silently swaps to a different model.
+ * How a request's model string is matched.
+ * - openai: our id, or a vendor spelling of the same model
+ *   (gpt-5.5 -> gpt-55, claude-sonnet-4-5-20250929 -> claude-sonnet-4.5).
+ * - anthropic: the same, plus Claude Code's built-in Claude ids fall back to
+ *   the newest Claude of that family this user can call, so Claude Code's
+ *   background calls work without extra env vars.
+ */
+export type ModelResolveMode = "openai" | "anthropic";
+
+const CLAUDE_FAMILIES = ["opus", "sonnet", "haiku", "fable"] as const;
+
+/**
+ * Spellings of the same model other clients send: date-stamped Anthropic ids,
+ * dashed version numbers, the [1m] context suffix, -latest aliases, provider
+ * prefixes (anthropic/claude-..., openai/gpt-...).
+ */
+export function modelIdCandidates(requested: string): string[] {
+  const candidates: string[] = [requested];
+  const add = (id: string): void => {
+    if (id && !candidates.includes(id)) {
+      candidates.push(id);
+    }
+  };
+  let base = requested.trim().toLowerCase();
+  add(base);
+  base = base.replace(/^[a-z0-9-]+\//, "");
+  add(base);
+  base = base
+    .replace(/\[[^\]]*\]$/, "")
+    .replace(/-latest$/, "")
+    .replace(/-\d{8}$/, "")
+    .replace(/@\d{8}$/, "");
+  add(base);
+  // claude-sonnet-4-5 -> claude-sonnet-4.5 ; claude-opus-5-5-fast -> claude-opus-5.5-fast
+  add(base.replace(/^(claude-[a-z]+-\d+)-(\d+)(?=$|-)/, "$1.$2"));
+  // claude-3-5-sonnet style -> claude-sonnet-3.5
+  const legacy = /^claude-(\d+)(?:-(\d+))?-([a-z]+)$/.exec(base);
+  if (legacy) {
+    add(`claude-${legacy[3]}-${legacy[1]}${legacy[2] ? `.${legacy[2]}` : ""}`);
+  }
+  // gpt-5.5 -> gpt-55 ; gpt-5.3-codex -> gpt-53-codex
+  add(base.replace(/^gpt-(\d)\.(\d)(?=$|-)/, "gpt-$1$2"));
+  return candidates;
+}
+
+/** Version number of a claude-<family>-X.Y id, for picking the newest. */
+function claudeVersion(id: string): number {
+  const match = /^claude-[a-z]+-(\d+)(?:\.(\d+))?/.exec(id);
+  return match ? Number(match[1]) * 100 + Number(match[2] ?? 0) : 0;
+}
+
+/**
+ * Resolution of the `model` string from a request: our id or a known vendor
+ * spelling of it (legacy ids map to their successor). Returns undefined when
+ * the model is unknown or not servable for this user. Only the anthropic mode
+ * maps a Claude id this user cannot call to another Claude of the same family.
  */
 export function resolveRequestedModel(
+  requested: string,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+  mode: ModelResolveMode = "openai",
+): ChatModelOption | undefined {
+  for (const candidate of modelIdCandidates(requested)) {
+    const match = resolveExactModel(candidate, user, availability);
+    if (match) {
+      return match;
+    }
+  }
+  if (mode !== "anthropic") {
+    return undefined;
+  }
+  const family = CLAUDE_FAMILIES.find((name) =>
+    new RegExp(`^(?:[a-z0-9-]+/)?claude-(?:[\\d-]+-)?${name}(?:-|$)`).test(
+      requested.trim().toLowerCase(),
+    ),
+  );
+  if (!family) {
+    return undefined;
+  }
+  const newest = listUserCallableModels(user, availability)
+    .filter((m) => new RegExp(`^claude-${family}-\\d`).test(m.id))
+    .filter((m) => !m.id.endsWith("-fast"))
+    .toSorted((a, b) => claudeVersion(b.id) - claudeVersion(a.id))[0];
+  return newest;
+}
+
+function resolveExactModel(
   requested: string,
   user: JwtPayloadType,
   availability: AgentEnvAvailability,
