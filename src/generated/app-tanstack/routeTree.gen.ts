@@ -385,6 +385,7 @@ import { Route as ApiLocaleSubscriptionAdminListRouteImport } from './routes/api
 import { Route as ApiLocaleSubscriptionAdminPurchasesRouteImport } from './routes/api.$locale.subscription.admin.purchases'
 import { Route as ApiLocaleSubscriptionAdminReferralsRouteImport } from './routes/api.$locale.subscription.admin.referrals'
 import { Route as ApiLocaleSubscriptionAdminStatsRouteImport } from './routes/api.$locale.subscription.admin.stats'
+import { Route as ApiLocaleSubscriptionAdminSyncStripeRouteImport } from './routes/api.$locale.subscription.admin.sync-stripe'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-active'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-cancelled'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-churned'
@@ -2840,6 +2841,12 @@ const ApiLocaleSubscriptionAdminStatsRoute =
     path: '/admin/stats',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
   } as any)
+const ApiLocaleSubscriptionAdminSyncStripeRoute =
+  ApiLocaleSubscriptionAdminSyncStripeRouteImport.update({
+    id: '/admin/sync-stripe',
+    path: '/admin/sync-stripe',
+    getParentRoute: () => ApiLocaleSubscriptionRoute,
+  } as any)
 const ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute =
   ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRouteImport.update({
     id: '/data-sources/subscriptions-active',
@@ -4916,6 +4923,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/admin/purchases': typeof ApiLocaleSubscriptionAdminPurchasesRoute
   '/api/$locale/subscription/admin/referrals': typeof ApiLocaleSubscriptionAdminReferralsRoute
   '/api/$locale/subscription/admin/stats': typeof ApiLocaleSubscriptionAdminStatsRoute
+  '/api/$locale/subscription/admin/sync-stripe': typeof ApiLocaleSubscriptionAdminSyncStripeRoute
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
@@ -5572,6 +5580,7 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/admin/purchases': typeof ApiLocaleSubscriptionAdminPurchasesRoute
   '/api/$locale/subscription/admin/referrals': typeof ApiLocaleSubscriptionAdminReferralsRoute
   '/api/$locale/subscription/admin/stats': typeof ApiLocaleSubscriptionAdminStatsRoute
+  '/api/$locale/subscription/admin/sync-stripe': typeof ApiLocaleSubscriptionAdminSyncStripeRoute
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
@@ -6236,6 +6245,7 @@ export interface FileRoutesById {
   '/api/$locale/subscription/admin/purchases': typeof ApiLocaleSubscriptionAdminPurchasesRoute
   '/api/$locale/subscription/admin/referrals': typeof ApiLocaleSubscriptionAdminReferralsRoute
   '/api/$locale/subscription/admin/stats': typeof ApiLocaleSubscriptionAdminStatsRoute
+  '/api/$locale/subscription/admin/sync-stripe': typeof ApiLocaleSubscriptionAdminSyncStripeRoute
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
@@ -6900,6 +6910,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/admin/purchases'
     | '/api/$locale/subscription/admin/referrals'
     | '/api/$locale/subscription/admin/stats'
+    | '/api/$locale/subscription/admin/sync-stripe'
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
@@ -7556,6 +7567,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/admin/purchases'
     | '/api/$locale/subscription/admin/referrals'
     | '/api/$locale/subscription/admin/stats'
+    | '/api/$locale/subscription/admin/sync-stripe'
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
@@ -8219,6 +8231,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/admin/purchases'
     | '/api/$locale/subscription/admin/referrals'
     | '/api/$locale/subscription/admin/stats'
+    | '/api/$locale/subscription/admin/sync-stripe'
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
@@ -11595,6 +11608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleSubscriptionAdminStatsRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
     }
+    '/api/$locale/subscription/admin/sync-stripe': {
+      id: '/api/$locale/subscription/admin/sync-stripe'
+      path: '/admin/sync-stripe'
+      fullPath: '/api/$locale/subscription/admin/sync-stripe'
+      preLoaderRoute: typeof ApiLocaleSubscriptionAdminSyncStripeRouteImport
+      parentRoute: typeof ApiLocaleSubscriptionRoute
+    }
     '/api/$locale/subscription/data-sources/subscriptions-active': {
       id: '/api/$locale/subscription/data-sources/subscriptions-active'
       path: '/data-sources/subscriptions-active'
@@ -14086,6 +14106,7 @@ interface ApiLocaleSubscriptionRouteChildren {
   ApiLocaleSubscriptionAdminPurchasesRoute: typeof ApiLocaleSubscriptionAdminPurchasesRoute
   ApiLocaleSubscriptionAdminReferralsRoute: typeof ApiLocaleSubscriptionAdminReferralsRoute
   ApiLocaleSubscriptionAdminStatsRoute: typeof ApiLocaleSubscriptionAdminStatsRoute
+  ApiLocaleSubscriptionAdminSyncStripeRoute: typeof ApiLocaleSubscriptionAdminSyncStripeRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
@@ -14107,6 +14128,8 @@ const ApiLocaleSubscriptionRouteChildren: ApiLocaleSubscriptionRouteChildren = {
   ApiLocaleSubscriptionAdminReferralsRoute:
     ApiLocaleSubscriptionAdminReferralsRoute,
   ApiLocaleSubscriptionAdminStatsRoute: ApiLocaleSubscriptionAdminStatsRoute,
+  ApiLocaleSubscriptionAdminSyncStripeRoute:
+    ApiLocaleSubscriptionAdminSyncStripeRoute,
   ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute:
     ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute,
   ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute:

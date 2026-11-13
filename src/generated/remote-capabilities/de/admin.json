@@ -230538,6 +230538,437 @@
     "credits": 0
   },
   {
+    "toolName": "subscription-sync-stripe",
+    "title": "Abos mit Stripe abgleichen",
+    "titleShort": "Stripe-Abgleich",
+    "description": "Holt Status, Abrechnungszeitraum und Kündigungsdaten aus Stripe in unsere Abo-Einträge. Setzt Altlasten ohne Stripe-ID mit abgelaufenem Zeitraum auf gekündigt. Vergibt oder entzieht keine Credits. Standardmäßig Probelauf.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "subscriptionId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Abo",
+          "description": "Unsere Abo-ID (UUID) oder die Stripe-Abo-ID (sub_...). Leer lassen und 'Alle' aktivieren.",
+          "placeholder": "sub_... oder Abo-UUID",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "all": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Alle",
+          "description": "Jedes Abo prüfen, das nicht bereits gekündigt oder abgelaufen ist.",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              },
+              "defaultValue": false
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Probelauf",
+          "description": "Änderungen anzeigen, ohne etwas zu schreiben.",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "dryRunResult": {
+          "type": "text",
+          "label": "Probelauf",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "scanned": {
+          "type": "text",
+          "label": "Geprüft",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "changed": {
+          "type": "text",
+          "label": "Geändert",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "failed": {
+          "type": "text",
+          "label": "Fehlgeschlagen",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "items": {
+          "type": "container",
+          "title": "Abos",
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "subscriptionId": {
+                "type": "text",
+                "label": "Abo",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "userEmail": {
+                "type": "text",
+                "label": "Nutzer",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "providerSubscriptionId": {
+                "type": "text",
+                "label": "Stripe-ID",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "action": {
+                "type": "text",
+                "label": "Aktion",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.action.updated": "enums.action.updated",
+                      "enums.action.unchanged": "enums.action.unchanged",
+                      "enums.action.expired": "enums.action.expired",
+                      "enums.action.missingInStripe": "enums.action.missingInStripe",
+                      "enums.action.skipped": "enums.action.skipped",
+                      "enums.action.error": "enums.action.error"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.action.updated": "enums.action.updated",
+                    "enums.action.unchanged": "enums.action.unchanged",
+                    "enums.action.expired": "enums.action.expired",
+                    "enums.action.missingInStripe": "enums.action.missingInStripe",
+                    "enums.action.skipped": "enums.action.skipped",
+                    "enums.action.error": "enums.action.error"
+                  },
+                  "options": [
+                    "enums.action.updated",
+                    "enums.action.unchanged",
+                    "enums.action.expired",
+                    "enums.action.missingInStripe",
+                    "enums.action.skipped",
+                    "enums.action.error"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "statusBefore": {
+                "type": "text",
+                "label": "Status vorher",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.status.incomplete": "enums.status.incomplete",
+                      "enums.status.incompleteExpired": "enums.status.incompleteExpired",
+                      "enums.status.trialing": "enums.status.trialing",
+                      "enums.status.active": "enums.status.active",
+                      "enums.status.pastDue": "enums.status.pastDue",
+                      "enums.status.canceled": "enums.status.canceled",
+                      "enums.status.unpaid": "enums.status.unpaid",
+                      "enums.status.paused": "enums.status.paused"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.status.incomplete": "enums.status.incomplete",
+                    "enums.status.incompleteExpired": "enums.status.incompleteExpired",
+                    "enums.status.trialing": "enums.status.trialing",
+                    "enums.status.active": "enums.status.active",
+                    "enums.status.pastDue": "enums.status.pastDue",
+                    "enums.status.canceled": "enums.status.canceled",
+                    "enums.status.unpaid": "enums.status.unpaid",
+                    "enums.status.paused": "enums.status.paused"
+                  },
+                  "options": [
+                    "enums.status.incomplete",
+                    "enums.status.incompleteExpired",
+                    "enums.status.trialing",
+                    "enums.status.active",
+                    "enums.status.pastDue",
+                    "enums.status.canceled",
+                    "enums.status.unpaid",
+                    "enums.status.paused"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "statusAfter": {
+                "type": "text",
+                "label": "Status nachher",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.status.incomplete": "enums.status.incomplete",
+                      "enums.status.incompleteExpired": "enums.status.incompleteExpired",
+                      "enums.status.trialing": "enums.status.trialing",
+                      "enums.status.active": "enums.status.active",
+                      "enums.status.pastDue": "enums.status.pastDue",
+                      "enums.status.canceled": "enums.status.canceled",
+                      "enums.status.unpaid": "enums.status.unpaid",
+                      "enums.status.paused": "enums.status.paused"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.status.incomplete": "enums.status.incomplete",
+                    "enums.status.incompleteExpired": "enums.status.incompleteExpired",
+                    "enums.status.trialing": "enums.status.trialing",
+                    "enums.status.active": "enums.status.active",
+                    "enums.status.pastDue": "enums.status.pastDue",
+                    "enums.status.canceled": "enums.status.canceled",
+                    "enums.status.unpaid": "enums.status.unpaid",
+                    "enums.status.paused": "enums.status.paused"
+                  },
+                  "options": [
+                    "enums.status.incomplete",
+                    "enums.status.incompleteExpired",
+                    "enums.status.trialing",
+                    "enums.status.active",
+                    "enums.status.pastDue",
+                    "enums.status.canceled",
+                    "enums.status.unpaid",
+                    "enums.status.paused"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "periodEndBefore": {
+                "type": "text",
+                "label": "Zeitraumende vorher",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "date",
+                        "coerce": true
+                      },
+                      "type": "date"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "periodEndAfter": {
+                "type": "text",
+                "label": "Zeitraumende nachher",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "date",
+                        "coerce": true
+                      },
+                      "type": "date"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "note": {
+                "type": "text",
+                "label": "Hinweis",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "subscriptions",
+    "tags": ["Abos mit Stripe abgleichen"],
+    "aliases": ["subscription-sync-stripe"],
+    "credits": 0
+  },
+  {
     "toolName": "subscription-cancel",
     "title": "Abonnement kündigen",
     "titleShort": "Abo kündigen",

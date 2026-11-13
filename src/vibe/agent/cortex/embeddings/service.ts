@@ -2,7 +2,7 @@ import "server-only";
 
 /**
  * Cortex Embedding Service
- * Generates text embeddings via OpenRouter (baai/bge-m3, 3072 dims).
+ * Generates text embeddings via OpenRouter (baai/bge-m3, 1024 dims, 8192-token input limit).
  * Used for semantic search across cortex nodes and chat messages.
  */
 import { createHash } from "node:crypto";
@@ -12,6 +12,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 
 import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../../env";
+import {
+  chunkTextForEmbedding,
+  EMBEDDING_MIN_SPLIT_CHARS,
+  estimateEmbeddingTokens,
+  isInputTooLongError,
+  splitChunkInHalf,
+} from "./chunking";
 
 /** Embedding model used for all cortex and message embeddings */
 export const EMBEDDING_MODEL = "baai/bge-m3";
@@ -40,7 +47,8 @@ interface EmbeddingResponse {
 
 /**
  * Generate an embedding vector for the given text.
- * For long texts, chunks and averages embeddings.
+ * Long texts are chunked by estimated tokens (bge-m3 limit: 8192) and the
+ * chunk embeddings averaged.
  * Returns null if the API key is not configured or the call fails.
  */
 export async function generateEmbedding(
@@ -62,51 +70,8 @@ export async function generateEmbedding(
   // across chunked requests, so it must not be recreated per chunk.
   const fetchImpl = createFixtureFetch(toolExecutionContext);
 
-  // Model context is 8192 tokens. Chars-per-token varies by content (code,
-  // non-Latin text, etc. run denser than ~4:1), so this stays well under the
-  // limit rather than assuming a fixed ratio - a chunk landing even 1 token
-  // over gets rejected outright by the API.
-  const maxCharsPerChunk = 20000;
-
   try {
-    // Short text - single call
-    if (trimmed.length <= maxCharsPerChunk) {
-      return callEmbeddingApi(apiKey, trimmed, fetchImpl);
-    }
-
-    // Long text - chunk and average
-    const chunks: string[] = [];
-    for (let i = 0; i < trimmed.length; i += maxCharsPerChunk) {
-      chunks.push(trimmed.slice(i, i + maxCharsPerChunk));
-    }
-
-    const embeddings = await Promise.all(
-      chunks.map((chunk) => callEmbeddingApi(apiKey, chunk, fetchImpl)),
-    );
-
-    // Filter out any failed chunks
-    const valid = embeddings.filter((e): e is number[] => e !== null);
-    if (valid.length === 0) {
-      return null;
-    }
-
-    // Average the embeddings
-    const avg = Array.from<number>({ length: EMBEDDING_DIMENSIONS }).fill(0);
-    for (const emb of valid) {
-      for (let i = 0; i < EMBEDDING_DIMENSIONS; i++) {
-        avg[i] += emb[i] / valid.length;
-      }
-    }
-
-    // L2-normalize so cosine similarity works correctly with HNSW index
-    const norm = Math.sqrt(avg.reduce((sum, v) => sum + v * v, 0));
-    if (norm > 0) {
-      for (let i = 0; i < avg.length; i++) {
-        avg[i] /= norm;
-      }
-    }
-
-    return avg;
+    return await embedTextWithFetch(apiKey, trimmed, fetchImpl);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(
@@ -145,13 +110,100 @@ async function isFixtureContext(
 }
 
 /**
+ * Embed already-trimmed text with an explicit fetch implementation.
+ * Chunks by estimated tokens (see ./chunking), splits and retries any chunk
+ * the provider still rejects as too long, then averages + L2-normalizes.
+ * Exported for tests (mocked fetch); production goes through generateEmbedding.
+ */
+export async function embedTextWithFetch(
+  apiKey: string,
+  text: string,
+  fetchImpl: typeof globalThis.fetch,
+): Promise<number[] | null> {
+  const chunks = chunkTextForEmbedding(text);
+
+  const perChunk = await Promise.all(
+    chunks.map((chunk) => embedChunk(apiKey, chunk, fetchImpl, 0)),
+  );
+  const valid = perChunk.flat();
+  if (valid.length === 0) {
+    return null;
+  }
+
+  // Single embedding: return as the provider produced it (unchanged behaviour
+  // for short text).
+  if (valid.length === 1) {
+    return valid[0];
+  }
+
+  // Average the embeddings
+  const avg = Array.from<number>({ length: EMBEDDING_DIMENSIONS }).fill(0);
+  for (const emb of valid) {
+    for (let i = 0; i < EMBEDDING_DIMENSIONS; i++) {
+      avg[i] += (emb[i] ?? 0) / valid.length;
+    }
+  }
+
+  // L2-normalize so cosine similarity works correctly with HNSW index
+  const norm = Math.sqrt(avg.reduce((sum, v) => sum + v * v, 0));
+  if (norm > 0) {
+    for (let i = 0; i < avg.length; i++) {
+      avg[i] /= norm;
+    }
+  }
+
+  return avg;
+}
+
+/** Max halving depth after too-long rejections (2^4 = 16 sub-chunks). */
+const MAX_SPLIT_DEPTH = 4;
+
+/**
+ * Embed one chunk. If the provider rejects it as too long (the estimate ran
+ * low for unusually dense text), split it in half and embed both halves.
+ * Returns zero or more embeddings (empty = this chunk failed).
+ */
+async function embedChunk(
+  apiKey: string,
+  chunk: string,
+  fetchImpl: typeof globalThis.fetch,
+  depth: number,
+): Promise<number[][]> {
+  const result = await callEmbeddingApi(apiKey, chunk, fetchImpl);
+  if (result.kind === "ok") {
+    return [result.embedding];
+  }
+  if (
+    result.kind === "too-long" &&
+    depth < MAX_SPLIT_DEPTH &&
+    chunk.length >= EMBEDDING_MIN_SPLIT_CHARS
+  ) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[cortex-embedding] Input too long (${chunk.length} chars, ~${estimateEmbeddingTokens(chunk)} est. tokens); splitting and retrying`,
+    );
+    const halves = splitChunkInHalf(chunk);
+    // Sequential: keeps fixture record/replay ordinals deterministic.
+    const first = await embedChunk(apiKey, halves[0], fetchImpl, depth + 1);
+    const second = await embedChunk(apiKey, halves[1], fetchImpl, depth + 1);
+    return [...first, ...second];
+  }
+  return [];
+}
+
+type EmbeddingCallResult =
+  | { kind: "ok"; embedding: number[] }
+  | { kind: "too-long" }
+  | { kind: "failed" };
+
+/**
  * Call the OpenRouter embeddings API for a single text chunk.
  */
 async function callEmbeddingApi(
   apiKey: string,
   text: string,
   fetchImpl: typeof globalThis.fetch,
-): Promise<number[] | null> {
+): Promise<EmbeddingCallResult> {
   const response = await fetchImpl("https://openrouter.ai/api/v1/embeddings", {
     method: "POST",
     headers: {
@@ -172,32 +224,47 @@ async function callEmbeddingApi(
     // provider's error body and the input size so the cause is diagnosable
     // (e.g. a chunk over the model's token limit).
     const body = await response.text().catch(() => "");
+    const tooLong = isInputTooLongError(response.status, body);
     // eslint-disable-next-line no-console
     console.error(
       `[cortex-embedding] API returned ${response.status}: ${response.statusText}`,
-      { inputChars: text.length, body: body.slice(0, 500) },
+      {
+        inputChars: text.length,
+        estimatedTokens: estimateEmbeddingTokens(text),
+        tooLong,
+        body: body.slice(0, 500),
+      },
     );
-    return null;
+    return tooLong ? { kind: "too-long" } : { kind: "failed" };
   }
 
   const data = (await response.json()) as EmbeddingResponse;
 
   if (data.error) {
+    const tooLong = isInputTooLongError(400, data.error.message);
     // eslint-disable-next-line no-console
-    console.error(`[cortex-embedding] API error: ${data.error.message}`);
-    return null;
+    console.error(`[cortex-embedding] API error: ${data.error.message}`, {
+      inputChars: text.length,
+      estimatedTokens: estimateEmbeddingTokens(text),
+      tooLong,
+    });
+    return tooLong ? { kind: "too-long" } : { kind: "failed" };
   }
 
   if (!data.data?.[0]?.embedding) {
     // eslint-disable-next-line no-console
     console.error("[cortex-embedding] No embedding in response");
-    return null;
+    return { kind: "failed" };
   }
 
   const raw = data.data[0].embedding;
 
   // Truncate to EMBEDDING_DIMENSIONS via Matryoshka Representation Learning (MRL)
-  return raw.length > EMBEDDING_DIMENSIONS
-    ? raw.slice(0, EMBEDDING_DIMENSIONS)
-    : raw;
+  return {
+    kind: "ok",
+    embedding:
+      raw.length > EMBEDDING_DIMENSIONS
+        ? raw.slice(0, EMBEDDING_DIMENSIONS)
+        : raw,
+  };
 }
