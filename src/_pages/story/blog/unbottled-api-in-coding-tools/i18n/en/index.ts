@@ -118,7 +118,7 @@ export const translations = {
     anthropicUrl:
       "Claude Code gets the base URL without /v1. With /v1 it calls /v1/v1/messages and gets a 404.",
     modelId:
-      "Use the exact id from GET /v1/models, like deepseek-v4.1-flash. Aider wants openai/ in front. Claude Code's built-in Claude ids are mapped for you to our newest Claude of the same family. Any other unknown id returns 404 model_not_found.",
+      "Use the exact id from GET /v1/models, like {{model}}. Aider wants openai/ in front. Claude Code's built-in Claude ids are mapped for you to our newest Claude of the same family. Any other unknown id returns 404 model_not_found.",
     paid: "HTTP 402 with paid_plan_required means the account has no paid plan yet. Any credit pack fixes it.",
     tools:
       "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /v1/models.",

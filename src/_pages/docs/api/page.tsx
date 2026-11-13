@@ -598,7 +598,7 @@ export function TanstackPage({
           <Code
             code={snippets.errorShapeAnthropic}
             language="json"
-            filename="error: /v1/messages"
+            filename="/v1/messages"
           />
           <Div className="overflow-hidden rounded-xl border border-border bg-card">
             <Row

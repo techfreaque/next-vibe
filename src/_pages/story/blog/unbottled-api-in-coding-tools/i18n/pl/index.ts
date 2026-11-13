@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
     anthropicUrl:
       "Claude Code dostaje adres bazowy bez /v1. Z /v1 wywoła /v1/v1/messages i trafi na 404.",
     modelId:
-      "Używaj dokładnie ID z GET /v1/models, na przykład deepseek-v4.1-flash. Aider chce openai/ z przodu. Wbudowane ID Claude z Claude Code trafiają same do naszego najnowszego Claude z tej samej rodziny. Każde inne nieznane ID zwraca 404 model_not_found.",
+      "Używaj dokładnie ID z GET /v1/models, na przykład {{model}}. Aider chce openai/ z przodu. Wbudowane ID Claude z Claude Code trafiają same do naszego najnowszego Claude z tej samej rodziny. Każde inne nieznane ID zwraca 404 model_not_found.",
     paid: "HTTP 402 z paid_plan_required znaczy, że konto nie ma jeszcze płatnego planu. Naprawia to dowolny pakiet kredytów.",
     tools:
       "Model bez obsługi narzędzi zwraca 400 tools_not_supported, gdy tylko agent wyśle narzędzia. Sprawdź supports_tools w GET /v1/models.",

@@ -15,8 +15,13 @@ import {
 
 import { API_KEY_PREFIX } from "./constants";
 
-/** Default model in every snippet: cheap, fast, calls tools. */
-export const CODING_TOOL_MODEL = ChatModelId.DEEPSEEK_V4_1_FLASH;
+/**
+ * Default model in every snippet. Passed real Codex CLI and Claude Code runs
+ * (read, edit, run) and calls tools reliably at a low output price.
+ * Not DeepSeek V4.1 Flash: OpenRouter spreads it over dozens of fp4/fp8
+ * hosts and some return garbled text inside long agent contexts.
+ */
+export const CODING_TOOL_MODEL = ChatModelId.GLM_5_3;
 /** Background / "haiku" slot: session titles, summaries, quick lookups. */
 export const CODING_TOOL_SMALL_MODEL = ChatModelId.GLM_5_3_FLASH;
 /** Extra entries in configs that list several models (OpenCode). */
@@ -25,7 +30,7 @@ export const CODING_TOOL_UNCENSORED_MODEL = ChatModelId.GLM_5_3_UNCENSORED;
 /** "Any id from GET /v1/models works", e.g. these. */
 export const CODING_TOOL_EXAMPLE_MODELS = [
   ChatModelId.KIMI_K3_1_PRO,
-  ChatModelId.GLM_5_3,
+  ChatModelId.KIMI_K3,
   ChatModelId.UNCENSORED_LM_V1_2,
 ] as const;
 

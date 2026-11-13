@@ -28,6 +28,7 @@ import type { JSX } from "react";
 import {
   buildCodingToolSnippets,
   buildPublicApiBaseUrl,
+  CODING_TOOL_MODEL,
   type CodingToolId,
   type CodingToolSetup,
 } from "@/api-keys/coding-tools";
@@ -94,7 +95,7 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
   {
     key: "cheap",
     models: [
-      ChatModelId.DEEPSEEK_V4_1_FLASH,
+      ChatModelId.GLM_5_3,
       ChatModelId.GLM_5_3_FLASH,
       ChatModelId.QWEN_3_8_FLASH,
       ChatModelId.CLAUDE_HAIKU_5_5,
@@ -352,7 +353,7 @@ export function TanstackPage({
             items={[
               t("gotchas.localeUrl"),
               t("gotchas.anthropicUrl"),
-              t("gotchas.modelId"),
+              t("gotchas.modelId", { model: CODING_TOOL_MODEL }),
               t("gotchas.paid"),
               t("gotchas.tools"),
               t("gotchas.rateLimit"),
