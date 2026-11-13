@@ -95,7 +95,7 @@ export const threadRenameFragment: SystemPromptFragment = {
     // nobody reads. GUARD: the rideRule below makes clear it must not fire before the
     // user's request is fully done — that blocks the T1 rename+endLoop hijack pattern
     // where the model uses rename to short-circuit real work.
-    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done${executeToolDenied ? "" : ", then let endLoop close the turn"}.`;
+    const rideRule = `Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done${executeToolDenied ? "" : ", then let endLoop close the turn"}.${executeToolDenied ? "" : " endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply."}`;
 
     if (isNew) {
       // Urgent + unconditional, but SUBORDINATE to the user's task: fire the rename

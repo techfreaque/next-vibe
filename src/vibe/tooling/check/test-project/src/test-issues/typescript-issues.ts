@@ -20,7 +20,7 @@ const inferrableBoolean: boolean = true;
 export function emptyFunction(): void {}
 
 // typescript/consistent-type-imports - violation: uses value import for type-only usage
-import type { GreetOptions } from "../greet";
+import { GreetOptions } from "../greet";
 
 // Function using the imported type to avoid unused import error
 export function greetWrapper(options: GreetOptions): string {

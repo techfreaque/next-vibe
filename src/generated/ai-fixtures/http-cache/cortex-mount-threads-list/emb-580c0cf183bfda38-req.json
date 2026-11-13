@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/listing--threads-root-folders-via-cortex-list-8c9859ca-3bb3-4f51-9f39-9e60a822e138.md\n\n# Listing /threads root folders via cortex-list\nFolder: private\nDescription: User asked for a cortex-list of the /threads directory and a full enumeration of every entry returned. The call returned four directories: private, shared, public, and cron. Reported that no top-level incognito or background folders exist, noting incognito is browser-only and background threads are",
+    "encoding_format": "float"
+  }
+}

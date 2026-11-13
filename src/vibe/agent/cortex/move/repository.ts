@@ -163,6 +163,19 @@ export class CortexMoveRepository {
     }
 
     try {
+      // Tombstones left at the destination by an earlier delete would collide
+      // with the unique (userId, path) index once the live subtree lands there.
+      // The moved rows supersede them, so drop them.
+      await db
+        .delete(cortexNodes)
+        .where(
+          and(
+            eq(cortexNodes.userId, userId),
+            eq(cortexNodes.isDeleted, true),
+            sql`(${cortexNodes.path} = ${to} OR ${cortexNodes.path} LIKE ${`${to}/%`})`,
+          ),
+        );
+
       // Ensure parent dirs for destination
       await ensureParentDirs(userId, to);
 
@@ -180,6 +193,7 @@ export class CortexMoveRepository {
         .where(
           and(
             eq(cortexNodes.userId, userId),
+            eq(cortexNodes.isDeleted, false),
             sql`(${cortexNodes.path} = ${from} OR ${cortexNodes.path} LIKE ${`${from}/%`})`,
           ),
         );

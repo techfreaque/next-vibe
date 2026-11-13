@@ -630,12 +630,19 @@ export class SingleFavoriteRepository {
       // re-adding the variant just removed.
       await markCompanionsSubset({ userId, skillIds: [deleted.skillId] });
 
-      // This op owns its `favorite-deleted` event, carrying the deleted id.
-      // Locally its client onEvent removes the row from the list cache;
-      // cross-instance (remoteEvent) the peer's onRemoteEvent removes it by id.
+      // This op owns its `favorite-deleted` event, carrying the deleted id:
+      //  1. DELETE — cross-instance relay (remoteEvent); the peer's onRemoteEvent
+      //     removes the row by id and emits on its own GET for its browser.
+      //  2. GET — the favorites page subscribes to the list endpoint, so the
+      //     local browser drops the card from there.
       createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
         urlPathParams: { id: deletedId },
       })("favorite-deleted");
+      await SingleFavoriteRepository.emitFavoriteDeletedToList({
+        id: deletedId,
+        user,
+        logger,
+      });
 
       return success({
         skillId: await SkillsRepository.resolveCanonicalSkillId(
@@ -714,9 +721,33 @@ export class SingleFavoriteRepository {
       user.id,
       logger,
     );
-    createEndpointEmitter(favoriteByIdDefinitions.DELETE, logger, user, {
-      urlPathParams: { id: urlPathParams.id },
+    // Local delivery only (the list GET is what this instance's favorites page
+    // subscribes to); fanOut:false on the GET emit, and no DELETE re-emit, so
+    // the applied delete never relays back.
+    await SingleFavoriteRepository.emitFavoriteDeletedToList({
+      id: urlPathParams.id,
+      user,
+      logger,
+    });
+  }
+
+  /**
+   * Emit `favorite-deleted` on the favorites list GET so an open favorites page
+   * drops the card live. fanOut:false: local delivery only — the DELETE event
+   * owns the cross-instance relay.
+   */
+  private static async emitFavoriteDeletedToList({
+    id,
+    user,
+    logger,
+  }: {
+    id: string;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const { default: favoritesListDef } = await import("../definition");
+    createEndpointEmitter(favoritesListDef.GET, logger, user, {
       fanOut: false,
-    })("favorite-deleted");
+    })("favorite-deleted", { payload: { id } });
   }
 }

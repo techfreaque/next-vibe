@@ -224,6 +224,8 @@ function makeCortexNodeSyncProvider(
                   frontmatter: remoteNode.frontmatter,
                   tags: remoteNode.tags,
                   nodeType: remoteNode.nodeType,
+                  // A newer live remote node revives a local tombstone.
+                  isDeleted: false,
                   updatedAt: new Date(remoteNode.updatedAt),
                 })
                 .where(eq(cortexNodes.id, existing.id));

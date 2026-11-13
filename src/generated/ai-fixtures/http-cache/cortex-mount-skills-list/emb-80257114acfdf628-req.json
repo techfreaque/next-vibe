@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/skills-folder-listing-and-fixture-verification-064dd9d1-df00-49fd-9dc4-b8bb0b7a0de7.md\n\n# Skills folder listing and fixture verification\nFolder: private\nDescription: Admin asked for a listing of the /skills folder via cortex-list. The listing returned 27 skill files, including the expected test fixture cortex-test-skill-fixture.md. Count and presence were confirmed to the user.",
+    "encoding_format": "float"
+  }
+}

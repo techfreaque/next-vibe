@@ -24,6 +24,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { resolveHermesDatabaseUrl } from "next-vibe/database/effective-url";
 import { databaseEnv } from "next-vibe/database/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
@@ -60,9 +61,6 @@ export const LOCAL_DEV_URL = "http://localhost:3002";
 
 /** PID file for vibe --hermes dev (hermes local dev) */
 export const HERMES_DEV_PID_FILE_PATH = ".tmp/.hermes-dev.pid";
-
-/** Port for the prod/preview PostgreSQL database */
-const PROD_DB_PORT = 5433;
 
 // ── Server detection ──────────────────────────────────────────────────────────
 
@@ -204,10 +202,9 @@ export function getProdDb(): ReturnType<
   >
 > {
   if (!prodDb) {
-    const baseUrl = databaseEnv.DATABASE_URL.replace(
-      /:\d+\//,
-      `:${String(PROD_DB_PORT)}/`,
-    );
+    // Atlas may run on PGlite (`file:` URL), so derive the Hermes URL the same
+    // way the --hermes server does instead of swapping a port in place.
+    const baseUrl = resolveHermesDatabaseUrl(databaseEnv.DATABASE_URL);
     prodPool = new Pool({
       connectionString: baseUrl,
       max: 3,

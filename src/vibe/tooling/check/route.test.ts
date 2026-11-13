@@ -23,7 +23,7 @@ import { execSync } from "node:child_process";
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-import { beforeAll, describe, expect, it } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 
 import type { LspIssue } from "./repository/typecheck/lsp-daemon";
 import { TsgoDaemon } from "./repository/typecheck/lsp-daemon";
@@ -58,85 +58,91 @@ interface FileStat {
   warnings: number;
 }
 
-/** Mode A (no-lsp, tsgo cold): verified from actual output */
+/**
+ * Mode A (no-lsp, tsgo cold): verified from actual output (2026-11-13,
+ * oxlint 1.91, TypeScript 7 / tsgo). Oxlint now prints short plugin names
+ * ("jsx-a11y(...)", "restricted(no-throw)"), and the restricted-syntax plugin
+ * reports one rule per restriction instead of a single "restricted-syntax".
+ */
 const NO_LSP_FILE_COUNTS: Record<string, FileStat> = {
-  "a11y-issues.tsx": { errors: 72, warnings: 2 },
-  "eslint-issues.tsx": { errors: 7, warnings: 0 },
-  "general-issues.ts": { errors: 33, warnings: 0 },
+  "layer-c-errors.ts": { errors: 3, warnings: 0 },
+  "a11y-issues.tsx": { errors: 70, warnings: 2 },
+  "eslint-issues.tsx": { errors: 8, warnings: 0 },
+  "general-issues.ts": { errors: 34, warnings: 0 },
   "i18n-issues.tsx": { errors: 43, warnings: 1 },
   "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
-  "nextjs-issues.tsx": { errors: 37, warnings: 1 },
-  "node-issues.ts": { errors: 14, warnings: 0 },
+  "nextjs-issues.tsx": { errors: 39, warnings: 1 },
+  "node-issues.ts": { errors: 13, warnings: 0 },
   "promise-issues.ts": { errors: 12, warnings: 0 },
-  "react-issues.tsx": { errors: 40, warnings: 2 },
-  "restricted-syntax-issues.tsx": { errors: 30, warnings: 0 },
+  "react-issues.tsx": { errors: 35, warnings: 2 },
+  "restricted-syntax-issues.tsx": { errors: 38, warnings: 0 },
   "type-errors.ts": { errors: 12, warnings: 0 },
   "typescript-issues.ts": { errors: 20, warnings: 0 },
   "calculate.ts": { errors: 1, warnings: 0 },
 };
 
 const NO_LSP_TOTALS = {
-  dir: { files: 13, issues: 357, errors: 350, warnings: 7 },
-  subfolder: { files: 12, issues: 356, errors: 349, warnings: 7 },
-  // folder+file excludes check.config.ts → same as dir (no extra files)
+  dir: { files: 14, issues: 364, errors: 357, warnings: 7 },
+  subfolder: { files: 12, issues: 360, errors: 353, warnings: 7 },
+  // folder+file: the 12 test-issues files + calculate.ts
   folderPlusFile: 13,
 };
 
-/** Mode B (lsp): LSP daemon finds additional TS errors + check.config.ts */
+/**
+ * Mode B (lsp): same per-file results as the cold path, plus check.config.ts,
+ * which the LSP scan of ./ includes (TS2307 on the @next-vibe/checker import).
+ */
 const LSP_FILE_COUNTS: Record<string, FileStat> = {
   "check.config.ts": { errors: 1, warnings: 0 },
-  "a11y-issues.tsx": { errors: 72, warnings: 2 },
-  "eslint-issues.tsx": { errors: 8, warnings: 0 },
-  "general-issues.ts": { errors: 36, warnings: 0 },
-  "i18n-issues.tsx": { errors: 43, warnings: 1 },
-  "jsx-capitalization-issues.tsx": { errors: 29, warnings: 1 },
-  "nextjs-issues.tsx": { errors: 37, warnings: 1 },
-  "node-issues.ts": { errors: 14, warnings: 0 },
-  "promise-issues.ts": { errors: 13, warnings: 0 },
-  "react-issues.tsx": { errors: 40, warnings: 2 },
-  "restricted-syntax-issues.tsx": { errors: 30, warnings: 0 },
-  "type-errors.ts": { errors: 12, warnings: 0 },
-  "typescript-issues.ts": { errors: 24, warnings: 0 },
-  "calculate.ts": { errors: 1, warnings: 0 },
+  ...NO_LSP_FILE_COUNTS,
 };
 
 const LSP_TOTALS = {
-  dir: { files: 14, issues: 367, errors: 360, warnings: 7 },
-  subfolder: { files: 12, issues: 365, errors: 358, warnings: 7 },
+  dir: { files: 15, issues: 365, errors: 358, warnings: 7 },
+  subfolder: { files: 12, issues: 360, errors: 353, warnings: 7 },
   // check.config.ts is only scanned when ./ is the root — not in subfolder+file combo
   folderPlusFile: 13,
 };
 
+/** Files outside src/test-issues (excluded from subfolder-scoped runs) */
+const OUTSIDE_SUBFOLDER = new Set([
+  "calculate.ts",
+  "check.config.ts",
+  "layer-c-errors.ts",
+]);
+
 /** Rules present in each file — same regardless of LSP mode */
 const FILE_RULES: Record<string, string[]> = {
+  "layer-c-errors.ts": ["2322", "2741"],
   "a11y-issues.tsx": [
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "eslint-plugin-jsx-a11y(alt-text)",
-    "eslint-plugin-jsx-a11y(anchor-has-content)",
-    "eslint-plugin-jsx-a11y(anchor-is-valid)",
-    "eslint-plugin-jsx-a11y(click-events-have-key-events)",
-    "eslint-plugin-jsx-a11y(heading-has-content)",
-    "eslint-plugin-jsx-a11y(iframe-has-title)",
-    "eslint-plugin-jsx-a11y(img-redundant-alt)",
-    "eslint-plugin-jsx-a11y(label-has-associated-control)",
-    "eslint-plugin-jsx-a11y(no-access-key)",
-    "eslint-plugin-jsx-a11y(no-autofocus)",
-    "eslint-plugin-jsx-a11y(no-distracting-elements)",
-    "eslint-plugin-jsx-a11y(no-redundant-roles)",
-    "eslint-plugin-jsx-a11y(role-has-required-aria-props)",
-    "eslint-plugin-jsx-a11y(tabindex-no-positive)",
-    "eslint-plugin-jsx-a11y(aria-props)",
-    "eslint-plugin-jsx-a11y(aria-role)",
-    "eslint-plugin-jsx-a11y(prefer-tag-over-role)",
-    "eslint-plugin-react(iframe-missing-sandbox)",
-    "eslint-plugin-react(no-unknown-property)",
-    "eslint-plugin-next(no-img-element)",
+    "jsx-capitalization(jsx-capitalization)",
+    "jsx-a11y(alt-text)",
+    "jsx-a11y(anchor-has-content)",
+    "jsx-a11y(anchor-is-valid)",
+    "jsx-a11y(click-events-have-key-events)",
+    "jsx-a11y(heading-has-content)",
+    "jsx-a11y(iframe-has-title)",
+    "jsx-a11y(img-redundant-alt)",
+    "jsx-a11y(label-has-associated-control)",
+    "jsx-a11y(no-access-key)",
+    "jsx-a11y(no-autofocus)",
+    "jsx-a11y(no-distracting-elements)",
+    "jsx-a11y(no-redundant-roles)",
+    "jsx-a11y(role-has-required-aria-props)",
+    "jsx-a11y(tabindex-no-positive)",
+    "jsx-a11y(aria-props)",
+    "jsx-a11y(aria-role)",
+    "jsx-a11y(prefer-tag-over-role)",
+    "react(iframe-missing-sandbox)",
+    "next(no-img-element)",
+    "i18n(no-literal-string)",
+    "2339",
   ],
   "eslint-issues.tsx": [
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
-    "eslint-plugin-react-hooks(exhaustive-deps)",
-    "eslint-plugin-jsx-a11y(click-events-have-key-events)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
+    "react-hooks(exhaustive-deps)",
+    "jsx-a11y(click-events-have-key-events)",
   ],
   "general-issues.ts": [
     "eslint(no-debugger)",
@@ -154,72 +160,79 @@ const FILE_RULES: Record<string, string[]> = {
     "oxc(missing-throw)",
     "oxc(bad-comparison-sequence)",
     "oxc(const-comparisons)",
-    "eslint-plugin-unicorn(no-new-array)",
-    "eslint-plugin-unicorn(prefer-array-flat)",
-    "eslint-plugin-unicorn(prefer-spread)",
-    "eslint-plugin-unicorn(prefer-includes)",
-    "oxlint-plugin-restricted(restricted-syntax)",
+    "unicorn(no-new-array)",
+    "unicorn(prefer-array-flat)",
+    "unicorn(prefer-spread)",
+    "unicorn(prefer-includes)",
+    "restricted(no-unknown)",
+    "18048",
+    "2769",
   ],
   "i18n-issues.tsx": [
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
-    "eslint-plugin-jsx-a11y(label-has-associated-control)",
-    "eslint-plugin-jsx-a11y(anchor-is-valid)",
-    "eslint-plugin-next(no-img-element)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
+    "jsx-a11y(label-has-associated-control)",
+    "jsx-a11y(anchor-is-valid)",
+    "next(no-img-element)",
   ],
   "jsx-capitalization-issues.tsx": [
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
-    "eslint-plugin-next(no-img-element)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
+    "next(no-img-element)",
   ],
   "nextjs-issues.tsx": [
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
-    "eslint-plugin-jsx-a11y(img-redundant-alt)",
-    "eslint-plugin-jsx-a11y(html-has-lang)",
-    "eslint-plugin-next(no-sync-scripts)",
-    "eslint-plugin-next(no-css-tags)",
-    "eslint-plugin-next(google-font-display)",
-    "eslint-plugin-next(no-page-custom-font)",
-    "eslint-plugin-next(no-img-element)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
+    "jsx-a11y(img-redundant-alt)",
+    "jsx-a11y(html-has-lang)",
+    "next(no-sync-scripts)",
+    "next(no-css-tags)",
+    "next(google-font-display)",
+    "next(no-page-custom-font)",
+    "next(no-img-element)",
   ],
   "node-issues.ts": [
-    "eslint-plugin-unicorn(prefer-node-protocol)",
-    "eslint-plugin-unicorn(no-new-array)",
-    "eslint-plugin-unicorn(prefer-includes)",
-    "eslint-plugin-unicorn(prefer-array-flat)",
-    "eslint-plugin-unicorn(prefer-spread)",
-    "simple-import-sort/imports",
+    "unicorn(prefer-node-protocol)",
+    "unicorn(no-new-array)",
+    "unicorn(prefer-includes)",
+    "unicorn(prefer-array-flat)",
+    "unicorn(prefer-spread)",
     "eslint(eqeqeq)",
     "eslint(no-console)",
     "eslint(no-self-compare)",
-    "oxlint-plugin-restricted(restricted-syntax)",
+    "restricted(no-unknown)",
   ],
   "promise-issues.ts": [
-    "eslint-plugin-promise(param-names)",
-    "eslint-plugin-promise(always-return)",
-    "eslint-plugin-promise(catch-or-return)",
-    "eslint-plugin-unicorn(no-await-in-promise-methods)",
-    "eslint-plugin-unicorn(no-single-promise-in-promise-methods)",
+    "promise(param-names)",
+    "promise(always-return)",
+    "promise(catch-or-return)",
+    "unicorn(no-await-in-promise-methods)",
+    "unicorn(no-single-promise-in-promise-methods)",
   ],
   "react-issues.tsx": [
-    "eslint-plugin-react(jsx-key)",
-    "eslint-plugin-react(jsx-no-duplicate-props)",
-    "eslint-plugin-react(no-children-prop)",
-    "eslint-plugin-react(no-direct-mutation-state)",
-    "eslint-plugin-react(self-closing-comp)",
-    "eslint-plugin-react(no-unknown-property)",
-    "eslint-plugin-react-hooks(exhaustive-deps)",
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
-    "oxlint-plugin-restricted(restricted-syntax)",
-    "eslint-plugin-next(no-img-element)",
-    "eslint-plugin-jsx-a11y(click-events-have-key-events)",
+    "react(jsx-key)",
+    "react(jsx-no-duplicate-props)",
+    "react(no-children-prop)",
+    "react(no-direct-mutation-state)",
+    "react-hooks(exhaustive-deps)",
+    "react-hooks(rules-of-hooks)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
+    "restricted(no-object-type)",
+    "next(no-img-element)",
+    "jsx-a11y(click-events-have-key-events)",
+    "17001",
+    "2540",
   ],
   "restricted-syntax-issues.tsx": [
-    "oxlint-plugin-restricted(restricted-syntax)",
-    "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-    "oxlint-plugin-i18n(no-literal-string)",
+    "restricted(no-unknown)",
+    "restricted(no-object-type)",
+    "restricted(no-throw)",
+    "restricted(no-jsx-in-object-literal)",
+    "restricted(no-raw-fetch)",
+    "restricted(no-browser-globals)",
+    "jsx-capitalization(jsx-capitalization)",
+    "i18n(no-literal-string)",
   ],
   "type-errors.ts": [
     // Bare codes match both [TS2322] (cold path) and [2322] (lsp path)
@@ -233,23 +246,30 @@ const FILE_RULES: Record<string, string[]> = {
     "2304",
     "2365",
     "2741",
-    "typescript-eslint(no-inferrable-types)",
-    "oxlint-plugin-restricted(restricted-syntax)",
+    "typescript(no-inferrable-types)",
+    "restricted(no-unknown)",
   ],
   "typescript-issues.ts": [
-    "typescript-eslint(no-explicit-any)",
+    "typescript(no-explicit-any)",
     "eslint(no-unused-vars)",
-    "typescript-eslint(no-inferrable-types)",
+    "typescript(no-inferrable-types)",
     "eslint(no-empty-function)",
-    "typescript-eslint(consistent-type-imports)",
-    "typescript-eslint(no-duplicate-enum-values)",
-    "typescript-eslint(no-extra-non-null-assertion)",
-    "typescript-eslint(explicit-function-return-type)",
-    "oxlint-plugin-restricted(restricted-syntax)",
+    "typescript(consistent-type-imports)",
+    "typescript(no-duplicate-enum-values)",
+    "typescript(no-extra-non-null-assertion)",
+    "typescript(explicit-function-return-type)",
+    "restricted(no-unknown)",
     "2801",
   ],
-  "calculate.ts": ["oxlint-plugin-restricted(restricted-syntax)"],
+  "calculate.ts": ["restricted(no-throw)"],
 };
+
+/**
+ * ESLint only runs simple-import-sort (every other rule lives in oxlint).
+ * node-issues.ts imports node:fs, node:path, node:events out of order.
+ */
+const ESLINT_IMPORT_SORT_FILE = "node-issues.ts";
+const ESLINT_IMPORT_SORT_RULE = "simple-import-sort/imports";
 
 // ============================================================
 // HELPERS
@@ -326,12 +346,17 @@ function extractFileBlock(output: string, filename: string): string {
 }
 
 function assertAllCheckersRan(out: string): void {
-  expect(out).toContain("Starting Oxlint check");
-  expect(out).toContain("Oxlint check completed");
-  expect(out).toContain("Starting ESLint check");
-  expect(out).toContain("ESLint check completed");
-  expect(out).toContain("Starting TypeScript check");
-  expect(out).toContain("TypeScript check completed");
+  // One summary row per checker, e.g. "❌ Oxlint      331 issues     0.2s"
+  expect(out).toMatch(/Oxlint\s+\d+ issues?/);
+  expect(out).toMatch(/ESLint\s+\d+ issues?/);
+  expect(out).toMatch(/TypeScript\s+\d+ issues?/);
+}
+
+function assertEslintWorked(out: string): void {
+  // A crashed ESLint prints no JSON and its row reads "0 issues"; the lint
+  // repository logs this warning so the false green is visible.
+  expect(out).not.toContain("ESLint crashed");
+  assertFileBlock(out, ESLINT_IMPORT_SORT_FILE, [ESLINT_IMPORT_SORT_RULE]);
 }
 
 function assertFileBlock(out: string, filename: string, rules: string[]): void {
@@ -353,6 +378,21 @@ function assertTypescriptMessages(out: string): void {
   expect(out).toContain("Cannot find name 'doesNotExist'");
   expect(out).toContain("This condition will always return true");
 }
+
+// The run rewrites tracked fixture files (.vscode/settings.json) and creates an
+// untracked check.config.ts. Put the fixture back the way the repo has it.
+const ORIGINAL_VSCODE_SETTINGS = existsSync(TEST_PROJECT_VSCODE_SETTINGS)
+  ? readFileSync(TEST_PROJECT_VSCODE_SETTINGS, "utf-8")
+  : undefined;
+
+afterAll(() => {
+  if (ORIGINAL_VSCODE_SETTINGS !== undefined) {
+    writeFileSync(TEST_PROJECT_VSCODE_SETTINGS, ORIGINAL_VSCODE_SETTINGS);
+  }
+  if (existsSync(TEST_PROJECT_CONFIG)) {
+    unlinkSync(TEST_PROJECT_CONFIG);
+  }
+});
 
 // ============================================================
 // CONFIG CREATION FLOW
@@ -457,9 +497,9 @@ function buildInvocationSuite(
     folderPlusFile: number;
   },
 ): void {
-  // Files that appear in subfolder scope (subset without calculate.ts and check.config.ts)
+  // Files that appear in subfolder scope (everything under src/test-issues)
   const subfolderFiles = Object.keys(fileCounts).filter(
-    (f) => f !== "calculate.ts" && f !== "check.config.ts",
+    (f) => !OUTSIDE_SUBFOLDER.has(f),
   );
 
   // ── Pattern 1: Full project (./) ────────────────────────
@@ -471,6 +511,8 @@ function buildInvocationSuite(
     });
 
     it("all three checkers ran", () => assertAllCheckersRan(out));
+
+    it("ESLint ran and detected import sorting", () => assertEslintWorked(out));
 
     it(`summary: ${totals.dir.files} files, ${totals.dir.issues} issues`, () => {
       const s = extractSummary(out);
@@ -531,7 +573,7 @@ function buildInvocationSuite(
       const allRules = [
         ...new Set(
           Object.entries(FILE_RULES)
-            .filter(([f]) => f !== "calculate.ts")
+            .filter(([f]) => !OUTSIDE_SUBFOLDER.has(f))
             .flatMap(([, rules]) => rules),
         ),
       ];
@@ -654,9 +696,9 @@ function buildInvocationSuite(
       expect(out).toContain("calculate.ts 1 error");
     });
 
-    it("detects restricted-syntax in calculate.ts", () => {
+    it("detects restricted syntax in calculate.ts", () => {
       const block = extractFileBlock(out, "calculate.ts");
-      expect(block).toContain("oxlint-plugin-restricted(restricted-syntax)");
+      expect(block).toContain("restricted(no-throw)");
     });
 
     it("TypeScript error messages present", () =>
@@ -753,16 +795,16 @@ describe("Compiled Runtime", () => {
     if (compiledOutput === "SKIP") {
       return;
     }
-    expect(compiledOutput).toContain("oxlint-plugin-jsx-capitalization");
-    expect(compiledOutput).toContain("oxlint-plugin-i18n");
-    expect(compiledOutput).toContain("oxlint-plugin-restricted");
+    expect(compiledOutput).toContain("jsx-capitalization(jsx-capitalization)");
+    expect(compiledOutput).toContain("i18n(no-literal-string)");
+    expect(compiledOutput).toContain("restricted(no-unknown)");
   });
 
   it("completes TypeScript check", () => {
     if (compiledOutput === "SKIP") {
       return;
     }
-    expect(compiledOutput).toContain("TypeScript check completed");
+    expect(compiledOutput).toMatch(/TypeScript\s+\d+ issues?/);
   });
 });
 

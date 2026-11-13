@@ -75,6 +75,11 @@ const favoriteCreatedPayloadSchema = z.object({
   favorites: z.array(favoriteCardSchema),
 });
 
+/** `favorite-deleted` payload: the display id (slug, or UUID for slugless rows) of the removed favorite. */
+const favoriteDeletedPayloadSchema = z.object({
+  id: z.string(),
+});
+
 /**
  * Get Favorites List Endpoint (GET)
  * Retrieves all favorites for the current user
@@ -422,6 +427,77 @@ const { GET } = createEndpoint({
             };
           },
         );
+      },
+    },
+    // Local-delivery receiver for deletes, mirroring `favorite-created`: the
+    // DELETE endpoint's own `favorite-deleted` event lives on the per-id DELETE
+    // channel, which the favorites page never subscribes to (it subscribes to
+    // this GET). The DELETE repository and its cross-instance applier both emit
+    // here so the open list drops the card live.
+    "favorite-deleted": {
+      allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+      payloadType: favoriteDeletedPayloadSchema,
+      onEvent: async ({ payload: rawPayload, logger }) => {
+        const { id: deletedId } =
+          favoriteDeletedPayloadSchema.parse(rawPayload);
+        const [{ apiClient }, favoritesDefinition, charactersDefinition] =
+          await Promise.all([
+            import("next-vibe/unified-ui/hooks/store"),
+            import("./definition"),
+            import("../definition"),
+          ]);
+
+        // Read the favorite's skillId before removing it, so the characters list
+        // can flip addedToFav back off for that skill.
+        let deletedSkillId: string | null = null;
+
+        // View 1 — favorites list: remove the row.
+        apiClient.updateEndpointData(
+          favoritesDefinition.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            const deleted = old.data.favorites.find((f) => f.id === deletedId);
+            deletedSkillId = deleted?.skillId ?? null;
+            return {
+              ...old,
+              data: {
+                ...old.data,
+                favorites: old.data.favorites.filter((f) => f.id !== deletedId),
+              },
+            };
+          },
+        );
+
+        // View 2 — characters/skills list: flip addedToFav off on the skill.
+        if (deletedSkillId) {
+          const baseSkillId = parseSkillId(deletedSkillId).skillId;
+          apiClient.updateEndpointData(
+            charactersDefinition.default.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  sections: old.data.sections.map((section) => ({
+                    ...section,
+                    skills: section.skills.map((char) =>
+                      parseSkillId(char.skillId).skillId === baseSkillId
+                        ? { ...char, addedToFav: false }
+                        : char,
+                    ),
+                  })),
+                },
+              };
+            },
+          );
+        }
       },
     },
   },

@@ -235,7 +235,13 @@ type PgliteValue =
   | PgliteValue[]
   | { [key: string]: PgliteValue };
 
+/** PGlite query parser that keeps a column's raw server text. */
+function keepText(value: string): string {
+  return value;
+}
+
 const OID_DATE = 1082;
+const OID_TIMESTAMP = 1114;
 const OID_TIMESTAMPTZ = 1184;
 const OID_JSON = 114;
 const OID_JSONB = 3802;
@@ -292,8 +298,17 @@ async function execInsertReturning(
   // path corrupts it. The rows come back exactly as RETURNING lists them
   // (never re-selected: "last row by ctid" is a different row whenever the
   // insert lands in reused page space).
+  // Date/time columns stay raw server text: PGlite parses `timestamp` (no tz)
+  // into a Date in this process's LOCAL zone, so re-encoding it via
+  // toISOString shifted every RETURNING timestamp by the host's UTC offset
+  // (e.g. cortex-write's created flag was always false on a CET host).
   const result = await pg.query<PgliteValue[]>(sql, params, {
     rowMode: "array",
+    parsers: {
+      [OID_DATE]: keepText,
+      [OID_TIMESTAMP]: keepText,
+      [OID_TIMESTAMPTZ]: keepText,
+    },
   });
   const cols = result.fields.map((f) => f.name);
   const typeIds = result.fields.map((f) => f.dataTypeID);

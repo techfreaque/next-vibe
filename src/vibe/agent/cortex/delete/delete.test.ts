@@ -13,9 +13,8 @@
  *     isDeleted=true and bumps updatedAt. The row is NOT hard-deleted; it stays
  *     for tombstone propagation. nodesDeleted = number of rows matched (the path
  *     itself plus every descendant under `${path}/%`).
- *   - getNode / listChildren do NOT filter isDeleted, so a soft-deleted node is
- *     still observable through READ/LIST. Tests assert the ACTUAL behavior, not
- *     an idealized one.
+ *   - getNode / pathExists / listChildren filter isDeleted, so a soft-deleted
+ *     node is invisible to READ/LIST; writing the same path revives the row.
  *   - Deleting a directory without recursive=true → VALIDATION_ERROR.
  *   - Deleting a non-existent writable path → NOT_FOUND.
  *   - Deleting the readonly roots /documents or /memories → FORBIDDEN.
@@ -57,7 +56,7 @@ async function purgeTestNodes(userId: string): Promise<void> {
     );
 }
 
-/** Direct DB row lookup, bypassing the isDeleted-agnostic getNode helper. */
+/** Direct DB row lookup, including tombstones (getNode hides them). */
 async function fetchRow(
   userId: string,
   path: string,

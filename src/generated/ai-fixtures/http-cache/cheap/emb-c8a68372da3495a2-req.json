@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-suite--tool-help-catalog-and-cortex-write-re-4526d670-63c8-4234-a36b-48c13c08a82d.md\n\n# Cheap suite: tool-help catalog and cortex write/read\nFolder: private\nDescription: Cheap test suite session. Turn 1 exercised the tool-help tool with three parallel calls: category='ai' (92 tools), query='search' (11 matches), and toolName='generate_image' (full schema) — all returned clean, well-formed data and closed STEP_OK. Turn 2 wrote the memory node /memories/t2-cheap-test",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls returned data. Here's what each gave:\n\n**1. `category='ai'`** — returned a **91-tool** array (matchedCount 91, totalCount 589), entries have `name` + `description`, but the array is **not narrowed to the ai category**: it includes `favorite-create`, `folder-rename`, `skill-publish`, `chat-moderation`, `refusal-index-*`, `vibe_agent_*` etc. The same tool's own output (call 2) reports the `ai` category as having **7** tools. So the category filter was silently ignored.\n\n**2. `query='search'`** — returned 11 tools, all with `name` + `description`, including `agent-search-messages`, `agent-search-threads`, `brave-search`, `kagi-search`, `web-search`, `cortex-search`, `leads-search`, `pos-product-lookup`. Reasonable keyword match.\n\n**3. `toolName='generate_image'`** — returned one tool with `name`, `description`, and a full `parameters` JSON schema (`prompt` required, optional `model` enum of 41 image models, optional `inputMediaUrl`), plus example input/response.\n\nFAILED: `tool-help` with `category='ai'` does not apply the category filter — it returned 91 tools across unrelated categories (favorites, folders, skills, moderation, account) despite the same tool reporting the `ai` category as having only 7 tools; `matchedCount: 91` vs `totalCount: 589` confirms no narrowing happened.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls returned clean, well-formed data.\n\n**1. `category='ai'`** — 92 tools returned, every entry carrying a `name` and a `description` (threads, folders, favorites, skills, models, media generation, moderation, refusal-index, etc.). Non-empty and consistent with the category spanning multiple feature areas.\n\n**2. `query='search'`** — 11 matches, each with `name` + `description` (`agent-search-messages`, `agent-search-threads`, `brave-search`, `kagi-search`, `web-search`, `cortex-search`, `leads-search`, `pos-product-lookup`, plus thread-scoped search and `tool-help` itself). The per-category breakdown in that response (ai: 7) correctly reflects only that search's matches, not the category total.\n\n**3. `toolName='generate_image'`** — full detail returned: name, description, and a complete JSON Schema with `prompt` (required, 1–2000 chars), optional `model` enum (39 image models), and optional `inputMediaUrl` for image-to-image, plus input/response examples.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

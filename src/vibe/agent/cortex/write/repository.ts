@@ -177,6 +177,8 @@ export class CortexWriteRepository {
             size,
             frontmatter,
             nodeType: CortexNodeType.FILE,
+            // Writing over a tombstone revives it.
+            isDeleted: false,
             updatedAt: now,
           },
         })

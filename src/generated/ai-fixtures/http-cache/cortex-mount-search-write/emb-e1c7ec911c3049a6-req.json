@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/create-and-verify-quantum-flux-md-test-document-a5d7399d-e499-4bd1-9340-ea21e8e2a9f0.md\n\n# Create and verify quantum-flux.md test document\nFolder: private\nDescription: User asked for a test document to be written to /documents/search-test/quantum-flux.md containing a short note on quantum flux resonance. The cortex-write call succeeded and returned created:false, indicating the file already existed and was overwritten. A follow-up cortex-read confirmed the exact c",
+    "encoding_format": "float"
+  }
+}

@@ -443,6 +443,7 @@ export async function loadAllPromptFragments(
                 eq(cortexNodes.userId, userId),
                 eq(cortexNodes.nodeType, CortexNodeType.FILE),
                 like(cortexNodes.path, \`\${MEMORIES_PREFIX}/%\`),
+                eq(cortexNodes.isDeleted, false),
               ),
             ),
           db

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-suite--tool-help-checks--cortex-round-trip---4526d670-63c8-4234-a36b-48c13c08a82d.md\n\n# Cheap suite: tool-help checks, cortex round-trip, branch test\nFolder: private\nDescription: Cheap test suite session. Turn 1 exercised tool-help with three parallel calls: category='ai' (92 tools), query='search' (11 matches), and toolName='generate_image' (full parameter schema) - all clean. Turn 2 wrote the memory node /memories/t2-cheap-test with content T2_CHEAP_OK and read it back, co",
+    "encoding_format": "float"
+  }
+}

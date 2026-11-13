@@ -15,11 +15,12 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
+import { db, isPglite } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { truncateContent } from "../_shared/text-utils";
+import { cosineSimilarity } from "../_shared/vector-utils";
 import { cortexNodes } from "../db";
 import { CortexCreditFeature, CortexNodeType } from "../enum";
 import { isValidPath, normalizePath } from "../repository";
@@ -261,19 +262,48 @@ async function runVectorSearch(
     conditions.push(like(cortexNodes.path, `${path}%`));
   }
 
-  const rows = await db
-    .select({
-      path: cortexNodes.path,
-      content: cortexNodes.content,
-      updatedAt: cortexNodes.updatedAt,
-      similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
-    })
-    .from(cortexNodes)
-    .where(and(...conditions))
-    .orderBy(
-      sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
-    )
-    .limit(limit);
+  // PGlite has no pgvector `<=>` operator (the column is plain text there):
+  // score in JS with the same cosine math. Real Postgres ranks in SQL.
+  const rows: Array<{
+    path: string;
+    content: string | null;
+    updatedAt: Date;
+    similarity: number;
+  }> = isPglite
+    ? (
+        await db
+          .select({
+            path: cortexNodes.path,
+            content: cortexNodes.content,
+            updatedAt: cortexNodes.updatedAt,
+            embedding: cortexNodes.embedding,
+          })
+          .from(cortexNodes)
+          .where(and(...conditions))
+      )
+        .map((r) => ({
+          path: r.path,
+          content: r.content,
+          updatedAt: r.updatedAt,
+          similarity: r.embedding
+            ? cosineSimilarity(queryEmbedding, r.embedding)
+            : 0,
+        }))
+        .toSorted((a, b) => b.similarity - a.similarity)
+        .slice(0, limit)
+    : await db
+        .select({
+          path: cortexNodes.path,
+          content: cortexNodes.content,
+          updatedAt: cortexNodes.updatedAt,
+          similarity: sql<number>`1 - (${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)})`,
+        })
+        .from(cortexNodes)
+        .where(and(...conditions))
+        .orderBy(
+          sql`${cortexNodes.embedding} <=> ${sql.raw(`'${embeddingStr}'::vector`)}`,
+        )
+        .limit(limit);
 
   // cortex_nodes is an index: content is NULL for virtual mounts. The excerpt
   // is resolved from the source AFTER merge, only for the final top-N (see

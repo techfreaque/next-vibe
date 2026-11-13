@@ -28,6 +28,7 @@ import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
 } from "./definition";
+import { findCheckConfigRoot } from "./find-root";
 import type {
   CheckConfig,
   CreateDefaultCheckConfigResult,
@@ -58,19 +59,10 @@ export class ConfigRepositoryImpl {
   // --------------------------------------------------------
 
   private static getConfigFilePath(): string {
-    let dir = process.cwd();
-    for (let i = 0; i < 10; i++) {
-      const candidate = resolve(dir, "check.config.ts");
-      if (existsSync(candidate)) {
-        return candidate;
-      }
-      const parent = dirname(dir);
-      if (parent === dir) {
-        break;
-      }
-      dir = parent;
-    }
-    return resolve(process.cwd(), "check.config.ts");
+    return resolve(
+      findCheckConfigRoot(process.cwd()) ?? process.cwd(),
+      "check.config.ts",
+    );
   }
 
   private static resolveJsPluginPath(pluginPath: string): string {
@@ -675,7 +667,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   static async createDefaultCheckConfig(
     logger: EndpointLogger,
   ): Promise<ResponseType<CreateDefaultCheckConfigResult>> {
-    const configPath = ConfigRepositoryImpl.getConfigFilePath();
+    // Always create in the current project, never at a config found further
+    // up: that one belongs to an enclosing workspace and must not be replaced.
+    const configPath = resolve(process.cwd(), "check.config.ts");
 
     try {
       const currentDir = dirname(fileURLToPath(import.meta.url));
@@ -718,7 +712,11 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         "fix: false",
       );
 
-      await fs.writeFile(configPath, templateContent, "utf8");
+      // "wx": refuse to overwrite an existing config.
+      await fs.writeFile(configPath, templateContent, {
+        encoding: "utf8",
+        flag: "wx",
+      });
 
       // Also create .mcp.json
       const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(

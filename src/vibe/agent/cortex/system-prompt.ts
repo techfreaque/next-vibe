@@ -16,6 +16,7 @@ import type { chatMessages as chatMessagesTable } from "../chat/db";
 import type { ChatMessageRole as chatMessageRoleValue } from "../chat/enum";
 import type { FavoriteSummaryItem } from "../skills/favorites/favorites-formatter";
 import { stripFrontmatter, truncateContent } from "./_shared/text-utils";
+import { cosineSimilarity } from "./_shared/vector-utils";
 import {
   CORTEX_EXEC_ALIAS,
   CORTEX_LIST_ALIAS,
@@ -491,7 +492,9 @@ function renderFileEntryLines(entry: CortexFileEntry): string[] {
 
   let scoreSuffix = "";
   if (entry.score !== undefined && !entry.pinned) {
-    scoreSuffix = ` [${Math.round(entry.score * 100)}%]`;
+    // Recency boost and path weight can push the adjusted score past 1;
+    // the label is a relevance percentage, so it caps at 100.
+    scoreSuffix = ` [${Math.min(100, Math.round(entry.score * 100))}%]`;
   }
 
   let badge = "";
@@ -756,22 +759,6 @@ function parseEmbeddingText(value: string): number[] {
   return value.replace(/^\[/, "").replace(/]$/, "").split(",").map(Number);
 }
 
-/** Cosine similarity — `1 - cosineDistance`, i.e. exactly what pgvector's `<=>` operator inverts. */
-function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0;
-  let normA = 0;
-  let normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    const av = a[i] ?? 0;
-    const bv = b[i] ?? 0;
-    dot += av * bv;
-    normA += av * av;
-    normB += bv * bv;
-  }
-  const denom = Math.sqrt(normA) * Math.sqrt(normB);
-  return denom === 0 ? 0 : dot / denom;
-}
-
 interface VectorSearchPgliteArgs extends Omit<VectorSearchOpts, "logger"> {
   db: NodePgDatabase<Record<string, never>>;
   cortexNodes: CortexNodesTableType;
@@ -921,6 +908,7 @@ async function loadMemoryContext(
         eq(cortexNodes.userId, userId),
         eq(cortexNodes.nodeType, CortexNodeType.FILE),
         like(cortexNodes.path, `${memoriesPath}/%`),
+        eq(cortexNodes.isDeleted, false),
       ),
     )
     .orderBy(sql`${cortexNodes.updatedAt} DESC`);
@@ -1840,6 +1828,7 @@ export async function loadRawEmbeddingScores(
     const ownFiles = and(
       eq(cortexNodes.userId, userId),
       eq(cortexNodes.nodeType, CortexNodeType.FILE),
+      eq(cortexNodes.isDeleted, false),
       isNotNull(cortexNodes.embedding),
     );
 

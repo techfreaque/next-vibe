@@ -53,9 +53,7 @@ export interface AnthropicRequestParts {
 }
 
 /** Tool names a tool search result loaded (tool_reference blocks in history). */
-export function referencedToolNames(
-  messages: AnthropicMessage[],
-): Set<string> {
+export function referencedToolNames(messages: AnthropicMessage[]): Set<string> {
   const names = new Set<string>();
   for (const message of messages) {
     if (typeof message.content === "string") {

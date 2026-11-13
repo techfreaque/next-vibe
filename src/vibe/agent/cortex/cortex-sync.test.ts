@@ -48,6 +48,7 @@ import {
 import { skillsSyncProvider } from "../skills/sync-provider";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { resolveHermesDatabaseUrl } from "next-vibe/database/effective-url";
 import { databaseEnv } from "next-vibe/database/env";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import * as userSchema from "next-vibe/identity/user/db";
@@ -115,7 +116,8 @@ interface ProdDbConnection {
 }
 
 function getProdDb(): ProdDbConnection {
-  const baseUrl = databaseEnv.DATABASE_URL.replace(/:\d+\//, `:5433/`);
+  // Atlas may run on PGlite (`file:`), so derive the Hermes URL like --hermes does.
+  const baseUrl = resolveHermesDatabaseUrl(databaseEnv.DATABASE_URL);
   const pool = new Pool({
     connectionString: baseUrl,
     max: 3,

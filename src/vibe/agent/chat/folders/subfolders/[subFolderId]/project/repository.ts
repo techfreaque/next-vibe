@@ -131,6 +131,7 @@ export async function loadProjectContext(
               eq(cortexNodes.userId, self.userId),
               eq(cortexNodes.nodeType, CortexNodeType.FILE),
               like(cortexNodes.path, `${knowledgePath(folder.id)}/%`),
+              eq(cortexNodes.isDeleted, false),
             ),
           )
           .orderBy(asc(cortexNodes.path))
@@ -221,6 +222,7 @@ export class FolderProjectRepository {
                 eq(cortexNodes.userId, folder.userId),
                 eq(cortexNodes.nodeType, CortexNodeType.FILE),
                 like(cortexNodes.path, `${dir}/%`),
+                eq(cortexNodes.isDeleted, false),
               ),
             )
             .orderBy(asc(cortexNodes.path))

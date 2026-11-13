@@ -237,6 +237,15 @@ export async function dispatchRemoteEvent(
 
   const handler = toolHandler.onRemoteEvent[envelope.eventName];
   if (!handler) {
+    ctx.logger.warn(
+      "[RemoteEventRegistry] Route has no onRemoteEvent handler for this event — dropping event",
+      {
+        endpointPath: wanted,
+        method,
+        eventName: envelope.eventName,
+        handledEvents: Object.keys(toolHandler.onRemoteEvent),
+      },
+    );
     return;
   }
 

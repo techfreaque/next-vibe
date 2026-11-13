@@ -482,7 +482,19 @@ export async function ensureParentDirs(
         content: null,
         size: 0,
       })
-      .onConflictDoNothing()
+      // Live dir already there → no-op. Tombstoned row at this path → revive
+      // it as a live dir (the unique (userId, path) index keeps tombstones).
+      .onConflictDoUpdate({
+        target: [cortexNodes.userId, cortexNodes.path],
+        set: {
+          isDeleted: false,
+          nodeType: CortexNodeType.DIR,
+          content: null,
+          size: 0,
+          updatedAt: new Date(),
+        },
+        setWhere: eq(cortexNodes.isDeleted, true),
+      })
       .returning({ id: cortexNodes.id });
     if (result.length > 0) {
       created++;

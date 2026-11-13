@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cortex-write-file-creation-verification-test-81287623-9f39-42c1-a95f-254ca65c7707.md\n\n# Cortex-write file creation verification test\nFolder: private\nDescription: The user asked me to create /documents/ai-test/notes.md with exact specified content using cortex-write, then confirm. I wrote the file (size 145 bytes, created:false indicating an existing file was overwritten) and read it back with cortex-read to verify the content matched exactly, including the t",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks--category--keyword--schem-f412a1ad-d590-4953-a3ab-a56d9fa8b442.md\n\n# Tool-help catalog checks: category, keyword, schema\nFolder: private\nDescription: The user set up a session-wide quality gate requiring every turn to end with STEP_OK or FAILED plus a description of anything off. This turn exercised the tool-help tool with three parallel calls: category='ai' (92 tools listed), query='search' (11 matching search tools), and toolName='generate_imag",
+    "encoding_format": "float"
+  }
+}

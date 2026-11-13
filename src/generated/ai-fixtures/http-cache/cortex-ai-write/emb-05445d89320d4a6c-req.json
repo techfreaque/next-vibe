@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The file is written and verified.\n\n**What I did:**\n\n1. `cortex-write` created/updated `/documents/ai-test/notes.md` — returned `size: 145`, timestamp `2026-11-13T19:00:54Z`.\n2. `cortex-read` read it back to confirm — content matches your text exactly, byte-for-byte, including the trailing newline.\n\n**Note:** the response included `created: false`, meaning the path already existed (`notes.md` was already in `/documents/ai-test/`) and was overwritten rather than newly created. The content is correct now.",
+    "encoding_format": "float"
+  }
+}

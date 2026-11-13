@@ -144,11 +144,18 @@ export class CortexDeleteRepository {
     }
 
     try {
+      // Soft-delete: mark isDeleted=true + bump updatedAt so the tombstone
+      // propagates through cursor sync (sync-provider serializes isDeleted) to
+      // peers that missed the single-shot `node-deleted` relay. A hard delete
+      // would leave offline peers holding the node forever. Reads filter
+      // tombstones (getNode/pathExists/listChildren); writes revive them.
       const deletedRows = await db
-        .delete(cortexNodes)
+        .update(cortexNodes)
+        .set({ isDeleted: true, updatedAt: new Date() })
         .where(
           and(
             eq(cortexNodes.userId, userId),
+            eq(cortexNodes.isDeleted, false),
             sql`(${cortexNodes.path} = ${path} OR ${cortexNodes.path} LIKE ${`${path}/%`})`,
           ),
         )

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks--category--keyword--schem-b21e828d-0b5b-4154-8904-2ac93f5a09fc.md\n\n# Tool-help catalog checks: category, keyword, schema\nFolder: private\nDescription: Ran three parallel tool-help calls to audit the tool catalog: a category filter for 'ai', a keyword query for 'search', and a detail lookup for generate_image. The keyword and detail calls behaved correctly, but the category filter was ignored and returned all 91 tools instead of the 7 in the ai cat",
+    "encoding_format": "float"
+  }
+}

@@ -30,6 +30,7 @@ import {
 import { parseError } from "../../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../../logger/types";
 import { Platform } from "../../../../platforms/platforms";
+import { findCheckConfigRoot } from "../../config/find-root";
 import { ConfigRepositoryImpl } from "../../config/repository";
 import type { CheckConfig } from "../../config/types";
 import { checkEnv } from "../../env";
@@ -212,18 +213,7 @@ function findProjectRoot(): string {
   // at the nearest app instead of the repo root when invoked from inside one
   // (e.g. cwd = a nested app). check.config.ts exists exactly once, at the
   // true root — the same marker ConfigRepositoryImpl.getConfigFilePath uses.
-  let dir = process.cwd();
-  for (let i = 0; i < 10; i++) {
-    if (existsSync(resolve(dir, "check.config.ts"))) {
-      return dir;
-    }
-    const parent = dirname(dir);
-    if (parent === dir) {
-      break;
-    }
-    dir = parent;
-  }
-  return process.cwd();
+  return findCheckConfigRoot(process.cwd()) ?? process.cwd();
 }
 
 /**
@@ -981,6 +971,31 @@ export class TypecheckRepository {
   }
 
   /**
+   * Every existing `node_modules/@types` strictly above the project root,
+   * nearest first, spelled relative to the temp config (via `rootPrefix`).
+   * Mirrors the upward part of TypeScript's default typeRoots lookup.
+   */
+  private static ancestorTypeRoots(
+    projectRoot: string,
+    rootPrefix: string,
+  ): string[] {
+    const roots: string[] = [];
+    let dir = resolve(projectRoot);
+    let up = "";
+    for (;;) {
+      const parent = dirname(dir);
+      if (parent === dir) {
+        return roots;
+      }
+      dir = parent;
+      up += "../";
+      if (existsSync(join(dir, "node_modules", "@types"))) {
+        roots.push(`${rootPrefix}${up}node_modules/@types`);
+      }
+    }
+  }
+
+  /**
    * Calculate the relative path prefix needed to reach project root from the cache directory.
    * e.g., ".tmp/typecheck-cache" -> "../../"
    */
@@ -1576,9 +1591,15 @@ export class TypecheckRepository {
     // `tsgo -p <project>`: @types-only reports a false TS2688, adding the
     // owner's bare node_modules reports nothing, and this shape reports
     // exactly what the project's own config does.
+    //
+    // The walk continues ABOVE the project root as well: a standalone project
+    // nested inside another checkout (the checker's own test-project) has no
+    // node_modules of its own and resolves `types: ["react", "node"]` from the
+    // enclosing repo's @types, exactly like `tsgo -p <project>` does.
     const adjustedTypeRoots = existingTypeRoots ?? [
       ...(prefix === rootPrefix ? [] : [`${prefix}node_modules/@types`]),
       `${rootPrefix}node_modules/@types`,
+      ...TypecheckRepository.ancestorTypeRoots(projectRoot, rootPrefix),
     ];
     // Bare package types (e.g. "bun-types" at node_modules/bun-types rather
     // than node_modules/@types/bun-types) are resolved per-entry above, in

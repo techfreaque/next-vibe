@@ -287,22 +287,36 @@ export class LintRepository {
       });
 
       let output = "";
+      let errorOutput = "";
 
       child.stdout?.on("data", (chunk: Buffer) => {
         output += chunk.toString();
       });
 
-      child.stderr?.on("data", () => {
-        // Ignore stderr
+      child.stderr?.on("data", (chunk: Buffer) => {
+        errorOutput += chunk.toString();
       });
 
       child.on("close", (code) => {
         // ESLint exit codes: 0=success, 1=lint errors found, 2=config/internal error
         if (code !== null && code > 2) {
           reject(new Error(`ESLint failed with exit code ${code}`));
-        } else {
-          resolve(output);
+          return;
         }
+        // Exit 2 (or a bunx wrapper exiting 0 after ESLint crashed) prints no
+        // JSON at all. Never let that read as "0 issues" silently.
+        if (code === 2 || (!output.trim() && errorOutput.trim())) {
+          const reason =
+            errorOutput
+              .split("\n")
+              .map((line) => line.trim())
+              .find((line) => line.startsWith("Error")) ??
+            errorOutput.trim().split("\n")[0];
+          logger.warn(
+            `[ESLINT] ESLint crashed (exit ${code}); no ESLint rules were checked: ${reason}`,
+          );
+        }
+        resolve(output);
       });
 
       child.on("error", (error) => {

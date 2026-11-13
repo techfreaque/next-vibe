@@ -599,6 +599,14 @@ export function startWebSocketServer(
                 msg.locale,
               ))
             ) {
+              logger.warn(
+                "[WS] Subscribe denied - socket identity may not join channel",
+                {
+                  channel: msg.channel,
+                  isPublic: ws.data.user.isPublic,
+                  connectorInstanceId: ws.data.connectorInstanceId,
+                },
+              );
               return;
             }
             subscribeToChannel(

@@ -11,8 +11,9 @@
  */
 
 import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 
+import { findCheckConfigRoot } from "../../../../config/find-root";
 import type {
   BoilerplatePluginConfig,
   CheckConfig,
@@ -89,24 +90,9 @@ const pluginConfigCache = new Map<string, ConfigLoadResult<LintConfigValue>>();
  */
 function findProjectRoot(): string {
   const cwd = process.cwd();
-  let currentDir = cwd;
-  const root = resolve("/");
-
-  while (currentDir !== root) {
-    const configPath = resolve(currentDir, "check.config.ts");
-    if (existsSync(configPath)) {
-      return currentDir;
-    }
-
-    const jsConfigPath = resolve(currentDir, "check.config.js");
-    if (existsSync(jsConfigPath)) {
-      return currentDir;
-    }
-
-    currentDir = dirname(currentDir);
-  }
-
-  return cwd;
+  return (
+    findCheckConfigRoot(cwd, ["check.config.ts", "check.config.js"]) ?? cwd
+  );
 }
 
 /**

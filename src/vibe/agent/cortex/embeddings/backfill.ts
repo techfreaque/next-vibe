@@ -306,6 +306,7 @@ export async function backfillEmbeddings(force = false): Promise<{
     // Fetch next batch of nodes without embeddings, excluding already-failed ones
     const whereConditions = [
       eq(cortexNodes.nodeType, CortexNodeType.FILE),
+      eq(cortexNodes.isDeleted, false),
       isNull(cortexNodes.embedding),
     ];
 

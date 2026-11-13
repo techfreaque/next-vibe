@@ -4,9 +4,9 @@
  */
 
 // unicorn/prefer-node-protocol — should use node: prefix (fixable)
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { EventEmitter } from "node:events";
+import { readFileSync } from "fs";
+import { join } from "path";
+import { EventEmitter } from "events";
 
 // unicorn/no-new-array — use Array.from instead (fixable by ESLint, not by oxlint)
 export function badArray(n: number): string[] {
@@ -30,14 +30,14 @@ export function uselessSpread(arr: string[]): string[] {
 
 // unicorn/prefer-array-flat — use .flat() instead of reduce (fixable)
 export function flatBad(arrs: string[][]): string[] {
-  return arrs.flat();
+  return arrs.reduce((acc, val) => acc.concat(val), []);
 }
 
 // unicorn/prefer-array-flat-map — use flatMap (fixable)
 export function flatMapBad(arr: string[]): string[] {
   return arr
     .map((x) => [x, x.toUpperCase()])
-    .flat();
+    .reduce((acc, val) => acc.concat(val), []);
 }
 
 // unicorn/prefer-set-size — use .size (fixable)

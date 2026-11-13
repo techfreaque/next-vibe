@@ -140,6 +140,15 @@ function slug(value: string): string {
     .slice(0, 80);
 }
 
+/** Random client IP in 198.18.0.0/15 (benchmarking range, never real users). */
+function randomOctet(): string {
+  return String(Math.floor(Math.random() * 254) + 1);
+}
+
+function randomTestIp(): string {
+  return `198.${String(18 + Math.floor(Math.random() * 2))}.${randomOctet()}.${randomOctet()}`;
+}
+
 function launchBrowser(): Promise<Browser> {
   return chromium.launch({
     headless: process.env["E2E_HEADED"] !== "1",
@@ -220,9 +229,14 @@ export function useE2E(
           // Unique UA per test: anonymous leads are deduped by IP + user agent,
           // so without it every context on localhost shares one lead — and one
           // test's cleanup deletes it under another.
+          // Unique client IP per test too: guests share one free pool per IP
+          // (anti-farming), so every localhost test would drain the same
+          // pool.
+          const testIp = randomTestIp();
           const context = await browser.newContext({
             baseURL: baseUrl,
             userAgent: `${userAgent} vibe-e2e/${crypto.randomUUID()}`,
+            extraHTTPHeaders: { "x-forwarded-for": testIp },
           });
           const cleanups: Array<() => Promise<void>> = [];
           if (options.guestCredits !== undefined) {
@@ -249,7 +263,9 @@ export function useE2E(
               `e2e-${slug(suite)}--${slug(name)}`,
               false,
             );
+            // Replaces the context's extra headers: keep the test IP.
             await context.setExtraHTTPHeaders({
+              "x-forwarded-for": testIp,
               [FIXTURE_SCOPE_HEADER]: scopeId,
             });
           }

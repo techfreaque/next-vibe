@@ -53,6 +53,15 @@ import {
   resolveRemoteUrlSync,
   unregisterDevFromHermes,
 } from "../../ai-stream/testing/remote-setup";
+import { scopedTranslation as skillByIdScopedTranslation } from "../[id]/i18n";
+
+/** The skill page's "add every variant to favorites" button label. */
+const ADD_ALL_LABEL = skillByIdScopedTranslation
+  .scopedT("en-US")
+  .t("get.addAllToFavorites");
+const ADD_ALL_BUTTON = new RegExp(
+  `^.*button "${ADD_ALL_LABEL.replaceAll(/[.*+?^$()|[\]{}\\]/g, "\\$&")}".*$`,
+);
 
 function sleep(ms: number): Promise<void> {
   return new Promise<void>((_resolve) => {
@@ -383,12 +392,12 @@ if (_atlasPort && _hermesPort && _hermesUrl) {
      */
     async function addFavViaAtlasBrowser(): Promise<void> {
       await browserNavigate(ATLAS_SESSION, ATLAS_SKILL_URL);
-      await browserWaitFor(ATLAS_SESSION, ["Career Coach", "Add All"], 15_000);
+      await browserWaitFor(ATLAS_SESSION, ["Career Coach", ADD_ALL_LABEL], 15_000);
       const snapshot = await browserSnapshot(ATLAS_SESSION);
-      const addAllUid = findUid(snapshot, /^.*button "Add All".*$/m);
+      const addAllUid = findUid(snapshot, ADD_ALL_BUTTON);
       expect(
         addAllUid,
-        `"Add All" button not found. snapshot:\n${snapshot.slice(0, 800)}`,
+        `"${ADD_ALL_LABEL}" button not found. snapshot:\n${snapshot.slice(0, 800)}`,
       ).toBeTruthy();
       if (!addAllUid) {
         return;

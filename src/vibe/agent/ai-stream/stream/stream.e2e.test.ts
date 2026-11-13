@@ -41,7 +41,7 @@ import { TOUR_SKIPPED_KEY } from "./widget/chat-ui/welcome-tour/tour-config";
 const endpoint = streamEndpoints.POST;
 const NEW_THREAD_PAGE = "/threads/private/new";
 /** Cheapest tool-capable OpenRouter chat model. */
-const CHEAP_MODEL = ChatModelId.QWEN_3_7_FLASH;
+const CHEAP_MODEL = ChatModelId.QWEN_3_8_FLASH;
 /** The answer ("pong") never appears in the question, so finding it proves the AI replied. */
 const PROMPT =
   "Which table-tennis word answers 'ping'? Reply with that single word only, lowercase.";
@@ -184,29 +184,25 @@ describe("E2E: chat stream", () => {
     // Spent elsewhere (another tab, a background task) while the draft is open
     await drainCredits(buyer.user);
 
-    // The open page picks the new balance up on its own: composer locks, the
-    // customer is told why and where to top up — the draft is kept.
-    await until("composer locked", () => composer.isDisabled());
-    await page
-      .getByText(t("input.noCredits.title"), { exact: true })
-      .first()
+    // The open page picks the new balance up on its own: the out-of-credits
+    // card replaces the textarea and tells the customer where to top up.
+    const card = page.getByTestId("out-of-credits-card").first();
+    await card.waitFor({ state: "visible" });
+    await composer.waitFor({ state: "detached" });
+    await card
+      .getByText(t("outOfCredits.member.title"), { exact: true })
       .waitFor({ state: "visible" });
-    await page
-      .getByRole("link", { name: t("input.noCredits.addCredits") })
-      .waitFor({ state: "visible" });
-    expect(await composer.inputValue()).toBe(PROMPT);
-    await page.keyboard.press("Enter");
     expect(
-      await page
-        .getByTitle(t("actions.sendMessage"), { exact: true })
-        .isDisabled(),
-    ).toBe(false);
-    await page.getByTitle(t("actions.sendMessage"), { exact: true }).click();
-    // Send-time guard: refuses with an explanation instead of a doomed request
-    await page
-      .getByText(t("input.noCredits.description"), { exact: true })
-      .first()
-      .waitFor({ state: "visible" });
+      await card
+        .getByRole("link", { name: t("outOfCredits.member.getCredits") })
+        .getAttribute("href"),
+    ).toBe(`/${defaultLocale}/subscription/buy`);
+    // Send-time guard: a send with an empty balance never reaches the AI
+    const send = page.getByTitle(t("actions.sendMessage"), { exact: true });
+    if (await send.isEnabled()) {
+      await send.click();
+      await page.waitForTimeout(1_000);
+    }
     expect(streamCalls).toEqual([]);
     // UI-side refusal, no request — what EndpointForm records for blocked submits
     recordOutcome(e2eEndpointId(endpoint), "clientValidation");

@@ -578,6 +578,15 @@ export class RemoteEventBridgeRepository {
       !envelope.eventName ||
       !evt.originInstanceId
     ) {
+      logger.warn(
+        "[RemoteEventBridge] handleRemoteEvent: envelope missing routing fields — dropping event",
+        {
+          endpointPath: envelope?.endpointPath,
+          endpointMethod: envelope?.endpointMethod,
+          eventName: envelope?.eventName,
+          originInstanceId: evt.originInstanceId,
+        },
+      );
       return;
     }
 

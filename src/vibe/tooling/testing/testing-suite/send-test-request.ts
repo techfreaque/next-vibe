@@ -5,6 +5,10 @@ import {
   type ToolExecutionContext,
 } from "next-vibe/core/execution-context";
 
+import {
+  isEmptySchema,
+  isNeverSchema,
+} from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { defaultLocale } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
@@ -117,7 +121,15 @@ export async function sendTestRequest<TEndpoint extends CreateApiEndpointAny>({
     const isContentData =
       result.success &&
       isContentResponse(result.data as Parameters<typeof isContentResponse>[0]);
-    if (endpoint.responseSchema && result.success && !isContentData) {
+    // Void endpoints (never/empty response schema) skip validation, exactly
+    // like the route handler's validateData does.
+    if (
+      endpoint.responseSchema &&
+      result.success &&
+      !isContentData &&
+      !isNeverSchema(endpoint.responseSchema) &&
+      !isEmptySchema(endpoint.responseSchema)
+    ) {
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {
         return fail({

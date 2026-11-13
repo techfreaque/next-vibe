@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `/threads` listing returned **4 entries** (all directories):\n\n| # | Name | Type |\n|---|------|------|\n| 1 | `private` | dir |\n| 2 | `shared` | dir |\n| 3 | `public` | dir |\n| 4 | `cron` | dir |\n\nRoot folders present: **private, shared, public, cron**. Note there is no top-level `incognito` or `background` folder — incognito threads are browser-only by design, and background threads live nested under `private`.",
+    "encoding_format": "float"
+  }
+}

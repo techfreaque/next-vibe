@@ -24,6 +24,8 @@ import { until } from "../ai-stream/testing/e2e-chat";
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { submitAndAwaitResponse } from "../ai-stream/testing/e2e-slow-submit";
 import { cacheDir } from "../ai-stream/testing/fetch-cache";
+import { scopedTranslation as consentScopedTranslation } from "../models/uncensored-consent/i18n";
+import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
 import imageGenerationEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -67,6 +69,21 @@ async function balanceOf(user: JwtPrivatePayloadType): Promise<number> {
   );
   expect(balance.success, JSON.stringify(balance)).toBe(true);
   return balance.success ? balance.data.total : Number.NaN;
+}
+
+/**
+ * Uncensored-tier models (Qwen Edit, Chroma) need the one-time 18+ consent;
+ * without it the server refuses with consent_required before charging. These
+ * tests exercise generation itself, so the buyer consents up front (the
+ * consent gate has its own tests in models/uncensored-consent).
+ */
+async function consentToUncensored(user: JwtPrivatePayloadType): Promise<void> {
+  const agreed = await UncensoredConsentRepository.agree(
+    user,
+    logger,
+    consentScopedTranslation.scopedT(defaultLocale).t,
+  );
+  expect(agreed.success, JSON.stringify(agreed)).toBe(true);
 }
 
 /**
@@ -127,6 +144,7 @@ describe("E2E: image generation", () => {
   e2e.it("edits a reference image on an image-to-image model", async ({ open, loginAs, cleanup }) => {
     const buyer = await createE2ECreditUser("image-gen-i2i", 100);
     cleanup(buyer.remove);
+    await consentToUncensored(buyer.user);
     await loginAs(buyer.user);
 
     // inputMediaUrl has no visible web control (the widget renders only the
@@ -178,6 +196,7 @@ describe("E2E: image generation", () => {
   e2e.it("resolves the default image model (Chroma) when none is passed and bills it", async ({ open, loginAs, cleanup }) => {
     const buyer = await createE2ECreditUser("image-gen-default", 100);
     cleanup(buyer.remove);
+    await consentToUncensored(buyer.user);
     await loginAs(buyer.user);
     const before = await balanceOf(buyer.user);
 
@@ -231,6 +250,7 @@ describe("E2E: image generation", () => {
   e2e.it("refuses a reference image on the default Chroma model before charging", async ({ open, loginAs, cleanup }) => {
     const buyer = await createE2ECreditUser("image-gen-chroma-ref", 10);
     cleanup(buyer.remove);
+    await consentToUncensored(buyer.user);
     await loginAs(buyer.user);
     const before = await balanceOf(buyer.user);
 

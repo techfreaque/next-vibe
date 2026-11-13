@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import { eq, or, sql } from "drizzle-orm";
+import { eq, inArray, or } from "drizzle-orm";
 
 import {
   type CountryLanguage,
@@ -248,30 +248,42 @@ export class LeadAuthRepository {
     logger: EndpointLogger,
   ): Promise<string[]> {
     try {
-      // Traverse the undirected leadLeadLinks graph from this lead
+      // Traverse the undirected leadLeadLinks graph from this lead, one query
+      // per BFS level (an IP cluster can hold thousands of leads; a query per
+      // node made login/signup take seconds).
       const visited = new Set<string>([leadId]);
-      const queue = [leadId];
+      let frontier = [leadId];
 
-      while (queue.length > 0) {
-        const current = queue.shift()!;
-        const neighbors = await db
-          .select({
-            other: sql<string>`CASE WHEN ${leadLeadLinks.leadId1} = ${current} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
-          })
-          .from(leadLeadLinks)
-          .where(
-            or(
-              eq(leadLeadLinks.leadId1, current),
-              eq(leadLeadLinks.leadId2, current),
-            ),
-          );
+      // Chunked so a huge level stays under the bind-parameter limit.
+      const CHUNK = 5000;
 
-        for (const { other } of neighbors) {
-          if (!visited.has(other)) {
-            visited.add(other);
-            queue.push(other);
+      while (frontier.length > 0) {
+        const next: string[] = [];
+        for (let i = 0; i < frontier.length; i += CHUNK) {
+          const chunk = frontier.slice(i, i + CHUNK);
+          const neighbors = await db
+            .select({
+              leadId1: leadLeadLinks.leadId1,
+              leadId2: leadLeadLinks.leadId2,
+            })
+            .from(leadLeadLinks)
+            .where(
+              or(
+                inArray(leadLeadLinks.leadId1, chunk),
+                inArray(leadLeadLinks.leadId2, chunk),
+              ),
+            );
+
+          for (const { leadId1, leadId2 } of neighbors) {
+            for (const other of [leadId1, leadId2]) {
+              if (!visited.has(other)) {
+                visited.add(other);
+                next.push(other);
+              }
+            }
           }
         }
+        frontier = next;
       }
 
       // Return all linked leads excluding the starting lead itself

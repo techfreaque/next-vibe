@@ -27,6 +27,15 @@ export function resolveEffectiveDatabaseUrl(raw: string): string {
   if (!isPreviewMode || cliArgs.includes("--skip-db-setup")) {
     return raw;
   }
+  return resolveHermesDatabaseUrl(raw);
+}
+
+/**
+ * The Hermes database URL derived from Atlas's DATABASE_URL, regardless of the
+ * current process mode. Test harnesses running as Atlas use it to reach the
+ * Hermes DB directly (a plain port swap breaks on a PGlite `file:` URL).
+ */
+export function resolveHermesDatabaseUrl(raw: string): string {
   const hermesUrl = process.env["HERMES_DATABASE_URL"];
   if (hermesUrl && hermesUrl.length > 0) {
     return hermesUrl;

@@ -1,5 +1,5 @@
 import { coreClientEnv } from "next-vibe/core/env-client";
-import { isPreviewMode } from "next-vibe/env/detect";
+import { isHermesDev, isPreviewMode } from "next-vibe/env/detect";
 import { Environment } from "next-vibe/env/env-util";
 
 export const GITHUB_REPO_URL = "https://github.com/techfreaque/next-vibe"; // eslint-disable-line i18next/no-literal-string
@@ -50,7 +50,15 @@ function getPortSuffix(): string {
   // No suffix in production or preview mode. In preview (vibe start/build/rebuild)
   // the Bun proxy doesn't have NODE_ENV=production but must use the same empty
   // suffix as the Next.js child (which does). isPreviewMode detects this via argv.
-  if (coreClientEnv.NODE_ENV === Environment.PRODUCTION || isPreviewMode) {
+  // Hermes DEV (`vibe --hermes dev`) is NOT a prod server: its Vite app worker
+  // (no --hermes in argv, NODE_ENV=development) sets the port-suffixed cookies,
+  // so the WS proxy in the CLI process must read those same names. Dropping the
+  // suffix there made the proxy auth every browser socket as a public lead and
+  // silently deny its user/{id}/ws-* subscriptions (no live updates on :3002).
+  if (
+    coreClientEnv.NODE_ENV === Environment.PRODUCTION ||
+    (isPreviewMode && !isHermesDev)
+  ) {
     return "";
   }
   try {

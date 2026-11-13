@@ -49,6 +49,12 @@ async function openChat(
 /** Opens the selector and finishes the one-screen setup with defaults. */
 async function completeSetup(page: Page): Promise<void> {
   await selectorTrigger(page).click();
+  // Guests first see the sign-in gate (signed-in users skip it).
+  const signin = page.getByTestId("selector-signin");
+  await signin.waitFor();
+  await signin
+    .getByRole("button", { name: tStream("onboarding.signin.continueAsGuest") })
+    .click();
   const setup = page.getByTestId("selector-setup");
   await setup.waitFor();
   await setup

@@ -1,0 +1,42 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a5a005ed49fbd259-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 13 Nov 2026 19:01:09 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794596466-B0OJ2d0LPNxqD2sLgodA",
+    "x-openrouter-release": "api;58f70e71-e511-4079-aba9-138f2865b641",
+    "set-cookie": "__cf_bm=VYPK3xKWVQb4h3ttoDDDX0SZsZTIrzYQTWXpKhsy6_M-1794596466.7713323-1.0.1.1-DAedIUG6REKzPzI3pIS1xyr4jRn9EzxBmg_LetRjVtjZS_j51Z5nIrRc7p6QdXFxgj72zoHHog7Grf0Dvhk2D0a5BhBkik.Uj.6hhCZthVopxkJvkPZSjDkCCruEe6b6; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 19:31:09 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"I'll list the /threads directory.\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call_resp_01a1d648-f102-7dd2-9f7a-2d4f06b1fc8c_0\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"toolName\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\": \"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"cortex-list\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\", \"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"input\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\": \"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"path\\\": \\\"/threads\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794596466-B0OJ2d0LPNxqD2sLgodA\",\"object\":\"chat.completion.chunk\",\"created\":1794596466,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Sail Research\",\"service_tier\":\"asap\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":8257,\"completion_tokens\":73,\"total_tokens\":8330,\"cost\":0.00060833304,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00060833304,\"upstream_inference_prompt_cost\":0.00060044904,\"upstream_inference_completions_cost\":0.000007884},\"completion_tokens_details\":{\"reasoning_tokens\":1,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

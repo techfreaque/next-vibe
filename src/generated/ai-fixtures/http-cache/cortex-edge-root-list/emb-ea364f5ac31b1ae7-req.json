@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cortex-root-listing--virtual-mounts-vs-native-stor-f775e73f-0920-4697-941f-23d5caf67ace.md\n\n# Cortex root listing: virtual mounts vs native storage\nFolder: private\nDescription: Ran cortex-list on the cortex root path \"/\" and returned all 10 directory entries: threads, skills, favorites, tasks, uploads, searches, gens, ssh, memories, documents. Classified them into virtual DB-backed mounts (threads, skills, favorites, tasks, uploads, searches, gens, ssh) versus native files",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a5a006761982d259-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 13 Nov 2026 19:01:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794596488-ObilP9vPxK9438bjj1nQ",
+    "x-openrouter-release": "api;58f70e71-e511-4079-aba9-138f2865b641",
+    "set-cookie": "__cf_bm=zicIMcBf6hs4AneFI0pf5Mhv7a6tHrhlfZw.bUGKwIo-1794596488.6553211-1.0.1.1-e280W4J5JSCHihgFd9a.FVdLjjCC2rOg.gijsXDk77xhX4DmsIwlJ8X9swMSefbZ6n8iQnUFROC0lP2A.r1KbmNStT2HO96PjgRIzINuxrYsEGGSvWorZCR4vTdtlbc7; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 19:31:29 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794596488-ObilP9vPxK9438bjj1nQ\",\"object\":\"chat.completion.chunk\",\"created\":1794596488,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"DigitalOcean\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call_b744050044534e428cfe9f71\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596488-ObilP9vPxK9438bjj1nQ\",\"object\":\"chat.completion.chunk\",\"created\":1794596488,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"DigitalOcean\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596488-ObilP9vPxK9438bjj1nQ\",\"object\":\"chat.completion.chunk\",\"created\":1794596488,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"DigitalOcean\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"toolName\\\":\\\"cortex-list\\\",\\\"input\\\":{\\\"path\\\":\\\"/tasks\\\"}}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794596488-ObilP9vPxK9438bjj1nQ\",\"object\":\"chat.completion.chunk\",\"created\":1794596488,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"DigitalOcean\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794596488-ObilP9vPxK9438bjj1nQ\",\"object\":\"chat.completion.chunk\",\"created\":1794596488,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"DigitalOcean\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":8363,\"completion_tokens\":64,\"total_tokens\":8427,\"cost\":0.00155142,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00155142,\"upstream_inference_prompt_cost\":0.00150534,\"upstream_inference_completions_cost\":0.00004608},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

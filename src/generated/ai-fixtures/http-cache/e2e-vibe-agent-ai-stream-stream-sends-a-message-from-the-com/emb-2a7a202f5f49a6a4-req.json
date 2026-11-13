@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/table-tennis-ping-pong-word-quiz-b21ee8b0-e48f-4f2a-8432-b32f764ec256.md\n\n# Table Tennis Ping Pong Word Quiz\nFolder: private\nDescription: The user asked a quick word-association puzzle: which table-tennis word answers 'ping'. Thea replied with the single lowercase word 'pong'. A brief, playful trivia exchange with no further discussion.",
+    "encoding_format": "float"
+  }
+}

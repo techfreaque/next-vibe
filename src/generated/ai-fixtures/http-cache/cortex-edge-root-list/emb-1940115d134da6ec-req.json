@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "`cortex-list /` returned 10 entries, all typed `dir`.\n\n## Entries returned\n\n| # | Entry | Path | Type |\n|---|-------|------|------|\n| 1 | threads | /threads | dir |\n| 2 | skills | /skills | dir |\n| 3 | favorites | /favorites | dir |\n| 4 | tasks | /tasks | dir |\n| 5 | uploads | /uploads | dir |\n| 6 | searches | /searches | dir |\n| 7 | gens | /gens | dir |\n| 8 | ssh | /ssh | dir |\n| 9 | memories | /memories | dir |\n| 10 | documents | /documents | dir |\n\n## Virtual mounts (DB-backed, read-only views)\n\nThese are generated from database tables / live services rather than real directories on disk:\n\n- **/threads** — conversation history (76 private, 22 background noted in context)\n- **/skills** — created skill personas\n- **/favorites** — saved model+character presets\n- **/tasks** — cron/background job definitions (Autopilot, Dreaming)\n- **/uploads** — user-uploaded media (42 items)\n- **/searches** — stored web-search results\n- **/gens** — generated media (images/video/music artefacts)\n- **/ssh** — machine connections + their configured mounts (terminal/SFTP proxy)\n\n## Native storage (real files on the filesystem)\n\n- **/memories** — markdown files, writable\n- **/documents** — markdown files + `/documents/templates/`, writable\n\n## Note for the tooling team\n\n`cortex-list` returns identical shapes for both kinds — every entry is `nodeType: \"dir\"` with `size: null`. There is no `storage`/`mountType` field, so the virtual-vs-native split above is inferred from platform behaviour, not reported by the API. Adding a `mountType: \"virtual\" | \"native\"` field would make this answerable from data rather than inference.\n\nAll 10 entries returned correctly, paths consistent,no errors.",
+    "encoding_format": "float"
+  }
+}

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -88,6 +89,21 @@ export class CortexMkdirRepository {
     try {
       const exists = await pathExists(userId, path);
       if (exists) {
+        // Dir already exists. An explicit viewType is applied (so
+        // `mkdir --view kanban` on an existing dir sets the view); without one
+        // the existing view is left untouched. Not a fresh creation either way.
+        if (viewType) {
+          await db
+            .update(cortexNodes)
+            .set({ viewType, updatedAt: new Date() })
+            .where(
+              and(
+                eq(cortexNodes.userId, userId),
+                eq(cortexNodes.path, path),
+                eq(cortexNodes.isDeleted, false),
+              ),
+            );
+        }
         return success({ responsePath: path, created: false });
       }
 
@@ -95,7 +111,11 @@ export class CortexMkdirRepository {
         await ensureParentDirs(userId, `${path}/placeholder`);
       }
 
-      // onConflictDoNothing: ensureParentDirs may have already created this dir
+      // ensureParentDirs above may already have materialized this dir row
+      // (without a viewType), or a tombstone may sit at this path. Upsert so the
+      // row ends up a live dir carrying the requested viewType; without a
+      // viewType an existing one is preserved.
+      const now = new Date();
       await db
         .insert(cortexNodes)
         .values({
@@ -106,7 +126,17 @@ export class CortexMkdirRepository {
           size: 0,
           viewType: viewType ?? null,
         })
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: [cortexNodes.userId, cortexNodes.path],
+          set: {
+            ...(viewType ? { viewType } : {}),
+            isDeleted: false,
+            nodeType: CortexNodeType.DIR,
+            content: null,
+            size: 0,
+            updatedAt: now,
+          },
+        });
 
       logger.info(
         `Cortex mkdir: ${path}${viewType ? ` (viewType: ${viewType})` : ""}`,

@@ -293,11 +293,12 @@ const { DELETE } = createEndpoint({
     description: "delete.success.description" as const,
   },
 
-  // This op owns its `favorite-deleted` event. A delete has no request body, so
-  // this is a side-effect event; the favorite's slug is the event's
-  // `urlPathParams.id` (the [id] route param). The client onEvent removes the row
-  // from the list cache; remoteEvent relays the delete cross-instance, where the
-  // route's onRemoteEvent removes the row by that same slug.
+  // This op owns its `favorite-deleted` relay event. A delete has no request
+  // body, so this is a side-effect event; the favorite's slug is the event's
+  // `urlPathParams.id` (the [id] route param). Cross-instance relay only — no
+  // onEvent here: this per-id DELETE channel has no browser subscriber. The
+  // favorites list GET owns the local `favorite-deleted` receiver; the DELETE
+  // repository and the peer's onRemoteEvent applier both emit there.
   channel: { scope: "user" } as const,
   events: {
     "favorite-deleted": {
@@ -305,70 +306,6 @@ const { DELETE } = createEndpoint({
       syncDomain: "favorites" as const,
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       urlPathParamsFields: ["id"] as const,
-      onEvent: async ({ urlPathParams, logger }) => {
-        const deletedId = urlPathParams.id;
-        if (!deletedId) {
-          return;
-        }
-        const [{ apiClient }, favoritesDefinition, charactersDefinition] =
-          await Promise.all([
-            import("next-vibe/unified-ui/hooks/store"),
-            import("../definition"),
-            import("../../definition"),
-          ]);
-
-        // Read the favorite's skillId before removing it, so the characters list
-        // can flip addedToFav back off for that skill.
-        let deletedSkillId: string | null = null;
-
-        // View 1 — favorites list: remove the row.
-        apiClient.updateEndpointData(
-          favoritesDefinition.default.GET,
-          logger,
-          (old) => {
-            if (!old?.success) {
-              return old;
-            }
-            const deleted = old.data.favorites.find((f) => f.id === deletedId);
-            deletedSkillId = deleted?.skillId ?? null;
-            return {
-              ...old,
-              data: {
-                ...old.data,
-                favorites: old.data.favorites.filter((f) => f.id !== deletedId),
-              },
-            };
-          },
-        );
-
-        // View 2 — characters/skills list: flip addedToFav off on the skill.
-        if (deletedSkillId) {
-          const baseSkillId = parseSkillId(deletedSkillId).skillId;
-          apiClient.updateEndpointData(
-            charactersDefinition.default.GET,
-            logger,
-            (old) => {
-              if (!old?.success) {
-                return old;
-              }
-              return {
-                ...old,
-                data: {
-                  ...old.data,
-                  sections: old.data.sections.map((section) => ({
-                    ...section,
-                    skills: section.skills.map((char) =>
-                      parseSkillId(char.skillId).skillId === baseSkillId
-                        ? { ...char, addedToFav: false }
-                        : char,
-                    ),
-                  })),
-                },
-              };
-            },
-          );
-        }
-      },
     },
   },
 

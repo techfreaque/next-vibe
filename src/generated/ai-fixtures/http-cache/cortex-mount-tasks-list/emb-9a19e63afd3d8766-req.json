@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/tasks is **not** empty — it contains 2 task files.\n\nListing:\n- `autopilot-b4c22963.md` (107 B)\n- `dream-b4c22963.md` (111 B)\n\nRead the first one, `/tasks/autopilot-b4c22963.md`, and its YAML frontmatter is intact and contains both required fields:\n\n```yaml\n---\ntaskId: \"autopilot-b4c22963\"\nname: \"Autopilot\"\nstatus: \"pending\"\nenabled: false\ncron: \"0 8 * * 1-5\"\ncreated: \"2026-09-18T22:56:28.727Z\"\n---\n```\n\n- `taskId` ✅ present (`autopilot-b4c22963`, matches the filename)\n- `status` ✅ present (`pending`)\n- Bonus: `name`, `enabled`, `cron`, `created` all present; body text follows the frontmatter.\n\nOne cosmetic note: the cortex tree view earlier showed these tasks as directories with descriptions (`Autopilot / 0 8 * * 1-5 [disabled]`), while `cortex-list` and `cortex-read` treat them as flat `.md` files. Harmless display difference, not a failure.\n\nVERDICT: PASS",
+    "encoding_format": "float"
+  }
+}

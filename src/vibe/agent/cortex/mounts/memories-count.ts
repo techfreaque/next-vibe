@@ -19,6 +19,7 @@ export async function countMemories(userId: string): Promise<number> {
         eq(cortexNodes.userId, userId),
         eq(cortexNodes.nodeType, CortexNodeType.FILE),
         like(cortexNodes.path, `${MEMORIES_PREFIX}/%`),
+        eq(cortexNodes.isDeleted, false),
       ),
     );
   return result[0]?.count ?? 0;
