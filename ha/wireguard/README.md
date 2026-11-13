@@ -46,9 +46,15 @@ ping -c3 10.88.0.2 # from srv1 (and 10.88.0.1 from srv2)
 Open **only** UDP 51820 to the peer's public IP. Everything else
 (5432/6379/9000/26379) binds to `10.88.0.0/24` and is never exposed publicly.
 
-```bash
-ufw allow from <PEER_PUBLIC_IP> to any port 51820 proto udp
-```
+On the live boxes this is done by `../scripts/ha-host-fw.sh` (systemd unit
+`ha-host-fw.service`), which also closes the other non-22/80/443 public ports.
+
+Transport is **plain WireGuard over UDP, direct between the public IPs**. Never
+wrap it in a TCP/WebSocket tunnel (wstunnel, chisel, frp, udp2raw, ...):
+Hostinger's in-VM scanner treats those processes as malware and hard-stops the
+VPS (S1, 2026-11-12, "Process: wstunnel"). Direct UDP between the two Hostinger
+boxes was tested at ~520 Mbit/s with 0% loss; the "UDP anti-DDoS" concern that
+led to wstunnel never materialised.
 
 > Both boxes verified `modprobe wireguard` succeeds, so the kernel module is
 > present; only `wireguard-tools` (the `wg`/`wg-quick` userspace) needs

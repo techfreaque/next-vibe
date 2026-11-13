@@ -65,10 +65,10 @@ export const {
     commented: true,
   },
   SSH_SERVER2_RELAY_ADDR: {
-    schema: z.string().default("10.88.0.2:7799"),
-    example: "10.88.0.2:7799",
+    schema: z.string().default("10.88.0.2"),
+    example: "10.88.0.2",
     comment:
-      "Private (WireGuard) host:port on SSH_SERVER2 for the box-to-box image relay from SSH_SERVER. Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
+      "Private (WireGuard) address of SSH_SERVER2 (host or host:sshPort) for the box-to-box image relay: SSH_SERVER pipes docker save over SSH with its restricted /root/.ssh/ha-image-relay key (see ha/README.md). Empty = upload to SSH_SERVER2 from this machine instead (much slower).",
     commented: true,
   },
   SSH_SERVER_ENV_PATH: {

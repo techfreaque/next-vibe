@@ -1,5 +1,7 @@
 # WireGuard config for SERVER 2 (replica, 10.88.0.2).
-# Render: replace __SRV2_PRIVATE_KEY__, __SRV1_PUBLIC_KEY__, __SRV1_PUBLIC_ENDPOINT__.
+# Render: fill the three double-underscore placeholders below (this box's private key,
+# the peer's public key, the peer's public IPv4:51820). Do not name them in comments:
+# a sed render would paste the private key into the comment too.
 # Install to /etc/wireguard/wg0.conf (chmod 600), then: systemctl enable --now wg-quick@wg0
 [Interface]
 Address = 10.88.0.2/24

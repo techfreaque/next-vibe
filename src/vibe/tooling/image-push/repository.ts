@@ -467,11 +467,17 @@ export class ImagePushRepository {
 
   /**
    * Ships the image Server 1 already holds to Server 2 box-to-box over the
-   * private WireGuard link (`nc` listener on Server 2's WG address, `docker
-   * save | gzip | nc` on Server 1), instead of uploading it a second time from
-   * this machine. Datacenter to datacenter is ~30x faster than a home uplink
-   * (564 MB in 20 s vs ~1 h for the 6.5 GB app image). Nothing is exposed
-   * publicly: the listener binds the WG IP only and exits after one stream.
+   * private WireGuard link, instead of uploading it a second time from this
+   * machine. Datacenter to datacenter is ~30x faster than a home uplink
+   * (564 MB in 20 s vs ~1 h for the 6.5 GB app image).
+   *
+   * Transport is plain SSH over WireGuard (`docker save | gzip | ssh`), using
+   * Server 1's dedicated key /root/.ssh/ha-image-relay, which Server 2 pins to
+   * `restrict,from="10.88.0.1",command="gunzip | docker load"`. Never use an
+   * `nc -l` listener or any tunnel/relay binary (nc, socat, wstunnel, chisel,
+   * ...) here: Hostinger's in-VM malware scanner flags such processes and
+   * hard-stops the VPS (it did so to Server 1 on 2026-11-12 for wstunnel).
+   * One-time setup per box pair: ha/README.md "Image relay".
    */
   private static async relayToSecondary(
     shaRef: string,
@@ -481,25 +487,29 @@ export class ImagePushRepository {
     t: ImagePushT,
   ): Promise<ResponseType<void>> {
     const q = ImagePushRepository.shellQuote;
-    const [relayHost = "", relayPort = "7799"] = relayAddr.split(":");
-    const listener = ImagePushRepository.runRemote(
+    const [relayHost = "", relayPort = "22"] = relayAddr.split(":");
+    // Drop a stale image under the same ref first so `docker load` re-tags it.
+    const cleared = await ImagePushRepository.runRemote(
       secondaryTarget,
-      `docker rmi ${q(shaRef)} 2>/dev/null; timeout 3600 sh -c ${q(`nc -l ${relayHost} ${relayPort} | gunzip | docker load`)}`,
+      `docker rmi ${q(shaRef)} >/dev/null 2>&1; true`,
       undefined,
       imagePushEnv.SSH_SERVER2_PWD,
     );
-    // Give the listener time to bind before Server 1 connects.
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 4000);
-    });
+    const relaySsh = [
+      "ssh -i /root/.ssh/ha-image-relay",
+      "-o BatchMode=yes -o IdentitiesOnly=yes",
+      "-o StrictHostKeyChecking=accept-new",
+      "-o UserKnownHostsFile=/root/.ssh/ha-image-relay.known_hosts",
+      `-p ${q(relayPort)}`,
+      q(`root@${relayHost}`),
+    ].join(" ");
     const sender = await ImagePushRepository.runRemote(
       primaryTarget,
-      `set -o pipefail; docker save ${q(shaRef)} | gzip -1 | nc -N ${q(relayHost)} ${q(relayPort)}`,
+      `set -o pipefail; docker save ${q(shaRef)} | gzip -1 | ${relaySsh}`,
       undefined,
       imagePushEnv.SSH_SERVER_PWD,
     );
-    const received = await listener;
-    const failed = [sender, received].find(
+    const failed = [cleared, sender].find(
       (r) => r.error !== undefined || r.exitCode !== 0,
     );
     if (failed) {

@@ -95,6 +95,12 @@ clamp very low TTLs upward).
 
 ## Status (staged, NOT live)
 
+> **2026-11-13: public :53 FIREWALLED on both boxes** (`ha/scripts/ha-host-fw.sh`, HA-DOCKER chain). The pdns containers still run and
+> answer on the WG IPs, but the internet cannot reach them. Before the registrar delegation: harden first (rate limiting via
+> dnsdist or pdns `max-qps`-style limits, `any-to-tcp=yes`, small responses, no recursion), then drop the `53` rules from
+> `ha-host-fw.sh` and re-apply. Query volume while it was open was tiny (S2: 87 queries in 3.5 days), so it was not the cause
+> of the S1 shutdown (that was wstunnel, see `ha/README.md`), but an open authoritative NS needs limits before it goes live.
+
 - **S2 (Frankfurt):** edge is RUNNING as a verifiable staging instance — pdns
   answers on `179.198.214.41:53` + `10.88.0.2:53` with the full correct zone;
   the health daemon runs. Nobody queries it (the registrar does not delegate to

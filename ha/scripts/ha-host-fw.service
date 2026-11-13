@@ -1,0 +1,17 @@
+[Unit]
+Description=HA host firewall (public: 22/80/443 only; WireGuard from peer only)
+After=docker.service network-online.target
+Wants=network-online.target
+# Re-apply when docker restarts (it recreates DOCKER-USER on a fresh start).
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/ha-host-fw.sh start
+ExecStop=/usr/local/sbin/ha-host-fw.sh stop
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target docker.service

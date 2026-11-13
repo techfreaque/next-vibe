@@ -4,7 +4,7 @@
 # (Server 1 prod-postgres) on Server 2, plus the manual failover lever.
 #
 # Runs ON Server 2. Replication goes over WireGuard to 10.88.0.1:5432 (the
-# pg-wg-forward socat in front of prod-postgres) as role `replicator`, through
+# pg-wg-forward HAProxy TCP forwarder in front of prod-postgres) as role `replicator`, through
 # the physical slot `s2_replica` (S1 caps retained WAL with
 # max_slot_wal_keep_size, so a dead S2 can never fill S1's disk).
 #
