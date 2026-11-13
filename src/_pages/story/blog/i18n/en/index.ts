@@ -155,6 +155,9 @@ export const translations = {
     subtitle:
       "Architecture deep dives and product updates when they ship. No filler, unsubscribe in one click.",
     newsletter: "Get the newsletter",
+    subscribedTitle: "You are on the list.",
+    subscribedSubtitle:
+      "New posts land in your inbox the day they ship. Until then, dig into the framework behind them.",
     framework: "Explore next-vibe",
   },
   labels: {

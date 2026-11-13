@@ -14,7 +14,7 @@ import { NewsletterStatusRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, t, logger }) =>
-      NewsletterStatusRepository.getStatus(data, t, logger),
+    handler: ({ data, user, t, logger }) =>
+      NewsletterStatusRepository.getStatus(data, user, t, logger),
   },
 });

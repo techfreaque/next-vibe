@@ -18,11 +18,13 @@ export const translations: typeof enTranslations = {
     description:
       "Adres e-mail, dla którego chcesz sprawdzić status subskrypcji",
     placeholder: "użytkownik@przykład.pl",
-    helpText: "Wprowadź adres e-mail, który chcesz sprawdzić",
+    helpText: "Zostaw puste, aby sprawdzić własną subskrypcję",
   },
   response: {
     subscribed: "Status subskrypcji",
     status: "Aktualny status",
+    confirmed: "Potwierdzona",
+    email: "Adres e-mail",
   },
   errors: {
     validation: {

@@ -8,18 +8,22 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { InputChangeEvent } from "next-vibe/ui/components/input";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { EndpointReturn } from "next-vibe/unified-ui/hooks/endpoint-types";
 import {
   createCustomStateKey,
+  queryClient,
   useCustomState,
 } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { z } from "zod";
 
+import { useLayoutNewsletterStatus } from "./_components/newsletter-status-provider";
 import { scopedTranslation } from "./i18n";
+import type { StatusGetResponseOutput } from "./status/definition";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
@@ -29,6 +33,16 @@ const newsletterEmailSchema = z.email();
 /****************************
  * TYPED STATE KEYS
  ****************************/
+
+/**
+ * Status queries use their own cache keys: the status endpoint's GET form
+ * state is shared per endpoint, so the own-status query (no email) and
+ * per-address checks would otherwise overwrite each other.
+ */
+// eslint-disable-next-line i18next/no-literal-string
+const NEWSLETTER_STATUS_QUERY_PREFIX = "newsletter-status";
+// eslint-disable-next-line i18next/no-literal-string
+const OWN_NEWSLETTER_STATUS_QUERY_KEY = "newsletter-status-own";
 
 // eslint-disable-next-line i18next/no-literal-string
 const manualEmailKey = createCustomStateKey<string>("newsletter_manual_email");
@@ -59,6 +73,8 @@ export function useNewsletterStatus(
       read: {
         queryOptions: {
           enabled: params.enabled !== false,
+          // Per-address cache, separate from the own-status query
+          queryKey: `${NEWSLETTER_STATUS_QUERY_PREFIX}-${params.email}`,
         },
         initialState: { email: params.email },
       },
@@ -66,6 +82,86 @@ export function useNewsletterStatus(
     logger,
     user,
   );
+}
+
+/****************************
+ * PROMO STATE (shared by every newsletter prompt)
+ ****************************/
+
+/**
+ * Where the visitor stands, from their OWN subscription (account email, user,
+ * linked leads, or the guest's lead):
+ * - loading: unknown yet. Render nothing promo-shaped (or a same-size skeleton).
+ * - confirmed: subscribed and confirmed. Hide every promo.
+ * - pending: subscribed, confirm link not clicked. "Check your inbox" + resend.
+ * - none: not subscribed. Show the form.
+ */
+export type NewsletterPromoState = "loading" | "confirmed" | "pending" | "none";
+
+export interface NewsletterPromo {
+  state: NewsletterPromoState;
+  /** Address of the pending/confirmed subscription, or the account email */
+  email: string | undefined;
+  isGuest: boolean;
+}
+
+export function toNewsletterPromoState(
+  status: StatusGetResponseOutput | undefined,
+): NewsletterPromoState {
+  if (!status) {
+    return "loading";
+  }
+  if (!status.subscribed) {
+    return "none";
+  }
+  return status.confirmed ? "confirmed" : "pending";
+}
+
+/**
+ * The one source of truth for "should I show a newsletter prompt here?".
+ * Pass `initialStatus` from a server loader (NewsletterStatusRepository
+ * .getOwnStatusSafe) so SSR renders the right state with no flash.
+ */
+export function useNewsletterPromo(
+  user: JwtPayloadType,
+  initialStatus?: StatusGetResponseOutput,
+): NewsletterPromo {
+  const logger = useLogger();
+  // Explicit prop first, then whatever the page layout loaded on the server
+  const layoutStatus = useLayoutNewsletterStatus();
+  const seedStatus = initialStatus ?? layoutStatus;
+  const endpoint = useEndpoint(
+    statusEndpoints,
+    {
+      read: {
+        queryOptions: { queryKey: OWN_NEWSLETTER_STATUS_QUERY_KEY },
+        initialState: {},
+        initialData: seedStatus,
+      },
+    },
+    logger,
+    user,
+  );
+  const response = endpoint.read?.response;
+  const status = response?.success ? response.data : seedStatus;
+  // A failed lookup must not hide the form forever: treat as not subscribed
+  const state =
+    response && !response.success ? "none" : toNewsletterPromoState(status);
+  return {
+    state,
+    email: status?.subscriptionEmail,
+    isGuest: user.isPublic,
+  };
+}
+
+/** Re-read the visitor's own status after a subscribe/unsubscribe/resend. */
+export async function refetchOwnNewsletterStatus(
+  logger: EndpointLogger,
+): Promise<void> {
+  logger.debug("Refetching own newsletter status");
+  await queryClient.invalidateQueries({
+    queryKey: [OWN_NEWSLETTER_STATUS_QUERY_KEY],
+  });
 }
 
 /****************************
@@ -184,6 +280,16 @@ export function useNewsletterManager(
       : (subscriptionEndpoint.create?.isSuccess ?? false)
         ? true
         : isSubscribed;
+
+  // Keep every state-aware prompt (footer, profile, sidebar) in sync with
+  // what this form just did.
+  const subscribeSucceeded = subscriptionEndpoint.create?.isSuccess ?? false;
+  const unsubscribeSucceeded = unsubscribeEndpoint.create?.isSuccess ?? false;
+  useEffect(() => {
+    if (subscribeSucceeded || unsubscribeSucceeded) {
+      void refetchOwnNewsletterStatus(logger);
+    }
+  }, [subscribeSucceeded, unsubscribeSucceeded, logger]);
 
   // Single notification state
   const notification: NewsletterManagerResult["notification"] =

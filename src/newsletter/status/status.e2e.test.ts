@@ -51,6 +51,7 @@ describe("E2E: newsletter status", () => {
     expect(result.response.data).toEqual({
       subscribed: true,
       status: NewsletterSubscriptionStatus.SUBSCRIBED,
+      confirmed: false,
     });
   });
 

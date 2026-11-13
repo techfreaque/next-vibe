@@ -440,6 +440,7 @@ export const translations = {
       title: "Newsletter",
       subtitle:
         "Updates in your inbox, plus {{bonusCredits}} extra free credits a month",
+      subtitleNeutral: "New models and product drops, in your inbox",
     },
     loadState: {
       loading: "Loading...",

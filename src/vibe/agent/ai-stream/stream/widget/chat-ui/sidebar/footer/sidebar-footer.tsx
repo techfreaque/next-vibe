@@ -31,9 +31,8 @@ import {
 import type { JSX } from "react";
 
 import { useCredits } from "@/credits/hooks";
-import { useNewsletterManager } from "@/newsletter/hooks";
+import { useNewsletterPromo } from "@/newsletter/hooks";
 import { FREE_CREDIT_MAX_TOTAL } from "@/products/constants";
-import { useUser } from "@/user/private/me/hooks";
 
 import { useChatBootContext } from "../../../../../../chat/hooks/context";
 import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
@@ -71,16 +70,11 @@ export function SidebarFooter({
   // Determine if user is logged in
   const isLoggedIn = user && !user.isPublic;
 
-  // Hide the Newsletter nav entry for logged-in users who are already
-  // subscribed. Guests (public users) always see it so they can sign up.
-  // We read the subscription status by the user's own email, same source the
-  // profile hub uses, so this stays in sync with the real subscribe/unsubscribe
-  // state rather than always showing a dead "Newsletter" link.
-  const { user: meProfile } = useUser(user, logger);
-  const myEmail =
-    meProfile && !meProfile.isPublic ? meProfile.email : undefined;
-  const { isSubscribed } = useNewsletterManager(user, myEmail);
-  const showNewsletterLink = !isLoggedIn || !isSubscribed;
+  // Newsletter nav entry only for visitors who are not on the list yet
+  // (guests and accounts). Same own-status source as every other newsletter
+  // prompt; hidden while unknown so it never shows then vanishes.
+  const newsletterPromo = useNewsletterPromo(user);
+  const showNewsletterLink = newsletterPromo.state === "none";
 
   return (
     <Div className="border-t border-border bg-background">
@@ -244,7 +238,7 @@ export function SidebarFooter({
                 </Button>
               </Link>
 
-              {/* Newsletter (hidden once the logged-in user is subscribed) */}
+              {/* Newsletter (only while not subscribed) */}
               {showNewsletterLink && (
                 <Link href={`/${locale}/story/newsletter`}>
                   <Button

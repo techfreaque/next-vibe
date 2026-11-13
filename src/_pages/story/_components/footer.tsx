@@ -28,7 +28,9 @@ import type React from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
+import { NewsletterPromoGate } from "@/newsletter/_components/newsletter-promo-gate";
 import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
+import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
 
 import { Logo } from "../../_components/logo";
 import { scopedTranslation } from "./i18n";
@@ -39,6 +41,8 @@ interface FooterProps {
   isPublic: boolean;
   user: JwtPayloadType;
   userEmail: string | undefined;
+  /** Visitor's own newsletter status (SSR) so the promo never flashes */
+  newsletterStatus: StatusGetResponseOutput | undefined;
 }
 
 /** Server-rendered — kept outside the component body so render stays pure. */
@@ -52,6 +56,7 @@ const Footer: React.FC<FooterProps> = ({
   isPublic,
   user,
   userEmail,
+  newsletterStatus,
 }) => {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -60,25 +65,29 @@ const Footer: React.FC<FooterProps> = ({
   return (
     <FooterContainer className="w-full border-t border-border bg-muted/40">
       <Div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 md:py-16">
-        {/* Newsletter capture — appears on every non-home story page */}
-        <Div className="mb-10 flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 md:mb-14 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
-          <Div className="flex flex-col gap-1.5 md:max-w-sm">
-            <H3 className="m-0 border-0 p-0 text-base font-semibold text-foreground">
-              {t("footer.newsletter.title")}
-            </H3>
-            <P className="text-sm text-muted-foreground">
-              {t("footer.newsletter.subtitle")}
-            </P>
+        {/* Newsletter capture on every non-home story page. The whole card
+            drops for confirmed subscribers; pending shows "check your inbox". */}
+        <NewsletterPromoGate user={user} initialStatus={newsletterStatus}>
+          <Div className="mb-10 flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 md:mb-14 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
+            <Div className="flex flex-col gap-1.5 md:max-w-sm">
+              <H3 className="m-0 border-0 p-0 text-base font-semibold text-foreground">
+                {t("footer.newsletter.title")}
+              </H3>
+              <P className="text-sm text-muted-foreground">
+                {t("footer.newsletter.subtitle")}
+              </P>
+            </Div>
+            <Div className="w-full md:max-w-md">
+              <NewsletterSubscribeInline
+                locale={locale}
+                user={user}
+                userEmail={userEmail}
+                variant="compact"
+                initialStatus={newsletterStatus}
+              />
+            </Div>
           </Div>
-          <Div className="w-full md:max-w-md">
-            <NewsletterSubscribeInline
-              locale={locale}
-              user={user}
-              userEmail={userEmail}
-              variant="compact"
-            />
-          </Div>
-        </Div>
+        </NewsletterPromoGate>
 
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}

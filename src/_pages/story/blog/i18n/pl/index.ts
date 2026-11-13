@@ -160,6 +160,9 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Architektura od kuchni i nowości w produkcie, gdy tylko wyjdą. Bez lania wody, wypis jednym kliknięciem.",
     newsletter: "Zapisz się do newslettera",
+    subscribedTitle: "Jesteś na liście.",
+    subscribedSubtitle:
+      "Nowe wpisy trafią do Twojej skrzynki w dniu publikacji. A do tego czasu poznaj framework, który za nimi stoi.",
     framework: "Poznaj next-vibe",
   },
   labels: {

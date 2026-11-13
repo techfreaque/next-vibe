@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { AuthRepository } from "next-vibe/identity/auth/repository";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
@@ -15,12 +19,14 @@ import type { JSX } from "react";
 
 import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
+import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 
 import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
-export const revalidate = 3600;
+// Per-visitor newsletter CTA (the story layout is force-dynamic anyway)
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -47,13 +53,28 @@ export const generateMetadata = async ({
 
 export interface BlogIndexPageData {
   locale: CountryLanguage;
+  /** Visitor is on the newsletter list (confirmed or pending): no signup CTA */
+  onNewsletterList: boolean;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<BlogIndexPageData> {
   const { locale } = await params;
-  return { locale };
+  const logger = createEndpointLogger(false, locale);
+  const user = await AuthRepository.getAuthMinimalUser(
+    [UserRole.PUBLIC, UserRole.CUSTOMER],
+    { platform: Platform.NEXT_PAGE, locale },
+    logger,
+  );
+  const newsletterStatus = await NewsletterStatusRepository.getOwnStatusSafe(
+    user,
+    logger,
+  );
+  return {
+    locale,
+    onNewsletterList: newsletterStatus?.subscribed === true,
+  };
 }
 
 interface BlogCardData {
@@ -139,7 +160,10 @@ function PostCard({
   );
 }
 
-export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  onNewsletterList,
+}: BlogIndexPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
@@ -304,24 +328,37 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
         </Div>
       </Section>
 
-      <CtaBand
-        title={t("cta.title")}
-        subtitle={t("cta.subtitle")}
-        actions={
-          <>
-            <Cta
-              href={`/${locale}/story/newsletter`}
-              label={t("cta.newsletter")}
-              icon={Mail}
-            />
+      {onNewsletterList ? (
+        <CtaBand
+          title={t("cta.subscribedTitle")}
+          subtitle={t("cta.subscribedSubtitle")}
+          actions={
             <Cta
               href={`/${locale}/story/framework`}
               label={t("cta.framework")}
-              variant="secondary"
             />
-          </>
-        }
-      />
+          }
+        />
+      ) : (
+        <CtaBand
+          title={t("cta.title")}
+          subtitle={t("cta.subtitle")}
+          actions={
+            <>
+              <Cta
+                href={`/${locale}/story/newsletter`}
+                label={t("cta.newsletter")}
+                icon={Mail}
+              />
+              <Cta
+                href={`/${locale}/story/framework`}
+                label={t("cta.framework")}
+                variant="secondary"
+              />
+            </>
+          }
+        />
+      )}
     </Div>
   );
 }

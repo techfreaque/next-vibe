@@ -18,11 +18,13 @@ export const translations: typeof enTranslations = {
     description:
       "Die E-Mail-Adresse, für die der Abonnementstatus geprüft werden soll",
     placeholder: "benutzer@beispiel.de",
-    helpText: "Geben Sie die E-Mail-Adresse ein, die Sie prüfen möchten",
+    helpText: "Leer lassen, um Ihr eigenes Abo zu prüfen",
   },
   response: {
     subscribed: "Abonnementstatus",
     status: "Aktueller Status",
+    confirmed: "Bestätigt",
+    email: "E-Mail-Adresse",
   },
   errors: {
     validation: {

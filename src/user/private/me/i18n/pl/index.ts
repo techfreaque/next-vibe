@@ -447,6 +447,7 @@ export const translations: typeof enTranslations = {
       title: "Newsletter",
       subtitle:
         "Aktualności na skrzynkę i dodatkowe {{bonusCredits}} darmowych kredytów miesięcznie",
+      subtitleNeutral: "Nowe modele i nowości prosto na skrzynkę",
     },
     loadState: {
       loading: "Ładowanie...",

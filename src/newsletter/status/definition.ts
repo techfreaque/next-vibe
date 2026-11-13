@@ -61,7 +61,9 @@ const { GET } = createEndpoint({
         placeholder: "email.placeholder",
         helpText: "email.helpText",
         columns: 12,
-        schema: z.email(),
+        // Optional: left empty, the caller's own subscription is looked up
+        // (account email, user id and linked leads, or the guest's lead).
+        schema: z.email().optional(),
         order: 1,
       }),
       // RESPONSE FIELDS
@@ -74,6 +76,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "response.status",
         schema: z.string(),
+      }),
+      confirmed: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.confirmed",
+        schema: z.boolean(),
+      }),
+      subscriptionEmail: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.email",
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -130,19 +142,29 @@ const { GET } = createEndpoint({
       unsubscribed: {
         email: "unsubscribed@example.com",
       },
+      own: {},
     },
     responses: {
       basic: {
         subscribed: true,
         status: "SUBSCRIBED",
+        confirmed: true,
       },
       subscribed: {
         subscribed: true,
         status: "SUBSCRIBED",
+        confirmed: true,
       },
       unsubscribed: {
         subscribed: false,
         status: "UNSUBSCRIBED",
+        confirmed: false,
+      },
+      own: {
+        subscribed: true,
+        status: "SUBSCRIBED",
+        confirmed: false,
+        subscriptionEmail: "me@example.com",
       },
     },
   },

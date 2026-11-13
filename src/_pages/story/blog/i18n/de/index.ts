@@ -158,6 +158,9 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Architektur-Deep-Dives und Produkt-Updates, sobald sie live sind. Kein Füllstoff, Abmeldung mit einem Klick.",
     newsletter: "Newsletter abonnieren",
+    subscribedTitle: "Du bist auf der Liste.",
+    subscribedSubtitle:
+      "Neue Beiträge landen am Tag der Veröffentlichung in deinem Postfach. Bis dahin: das Framework dahinter.",
     framework: "next-vibe entdecken",
   },
   labels: {

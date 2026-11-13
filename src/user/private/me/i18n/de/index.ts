@@ -452,6 +452,7 @@ export const translations: typeof enTranslations = {
       title: "Newsletter",
       subtitle:
         "Updates in dein Postfach, plus {{bonusCredits}} Gratis-Credits extra im Monat",
+      subtitleNeutral: "Neue Modelle und Produkt-Updates im Postfach",
     },
     loadState: {
       loading: "Wird geladen...",

@@ -15,11 +15,13 @@ export const translations = {
     label: "Email Address",
     description: "The email address to check subscription status for",
     placeholder: "user@example.com",
-    helpText: "Enter the email address you want to check",
+    helpText: "Leave empty to check your own subscription",
   },
   response: {
     subscribed: "Subscription Status",
     status: "Current Status",
+    confirmed: "Confirmed",
+    email: "Email Address",
   },
   errors: {
     validation: {

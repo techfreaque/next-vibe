@@ -112,6 +112,7 @@ import {
 import creditsDef from "@/credits/definition";
 import configDef from "@/lead-magnet/config/definition";
 import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-subscribe-inline";
+import { useNewsletterPromo } from "@/newsletter/hooks";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
@@ -833,6 +834,8 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
     error: profileError,
   } = useUser(user, logger);
   const profile = profileRaw && !profileRaw.isPublic ? profileRaw : undefined;
+  // Same own-status source as every other newsletter prompt
+  const newsletterPromo = useNewsletterPromo(user);
 
   const [editing, setEditing] = useState(false);
   const [liveAvatarUrl, setLiveAvatarUrl] = useState<string | null>(null);
@@ -1514,9 +1517,14 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
       {/* ── NEWSLETTER ── */}
       <HubSection
         title={t("widget.newsletter.title")}
-        subtitle={t("widget.newsletter.subtitle", {
-          bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
-        })}
+        subtitle={
+          newsletterPromo.state === "none" ||
+          newsletterPromo.state === "pending"
+            ? t("widget.newsletter.subtitle", {
+                bonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus,
+              })
+            : t("widget.newsletter.subtitleNeutral")
+        }
       >
         <Div className="p-3.5">
           <NewsletterSubscribeInline
@@ -1524,6 +1532,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
             user={user}
             userEmail={profile?.email}
             variant="card"
+            showSubscribedNotice
           />
         </Div>
       </HubSection>

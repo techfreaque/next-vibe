@@ -26,7 +26,8 @@ import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
-import { useNewsletterManager } from "@/newsletter/hooks";
+import { NewsletterPendingNotice } from "@/newsletter/_components/newsletter-subscribe-inline";
+import { useNewsletterManager, useNewsletterPromo } from "@/newsletter/hooks";
 
 import {
   Callout,
@@ -70,6 +71,8 @@ export function NewsletterPage({
     isSubscribed,
     handleEmailChange,
   } = useNewsletterManager(user, userEmail);
+  // The visitor's OWN subscription (also covers guests whose lead subscribed)
+  const promo = useNewsletterPromo(user);
 
   // Track if we've already set the prefilled email to prevent infinite loops
   const hasSetPrefilledEmail = useRef(false);
@@ -94,6 +97,23 @@ export function NewsletterPage({
 
   const hasPrefilledEmail =
     prefilledEmail !== undefined && prefilledEmail.length > 0;
+
+  // A returning guest whose lead is on the list: show their address and its
+  // real state instead of an empty "Subscribe" form.
+  const ownEmail = promo.email;
+  useEffect(() => {
+    if (!isLoggedIn && !hasPrefilledEmail && !email && ownEmail) {
+      setEmail(ownEmail);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ownEmail, isLoggedIn, hasPrefilledEmail]);
+
+  // Pending double opt-in for the address in the form
+  const isPendingHere =
+    isSubscribed &&
+    promo.state === "pending" &&
+    promo.email !== undefined &&
+    promo.email.toLowerCase() === email.toLowerCase();
 
   const benefits = [
     {
@@ -206,23 +226,36 @@ export function NewsletterPage({
                 {submitLabel}
               </Button>
 
-              {notification && (
-                <Div
-                  className={cn(
-                    "rounded-lg border p-3 text-sm",
-                    notification.type === "error" &&
-                      "border-destructive/30 bg-destructive/10 text-destructive",
-                    notification.type === "success" &&
-                      "border-success/30 bg-success/10 text-success",
-                    notification.type === "info" &&
-                      "border-primary/30 bg-primary/10 text-primary",
-                    notification.type === "confirm" &&
-                      "border-warning/30 bg-warning/10 text-warning",
-                  )}
-                >
-                  {notification.message}
-                </Div>
+              {isPendingHere && !showConfirmUnsubscribe && (
+                <NewsletterPendingNotice
+                  locale={locale}
+                  user={user}
+                  email={email}
+                />
               )}
+
+              {notification &&
+                !(
+                  isPendingHere &&
+                  (notification.type === "info" ||
+                    notification.type === "success")
+                ) && (
+                  <Div
+                    className={cn(
+                      "rounded-lg border p-3 text-sm",
+                      notification.type === "error" &&
+                        "border-destructive/30 bg-destructive/10 text-destructive",
+                      notification.type === "success" &&
+                        "border-success/30 bg-success/10 text-success",
+                      notification.type === "info" &&
+                        "border-primary/30 bg-primary/10 text-primary",
+                      notification.type === "confirm" &&
+                        "border-warning/30 bg-warning/10 text-warning",
+                    )}
+                  >
+                    {notification.message}
+                  </Div>
+                )}
             </Form>
 
             <Div className="mt-5 flex flex-col gap-1 border-t border-border pt-4 text-sm text-muted-foreground">
@@ -267,22 +300,25 @@ export function NewsletterPage({
         </Callout>
       </PageSection>
 
-      <CtaBand
-        title={t("page.cta.title")}
-        subtitle={t("page.cta.description")}
-        actions={
-          <Button
-            onClick={() => {
-              scrollToTop();
-            }}
-            size="lg"
-            className="h-12 w-full gap-2 px-6 text-base font-medium sm:w-auto"
-          >
-            <Send className="h-4 w-4" />
-            {t("page.cta.subscribeButton")}
-          </Button>
-        }
-      />
+      {/* Bottom subscribe CTA only for visitors not on the list */}
+      {!isSubscribed && (
+        <CtaBand
+          title={t("page.cta.title")}
+          subtitle={t("page.cta.description")}
+          actions={
+            <Button
+              onClick={() => {
+                scrollToTop();
+              }}
+              size="lg"
+              className="h-12 w-full gap-2 px-6 text-base font-medium sm:w-auto"
+            >
+              <Send className="h-4 w-4" />
+              {t("page.cta.subscribeButton")}
+            </Button>
+          }
+        />
+      )}
     </Div>
   );
 }

@@ -20,6 +20,9 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/_pages/story/_components/footer";
 import { Navbar } from "@/_pages/story/_components/nav/navbar";
+import { NewsletterStatusProvider } from "@/newsletter/_components/newsletter-status-provider";
+import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
+import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { SubscriptionRepository } from "@/subscription/repository";
 
@@ -34,6 +37,8 @@ export interface SiteLayoutData {
   userProfile: StandardUserType | undefined;
   hasSubscription: boolean;
   totalModelCount: number;
+  /** Visitor's own newsletter status, so footer promos render right on SSR */
+  newsletterStatus: StatusGetResponseOutput | undefined;
   isHomePage: boolean;
   children?: ReactNode;
 }
@@ -88,6 +93,11 @@ export async function tanstackLoader({
   const isHomePage =
     normalizedPath === `/${locale}/story` || normalizedPath === `/${locale}`;
 
+  const newsletterStatus = await NewsletterStatusRepository.getOwnStatusSafe(
+    user,
+    logger,
+  );
+
   return {
     locale,
     user,
@@ -95,6 +105,7 @@ export async function tanstackLoader({
     hasSubscription,
     totalModelCount,
     isHomePage,
+    newsletterStatus,
   };
 }
 
@@ -105,34 +116,38 @@ export function TanstackPage({
   hasSubscription,
   totalModelCount,
   isHomePage,
+  newsletterStatus,
   children,
 }: SiteLayoutData): JSX.Element {
   return (
-    <PageLayout scrollable={true}>
-      <Main className="min-h-screen ">
-        <Navbar
-          user={user}
-          userProfile={userProfile}
-          locale={locale}
-          hasSubscription={hasSubscription}
-          navigationItems={navItems}
-          totalModelCount={totalModelCount}
-        />
-        {children}
-        <Div
-          id={SITE_FOOTER_ID}
-          style={isHomePage ? { display: "none" } : undefined}
-        >
-          <Footer
-            locale={locale}
-            totalModelCount={totalModelCount}
-            isPublic={user.isPublic}
+    <NewsletterStatusProvider status={newsletterStatus}>
+      <PageLayout scrollable={true}>
+        <Main className="min-h-screen ">
+          <Navbar
             user={user}
-            userEmail={userProfile?.email}
+            userProfile={userProfile}
+            locale={locale}
+            hasSubscription={hasSubscription}
+            navigationItems={navItems}
+            totalModelCount={totalModelCount}
           />
-        </Div>
-      </Main>
-    </PageLayout>
+          {children}
+          <Div
+            id={SITE_FOOTER_ID}
+            style={isHomePage ? { display: "none" } : undefined}
+          >
+            <Footer
+              locale={locale}
+              totalModelCount={totalModelCount}
+              isPublic={user.isPublic}
+              user={user}
+              userEmail={userProfile?.email}
+              newsletterStatus={newsletterStatus}
+            />
+          </Div>
+        </Main>
+      </PageLayout>
+    </NewsletterStatusProvider>
   );
 }
 

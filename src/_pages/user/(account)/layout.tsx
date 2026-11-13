@@ -17,6 +17,9 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/_pages/story/_components/footer";
 import { Navbar } from "@/_pages/story/_components/nav/navbar";
+import { NewsletterStatusProvider } from "@/newsletter/_components/newsletter-status-provider";
+import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
+import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { SubscriptionRepository } from "@/subscription/repository";
 
@@ -28,6 +31,8 @@ export interface AccountLayoutData {
   userProfile: StandardUserType | undefined;
   hasSubscription: boolean;
   totalModelCount: number;
+  /** Visitor's own newsletter status, so footer promos render right on SSR */
+  newsletterStatus: StatusGetResponseOutput | undefined;
   children?: ReactNode;
 }
 
@@ -76,7 +81,19 @@ export async function tanstackLoader({
     await getEnvAvailability(),
   );
 
-  return { locale, user, userProfile, hasSubscription, totalModelCount };
+  const newsletterStatus = await NewsletterStatusRepository.getOwnStatusSafe(
+    user,
+    logger,
+  );
+
+  return {
+    locale,
+    user,
+    userProfile,
+    hasSubscription,
+    totalModelCount,
+    newsletterStatus,
+  };
 }
 
 export function TanstackPage({
@@ -85,29 +102,33 @@ export function TanstackPage({
   userProfile,
   hasSubscription,
   totalModelCount,
+  newsletterStatus,
   children,
 }: AccountLayoutData): JSX.Element {
   return (
-    <PageLayout scrollable={true}>
-      <Main className="min-h-screen">
-        <Navbar
-          user={user}
-          userProfile={userProfile}
-          locale={locale}
-          hasSubscription={hasSubscription}
-          navigationItems={accountNavItems}
-          totalModelCount={totalModelCount}
-        />
-        {children}
-        <Footer
-          locale={locale}
-          totalModelCount={totalModelCount}
-          isPublic={user.isPublic}
-          user={user}
-          userEmail={userProfile?.email}
-        />
-      </Main>
-    </PageLayout>
+    <NewsletterStatusProvider status={newsletterStatus}>
+      <PageLayout scrollable={true}>
+        <Main className="min-h-screen">
+          <Navbar
+            user={user}
+            userProfile={userProfile}
+            locale={locale}
+            hasSubscription={hasSubscription}
+            navigationItems={accountNavItems}
+            totalModelCount={totalModelCount}
+          />
+          {children}
+          <Footer
+            locale={locale}
+            totalModelCount={totalModelCount}
+            isPublic={user.isPublic}
+            user={user}
+            userEmail={userProfile?.email}
+            newsletterStatus={newsletterStatus}
+          />
+        </Main>
+      </PageLayout>
+    </NewsletterStatusProvider>
   );
 }
 

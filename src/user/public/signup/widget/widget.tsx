@@ -59,6 +59,7 @@ import {
   FREE_CREDIT_ALLOWANCE,
   FREE_CREDIT_MAX_TOTAL,
 } from "@/products/constants";
+import { useNewsletterPromo } from "@/newsletter/hooks";
 import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
@@ -101,6 +102,7 @@ export function SignupFormContainer({
   const form = useWidgetForm();
   const t = useWidgetTranslation<typeof definition.POST>();
   const user = useWidgetUser();
+  const newsletterPromo = useNewsletterPromo(user);
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const data = useWidgetValue<typeof definition.POST>();
@@ -256,72 +258,76 @@ export function SignupFormContainer({
         />
         <PasswordMatchIndicator />
 
-        {/* Newsletter opt-in: explicit, never pre-ticked, details in the tooltip */}
-        <FormField
-          control={form.control}
-          name="subscribeToNewsletter"
-          render={({ field: formField }) => (
-            <FormItem className="space-y-2">
-              <Div className="flex items-start gap-3">
-                <FormControl>
-                  <Checkbox
-                    id={formField.name}
-                    name={formField.name}
-                    checked={formField.value === true}
-                    onCheckedChange={(checked) =>
-                      formField.onChange(checked === true)
-                    }
-                    className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                </FormControl>
-                <Div className="flex flex-col gap-0.5">
-                  <Div className="flex items-start gap-1.5">
+        {/* Newsletter opt-in: explicit, never pre-ticked, details in the tooltip.
+            Dropped when this visitor's lead already holds a confirmed
+            subscription: it carries over to the new account on its own. */}
+        {newsletterPromo.state !== "confirmed" && (
+          <FormField
+            control={form.control}
+            name="subscribeToNewsletter"
+            render={({ field: formField }) => (
+              <FormItem className="space-y-2">
+                <Div className="flex items-start gap-3">
+                  <FormControl>
+                    <Checkbox
+                      id={formField.name}
+                      name={formField.name}
+                      checked={formField.value === true}
+                      onCheckedChange={(checked) =>
+                        formField.onChange(checked === true)
+                      }
+                      className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                  </FormControl>
+                  <Div className="flex flex-col gap-0.5">
+                    <Div className="flex items-start gap-1.5">
+                      <Label
+                        htmlFor={formField.name}
+                        className="cursor-pointer text-sm font-medium leading-snug"
+                      >
+                        {t(
+                          "fields.subscribeToNewsletter.checkboxLabel",
+                          newsletterCredits,
+                        )}
+                      </Label>
+                      <TooltipProvider delayDuration={300}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="mt-0.5 inline-flex h-auto shrink-0 cursor-help p-0"
+                              aria-label={t(
+                                "fields.subscribeToNewsletter.tooltip",
+                                newsletterCredits,
+                              )}
+                            >
+                              <Info className="h-3.5 w-3.5 text-muted-foreground transition-colors hover:text-foreground" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[260px]">
+                            <Span className="text-sm">
+                              {t(
+                                "fields.subscribeToNewsletter.tooltip",
+                                newsletterCredits,
+                              )}
+                            </Span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Div>
                     <Label
                       htmlFor={formField.name}
-                      className="cursor-pointer text-sm font-medium leading-snug"
+                      className="cursor-pointer text-xs font-normal leading-snug text-muted-foreground"
                     >
-                      {t(
-                        "fields.subscribeToNewsletter.checkboxLabel",
-                        newsletterCredits,
-                      )}
+                      {t("fields.subscribeToNewsletter.hint")}
                     </Label>
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="mt-0.5 inline-flex h-auto shrink-0 cursor-help p-0"
-                            aria-label={t(
-                              "fields.subscribeToNewsletter.tooltip",
-                              newsletterCredits,
-                            )}
-                          >
-                            <Info className="h-3.5 w-3.5 text-muted-foreground transition-colors hover:text-foreground" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[260px]">
-                          <Span className="text-sm">
-                            {t(
-                              "fields.subscribeToNewsletter.tooltip",
-                              newsletterCredits,
-                            )}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                   </Div>
-                  <Label
-                    htmlFor={formField.name}
-                    className="cursor-pointer text-xs font-normal leading-snug text-muted-foreground"
-                  >
-                    {t("fields.subscribeToNewsletter.hint")}
-                  </Label>
                 </Div>
-              </Div>
-            </FormItem>
-          )}
-        />
+              </FormItem>
+            )}
+          />
+        )}
         {/* Accept Terms - same layout as the newsletter opt-in, with linked terms/conditions */}
         <FormField
           control={form.control}
