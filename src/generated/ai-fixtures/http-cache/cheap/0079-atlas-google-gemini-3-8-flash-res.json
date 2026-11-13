@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e36080b02bbaa-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:44:31 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577466-lqhMmX51xrnGGKhVB9eQ",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=RXz0D.TrcNvFiPzisVa.zZ_imonxy4aZ6wjeORmT6N8-1794577465.606999-1.0.1.1-GJijRkGW0O1ejYZ9cp8Wc2KrGkYeA3Dobu9WPXo1kngLQ8G4hMDftZ6FJjlkLt4CwFqGDy_KSEDxbCCHXp95E8V8YLo5F7QC1d12GDkzFr6w5LAEjmypFLO2Y3.tIR_H; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:14:31 GMT"
+  },
+  "body": {
+    "id": "gen-1794577466-lqhMmX51xrnGGKhVB9eQ",
+    "object": "chat.completion",
+    "created": 1794577466,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview and Structure\nThis is a 25-second instrumental excerpt of a relaxed, jazzy hip-hop / boom-bap beat with neo-soul and lo-fi influences. The track operates in standard 4/4 time signature at a steady mid-tempo groove of approximately 88–90 BPM. It functions as a looping musical groove featuring repetitive melodic phrasing and signature percussive sound effects, ending on a transitional drum fill and sweep. There are no vocals or spoken words present.\n\n### Instrumentation and Rhythm\n- **Drums & Percussion:** \n  - A dry, punchy boom-bap drum pattern drives the track.\n  - A round, resonant kick drum hits firmly on beat 1 with syncopated off-beat hits anticipating the backbeat.\n  - A crisp, snappy acoustic/layered snare (blended with a subtle clap texture) reliably strikes on beats 2 and 4.\n  - Closed hi-hats maintain an eighth-note rhythm with slight swing, embellished by occasional subtle velocity dynamics and soft sixteenth-note ticks.\n- **Keys / Chords:** \n  - A warm, electric piano (Rhodes-style synthesizer) plays a rich, jazzy, soulful chord progression.\n  - The chords are voiced with slight chorus and gentle stereo tremolo modulation, creating an intimate, nostalgic harmonic bed.\n- **Bass:** \n  - A smooth, deep sub-bass line supports the chords, tracing the root notes with rounded low-end warmth that locks tightly with the kick drum.\n\n### Sound Effects and Micro-Events\n- **Rising Whistle/Chirp SFX:** At regular intervals (occurring roughly every 4 to 5 seconds: ~00:00, ~00:05, ~00:11, ~00:16, and ~00:21), a distinct, high-pitched metallic rising pitch-bend sound effect (similar to a synthesized slide whistle or retro video game sound) chirps cleanly in the upper register.\n- **Transition / Outro (00:22 – 00:25):** \n  - At 00:22–00:23, a descending pitch/laser-style power-down sweep drops across the frequency spectrum.\n  - The main groove drops out for a brief, snappy syncopated snare/tom drum fill from 00:23 to 00:24.\n  - The audio cuts off sharply at 00:25 right as the next measure would begin.\n\n### Production and Audio Characteristics\n- **Production Style:** Polished modern beat production with deliberate vintage/lo-fi warmth, tight transient control on the percussion, and a spacious stereo field.\n- **Tone & Mood:** Relaxed, mellow, reflective, and head-nodding.\n- **Audio Quality:** Clean digital stereo mix with no unwanted background noise or clipping.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Characteristics**\n\nI'm currently focused on dissecting the sonic elements of this track. My initial impressions point towards an instrumental hip-hop foundation, likely within the boom bap or lo-fi sphere, with neo-soul inflections. The tempo hovers around 88-90 BPM in a standard 4/4 time signature. I'm particularly interested in the drum patterns.\n\n**Drilling Into Rhythmic Details**\n\nMy latest analysis zeroes in on the percussion. I'm hearing a definite boom-bap influence with a swung feel. The kick hits on 1 and a syncopated beat before 3, while the snare lands on 2 and 4. Hi-hats are steady with subtle 16th-note flourishes.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Characteristics**\n\nI'm currently focused on dissecting the sonic elements of this track. My initial impressions point towards an instrumental hip-hop foundation, likely within the boom bap or lo-fi sphere, with neo-soul inflections. The tempo hovers around 88-90 BPM in a standard 4/4 time signature. I'm particularly interested in the drum patterns.\n\n**Drilling Into Rhythmic Details**\n\nMy latest analysis zeroes in on the percussion. I'm hearing a definite boom-bap influence with a swung feel. The kick hits on 1 and a syncopated beat before 3, while the snare lands on 2 and 4. Hi-hats are steady with subtle 16th-note flourishes.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1116,
+      "total_tokens": 2188,
+      "cost": 0.004989,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.004989,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.004185
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 493,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Called `payment-invoice-list` — it returned a valid response with an `invoices` array:\n\n```json\n{\"invoices\":[],\"total\":0}\n```\n\nThe `invoices` array is present and `total: 0` is consistent with the empty array (no invoices on this account). No errors, no missing field, no raw internal data leaking.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

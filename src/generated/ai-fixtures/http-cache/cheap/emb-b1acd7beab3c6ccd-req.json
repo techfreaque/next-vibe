@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both tools ran in parallel:\n\n1. **`cortex-write`** → `{\"created\":false,\"responsePath\":\"/memories/t8-parallel-test\",\"size\":14,...}` — `responsePath` present, 14 bytes matching `T8_PARALLEL_OK`. ✓\n2. **`chat-settings`** → returned a full settings object including `selectedSkill: \"thea__cheap\"`. ✓\n\nBoth returned their expected result shape and neither errored.\n\nHowever, per my standing quality-gate mandate to report anything off anywhere in the session, I have to flag one thing in the `chat-settings` payload:\n\n- **`viewMode` is a raw internal enum identifier (MINOR).** It returns `\"enums.viewMode.linear\"` instead of a clean value like `\"linear\"`. The `enums.viewMode.` prefix is a codegen/serialization artifact leaking into a user-facing API response — the same class of issue as a raw internal field name. A consumer reading this field gets an internal type path rather than a usable mode value.\n\nFAILED: `chat-settings` returns `viewMode` as a raw internal enum identifier (`\"enums.viewMode.linear\"`) instead of a clean value (`\"linear\"`) — an internal serialization artifact leaking into a user-facing field. (Both requested tools otherwise ran correctly: `cortex-write` returned a `responsePath`, `chat-settings` returned a `selectedSkill`.)",
+    "encoding_format": "float"
+  }
+}

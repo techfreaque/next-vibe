@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59dedfd6f32d386-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:55:19 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574515-9O3XXefhJ6DFeAWaPw0t",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=ynjXcy3Dm0R3MPfYHmFSOLhX51OLkVdnqd8N5OjN_hA-1794574514.785273-1.0.1.1-wjUud54uaMEgjACKhyzSI0mGtzE76bfzrXIMOC0fitFxjrYIt2WHZqaZtc4.4laEzxDzWh3STGWePdQ38GmGmCVlaar1ZsouR8.y1_AxGYd.bkSKcRUAwhriE4FPmNYk; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:25:19 GMT"
+  },
+  "body": {
+    "id": "gen-1794574515-9O3XXefhJ6DFeAWaPw0t",
+    "object": "chat.completion",
+    "created": 1794574515,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview and Genre\nThis is an instrumental hip-hop and neo-soul groove track, approximately 28 seconds in duration. It blends elements of classic boom-bap, modern lo-fi, and funk/jazz fusion, built around a bouncy bassline, warm electric guitar licks, and crisp, swinging percussion.\n\n### Tempo, Meter, and Key\n- **Tempo:** Approximately 88–90 BPM\n- **Time Signature:** 4/4\n- **Key/Tonal Center:** D minor (with a jazzy, modal funk progression)\n\n### Instrumentation and Sound Design\n- **Drums & Percussion:** \n  - A punchy, compressed acoustic-style kick drum hitting on downbeats and syncopated off-beats.\n  - A snappy, dry snare layered with a crisp finger-snap/clap texture on beats 2 and 4.\n  - Steady, swung eighth-note closed hi-hats with subtle open-hat accents at the end of bars.\n  - Light percussive foley/clicks providing textural depth in the stereo field.\n- **Bass:**\n  - A warm, rounded electric bass guitar tone playing an active, melodic, and syncopated funk line, locking closely with the kick drum while providing fluid melodic movement.\n- **Guitars:**\n  - Clean, DI-style electric guitar with light chorus and subtle envelope/wah coloration, performing tasteful staccato funk chords and short melodic fills/slides.\n- **Keys / Synths:**\n  - Soft Rhodes/electric piano chords providing background harmonic pad support.\n  - Occasional subtle pitch-bent synth accents and filtered transition sweeps.\n\n### Structural Timeline\n- **00:00 – 00:09:** Main groove is established. The rhythmic foundation kicks in immediately with the full drum pattern, the walking funk bassline, and syncopated clean guitar plucks.\n- **00:09 – 00:18:** Continuation of the primary loop, maintaining a steady, head-nodding groove with slight variations in the guitar ornamentation.\n- **00:18 – 00:22:** A brief transitional fill/breakdown occurs; the drums stutter and momentarily strip back, with a resonant low-pass filter effect or quick bass slide leading into the next phrase.\n- **00:22 – 00:28:** The beat drops back in with a deeper low-end presence, an added subtle melodic synth/flute accent, and a short vocal chop/sample flourish before the audio cuts off cleanly on the downbeat.\n\n### Production and Mood\n- **Production Style:** Highly polished studio production with tight low-end management, dry and close-mic'd drum textures, and pristine stereo separation.\n- **Mood / Vibe:** Chill, confident, rhythmic, and sophisticatedly relaxed; ideal as a backing beat for modern rap, neo-soul vocals, or urban lifestyle media.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Content**\n\nI'm currently breaking down the audio. It's a roughly 28-second instrumental, leaning towards hip-hop, with elements of boom bap, lo-fi, jazz rap, and a funky groove. The tempo is around 80 BPM. My next step is to capture a detailed transcription.\n\n**Detailing Audio Elements**\n\nI'm refining the BPM to approximately 88, firmly in 4/4. My analysis points to a minor key, likely D or G. The drum loop is distinctly boom-bap, complemented by a funky bassline and clean guitar riffs. I've also noted subtle percussion and keyboard stabs.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Content**\n\nI'm currently breaking down the audio. It's a roughly 28-second instrumental, leaning towards hip-hop, with elements of boom bap, lo-fi, jazz rap, and a funky groove. The tempo is around 80 BPM. My next step is to capture a detailed transcription.\n\n**Detailing Audio Elements**\n\nI'm refining the BPM to approximately 88, firmly in 4/4. My analysis points to a minor key, likely D or G. The drum loop is distinctly boom-bap, complemented by a funky bassline and clean guitar riffs. I've also noted subtle percussion and keyboard stabs.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1139,
+      "total_tokens": 2211,
+      "cost": 0.00507525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00507525,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00427125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 512,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

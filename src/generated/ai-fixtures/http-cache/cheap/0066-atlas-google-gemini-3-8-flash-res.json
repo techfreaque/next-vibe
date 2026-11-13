@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df371fd2a1d86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:59:01 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574738-0c2KMIhLukOU6kSrva2z",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=jfA3vYV3ceJws9hDglHKKasKjnF_F4GXnsRlhs4zI6Y-1794574738.2392788-1.0.1.1-rK0CPyfeFo4KsOKyyvRf94Df36bGrTAhu67O02yY8DrEI18sg20W9PT94jVfE3ic8iKZ333DL7R9FmnaEzcGPJQtx.cTam87KUbBZTJYmXC88oFMk2NgRoEgvZntuw2C; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:29:01 GMT"
+  },
+  "body": {
+    "id": "gen-1794574738-0c2KMIhLukOU6kSrva2z",
+    "object": "chat.completion",
+    "created": 1794574738,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Audio Overview and Acoustic Environment\nThe audio is an 18-second voice recording of a single speaker in a quiet indoor room. The recording quality is clear and direct, likely captured via a headset or computer/phone microphone positioned close to the speaker, with minimal background noise and a subtle, natural room acoustic. There is no background music or secondary sound effects.\n\n### Speaker Characteristics\n- **Gender/Age:** Male, estimated 20s to 30s.\n- **Accent:** Non-native English speaker with a distinct European (likely Germanic/Central European) accent.\n- **Tone & Delivery:** Calm, instructional, and deliberate. He speaks slowly, taking noticeable pauses between words and phrases as he formulates the sentence.\n\n### Verbatim Speech Transcription\n\"If you hear this, exactly transcribe the whole message exactly as I say it, including... the magic... keyword... banana banana... and I need to fill up the last few seconds, and it will be—\"\n\n*(Note: The audio cuts off abruptly right after the word \"be\" at approximately 00:18).*\n\n### Timing and Delivery Breakdown\n- **00:00 – 00:06:** He begins clearly: *\"If you hear this, exactly transcribe the whole message exactly as I say it...\"*\n- **00:06 – 00:11:** He pauses thoughtfully, slowing down significantly: *\"...including [pause] the magic [pause] keyword [pause] banana banana...\"*\n- **00:12 – 00:18:** Resumes a normal conversational pace: *\"...and I need to fill up the last few seconds, and it will be—\"* followed by an abrupt end of the clip.",
+          "refusal": null,
+          "reasoning": "**Developing Core Instructions**\n\nI'm currently focusing on precisely capturing the verbatim transcription requirement, paying close attention to the user's explicit instruction for the exact inclusion of the \"magic keyword banana banana\" and the entirety of their spoken message.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Developing Core Instructions**\n\nI'm currently focusing on precisely capturing the verbatim transcription requirement, paying close attention to the user's explicit instruction for the exact inclusion of the \"magic keyword banana banana\" and the entirety of their spoken message.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a1+zyBrlcOuZUX47dbgmzgBr92oRqz4jdAX0ev7VuudJFsxPxZ8VjCzEqXfR13Z8/EAnvDrJXSrE6oPNsksCRUv6ScgpupoNW2NfojebG1YU2bLa/EDqYdkkh54cqmmAi6rNcT+vKH//QRaiQZfCAkDDDwXv8Ej1HkfunomMtzTKHgTou+ZsllJ+C0Ycn9Sm6OLJZ4jPSYmWv5qv77BLVX9iAO79DF3yu5r4/4fQ9V9PvQ92soj0rfnAgAGVA81I1N+hpxJkFkacDGFPqCagybu2RR1lHmNjKZrVAhJEcwxksr5yI7GhiPJPjhvietUSdKeYsSxDbx1byTLMd4BtOW0TuhpfSqPyr8FzisGDo38qNKVx0SW/bHcn2T6U1AKa7OVTiJAoXyU0KbhtnOUtpa/NfGJTRT1qg+B1w0Q6FlUJu1T8DpgQR8NHVm6ai9h8gDL0qNT2PkMOlr9SvUHuh4vvVh9hbs4KL8nJYDYndS1gYKG9oEE5q6LQ2nEq36HgLhU6gx5iq9vnFBkzLVBRO4AFXYtOdQw7o/1sNx46bveCU9U7jU9SDaW4IgNC5d5O/zf9Mp2TDP+89yzN36YGuH18rkmlA+wwH88wowCpIyE88tEqVNKRUKroDVOwUsxOIG9MEo1ajIynxbdiiTYfbYiNOzZFeUu8A07UPxtPtzVbI49Ecov9piYxe19Ncrg7V04jVzBXQ0kOEd05fCnkU3L+trfPCMXdcUrMBRpG9Jk+NO0Frnq3ROcY+P4y1RIVJG1E1X8homHsdTYWv1NVXnqlsD1z/HUYimWlJoxYM/9/CQi9OqxL1NjKy9VBLpKIOlTmW8VqLFtiiIsUOGTxz5C1uDae4OTTGTKG+BpzynGjXzviRqgXlMv2yafDipphizNYU9SPd70LmLy++PCgzr5290jnhR5A2a/SKFO3USVuVGqmmz6lV6n4uuwA5oLQUtQeA+l76Hg+oFJsUirMf0xZCALeDahECQYTuzJ1Ida1NbheXXVwdjgI/FnHk7so+rAoHfPe14kj6YbtJsz/D+BpSMkFTWVYS+N1+OKLo+jkIoYvqdM1yV3+sTfsKuHo0f7ttgjzDIYAlwEVtABj8bfwHnpNhIlE9Hz+/dQSFJl5b991rRe3iuzDJMpApvowPRX5co11eUOZrsz8qFwzsPwMH36NKb63VhrLlpRmtACwu8Fh0nhDudSA5hhJowAb/57GAItHuCpLCWgpMlmmyDhTDlOB0oXRmU5aY/ueaTgPhdHFkXwX/WAr6dEe5/hd/QMDKhu1iYlZj++l6bgZm3Ge6puQlRjzBDafrioNiyde1SVzsrHYkrkG12E/1ircxjJBa7JHT1r+TF0KVxYM2BpeO/OCUL0Mpo2h2W0415bTG5hTekruHtytBxJkuYkdluQFJ9JviBsFCjnOc9kKTibh6SpcniDfS/jQRKlyMbcUrzYk7SNwg5udUEq50lOyQD1p7OKeA2/cXepWpc0U3fGjEXmH3W5hVaFic+vMxekP9jLUJH74LoyIWBNUY6cTruHsysh4TZq9Oyg3NnkJRFM95yKRPpkf+J54HLrbpobV3RhTywiehJ8ORcaGYMqllbgyD+LNgcfHuK5D4P2vldlc5iFX8Ks3CwFcpEzuxM/yN5TT9hLy4b4GnkO/m6iWPZ5eF0rqDi8wCIca0icBm/NKnYX6LyEAVyM2hC3a25jU+GfFM6e4tVNRDmlfaDJIxNGf2+eEd8/1U+x336BM1KUcVNeOhw9CTxZ+lP408SNd1HQMPDcluDVihLgWxQQcXZ3LwGyYp0fnx2/R/elAEQrWpryyUkWytYE=",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 630,
+      "total_tokens": 1452,
+      "cost": 0.002979,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002979,
+        "upstream_inference_prompt_cost": 0.0006165,
+        "upstream_inference_completions_cost": 0.0023625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 263,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

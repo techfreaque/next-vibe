@@ -491,6 +491,24 @@ function parseSseEvents(text: string): string[] {
     .filter((l) => l.length > 0);
 }
 
+/**
+ * Did a captured SSE stream reach its terminal event? OpenAI-compatible
+ * streams end with `[DONE]` / a non-null finish_reason, Anthropic with
+ * `message_stop`, Gemini with a `finishReason`. A stream without any of them
+ * was cut mid-answer.
+ */
+function sseStreamCompleted(chunks: Uint8Array[]): boolean {
+  const decoder = new TextDecoder();
+  // The terminal event is always near the end; scan the tail only.
+  const tail = chunks
+    .slice(-8)
+    .map((c) => decoder.decode(c))
+    .join("");
+  return /\[DONE\]|"finish_reason"\s*:\s*"|message_stop|"finishReason"\s*:\s*"/.test(
+    tail,
+  );
+}
+
 /** Wrap raw bytes as a ReadableStream so the AI SDK SSE parser gets a proper stream */
 function bytesToStream(bytes: Uint8Array): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
@@ -940,7 +958,18 @@ async function engineFetch(
               controller.enqueue(value);
             }
             wd.clear();
-            writeCache();
+            // Persist only a stream that reached its terminal event. An
+            // upstream cut (aborted request, dead dev server mid-turn) also
+            // ends as `done`, and recording that half stream turned it into a
+            // fixture every later replay served as the model's full answer.
+            if (sseStreamCompleted(chunks)) {
+              writeCache();
+            } else {
+              logger.warn(
+                "[FetchCache] SSE stream ended without a terminal event; not recording",
+                { url: redactUrl(url), file: rp },
+              );
+            }
             controller.close();
           } catch (pumpErr) {
             wd.clear();

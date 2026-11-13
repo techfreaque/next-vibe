@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df166ffcc1d86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:57:40 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574656-xovZ6DnTkJTPkxT8zgwM",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=DsnAvU416GS_1JO._WKU4.PXt6iV3exVyO8kJ78tVn8-1794574654.5562537-1.0.1.1-RSXbMjAnaObBiGu_q60QRBRBJcqJToaH3FZj.zWayH2V0yy13a.bql3_mU7RxB.kkVCBK8QlssdH_HAjCdr6sRTy5kW6uCPcwNQsjzKtdA1eMfgxFlOgz_Gx56iT3gxo; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:27:40 GMT"
+  },
+  "body": {
+    "id": "gen-1794574656-xovZ6DnTkJTPkxT8zgwM",
+    "object": "chat.completion",
+    "created": 1794574656,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview and Production Quality\nThis is a 27-second loopable instrumental track with a bright, bouncy, and modern synth-pop/indie electronic character, typical of contemporary advertising, vlog background music, or tech commercial underscore. The production is crisp, clean, studio-polished, and well-balanced with punchy low-end and sparkling high frequencies. There is no speech or vocal presence.\n\n### Musical Elements\n- **Genre & Style:** Upbeat Commercial Synth-Pop / Indie Electronic / Corporate Pop\n- **Tempo:** Approximately 118–120 BPM\n- **Time Signature:** 4/4\n- **Key:** Major key, bright and uplifting tonality (around E♭ or F Major)\n\n### Instrumentation & Arrangement\n- **Drums & Percussion:**\n  - A tight, punchy acoustic/hybrid kick drum hitting steady syncopated patterns.\n  - Crisp, snappy electronic snare layered with a handclap on beats 2 and 4.\n  - Fast, sixteenth-note rhythmic shaker and delicate closed hi-hats providing forward momentum and groove.\n- **Bass:**\n  - A round, resonant synth bass/sub-bass plucking short, staccato notes that lock tightly with the kick drum pattern.\n- **Synths & Melody:**\n  - Staccato synth plucks with a marimba/kalimba-like digital timbre, playing a rhythmic, syncopated chordal progression.\n  - Light, chiming bell-like synth accents in the higher register that add sparkle and playfulness.\n  - Subtle stereo widening and short room reverb applied to the synth elements.\n\n### Structural Progression\n- **00:00 – 00:21:** The core groove establishes immediately with full instrumentation—driving kick, snappy snare/clap, chattering percussion, staccato synth plucks, and buoyant bassline repeating a cheerful 4-bar harmonic motif.\n- **00:21 – 00:24:** A subtle transition or turn occurs where a low-pass/filtered accent and a low impact hit mark a bridge or section ending.\n- **00:24 – 00:27:** A short, descending bass drum/kick cadence leads to a clean, abrupt stop on beat 1 with a brief natural reverb tail fading out.",
+          "refusal": null,
+          "reasoning": "**Analyzing Sonic Elements**\n\nI'm currently dissecting a short, upbeat instrumental. It has a distinctly cheerful, electronic vibe with a driving drum beat featuring a tight kick, snare/clap, and syncopated hi-hats. Additional percussion like a shaker adds to its energetic character.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Sonic Elements**\n\nI'm currently dissecting a short, upbeat instrumental. It has a distinctly cheerful, electronic vibe with a driving drum beat featuring a tight kick, snare/clap, and syncopated hi-hats. Additional percussion like a shaker adds to its energetic character.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a1+T0vWxIVcNa0YqqkJnin3PT50bl8i1bxSgWfoDCL5aygzDgbmDvCfG/g2ZcX/kvSNqda3NXuvfDxF2KxwY3ohx10qVhVcuEAyqz5q+ELhM2uZLvEzfrjmFPkN6TNJJLN4yWi41gDrI+n/QnX9S9z3LIseTF0VBbE3Yh19Yw00ZPgXTYDhZ4vYA9fn191R97k6mdaU55brMB8SL8nbJRwk7buMnHoOlrvvY0q9390RCp8RaRjBRSHv8LTwKPhXNFzwkAxiCMW7vCSL5XVIdkHAt7rBuu9JvCOXK6q2gkK18yBlBPwfzPfCMWMHDaJLwmEjPQMOoAxA6V0Kf9zBUDbCRWlqWcUXK5yp2uwzVNcLhKkGl00S00t8RyzPSE7UeIrDNUCCvPt80J3PUID5xybkiEdmOV+pnIw2VDNVeQ7BXzOiydxSQmhINJ7EpXxFGjry1C1bgIbo3JsFD2qG+fl0aYpeIxl8jlHGlp98pXmVGQOh51QDvP9KJlpIb0WOIlxV6c9Tkmibu7aAwziFrBnC073aUefvYTVQ267vWv16HBSH68JStSkDZT5bJqiqA1xS0IEBfSFP8uqiRdkDSAp7W5hbKez8BFUM9tlZg3D7xvmoND2C+IM0WKOLTSwNnv7W9X+36/ooKOTSCLplsUxXBJN9D1PfNR+uKT4bLN2PXh0Yq5pBw2pCwyhFPazJ7r0XyOW1kjnLrSQ05KQWy6CRA92xHfaXxP0NcjFwS9P3hJhY5GkKpXL4UYkh1RN3Z9hp08QWuGIFgOnrzSJxD9mR7kj++atSJ/3BtXXQjlhDw50EZgRN0CSGweFuFND2zU/hY4HUzmgJogo5YA/Cvle7m5gwjQKW38hoPyKulSUsUNDEowHcSRGX7pTTLPs6djjxZtGeBmwpmmg9Rhhg+qJIcITwMGlvpuQEdBXI26DxVmNm6s8viDYTVizppMeYPyrZLjyWRbQdtvUt7OWq2DkIqCNcnZgYt4NQLr8xbvFe6JUlo7O0yyMMC7V9kVM0tiR6ULZvM7DoE9NyVbMdTM5+TbOMR/PjnhjZULyhHT00S/cLgfzjMiHzlJHx1w13gxwxdwjkFFzIkoyR7UQMKCyG9FOi2i5+FElI/FNUwlrNcbxS+4E45gnBnEpWbIw6Fx9UiOISHSbGveZdO5vnpMhOqCtzPIl/QFbK0x6hEguIy/gtw33OAwK41JRpF0NG0xxEOTTo24jF6EcYgqdcxKUZB",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 692,
+      "total_tokens": 1764,
+      "cost": 0.003399,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.003399,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.002595
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 199,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

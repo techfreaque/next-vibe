@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls issued together in one response:\n\n1. **`tool-help`** (no params) → returned **582 tools across 24 categories**, with per-category counts and sub-categories. Well-formed.\n2. **`cortex-write`** with `callbackMode='approve'` → paused for confirmation, then returned the confirmed result: `{\"created\":false,\"responsePath\":\"/memories/t7-approve-test\",\"size\":13,...}` with the hint *\"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\"* The write is 13 bytes, matching `T7_APPROVE_OK`. The approval gate worked as designed.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Called `companies-list` — it ran cleanly and returned a `companies` array with 1 entry:\n\n| name | type | role | country | currency | isActive |\n|------|------|------|---------|----------|----------|\n| Demo Company | b2c | owner | DE | EUR | true |\n\nThe `companies` array is present, `total: 1` matches the single entry, and all fields are populated and sensible. No errors, no empty result, no raw internal fields leaking into user-facing output.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

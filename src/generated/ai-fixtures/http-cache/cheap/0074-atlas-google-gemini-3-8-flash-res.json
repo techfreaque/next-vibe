@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e34d9d956bbaa-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:43:41 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577418-5ZitmJw3Cfa4Vbkpu6eO",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=Cy8IVRvvtK8URwERhgpAgXHEaLjomCcEM20ZTrATUnU-1794577417.253894-1.0.1.1-XQZGbGmBY6Yb0w8u6W2AgWX.skqez_6vh4jtHxCe4br8bNGzZTWgp2x4Fzz17nc3sWtU3pnwLWXG6QQEu9K_lCg3Zadd6y9VYrhgAEiUtGVeN5nMuK_cxXPjx4lrfvaF; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:13:41 GMT"
+  },
+  "body": {
+    "id": "gen-1794577418-5ZitmJw3Cfa4Vbkpu6eO",
+    "object": "chat.completion",
+    "created": 1794577418,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Audio Overview\nThis is a short, spoken-voice audio recording lasting approximately 19 seconds. It features a single male speaker delivering a deliberate instruction. There is no background music or ambient noise present.\n\n---\n\n### Verbatim Speech Transcription\n\n> \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword banana banana, and I need to fill up the last few seconds and it will be...\"\n\n*(The sentence cuts off abruptly at \"it will be\" as the recording ends.)*\n\n---\n\n### Speaker Profile & Delivery\n- **Gender & Age:** Male, adult (estimated mid-20s to late 30s).\n- **Accent:** Non-native English speaker with a distinct Continental European accent, most likely German. Pronunciation traits include slightly rolled/hard consonants (e.g., in \"transcribe\", \"magic\").\n- **Tone & Emotion:** Calm, neutral, casual, and instructional.\n- **Pacing & Cadence:** Slow, measured, and deliberate, with noticeable pauses between phrases as if improvising or timing his speech (especially around the 0:08–0:13 mark before and after stating \"banana banana\").\n\n---\n\n### Recording & Audio Characteristics\n- **Environment:** Quiet indoor room.\n- **Acoustics & Fidelity:** Clean, direct vocal recording with mild room reflections; likely recorded using a standard condenser microphone or headset mic.\n- **Background Sound:** No background music, ambient artifacts, or secondary voices are audible.",
+          "refusal": null,
+          "reasoning": "**Detailing Auditory Analysis**\n\nI'm now focusing on providing a precise transcription and a rich auditory description for the speech-only audio, which I estimate to be between 19-20 seconds long and spoken by an adult male.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Detailing Auditory Analysis**\n\nI'm now focusing on providing a precise transcription and a rich auditory description for the speech-only audio, which I estimate to be between 19-20 seconds long and spoken by an adult male.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a1+Hh9dA9TweiUJrkMVJLwcP0EXdHc5T9mqhkj+6kzugnx/g6298UDX2bNhgcLwuImH1SiIc+QsEv/ehfUvlagjXtSyE73gfhFqwKqY4Gwz12I5CzAOUKXG3zqy81dYQ/Zn9d1RCxgtnFGdz527RFMufZ+wPx1fw93r6c+HxwqWdTyKxi4LJtESzCVEjbjIHH5Z5bAW4062lfG2o2FTpzhS8tmqreFwiU0UbepJmBHSO/uTR6WkUD3CUf14ouh0isKajPVV1bG8pUWKhcr/6rmFPGEnw6EXDeX5IVyMCCtAXmSWrWMChd2UMnDVAWTZ93W6HuhSJ9mDAAVUZL+l4QQabhCmiRCjlDLBXdNGvV6nfVvDiOftRHlDkV30QsmY0G9u31b2OFUR/80UW24uHOYFkc/5ykk6Kv3+p+KGv6nuV3T39jb9fnwzHgfetYeh7LTn5cWAW2ny6qchReMuDeWq3PT27oCVWjtsH29e7mu/q6fhghRRHGQ8uKYLZbJyYi4Nbx5bRoToPZBzfUFhj8HpaboRzfdwHLW3up22kQQxmRzrKhQ+FXxG+ga2KQn1A8kpctLv9NXp1/D5d2ZLQvjoVlUljEk7skWpaAjsGztYQMDf6PEG4LaiQhqkBLOvpujJEPVk8y+ebHXHIlbp5CRW2cd2C3qu+AX5TU4NBbhB+1I0PBMiqlyTbjmGK4/1YI4ozubh4/S9nu+8g/o4exqtIUUGv1jaOffnwJSAYsj0ypCusAmJM9bTOQierdiwIRDBkTmu8n0lWxMbwBHF0OtjZucbElCPXzAzpuJJ5GlsLQggTCDwWUEo1Vp97835rBf1ogRyakIoqtmBabsPtAGrA0DIVzgJc3xuuKNczo8JJlP2z76vDzaRPTPDJ9bIcINN4Iv/HHiBm7pY/jnecYlXvuRNyh6ky3e3dnmM2SUgMpceFf9h5v1FKvGeMMeYtdzSJTMQvn0WqM4f1kfjfDGy4AFXhZJ/hIz4gpaoN5qUNVCR6NIYLObZPSNcTAJZLro0x83xOYmELKkQOJSeqjlU8NX8r0WIEDH95BZg9yEsbLbACwLCC195HeS2v4862ogc9huS1uUE/L7XDA/L/BcKgO8xvCnA=",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 466,
+      "total_tokens": 1288,
+      "cost": 0.002364,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002364,
+        "upstream_inference_prompt_cost": 0.0006165,
+        "upstream_inference_completions_cost": 0.0017475
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 146,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e34d9a9c0dbad-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:43:46 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577417-oskzcnxbZDQPQlf7Cb2Q",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=EGWlluaajqJCibyiTrMq4I.J79T_c9pdGDTIbkyJrvw-1794577417.2273521-1.0.1.1-Bc9l2X5FswL8pG0nqPabsr8q5P.hHU1dMcYJY5uJamt6oo7i.JblDb_YMiPIM8O79gOHN7S.LBGGfIEkfJqTUKroqHOqGGjufC3QXO4Ch_yHE2U5grfCP37qNV0c2msM; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:13:46 GMT"
+  },
+  "body": {
+    "id": "gen-1794577417-oskzcnxbZDQPQlf7Cb2Q",
+    "object": "chat.completion",
+    "created": 1794577417,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview and Genre\nThis is a 25-second instrumental music loop/track excerpt in a modern Funk / Nu-Funk / Neo-Soul / R&B groove style. It features a bright, bouncy, and rhythmic rhythm section with no vocals or speech.\n\n### Tempo, Meter, and Key\n- **Tempo:** Approximately 108–110 BPM.\n- **Time Signature:** 4/4.\n- **Key:** F major / D minor groove (consistent cyclical funk chord vamp).\n\n### Instrumentation and Arrangement\n- **Electric Guitar:** A clean-toned, slightly compressed electric guitar plays chopped, rhythmic funk chord stabs and syncopated rhythmic scratching on the off-beats across the stereo field, providing the rhythmic backbone.\n- **Electric Bass:** A round, punchy, warm electric bass guitar plays an active, melodic, and syncopated funk bassline that locks tightly with the kick drum, sliding and bouncing between root notes and fifths/octaves.\n- **Drums and Percussion:** \n  - A tight, punchy acoustic-style kick drum playing syncopated patterns.\n  - A snappy snare drum layered with crisp handclaps hitting solidly on beats 2 and 4.\n  - Closed, crisp hi-hats playing steady, lightly swung 16th-note patterns with occasional open-hat accents.\n  - Subtle auxiliary percussion (shaker/tambourine) adding texture and motion to the high-frequency rhythm.\n\n### Structure and Progression\n- **0:00 – 0:21:** The core groove runs uninterrupted—a steady, repeating two-bar funk vamp driven by the clean rhythm guitar, bouncy bass, and punchy drum beat.\n- **0:21 – 0:24:** A musical breakdown/turnaround occurs. The main groove strips back, followed by a syncopated drum fill (snare/tom accent figure) leading toward a stop.\n- **0:24 – 0:25:** A concluding drum hit/cymbal tap cuts off cleanly into silence at the end of the clip.\n\n### Production Style and Audio Quality\n- **Audio Quality:** Clean, commercial studio-quality mix.\n- **Processing:** Dry, upfront drums with controlled reverb; guitar and bass are tightly compressed and balanced; pristine frequency separation with no distortion, background noise, or artifacts.\n- **Mood:** Upbeat, feel-good, head-nodding, and casually confident.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Structure**\n\nI'm currently focused on dissecting the musical elements of the audio. My attention is on identifying the tempo, time signature, and specific instrumentation to accurately describe it as an audio bridge.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Structure**\n\nI'm currently focused on dissecting the musical elements of the audio. My attention is on identifying the tempo, time signature, and specific instrumentation to accurately describe it as an audio bridge.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 875,
+      "total_tokens": 1947,
+      "cost": 0.00408525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00408525,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00328125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 352,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

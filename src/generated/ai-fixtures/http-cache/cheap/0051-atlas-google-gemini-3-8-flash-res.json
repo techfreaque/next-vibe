@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59def53e90bc518-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:56:13 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574570-NeD1NX3Bnc790Yir5e5w",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=22VG2GjsBz3tTbAkZa2q.Tu0H_P69U7Spkt48_wAeGA-1794574569.5869443-1.0.1.1-Q_iBvO5ZG9BBnvis6SHuHYX3Ee5LTdPU2P60Lar3bcip63Tl4VDhT4AHOLsVq4mXo6LoQVBhAkNwCcXlPtwgf_inpw346AcdpxZr_xoesJxTSWFRn1JJf1TcqG2TU6Sa; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:26:13 GMT"
+  },
+  "body": {
+    "id": "gen-1794574570-NeD1NX3Bnc790Yir5e5w",
+    "object": "chat.completion",
+    "created": 1794574570,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Audio Overview and Characteristics\n- **Type:** Music Track (Instrumental Loop/Groove)\n- **Duration:** Approximately 26 seconds\n- **Production Quality:** Polished studio mix, punchy, well-balanced frequency spectrum with crisp transients and punchy low end.\n- **Genre:** Funk / Hip-Hop Instrumental / Boom Bap Groove\n- **Tempo:** ~100 BPM\n- **Time Signature:** 4/4\n- **Key:** F minor / C minor funk modality (bluesy, minor pentatonic funk groove)\n- **Mood / Atmosphere:** Energetic, rhythmic, confident, head-nodding, upbeat, and funky.\n\n---\n\n### Instrumentation and Layering\n1. **Drums / Percussion:**\n   - A driving, live-sounding funk drum break.\n   - **Kick Drum:** Punchy, tight acoustic kick landing strongly on beat 1 and syncopated off-beats.\n   - **Snare Drum:** Crisp, resonant, dry acoustic snare cracking sharply on beats 2 and 4, accompanied by subtle ghost notes.\n   - **Hi-Hats:** Tight, semi-swung closed hi-hat pattern with 16th-note subdivisions, occasionally opening slightly for accentuation.\n   - **Shaker / Tambourine:** Light high-frequency shaker layering running consistently to maintain momentum.\n\n2. **Bass:**\n   - Funky, active electric bass guitar line with round low-mid presence.\n   - Features syncopated staccato plucking, dynamic slides, and rhythmic octave bounces locking tightly with the kick drum.\n\n3. **Guitars / Keyboards:**\n   - **Rhythm Guitar:** Clean, muted funk guitar scratching (\"chank\") with subtle wah/envelope filter effect providing continuous rhythmic percussive texture.\n   - **Electric Piano / Clavinet / Organ:** Brief percussive stabs on off-beats providing harmonic structure and classic 1970s funk flavor.\n\n---\n\n### Chronological Structure\n- **0:00 – 0:10 | Main Groove Establishment:**\n  - The track begins immediately at full energy with the complete rhythm section (drums, bass, rhythm guitar chops, and light keyboard accents) locked into a repeating 2-bar or 4-bar funk loop.\n- **0:10 – 0:20 | Continued Groove:**\n  - The loop continues with steady, unwavering rhythmic momentum, maintaining the driving, danceable bounce.\n- **0:20 – 0:26 | Rhythmic Variation & Transition / Outro:**\n  - At approximately 0:20–0:22, there is a subtle vinyl stop/pitch-drop or turntable scratching effect / fill that accents the turn of the phrase.\n  - At 0:23–0:25, a short drum fill and bass breakdown leads into a brief rhythmic cadence, fading or cutting off sharply as the loop concludes.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Content**\n\nI'm currently dissecting a roughly 26-second audio clip. Initial analysis points to a funk/groove/hip-hop breakbeat with a BPM around 95-100. My next step is to confirm this BPM precisely.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Content**\n\nI'm currently dissecting a roughly 26-second audio clip. Initial analysis points to a funk/groove/hip-hop breakbeat with a BPM around 95-100. My next step is to confirm this BPM precisely.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1021,
+      "total_tokens": 2093,
+      "cost": 0.00463275,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00463275,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00382875
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 391,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

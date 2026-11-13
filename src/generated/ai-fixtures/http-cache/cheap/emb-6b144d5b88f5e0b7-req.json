@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/qa-suite--callbacks--tools--media---payments-b1651f69-c681-4273-876b-c3469626d8e5.md\n\n# QA Suite: Callbacks, Tools, Media & Payments\nFolder: private\nDescription: Quality-gate run of the 'cheap' test suite on the atlas dev instance using deepseek-v4.1-flash and skill quality-tester__budget. Covered parallel tool-help exploration, credits-balance, favorites, detach + await-task, endLoop, inline wait, wakeUp async delivery, approve gating, contact-form, paralle",
+    "encoding_format": "float"
+  }
+}

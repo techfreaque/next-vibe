@@ -407,8 +407,16 @@ export async function emitSyntheticToolMessage(
     toolCall: ToolCall;
   },
 ): Promise<void> {
-  const { messageId, threadId, parentId, model, skill, sequenceId, toolCall } =
-    params;
+  const { messageId, threadId, parentId, model, skill, sequenceId } = params;
+  // A synthetic row is born settled: the file part already streamed and the
+  // result (URL, mediaType, creditCost) is final. Without an explicit status
+  // the row sat at status=null forever, unlike every real tool row, which
+  // ends "completed"/"failed" (tool-parts). Consumers keyed on status (UI
+  // spinners, status filters, test gates) then treated it as unsettled.
+  const toolCall: ToolCall = {
+    ...params.toolCall,
+    status: params.toolCall.status ?? "completed",
+  };
 
   if (w.deps.isIncognito) {
     return;

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I can see the `products-category-list` result in context. It contains a `categories` array with **3 categories**:\n\n1. **Services** — `794b87c5-c975-4615-8ae6-95b23ad69d7a`, active, no parent\n2. **Physical Goods** — `25f7a73b-3b38-46cb-b880-b2251b469c58`, active, no parent\n3. **Digital Products** — `cffc90b4-57b9-4e11-bdc7-38594a44fb10`, active, no parent\n\nThe result also reports `total: 3`, matching the array length.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

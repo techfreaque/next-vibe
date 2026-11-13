@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-suite-qa--tools--callbacks--media--companies-dde7a584-0271-4982-b7b5-915ed10195fa.md\n\n# Cheap Suite QA: Tools, Callbacks, Media, Companies\nFolder: private\nDescription: Quality-gate run of the 'cheap' suite on the atlas dev instance. Covered parallel tool-help exploration, credits-balance, favorites, all callback modes (detach, await-task, endLoop, inline wait, wakeUp, approve), contact-form, parallel tool calls, product categories, and image/audio/video/voice atta",
+    "encoding_format": "float"
+  }
+}

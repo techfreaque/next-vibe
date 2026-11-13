@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Session wrapped — the \"cheap\" suite covered parallel tool-help exploration, credits-balance, favorites, detach → await-task, endLoop, inline wait, wakeUp delivery (single + repeat + stress), approve-gate, contact-form, parallel cortex-write + chat-settings, product categories, and image/audio attachments. All tool calls executed and returned well-formed result shapes.\n\nBut per my standing quality gate, I can't close clean:\n\n**FAILED:**\n\n1. **`credits-balance` misreport (MAJOR) — leftover from turn T4a.** The tool actually returned `{\"capacity\":2170,\"earned\":0,\"expiresAt\":null,\"expiring\":0,\"free\":0,\"permanent\":1461.48,\"total\":1461.48}`, but my T4a reply stated a total of **1573.85** credits (`free: 44.31` + `permanent: 1529.54`). Those numbers do not match the tool output — a fabricated/mismatched wallet figure shown to the user as fact.\n\n2. **`credits-balance` undocumented field (MINOR).** The result includes `capacity: 2170`, which appears nowhere in the tool's description (\"Retrieve current user's credit balance with breakdown\") or its example response, and does not reconcile with `total` (1461.48) or any visible sum — a confusing, unexplained user-facing field.\n\nEverything else in the run checked out: tool-help (category/keyword/detail), favorites (14 entries, counts consistent), detach → `taskId` with no `responsePath`, await-task → `responsePath` present, inline wait → `responsePath` present, endLoop → clean single dispatch, wakeUp → deferred results with non-empty `responsePath`, approve-gate and contact-form → clean confirmations, product categories (3, `total: 3`), and image/audio attachments processed.\n\nFAILED: `credits-balance` result was misreported in turn T4a (reported total 1573.85 / free 44.31 / permanent 1529.54 vs. actual 1461.48 / 0 / 1461.48), and the tool emits an undocumented `capacity` field that doesn't reconcile with `total`.",
+    "encoding_format": "float"
+  }
+}

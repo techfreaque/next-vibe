@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `contact-form` tool was invoked directly with the exact values given, `callbackMode='approve'` triggered the confirmation gate, and it returned a clean, user-facing success message: *\"Thank you for contacting us! We've received your message and will get back to you soon.\"* The subject was passed verbatim as `subject.generalInquiry` per instruction.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

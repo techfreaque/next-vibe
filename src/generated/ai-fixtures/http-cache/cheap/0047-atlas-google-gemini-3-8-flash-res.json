@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59dee93ed421d86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:55:42 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574539-Pg1pNHYYCV0OPDlXYkO9",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=JVCcLbDnryKNd3rQ4Rae7x.7mswjS6PufLhCtq7ggjE-1794574538.87262-1.0.1.1-yVbERuj1zKeaEHgf_gYdZQoxhglDJQ5pdKScB0RSJy0Upg1TG92QBGHuV.aGn1Bv2w8LPiIhsWxtqDGICTapGzrBwXcwHOmEbmwTPqMWDQrxOF8BtGU6xghM0PYAC82w; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:25:42 GMT"
+  },
+  "body": {
+    "id": "gen-1794574539-Pg1pNHYYCV0OPDlXYkO9",
+    "object": "chat.completion",
+    "created": 1794574539,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Audio Overview\nAn instrumental, studio-produced hip-hop/lo-fi beat featuring a laid-back, jazzy groove that plays continuously before resolving into a brief percussive fill and an extended sub-bass impact drop. The clip is approximately 26 seconds in duration. There is no speech or singing present.\n\n---\n\n### Musical Analysis\n\n- **Genre/Style:** Lo-Fi Hip-Hop / Jazzy Boom Bap / Instrumental Beat\n- **Tempo:** Approximately 88–90 BPM\n- **Time Signature:** 4/4\n- **Key/Tonality:** Minor tonality with warm, jazzy chord extensions\n- **Mood:** Relaxed, mellow, funky, head-nodding, and contemplative\n\n#### Instrumentation & Arrangement\n1. **Drums:**\n   - **Kick Drum:** Punchy, rounded acoustic-sampled kick with solid low-end thump, playing a syncopated boom-bap rhythm.\n   - **Snare Drum:** Crisp, dry, centered acoustic snare hitting firmly on beats 2 and 4, accompanied by subtle ghost notes.\n   - **Hi-Hats & Percussion:** Tight closed hi-hats ticking with a distinct laid-back swing feel (swung eighth/sixteenth notes), blended with subtle shaker/tambourine rustle in the stereo field.\n2. **Bass:**\n   - A warm, rounded, deep electric or synth bass guitar sound playing an active, melodic, syncopated walking bassline. It features subtle finger-slide nuances and rhythmic articulations that lock tightly with the kick drum.\n3. **Keys / Chords:**\n   - Soft, Rhodes-style electric piano playing lush, slightly detuned jazz chords. The chords have a mellow attack, subtle tremolo/chorus modulation, and slight stereo width, providing harmonic warmth.\n4. **Melodic Accents:**\n   - Sparse, high-register synth plucks or bell-like mallet tones with light digital delay, ringing out periodically as syncopated counter-accents above the chords.\n\n---\n\n### Structural Progression\n\n- **00:00 – 00:19 | Main Groove Loop:**\n  The full beat is established immediately with the drums, bouncing bassline, warm electric piano chords, and occasional twinkling synth accents looping seamlessly in an 8-bar phrasing structure.\n\n- **00:19 – 00:22 | Breakdown & Fill:**\n  The main rhythm section and chord vamp abruptly stop. In their place, a brief transitional drum fill plays—featuring dry, descending percussive tom/snare rolls and a subtle glitch effect.\n\n- **00:22 – 00:26 | Sub Drop & Outro:**\n  A heavy, resonant sub-bass drop / low-frequency 808 boom hits with a soft percussive transient on the downbeat (~00:22), resonating downward and gradually decaying into near-silence by 00:25, ending in complete silence at 00:26.\n\n---\n\n### Production & Sound Quality\n- **Audio Quality:** Clean, modern studio production with intentional vintage/lo-fi coloring (warm tape saturation, gentle low-pass filtering on melodic elements, and subtle room ambiance).\n- **Stereo Imaging:** Drums and bass are centered and punchy; electric piano and melodic bell accents are spread across the stereo field with gentle reverb and delay tails.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Elements**\n\nI'm currently dissecting the audio, noting its 26-second duration and instrumental hip-hop/beat nature. My focus is on identifying key components like the funky, grooving bassline and the crisp acoustic drums.\n\n**Identifying Sonic Details**\n\nI'm now focusing on the finer sonic textures. I've picked out the distinct vinyl crackle and a subtle shaker, plus a quirky synth element that accents the beat. The ending sequence around 00:19-00:26 is particularly interesting, with a drum breakdown leading to a sub bass drop.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Elements**\n\nI'm currently dissecting the audio, noting its 26-second duration and instrumental hip-hop/beat nature. My focus is on identifying key components like the funky, grooving bassline and the crisp acoustic drums.\n\n**Identifying Sonic Details**\n\nI'm now focusing on the finer sonic textures. I've picked out the distinct vinyl crackle and a subtle shaker, plus a quirky synth element that accents the beat. The ending sequence around 00:19-00:26 is particularly interesting, with a drum breakdown leading to a sub bass drop.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1431,
+      "total_tokens": 2503,
+      "cost": 0.00617025,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00617025,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00536625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 702,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

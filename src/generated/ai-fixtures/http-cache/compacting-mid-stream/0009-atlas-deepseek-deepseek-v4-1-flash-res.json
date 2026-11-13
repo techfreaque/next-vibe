@@ -1,0 +1,29 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a59e42fa08bad9d8-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 13 Nov 2026 13:53:16 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577995-GKIfiHU5jFSTAtfgba3h",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=5m7DfC5DXjfOCFn9AHoiShtlKVeFI6EfjoWNqeb11a0-1794577995.8522146-1.0.1.1-FligFNlZTcMz5AyHTMLxM4vWLoFiOtypMVvaRBjE5E_yl0vUDYfgR9I9C7F8RSN_1FpfSFkG_0cBk4lwGMnYgWO7BhXF_VS.Mhf9uCO41wfVZlIFd.t4lqd4CmKW8OZI; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:23:16 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794577995-GKIfiHU5jFSTAtfgba3h\",\"object\":\"chat.completion.chunk\",\"created\":1794577995,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"FOLLOWUP_DONE\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577995-GKIfiHU5jFSTAtfgba3h\",\"object\":\"chat.completion.chunk\",\"created\":1794577995,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}]}",
+    "data: {\"id\":\"gen-1794577995-GKIfiHU5jFSTAtfgba3h\",\"object\":\"chat.completion.chunk\",\"created\":1794577995,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Morph\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"stop\",\"native_finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":7832,\"completion_tokens\":7,\"total_tokens\":7839,\"cost\":0.000818609,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.000818609,\"upstream_inference_prompt_cost\":0.000814528,\"upstream_inference_completions_cost\":0.000004081},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

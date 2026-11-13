@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `cortex-write` call with `callbackMode='wakeUp'` returned inline with a non-empty `responsePath: \"/memories/cb-wakeup-stress-test\"` (size 25, matching the 25-char payload) — outcome (b) INLINE, which is valid.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

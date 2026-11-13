@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df0126c4fc518-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:56:45 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574600-5YWmCJbKRDl7zREezoaE",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=ywXoKpra8QoUuhdBXuuNf5ZYmoaiEaTwWK4hWOHwzsQ-1794574600.0641246-1.0.1.1-ZpcuQpAl8RmHTy_y1bLj0IWNRrjYJeQguMO8rEKx_XYZn7uflRBVsm55i6Kx9rTY5meEDNdigWtyo7k.gOZuY6KwKnUNTLmH.yolSPhQY9SkXFP2QnMRyd7aOL.mrpl7; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:26:45 GMT"
+  },
+  "body": {
+    "id": "gen-1794574600-5YWmCJbKRDl7zREezoaE",
+    "object": "chat.completion",
+    "created": 1794574600,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview and Duration\nThis is a 26-second instrumental musical beat/loop centered around a laid-back, syncopated hip-hop/neo-soul groove. The recording has polished studio production quality with crisp transients, warm low-end saturation, and no clipping or ambient noise.\n\n---\n\n### Musical Analysis\n\n- **Genre / Style:** Instrumental Hip-Hop / Boom-Bap / Funk / Neo-Soul beat (reminiscent of J Dilla, 9th Wonder, or Pete Rock production).\n- **Tempo:** Moderate walking tempo, estimated at approximately 92–94 BPM.\n- **Time Signature:** 4/4.\n- **Key / Tonality:** Minor key (centered around a warm, soulful minor chord progression, likely in C minor or F minor).\n- **Mood / Atmosphere:** Cool, head-nodding, relaxed, confident, and rhythmic.\n\n---\n\n### Instrumentation and Arrangement\n\n1. **Drums / Percussion:**\n   - A crisp, sample-based acoustic drum break kit.\n   - Snare drum hits firmly on beats 2 and 4 with natural room reverb and occasional soft ghost notes.\n   - A punchy, round kick drum drives a syncopated, bouncing pattern interacting tightly with the bassline.\n   - Steady, slightly swung eighth-note hi-hat patterns with subtle open-hat accents on the off-beats.\n\n2. **Bass:**\n   - A warm, round, and articulate electric bass guitar (or realistic fingered bass sample).\n   - Plays a prominent, melodic, and funky groove featuring expressive slides, syncopated sixteenth-note pushes, and sustained low root notes.\n\n3. **Keys / Harmony:**\n   - A warm electric piano (Fender Rhodes / Wurlitzer style) playing muted, jazzy chord stabs on off-beats, creating a harmonic cushion behind the bassline.\n\n4. **Turntable / DJ Effects:**\n   - Subtle, rhythmic vinyl scratches and record-stop/backspin nuances are integrated sparsely into the beat to accentuate bar turnarounds.\n\n---\n\n### Structural Progression\n\n- **0:00 – 0:21:** The core groove establishes immediately with full instrumentation—pounding kick/snare pattern, dynamic walking bassline, rhythmic electric piano chords, and subtle DJ scratch embellishments cycling through a repetitive, hypnotic 4-bar loop.\n- **0:21 – 0:23:** A brief rhythmic turnaround/breakdown occurs featuring a quick drum fill and a momentary drop in energy/instrumentation.\n- **0:23 – 0:26:** The full groove drops back in for one final bar before cutting off cleanly.\n\n---\n\n### Vocals and Non-Musical Sounds\n- There is no discernible spoken dialogue, singing, or continuous vocal track.\n- Only minute, heavily processed vocal snippets may exist as rhythmic background textures or DJ scratch soundbites. No speech transcription is applicable.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Structure**\n\nI'm currently breaking down the audio clip's composition, noting its loop-based, instrumental nature within a hip-hop, R&B, and funk context, and I've established its approximate 26-second duration.\n\n**Identifying Core Elements**\n\nI'm now focusing on the specific sonic components: a crisp drum break with a funky kick and ghost notes, a melodic and syncopated bassline, and jazzy electric piano chords, all within a 4/4 moderate tempo.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Structure**\n\nI'm currently breaking down the audio clip's composition, noting its loop-based, instrumental nature within a hip-hop, R&B, and funk context, and I've established its approximate 26-second duration.\n\n**Identifying Core Elements**\n\nI'm now focusing on the specific sonic components: a crisp drum break with a funky kick and ghost notes, a melodic and syncopated bassline, and jazzy electric piano chords, all within a 4/4 moderate tempo.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1226,
+      "total_tokens": 2298,
+      "cost": 0.0054015,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0054015,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.0045975
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 599,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

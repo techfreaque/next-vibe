@@ -1,0 +1,77 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df01269411d86-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:56:47 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574600-0JNfzuNVCQ9R2wi30GLu",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=lyC0vhF.F_u4NFT9k3aahydcroC2fZgUJg7yiLI.SOU-1794574600.0690622-1.0.1.1-Ahbf7Pa7TYdpgVn5ZUN0e.5V1UBX5V8pz8WFGyHS9KjwFyoTCEd2s7XNXog8crQmSKa2bOovkeUrZkqriZnyICsbVSIu73imLFNtJWyC_4M4D53vXb.ZzrvCZEoU5ujC; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:26:47 GMT"
+  },
+  "body": {
+    "id": "gen-1794574600-0JNfzuNVCQ9R2wi30GLu",
+    "object": "chat.completion",
+    "created": 1794574600,
+    "model": "google/gemini-3.5-flash-lite",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "The video opens with a close-up shot of a person’s hands holding a partially solved Rubik’s cube in an indoor setting. The background is completely filled with a dense, chaotic pile of scattered Rubik’s cubes in various states of being solved or scrambled, creating a colorful mosaic of red, blue, green, yellow, white, and black plastic squares. \n\nThe camera maintains a tight focus on the hands and the cube being manipulated. The person's fingers turn the faces of the cube, shifting the colorful tiles. There is no text on screen, and no audio or speech is present—the video is completely silent. The visual style is realistic with high production quality, featuring sharp focus and natural lighting. The mood is focused and contemplative, showcasing a demonstration or hobbyist activity centered around puzzle-solving amidst a overwhelming backdrop of similar puzzles.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a183aweTqcZdbJmu/REsrOi5Rgu+D+2TFqhBPCcPeJ/K/rSJIor+VsX1ZVLRolVXXmAXq0+IxWNjWKIpsEjJJwgYWbqO16JqA6Ma291D56zX4mxBVpXpSWM=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 175,
+      "total_tokens": 583,
+      "cost": 0.0005599,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0005599,
+        "upstream_inference_prompt_cost": 0.0001224,
+        "upstream_inference_completions_cost": 0.0004375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

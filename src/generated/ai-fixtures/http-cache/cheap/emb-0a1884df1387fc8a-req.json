@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Called `favorites` (no params). Result is well-formed:\n\n- `favorites` array present with **14 entries**\n- Each entry has `id`, `name`, `description`, `skillId`, `modelId`/`modelInfo`, `position`, `tagline`, `voiceId`\n- Pagination fields consistent: `currentPage: 1`, `matchedCount: 14`, `totalCount: 14`, `totalPages: 1`\n- `hint`: \"14 favorites found.\"\n\nArray is present and populated as expected.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

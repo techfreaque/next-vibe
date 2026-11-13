@@ -147,3 +147,27 @@ export function assertStepOk(
     `[${stepName}] AI did NOT confirm STEP_OK as its final verdict - reported issues instead:\n\n${verdict.failedText ?? stripReasoning(content)}`,
   ).toBe(true);
 }
+
+/**
+ * Verdict gate for a NATIVE media turn (an image-output model emitting file
+ * parts). Such a turn's visible text can be split across the assistant
+ * bubbles around the synthetic tool rows, so the verdict is read from their
+ * joined text, in order. Any visible text must end with STEP_OK (a FAILED or
+ * a missing verdict fails the step). An image-only reply (Gemini image
+ * models often emit no text at all) carries no verdict to check: the step's
+ * structural gates (stored file, settled tool row, billed turn) are the
+ * evidence there.
+ */
+export function assertNativeTurnVerdict(
+  assistantContents: (string | null)[],
+  stepName: string,
+): void {
+  const visible = assistantContents
+    .map((c) => stripReasoning(c ?? ""))
+    .filter((c) => c.length > 0)
+    .join("\n");
+  if (visible.length === 0) {
+    return;
+  }
+  assertStepOk(visible, stepName);
+}

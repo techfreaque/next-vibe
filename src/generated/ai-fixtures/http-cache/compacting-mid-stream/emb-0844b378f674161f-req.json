@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[C2-FOLLOWUP] Respond with ONLY the word: FOLLOWUP_DONE. No preamble, no tools, no punctuation beyond that.",
+    "encoding_format": "float"
+  }
+}

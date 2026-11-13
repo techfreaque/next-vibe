@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Audio processed.** It's a ~26-second instrumental beat blending boom-bap hip-hop, funk, and lo-fi/neo-soul — no vocals.\n\n- **Tempo/Key:** ~90–92 BPM, 4/4, minor tonality with a funky melodic soul cadence\n- **Drums:** punchy kick, snappy snare on 2 & 4, tight closed hi-hats, subtle shaker/woodblock percussion\n- **Bass:** warm, round, bouncy electric/synth bassline carrying the main melodic contour\n- **Keys/Chimes:** bright electric piano and mallet-synth stabs playing syncopated upper-register counter-melodies\n- **Guitar:** light muted electric strums adding funk texture\n- **Structure:** main groove loops 0:00–0:18 → brief drum fill/transition 0:18–0:20 → full beat returns with emphasized low end through 0:26\n- **Mood:** chill, confident, upbeat, playful, funky\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

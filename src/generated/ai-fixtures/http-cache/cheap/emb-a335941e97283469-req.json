@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Called `companies-list` — it returned a `companies` array with 1 entry: **Demo Company** (DE, EUR, active, created 2026-08-29).\n\nBut the payload leaks unrendered enum strings into user-facing output:\n\n- `role: \"enums.companyMemberRole.owner\"` — should surface as `owner`\n- `type: \"enums.companyType.b2c\"` — should surface as `b2c`\n\nThese are raw internal enum identifiers, not display values, so the result is not clean for a real user.\n\nFAILED: `companies-list` returns raw unrendered enum values (`enums.companyMemberRole.owner`, `enums.companyType.b2c`) instead of plain labels — internal identifiers leaking into user-facing output. Severity: MINOR (cosmetic/confusing).",
+    "encoding_format": "float"
+  }
+}

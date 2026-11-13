@@ -320,7 +320,13 @@ export async function shouldTriggerCompacting(
   const isEmergencyCompact =
     !compactingDisabled && totalTokens >= emergencyThreshold;
 
-  const shouldCompact = isEmergencyCompact || totalTokens >= effectiveTrigger;
+  // Nothing to summarize → never compact. System prompt + tools alone can
+  // cross a low trigger on a brand-new thread; compacting then summarized an
+  // empty history into a ROOT compacting node above the first user message
+  // ("No substantive conversation content...") and billed a pointless call.
+  const shouldCompact =
+    messagesToCompact.length > 0 &&
+    (isEmergencyCompact || totalTokens >= effectiveTrigger);
 
   logger.debug("[Compacting] Token calculation", {
     totalTokens,

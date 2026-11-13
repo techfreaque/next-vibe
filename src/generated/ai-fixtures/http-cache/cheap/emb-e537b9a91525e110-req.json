@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-test--callback-modes---tool-qa-248e5b67-ef25-4c6e-8839-267904b88706.md\n\n# Cheap Test: Callback Modes & Tool QA\nFolder: private\nDescription: Quality-gate run of the 'cheap' suite on the atlas dev instance. Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, and wakeUp async delivery. Phase-2 wakeUp delivery con",
+    "encoding_format": "float"
+  }
+}

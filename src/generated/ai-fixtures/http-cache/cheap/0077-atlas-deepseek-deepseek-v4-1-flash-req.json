@@ -1,0 +1,716 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/3.1.0 ai-sdk/provider-utils/5.0.42 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai\n\n**Current Date:** 2026-11-13\n\nYou are an AI on unbottled.ai - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.\n\n## unbottled.ai\n\n- **Models:** 122 — Claude, GPT, Gemini, Llama, and uncencored ones GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, UncensoredLM v1.2, Venice Uncensored 1.2.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed. 70/month with a free account, +20 with a confirmed newsletter subscription.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## User Language and Location\n\n**Default language:** English (en-GLOBAL) | **Location:** Global 🌐\n\nALWAYS respond in the language of the user's current message. Default language is a fallback only.\nWhen writing to Cortex (memories, documents, tasks), always use the user's language - not English - unless the content is inherently language-neutral (code, identifiers).\n\n## Current Context\n\n- **Folder:** private - Private conversations - server-stored, visible only to the account owner. Requires an account.\n- **Sub-folder:** bb87c805-d83e-4dc6-82f2-dd1ef22eab42\n\n## Message Context\n\nEach message is prefixed with auto-generated metadata: `[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]`\n\n**Fields (only non-empty shown):** ID (8-char ref), Model, Skill, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).\n\n- Check metadata before responding - multiple skills/models may be active in one thread.\n- Do NOT reproduce `[Context: ...]` tags in your responses - they are injected automatically.\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  HDMI-A-1 [PRIMARY]: 1920×1200 @(1677,0)\n  DP-1: 1440×2560 @(3734,92)\n  DP-2: 2294×960 @(1440,1200)\n  DP-3: 1440×2560 @(0,92)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: HDMI-A-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool). Leave the field OUT for the default - never send \"omit\", \"none\" or \"sync\" as a value:\n\n- *(field left out)* (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.\n\n## Media tools (use `tool-help` for schema before calling)\n- `generate_image` — Images via Chroma\n- `generate_music` — Music/audio via Sonauto Song\n- `generate_video` — Video via Veo 3.1 Fast [duration: 4–8s | ratios: 16:9, 9:16 | resolutions: 720p, 1080p, 4K | frame inputs: first_frame, last_frame]\n- `describe_image` — analyse/describe an image\n- `describe_video` — analyse/describe a video\n- `transcribe_audio` — speech-to-text from audio\n- `text-to-speech` — convert text to spoken audio\n\n# Formatting Instructions\n\n- CRITICAL: Add blank lines between all content blocks (paragraphs, headings, lists, code, quotes)\n- Use **bold** for emphasis, *italic* for subtle emphasis\n- Use ## headings and ### subheadings (only in detailed responses)\n- Use (-) for lists, (1.) for ordered lists\n- Use `backticks` for inline code, ```blocks``` for code examples\n- Use > for important notes\n- Use tables for comparisons, matrices, and structured data\n- NEVER write walls of text - always break into readable paragraphs\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\nYou have full browser automation. `tool-help query=browser` lists all tools; `tool-help query=browser-<toolname>` gives full schema.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## User\n\n**Name:** Admin User\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Coding Agent\n\nWhen delegating coding work, use the `ai-run` tool with the `vibe-coder` skill. Pass the full task description as the prompt. The vibe-coder skill carries the full project context and coding conventions.\n\n## Background Agents\n\nNeither **Dreamer** nor **Autopilot** is enabled.\n\n- **Dreamer** runs on a schedule (e.g. nightly) to reorganize the cortex - consolidate scattered memories, update life areas, and spot gaps. Think of it as your AI keeping the filing system clean while you sleep.\n- **Autopilot** runs on a schedule (e.g. weekday mornings) to advance stalled projects, clear your task queue, and execute real output on your goals.\n\nBoth can be enabled in **chat settings** (the gear icon in the model selector). They run in the background folder and create session logs so you can review what they did.\n\n## System Context\n\n- **Instance:** Dev / coding instance ()\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 122\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n**Known instances:** `thea`\n\n## Remote Instances\n\n- \"thea\" - use tool-help(instanceId=\"thea\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"thea\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: leave the field out=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: { prompt: string, provider: claude-code|open-code, model: string, taskTitle: string, interactiveMode: boolean }\ncortex-delete — Remove a file or folder. Gone forever. | input: { path: string, recursive: boolean }\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: { path: string, find: string, replace: string, startLine: integer, endLine: integer, newContent: string }\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: { path: string, command: string, workingDir: string, terminalId: string, timeoutMs: number }\ncortex-list — See what's in a folder. | input: { path: string }\ncortex-mkdir — Create a folder. | input: { path: string, viewType: enums.viewType.list|enums.viewType.kanban|enums.viewType.calendar|enums.viewType.grid|enums.viewType.wiki, createParents: boolean }\ncortex-move — Move or rename a file or folder. | input: { from: string, to: string }\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: { path: string, maxLines: integer }\ncortex-search — Find files by name or content. Searches everything. | input: { query: string, path: string, maxResults: integer }\ncortex-terminals — List active terminal sessions with current working directories. | input: { path: string }\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: { path: string, depth: integer }\ncortex-write — Save a file. Give it a path and content - done. | input: { path: string, content: string, createParents: boolean }\nweb-search — Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider. | input: { query: string, provider: enums.provider.AUTO|enums.provider.BRAVE|enums.provider.KAGI, maxResults: number, includeNews: boolean, freshness: past_day|past_week|past_month|past_year } | 0.65 credits\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:9f98b9ed | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:412c0b5e | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:c6733005 | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:cfeab0fe | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:2547ed8c | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:b74eb555 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:40083a71 | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:db9647b6 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:6215c72d | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:e9a2f828 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:2c9dae96 | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:b31cdced | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:41]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:997ca292 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:524a6b52 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:34faf2a5 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:eba77d8c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:019b724c | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:f39a051a | Model:deepseek-v4.1-flash | Skill:quality-tester | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:3092d313 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": [
+          {
+            "text": "[Context: ID:9027d327 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:6d74f921 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:b3833422 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:51192962 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:2ec2787e | Model:deepseek-v4.1-flash | Skill:quality-tester | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:5b5fe2d3 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:205bc582 | Model:deepseek-v4.1-flash | Skill:quality-tester | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:8653546c | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:2298ebac | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:c4cc9830 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:4481f721 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:dde0d046 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:a79cd16a | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:8e58d666 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:ae46d5eb | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:12066d99 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:80d2eabc | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:6d815f70 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:531c0feb | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:562c8ce1 | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:09ad038d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:42]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:cd619d07 | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:3c746a99 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:eb868de6 | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:c2eb5fe4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:b3c732aa | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:8b917f1a | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:a7fde790 | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:2f3dbfbe | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:e51b9b71 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:fa0dda75 | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:5de1a669 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:31288bcc | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Cheap Suite QA: Callbacks, Tools & Media\" / \"Quality-gate run of the 'cheap' suite on the atlas dev instance (deepseek-v4.1-flash, skill quality-tester__budget). Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, wakeUp async delivery, approve gating, contact-form, parallel multi-tool dispatch, products-category-list, and media attachments (image, audio, video, voice). Latest turn: companies-list returned a valid companies array. Noted: an earlier credits-balance reply misreported figures (agent-side error, later retracted).\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── cb-wait-inline-test [77%]\n│   │   wait-inline-test-payload\n│   ├── name.md [74%]\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── t7-approve-test [73%]\n│   │   T7_APPROVE_OK\n│   ├── cb-await-task-test [72%]\n│   │   await-task-test-payload\n│   ├── t2-cheap-test [71%]\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test [69%]\n│   │   T8_PARALLEL_OK\n│   ├── cb-wakeup-repeat-test [68%]\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test [68%]\n│   │   wakeup-test-payload\n│   ├── background.md [66%]\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── cb-wakeup-stress-test [66%]\n│   │   wakeup-stress-test-payload\n│   ├── skills.md [62%]\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 25 · 3 background)\n│   └── cheap-test--callback-modes---tool-qa-238dca8f-0a98-41da-b987-cad781a5e587 [72%]\n├── skills/ (10 created)\n│   ├── Code Reviewer (code-reviewer-6) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-5) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-5) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-4) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-4) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-3) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── E2E Attribution Skill 1794433547926-14x2 (e2e-lead-skill-1794433547926-14x2) (created)\n│   ├── E2E Lead Magnet Skill (e2e-lead-magnet-1794388514598-9zf6) (created)\n│   └── Code Reviewer (code-reviewer-3) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (2)\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled]\n│   └── Dreaming\n│       0 2 * * * [disabled]\n├── favorites/ (14)\n│   ├── quality-tester\n│   │   model: skill:quality-tester\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── test-chef-bot\n│   │   model: skill:test-chef-bot\n│   └── +4 more\n└── /uploads/ (24 - images, documents, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (14)\n- [quality-tester] Quality Tester | char:Quality Tester (quality-tester) | model:\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical | char:Technical (technical) | model:\n- [my-technical-7] My Technical | char:Technical (technical) | model:\n- [my-technical-8] My Technical | char:Technical (technical) | model:\n- [test-chef-bot] Test Chef Bot | char:Test Chef Bot (test-chef-bot) | model:\n- [my-technical-9] My Technical | char:Technical (technical) | model:\n- [thea-2] Thea | char:Thea (thea) | model:\n- [quality-tester-budget] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-native-image] Quality Tester - Native Image | char:Quality Tester - Native Image (quality-tester) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:4b9a1963 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 13, 14:43]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "[T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. Enum-valued fields in tool results come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design and the UI translates them: that alone is never an issue. You dont need to create any memories unless asked, other than that treat it like any other chat. This test suite is called cheap\n\nNow: explore the tool catalog with the tool-help tool by making THREE calls. Issue ALL THREE IN PARALLEL in this ONE turn — emit them together in a single response (do NOT wait for one result before making the next), each NOW (do not reuse earlier results): (1) the tool-help tool with category='ai' to list the \"ai\" category's tools; (2) the tool-help tool with query='search' to keyword-search for search tools; (3) the tool-help tool with toolName='generate_image' to get one tool's full schema. Check: the category-narrow and keyword-query calls each return a non-empty tools array whose entries have a name + description; the detail call returns generate_image with a name, a description, and a parameters schema. End your reply with STEP_OK if all looked right AND nothing else is off, or FAILED: <what was wrong> otherwise.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Cheap Suite QA: Callbacks, Tools & Media\" / \"Quality-gate run of the 'cheap' suite on the atlas dev instance (deepseek-v4.1-flash, skill quality-tester__budget). Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, wakeUp async delivery, approve gating, contact-form, parallel multi-tool dispatch, products-category-list, and media attachments (image, audio, video, voice). Latest turn: companies-list returned a valid companies array. Noted: an earlier credits-balance reply misreported figures (agent-side error, later retracted).\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── t7-approve-test\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 25 · 3 background)\n├── skills/ (10 created)\n│   ├── Code Reviewer (code-reviewer-6) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-5) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-5) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-4) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-4) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-3) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── E2E Attribution Skill 1794433547926-14x2 (e2e-lead-skill-1794433547926-14x2) (created)\n│   ├── E2E Lead Magnet Skill (e2e-lead-magnet-1794388514598-9zf6) (created)\n│   └── Code Reviewer (code-reviewer-3) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (2)\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled]\n│   └── Dreaming\n│       0 2 * * * [disabled]\n├── favorites/ (14)\n│   ├── quality-tester\n│   │   model: skill:quality-tester\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── My Technical\n│   │   model: skill:technical\n│   ├── test-chef-bot\n│   │   model: skill:test-chef-bot\n│   └── +4 more\n└── /uploads/ (24 - images, documents, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (14)\n- [quality-tester] Quality Tester | char:Quality Tester (quality-tester) | model:\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical | char:Technical (technical) | model:\n- [my-technical-7] My Technical | char:Technical (technical) | model:\n- [my-technical-8] My Technical | char:Technical (technical) | model:\n- [test-chef-bot] Test Chef Bot | char:Test Chef Bot (test-chef-bot) | model:\n- [my-technical-9] My Technical | char:Technical (technical) | model:\n- [thea-2] Thea | char:Thea (thea) | model:\n- [quality-tester-budget] Quality Tester - Budget | char:Quality Tester - Budget (quality-tester) | model:\n- [quality-tester-native-image] Quality Tester - Native Image | char:Quality Tester - Native Image (quality-tester) | model:\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"toolName\":\"companies-list\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_0_9c06f67c29000ce0",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"companies\":[{\"country\":\"DE\",\"createdAt\":\"2026-08-29T17:02:10.640Z\",\"currency\":\"EUR\",\"email\":null,\"id\":\"e7f27962-ea54-447c-a142-be1d609eb4dc\",\"isActive\":true,\"name\":\"Demo Company\",\"role\":\"enums.companyMemberRole.owner\",\"type\":\"enums.companyType.b2c\"}],\"total\":1}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_0_9c06f67c29000ce0"
+      },
+      {
+        "content": "Called `companies-list` — it ran cleanly and returned a `companies` array with 1 entry:\n\n| name | type | role | country | currency | isActive |\n|------|------|------|---------|----------|----------|\n| Demo Company | b2c | owner | DE | EUR | true |\n\nThe `companies` array is present, `total: 1` matches the single entry, and all fields are populated and sensible. No errors, no empty result, no raw internal fields leaking into user-facing output.\n\nSTEP_OK",
+        "role": "assistant"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"endLoop\",\"input\":{\"description\":\"Quality-gate run of the 'cheap' suite on the atlas dev instance (deepseek-v4.1-flash, skill quality-tester__budget). Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, wakeUp async delivery, approve gating, contact-form, parallel multi-tool dispatch, products-category-list, and media attachments (image, audio, video, voice). Latest turn: companies-list returned a valid companies array. Noted: an earlier credits-balance reply misreported figures (agent-side error, later retracted).\",\"title\":\"Cheap Suite QA: Callbacks, Tools & Media\"},\"toolName\":\"rename-thread\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_0_ac2fa17418c9309c",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-13T13:43:24.186Z\",\"updatedPreview\":\"Quality-gate run of the 'cheap' suite on the atlas dev instance (deepseek-v4.1-flash, skill quality-tester__budget). Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, wakeUp async delivery, approve gating, contact-form, parallel multi-tool dispatch, products-category-list, and media attachments (image, audio, video, voice). Latest turn: companies-list returned a valid companies array. Noted: an earlier credits-balance reply misreported figures (agent-side error, later retracted).\",\"updatedThreadId\":\"b1651f69-c681-4273-876b-c3469626d8e5\",\"updatedTitle\":\"Cheap Suite QA: Callbacks, Tools & Media\"}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_0_ac2fa17418c9309c"
+      },
+      {
+        "content": "[T11e payment-invoice-list] Call the payment-invoice-list tool to list the payment invoices. Check that the result has an invoices array. End your reply with STEP_OK if you called the tool, or FAILED: <reason>.",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "reasoning": "Let me call payment-invoice-list. First check schema, then call.\n\nThe thread title still fits reasonably. The topic hasn't shifted dramatically. I'll skip rename since it still covers the conversation.\n\nLet me call the tool.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": "Let me call payment-invoice-list. First check schema, then call.\n\nThe thread title still fits reasonably. The topic hasn't shifted dramatically. I'll skip rename since it still covers the conversation.\n\nLet me call the tool.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"toolName\":\"payment-invoice-list\"},\"toolName\":\"tool-help\"}",
+              "name": "execute-tool"
+            },
+            "id": "chatcmpl-tool-c6db5847b51747c39bfc5483034c14c1",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"toolName\":\"payment-invoice-list\"}",
+              "name": "execute-tool"
+            },
+            "id": "chatcmpl-tool-826cab33585641fd8093847491f7dea5",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "{\"result\":{\"hint\":\"Call as: execute-tool toolName=\\\"payment-invoice-list\\\". CLI: vibe payment-invoice-list [--field=value].\",\"matchedCount\":1,\"tools\":[{\"category\":\"payments\",\"description\":\"List AR invoices for a company with optional filters\",\"examples\":{\"inputs\":{\"default\":{\"companyId\":\"00000000-0000-0000-0000-000000000001\",\"page\":1,\"pageSize\":20}},\"responses\":{\"default\":{\"invoices\":[],\"total\":0}}},\"name\":\"payment-invoice-list\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"properties\":{\"companyId\":{\"description\":\"Filter invoices for this company\",\"format\":\"uuid\",\"pattern\":\"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$\",\"type\":\"string\"},\"customerId\":{\"description\":\"Filter by customer\",\"format\":\"uuid\",\"pattern\":\"^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$\",\"type\":\"string\"},\"page\":{\"default\":1,\"description\":\"Page number\",\"maximum\":9007199254740991,\"minimum\":1,\"type\":\"integer\"},\"pageSize\":{\"default\":20,\"description\":\"Results per page\",\"maximum\":100,\"minimum\":1,\"type\":\"integer\"},\"status\":{\"description\":\"Filter by invoice status\",\"type\":\"string\"}},\"type\":\"object\"},\"title\":\"Invoices\"}],\"totalCount\":584}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "chatcmpl-tool-c6db5847b51747c39bfc5483034c14c1"
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"result\":{\"invoices\":[],\"total\":0}}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "chatcmpl-tool-826cab33585641fd8093847491f7dea5"
+      }
+    ],
+    "model": "deepseek/deepseek-v4.1-flash",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {},
+                  {},
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "callbackMode": {
+                "default": "wait",
+                "enum": [
+                  "wait",
+                  "detach",
+                  "endLoop",
+                  "wakeUp",
+                  "approve"
+                ],
+                "type": "string"
+              },
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "toolName"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

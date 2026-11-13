@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Phase 2 (wakeUp, stress) confirmed: the deferred result is `{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-13T12:52:09.429Z\"}` — a non-empty `responsePath` is present, matching the 26-char payload. Async delivery behaved exactly as documented.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

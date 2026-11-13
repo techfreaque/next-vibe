@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df371fbd47185-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:59:03 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574739-5UdzHbi6pZYRnks7XQMf",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=iTm3l2kBapUNdPnhUxvBbRsK0qKZ5z7FNVQRjUBYJAg-1794574738.2335892-1.0.1.1-2rNiCRJOkDXa0fTmJxj4aFmOqhtiuzmJV_xAmHuX3HaINFXzPEGL4XDwytYblC49cTWLQCns2bsD3ddP4qhR0CP8R3p.qn9cZnBHPntOC1PVqUIMbQdlnoGN42z3gqYC; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:29:03 GMT"
+  },
+  "body": {
+    "id": "gen-1794574739-5UdzHbi6pZYRnks7XQMf",
+    "object": "chat.completion",
+    "created": 1794574739,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "An instrumental hip-hop and neo-soul music loop plays throughout the duration of this clip (approximately 28 seconds). There is no speech or vocal content present.\n\n### Musical Overview & Genre\n- **Genre/Subgenre:** Instrumental Hip-Hop / Neo-Soul / Boom-Bap / R&B Beat\n- **Tempo:** Moderate, approximately 86–88 BPM\n- **Time Signature:** 4/4\n- **Key:** F major / D minor (warm, relaxed, mellow emotional tone)\n\n### Instrumentation & Composition\n- **Electric Guitar:** The primary harmonic foundation consists of a clean, slightly processed electric guitar (light chorus/reverb) playing a steady, syncopated funk/soul rhythm with brief chanks, muted strums, and smooth chord voicings.\n- **Bass:** A smooth, deep synth-bass/electric sub-bassline pulses warmly in the low end, following the groove and anchoring the guitar progression.\n- **Drums & Percussion:** \n  - A punchy, dry acoustic/sampled snare lands firmly on beats 2 and 4, reinforced by a soft layered rim/clap.\n  - A round, resonant kick drum plays a syncopated boom-bap pattern.\n  - Crisp hi-hats maintain a loose, slightly swung 16th-note pattern accented by subtle open-hat sizzles and a continuous light shaker/tambourine rhythm.\n\n### Structure & Progression\n- **00:00 – 00:22:** A continuous, laid-back instrumental groove featuring the guitar rhythm, bass, and full drum loop cycling seamlessly.\n- **00:22 – 00:25:** A transitional bridge/fill section. The main rhythm track cuts out, replaced by a momentary atmospheric swell, a reverse riser/cymbal effect, and a short pitch-bent melodic accent.\n- **00:25 – 00:28:** A brief drum fill featuring a punchy kick and snare drops back in to re-establish the primary beat as the audio ends.\n\n### Production Style & Quality\n- Clean, modern studio production with balanced mixing.\n- Low end is tight and warm; highs are crisp without harshness.\n- Overall mood is relaxed, focused, and reflective, characteristic of contemporary study beats or modern R&B production backdrops.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Content**\n\nI'm currently focused on dissecting the provided audio, identifying it as a roughly 28-second instrumental piece. My analysis points towards a hip hop, R&B, neo-soul, or lo-fi boom bap genre, with a tempo hovering between 85 and 90 BPM.\n\n**Defining Sonic Elements**\n\nI've refined my analysis, confirming a 4/4 minor key (likely D minor/F major) and a steady boom-bap groove. The instrumentation includes clean electric guitar chords, a warm bassline, and a crisp drum pattern. I've also identified a distinct transitional break around 00:22, featuring atmospheric synth swells before the beat returns.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Content**\n\nI'm currently focused on dissecting the provided audio, identifying it as a roughly 28-second instrumental piece. My analysis points towards a hip hop, R&B, neo-soul, or lo-fi boom bap genre, with a tempo hovering between 85 and 90 BPM.\n\n**Defining Sonic Elements**\n\nI've refined my analysis, confirming a 4/4 minor key (likely D minor/F major) and a steady boom-bap groove. The instrumentation includes clean electric guitar chords, a warm bassline, and a crisp drum pattern. I've also identified a distinct transitional break around 00:22, featuring atmospheric synth swells before the beat returns.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 923,
+      "total_tokens": 1995,
+      "cost": 0.00426525,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00426525,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00346125
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 423,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

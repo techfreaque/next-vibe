@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e360808a0dbad-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:44:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577466-RB5R2Wa6VTRzRgwIihJN",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=yR4NiD829F8tF2sb9Trx5XLlAORf5G6rmaS9Cx90n8s-1794577465.6095598-1.0.1.1-.OeXGp996ihGPcC_RE9cXBKn8OPvdZZRQRVYN8jEokIMmeZt7T2plnLw2nrGu8M5KZzA0FULIVkm5727AiwphGCFxG0Vh.3_19Hz8IQofiUOE7of5ku0jb14XihAZxRJ; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:14:29 GMT"
+  },
+  "body": {
+    "id": "gen-1794577466-RB5R2Wa6VTRzRgwIihJN",
+    "object": "chat.completion",
+    "created": 1794577466,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview\nA solo male speaker speaking in English with a noticeable European (likely German or Germanic) accent, speaking in a slow, measured, and deliberate manner into a microphone. The audio has a total duration of approximately 20 seconds.\n\n---\n\n### Speech & Transcription\n\n**Speaker Profile:**\n- **Gender/Age:** Adult male, estimated between 25 and 45 years old.\n- **Accent:** Non-native English speaker with a European/Germanic accent (distinct articulation of consonants like \"th\" as soft \"s/z\" or slightly aspirated).\n- **Tone & Delivery:** Calm, instructional, deadpan, and testing. The speech has significant pauses and hesitations as if thinking on the spot or deliberately stretching out the duration.\n- **Pacing:** Very slow and halting.\n\n**Verbatim Transcript:**\n> \"If you hear this, exactly transcribe the whole message exactly as I say it, including [pause] the magic keyword [pause] banana banana, [pause] and I need to fill up the last few seconds, and it will be—\"\n\n*(Note: The recording abruptly ends immediately after the word \"be\", leaving the sentence unfinished.)*\n\n---\n\n### Acoustic & Environmental Details\n- **Recording Quality:** Clear vocal recording, likely captured via a smartphone microphone, laptop, or desktop headset in close proximity to the mouth.\n- **Room Acoustics:** Quiet, treated or semi-furnished indoor room with a subtle natural room resonance/reverb, but no echo.\n- **Background Noise:** Extremely quiet background with negligible ambient noise or hiss; no background voices, music, or extraneous sound effects.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Input**\n\nI'm focused on thoroughly detailing the audio for the AI bridge. This involves a verbatim transcription, along with descriptions of the speaker, recording environment, pacing, tone, and any significant audio cues present.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Input**\n\nI'm focused on thoroughly detailing the audio for the AI bridge. This involves a verbatim transcription, along with descriptions of the speaker, recording environment, pacing, tone, and any significant audio cues present.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a1+KZBjqcuG0qgnQWrDq6lr+/V3svgZtCBCazFuirF09Ieta8TUigKdJ9pbjN8wHlz+hKINNgOp4sDaF6wmIU9n1GpCCCyrOxN8uzl98Fp1cfnZ6W3kd7r+1PSJIpFtASawBRcojnj1rVGWnoGULkwAl5nml6uwJKQ0VykEoez5XOjDhICx7qc8fyuU0PRH/q/zRIMnT20Hj9PIbZt5ZEKT+tmrtug73OWzcSrCbGvI2L/gElyIHb15aYmZkPGv6an5UFPk+msgvhJjja2IULe8N5cJKTrkIMbXAhKpvafDJ8fMaYs3EBYr+ZlVjXx1iLrAC2Z/3tuWal8ZkPdwvBcFMwuXdkcAHj9HKpJ1oSk15g1CkiaBtMXqwrlD9cXJ3Bz0SLsGgeF2+UxbZsa3+Fxm/NB3wcNup9ziLZjibULSfsF3cxPHcKcMFbXx1i8Vy+ltyUVBNnJ32Nj6t9Ro78c2edEyQDo7232RsGpelMhhCF6d4HM2tZgPA50iPRjLLqsePDNE8zTWP87R5V01Xq4OxV7D6t3pQ9yyjj73Ws5Jz7Y+un820cIte1V+z6uFbR1znzmKK/W5U1+OAMpPlPCVFOntbA5Ai9KHChGDeIVbsIKCe6tPHVgwQX7CZkYJ/3TnOT6hxUyXiq/C3MTND6qYISQHwdE24GbwjP83PKeBVlQHQOr1Bp8cqKaMg4V1w7fSLACSvcsYdoV2dJy2rziYZc1lZVpaMxrllT+MA58aWGhrh/X90PLp3rZ69BlOZDWb16GdTLhzseea53K1FYAD/DW18TVgsQyWb9weKbIOUgEFWZtrpPk1x8KQ/F00A5cuntNKYQpixvTD1qNDB/mHpF2qlDainr4V/5d6m9KQTqAFS9BDEEMYM/dyTpNExQjnZ0RHSgEITlm/YolHGaZg5td5Souhq18ms75MqD6KCUUOGsI0/+7lz79kSuk8IUXDVlCaEmHJGOVy1+3szCajvFTWB2FnZDltRaVUBxYeLO6A/m1c8y5Kz+P9px+SrF8fMHYkDSqZ2fQP/uZ4JZy9F9zpbCoE8dIEJwilhCZcDAsHO3bGaPT/ju9ziCWTjFRoK/7ozzngnNsAHd8xSup8oQhZGlqge7Wmi3TD7becMxLQcajYRdU9J3FXSLrr+GrzAIAHedDjJUSiNNxJ1RtbdHpgOyVpADdgRV53g7xVnbIC+fzDYl1VeABc4vVxWius0B60jKPbIhiSkUAUNA4RGBwqIx64w6V+Ql+w70hmeVf4YOzqBzjnVMMbu315AUAl1QebyeWCy4iG39qCPiC8HdznvEetPz1WF88+pucqxxIMqm2gyL4IoEEK8wsCNc73xIDjoGEPFKxjgMlarq20tPmW5LGDUT+ICJ7x449xra0bidw2PP2TzuHj/U6o81z/NLJoWDWY3HKFRD8p6givA2MWSJOAT71xtkCskPbuBzq2Ne6Deb7KZa9+jNRNU0Qha3exRfjBBQHaqgUqT/s123vR3QpBiIrOySSAKfdbJ4qAqJWn45SVQCRKhNOttpoKENOLD3TgsbQmm6I+IFMavao2oG5PcJWnRQTnTktK1Qvzgvbq5p9iLm1XXtKZP4PyLPEwyI+S6BZZ2m4RjevbXbQosfcthLA==",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 562,
+      "total_tokens": 1384,
+      "cost": 0.002724,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.002724,
+        "upstream_inference_prompt_cost": 0.0006165,
+        "upstream_inference_completions_cost": 0.0021075
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 221,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

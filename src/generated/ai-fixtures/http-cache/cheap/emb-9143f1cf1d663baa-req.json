@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "This is outcome **(a) DEFERRED** — the dispatch returned `taskId: \"local-wu-chatcmpl-tool-194af3fea2024966b89a2cc0076db483\"` and no `responsePath`, with a hint confirming the result will be injected automatically when ready. I'll be revived when the write completes.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

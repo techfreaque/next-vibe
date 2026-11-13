@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached image is a simple graphic: a solid red circle centered on a plain white background. No text, shapes, or other elements — just the single filled red circle.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

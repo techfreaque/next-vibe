@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df0126d82d386-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:56:43 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574600-CMdTDMxhx3MXy01cCHWS",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=vd4KCSzI8VCOCTY.EN4Au75lO5.MyvdM_Iw1y1NB18I-1794574600.0654812-1.0.1.1-yOvSFv2e1.rNlT5Ht_J8ZfjVUD7rTko.LZFGpgJBXmevWdTKOyc.OAulFfyHfnQ0KQZ9W_K4HVtmSQAn5laIBcOmEhwv1y_FUHnnjaCMFULrYJggd87PzELxSMM_lp9F; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:26:43 GMT"
+  },
+  "body": {
+    "id": "gen-1794574600-CMdTDMxhx3MXy01cCHWS",
+    "object": "chat.completion",
+    "created": 1794574600,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview\n- **Duration:** 27.2 seconds\n- **Format:** Instrumental music cue / background loop\n- **Genre/Style:** Modern Electro-Funk / Synth-Pop / J-Pop BGM style (reminiscent of contemporary anime soundtrack backing tracks, commercial tech intros, or upbeat lifestyle vlog music)\n- **Tempo:** Approximately 122–124 BPM\n- **Time Signature:** 4/4\n- **Speech/Vocals:** None present. Completely instrumental.\n\n---\n\n### Musical Analysis & Instrumentation\n\n#### Rhythm Section\n- **Drums & Percussion:** Electronic drum kit with a tight, punchy kick drum anchoring the groove, snappy digital snare/handclap layered on beats 2 and 4, and brisk, continuous closed hi-hats with light sixteenth-note swings. A crisp shaker/tambourine-like percussion element sits subtly in the upper-mid stereo field to maintain forward momentum.\n- **Bass:** Deep, active synth-bass / processed electric bass playing an energetic, syncopated funk groove with rhythmic octave jumps, staccato plucks, and subtle pitch slides that tightly lock in with the kick drum.\n\n#### Melodic & Harmonic Elements\n- **Rhythm Guitar:** Clean, bright electric guitar performing compressed funk chops and skank strums on the upbeats, panned slightly off-center to give space to the synths.\n- **Synthesizers & Keys:**\n  - Plucked digital synth arpeggios and bright bell-like synth keys providing bouncy melodic counter-melodies and rhythmic chord stabs.\n  - Sweet, playful lead synth accents that flutter with a clean, chiptune/FM-synthesis-inspired brightness.\n  - Warm, subtle synth pad chords filling the mid-range background ambience.\n\n---\n\n### Chronological Structure\n\n- **0:00 – 0:11:** The main upbeat groove establishes immediately. Driving funk bassline, four-on-the-floor influenced beat, upbeat rhythm guitar chops, and playful synth hooks interlocking in an energetic loop.\n- **0:11 – 0:21:** The groove continues with subtle additions of melodic synth variations and higher-register playful digital chime phrases, maintaining a sunny, cheerful bounce.\n- **0:21 – 0:23:** A brief rhythmic transition / turnaround; the beat executes a short fill with quick snare hits and a subtle filter sweep.\n- **0:23 – 0:27:** An abrupt structural break / drop. The high-energy groove cuts away; a low, resonant, filtered kick/sub impact sounds, followed by a descending pitch drop/synth slide and soft, ticking ambient percussive clicks that quickly fade into silence as the track concludes.\n\n---\n\n### Production & Sound Quality\n- **Audio Quality:** Pristine, modern digital studio mix.\n- **Dynamic Range & Texture:** Highly polished, balanced frequency distribution with punchy, controlled low-end, warm mids, and airy, sparkling top-end. Stereo imaging is wide with clear separation between rhythmic guitar chops, synth arpeggios, and centered percussion.\n- **Emotional Tone:** Lighthearted, optimistic, buoyant, stylish, and playful.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Elements**\n\nI'm currently focused on dissecting the musical components of this short 27-second clip. My analysis points towards an energetic electronic soundscape, with influences from synth-pop, funk, disco-pop, and even a chiptune-esque electro-pop feel.\n\n**Investigating Sonic Details**\n\nI've been drilling down into the specific instruments. The prominent groovy bassline, bright funk guitar, and tight electronic drums are key. I'm also identifying playful synth melodies and chiptune-like accents, along with subtle rising effects.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Elements**\n\nI'm currently focused on dissecting the musical components of this short 27-second clip. My analysis points towards an energetic electronic soundscape, with influences from synth-pop, funk, disco-pop, and even a chiptune-esque electro-pop feel.\n\n**Investigating Sonic Details**\n\nI've been drilling down into the specific instruments. The prominent groovy bassline, bright funk guitar, and tight electronic drums are key. I'm also identifying playful synth melodies and chiptune-like accents, along with subtle rising effects.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1201,
+      "total_tokens": 2273,
+      "cost": 0.00530775,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00530775,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.00450375
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 523,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

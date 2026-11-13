@@ -48,8 +48,30 @@ import {
   runTestStream,
   type SlimMessage,
 } from "../../testing/headless-test-runner";
+import {
+  assertAiMediaUrlsGrounded,
+  assertAiTaskIdsGrounded,
+} from "./helpers/grounding";
+import { chainParentOf } from "./helpers/messages";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * The answer at the end of an ordered chain. An answer that fired an endLoop
+ * side-action (rename-thread on an untitled thread) ends at that tool row, so
+ * step back over it to the assistant that carried the reply.
+ */
+function answerLeaf(chain: SlimMessage[]): SlimMessage {
+  const tip = chain[chain.length - 1]!;
+  if (
+    tip.role === "tool" &&
+    tip.toolCall?.callbackMode === "endLoop" &&
+    chain.length > 1
+  ) {
+    return chain[chain.length - 2]!;
+  }
+  return tip;
+}
 
 /**
  * Temporarily set compactTrigger on a favorite. Returns an async function that
@@ -413,7 +435,7 @@ describe("Compacting - context management", () => {
         expect(c1Chain[0]!.role, "C1: chain root must be user").toBe("user");
 
         // Leaf must be assistant with C1_PASS
-        const c1Leaf = c1Chain[c1Chain.length - 1]!;
+        const c1Leaf = answerLeaf(c1Chain);
         expect(c1Leaf.role, "C1: chain leaf must be assistant").toBe(
           "assistant",
         );
@@ -552,7 +574,7 @@ describe("Compacting - context management", () => {
         const t1Chain = buildOrderedChain(turn1.messages);
         expect(t1Chain[0]!.role, "C2-T1: root must be user").toBe("user");
 
-        const t1Leaf = t1Chain[t1Chain.length - 1]!;
+        const t1Leaf = answerLeaf(t1Chain);
         expect(t1Leaf.role, "C2-T1: turn 1 leaf must be assistant").toBe(
           "assistant",
         );
@@ -612,8 +634,8 @@ describe("Compacting - context management", () => {
         ).toBe(t1Chain[0]!.id);
 
         // Turn-2 user message is the second-to-last in chain
-        const t2Leaf = t2Chain[t2Chain.length - 1]!;
-        const t2User = t2Chain[t2Chain.length - 2];
+        const t2Leaf = answerLeaf(t2Chain);
+        const t2User = t2Chain[t2Chain.indexOf(t2Leaf) - 1];
         expect(
           t2User?.role,
           "C2-T2: second-to-last message must be user (turn 2)",
@@ -630,11 +652,12 @@ describe("Compacting - context management", () => {
           "C2-T2: turn 2 leaf must contain FOLLOWUP_DONE",
         ).toContain("FOLLOWUP_DONE");
 
-        // Turn-2 user message must be a child of the turn-1 final assistant (COMPACT_DONE)
+        // Turn-2 user message must chain after turn 1's tip: the final
+        // assistant (COMPACT_DONE), or the endLoop rename row riding it.
         expect(
-          t2User?.parentId,
-          "C2-T2: turn-2 user message must be a child of the turn-1 final assistant",
-        ).toBe(t1Leaf.id);
+          chainParentOf(t2User, turn2.messages),
+          "C2-T2: turn-2 user message must be a child of the turn-1 tip (through any pre-turn compacting node)",
+        ).toBe(t1Chain[t1Chain.length - 1]!.id);
 
         // Compacting message still present in the full thread
         const t2CompactIdx = t2Chain.findIndex((m) => m.isCompacting);
@@ -708,6 +731,11 @@ describe("Compacting - context management", () => {
               `C2-quality: compacting msg ${cm.id} input tokens must be ≤50k`,
             ).toBeLessThanOrEqual(50_000);
           }
+
+          // Recaps must not invent: every task id / media URL a summary
+          // cites has to exist in the thread's tool rows (or cron_tasks).
+          await assertAiTaskIdsGrounded(freshMessages, "C2-quality");
+          assertAiMediaUrlsGrounded(freshMessages, "C2-quality");
         }
       } finally {
         await restoreC2();

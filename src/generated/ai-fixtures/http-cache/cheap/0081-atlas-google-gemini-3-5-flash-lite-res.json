@@ -1,0 +1,77 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e36080fe4bbb5-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:44:33 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577466-dKlcWAjIZ50FHA0wVDUh",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=tDzPM8i4GnaaCy_OzYfmrnTs4M0XJGDpMppH33tg5jQ-1794577465.6096048-1.0.1.1-dEJpc2gvXxVDxtKyGi1rgqonCyeUvpTQfKvlNhPFhRVw3AYzJX5zN2jJ00odc6yTNdDdqMy2rRM4KztbUF76hj4.dHQVV521kOv1ebE5X7iWFdgW.QcuHyhlCarJOeFn; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:14:33 GMT"
+  },
+  "body": {
+    "id": "gen-1794577466-dKlcWAjIZ50FHA0wVDUh",
+    "object": "chat.completion",
+    "created": 1794577466,
+    "model": "google/gemini-3.5-flash-lite",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "A close-up shot shows a person's hands holding a partly solved Rubik's cube against a chaotic, blurry background filled with dozens of other scrambled Rubik's cubes of various colors and patterns. The hands, with medium-dark skin tone, turn and manipulate the faces of the cube, aligning the colored squares. The lighting is bright and even, highlighting the glossy plastic surface of the cubes. The camera remains fixed in a tight close-up on the hands and the central cube, creating a shallow depth of field where the surrounding cubes are out of focus. There is no text on screen, and no audio is present.",
+          "refusal": null,
+          "reasoning": null,
+          "reasoning_details": [
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a182NIZkJ8mNOHgGbwJMPcInkXmIY3JzsdcifGWGnJNRlb3daTqJB1Ci1hZCYSceqXI8ktWKYn7Qd1trXsvNQFfjA3Ge0VxXAon7fcEHkddGLVsMCsjv80E=",
+              "format": "google-gemini-v1",
+              "index": 0
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 408,
+      "completion_tokens": 129,
+      "total_tokens": 537,
+      "cost": 0.0004449,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 66
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0004449,
+        "upstream_inference_prompt_cost": 0.0001224,
+        "upstream_inference_completions_cost": 0.0003225
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

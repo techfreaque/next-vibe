@@ -1,0 +1,31 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a59de96f1f17db9d-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 13 Nov 2026 12:52:09 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574328-M7WgkUcYiiGEL7PkA7Sd",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=gORPRWUYYhLOi.KkbXf3_oL2h44yj5y499b4HLr7UGw-1794574328.1731682-1.0.1.1-tFn044doSK8ziWZQqGlNgytOXpqBBu8S4.J7nubPObdT5fe2FyAJCvO8FbdszsrgnsptjpOZJfh76e7NsaHrSFmhBtJ3_MEIdaKMk1borzVJsd04d28iAM5AxT7PSe_W; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:22:09 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794574328-M7WgkUcYiiGEL7PkA7Sd\",\"object\":\"chat.completion.chunk\",\"created\":1794574328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Venice\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\\n\\n\",\"role\":\"assistant\"},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794574328-M7WgkUcYiiGEL7PkA7Sd\",\"object\":\"chat.completion.chunk\",\"created\":1794574328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Venice\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"chatcmpl-tool-a01bb4d5d92c4ae9954b592dedcc3172\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794574328-M7WgkUcYiiGEL7PkA7Sd\",\"object\":\"chat.completion.chunk\",\"created\":1794574328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Venice\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\": \\\"wakeUp\\\", \\\"input\\\": {\\\"content\\\": \\\"wakeup-stress-test-payload\\\", \\\"path\\\": \\\"/memories/cb-wakeup-stress-test\\\"}, \\\"toolName\\\": \\\"cortex-write\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794574328-M7WgkUcYiiGEL7PkA7Sd\",\"object\":\"chat.completion.chunk\",\"created\":1794574328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Venice\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794574328-M7WgkUcYiiGEL7PkA7Sd\",\"object\":\"chat.completion.chunk\",\"created\":1794574328,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"Venice\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":24511,\"completion_tokens\":106,\"total_tokens\":24617,\"cost\":0.00605778,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":4864,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00605778,\"upstream_inference_prompt_cost\":0.00593058,\"upstream_inference_completions_cost\":0.0001272},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

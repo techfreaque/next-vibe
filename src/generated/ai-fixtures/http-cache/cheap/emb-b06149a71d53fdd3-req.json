@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** A solid red circle centered on a plain white background — a single filled red disc, no text or other elements.\n\n**Audio:** Received and processed — an instrumental hip-hop / neo-soul groove (~28s, ~88–90 BPM, D minor) with boom-bap drums, a funky electric bassline, clean electric guitar licks, and Rhodes keys. Chill, confident, head-nodding vibe.\n\nBoth the image content (native) and the audio description are present.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

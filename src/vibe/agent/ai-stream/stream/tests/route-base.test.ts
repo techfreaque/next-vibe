@@ -52,7 +52,12 @@ import "server-only";
 globalThis.AI_SDK_LOG_WARNINGS = false;
 
 import { and, eq, sql } from "drizzle-orm";
-import { DefaultFolderId, makeHeadlessContext, rootlessToolExecutionContext, type ToolExecutionContext } from "../../../../core/execution-context";
+import {
+  DefaultFolderId,
+  makeHeadlessContext,
+  rootlessToolExecutionContext,
+  type ToolExecutionContext,
+} from "../../../../core/execution-context";
 import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
 import {
   ContentLevel,
@@ -111,14 +116,23 @@ import {
   ensureVariantFavorite,
   ensureVisualFavorite,
 } from "./helpers/favorites";
+import { assertThreadGrounded } from "./helpers/grounding";
 import {
+  assertCleanFinish,
   assertNoMetaToolPrefix,
   assertToolMessageComplete,
+  chainParentOf,
   findToolMsg,
   isToolMsgFor,
   resolveToolResult,
+  tipAfterAnswer,
 } from "./helpers/messages";
-import { assertStepOk, toolInstr, toolInstrWithArgs } from "./helpers/prompts";
+import {
+  assertNativeTurnVerdict,
+  assertStepOk,
+  toolInstr,
+  toolInstrWithArgs,
+} from "./helpers/prompts";
 import {
   assertNoPendingTasks,
   assertThreadIdle,
@@ -653,6 +667,27 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             }
             try {
               await fn();
+              // Evidence over self-report: every URL / task id the AI or a
+              // compacting recap wrote must exist, tool media must be stored,
+              // native media rows must be settled. Runs after EVERY step so a
+              // fabrication fails the step that introduced it.
+              if (threadId) {
+                const stepMessages = await getMessages(threadId);
+                await assertThreadGrounded(stepMessages, name, {
+                  // Remote-loop media lands in the peer's storage.
+                  checkStorage: !usesRemote,
+                  fixturePrefix: cfg.cachePrefix,
+                });
+                // An answer that fired an endLoop side-action (rename-thread
+                // on an untitled/stale thread) ends at that tool row: the
+                // next step chains after it, as the UI does.
+                if (lastMainAiMsgId) {
+                  lastMainAiMsgId = tipAfterAnswer(
+                    lastMainAiMsgId,
+                    stepMessages,
+                  );
+                }
+              }
             } catch (err) {
               suiteFailed = true;
               // oxlint-disable-next-line restricted-syntax -- intentional re-throw in test suite
@@ -743,7 +778,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
 
           const { result, messages } = await runStream({
             user: testUser,
-            prompt: `[T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. You dont need to create any memories unless asked, other than that treat it like any other chat. This test suite is called ${cfg.cachePrefix}
+            prompt: `[T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. Enum-valued fields in tool results come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design and the UI translates them: that alone is never an issue. You dont need to create any memories unless asked, other than that treat it like any other chat. This test suite is called ${cfg.cachePrefix}
 
 Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THREE calls. Issue ALL THREE IN PARALLEL in this ONE turn — emit them together in a single response (do NOT wait for one result before making the next), each NOW (do not reuse earlier results): (1) ${toolInstrWithArgs(cfg, "tool-help", "category='ai'")} to list the "ai" category's tools; (2) ${toolInstrWithArgs(cfg, "tool-help", "query='search'")} to keyword-search for search tools; (3) ${toolInstrWithArgs(cfg, "tool-help", "toolName='generate_image'")} to get one tool's full schema.${cfg.remoteInstanceId ? ` The instanceId='${cfg.remoteInstanceId}' routing above applies ONLY to these three tool-help calls that I explicitly asked you to run there — it is NOT a blanket rule. Any OTHER tool you decide to use on your own is a separate decision: route each one wherever is correct for what it does, and never carry '${cfg.remoteInstanceId}' onto a call I didn't ask to run there.` : ""} Check: the category-narrow and keyword-query calls each return a non-empty tools array whose entries have a name + description; the detail call returns generate_image with a name, a description, and a parameters schema. End your reply with STEP_OK if all looked right AND nothing else is off, or FAILED: <what was wrong> otherwise.`,
             favoriteId: mainFavoriteId,
@@ -1053,7 +1088,10 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           expect(lastAi!.promptTokens).toBeGreaterThan(0);
           expect(lastAi!.completionTokens).toBeGreaterThan(0);
           expect(lastAi!.creditCost).toBeGreaterThan(0);
-          expect(lastAi!.finishReason).toBe("stop");
+          assertCleanFinish(lastAi!, messages, "T1");
+          // The mandatory first-turn rename rides the answer with endLoop:
+          // its tool row is the true tip the next turn chains after.
+          lastMainAiMsgId = tipAfterAnswer(t1ToolAiMsgId, messages);
 
           // ── Chain from last AI back to root ──
           const chain = walkChain(messages, lastAi!.id);
@@ -1360,7 +1398,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             (m) => m.id === result.data.lastAiMessageId,
           );
           expect(lastAi).toBeDefined();
-          expect(lastAi!.finishReason).toBe("stop");
+          assertCleanFinish(lastAi!, messages, "T2");
           assertStepOk(lastAi!.content, "T2");
           lastMainAiMsgId = result.data.lastAiMessageId!;
 
@@ -1735,7 +1773,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         // T4a (not a second fork off 3b). The T3a retry branch stays abandoned.
         const musicUser = musicAdded.find((m) => m.role === "user");
         expect(
-          musicUser?.parentId,
+          chainParentOf(musicUser, musicMsgs),
           `T4a: music user parentId must be branchForkAiMsgId=${branchForkAiMsgId}`,
         ).toBe(branchForkAiMsgId);
 
@@ -1812,7 +1850,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           (m) => m.id === musicResult.data.lastAiMessageId,
         );
         expect(musicLastAi).toBeDefined();
-        expect(musicLastAi!.finishReason).toBe("stop");
+        assertCleanFinish(musicLastAi!, musicMsgs, "T4a");
         assertStepOk(musicLastAi!.content, "T4a");
 
         // Exact chain: [t1UserMsgId, ..., branchForkAiMsgId, musicUser, ..., musicLastAi]
@@ -1896,7 +1934,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         // AFTER T4a, not a sibling fork off 3b).
         const videoUser = videoAdded.find((m) => m.role === "user");
         expect(
-          videoUser?.parentId,
+          chainParentOf(videoUser, videoMsgs),
           `T4b: favorites user parentId must be t4aMusicAiMsgId=${t4aMusicAiMsgId} (chains after T4a, not a fork off branchForkAiMsgId=${branchForkAiMsgId})`,
         ).toBe(t4aMusicAiMsgId);
 
@@ -1920,7 +1958,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           (m) => m.id === videoResult.data.lastAiMessageId,
         );
         expect(videoLastAi).toBeDefined();
-        expect(videoLastAi!.finishReason).toBe("stop");
+        assertCleanFinish(videoLastAi!, videoMsgs, "T4b");
         assertStepOk(videoLastAi!.content, "T4b");
         lastMainAiMsgId = videoResult.data.lastAiMessageId!;
 
@@ -2491,7 +2529,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               expect(
                 String(phase1Res!["imageUrl"]),
                 "T6a inline delivery: imageUrl must be a real URL",
-              ).toMatch(/^https?:\/\/.+/);
+              ).toMatch(
+                /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+              );
               // Capture the generated image URL — the T6v video-gen step (after
               // T6b) consumes it as lastFrameUrl.
               t6aGeneratedImageUrl = String(phase1Res!["imageUrl"]);
@@ -2626,7 +2666,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
                 expect(
                   String(inlineRes?.["imageUrl"] ?? ""),
                   "T6b inline: original message must hold the final imageUrl",
-                ).toMatch(/^https?:\/\/.+/);
+                ).toMatch(
+                  /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+                );
               }
               expect(
                 originalMsg!.toolCall?.isDeferred,
@@ -2867,7 +2909,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           expect(
             t6aGeneratedImageUrl,
             "T6v: t6aGeneratedImageUrl must be captured from T6a before the video step runs",
-          ).toMatch(/^https?:\/\/.+/);
+          ).toMatch(
+            /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+          );
         }
 
         // VEO_3_1 costs ~48 cr/sec * 5 sec * 1.3 markup = ~312 cr minimum.
@@ -2903,7 +2947,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
         // Chains linearly from T6b's leaf.
         const t6vUser = t6vAdded.find((m) => m.role === "user");
         expect(
-          t6vUser?.parentId,
+          chainParentOf(t6vUser, t6vMsgs),
           `T6v: user parentId must be lastMainAiMsgId=${lastMainAiMsgId} (chains after T6b)`,
         ).toBe(lastMainAiMsgId);
 
@@ -2922,7 +2966,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           ).toBe(true);
         } else {
           expect(typeof t6vRes!["videoUrl"]).toBe("string");
-          expect(String(t6vRes!["videoUrl"])).toMatch(/^https?:\/\/.+/);
+          expect(String(t6vRes!["videoUrl"])).toMatch(
+            /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+          );
           expect(typeof t6vRes!["creditCost"]).toBe("number");
           expect((t6vRes!["creditCost"] as number) > 0).toBe(true);
           expect(typeof t6vRes!["durationSeconds"]).toBe("number");
@@ -2968,7 +3014,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           (m) => m.id === t6vResult.data.lastAiMessageId,
         );
         expect(t6vLastAi).toBeDefined();
-        expect(t6vLastAi!.finishReason).toBe("stop");
+        assertCleanFinish(t6vLastAi!, t6vMsgs, "T6v");
         assertStepOk(t6vLastAi!.content, "T6v");
         lastMainAiMsgId = t6vResult.data.lastAiMessageId!;
 
@@ -3078,7 +3124,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
                 expect(
                   String(phase1Res!["imageUrl"]),
                   `${round.label} inline: imageUrl must be a real URL`,
-                ).toMatch(/^https?:\/\/.+/);
+                ).toMatch(
+                  /^(https?:\/\/.+|\/api\/en-GLOBAL\/vibe\/agent\/chat\/threads\/files\/.+)/,
+                );
               }
               await assertThreadIdle(threadId, testUser);
               const inlineMsgs = await getMessages(threadId);
@@ -3995,7 +4043,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           const { result, messages } = await runStream({
             user: testUser,
             prompt: cfg.cheapMode
-              ? `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "cortex-write", `path='${t8CheapPath}' and content='T8_PARALLEL_OK'`)} to write a memory node, and (2) ${toolInstr(cfg, "chat-settings")} to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`
+              ? `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "cortex-write", `path='${t8CheapPath}' and content='T8_PARALLEL_OK'`)} to write a memory node, and (2) ${toolInstr(cfg, "chat-settings")} to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. Enum-valued fields come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design, the UI translates them: that is not an issue. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`
               : `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "tool-help", `query='image'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)} to look up tools matching 'image' (this returns a tools array, NOT categories), and (2) ${toolInstrWithArgs(cfg, "generate_image", `prompt='green square'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)}. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. tool-help WITH a query returns a tools array; an empty array only means no match, not a failure. Check that tool-help returned a tools array (any length) and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`,
             threadId,
             favoriteId: mainFavoriteId,
@@ -4111,7 +4159,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           );
           expect(lastAi?.content).toBeTruthy();
           // ── Final AI has token metadata ──
-          expect(lastAi!.finishReason).toBe("stop");
+          assertCleanFinish(lastAi!, messages, "T8");
           expect(lastAi!.creditCost).toBeGreaterThan(0);
           assertStepOk(lastAi!.content, "T8");
           lastMainAiMsgId = result.data.lastAiMessageId!;
@@ -4317,7 +4365,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           );
           expect(imgAiMsg).toBeDefined();
           expect(imgAiMsg!.role).toBe("assistant");
-          expect(imgAiMsg!.finishReason).toBe("stop");
+          assertCleanFinish(imgAiMsg!, imgMsgs, "T10a");
           expect(imgAiMsg!.creditCost).toBeGreaterThan(0);
 
           assertNoOrphans(
@@ -4744,6 +4792,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               Array.isArray(companiesRes!["companies"]),
               "[T11] companies-list result must have a companies array",
             ).toBe(true);
+            assertStepOk(result.data.lastAiMessageContent, "T11");
             lastMainAiMsgId = result.data.lastAiMessageId ?? lastMainAiMsgId;
           } else {
             expect(result.data.lastGeneratedMediaUrl).toBeTruthy();
@@ -4759,6 +4808,16 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             expect(toolRes).not.toBeNull();
             expect(typeof toolRes!["file"]).toBe("string");
             expect(toolRes!["creditCost"]).toBe(0);
+            expect(
+              imageToolMsg!.toolCall?.status,
+              "[T11] native generate_image row must be settled (status completed)",
+            ).toBe("completed");
+            assertNativeTurnVerdict(
+              added
+                .filter((m) => m.role === "assistant" && !m.isCompacting)
+                .map((m) => m.content),
+              "T11",
+            );
 
             // Native image gen: args.prompt must be empty string (not the user message text).
             // An empty prompt tells gap-fill to fire the vision bridge on the next turn with a
@@ -4868,6 +4927,16 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             expect(typeof i2iToolRes!["file"]).toBe("string");
             expect(i2iToolRes!["file"]).toBeTruthy();
             expect(i2iToolRes!["creditCost"]).toBe(0);
+            expect(
+              i2iToolMsg!.toolCall?.status,
+              "[T11 native-i2i] native generate_image row must be settled (status completed)",
+            ).toBe("completed");
+            assertNativeTurnVerdict(
+              i2iAdded
+                .filter((m) => m.role === "assistant" && !m.isCompacting)
+                .map((m) => m.content),
+              "T11 native-i2i",
+            );
 
             const i2iLeaf = [...i2iAdded]
               .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
@@ -4972,6 +5041,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               Array.isArray(invoiceRes!["invoices"]),
               "[T11e] payment-invoice-list result must have an invoices array",
             ).toBe(true);
+            assertStepOk(result.data.lastAiMessageContent, "T11e");
             lastMainAiMsgId = result.data.lastAiMessageId ?? lastMainAiMsgId;
 
             assertNoOrphans(
@@ -5011,6 +5081,16 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           expect(typeof imageRes!["file"]).toBe("string");
           expect(imageRes!["file"]).toBeTruthy();
           expect(imageRes!["creditCost"]).toBe(0);
+          expect(
+            imageToolMsg!.toolCall?.status,
+            "[T11e] native generate_image row must be settled (status completed)",
+          ).toBe("completed");
+          assertNativeTurnVerdict(
+            added
+              .filter((m) => m.role === "assistant" && !m.isCompacting)
+              .map((m) => m.content),
+            "T11e",
+          );
 
           // Native gen: args.prompt must be empty so gap-fill vision-bridges on the
           // next non-image turn — there is no inputMediaUrl, the model saw the image.

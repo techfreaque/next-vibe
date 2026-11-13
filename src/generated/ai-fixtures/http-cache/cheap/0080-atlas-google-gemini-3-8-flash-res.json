@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59e3608086ad9db-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 13:44:29 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577466-Zz8KPANP0QB13jkYuWXZ",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=lyz1W6ZF5u7vsVq3XsswCNzt0FJMmA_Kw601UvCN3SM-1794577465.6112103-1.0.1.1-WpC8nO72YUOy451SgUZDWtur1eMVZYMGhslEsJMJlJidJ_JkdHgQDzQiUtMTLdyBAwtzpUhXRIafkjUIsb9ynMuLH.EcmQbT0CRshVy31ywlXFRmY9Ll5hds4OKrUcnl; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:14:29 GMT"
+  },
+  "body": {
+    "id": "gen-1794577466-Zz8KPANP0QB13jkYuWXZ",
+    "object": "chat.completion",
+    "created": 1794577466,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview\nThis is a 26-second instrumental electronic music loop featuring an upbeat, funky, synth-driven groove reminiscent of modern indie video game soundtracks (such as *Sonic Mania* or *Chucklefish* games), YouTube tech/vlog background music, or electro-funk chiptune.\n\n---\n\n### Musical Characteristics\n- **Tempo:** Approximately 120–124 BPM.\n- **Time Signature:** 4/4.\n- **Key:** F Minor / G Minor (minor pentatonic/blues inflections).\n- **Genre/Style:** Electro-funk / Synth-pop / Chiptune / Video Game OST.\n\n---\n\n### Instrumentation & Arrangement\n- **Percussion / Drums:** \n  - A tight, punchy electronic drum kit anchors the track.\n  - A solid kick drum hits on downbeats with occasional syncopated pickups.\n  - A crisp, snappy layered snare/clap sounds consistently on beats 2 and 4.\n  - Intricate, sixteenth-note closed and semi-open hi-hat patterns provide forward momentum and rhythmic subdivision.\n  - At **00:20–00:22**, a rapid, ascending quantized snare/tom drum fill signals a section transition.\n- **Bass:** \n  - A warm, rounded synth bass (analog-style sawtooth/square hybrid with low-pass filtering) plays a bouncy, syncopated, staccato groove that tightly locks in with the kick drum.\n- **Lead / Chords:**\n  - A bright, plucky clavinet-style digital synth key sound plays a funky, staccato melodic motif repeating in a 4-bar loop.\n  - Smooth, warm synth poly-chords sustain quietly underneath to provide harmonic depth.\n- **Layering / Transition (00:22–00:26):**\n  - Following the fill at 00:21, an additional brassy, fuller synthesizer lead/harmony enters, elevating the intensity and widening the stereo spectrum with a more triumphant, dynamic melodic variation until the clip ends.\n\n---\n\n### Vocals & Speech\n- **None:** The audio is entirely instrumental.\n\n---\n\n### Production & Audio Quality\n- **Audio Quality:** Clean, modern, digital studio mix with no background noise, distortion, or hiss.\n- **Dynamics & Mixing:** Punchy, well-compressed transients; clear separation between the sub-bass frequencies and the bright, rhythmic mid/high synth layers; wide stereo panning on hi-hats and melodic accents.\n- **Mood:** Playful, energetic, motivating, and cheerful.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Content**\n\nI'm focused on thoroughly dissecting the ~26-second audio clip. My current analysis highlights its upbeat nature, leaning heavily into retro synth-pop, electronic, chiptune, and funky styles.\n\n**Dissecting Audio Elements**\n\nI'm deep into the instrumental structure now. The punchy drums and syncopated bass are key. I've pinpointed a catchy synth riff, and am identifying those ambient accents and the impactful brass entry near the end.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Content**\n\nI'm focused on thoroughly dissecting the ~26-second audio clip. My current analysis highlights its upbeat nature, leaning heavily into retro synth-pop, electronic, chiptune, and funky styles.\n\n**Dissecting Audio Elements**\n\nI'm deep into the instrumental structure now. The punchy drums and syncopated bass are key. I've pinpointed a catchy synth riff, and am identifying those ambient accents and the impactful brass entry near the end.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1022,
+      "total_tokens": 2094,
+      "cost": 0.0046365,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0046365,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.0038325
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 467,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-suite-qa--callbacks--tools---media-b1651f69-c681-4273-876b-c3469626d8e5.md\n\n# Cheap Suite QA: Callbacks, Tools & Media\nFolder: private\nDescription: Quality-gate run of the 'cheap' suite on the atlas dev instance (deepseek-v4.1-flash, skill quality-tester__budget). Covered parallel tool-help exploration (category filter, keyword query, single-tool schema), credits-balance, favorites listing, detach + await-task, endLoop dispatch, inline wait, wa",
+    "encoding_format": "float"
+  }
+}

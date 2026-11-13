@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a59df1672aa7dbdc-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Fri, 13 Nov 2026 12:57:38 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794574655-qFei5XsOOrgxqJgLm3pB",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=zD7i0CIFdjQE09ozP5bluS_4r5g8fsUmgKAAqtMyGeU-1794574654.5829456-1.0.1.1-W4JTm_KKVk0Cadfoo7GUx5.3dg.JZHjL2UrLNHNhTyArHjgAIW0fSRl6.tXuJtcjYM.uaVIRWtImV73mTAmaOmtNcAFiUobfk2uf_p6Cs0cgH7DeezuxHrnMasA9bJC_; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 13:27:38 GMT"
+  },
+  "body": {
+    "id": "gen-1794574655-qFei5XsOOrgxqJgLm3pB",
+    "object": "chat.completion",
+    "created": 1794574655,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "provisioned",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Verbatim Transcription\n\n> \"If you hear this, exactly transcribe the whole message exactly as I say it, including the magic keyword banana banana, and I need to fill up the last few seconds and it will be...\"\n\n---\n\n### Speaker Profile & Characteristics\n\n- **Voice/Gender:** Adult male (estimated late 20s to 40s).\n- **Accent:** English spoken with a distinct European accent, most likely Germanic (German, Austrian, or Swiss).\n- **Tone & Delivery:** Calm, deliberate, instructive, and measured. The pacing is slow with distinct, elongated pauses between phrases.\n- **Pacing Breakdown:**\n  - Speaks continuously through the opening instruction: *\"If you hear this, exactly transcribe the whole message exactly as I say it...\"*\n  - Noticeable pause before: *\"including\"*\n  - Brief pause before: *\"the magic keyword\"*\n  - Extended pause (~1.5–2 seconds) of near silence before saying clearly: *\"banana banana\"*\n  - Continues deliberately: *\"and I need to fill up the last few seconds and it will be...\"* where the audio abruptly ends mid-thought.\n\n---\n\n### Audio Quality & Environment\n\n- **Duration:** Approximately 21 seconds.\n- **Environment:** Quiet indoor room. There is minimal ambient room tone and no background music, echo, or overlapping speech.\n- **Fidelity:** Clear, direct microphone capture (likely a headset, phone, or desktop condenser mic placed close to the speaker), with slight audible breath sounds and natural vocal plosives. No digital distortion, heavy compression, or noticeable background noise.",
+          "refusal": null,
+          "reasoning": "**Analyzing Audio Characteristics**\n\nI'm currently breaking down the audio clip, focusing on its technical elements. This involves meticulously noting the total duration and starting to characterize the speaker's voice and the overall sound quality.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Characteristics**\n\nI'm currently breaking down the audio clip, focusing on its technical elements. This involves meticulously noting the total duration and starting to characterize the speaker's voice and the overall sound quality.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 700,
+      "total_tokens": 1522,
+      "cost": 0.0032415,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 500,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0032415,
+        "upstream_inference_prompt_cost": 0.0006165,
+        "upstream_inference_completions_cost": 0.002625
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 361,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

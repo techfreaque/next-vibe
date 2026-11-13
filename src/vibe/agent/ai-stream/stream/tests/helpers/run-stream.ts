@@ -28,7 +28,7 @@ import {
 } from "../../../testing/headless-test-runner";
 import { assertParentTimeOrder } from "./chain";
 import type { ModeConfig } from "./config";
-import { resolveToolResult } from "./messages";
+import { resolveToolResult, tipAfterAnswer } from "./messages";
 
 /**
  * Assert that the thread's streamingState is idle.
@@ -139,11 +139,19 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
     const effectiveThreadId = params.threadId ?? deps.getCaseThreadId();
     // Snapshot the thread BEFORE the stream so post-stream checks can
     // distinguish this stream's tool messages from earlier ones.
+    const preStreamMessages = effectiveThreadId
+      ? await getMessages(effectiveThreadId)
+      : [];
     const preStreamMessageIds = new Set<string>(
-      effectiveThreadId
-        ? (await getMessages(effectiveThreadId)).map((m) => m.id)
-        : [],
+      preStreamMessages.map((m) => m.id),
     );
+    // Continue AFTER an endLoop side-action (rename-thread riding the
+    // previous answer), exactly like the UI continues from the leaf.
+    // Otherwise the new user message forks off the answer and strands the
+    // rename row as a dead-end branch.
+    const explicitParentMessageId = params.explicitParentMessageId
+      ? tipAfterAnswer(params.explicitParentMessageId, preStreamMessages)
+      : params.explicitParentMessageId;
     // Every stream lands in <suiteRoot> → tests → <testCaseName> unless the
     // call explicitly targets another root (e.g. INCOGNITO — an incognito
     // stream must stay incognito in EVERY context, relay included). The suite
@@ -239,6 +247,7 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
     const firstResult = await runTestStream({
       timezone: deps.timezone,
       ...params,
+      explicitParentMessageId,
       // The seeded case threadId (or an explicit per-call one) — its fixtures
       // row is already written, so the AI loop replays from ordinal 0.
       threadId: effectiveThreadId,

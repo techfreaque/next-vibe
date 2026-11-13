@@ -330,6 +330,81 @@ export function assertToolMessageComplete(
 }
 
 /**
+ * The real chain tip after an answer: when the answer's step fired an endLoop
+ * side-action (rename-thread on an untitled/stale thread), that tool row is
+ * the leaf and the next turn must chain after it (as the UI does), otherwise
+ * the rename row is left as an unexpected dead-end branch. Deterministic
+ * whether or not the row already has children, so a later send that names
+ * the same assistant (retry/branch from a recorded parent) lands on the same
+ * parent as the original.
+ */
+export function tipAfterAnswer(aiId: string, messages: SlimMessage[]): string {
+  const ai = messages.find((m) => m.id === aiId);
+  if (ai?.role !== "assistant") {
+    return aiId;
+  }
+  const endLoopChild = messages.findLast(
+    (m) =>
+      m.role === "tool" &&
+      m.parentId === aiId &&
+      m.toolCall?.callbackMode === "endLoop",
+  );
+  return endLoopChild?.id ?? aiId;
+}
+
+/**
+ * The conversational parent of a message: its parentId with any compacting
+ * nodes skipped. Auto-compaction inserts a summary node between the previous
+ * tip and the next user message (when the context crosses the trigger), so a
+ * "user chains after X" check must look through it.
+ */
+export function chainParentOf(
+  msg: SlimMessage | undefined,
+  messages: SlimMessage[],
+): string | null | undefined {
+  let parentId = msg?.parentId;
+  for (;;) {
+    const parent = messages.find((m) => m.id === parentId);
+    if (!parent?.isCompacting) {
+      return parentId;
+    }
+    parentId = parent.parentId;
+  }
+}
+
+/**
+ * Assert the answer turn ended cleanly. A plain answer ends "stop". An answer
+ * whose step also fired an endLoop side-action (rename-thread, mandated on a
+ * still-untitled thread) is closed by the endLoop park instead of a provider
+ * "stop": the step's finish reason is "tool-calls", and the early-end billing
+ * path (loop/finalize.ts billCompletedSteps) currently persists null. Either
+ * is a clean end; "length"/"error"/"content-filter" never are.
+ */
+export function assertCleanFinish(
+  ai: SlimMessage,
+  messages: SlimMessage[],
+  stepName: string,
+): void {
+  const endedByEndLoop = messages.some(
+    (m) =>
+      m.role === "tool" &&
+      m.parentId === ai.id &&
+      m.toolCall?.callbackMode === "endLoop",
+  );
+  if (endedByEndLoop) {
+    expect(
+      [null, "tool-calls", "stop"].includes(ai.finishReason),
+      `[${stepName}] endLoop-closed answer ${ai.id} must end cleanly (got finishReason=${String(ai.finishReason)})`,
+    ).toBe(true);
+    return;
+  }
+  expect(
+    ai.finishReason,
+    `[${stepName}] answer ${ai.id} must end with finishReason "stop"`,
+  ).toBe("stop");
+}
+
+/**
  * Assert that no tool message uses the `instanceId__toolName` prefix form for
  * meta-tools (tool-help, execute-tool). Meta-tools must always be called by
  * bare name with an instanceId param - never as `hermes__tool-help` etc.

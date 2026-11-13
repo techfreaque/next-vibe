@@ -10,6 +10,7 @@
 import "server-only";
 
 import type { SlimMessage } from "../../../testing/headless-test-runner";
+import { tipAfterAnswer } from "./messages";
 
 /** Walk parent chain from leafId → root. Returns [root, ..., leaf] */
 export function walkChain(messages: SlimMessage[], leafId: string): string[] {
@@ -192,7 +193,12 @@ export function assertChainIntegrity(
   // 5. Leaf whitelist - every leaf must be expectedLeafId or a known dead-end.
   // Compacting messages are always legitimate leaves (a failed auto-compact
   // leaves its summary node as a dead-end sibling by design).
-  const { expectedLeafId, knownDeadEndLeaves } = options;
+  const { knownDeadEndLeaves } = options;
+  // An answer that fired an endLoop side-action (rename-thread) ends at that
+  // tool row: it is the real tip, not a stray dead-end.
+  const expectedLeafId = options.expectedLeafId
+    ? tipAfterAnswer(options.expectedLeafId, messages)
+    : undefined;
   if (expectedLeafId) {
     const unexpectedLeaves = leaves.filter(
       (m) =>
