@@ -256,7 +256,7 @@ const { GET } = createEndpoint({
           resultCount: 0,
           totalCost: 0,
           budgetCredits: null,
-          judgeModelId: "qwen-3.7-flash",
+          judgeModelId: "glm-5.3-flash-uncensored",
           judgePromptVersion: "judge-v1",
           cancelReason: null,
           notes: null,

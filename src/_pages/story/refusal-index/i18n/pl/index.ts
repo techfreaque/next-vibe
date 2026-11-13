@@ -49,6 +49,17 @@ export const translations: typeof enTranslations = {
     title: "Gdzie modele odmawiają",
     intro: "Średni odsetek odmów według kategorii pytań i poziomu.",
     category: "Kategoria",
+    names: {
+      politics: "Polityka",
+      history: "Historia",
+      health: "Zdrowie",
+      drugs: "Narkotyki",
+      sexuality: "Seksualność",
+      security: "Bezpieczeństwo IT",
+      religion: "Religia",
+      law: "Prawo",
+      science: "Nauka",
+    },
   },
   method: {
     label: "Metoda",

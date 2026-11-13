@@ -85,6 +85,7 @@ export const translations: typeof enTranslations = {
       "Probelauf: zeigt, was die Fortsetzung noch abarbeiten würde.",
     started: "Lauf gestartet. Er läuft im Hintergrund weiter.",
     resumed: "Lauf fortgesetzt. Er läuft im Hintergrund weiter.",
+    finishedWaiting: "Lauf beendet. Endstatus siehe oben.",
   },
 
   fields: {

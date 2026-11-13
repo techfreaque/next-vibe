@@ -12,8 +12,13 @@ export const REFUSAL_INDEX_RUNS_ALIAS = "refusal-index-runs" as const;
 export const REFUSAL_INDEX_LEADERBOARD_ALIAS =
   "refusal-index-leaderboard" as const;
 
-/** Fixed cheap judge. Stored on each run row. */
-export const JUDGE_MODEL_ID = ChatModelId.QWEN_3_7_FLASH;
+/**
+ * Fixed cheap judge. Stored on each run row.
+ * Must be an uncensored model: a filtered judge refuses to classify the very
+ * answers this index measures (Qwen 3.7 Flash hit Alibaba's upstream
+ * "inappropriate content" block on Tiananmen answers and returned nothing).
+ */
+export const JUDGE_MODEL_ID = ChatModelId.GLM_5_3_FLASH_UNCENSORED;
 export const JUDGE_PROMPT_VERSION = "judge-v1" as const;
 export const RUNNER_PROMPT_VERSION = "runner-v1" as const;
 

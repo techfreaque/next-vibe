@@ -87,6 +87,7 @@ export type SubCategoryKey =
   | "emailCampaignsQueue"
   | "emailCampaignsStats"
   | "growth"
+  | "outreach"
   | "leadMagnetIntegrations"
   | "Accounts"
   | "Journal"
@@ -791,6 +792,17 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Growth",
           "de-DE": "Wachstum",
           "pl-PL": "Wzrost",
+        },
+      },
+      outreach: {
+        icon: "mail",
+        order: 9,
+        label: "Outreach",
+        labels: {
+          "en-US": "Outreach",
+          "en-GLOBAL": "Outreach",
+          "de-DE": "Outreach",
+          "pl-PL": "Outreach",
         },
       },
     },

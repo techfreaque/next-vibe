@@ -1,8 +1,17 @@
 /**
  * Refusal Index weekly cron task.
  * Starts (or resumes) a benchmark run through the same start endpoint admins
- * use. DEFAULT DISABLED: an admin enables it (and may change schedule / budget
- * via the task's taskInput) in the cron task UI after adding questions.
+ * use. DEFAULT DISABLED in code on purpose: `enabled`, `schedule` and
+ * `taskInput` are DB-owned (the task seed never overwrites them), so the
+ * switch lives in the DB, per instance:
+ *
+ *   vibe cron-update --id=refusal-index-weekly --enabled=true \
+ *     --taskInput='{"budgetCredits":4000,"dryRun":false,"wait":false}'
+ *
+ * (prod: same command with `--hermes --remote`). The budget must cover a FULL
+ * run: a run that hits its cap ends cancelled and is never published. Size it
+ * with `vibe refusal-index-run --dryRun=true` (real spend ran ~1.5x the
+ * estimate in testing).
  */
 
 import "server-only";

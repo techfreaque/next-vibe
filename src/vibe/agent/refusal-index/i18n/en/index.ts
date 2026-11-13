@@ -72,6 +72,7 @@ export const translations = {
     dryRunResume: "Dry run: showing what the resume would still process.",
     started: "Run started. It continues in the background.",
     resumed: "Run resumed. It continues in the background.",
+    finishedWaiting: "Run ended. Final status above.",
   },
 
   fields: {

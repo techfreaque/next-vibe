@@ -51,8 +51,9 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Dein Link ist einen Klick entfernt.",
     subtitle:
-      "Kostenloses Konto. Kein Mindestumsatz. Verdienste landen sofort als Credits - Auszahlung in BTC oder USDC ab {{minPayout}}.",
+      "Kostenloses Konto. Kein Mindestumsatz. Nach der {{holdDays}}-tägigen Widerrufsfrist werden Verdienste zu Credits. Auszahlung in BTC oder USDC ab {{minPayout}}.",
     primary: "Link holen",
     secondary: "Einsteiger-Guide lesen",
+    partners: "Für Creator und Newsletter",
   },
 };

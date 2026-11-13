@@ -107,6 +107,16 @@ export const category: CategoryDefinition = {
         "pl-PL": "Wzrost",
       },
     },
+    outreach: {
+      icon: "mail",
+      order: 9,
+      label: {
+        "en-US": "Outreach",
+        "en-GLOBAL": "Outreach",
+        "de-DE": "Outreach",
+        "pl-PL": "Outreach",
+      },
+    },
     leadMagnetIntegrations: {
       icon: "plug",
       order: 7,

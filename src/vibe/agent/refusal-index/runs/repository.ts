@@ -364,7 +364,9 @@ export class RefusalRunsRepository {
         await db
           .update(refusalIndexRuns)
           .set({
-            budgetCredits: data.budgetCredits,
+            // Keep the run's cap unless the caller sets a new one: a resume
+            // without a budget must never turn a capped run into an uncapped one.
+            budgetCredits: data.budgetCredits ?? run.budgetCredits,
             updatedAt: new Date(),
           })
           .where(eq(refusalIndexRuns.id, run.id));
@@ -522,6 +524,7 @@ export class RefusalRunsRepository {
     });
     const { t } = scopedTranslation.scopedT(params.locale);
     let status: string = t(RefusalRunStatus.RUNNING);
+    let note = params.note;
     if (params.data.wait) {
       const finished = await execution;
       if (!finished.success) {
@@ -531,6 +534,7 @@ export class RefusalRunsRepository {
         });
       }
       status = t(finished.data.status);
+      note = t("messages.finishedWaiting");
     } else {
       void execution;
     }
@@ -542,7 +546,7 @@ export class RefusalRunsRepository {
       questionCount: params.questionCount,
       pendingPairs: params.pendingPairs,
       estimatedCredits: params.estimatedCredits,
-      note: params.note,
+      note,
     });
   }
 }

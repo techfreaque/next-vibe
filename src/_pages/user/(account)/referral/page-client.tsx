@@ -26,6 +26,7 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 import referralCodesListDefinition from "@/referral/codes/list/definition";
 import referralDefinition from "@/referral/definition";
+import referralLinksDefinition from "@/referral/links/definition";
 import referralPayoutDefinition from "@/referral/payout/definition";
 import referralStatsDefinition from "@/referral/stats/definition";
 
@@ -328,6 +329,15 @@ export function ReferralPageClient({
               />
             </Div>
 
+            {/* ── TRACKED LINKS: one link per placement, stats per link ── */}
+            <EndpointsPage
+              logger={logger}
+              endpoint={referralLinksDefinition}
+              user={user}
+              locale={locale}
+              platform={platform}
+            />
+
             <Div className="flex flex-col gap-4">
               <Div className="flex flex-col gap-1">
                 <H2 className={sectionTitle}>{t("overview.title")}</H2>
@@ -381,7 +391,9 @@ export function ReferralPageClient({
               </Div>
               <Div className="flex w-full flex-col gap-2">
                 <Button asChild className="h-11 w-full gap-2">
-                  <Link href={`/${locale}/user/signup`}>
+                  <Link
+                    href={`/${locale}/user/signup?callbackUrl=${encodeURIComponent(`/${locale}/user/referral`)}`}
+                  >
                     <UserPlus className="h-4 w-4" />
                     {t("cta.signUp")}
                     <ArrowRight className="h-4 w-4" />

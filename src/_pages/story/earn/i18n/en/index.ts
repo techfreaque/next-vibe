@@ -49,8 +49,9 @@ export const translations = {
   cta: {
     title: "Your link is one click away.",
     subtitle:
-      "Free account. No minimum spend. Earnings show up as credits instantly - withdraw to BTC or USDC from {{minPayout}}.",
+      "Free account. No minimum spend. Earnings turn into credits after the {{holdDays}}-day refund window. Withdraw to BTC or USDC from {{minPayout}}.",
     primary: "Get your link",
     secondary: "Read the beginner guide",
+    partners: "For creators and newsletters",
   },
 };

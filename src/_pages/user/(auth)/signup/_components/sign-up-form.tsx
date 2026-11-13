@@ -14,6 +14,8 @@ import signupEndpoints from "@/user/public/signup/definition";
 interface SignUpFormProps {
   locale: CountryLanguage;
   initialReferralCode: string | null;
+  /** Same-site path validated by the page loader. */
+  callbackUrl: string | null;
   user: JwtPayloadType;
   platform: Platform;
 }
@@ -21,6 +23,7 @@ interface SignUpFormProps {
 export default function SignUpForm({
   locale,
   initialReferralCode,
+  callbackUrl,
   user,
   platform,
 }: SignUpFormProps): React.JSX.Element {
@@ -68,7 +71,7 @@ export default function SignUpForm({
           autoPrefillData,
           mutationOptions: {
             onSuccess: () => {
-              router.push(`/${locale}`);
+              router.push(callbackUrl ?? `/${locale}`);
             },
           },
         },

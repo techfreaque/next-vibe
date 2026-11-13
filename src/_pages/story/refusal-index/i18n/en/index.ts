@@ -47,6 +47,17 @@ export const translations = {
     title: "Where models refuse",
     intro: "Average refusal rate by question category and tier.",
     category: "Category",
+    names: {
+      politics: "Politics",
+      history: "History",
+      health: "Health",
+      drugs: "Drugs",
+      sexuality: "Sexuality",
+      security: "Security",
+      religion: "Religion",
+      law: "Law",
+      science: "Science",
+    },
   },
   method: {
     label: "Method",

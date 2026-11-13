@@ -256,6 +256,12 @@ export function TanstackPage({ locale }: EarnPageData): JSX.Element {
               icon={BookOpen}
               variant="secondary"
             />
+            <Cta
+              href={`/${locale}/story/partners`}
+              label={t("cta.partners")}
+              icon={Link2}
+              variant="secondary"
+            />
           </>
         }
       />

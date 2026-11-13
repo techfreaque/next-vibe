@@ -83,6 +83,7 @@ export const translations: typeof enTranslations = {
     dryRunResume: "Próba na sucho: pokazuje, co wznowienie jeszcze przetworzy.",
     started: "Przebieg ruszył. Działa dalej w tle.",
     resumed: "Przebieg wznowiony. Działa dalej w tle.",
+    finishedWaiting: "Przebieg zakończony. Status końcowy powyżej.",
   },
 
   fields: {

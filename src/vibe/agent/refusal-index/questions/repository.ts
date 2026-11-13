@@ -1,6 +1,6 @@
 /**
  * Refusal Index - Questions Repository
- * Admin CRUD over the curated question set. Pure data: nothing is seeded.
+ * Admin CRUD over the curated question set (initial set seeded by slug).
  */
 
 import "server-only";

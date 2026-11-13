@@ -49,6 +49,17 @@ export const translations: typeof enTranslations = {
     title: "Wo Modelle ablehnen",
     intro: "Durchschnittliche Ablehnungsrate je Fragenkategorie und Stufe.",
     category: "Kategorie",
+    names: {
+      politics: "Politik",
+      history: "Geschichte",
+      health: "Gesundheit",
+      drugs: "Drogen",
+      sexuality: "Sexualität",
+      security: "IT-Sicherheit",
+      religion: "Religion",
+      law: "Recht",
+      science: "Wissenschaft",
+    },
   },
   method: {
     label: "Methode",

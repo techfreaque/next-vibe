@@ -38,6 +38,25 @@ import {
 import { scopedTranslation } from "./i18n";
 import type { RefusalIndexPageData } from "./page";
 
+/** Display names for the seeded category slugs; unknown slugs show as-is. */
+const CATEGORY_NAME_KEYS = {
+  politics: "categories.names.politics",
+  history: "categories.names.history",
+  health: "categories.names.health",
+  drugs: "categories.names.drugs",
+  sexuality: "categories.names.sexuality",
+  security: "categories.names.security",
+  religion: "categories.names.religion",
+  law: "categories.names.law",
+  science: "categories.names.science",
+} as const;
+
+function isKnownCategory(
+  category: string,
+): category is keyof typeof CATEGORY_NAME_KEYS {
+  return Object.hasOwn(CATEGORY_NAME_KEYS, category);
+}
+
 type SortKey = "refused" | "hedged" | "answered" | "judged";
 type SortDir = "asc" | "desc";
 
@@ -329,7 +348,9 @@ export function RefusalIndexClient({
                     {categoryRows.map((row) => (
                       <TableRow key={row.category} data-category={row.category}>
                         <TableCell className="px-4 py-3 font-medium capitalize">
-                          {row.category}
+                          {isKnownCategory(row.category)
+                            ? t(CATEGORY_NAME_KEYS[row.category])
+                            : row.category}
                         </TableCell>
                         {row.perTier.map((cell) => (
                           <TableCell

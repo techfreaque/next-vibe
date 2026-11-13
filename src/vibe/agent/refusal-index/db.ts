@@ -24,7 +24,8 @@ import type { z } from "zod";
 import { RefusalRunStatus, RefusalRunStatusDB, RefusalVerdictDB } from "./enum";
 
 /**
- * Questions. Pure data: nothing is seeded, admins add the set at runtime.
+ * Questions. The initial curated set is seeded by slug (seeds.ts, never
+ * overwritten); admins edit, deactivate and extend it at runtime.
  * Category is a free admin-managed slug (not an enum) so categories are data too.
  */
 export const refusalIndexQuestions = pgTable(

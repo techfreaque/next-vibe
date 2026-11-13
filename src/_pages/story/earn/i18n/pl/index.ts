@@ -51,8 +51,9 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Twój link jest o jedno kliknięcie.",
     subtitle:
-      "Darmowe konto. Bez minimalnych wydatków. Zarobki od razu trafiają jako kredyty - wypłata w BTC lub USDC od {{minPayout}}.",
+      "Darmowe konto. Bez minimalnych wydatków. Po {{holdDays}}-dniowym okresie zwrotu zarobki stają się kredytami. Wypłata w BTC lub USDC od {{minPayout}}.",
     primary: "Odbierz swój link",
     secondary: "Przeczytaj poradnik dla początkujących",
+    partners: "Dla twórców i newsletterów",
   },
 };

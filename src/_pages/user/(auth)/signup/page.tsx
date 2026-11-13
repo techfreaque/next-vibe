@@ -27,7 +27,23 @@ export interface SignUpPageData {
   locale: CountryLanguage;
   user: JwtPayloadType | null;
   initialReferralCode: string | null;
+  /** Same-site path to land on after signup (e.g. the referral page). */
+  callbackUrl: string | null;
   platform: Platform;
+}
+
+/** Only same-site absolute paths: "/x" yes, "//host", "https:", "\\" no. */
+function safeCallbackPath(value: string | undefined): string | null {
+  if (
+    !value ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\") ||
+    value.includes("://")
+  ) {
+    return null;
+  }
+  return value;
 }
 
 /**
@@ -82,13 +98,14 @@ export async function tanstackLoader({
   const search = searchParams ? await searchParams : {};
   const refFromUrl = search["ref"] ?? null;
   const skillIdFromUrl = search["skillId"] ?? null;
+  const callbackUrl = safeCallbackPath(search["callbackUrl"]);
 
   const logger = createEndpointLogger(false, locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
 
   // Only redirect if user is authenticated and not a public user
   if (user.success && !user.data.isPublic) {
-    redirect(`/${locale}/`);
+    redirect(callbackUrl ?? `/${locale}/`);
   }
 
   if (!user.success) {
@@ -96,6 +113,7 @@ export async function tanstackLoader({
       locale,
       user: null,
       initialReferralCode: null,
+      callbackUrl,
       platform: Platform.NEXT_PAGE,
     };
   }
@@ -174,6 +192,7 @@ export async function tanstackLoader({
     locale,
     user: user.data,
     initialReferralCode,
+    callbackUrl,
     platform: Platform.NEXT_PAGE,
   };
 }
@@ -182,6 +201,7 @@ export function TanstackPage({
   locale,
   user,
   initialReferralCode,
+  callbackUrl,
   platform,
 }: SignUpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
@@ -194,6 +214,7 @@ export function TanstackPage({
     <SignUpForm
       locale={locale}
       initialReferralCode={initialReferralCode}
+      callbackUrl={callbackUrl}
       user={user}
       platform={platform}
     />
