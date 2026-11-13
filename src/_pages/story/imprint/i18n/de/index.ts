@@ -4,45 +4,39 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Impressum - {{appName}}",
     category: "Rechtliches",
-    description:
-      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
+    description: "Impressum und Anbieterkennzeichnung von {{appName}}",
     imageAlt: "Impressum",
     keywords:
-      "Impressum, rechtlicher Hinweis, Unternehmensinformationen, {{appName}} rechtlich",
+      "Impressum, Anbieterkennzeichnung, Rechtliche Hinweise, {{appName}} Impressum",
     ogTitle: "Impressum - {{appName}}",
-    ogDescription:
-      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
+    ogDescription: "Impressum und Anbieterkennzeichnung von {{appName}}",
     twitterTitle: "Impressum - {{appName}}",
-    twitterDescription:
-      "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
+    twitterDescription: "Impressum und Anbieterkennzeichnung von {{appName}}",
   },
   printAriaLabel: "Impressum drucken",
   onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Impressum",
-  lastUpdated: "Zuletzt aktualisiert: Januar 2025",
+  lastUpdated: "Stand: Januar 2025",
   introduction:
-    "Dieses Impressum enthält die gesetzlich vorgeschriebenen Informationen über {{appName}} gemäß den geltenden Gesetzen.",
+    "Dieses Impressum enthält die gesetzlich vorgeschriebenen Angaben zu {{appName}} nach dem geltenden Recht.",
   sections: {
     partnerships: {
-      title: "Partnerschaften & Zugehörigkeiten",
-      description:
-        "Informationen über unsere Geschäftspartnerschaften und Zugehörigkeiten.",
+      title: "Partnerschaften",
+      description: "Angaben zu unseren geschäftlichen Partnerschaften.",
       content:
-        "{{appName}} unterhält Partnerschaften mit führenden KI-Anbietern, um unseren Nutzern den bestmöglichen Service zu bieten.",
+        "{{appName}} arbeitet mit führenden KI-Anbietern zusammen, um seinen Nutzern den bestmöglichen Service zu bieten.",
     },
     companyInfo: {
-      title: "Unternehmensinfos",
-      description:
-        "Rechtliche Informationen über {{appName}} und unsere eingetragene Geschäftseinheit.",
+      title: "Anbieter",
+      description: "Rechtliche Angaben zum Anbieter von {{appName}}.",
     },
     responsiblePerson: {
-      title: "Verantwortliche Person",
-      description:
-        "Informationen über die für den Inhalt dieser Website verantwortliche Person.",
+      title: "Verantwortlich für den Inhalt",
+      description: "Für den Inhalt dieser Website verantwortlich:",
     },
     contactInfo: {
-      title: "Kontaktinformationen",
+      title: "Kontakt",
       description:
         "So erreichen Sie uns für rechtliche und geschäftliche Anfragen.",
     },
@@ -51,37 +45,37 @@ export const translations: typeof enTranslations = {
       copyright: {
         title: "Urheberrecht",
         content:
-          "Alle Inhalte auf dieser Website sind urheberrechtlich geschützt. Unbefugte Nutzung ist untersagt.",
+          "Alle Inhalte dieser Website sind urheberrechtlich geschützt. Jede Verwertung ohne Zustimmung ist untersagt.",
       },
       liability: {
-        title: "Haftung",
+        title: "Haftung für Inhalte",
         content:
-          "Wir machen keine Zusicherungen oder Gewährleistungen über die Vollständigkeit, Genauigkeit oder Zuverlässigkeit der Informationen auf dieser Website.",
+          "Für die Vollständigkeit, Richtigkeit und Zuverlässigkeit der Informationen auf dieser Website übernehmen wir keine Gewähr.",
       },
       links: {
-        title: "Externe Links",
+        title: "Haftung für Links",
         content:
-          "Unsere Website kann Links zu externen Websites enthalten. Wir sind nicht verantwortlich für den Inhalt externer Websites.",
+          "Unsere Website kann Links zu externen Websites enthalten. Für deren Inhalte sind wir nicht verantwortlich.",
       },
     },
     disputeResolution: {
       title: "Streitbeilegung",
       description:
-        "Informationen darüber, wie Streitigkeiten behandelt und gelöst werden.",
+        "Angaben dazu, wie Streitigkeiten behandelt und beigelegt werden.",
       content:
-        "Alle Streitigkeiten, die sich aus der Nutzung dieser Website ergeben, werden gemäß dem anwendbaren Recht beigelegt.",
+        "Streitigkeiten aus der Nutzung dieser Website werden nach dem anwendbaren Recht beigelegt.",
     },
   },
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Impressum",
+    description: "Impressum-Endpunkt",
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Impressum-Konfiguration",
+      description: "Impressum-Parameter konfigurieren",
     },
     response: {
       title: "Antwort",
-      description: "Antwortdaten",
+      description: "Impressum-Antwortdaten",
     },
     errors: {
       unauthorized: {

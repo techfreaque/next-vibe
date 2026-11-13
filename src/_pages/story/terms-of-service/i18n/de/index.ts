@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
     governingLaw: {
       title: "Anwendbares Recht",
       content:
-        "Diese Nutzungsbedingungen unterliegen den Gesetzen von {{jurisdictionCountry}}. Streitigkeiten werden in den Gerichten von {{jurisdictionCity}}, {{jurisdictionCountry}} beigelegt.",
+        "Diese Nutzungsbedingungen unterliegen dem Recht der {{jurisdictionCountry}}. Gerichtsstand für alle Streitigkeiten ist {{jurisdictionCity}}, {{jurisdictionCountry}}.",
     },
   },
   post: {

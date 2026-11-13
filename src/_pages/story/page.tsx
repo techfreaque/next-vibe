@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { getMaxToolCountAllPlatforms } from "next-vibe/agent/chat/default-tool-counts";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import {
-  getAvailableModelCount,
-  getAvailableModelCountsByContentLevel,
-  getAvailableProviderCount,
+  getAvailableChatModelCount,
+  getAvailableChatModelCountsByContentLevel,
+  getAvailableChatProviderCount,
   type ModelCountsByContentLevel,
 } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
@@ -40,11 +40,15 @@ export async function generateMetadata({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   return metadataGenerator(locale, {
     path: "",
     title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", { modelCount }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords")],
@@ -90,15 +94,15 @@ export async function tanstackLoader({
     return {
       locale,
       totalToolCount,
-      totalModelCount: getAvailableModelCount(
+      totalModelCount: getAvailableChatModelCount(
         false,
         await getEnvAvailability(),
       ),
-      totalProviderCount: getAvailableProviderCount(
+      totalProviderCount: getAvailableChatProviderCount(
         false,
         await getEnvAvailability(),
       ),
-      modelCountsByTier: getAvailableModelCountsByContentLevel(
+      modelCountsByTier: getAvailableChatModelCountsByContentLevel(
         false,
         await getEnvAvailability(),
       ),
@@ -113,15 +117,15 @@ export async function tanstackLoader({
   return {
     locale,
     totalToolCount,
-    totalModelCount: getAvailableModelCount(
+    totalModelCount: getAvailableChatModelCount(
       isAdmin,
       await getEnvAvailability(),
     ),
-    totalProviderCount: getAvailableProviderCount(
+    totalProviderCount: getAvailableChatProviderCount(
       isAdmin,
       await getEnvAvailability(),
     ),
-    modelCountsByTier: getAvailableModelCountsByContentLevel(
+    modelCountsByTier: getAvailableChatModelCountsByContentLevel(
       isAdmin,
       await getEnvAvailability(),
     ),

@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   appName: "unbottled.ai",
   appDescription:
-    "Free speech AI platform with {{modelCount}} models. User-controlled censorship and privacy-first design.",
+    "KI-Plattform für freie Rede mit {{modelCount}} Modellen. Zensur nach deinen Regeln, Datenschutz von Grund auf.",
   framework: "NextVibe.dev",
   websiteUrl: "https://unbottled.ai",
   group: {
@@ -12,8 +12,8 @@ export const translations: typeof enTranslations = {
     registrationNumber: "",
     foundedYear: 2024,
     jurisdiction: {
-      country: "Switzerland",
-      city: "Zurich",
+      country: "Schweiz",
+      city: "Zürich",
     },
     address: {
       title: "Adresse",
@@ -28,11 +28,11 @@ export const translations: typeof enTranslations = {
     contact: {
       phone: "+1 (555) 123-4567",
       telephone: "+1-555-0123",
-      title: "Contact",
+      title: "Kontakt",
       description:
-        "If you have any questions about this Privacy Policy, please contact us at",
+        "Bei Fragen zu dieser Datenschutzerklärung erreichen Sie uns unter",
       content:
-        "If you have any questions about these Terms of Service, please contact us at",
+        "Bei Fragen zu diesen Nutzungsbedingungen erreichen Sie uns unter",
     },
   },
   emails: {
