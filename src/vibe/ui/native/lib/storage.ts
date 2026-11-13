@@ -122,3 +122,9 @@ export function removeSessionItem(key: string, logger: EndpointLogger): void {
   void key;
   void logger;
 }
+
+/**
+ * Storage for values that can grow to MBs (web: IndexedDB).
+ * AsyncStorage has no ~5 MB origin cap like web localStorage, so large values use the same store.
+ */
+export const largeStorage: Storage = storage;

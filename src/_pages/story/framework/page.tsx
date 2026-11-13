@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -299,7 +299,7 @@ export async function tanstackLoader({
   return {
     locale,
     endpointCount: endpointsMeta.length,
-    modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+    modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     ...snippets,
     platform: Platform.NEXT_PAGE,
   };

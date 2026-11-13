@@ -156,6 +156,12 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
+    post("chatgpt-alternative-without-filters", {
+      title: t("posts.chatgptAlternative.title"),
+      category: t("posts.chatgptAlternative.category"),
+      excerpt: t("posts.chatgptAlternative.excerpt"),
+      readTime: t("posts.chatgptAlternative.readTime"),
+    }),
     post("unbottled-api-in-coding-tools", {
       title: t("posts.codingTools.title"),
       category: t("posts.codingTools.category"),

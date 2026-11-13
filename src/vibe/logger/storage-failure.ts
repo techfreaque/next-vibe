@@ -16,9 +16,31 @@ export type StorageArea =
   | "sessionStorage"
   | "cookie"
   | "asyncStorage"
+  | "indexedDB"
   | "file";
 
-export type StorageOperation = "get" | "set" | "remove" | "list" | "parse";
+export type StorageOperation =
+  | "get"
+  | "set"
+  | "remove"
+  | "list"
+  | "parse"
+  | "open"
+  | "migrate";
+
+/** What already fills the storage area when a write fails (quota diagnosis). */
+export interface StorageUsage {
+  /** Total characters (keys + values) currently stored in the area. */
+  usedChars?: number;
+  /** Number of keys in the area. */
+  keyCount?: number;
+  /** Largest stored key and its value length - the usual quota hog. */
+  largestKey?: string | null;
+  largestChars?: number;
+  /** navigator.storage.estimate() numbers (origin-wide, bytes). */
+  originUsageBytes?: number;
+  originQuotaBytes?: number;
+}
 
 export interface StorageFailure {
   platform: StoragePlatform;
@@ -29,6 +51,8 @@ export interface StorageFailure {
   error: Error | string | number | boolean | null | undefined;
   /** Length of the value being written (quota diagnosis) - never the value. */
   valueLength?: number;
+  /** Area usage at failure time (never values). */
+  usage?: StorageUsage;
 }
 
 /** Error class name: QuotaExceededError, SecurityError, ENOENT, SyntaxError ... */
@@ -72,6 +96,7 @@ export function reportStorageFailure(
       errorName: name,
       errorMessage: errorMessage(failure.error),
       valueLength: failure.valueLength ?? null,
+      ...failure.usage,
       quotaExceeded:
         /quota/i.test(name) || /quota/i.test(String(failure.error)),
       securityBlocked: name === "SecurityError",

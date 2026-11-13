@@ -39,6 +39,7 @@ import {
   calculateCreditCost,
   isApiProviderAvailable,
   isModelProviderAvailable,
+  isProviderSellable,
   type ModelDefinition,
   type ModelOptionBase,
   modelProviders,
@@ -134,6 +135,11 @@ export function getModelCost(
   );
 }
 
+/**
+ * Counts every model definition across all modalities (chat, image, video,
+ * music, TTS, STT). Not a user-facing figure: public "N models" copy uses
+ * {@link getAvailableChatModelCount}.
+ */
 export function getAvailableModelCount(
   isAdmin: boolean,
   availability: AgentEnvAvailability,
@@ -221,63 +227,69 @@ export function getAvailableModelCountsByContentLevel(
   return counts;
 }
 
+// ============================================
+// PUBLIC CHAT-MODEL COUNTS (single source of truth)
+// ============================================
+//
+// Every user-facing "N models" figure (pages, meta, emails, OG text, system
+// prompt) uses these helpers. One rule: a chat model counts when it is
+// enabled, and at least one of its providers is visible to the viewer
+// (not admin-only for non-admins), sellable (priced, never a 0-cost row) and
+// configured on this instance. Image/video/music/TTS/STT definitions never
+// count: they inflate the number past what a user can pick in a thread.
+
+function isChatModelOffered(
+  def: ModelDefinition,
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): boolean {
+  if (def.enabled === false && def.enabledWithoutPrice !== true) {
+    return false;
+  }
+  return def.providers.some(
+    (p) =>
+      (isAdmin || p.adminOnly !== true) &&
+      isProviderSellable(def, p) &&
+      isApiProviderAvailable(p.apiProvider, availability),
+  );
+}
+
+function offeredChatModelDefinitions(
+  isAdmin: boolean,
+  availability: AgentEnvAvailability,
+): ModelDefinition[] {
+  return Object.values(chatModelDefinitions).filter((def) =>
+    isChatModelOffered(def, isAdmin, availability),
+  );
+}
+
 /**
- * Honest, user-facing chat-model count: only the chat models a user can
- * actually pick in a thread (excludes image/video/music/TTS/STT model
- * definitions, which inflate {@link getAvailableModelCount}).
+ * Honest, user-facing chat-model count: the chat models a user can actually
+ * pick and pay for in a thread. Use this for every public "N models" figure.
  */
 export function getAvailableChatModelCount(
   isAdmin: boolean,
   availability: AgentEnvAvailability,
 ): number {
-  return Object.values(chatModelDefinitions).filter((def) => {
-    const visibleProviders = isAdmin
-      ? def.providers
-      : def.providers.filter((p) => !p.adminOnly);
-    if (visibleProviders.length === 0) {
-      return false;
-    }
-    if (isAdmin) {
-      return true;
-    }
-    return visibleProviders.some((p) => {
-      const option = chatModelOptions.find((m) => m.id === p.id);
-      return option ? isModelProviderAvailable(option, availability) : false;
-    });
-  }).length;
+  return offeredChatModelDefinitions(isAdmin, availability).length;
 }
 
 /**
- * Number of distinct labs/providers that publish at least one available chat
- * model (honest "across N labs" figure, not the full multi-modal provider set).
+ * Number of distinct labs that publish at least one offered chat model
+ * (honest "across N labs" figure, not the full multi-modal provider set).
  */
 export function getAvailableChatProviderCount(
   isAdmin: boolean,
   availability: AgentEnvAvailability,
 ): number {
-  const providerIds = new Set<string>();
-  for (const def of Object.values(chatModelDefinitions)) {
-    const visibleProviders = isAdmin
-      ? def.providers
-      : def.providers.filter((p) => !p.adminOnly);
-    if (visibleProviders.length === 0) {
-      continue;
-    }
-    const available =
-      isAdmin ||
-      visibleProviders.some((p) => {
-        const option = chatModelOptions.find((m) => m.id === p.id);
-        return option ? isModelProviderAvailable(option, availability) : false;
-      });
-    if (available) {
-      providerIds.add(def.by);
-    }
-  }
-  return providerIds.size;
+  return new Set(
+    offeredChatModelDefinitions(isAdmin, availability).map((def) => def.by),
+  ).size;
 }
 
 /**
- * Per-tier counts restricted to pickable chat models (honest tier breakdown).
+ * Per-tier counts of offered chat models. Sums to
+ * {@link getAvailableChatModelCount}.
  */
 export function getAvailableChatModelCountsByContentLevel(
   isAdmin: boolean,
@@ -288,24 +300,7 @@ export function getAvailableChatModelCountsByContentLevel(
     open: 0,
     uncensored: 0,
   };
-
-  for (const def of Object.values(chatModelDefinitions)) {
-    const visibleProviders = isAdmin
-      ? def.providers
-      : def.providers.filter((p) => !p.adminOnly);
-    if (visibleProviders.length === 0) {
-      continue;
-    }
-    if (
-      !isAdmin &&
-      !visibleProviders.some((p) => {
-        const option = chatModelOptions.find((m) => m.id === p.id);
-        return option ? isModelProviderAvailable(option, availability) : false;
-      })
-    ) {
-      continue;
-    }
-
+  for (const def of offeredChatModelDefinitions(isAdmin, availability)) {
     if (def.content === ContentLevel.MAINSTREAM) {
       counts.mainstream++;
     } else if (def.content === ContentLevel.OPEN) {
@@ -314,6 +309,5 @@ export function getAvailableChatModelCountsByContentLevel(
       counts.uncensored++;
     }
   }
-
   return counts;
 }

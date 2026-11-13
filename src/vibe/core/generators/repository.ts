@@ -35,6 +35,7 @@ import type {
 } from "./definition";
 import { generate as generateGeneratorsIndex, OUTPUT_FILE } from "./generator";
 import {
+  fingerprint,
   type GenState,
   isUnchanged,
   markDone,
@@ -136,7 +137,18 @@ async function runWithConcurrencyLimit<T>(
 }
 
 type RunOutcome =
-  | { status: "ran"; summary: string; cacheKey: string | null }
+  | {
+      status: "ran";
+      summary: string;
+      cacheKey: string | null;
+      /**
+       * Input fingerprint taken BEFORE the generator ran. Recording a
+       * fingerprint taken after the run would mark files created mid-run (a
+       * concurrent edit, a parallel agent) as generated although the output
+       * never saw them, and the next run would skip them as cached.
+       */
+      preRunFingerprint: string | null;
+    }
   | { status: "skipped" }
   | { status: "failed"; error: string };
 
@@ -182,11 +194,13 @@ export class GeneratorRunner {
     genState: GenState,
     opts: RunGeneratorsOptions,
   ): Promise<RunOutcome> {
+    let preRunFingerprint: string | null = null;
     if (!opts.noCache && !opts.force && gen.cacheKey) {
       const inputs = gen.findInputs(opts.live);
       if (isUnchanged(gen.cacheKey, inputs, gen.output, genState)) {
         return { status: "skipped" };
       }
+      preRunFingerprint = fingerprint(inputs);
     }
 
     try {
@@ -198,6 +212,7 @@ export class GeneratorRunner {
         status: "ran",
         summary: result.summary,
         cacheKey: gen.cacheKey,
+        preRunFingerprint,
       };
     } catch (error) {
       return { status: "failed", error: parseError(error).message };
@@ -223,7 +238,8 @@ export class GeneratorRunner {
       phases: [],
       totalGenerators: 0,
     };
-    const recordedCacheKeys = new Set<string>();
+    /** cacheKey → input fingerprint taken before that generator ran. */
+    const recordedFingerprints = new Map<string, string>();
 
     // ── Progress reporting ──────────────────────────────────────────────
     // Each generator gets a phase row; every state change hands a snapshot to
@@ -265,8 +281,8 @@ export class GeneratorRunner {
         result.output.push(`✅ ${key}: ${outcome.summary}`);
         row.status = "done";
         row.summary = outcome.summary;
-        if (outcome.cacheKey) {
-          recordedCacheKeys.add(outcome.cacheKey);
+        if (outcome.cacheKey && outcome.preRunFingerprint) {
+          recordedFingerprints.set(outcome.cacheKey, outcome.preRunFingerprint);
         }
       } else if (outcome.status === "skipped") {
         result.skipped.push(key);
@@ -410,10 +426,8 @@ export class GeneratorRunner {
     );
 
     if (!opts.noCache && !opts.force) {
-      for (const gen of generators) {
-        if (gen.cacheKey && recordedCacheKeys.has(gen.cacheKey)) {
-          markDone(gen.cacheKey, gen.findInputs(opts.live), genState);
-        }
+      for (const [cacheKey, preRunFingerprint] of recordedFingerprints) {
+        genState[cacheKey] = preRunFingerprint;
       }
       writeGenState(genState);
     }

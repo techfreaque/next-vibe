@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `cortex-write` call with `callbackMode='detach'` returned immediately with a `taskId` string and **no** `responsePath` — the write is running in the background as expected.\n\nSTEP_OK taskId=local-bg-chatcmpl-tool-ba46c841c7a14785978727c227c05023",
+    "encoding_format": "float"
+  }
+}

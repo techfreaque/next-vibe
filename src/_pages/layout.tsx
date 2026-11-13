@@ -5,7 +5,7 @@ import "next-vibe/ui/global-css";
 import type { Metadata, Viewport } from "next";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -51,7 +51,7 @@ export async function generateMetadata({
     title: t("meta.defaultTitle"),
     category: t("meta.category"),
     description: t("meta.description", {
-      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+      modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),

@@ -9,8 +9,8 @@ import {
   ImageGenModelId,
 } from "next-vibe/agent/image-generation/models";
 import {
-  getAvailableModelCount,
-  getAvailableModelCountsByContentLevel,
+  getAvailableChatModelCount,
+  getAvailableChatModelCountsByContentLevel,
   type ModelCountsByContentLevel,
 } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -147,8 +147,8 @@ export async function tanstackLoader({
   const availability = await getEnvAvailability();
   return {
     locale,
-    modelCount: getAvailableModelCount(false, availability),
-    counts: getAvailableModelCountsByContentLevel(false, availability),
+    modelCount: getAvailableChatModelCount(false, availability),
+    counts: getAvailableChatModelCountsByContentLevel(false, availability),
   };
 }
 

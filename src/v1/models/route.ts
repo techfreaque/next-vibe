@@ -10,7 +10,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: v1ModelsEndpoints,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, request, t }) =>
-      V1ModelsRepository.list(user, request, t),
+    handler: ({ user, request, t, logger }) =>
+      V1ModelsRepository.list(user, request, t, logger),
   },
 });

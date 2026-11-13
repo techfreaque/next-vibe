@@ -25,7 +25,7 @@ import {
   productsRepository,
 } from "../../../products/repository-client";
 import { getEnvAvailability } from "../../../vibe/agent/env-availability";
-import { getAvailableModelCount } from "../../../vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "../../../vibe/agent/models/all-models";
 import type { PaymentInterval } from "../types";
 import { scopedTranslation } from "./i18n";
 import { StripeProvider } from "./repository";
@@ -76,7 +76,10 @@ export class StripePriceManager {
       const productName = t(product.name);
       const productDescription = t(product.description, {
         subCredits: product.credits,
-        modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+        modelCount: getAvailableChatModelCount(
+          false,
+          await getEnvAvailability(),
+        ),
       });
 
       logger.info("Creating Stripe price with locale-adjusted pricing", {

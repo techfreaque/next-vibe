@@ -26,6 +26,7 @@ import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
 import {
+  isStorageFileOwner,
   mimeFromUrl,
   parseStorageUrl,
   resolveStorageUrl,
@@ -45,6 +46,7 @@ import type { VideoGenerationT } from "./i18n";
 import {
   filterVideoGenModels,
   getVideoGenModelById,
+  resolveVideoGenRouteForImageInput,
   videoGenModelOptions,
   type VideoGenModelSelection,
 } from "./models";
@@ -93,9 +95,8 @@ async function inlineOwnStorageUrl(
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
   if (!isAdmin) {
-    const meta = await storage.getFileMetadata(parsed.fileId);
-    const userId = user.isPublic ? undefined : user.id;
-    if (!meta || meta.uploadedBy !== userId) {
+    const meta = await storage.getFileMetadata(parsed.fileId, parsed.threadId);
+    if (!meta || !isStorageFileOwner(meta, user)) {
       // not owned — hand the provider a fully-qualified URL; it will reject if unreachable
       return resolveStorageUrl(url);
     }
@@ -136,28 +137,32 @@ export class VideoGenerationRepository {
       });
     }
 
-    // Modality-aware resolution: image-to-video needs an image-capable model.
+    // Modality-aware resolution: image-to-video needs an image-capable route.
     // The model usually comes from the favorite's videoGenModelSelection —
     // chosen for text-to-video — and the model field is hidden from the AI
     // (hiddenForPlatforms), so nobody upstream can correct a t2v default for
-    // an i2v request. Resolve to the cheapest image-capable model instead of
-    // letting the provider fail with a misleading init_image error.
+    // an i2v request. Move to an image-capable route (same model first), or
+    // reject: a text-only route would drop the image or fail upstream with a
+    // misleading init_image error.
     const seedImageUrl = resolveSeedImageUrl(data.frameReferences);
     const hasFrameImage = (data.frameReferences?.length ?? 0) > 0;
-    if (hasFrameImage && !videoModel.inputs.includes("image")) {
-      const { getVideoGenModelsByInputModality } = await import("./models");
-      const imageCapable = getVideoGenModelsByInputModality("image");
-      const substitute = imageCapable.toSorted(
-        (a, b) =>
-          (a.creditCostPerSecond ?? Infinity) -
-          (b.creditCostPerSecond ?? Infinity),
-      )[0];
-      if (substitute) {
+    if (hasFrameImage) {
+      const imageRoute = resolveVideoGenRouteForImageInput(videoModel);
+      if (!imageRoute) {
+        return fail({
+          message: t("post.errors.noImageCapableModel"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+      if (imageRoute !== videoModel) {
         logger.debug(
-          "[VideoGen] Resolved image-capable model for image-to-video request",
-          { requested: videoModel.id, resolved: substitute.id },
+          "[VideoGen] Resolved image-capable route for image-to-video request",
+          {
+            requested: `${videoModel.id}/${videoModel.apiProvider}`,
+            resolved: `${imageRoute.id}/${imageRoute.apiProvider}`,
+          },
         );
-        videoModel = substitute;
+        videoModel = imageRoute;
       }
     }
 

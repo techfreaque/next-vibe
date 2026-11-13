@@ -138,6 +138,8 @@ export const translations = {
         "This model requires an input image URL. Paste an image link to animate it.",
       imageInputUnsupported:
         "The video model {{model}} rejected the input image - it likely does not support image-to-video. Retry generate_video WITHOUT the model parameter (the default model animates images), or drop the image.",
+      noImageCapableModel:
+        "No video model here takes a reference image. Drop the image to generate from the prompt alone.",
     },
     success: {
       title: "Video Generated",

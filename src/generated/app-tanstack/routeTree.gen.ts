@@ -166,6 +166,7 @@ import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.use
 import { Route as ApiLocaleV1ModelsRouteImport } from './routes/api.$locale.v1.models'
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
+import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
 import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
@@ -1526,6 +1527,12 @@ const ApiLocaleVibeHelpToolRoute = ApiLocaleVibeHelpToolRouteImport.update({
   path: '/api/$locale/vibe/help-tool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute =
+  LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport.update({
+    id: '/blog/chatgpt-alternative-without-filters/',
+    path: '/blog/chatgpt-alternative-without-filters/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport.update({
     id: '/blog/dead-trading-bot-to-monitoring-engine/',
@@ -4946,6 +4953,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -5599,6 +5607,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -6260,6 +6269,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -6921,6 +6931,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
@@ -7574,6 +7585,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
     | '/$locale/story/blog/hermes-thea-two-way-remote'
@@ -8234,6 +8246,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
@@ -10020,6 +10033,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/vibe/help-tool'
       preLoaderRoute: typeof ApiLocaleVibeHelpToolRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/story/blog/chatgpt-alternative-without-filters/': {
+      id: '/$locale/story/blog/chatgpt-alternative-without-filters/'
+      path: '/blog/chatgpt-alternative-without-filters'
+      fullPath: '/$locale/story/blog/chatgpt-alternative-without-filters/'
+      preLoaderRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': {
       id: '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
@@ -13587,6 +13607,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
+  LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -13626,6 +13647,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
+  LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute:
+    LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
     LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute,
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute:

@@ -30,6 +30,7 @@ import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-fiel
 
 import {
   formatTokenCount,
+  isModelPageAlias,
   PUBLIC_CHAT_MODEL_IDS,
   toModelSlug,
 } from "./model-facts";
@@ -110,6 +111,15 @@ export function listCatalogEntries(
   const entries: CatalogEntry[] = [];
   for (const [defKey, def] of Object.entries(CATALOG_DEFINITIONS[type])) {
     if (def.enabled === false && def.enabledWithoutPrice !== true) {
+      continue;
+    }
+    // A duplicate route of another model (e.g. claude-code-haiku of Claude
+    // Haiku 5.5) is one model, one row. Admins still see the raw entries.
+    if (
+      type === "text" &&
+      options.isAdmin !== true &&
+      isModelPageAlias(defKey)
+    ) {
       continue;
     }
     const providers = visibleProviders(def, options);

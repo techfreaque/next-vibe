@@ -26,7 +26,10 @@ import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
 import { sttModelDefinitions } from "../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../text-to-speech/models";
-import { videoGenModelDefinitions } from "../../video-generation/models";
+import {
+  deriveVideoModelInputs,
+  videoGenModelDefinitions,
+} from "../../video-generation/models";
 import type { Modality } from "../enum";
 import { ApiProvider } from "../models";
 import type { ModelDefinition } from "../models";
@@ -1106,7 +1109,11 @@ export class ModelPricesRepository {
         }
       }
 
-      // For non-chat models: apply deterministic modalities based on role
+      // For non-chat models: apply deterministic modalities based on role.
+      // Video inputs are NOT a role constant: image-to-video models take a
+      // reference image. They derive from provider route data (OpenRouter
+      // supported_frame_images, ModelsLab init_image → supportedFrameImages),
+      // using this run's fresh settings updates over the current definitions.
       const roleModalityDefaults: Record<
         string,
         { inputs: Modality[]; outputs: Modality[] } | undefined
@@ -1117,6 +1124,15 @@ export class ModelPricesRepository {
         tts: { inputs: ["text"], outputs: ["audio"] },
         stt: { inputs: ["audio"], outputs: ["text"] },
       };
+      const freshFrameImages = new Map<string, boolean>();
+      for (const u of allSettingsUpdates) {
+        if (u.field === "supportedFrameImages") {
+          freshFrameImages.set(
+            u.providerModel,
+            u.tsLiteral.replaceAll(/\s/g, "") !== "[]",
+          );
+        }
+      }
       const allNonChatDefs: Record<string, Record<string, ModelDefinition>> = {
         "image-gen": { ...imageGenModelDefinitions },
         "music-gen": { ...musicGenModelDefinitions },
@@ -1131,7 +1147,7 @@ export class ModelPricesRepository {
         }
         const enumPrefix = enumPrefixForRole[role] ?? role;
         const fileContent = roleFileContents[role];
-        for (const modelId of Object.keys(defs)) {
+        for (const [modelId, def] of Object.entries(defs)) {
           const escapedModelId = modelId.replaceAll(
             /[.*+?^${}()|[\]\\]/g,
             "\\$&",
@@ -1143,13 +1159,16 @@ export class ModelPricesRepository {
           if (!enumKey) {
             continue;
           }
+          const isVideo = role === "video-gen";
           const result = applyModalityUpdate(
             roleFileContents[role],
             enumPrefix,
             enumKey,
-            defaults.inputs,
+            isVideo
+              ? deriveVideoModelInputs(def, freshFrameImages)
+              : defaults.inputs,
             defaults.outputs,
-            `${role}-deterministic`,
+            isVideo ? "video-gen-provider-routes" : `${role}-deterministic`,
           );
           if (result.changed) {
             roleFileContents[role] = result.content;

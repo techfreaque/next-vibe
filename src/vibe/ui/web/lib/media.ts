@@ -35,6 +35,13 @@ export interface MicrophoneRequestResult {
   /** getUserMedia rejection name: NotAllowedError, NotFoundError, NotReadableError, ... */
   errorName: string | null;
   errorMessage: string | null;
+  /**
+   * `navigator.userActivation.isActive` at the moment getUserMedia was called.
+   * false = no transient user gesture, which some browsers (Firefox Android)
+   * answer with NotAllowedError without ever showing a prompt. null = the
+   * browser has no User Activation API.
+   */
+  userActivationActive: boolean | null;
 }
 
 /**
@@ -42,22 +49,30 @@ export interface MicrophoneRequestResult {
  * right message (permission denied vs no device vs mic busy) and log it.
  */
 export async function requestMicrophoneStream(): Promise<MicrophoneRequestResult> {
+  const userActivationActive = navigator.userActivation?.isActive ?? null;
   if (!navigator.mediaDevices?.getUserMedia) {
     // Insecure context (http) or an old browser: the API is simply absent.
     return {
       stream: null,
       errorName: "NotSupportedError",
       errorMessage: "navigator.mediaDevices.getUserMedia unavailable",
+      userActivationActive,
     };
   }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    return { stream, errorName: null, errorMessage: null };
+    return {
+      stream,
+      errorName: null,
+      errorMessage: null,
+      userActivationActive,
+    };
   } catch (err) {
     return {
       stream: null,
       errorName: err instanceof Error ? err.name : "UnknownError",
       errorMessage: err instanceof Error ? err.message : String(err),
+      userActivationActive,
     };
   }
 }

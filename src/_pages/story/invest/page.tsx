@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", {
-      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+      modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
     imageAlt: t("meta.imageAlt", { appName }),

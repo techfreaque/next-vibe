@@ -7,6 +7,7 @@ import "server-only";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { V1T } from "../i18n";
 import { gateApiKeyRequest } from "../shared/gate";
@@ -18,8 +19,9 @@ export class V1ModelsRepository {
     user: JwtPayloadType,
     request: Request | undefined,
     t: V1T,
+    logger: EndpointLogger,
   ): Promise<StreamingResponse> {
-    const gate = await gateApiKeyRequest(user, request, t);
+    const gate = await gateApiKeyRequest(user, request, t, logger);
     if (!gate.ok) {
       return gate.response;
     }

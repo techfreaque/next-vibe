@@ -12,6 +12,8 @@ export const translations: typeof enTranslations = {
       "API-Schlüssel fehlt. Sende ihn als 'Authorization: Bearer <Schlüssel>'. Erstelle einen unter Einstellungen > API-Schlüssel.",
     invalidKey:
       "Ungültiger oder widerrufener API-Schlüssel. Prüfe den Schlüssel oder erstelle unter Einstellungen > API-Schlüssel einen neuen.",
+    authUnavailable:
+      "API-Schlüssel gerade nicht prüfbar. Dein Schlüssel wurde nicht abgelehnt. In {{seconds}}s erneut versuchen.",
     modelNotFound:
       "Das Modell '{{model}}' existiert nicht oder steht dir nicht zur Verfügung. Deine Modelle: GET /v1/models.",
     paidRequired:

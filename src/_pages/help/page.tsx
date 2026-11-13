@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { languageConfig } from "next-vibe/core/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
@@ -88,7 +88,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableModelCount(
+  const modelCount = getAvailableChatModelCount(
     isAdmin,
     await getEnvAvailability(),
   );

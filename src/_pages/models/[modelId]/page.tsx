@@ -10,11 +10,13 @@ import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repositor
 import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { notFound } from "next-vibe/ui/lib/not-found";
+import { permanentRedirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
+  findModelPageAlias,
   findPublicModelId,
   formatTokenCount,
   getModelFacts,
@@ -23,6 +25,7 @@ import {
   suggestComparisons,
   buildPickerModels,
   type PickerModel,
+  toModelSlug,
 } from "../_shared/model-facts";
 import { formatNumber, tierName } from "../_shared/model-format";
 import {
@@ -39,6 +42,17 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; modelId: string }>;
 }
 
+/**
+ * Duplicate entries (e.g. /models/claude-code-haiku, a provider route of
+ * Claude Haiku 5.5) have no page of their own: 308 to the canonical page.
+ */
+function redirectAlias(locale: CountryLanguage, modelId: string): void {
+  const canonical = findModelPageAlias(modelId);
+  if (canonical !== null) {
+    permanentRedirect(`/${locale}/models/${toModelSlug(canonical)}`);
+  }
+}
+
 function resolveFacts(modelId: string): ModelFacts | null {
   const id = findPublicModelId(modelId);
   return id === null ? null : getModelFacts(id);
@@ -46,6 +60,7 @@ function resolveFacts(modelId: string): ModelFacts | null {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, modelId } = await params;
+  redirectAlias(locale, modelId);
   const facts = resolveFacts(modelId);
   if (facts === null) {
     const media = findMediaFacts(modelId);
@@ -121,6 +136,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ModelPageData> {
   const { locale, modelId } = await params;
+  redirectAlias(locale, modelId);
   const facts = resolveFacts(modelId);
   if (facts === null) {
     const media = findMediaFacts(modelId);

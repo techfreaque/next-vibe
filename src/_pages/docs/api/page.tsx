@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -46,7 +46,7 @@ export async function tanstackLoader({
   const { locale } = await params;
   return {
     locale,
-    modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+    modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     baseUrl: `${envClient.NEXT_PUBLIC_APP_URL}/api/${locale}/v1`,
     platform: Platform.NEXT_PAGE,
   };
@@ -63,7 +63,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const modelCount = getAvailableModelCount(false, await getEnvAvailability());
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   return metadataGenerator(locale, {
     path: "docs/api",
     title: t("meta.title", { appName }),

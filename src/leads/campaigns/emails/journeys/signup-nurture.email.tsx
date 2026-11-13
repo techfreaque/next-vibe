@@ -5,7 +5,7 @@
  */
 
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { EmailCampaignStage } from "next-vibe/identity/lead/enum";
 import React from "react";
 
@@ -47,7 +47,10 @@ export const signupNurtureInitialEmail: EmailTemplateFunction = async ({
 
       <HumanText variant="body">
         {t("initial.modelChoice", {
-          modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+          modelCount: getAvailableChatModelCount(
+            false,
+            await getEnvAvailability(),
+          ),
         })}
       </HumanText>
 

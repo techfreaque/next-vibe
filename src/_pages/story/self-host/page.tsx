@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getMaxToolCountAllPlatforms } from "next-vibe/agent/chat/default-tool-counts";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -63,7 +63,10 @@ export async function tanstackLoader({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<SelfHostPageData> {
   const { locale } = await params;
-  const modelCount = getAvailableModelCount(false, await getEnvAvailability());
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   return {
     locale,
     modelCount,

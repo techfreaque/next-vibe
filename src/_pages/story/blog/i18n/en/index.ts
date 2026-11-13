@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    chatgptAlternative: {
+      title: "A ChatGPT alternative without filters. You set the level.",
+      category: "Guide",
+      excerpt:
+        "Mainstream models keep their filters everywhere. Here they sit next to open and uncensored ones, and you pick per message. What changes, what it costs, and when ChatGPT is still the better pick.",
+      readTime: "7 min read",
+    },
     codingTools: {
       title: "One key. Every model. Inside your coding agent.",
       category: "Developer Guide",

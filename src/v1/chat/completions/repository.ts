@@ -249,7 +249,7 @@ export class V1ChatCompletionsRepository {
     const runner = params.runner ?? aiSdkRunner;
 
     // 1. Identity + per-key rate limit
-    const gate = await gateApiKeyRequest(user, request, t);
+    const gate = await gateApiKeyRequest(user, request, t, logger);
     if (!gate.ok) {
       return gate.response;
     }

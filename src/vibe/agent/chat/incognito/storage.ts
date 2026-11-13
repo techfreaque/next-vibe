@@ -7,7 +7,7 @@
 "use client";
 
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
-import { storage } from "next-vibe/ui/lib/storage";
+import { largeStorage } from "next-vibe/ui/lib/storage";
 
 import { reportStorageFailure } from "../../../logger/storage-failure";
 import type { EndpointLogger } from "../../../logger/types";
@@ -55,8 +55,10 @@ async function getItem<T>(
     return defaultValue;
   }
 
-  // storage.getItem reports its own read failures
-  const item = await storage.getItem(key, logger);
+  // largeStorage (IndexedDB, migrating old localStorage values) reports its
+  // own read failures. The message store inlines incognito attachments as
+  // data URIs, so it outgrows the ~5 MB localStorage quota fast.
+  const item = await largeStorage.getItem(key, logger);
   if (!item) {
     return defaultValue;
   }
@@ -66,7 +68,7 @@ async function getItem<T>(
     // Corrupt incognito blob: the user's local threads/messages look empty
     reportStorageFailure(logger, {
       platform: "web",
-      area: "localStorage",
+      area: "indexedDB",
       operation: "parse",
       key: `incognito:${key}`,
       error: error instanceof Error ? error : String(error),
@@ -95,15 +97,15 @@ async function setItem<T>(
     // Circular/BigInt value - the incognito write is lost
     reportStorageFailure(logger, {
       platform: "web",
-      area: "localStorage",
+      area: "indexedDB",
       operation: "set",
       key: `incognito:${key}`,
       error: error instanceof Error ? error : String(error),
     });
     return;
   }
-  // storage.setItem reports quota/security failures with the key + size
-  await storage.setItem(key, serialized, logger);
+  // largeStorage.setItem reports quota/security failures with the key + size
+  await largeStorage.setItem(key, serialized, logger);
 }
 
 /**

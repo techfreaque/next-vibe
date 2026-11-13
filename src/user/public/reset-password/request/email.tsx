@@ -21,7 +21,7 @@ import {
 } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -269,7 +269,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         publicName: user.publicName,
         userId: user.id,
         passwordResetUrl,
-        totalModelCount: getAvailableModelCount(
+        totalModelCount: getAvailableChatModelCount(
           false,
           await getEnvAvailability(),
         ),

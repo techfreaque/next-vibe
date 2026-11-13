@@ -159,3 +159,9 @@ export function setSessionItem(
 export function removeSessionItem(key: string, logger: EndpointLogger): void {
   removeLocalItem(key, logger);
 }
+
+/**
+ * Storage for values that can grow to MBs (web: IndexedDB).
+ * The file store has no size cap, so large values use the same store.
+ */
+export const largeStorage: Storage = storage;

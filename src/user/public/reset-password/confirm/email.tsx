@@ -13,7 +13,7 @@ import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/messenger/registry/template";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -219,7 +219,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     const templateProps: PasswordResetConfirmProps = {
       publicName: user.publicName,
       userId: user.id,
-      totalModelCount: getAvailableModelCount(
+      totalModelCount: getAvailableChatModelCount(
         false,
         await getEnvAvailability(),
       ),

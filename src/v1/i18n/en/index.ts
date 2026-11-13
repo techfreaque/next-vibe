@@ -10,6 +10,8 @@ export const translations = {
       "Missing API key. Send it as 'Authorization: Bearer <key>'. Create a key under Settings > API keys.",
     invalidKey:
       "Invalid or revoked API key. Check the key or create a new one under Settings > API keys.",
+    authUnavailable:
+      "Could not verify your API key right now. Your key was not rejected. Retry in {{seconds}}s.",
     modelNotFound:
       "The model '{{model}}' does not exist or is not available to you. List your models with GET /v1/models.",
     paidRequired:

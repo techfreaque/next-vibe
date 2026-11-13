@@ -96,6 +96,10 @@ let globalSeq = 0;
 /** Set to true during shutdown to suppress expected proxy errors */
 let shuttingDown = false;
 
+/** RFC 6455 1012 "Service Restart": sent to every client on a clean stop. */
+const WS_SERVER_RESTART_CODE = 1012;
+const WS_SERVER_RESTART_REASON = "server-restart";
+
 /**
  * Broadcast to all subscribers on a channel (no user filter).
  * Used by pub/sub adapters that relay events from other processes.
@@ -619,6 +623,18 @@ export function startWebSocketServer(
     stop: (): void => {
       shuttingDown = true;
       clearLocalBroadcast();
+      // Close every client socket with 1012 "Service Restart" + a reason
+      // first, so the browser's "[WS Client] Connection lost" row says the
+      // server restarted (deploy/restart) instead of an anonymous 1006.
+      for (const subscribers of channels.values()) {
+        for (const ws of subscribers) {
+          try {
+            ws.close(WS_SERVER_RESTART_CODE, WS_SERVER_RESTART_REASON);
+          } catch {
+            /* already closing */
+          }
+        }
+      }
       server.stop(true);
     },
     nextPort,

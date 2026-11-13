@@ -32,7 +32,7 @@ import type {
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreEnv } from "next-vibe/core/env";
 
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -458,7 +458,10 @@ async function renderWelcomeEmailByEmail(
     privateName: user.privateName,
     userId: user.id,
     leadId: user.leadId,
-    totalModelCount: getAvailableModelCount(false, await getEnvAvailability()),
+    totalModelCount: getAvailableChatModelCount(
+      false,
+      await getEnvAvailability(),
+    ),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 

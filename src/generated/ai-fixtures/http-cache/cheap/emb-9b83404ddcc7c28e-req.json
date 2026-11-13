@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "PHASE 1 — the `cortex-write` call with `callbackMode='wakeUp'` returned a `taskId` (`local-wu-chatcmpl-tool-812b79d17cf641bdbc8f2f4fbfc1e3a1`) with **no** `responsePath` in the immediate dispatch result, and the hint confirms the result will be auto-injected when ready. This is exactly the expected dispatch behavior.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -61,8 +61,10 @@ export class ChatFileRepository {
 
   /**
    * Resolve a file's metadata regardless of the active storage backend.
-   * Filesystem keeps the fast path-based read; S3/MinIO goes through the
-   * storage adapter (object-store lookup). Keeping this abstraction here is
+   * Filesystem keeps the fast path-based read; S3/MinIO reads the
+   * thread-scoped metadata object directly (never a bucket-wide search: the
+   * old unpaginated listing only saw the first 1000 keys, so incognito files
+   * in later threads 404'd as "Lead does not have permission"). Keeping this abstraction here is
    * what lets the serving route work when CHAT_STORAGE_TYPE=s3.
    */
   private static async resolveFileMetadata(
@@ -76,7 +78,7 @@ export class ChatFileRepository {
     if (!fileId) {
       return null;
     }
-    return getStorageAdapter().getFileMetadata(fileId);
+    return getStorageAdapter().getFileMetadata(fileId, threadId);
   }
 
   static async getFile(
@@ -116,6 +118,8 @@ export class ChatFileRepository {
           logger.error("Lead does not have permission to access file", {
             leadId: user.leadId,
             hasFileLeadId: !!fileMetadata?.leadId,
+            metadataFound: fileMetadata !== null,
+            storageType: agentEnv.CHAT_STORAGE_TYPE,
             threadId: data.threadId,
             filename: data.filename,
           });
@@ -192,7 +196,7 @@ export class ChatFileRepository {
         });
         return { buffer: Buffer.from(""), contentType: "text/plain" };
       }
-      const metadata = await storage.getFileMetadata(fileId);
+      const metadata = await storage.getFileMetadata(fileId, data.threadId);
       return {
         buffer: Buffer.from(base64, "base64"),
         contentType: metadata?.mimeType ?? "application/octet-stream",

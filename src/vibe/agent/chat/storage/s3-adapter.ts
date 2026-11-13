@@ -138,12 +138,16 @@ export class S3StorageAdapter implements StorageAdapter {
     };
   }
 
-  async deleteFile(fileId: string): Promise<void> {
+  async deleteFile(fileId: string, threadId?: string): Promise<void> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return;
     }
 
-    const metadata = await this.getFileMetadata(fileId);
+    const metadata = threadId
+      ? await this.readMetadataObject(
+          `chat-attachments/${threadId}/.metadata/${fileId}.json`,
+        )
+      : await this.getFileMetadata(fileId);
     if (!metadata) {
       return;
     }
@@ -189,51 +193,32 @@ export class S3StorageAdapter implements StorageAdapter {
     return buildStorageFileUrl(metadata.threadId, metadata.filename);
   }
 
-  async getFileMetadata(fileId: string): Promise<FileMetadata | null> {
+  async getFileMetadata(
+    fileId: string,
+    threadId?: string,
+  ): Promise<FileMetadata | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return null;
+    }
+
+    if (threadId) {
+      return this.readMetadataObject(
+        `chat-attachments/${threadId}/.metadata/${fileId}.json`,
+      );
     }
 
     // Search through all thread directories for this fileId
     // List all objects under chat-attachments/
     try {
-      const listCommand = new ListObjectsV2Command({
-        Bucket: this.bucket,
-        Prefix: "chat-attachments/",
-      });
-
-      const response = await this.client.send(listCommand);
-      const objects = response.Contents || [];
+      const { keys } = await this.listAllKeys("chat-attachments/");
 
       // Find all .metadata directories and check for our fileId
-      for (const obj of objects) {
-        if (!obj.Key) {
-          continue;
-        }
-
+      for (const key of keys) {
         // Check if this is a metadata file for our fileId
-        if (
-          obj.Key.includes("/.metadata/") &&
-          obj.Key.endsWith(`${fileId}.json`)
-        ) {
-          try {
-            const getCommand = new GetObjectCommand({
-              Bucket: this.bucket,
-              Key: obj.Key,
-            });
-
-            const result = await this.client.send(getCommand);
-            const body = await result.Body?.transformToString();
-
-            if (body) {
-              const metadata = JSON.parse(body) as FileMetadata;
-              // Convert uploadedAt string back to Date
-              metadata.uploadedAt = new Date(metadata.uploadedAt);
-              return metadata;
-            }
-          } catch {
-            // Metadata file couldn't be read, continue searching
-            continue;
+        if (key.includes("/.metadata/") && key.endsWith(`/${fileId}.json`)) {
+          const metadata = await this.readMetadataObject(key);
+          if (metadata) {
+            return metadata;
           }
         }
       }
@@ -324,33 +309,15 @@ export class S3StorageAdapter implements StorageAdapter {
     const results: FileMetadata[] = [];
 
     try {
-      const listCommand = new ListObjectsV2Command({
-        Bucket: this.bucket,
-        Prefix: prefix,
-      });
+      const { keys } = await this.listAllKeys(prefix);
 
-      const response = await this.client.send(listCommand);
-      const objects = response.Contents ?? [];
-
-      for (const obj of objects) {
-        if (!obj.Key?.endsWith(".json")) {
+      for (const key of keys) {
+        if (!key.endsWith(".json")) {
           continue;
         }
-        try {
-          const getCommand = new GetObjectCommand({
-            Bucket: this.bucket,
-            Key: obj.Key,
-          });
-          const result = await this.client.send(getCommand);
-          const body = await result.Body?.transformToString();
-          if (!body) {
-            continue;
-          }
-          const metadata = JSON.parse(body) as FileMetadata;
-          metadata.uploadedAt = new Date(metadata.uploadedAt);
+        const metadata = await this.readMetadataObject(key);
+        if (metadata) {
           results.push(metadata);
-        } catch {
-          // Skip unreadable metadata objects
         }
       }
     } catch {
@@ -358,5 +325,80 @@ export class S3StorageAdapter implements StorageAdapter {
     }
 
     return results;
+  }
+
+  async listThreadIds(): Promise<string[]> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
+      return [];
+    }
+
+    const root = "chat-attachments/";
+    try {
+      const { prefixes } = await this.listAllKeys(root, "/");
+      return prefixes
+        .map((prefix) => prefix.slice(root.length).replace(/\/$/, ""))
+        .filter((threadId) => threadId.length > 0);
+    } catch {
+      // Bucket/prefix doesn't exist - return empty
+      return [];
+    }
+  }
+
+  /**
+   * List every key (and, with a delimiter, every common prefix) under a
+   * prefix, following continuation tokens past the 1000-object page limit.
+   */
+  private async listAllKeys(
+    prefix: string,
+    delimiter?: string,
+  ): Promise<{ keys: string[]; prefixes: string[] }> {
+    const keys: string[] = [];
+    const prefixes: string[] = [];
+    let continuationToken: string | undefined;
+
+    do {
+      const response = await this.client.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket,
+          Prefix: prefix,
+          Delimiter: delimiter,
+          ContinuationToken: continuationToken,
+        }),
+      );
+      for (const obj of response.Contents ?? []) {
+        if (obj.Key) {
+          keys.push(obj.Key);
+        }
+      }
+      for (const common of response.CommonPrefixes ?? []) {
+        if (common.Prefix) {
+          prefixes.push(common.Prefix);
+        }
+      }
+      continuationToken = response.IsTruncated
+        ? response.NextContinuationToken
+        : undefined;
+    } while (continuationToken);
+
+    return { keys, prefixes };
+  }
+
+  private async readMetadataObject(key: string): Promise<FileMetadata | null> {
+    try {
+      const result = await this.client.send(
+        new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      const body = await result.Body?.transformToString();
+      if (!body) {
+        return null;
+      }
+      const metadata = JSON.parse(body) as FileMetadata;
+      // Convert uploadedAt string back to Date
+      metadata.uploadedAt = new Date(metadata.uploadedAt);
+      return metadata;
+    } catch {
+      // Missing or unreadable metadata object
+      return null;
+    }
   }
 }

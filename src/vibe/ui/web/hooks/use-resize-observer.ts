@@ -30,18 +30,41 @@ export function useResizeObserver(
       return;
     }
 
+    // Apply the new size on the next frame, not inside the observer callback.
+    // A synchronous setState here re-renders consumers that resize OTHER
+    // observed elements (the chat input height becomes the messages list's
+    // bottom padding, which the messages ResizeObserver watches) within the
+    // same frame, and the browser reports "ResizeObserver loop completed with
+    // undelivered notifications" as an uncaught error.
+    const pending: { frame: number | null } = { frame: null };
     const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setSize({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
+      const entry = entries[entries.length - 1];
+      if (!entry) {
+        return;
       }
+      const next: ElementSize = {
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      };
+      if (pending.frame !== null) {
+        cancelAnimationFrame(pending.frame);
+      }
+      pending.frame = requestAnimationFrame(() => {
+        pending.frame = null;
+        setSize((prev) =>
+          prev.width === next.width && prev.height === next.height
+            ? prev
+            : next,
+        );
+      });
     });
 
     observer.observe(target);
 
     return (): void => {
+      if (pending.frame !== null) {
+        cancelAnimationFrame(pending.frame);
+      }
       observer.disconnect();
     };
   }, [ref]);

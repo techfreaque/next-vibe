@@ -66,7 +66,7 @@ import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "../../../cortex/widget/cortex-modal";
 import { useProviderAvailability } from "../../../env-availability-store";
-import { getAvailableModelCount } from "../../../models/all-models";
+import { getAvailableChatModelCount } from "../../../models/all-models";
 import { AIToolsModal } from "../../../tools/widget/ai-tools-modal";
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
@@ -308,7 +308,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   const isAuthenticated = !user.isPublic;
   const isAdmin = isAuthenticated && user.roles.includes(UserRole.ADMIN);
   const availability = useProviderAvailability();
-  const totalModelCount = getAvailableModelCount(isAdmin, availability);
+  const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   // Auth dialog for welcome tour
   const [authDialogOpen, setAuthDialogOpen] = useState(false);

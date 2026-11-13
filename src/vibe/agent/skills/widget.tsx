@@ -70,7 +70,7 @@ import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
 import { useTourState } from "../chat/tour-state";
 import { useProviderAvailability } from "../env-availability-store";
-import { getAvailableModelCount } from "../models/all-models";
+import { getAvailableChatModelCount } from "../models/all-models";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
@@ -110,7 +110,7 @@ export function SkillsListContainer({
     () => ({
       ...children.modelDescription,
       contentParams: {
-        count: getAvailableModelCount(isAdmin, availability),
+        count: getAvailableChatModelCount(isAdmin, availability),
       },
     }),
     [children.modelDescription, isAdmin, availability],

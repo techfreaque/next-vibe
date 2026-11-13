@@ -7,7 +7,7 @@
 
 import { NextResponse } from "next/server";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
@@ -51,7 +51,7 @@ export async function GET(
     name: configT("appName"),
     short_name: configT("appName"),
     description: configT("appDescription", {
-      modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+      modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
     }),
     start_url: `/${locale}/`,
     display: MANIFEST_CONSTANTS.DISPLAY,

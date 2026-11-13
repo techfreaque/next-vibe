@@ -35,7 +35,7 @@ export class UrlCacheCleanupRepository {
 
     for (const metadata of allFiles) {
       if (metadata.uploadedAt < cutoff) {
-        await adapter.deleteFile(metadata.id);
+        await adapter.deleteFile(metadata.id, CACHE_THREAD_ID);
         deletedCount++;
       }
     }

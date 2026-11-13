@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { UserApiKey } from "@/api-keys/db";
-import { ApiKeyAuth } from "@/api-keys/auth";
+import {
+  API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
+  ApiKeyAuth,
+  type ApiKeyResolution,
+} from "@/api-keys/auth";
 import { consumeRateLimit } from "@/api-keys/keys";
 import { isPaidUser } from "@/api-keys/paid";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
@@ -14,6 +18,7 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { V1T } from "../i18n";
 import { openAiError } from "./openai";
@@ -26,22 +31,41 @@ export async function gateApiKeyRequest(
   user: JwtPayloadType,
   request: Request | undefined,
   t: V1T,
+  logger: EndpointLogger,
 ): Promise<GateResult> {
-  const key = request ? await ApiKeyAuth.keyForRequest(request) : undefined;
-  if (user.isPublic || !key) {
-    const hasBearer = request?.headers
-      .get("authorization")
-      ?.startsWith("Bearer ");
+  const resolution: ApiKeyResolution = request
+    ? await ApiKeyAuth.keyForRequest(request, logger)
+    : { status: "missing" };
+  // Lookup failed (DB slow/down): the key may be valid. Retryable 503, never
+  // a 401 that tells the client to throw its key away. Logged in ApiKeyAuth.
+  if (resolution.status === "unavailable") {
+    return {
+      ok: false,
+      response: openAiError(
+        503,
+        t("openai.authUnavailable", {
+          seconds: API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
+        }),
+        "server_error",
+        "auth_unavailable",
+        null,
+        { "Retry-After": String(API_KEY_LOOKUP_RETRY_AFTER_SECONDS) },
+      ),
+    };
+  }
+  if (user.isPublic || resolution.status !== "ok") {
+    const missing = resolution.status === "missing";
     return {
       ok: false,
       response: openAiError(
         401,
-        hasBearer ? t("openai.invalidKey") : t("openai.missingKey"),
+        missing ? t("openai.missingKey") : t("openai.invalidKey"),
         "authentication_error",
-        hasBearer ? "invalid_api_key" : "missing_api_key",
+        missing ? "missing_api_key" : "invalid_api_key",
       ),
     };
   }
+  const { key } = resolution;
   if (key.userId !== user.id) {
     // Defence in depth: the key must belong to the resolved user.
     return {

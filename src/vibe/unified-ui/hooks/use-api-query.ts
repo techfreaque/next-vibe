@@ -315,10 +315,18 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
   // Stable refetch function - use ref to avoid depending on query object (new every render)
   const queryRef = useRef(query);
+  // refetch() bypasses React Query's `enabled`. A path param that is still
+  // empty can only fail in callApi ("Missing URL path parameter"), so explicit
+  // refetches (EndpointsPage after update/delete, form submit) hold too.
+  const hasAllPathParamsRef = useRef(hasAllPathParams);
   useLayoutEffect(() => {
     queryRef.current = query;
+    hasAllPathParamsRef.current = hasAllPathParams;
   });
   const refetch = useCallback(async () => {
+    if (!hasAllPathParamsRef.current) {
+      return queryRef.current.data ?? success(undefined as never);
+    }
     const result = await queryRef.current.refetch();
     return result.data ?? queryRef.current.data ?? success(undefined as never);
   }, []);

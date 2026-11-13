@@ -11,3 +11,8 @@ export function redirect(url: string): never {
   // eslint-disable-next-line restricted/restricted-syntax
   throw new Error("REDIRECT");
 }
+
+/** Native has no HTTP status: a permanent redirect is a plain replace. */
+export function permanentRedirect(url: string): never {
+  return redirect(url);
+}

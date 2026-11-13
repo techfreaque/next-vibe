@@ -19,6 +19,7 @@ import {
 import type { AgentTranslationKey } from "next-vibe/agent/i18n";
 import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
+  ApiProvider,
   apiProviderDisplayNames,
   calculateCreditCost,
   type ModelDefinition,
@@ -97,11 +98,65 @@ function publicOptionsFor(id: ChatModelId): ChatModelOption[] {
   );
 }
 
+/** Served by a public provider other than the UNBOTTLED cloud mirror. */
+function hasDirectPublicProvider(def: ModelDefinition): boolean {
+  return def.providers.some(
+    (provider) =>
+      provider.adminOnly !== true &&
+      provider.apiProvider !== ApiProvider.UNBOTTLED,
+  );
+}
+
+/**
+ * Definitions that are a provider route of another model, not a model of
+ * their own - e.g. the admin-only Claude Code entries (claude-code-haiku)
+ * duplicate Claude Haiku 5.5, which already carries the Claude Code route.
+ * Rule: same lab + name as a definition with a direct public provider, and no
+ * direct public provider itself. Alias → canonical id. Aliases get no page,
+ * catalog row or sitemap entry; their URLs redirect to the canonical page.
+ */
+const MODEL_PAGE_ALIASES: ReadonlyMap<ChatModelId, ChatModelId> = (() => {
+  const groups = new Map<string, ChatModelId[]>();
+  for (const id of Object.values(ChatModelId)) {
+    const def = chatModelDefinitions[id];
+    if (!isPublicDefinition(def)) {
+      continue;
+    }
+    const key = `${def.by}\u0000${def.name}`;
+    groups.set(key, [...(groups.get(key) ?? []), id]);
+  }
+  const aliases = new Map<ChatModelId, ChatModelId>();
+  for (const ids of groups.values()) {
+    const canonical = ids.find((id) =>
+      hasDirectPublicProvider(chatModelDefinitions[id]),
+    );
+    if (canonical === undefined) {
+      continue;
+    }
+    for (const id of ids) {
+      if (!hasDirectPublicProvider(chatModelDefinitions[id])) {
+        aliases.set(id, canonical);
+      }
+    }
+  }
+  return aliases;
+})();
+
+const aliasIds: ReadonlySet<string> = new Set<string>(
+  MODEL_PAGE_ALIASES.keys(),
+);
+
+/** True when this chat model id is a duplicate route of another model's page. */
+export function isModelPageAlias(id: string): boolean {
+  return aliasIds.has(id);
+}
+
 /** Every chat model a public visitor can use, in registry order. */
 export const PUBLIC_CHAT_MODEL_IDS: readonly ChatModelId[] = Object.values(
   ChatModelId,
 ).filter(
   (id) =>
+    !MODEL_PAGE_ALIASES.has(id) &&
     isPublicDefinition(chatModelDefinitions[id]) &&
     publicOptionsFor(id).length > 0,
 );
@@ -110,13 +165,36 @@ const idBySlug = new Map<string, ChatModelId>(
   PUBLIC_CHAT_MODEL_IDS.map((id) => [toModelSlug(id), id]),
 );
 
+const aliasBySlug = new Map<string, ChatModelId>(
+  [...MODEL_PAGE_ALIASES].map(([alias, canonical]) => [
+    toModelSlug(alias),
+    canonical,
+  ]),
+);
+
+function normalizeSegment(segment: string): string {
+  return decodeURIComponent(segment).toLowerCase().replaceAll(/[._]+/g, "-");
+}
+
+/**
+ * The canonical model for a URL segment that names a duplicate (alias) entry,
+ * e.g. "claude-code-haiku" → claude-haiku-5.5. Null for any other segment.
+ * Pages use it to redirect old duplicate URLs to the one canonical page.
+ */
+export function findModelPageAlias(segment: string): ChatModelId | null {
+  const canonical = aliasBySlug.get(normalizeSegment(segment));
+  return canonical !== undefined && PUBLIC_CHAT_MODEL_IDS.includes(canonical)
+    ? canonical
+    : null;
+}
+
 /** Resolve a URL segment (slug, or the raw model id) to a public model. */
 export function findPublicModelId(segment: string): ChatModelId | null {
   const decoded = decodeURIComponent(segment).toLowerCase();
   return (
     idBySlug.get(decoded) ??
-    idBySlug.get(decoded.replaceAll(/[._]+/g, "-")) ??
-    null
+    idBySlug.get(normalizeSegment(segment)) ??
+    findModelPageAlias(segment)
   );
 }
 

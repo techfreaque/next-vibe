@@ -85,4 +85,24 @@ describe("client logger dedup", () => {
     await waitForSent("Distinct A", 2);
     expect(sent.filter((r) => r.message.startsWith("Distinct "))).toHaveLength(3);
   });
+
+  it("counts repeats that differ only in per-occurrence measurements", async () => {
+    const logger = createClientLogger(false, "en-US", "tab-1");
+    for (let i = 0; i < 4; i++) {
+      logger.error("Measured failure", {
+        endpoint: "notifications/unread-count/GET",
+        durationMs: 1000 + i,
+        requestId: `req-${i}`,
+      });
+    }
+    await waitForSent("Measured failure", 1);
+    expect(sent.filter((r) => r.message === "Measured failure")).toHaveLength(1);
+
+    jest.advanceTimersByTime(30_000);
+    await waitForSent("Measured failure", 2);
+    const all = sent.filter((r) => r.message === "Measured failure");
+    expect(all).toHaveLength(2);
+    const flush = Object.assign({}, ...(all[1]?.metadata ?? []));
+    expect(flush["occurrences"]).toBe(3);
+  });
 });

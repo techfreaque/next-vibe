@@ -6,7 +6,7 @@
 
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -42,7 +42,7 @@ export async function generateSubscriptionMetadata(
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
     subCredits: subscription.credits,
     subPrice: formatCurrency(subscription.price, subscription.currency, locale),
-    modelCount: getAvailableModelCount(false, await getEnvAvailability()),
+    modelCount: getAvailableChatModelCount(false, await getEnvAvailability()),
   };
 
   return metadataGenerator(locale, {

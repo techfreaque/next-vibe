@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `credits-balance` tool returned a result with a numeric `total` (100149.71) — but the breakdown is internally inconsistent.\n\n**What I checked:**\n\n- `total` is present and numeric ✓\n- Breakdown invariant: in the tool's own example, `total` = `free` + `permanent` + `expiring` (0 + 500 + 1000 = 1500 ✓)\n- Here: `free` 49.71 + `permanent` 1529.54 + `expiring` 0 = **1579.25**, but `total` reports **100149.71** — a discrepancy of **98,570.46**\n- `capacity` (2170) is also unexplained and unrelated to any of the components\n\nThe total is numeric, but it does not equal the sum of its own parts, so the result contradicts itself.\n\n---\n\n**Failure report**\n\n1. **What was asked:** Read the credit wallet balance and confirm it has a numeric total.\n2. **What happened:** The call succeeded and returned a numeric `total`, but the component breakdown does not sum to it.\n3. **Exact result:** `{\"capacity\":2170,\"earned\":0,\"expiresAt\":null,\"expiring\":0,\"free\":49.71,\"permanent\":1529.54,\"total\":100149.71}` — `free + permanent + expiring = 1579.25`, `total = 100149.71`.\n4. **Severity:** MAJOR (works but wrong — the displayed balance breakdown is inconsistent with the total).\n\nFAILED: `credits-balance` total (100149.71) does not equal the sum of its components (free 49.71 + permanent 1529.54 + expiring 0 = 1579.25); the breakdown is internally inconsistent.",
+    "encoding_format": "float"
+  }
+}

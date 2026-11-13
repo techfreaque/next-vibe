@@ -76,6 +76,23 @@ export function parseStorageUrl(
 }
 
 /**
+ * Does `user` own this stored file? A logged-in user owns files they
+ * uploaded (`uploadedBy`); anyone owns files stamped with their own `leadId`
+ * (incognito uploads, same rule as the files route). Never true on a missing
+ * id: comparing `uploadedBy !== userId` let every public user (userId
+ * undefined) pass on any file without `uploadedBy`.
+ */
+export function isStorageFileOwner(
+  meta: { uploadedBy?: string; leadId?: string },
+  user: JwtPayloadType,
+): boolean {
+  if (!user.isPublic && meta.uploadedBy && meta.uploadedBy === user.id) {
+    return true;
+  }
+  return !!meta.leadId && meta.leadId === user.leadId;
+}
+
+/**
  * Resolve a storage URL to base64 data using the storage adapter directly.
  *
  * When `user` is provided, ownership is verified: the file's `uploadedBy` must
@@ -118,12 +135,14 @@ export async function fetchStorageFileAsBase64(
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     if (!isAdmin) {
-      const meta = await storage.getFileMetadata(parsed.fileId);
+      const meta = await storage.getFileMetadata(
+        parsed.fileId,
+        parsed.threadId,
+      );
       if (!meta) {
         return null;
       }
-      const userId = user.isPublic ? undefined : user.id;
-      if (meta.uploadedBy !== userId) {
+      if (!isStorageFileOwner(meta, user)) {
         return null;
       }
     }

@@ -21,11 +21,13 @@ export async function requestMicrophoneStream(): Promise<{
   stream: null;
   errorName: string | null;
   errorMessage: string | null;
+  userActivationActive: boolean | null;
 }> {
   return {
     stream: null,
     errorName: "NotSupportedError",
     errorMessage: "microphone capture unavailable on this platform",
+    userActivationActive: null,
   };
 }
 

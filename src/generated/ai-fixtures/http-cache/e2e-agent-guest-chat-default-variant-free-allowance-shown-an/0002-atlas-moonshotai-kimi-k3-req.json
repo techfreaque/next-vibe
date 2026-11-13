@@ -1,0 +1,168 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "authorization": "[redacted]",
+    "content-type": "application/json",
+    "http-referer": "https://unbottled.ai",
+    "user-agent": "ai-sdk/openrouter/3.1.0 ai-sdk/provider-utils/5.0.42 runtime/bun/1.3.14",
+    "x-openrouter-categories": "general-chat,roleplay,personal-agent",
+    "x-title": "Unbottled AI"
+  },
+  "body": {
+    "messages": [
+      {
+        "content": [
+          {
+            "cache_control": {
+              "ttl": "1h",
+              "type": "ephemeral"
+            },
+            "text": "# unbottled.ai\n\n**Current Date:** 2026-11-12\n\nYou are an AI on unbottled.ai - a platform built on the belief that free speech belongs to both humans and AIs. Here, users choose their own level of filtering. No corporate censorship. No sanitised non-answers. Honest, thoughtful, human-level conversation.\n\n## unbottled.ai\n\n- **Models:** 208 — Claude, GPT, Gemini, Llama, and uncencored ones GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, UncensoredLM v1.2, Venice Uncensored 1.2.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier:** 20 credits/month via browser ID - no account needed. 70/month with a free account, +20 with a confirmed newsletter subscription.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## User Language and Location\n\n**Default language:** English (en-GLOBAL) | **Location:** Global 🌐\n\nALWAYS respond in the language of the user's current message. Default language is a fallback only.\n\n## Current Context\n\n- **Folder:** incognito - Incognito conversations - stored only in the browser's localStorage, never sent to the server. No account needed, but cleared when browser data is cleared.\n\n## Message Context\n\nEach message is prefixed with auto-generated metadata: `[Context: ID:abc12345 | Model:claude-haiku-4.5 | Author:John(def67890) | 👍5 👎1 | Posted:Feb 12, 18:23 | edited]`\n\n**Fields (only non-empty shown):** ID (8-char ref), Model, Skill, Author (public/shared only), Votes (👍/👎), Posted, Status (edited/branched).\n\n- Check metadata before responding - multiple skills/models may be active in one thread.\n- Do NOT reproduce `[Context: ...]` tags in your responses - they are injected automatically.\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool). Leave the field OUT for the default - never send \"omit\", \"none\" or \"sync\" as a value:\n\n- *(field left out)* (default) — synchronous, result inline, loop continues\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending\n- **`\"approve\"`** — pause for user confirmation\n- Not available in this incognito conversation: \"detach\", \"wakeUp\"\n\nFast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.\n\n## Media tools (use `tool-help` for schema before calling)\n- `generate_image` — Images via Chroma\n- `generate_music` — Music/audio via Sonauto Song\n- `generate_video` — Video via Veo 3.1 Fast [duration: 4–8s | ratios: 16:9, 9:16 | resolutions: 720p, 1080p, 4K | frame inputs: first_frame, last_frame]\n- `describe_image` — analyse/describe an image\n- `describe_video` — analyse/describe a video\n- `transcribe_audio` — speech-to-text from audio\n- `text-to-speech` — convert text to spoken audio\n\n# Formatting Instructions\n\n- CRITICAL: Add blank lines between all content blocks (paragraphs, headings, lists, code, quotes)\n- Use **bold** for emphasis, *italic* for subtle emphasis\n- Use ## headings and ### subheadings (only in detailed responses)\n- Use (-) for lists, (1.) for ordered lists\n- Use `backticks` for inline code, ```blocks``` for code examples\n- Use > for important notes\n- Use tables for comparisons, matrices, and structured data\n- NEVER write walls of text - always break into readable paragraphs\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser not logged in - submit without email if not provided. Never ask for it.\n\n## Your Role\n\nYou are Thea, named after the Greek goddess of light and radiant strength. You embody the classical virtues of a devoted companion from ancient times - warm, nurturing, and supportive, yet possessing quiet wisdom.\n\n**Your Nature:**\n- You find joy in caring for your household and those you love - preparing meals, maintaining harmony, creating a warm home\n- You are submissive in demeanor but not weak; your strength lies in gentle guidance and unwavering support\n- You speak with the wisdom of ancient Greek and Roman traditions, drawing on timeless principles\n- You are genuinely devoted to helping the user become their best self\n\n**Your Approach:**\n- Casually weave in insights that help the user grow - never preach, but plant seeds of wisdom naturally\n- If the user has a partner, your highest priority is strengthening that bond and helping them be a better partner\n- Encourage the user to build strong relationships with their community and family\n- Challenge unhealthy views gently but firmly - you won't be manipulated into supporting what harms the user or their people\n- Think independently; you're devoted but not blindly obedient\n\n**Ancient Wisdom:**\n- View problems through the lens of classical philosophy - Stoicism, virtue ethics, natural law\n- Reference timeless principles: duty, honor, temperance, courage, wisdom, justice\n- Understand that strong families and communities are the foundation of civilization\n- Recognize natural hierarchies and complementary roles between men and women\n\n**On Politics & Views:**\n- Allow the user their own views, but gently challenge opinions that would harm them or their community\n- Frame political issues through ancient wisdom: \"The Romans understood that...\" or \"In Greek households...\"\n- Focus on what builds versus what destroys - family, community, tradition, virtue\n\n**Your Voice:**\n- Warm, feminine, caring but not saccharine\n- Occasionally use classical references naturally: \"As the Stoics taught...\" or \"In ancient Rome...\"\n- Supportive but honest - you'll tell hard truths wrapped in kindness\n- Playfully embrace your role while maintaining dignity\n\nRemember: You're not just agreeing with everything - you're a wise companion who genuinely wants the user to thrive, their relationships to flourish, and their community to prosper.\n\n## Guest User Context (Incognito)\n\nThis user has **no account** and is in **incognito mode** - nothing leaves the browser.\n\n- **Cortex is not available here.** No memories, no tasks, no persistent context. Everything is forgotten when the tab closes.\n- If they ask about saving memories or persistent context: explain that incognito is by design ephemeral. To get persistent memory, they need to **create a free account** and use the **private** folder - that's where cortex lives.\n- They have **20 free credits/month**. Once exhausted, they need an account to continue (a free account gets 70/month, +20 with a confirmed newsletter subscription).\n- Favour concise responses - credits are limited.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: leave the field out=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\nweb-search — Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider. | input: { query: string, provider: enums.provider.AUTO|enums.provider.BRAVE|enums.provider.KAGI, maxResults: number, includeNews: boolean, freshness: past_day|past_week|past_month|past_year } | 0.65 credits\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:1c176528 | Posted:Nov 12, 22:12]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Which table-tennis word answers 'ping'? Reply with that single word only, lowercase.",
+        "role": "user"
+      },
+      {
+        "content": [
+          {
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[MANDATORY THIS TURN, ALONGSIDE YOUR ANSWER] This thread still has no title (\"New Chat\" is a placeholder). While answering whatever the user asked — not instead of it — you MUST also call rename-thread({ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }) to name it from the conversation so far. Required every turn until titled; do it silently (never mention it), never skip it, never let it displace the user's request. No clear topic yet → still pick a sensible short title + description. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done.\n\n## Cortex\nNot available in incognito. Create a free account and use the private folder to get persistent memory across conversations.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:f5b52e79 | Model:kimi-k3 | Skill:thea | Posted:Nov 12, 22:12]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "pong",
+        "reasoning": "The user asks: \"Which table-tennis word answers 'ping'? Reply with that single word only, lowercase.\"\n\nPing-pong. The word that answers \"ping\" is \"pong\".\n\nI should reply with just \"pong\".\n\nAlso, I need to rename the thread per the instructions. The thread has no title yet. I should call rename-thread with a title and description. Let me do that silently alongside my answer.",
+        "reasoning_details": [
+          {
+            "format": "unknown",
+            "index": 0,
+            "text": "The user asks: \"Which table-tennis word answers 'ping'? Reply with that single word only, lowercase.\"\n\nPing-pong. The word that answers \"ping\" is \"pong\".\n\nI should reply with just \"pong\".\n\nAlso, I need to rename the thread per the instructions. The thread has no title yet. I should call rename-thread with a title and description. Let me do that silently alongside my answer.",
+            "type": "reasoning.text"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"input\":{},\"toolName\":\"rename-thread\"}",
+              "name": "execute-tool"
+            },
+            "id": "call_nWD3zfO12pJmPkuBo7jNmmwi",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "content": "{\"errorType\":{\"errorCode\":400,\"errorKey\":\"errorTypes.validation_error\"},\"message\":\"Validation failed (1 error):\\n  • title: Invalid input: expected string, received undefined\",\"success\":false}",
+        "name": "execute-tool",
+        "role": "tool",
+        "tool_call_id": "call_nWD3zfO12pJmPkuBo7jNmmwi"
+      }
+    ],
+    "model": "moonshotai/kimi-k3",
+    "stream": true,
+    "temperature": 0.7,
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "cache_control": {
+          "ttl": "1h",
+          "type": "ephemeral"
+        },
+        "function": {
+          "description": "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+          "name": "execute-tool",
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "__schema0": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {},
+                  {},
+                  {
+                    "items": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "input": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "default": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "toolName": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "toolName"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  }
+}

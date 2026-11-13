@@ -33,4 +33,14 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "componentStack",
   "callerStack",
   "stack",
+  // Per-occurrence measurements. Each value is unique, so keeping them in the
+  // fingerprint turned one failure into one row per occurrence (586 rows for a
+  // single stuck unread-count poll on 2026-11-13). The latest value is still
+  // stored on the row; occurrences are counted instead of split.
+  "durationMs",
+  "offlineMs",
+  "elapsedMs",
+  "ageMs",
+  "valueLength",
+  "audioDataLength",
 ]);

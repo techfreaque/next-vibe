@@ -12,6 +12,7 @@ import {
   isProviderSellable,
   type ModelDefinition,
   type ModelOptionVideoBased,
+  type ModelProviderConfig,
   type ModelProviderConfigVideoBased,
 } from "../models/models";
 import type { FiltersModelSelection } from "../models/selection";
@@ -75,7 +76,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-04 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-04 from video-gen-deterministic
     providers: [
       {
@@ -168,7 +169,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -199,6 +200,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.6-i2v",
         creditCostPerSecond: 10, // updated: 2026-04-04 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["1080p"], // updated: 2026-07-10 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-07-10 from modelslab.com
@@ -238,7 +240,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -246,6 +248,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.6-i2v-flash",
         creditCostPerSecond: 10, // updated: 2026-07-02 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["1080p"], // updated: 2026-07-10 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-07-10 from openrouter.ai
@@ -283,7 +286,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -408,7 +411,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -416,6 +419,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "omni-human-1.5",
         creditCostPerSecond: 14, // updated: 2026-03-31 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
@@ -445,7 +449,7 @@ export const videoGenModelDefinitions: Record<
     icon: "video",
     // image: ModelsLab img2video accepts init_image for veo-3.1 (verified);
     // the -fast variant rejects it ("init_image is invalid").
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -526,7 +530,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -609,7 +613,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -617,6 +621,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v2-5-turbo-i2v",
         creditCostPerSecond: 4.2, // updated: 2026-11-09 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 8, // updated: 2026-07-10 from openrouter.ai
         supportedDurations: ["5", "10"], // updated: 2026-07-10 from modelslab.com
@@ -734,7 +739,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -742,6 +747,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v2-1-master-i2v",
         creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10"], // updated: 2026-04-04 from modelslab.com
@@ -775,7 +781,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -907,7 +913,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -915,6 +921,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "ltx-2-3-pro-i2v",
         creditCostPerSecond: 9.6, // updated: 2026-11-09 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["2K", "4K"], // updated: 2026-04-04 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
@@ -950,7 +957,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1007,7 +1014,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1015,6 +1022,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-i2v",
         creditCostPerSecond: 6.7, // updated: 2026-07-02 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "10"], // updated: 2026-07-10 from modelslab.com
@@ -1048,7 +1056,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1056,6 +1064,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-Fast-i2v",
         creditCostPerSecond: 3.8, // updated: 2026-03-31 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "10"], // updated: 2026-04-04 from modelslab.com
@@ -1284,7 +1293,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1423,7 +1432,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1431,6 +1440,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "grok-i2v",
         creditCostPerSecond: 6, // updated: 2026-03-31 from modelslab.com
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 1, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["1", "15"], // updated: 2026-07-10 from modelslab.com
@@ -1468,7 +1478,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -1543,7 +1553,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -1590,7 +1600,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -1643,7 +1653,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -1796,7 +1806,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -1915,7 +1925,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -2036,7 +2046,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-07-10 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
       {
@@ -2157,7 +2167,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-11-09 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-11-09 from video-gen-deterministic
     providers: [
       {
@@ -2228,7 +2238,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-11-09 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-11-09 from video-gen-deterministic
     providers: [
       {
@@ -2360,7 +2370,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-11-09 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-11-09 from video-gen-deterministic
     providers: [
       {
@@ -2441,7 +2451,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "si-x",
-    inputs: ["text"], // updated: 2026-11-09 from video-gen-deterministic
+    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-11-09 from video-gen-deterministic
     providers: [
       {
@@ -2557,7 +2567,7 @@ function buildVideoGenOption(
     features: def.features,
     weaknesses: def.weaknesses,
     adminOnly: provider.adminOnly,
-    inputs: def.inputs,
+    inputs: videoRouteInputs(def, provider),
     outputs: def.outputs,
     voiceMeta: def.voiceMeta,
     creditCostPerSecond: p.creditCostPerSecond,
@@ -2571,6 +2581,65 @@ function buildVideoGenOption(
     supportedFrameImages: p.supportedFrameImages,
     generateAudio: p.generateAudio,
   };
+}
+
+// ============================================================
+// VIDEO GEN INPUT MODALITIES
+// ============================================================
+
+/**
+ * Whether a provider route reports reference-image input. The price updater
+ * writes provider data into `supportedFrameImages` (OpenRouter
+ * `supported_frame_images`, ModelsLab `init_image`). UNBOTTLED routes forward
+ * the request to another instance and report nothing of their own.
+ */
+export function videoRouteReportsImage(provider: ModelProviderConfig): boolean {
+  return (
+    provider.apiProvider !== ApiProvider.UNBOTTLED &&
+    "supportedFrameImages" in provider &&
+    (provider.supportedFrameImages?.length ?? 0) > 0
+  );
+}
+
+/**
+ * A video model's `inputs`: text, plus image when any of its routes takes a
+ * reference image. `frameOverrides` (providerModel → accepts image) carries
+ * fresh provider data that is not in the definitions yet (price updater run).
+ */
+export function deriveVideoModelInputs(
+  def: ModelDefinition,
+  frameOverrides: ReadonlyMap<string, boolean> = new Map(),
+): Modality[] {
+  const acceptsImage = def.providers.some((provider) => {
+    if (provider.apiProvider === ApiProvider.UNBOTTLED) {
+      return false;
+    }
+    return (
+      frameOverrides.get(provider.providerModel) ??
+      videoRouteReportsImage(provider)
+    );
+  });
+  return acceptsImage ? ["text", "image"] : ["text"];
+}
+
+/**
+ * Inputs of one (model, provider) route. A model can take images on one route
+ * and be text-only on another (e.g. Wan 2.7: OpenRouter takes frames, the
+ * ModelsLab t2v endpoint does not), so the resolver must not hand an image to
+ * a text-only route. UNBOTTLED inherits the model's inputs: the remote
+ * instance resolves its own image-capable route.
+ */
+function videoRouteInputs(
+  def: ModelDefinition,
+  provider: ModelProviderConfigVideoBased,
+): Modality[] {
+  if (
+    provider.apiProvider === ApiProvider.UNBOTTLED ||
+    videoRouteReportsImage(provider)
+  ) {
+    return def.inputs;
+  }
+  return def.inputs.filter((m) => m !== "image");
 }
 
 // ============================================================
@@ -2677,11 +2746,30 @@ export function getBestVideoGenModel(
 }
 
 /**
- * Returns all video gen model options that accept the given input modality.
- * E.g. getVideoGenModelsByInputModality("image") → all I2V models.
+ * Capability guard for a request with reference images: returns the route to
+ * run it on, or null when no route can take an image (caller rejects).
+ * - requested route takes images → it is used as-is
+ * - same model, other route takes images → that route (cheapest first)
+ * - otherwise the cheapest image-capable model (the model field is hidden
+ *   from the AI, so a t2v default cannot be corrected upstream)
  */
-export function getVideoGenModelsByInputModality(
-  modality: Modality,
-): VideoGenModelOption[] {
-  return videoGenModelOptions.filter((m) => m.inputs.includes(modality));
+export function resolveVideoGenRouteForImageInput(
+  requested: VideoGenModelOption,
+): VideoGenModelOption | null {
+  if (requested.inputs.includes("image")) {
+    return requested;
+  }
+  // Admin-only routes are never a silent substitute for a user's request.
+  const imageRoutes = videoGenModelOptionsPool.filter(
+    (m) => m.inputs.includes("image") && !m.adminOnly,
+  );
+  const sameModel = imageRoutes.find((m) => m.id === requested.id);
+  if (sameModel) {
+    return sameModel;
+  }
+  return (
+    imageRoutes.toSorted(
+      (a, b) => a.creditCostPerSecond - b.creditCostPerSecond,
+    )[0] ?? null
+  );
 }

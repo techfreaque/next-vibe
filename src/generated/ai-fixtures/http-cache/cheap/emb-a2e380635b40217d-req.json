@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three parallel calls returned cleanly.\n\n- **`category='ai'`** → non-empty tools array, **89 tools**, every entry has a `name` + `description` ✓\n- **`query='search'`** → non-empty tools array, **11 tools**, every entry has a `name` + `description` ✓\n- **`toolName='generate_image'`** → detail returned with a `name`, a `description`, and a full `parameters` schema (`prompt` required; `model` + `inputMediaUrl` optional, with a model enum and example input/response) ✓\n\nAll three modes work as specified — category narrowing, keyword query, and single-tool schema detail all return well-formed, non-empty results with the expected fields. Nothing else looked off.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

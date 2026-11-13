@@ -12,7 +12,7 @@ import {
   Text as Span,
 } from "@react-email/components";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -469,7 +469,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
         userId: requestData.user?.id ?? user.id,
         leadId: requestData.user?.leadId ?? user.leadId,
         planName: requestData.planName ?? "",
-        totalModelCount: getAvailableModelCount(
+        totalModelCount: getAvailableChatModelCount(
           false,
           await getEnvAvailability(),
         ),

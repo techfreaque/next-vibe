@@ -109,15 +109,31 @@ function useInputHeight(
       return;
     }
 
+    // Next frame, not inside the callback: the input height becomes the
+    // messages list's bottom padding, and resizing another observed element
+    // in the same frame raises "ResizeObserver loop completed".
+    const pending: { frame: number | null } = { frame: null };
     const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setInputHeight(entry.contentRect.height);
+      const entry = entries[entries.length - 1];
+      if (!entry) {
+        return;
       }
+      const height = entry.contentRect.height;
+      if (pending.frame !== null) {
+        cancelAnimationFrame(pending.frame);
+      }
+      pending.frame = requestAnimationFrame(() => {
+        pending.frame = null;
+        setInputHeight(height);
+      });
     });
 
     resizeObserver.observe(inputContainerRef.current as Element);
 
     return (): void => {
+      if (pending.frame !== null) {
+        cancelAnimationFrame(pending.frame);
+      }
       resizeObserver.disconnect();
     };
   }, [inputContainerRef]);

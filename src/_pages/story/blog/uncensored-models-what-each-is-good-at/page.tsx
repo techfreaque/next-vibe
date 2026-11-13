@@ -14,7 +14,7 @@ import {
 } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import {
-  getAvailableModelCountsByContentLevel,
+  getAvailableChatModelCountsByContentLevel,
   type ModelCountsByContentLevel,
 } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -136,7 +136,7 @@ export async function tanstackLoader({
   const availability = await getEnvAvailability();
   return {
     locale,
-    counts: getAvailableModelCountsByContentLevel(false, availability),
+    counts: getAvailableChatModelCountsByContentLevel(false, availability),
   };
 }
 

@@ -48,9 +48,10 @@ export interface StorageAdapter {
   }>;
 
   /**
-   * Delete a file by its ID
+   * Delete a file by its ID. Pass the owning threadId when known: it skips the
+   * search across every thread namespace.
    */
-  deleteFile(fileId: string): Promise<void>;
+  deleteFile(fileId: string, threadId?: string): Promise<void>;
 
   /**
    * Get a file's public URL
@@ -58,9 +59,14 @@ export interface StorageAdapter {
   getFileUrl(fileId: string): Promise<string>;
 
   /**
-   * Get file metadata
+   * Get file metadata. Pass the owning threadId when known: it reads the one
+   * metadata object directly instead of searching every thread namespace
+   * (on S3 that search lists the whole bucket per call).
    */
-  getFileMetadata(fileId: string): Promise<FileMetadata | null>;
+  getFileMetadata(
+    fileId: string,
+    threadId?: string,
+  ): Promise<FileMetadata | null>;
 
   /**
    * Check if a file exists
@@ -78,6 +84,12 @@ export interface StorageAdapter {
    * Used for cleanup tasks that need to enumerate files without knowing their IDs.
    */
   listFilesByThread(threadId: string): Promise<FileMetadata[]>;
+
+  /**
+   * List every threadId namespace that holds files (stored threads, incognito
+   * threads, standalone tool namespaces, caches). Used by storage cleanup jobs.
+   */
+  listThreadIds(): Promise<string[]>;
 }
 
 let storageInstance: StorageAdapter | null = null;

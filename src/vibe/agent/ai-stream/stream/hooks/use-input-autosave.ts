@@ -5,7 +5,7 @@
  */
 
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { storage } from "next-vibe/ui/lib/storage";
+import { largeStorage, storage } from "next-vibe/ui/lib/storage";
 
 import type { DefaultFolderId } from "../../../../core/execution-context";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";
@@ -100,7 +100,7 @@ export async function clearDraft(
 }
 
 /**
- * Serializable file data for localStorage
+ * Serializable file data for draft attachment storage
  */
 interface SerializableFile {
   name: string;
@@ -146,7 +146,7 @@ function base64ToFile(data: SerializableFile): File {
 }
 
 /**
- * Save draft attachments to localStorage
+ * Save draft attachments (IndexedDB on web via largeStorage)
  */
 export async function saveDraftAttachments(
   storageKey: string,
@@ -157,7 +157,7 @@ export async function saveDraftAttachments(
     const attachmentKey = `${storageKey}-attachments`;
 
     if (files.length === 0) {
-      await storage.removeItem(attachmentKey, logger);
+      await largeStorage.removeItem(attachmentKey, logger);
       logger.debug("Chat Input Autosave", "Removed empty draft attachments", {
         storageKey,
       });
@@ -175,7 +175,8 @@ export async function saveDraftAttachments(
       })),
     );
 
-    await storage.setItem(
+    // Base64 attachments are MBs: IndexedDB on web, never localStorage
+    await largeStorage.setItem(
       attachmentKey,
       JSON.stringify(serializableFiles),
       logger,
@@ -193,7 +194,7 @@ export async function saveDraftAttachments(
 }
 
 /**
- * Load draft attachments from localStorage
+ * Load draft attachments (reads + migrates old localStorage values)
  */
 export async function loadDraftAttachments(
   storageKey: string,
@@ -201,7 +202,7 @@ export async function loadDraftAttachments(
 ): Promise<File[]> {
   try {
     const attachmentKey = `${storageKey}-attachments`;
-    const saved = await storage.getItem(attachmentKey, logger);
+    const saved = await largeStorage.getItem(attachmentKey, logger);
 
     if (!saved) {
       return [];
@@ -226,7 +227,7 @@ export async function loadDraftAttachments(
 }
 
 /**
- * Clear draft attachments from localStorage
+ * Clear draft attachments from storage
  */
 export async function clearDraftAttachments(
   storageKey: string,
@@ -234,7 +235,7 @@ export async function clearDraftAttachments(
 ): Promise<void> {
   try {
     const attachmentKey = `${storageKey}-attachments`;
-    await storage.removeItem(attachmentKey, logger);
+    await largeStorage.removeItem(attachmentKey, logger);
     logger.debug("Chat Input Autosave", "Cleared draft attachments", {
       storageKey,
     });

@@ -240,7 +240,7 @@ describe("OpenAI-compatible API", () => {
       const { key } = await createKey(alice.user, "models");
       const request = v1Request("/models", key);
       const user = await authed(request);
-      const out = await V1ModelsRepository.list(user ?? ApiKeyAuthAnonymous(), request, t);
+      const out = await V1ModelsRepository.list(user ?? ApiKeyAuthAnonymous(), request, t, logger);
       expect(out.response.status).toBe(200);
       const body = (await out.response.json()) as {
         object: string;
@@ -257,11 +257,40 @@ describe("OpenAI-compatible API", () => {
 
     it("401 with OpenAI error body for a bad key", async () => {
       const request = v1Request("/models", "sk-unb-bad");
-      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t);
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
       expect(out.response.status).toBe(401);
       const body = (await out.response.json()) as { error: { code: string; type: string } };
       expect(body.error.code).toBe("invalid_api_key");
       expect(body.error.type).toBe("authentication_error");
+    });
+
+    it("503 + Retry-After (never 401) when the key lookup fails", async () => {
+      const { key } = await createKey(alice.user, "lookup-timeout");
+      const request = v1Request("/models", key);
+      const timedOut = (): Promise<undefined> =>
+        Promise.reject(new Error("timeout exceeded when trying to connect"));
+      const auth = await ApiKeyAuth.authenticateRequest(request, defaultLocale, logger, timedOut);
+      expect(auth?.success && auth.data.isPublic).toBe(true);
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
+      expect(out.response.status).toBe(503);
+      expect(out.response.headers.get("Retry-After")).toBe("5");
+      const body = (await out.response.json()) as { error: { code: string; type: string } };
+      expect(body.error.code).toBe("auth_unavailable");
+      expect(body.error.type).toBe("server_error");
+
+      // Same key, DB healthy again: authenticates normally.
+      const retry = v1Request("/models", key);
+      expect((await authed(retry))?.id).toBe(alice.user.id);
+    });
+
+    it("503 when the gate's own lookup fails (auth layer skipped)", async () => {
+      const request = v1Request("/models", "sk-unb-anything");
+      const resolution = await ApiKeyAuth.keyForRequest(request, logger, () =>
+        Promise.reject(new Error("canceling statement due to statement timeout")),
+      );
+      expect(resolution.status).toBe("unavailable");
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
+      expect(out.response.status).toBe(503);
     });
   });
 
@@ -377,7 +406,7 @@ describe("OpenAI-compatible API", () => {
       expect(body.error.code).toBe("paid_plan_required");
       expect(body.error.type).toBe("insufficient_quota");
       const request = v1Request("/models", generated.plaintext);
-      const models = await V1ModelsRepository.list((await authed(request)) ?? ApiKeyAuthAnonymous(), request, t);
+      const models = await V1ModelsRepository.list((await authed(request)) ?? ApiKeyAuthAnonymous(), request, t, logger);
       expect(models.response.status).toBe(402);
     });
 

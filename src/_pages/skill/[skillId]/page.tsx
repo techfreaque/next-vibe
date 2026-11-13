@@ -12,6 +12,7 @@ import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { parseSkillId } from "next-vibe/agent/chat/slugify";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { modelProviders } from "next-vibe/agent/models/models";
 import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
 import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
@@ -63,7 +64,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   let name = "";
   let tagline = "";
-  let modelCount = 0;
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   if (user) {
     // Variant URLs (<skill>__<variant>) and legacy aliases resolve like the loader.
     const skillResult = await SkillsRepository.getSkillById(
@@ -81,7 +85,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (skillResult.success) {
       name = skillResult.data.name ?? "";
       tagline = skillResult.data.tagline ?? "";
-      modelCount = skillResult.data.variants?.length ?? 0;
     }
   }
 

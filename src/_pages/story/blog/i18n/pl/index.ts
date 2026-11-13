@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    chatgptAlternative: {
+      title: "Alternatywa dla ChatGPT bez filtrów. Poziom ustawiasz ty.",
+      category: "Poradnik",
+      excerpt:
+        "Modele mainstreamowe wszędzie mają swoje filtry. Tutaj stoją obok modeli otwartych i niecenzurowanych, a ty wybierasz przy każdej wiadomości. Co się zmienia, ile to kosztuje i kiedy ChatGPT nadal wygrywa.",
+      readTime: "7 min czytania",
+    },
     codingTools: {
       title: "Jeden klucz. Każdy model. Prosto w twoim agencie.",
       category: "Przewodnik dla programistów",

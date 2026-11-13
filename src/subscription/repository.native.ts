@@ -63,6 +63,8 @@ export class SubscriptionRepository {
     _userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _options: { syncWithProvider?: boolean } = {},
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
     const response = await nativeEndpoint(
       subscriptionEndpoints.GET,

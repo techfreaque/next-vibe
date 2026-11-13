@@ -161,6 +161,32 @@ function buildBody<TEndpoint extends CreateApiEndpointAny>(
 }
 
 /**
+ * Short, sanitized look at a non-JSON body (HTML error/block page, proxy
+ * text) for the failure log: the <title> and the first 200 chars of visible
+ * text, with long tokens and emails redacted. Never throws.
+ */
+async function readNonJsonBodyPreview(
+  response: Response,
+): Promise<{ title: string | null; snippet: string | null }> {
+  try {
+    const raw = (await response.text()).slice(0, 20_000);
+    const title = /<title[^>]*>([^<]{0,200})<\/title>/i.exec(raw)?.[1]?.trim();
+    const snippet = raw
+      .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .replace(/[A-Za-z0-9+/_=-]{24,}/g, "[redacted]")
+      .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, "[email]")
+      .trim()
+      .slice(0, 200);
+    return { title: title || null, snippet: snippet || null };
+  } catch {
+    // Body unreadable: the headers in the log still identify the sender
+    return { title: null, snippet: null };
+  }
+}
+
+/**
  * What happened on the wire, filled in by callApiInner so the central failure
  * report can say more than the ErrorResponseType carries.
  */
@@ -456,12 +482,28 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       // bounced to a page (or a proxy maintenance page served as 200) used to
       // surface only as "Unexpected token '<' ... is not valid JSON". Record
       // where it actually landed so the next one is traceable.
+      // Who answered? Our edge always adds "via: 1.1 Caddy", our middleware
+      // adds CORS on every /api/ passthrough and Next pages add x-powered-by.
+      // None of them present => a third party (filtering proxy, captive
+      // portal) answered. 2026-11-12: a stream POST got a 200 text/html page
+      // we could not attribute because none of this was recorded.
+      const h = response.headers;
+      const body = await readNonJsonBodyPreview(response);
       logger.error("callApi: non-JSON response", {
         endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
         status: response.status,
-        contentType: response.headers.get("content-type"),
+        contentType: h.get("content-type"),
         redirected: response.redirected,
-        finalUrl: response.redirected ? response.url : null,
+        finalUrl: response.url || null,
+        responseType: response.type,
+        via: h.get("via"),
+        server: h.get("server"),
+        poweredBy: h.get("x-powered-by"),
+        servedBy: h.get("x-vibe-upstream") ?? h.get("x-served-by"),
+        contentLength: h.get("content-length"),
+        hasVibeCors: h.has("access-control-allow-credentials"),
+        bodyTitle: body.title,
+        bodySnippet: body.snippet,
       });
       diag.alreadyLogged = true;
       return fail({

@@ -137,6 +137,8 @@ export const translations: typeof enTranslations = {
         "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",
       imageInputUnsupported:
         "Model wideo {{model}} odrzucił obraz wejściowy - prawdopodobnie nie obsługuje image-to-video. Wywołaj generate_video BEZ parametru model (model domyślny animuje obrazy) albo pomiń obraz.",
+      noImageCapableModel:
+        "Żaden dostępny model wideo nie przyjmuje obrazu referencyjnego. Pomiń obraz, aby generować z samego promptu.",
     },
     success: {
       title: "Wideo wygenerowane",

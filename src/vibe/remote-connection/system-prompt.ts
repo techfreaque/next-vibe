@@ -11,7 +11,7 @@ import type {
   SystemPromptServerParams,
 } from "../agent/ai-stream/system-prompt/types";
 import { getEnvAvailability } from "../agent/env-availability";
-import { getAvailableModelCount } from "../agent/models/all-models";
+import { getAvailableChatModelCount } from "../agent/models/all-models";
 import { coreClientEnv as envClient } from "../core/env-client";
 import { db } from "../database";
 import { VibeMode } from "../env/env-util";
@@ -46,7 +46,7 @@ export async function loadRemoteInstancesContext(
   const appUrl = envClient.NEXT_PUBLIC_APP_URL;
   const vibeMode = envClient.NEXT_PUBLIC_VIBE_MODE;
   const isDev = vibeMode === VibeMode.DEV;
-  const totalModelCount = getAvailableModelCount(
+  const totalModelCount = getAvailableChatModelCount(
     isAdmin,
     await getEnvAvailability(),
   );

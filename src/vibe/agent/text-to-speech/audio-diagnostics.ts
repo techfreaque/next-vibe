@@ -48,6 +48,45 @@ export function classifyPlayRejection(
   return "unknown";
 }
 
+/**
+ * What the player was handed, safe to log: the data URI header (never the
+ * base64 payload) or the URL path (never the query, which may carry tokens),
+ * plus whether this browser claims it can decode the declared format.
+ */
+export function describeAudioSource(
+  audio: HTMLAudioElement,
+  audioData: string,
+): {
+  audioDataLength: number;
+  srcPrefix: string;
+  declaredMime: string | null;
+  canPlayDeclared: string | null;
+  canPlayMpeg: string;
+} {
+  let srcPrefix = "";
+  let declaredMime: string | null = null;
+  if (audioData.startsWith("data:")) {
+    const comma = audioData.indexOf(",");
+    srcPrefix = audioData.slice(0, comma === -1 ? 40 : comma + 1).slice(0, 40);
+    const mime = audioData.slice(5, comma === -1 ? 5 : comma).split(";")[0];
+    declaredMime = mime && mime.length > 0 ? mime : null;
+  } else if (audioData.startsWith("blob:")) {
+    srcPrefix = "blob:";
+  } else if (audioData.length > 0) {
+    const queryStart = audioData.search(/[?#]/);
+    srcPrefix = (
+      queryStart === -1 ? audioData : audioData.slice(0, queryStart)
+    ).slice(0, 120);
+  }
+  return {
+    audioDataLength: audioData.length,
+    srcPrefix,
+    declaredMime,
+    canPlayDeclared: declaredMime ? audio.canPlayType(declaredMime) : null,
+    canPlayMpeg: audio.canPlayType("audio/mpeg"),
+  };
+}
+
 /** `audio.error` + element state, safe to log (no audio data, no URL query). */
 export function describeAudioElement(audio: HTMLAudioElement): {
   mediaErrorCode: number | null;

@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import {
   classifyPlayRejection,
   describeAudioElement,
+  describeAudioSource,
 } from "../../../text-to-speech/audio-diagnostics";
 
 /** How many seconds before the current chunk ends to start preloading the next */
@@ -20,6 +21,18 @@ const PREFETCH_LEAD_TIME_S = 5;
 interface QueuedAudio {
   audioData: string;
   chunkIndex: number;
+}
+
+/**
+ * Detach an element from its source without firing a media `error` event.
+ * Assigning `src = ""` runs the load algorithm against the page URL and fires
+ * MEDIA_ERR_SRC_NOT_SUPPORTED, which any still-attached error listener then
+ * reports as a playback failure.
+ */
+function releaseAudio(audio: HTMLAudioElement): void {
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
 }
 
 export class AudioQueueManager {
@@ -38,6 +51,12 @@ export class AudioQueueManager {
   private currentAudioCleanup: (() => void) | null = null;
   /** Logger from the most recent enqueue() - used by paths without a logger arg (stop, prefetch) */
   private logger: EndpointLogger;
+  /** Bumped by stop(): async work from an older session must not touch state */
+  private session = 0;
+  /** In-flight preloads (not yet ready), keyed by chunk index -> cancel */
+  private pendingPreloads: Map<number, () => void> = new Map();
+  /** Detaches the playing chunk's listeners and settles its promise */
+  private currentPlaybackCancel: (() => void) | null = null;
 
   constructor(logger: EndpointLogger) {
     this.logger = logger;
@@ -68,6 +87,15 @@ export class AudioQueueManager {
    */
   enqueue(audioData: string, chunkIndex: number, logger: EndpointLogger): void {
     this.logger = logger;
+    // The server ends every TTS stream with an `audioIsFinal` marker that
+    // carries no audio. Loading "" resolves to the page URL and fails with
+    // MEDIA_ERR_SRC_NOT_SUPPORTED, so it never reaches an audio element.
+    if (audioData.length === 0) {
+      logger.debug("[TTS-PLAY] Skipping empty audio chunk (end marker)", {
+        chunkIndex,
+      });
+      return;
+    }
     this.queue.push({ audioData, chunkIndex });
     // Sort by chunk index to ensure correct order
     this.queue.sort((a, b) => a.chunkIndex - b.chunkIndex);
@@ -85,33 +113,51 @@ export class AudioQueueManager {
     audioData: string,
     chunkIndex: number,
   ): Promise<void> {
-    // Skip if already preloaded
-    if (this.preloadedAudio.has(chunkIndex)) {
+    // Skip if already preloaded or loading
+    if (
+      this.preloadedAudio.has(chunkIndex) ||
+      this.pendingPreloads.has(chunkIndex)
+    ) {
       return;
     }
 
+    const session = this.session;
     const audio = new Audio();
 
     // Set up the audio element
     audio.preload = "auto";
 
-    // Create a promise that resolves when audio is ready
+    // Create a promise that resolves when audio is ready (or the preload is
+    // cancelled by stop()/clear(), which is not a failure)
     const loadPromise = new Promise<void>((resolve, reject) => {
-      const onCanPlayThrough = (): void => {
+      const detach = (): void => {
         audio.removeEventListener("canplaythrough", onCanPlayThrough);
         audio.removeEventListener("error", onError);
-        this.preloadedAudio.set(chunkIndex, audio);
+        this.pendingPreloads.delete(chunkIndex);
+      };
+
+      const onCanPlayThrough = (): void => {
+        detach();
+        if (session === this.session) {
+          this.preloadedAudio.set(chunkIndex, audio);
+        } else {
+          releaseAudio(audio);
+        }
         resolve();
       };
 
       const onError = (e: Event): void => {
-        audio.removeEventListener("canplaythrough", onCanPlayThrough);
-        audio.removeEventListener("error", onError);
+        detach();
         reject(e);
       };
 
       audio.addEventListener("canplaythrough", onCanPlayThrough);
       audio.addEventListener("error", onError);
+      this.pendingPreloads.set(chunkIndex, (): void => {
+        detach();
+        releaseAudio(audio);
+        resolve();
+      });
     });
 
     // Start loading
@@ -123,12 +169,12 @@ export class AudioQueueManager {
     } catch {
       // Preload failed - will fall back to direct play
       this.logger.warn("[TTS-PLAY] Audio chunk preload failed", {
+        ...describeAudioSource(audio, audioData),
         component: "AudioQueueManager",
         operation: "preloadAudio",
         chunkIndex,
         mediaErrorCode: audio.error?.code ?? null,
         mediaErrorMessage: audio.error?.message ?? null,
-        audioDataLength: audioData.length,
         mimePrefix: audioData.slice(0, audioData.indexOf(",") + 1).slice(0, 40),
       });
     }
@@ -153,12 +199,19 @@ export class AudioQueueManager {
       return;
     }
 
+    const session = this.session;
     try {
       await this.playAudio(next.audioData, next.chunkIndex, logger);
       this.nextExpectedChunk = next.chunkIndex + 1;
     } catch {
       // Playback failed - continue with next chunk. The failure itself is
       // already logged in playAudio (media error / play() rejection).
+    }
+
+    // stop() ran while this chunk was playing: it already reset the state,
+    // and a newer session may be playing now.
+    if (session !== this.session) {
+      return;
     }
 
     // Check if there are more chunks to play
@@ -303,31 +356,66 @@ export class AudioQueueManager {
       // Schedule look-ahead prefetch of the next chunk
       this.schedulePrefetch(audio, chunkIndex);
 
-      const onEnded = (): void => {
+      /** Set when stop() tore this playback down on purpose */
+      let cancelled = false;
+
+      const detach = (): void => {
         audio.removeEventListener("ended", onEnded);
         audio.removeEventListener("error", onError);
+        audio.removeEventListener("canplaythrough", onCanPlay);
         this.clearPrefetchTimer();
         this.currentAudio = null;
         this.currentAudioCleanup = null;
+        this.currentPlaybackCancel = null;
+      };
+
+      const onEnded = (): void => {
+        detach();
         resolve();
       };
 
       const onError = (e: Event): void => {
         logger.error("[TTS-PLAY] Audio chunk playback error", {
           ...describeAudioElement(audio),
+          ...describeAudioSource(audio, audioData),
           component: "AudioQueueManager",
           operation: "playAudio",
           chunkIndex,
           mediaErrorCode: audio.error?.code ?? null,
           mediaErrorMessage: audio.error?.message ?? null,
-          audioDataLength: audioData.length,
         });
-        audio.removeEventListener("ended", onEnded);
-        audio.removeEventListener("error", onError);
-        this.clearPrefetchTimer();
-        this.currentAudio = null;
-        this.currentAudioCleanup = null;
+        detach();
         reject(e);
+      };
+
+      const startPlayback = (): void => {
+        audio.play().catch((e: Error) => {
+          // stop() pausing/releasing the element rejects a pending play()
+          // with AbortError: that is our own teardown, not a playback failure.
+          if (cancelled) {
+            return;
+          }
+          logger.error("[TTS-PLAY] play() failed", e, {
+            ...describeAudioElement(audio),
+            ...describeAudioSource(audio, audioData),
+            component: "AudioQueueManager",
+            chunkIndex,
+            failureKind: classifyPlayRejection(e),
+          });
+          detach();
+          reject(e);
+        });
+      };
+
+      const onCanPlay = (): void => {
+        audio.removeEventListener("canplaythrough", onCanPlay);
+        startPlayback();
+      };
+
+      this.currentPlaybackCancel = (): void => {
+        cancelled = true;
+        detach();
+        resolve();
       };
 
       audio.addEventListener("ended", onEnded);
@@ -336,31 +424,8 @@ export class AudioQueueManager {
       // If audio is already loaded (preloaded case), play immediately
       // Otherwise wait for canplaythrough before playing
       if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        audio.play().catch((e: Error) => {
-          logger.error("[TTS-PLAY] play() failed", e, {
-            ...describeAudioElement(audio),
-            component: "AudioQueueManager",
-            chunkIndex,
-            failureKind: classifyPlayRejection(e),
-            audioDataLength: audioData.length,
-          });
-          reject(e);
-        });
+        startPlayback();
       } else {
-        const onCanPlay = (): void => {
-          audio.removeEventListener("canplaythrough", onCanPlay);
-
-          audio.play().catch((e: Error) => {
-            logger.error("[TTS-PLAY] play() failed", e, {
-              ...describeAudioElement(audio),
-              component: "AudioQueueManager",
-              chunkIndex,
-              failureKind: classifyPlayRejection(e),
-              audioDataLength: audioData.length,
-            });
-            reject(e);
-          });
-        };
         audio.addEventListener("canplaythrough", onCanPlay);
         // Start loading if not already
         if (audio.readyState === HTMLMediaElement.HAVE_NOTHING) {
@@ -375,23 +440,26 @@ export class AudioQueueManager {
    */
   stop(): void {
     const wasPlaying = this.isPlaying;
+    this.session++;
     this.queue = [];
     this.clearPrefetchTimer();
     if (this.currentAudioCleanup) {
       this.currentAudioCleanup();
       this.currentAudioCleanup = null;
     }
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.src = "";
+    // Detach the playing chunk's listeners BEFORE releasing its source, or
+    // the teardown is reported as "[TTS-PLAY] Audio chunk playback error".
+    const playing = this.currentAudio;
+    if (this.currentPlaybackCancel) {
+      this.currentPlaybackCancel();
+      this.currentPlaybackCancel = null;
+    }
+    if (playing) {
+      releaseAudio(playing);
       this.currentAudio = null;
     }
     this.isPlaying = false;
-    // Clear preloaded audio
-    this.preloadedAudio.forEach((audio) => {
-      audio.src = "";
-    });
-    this.preloadedAudio.clear();
+    this.releasePreloads();
     this.nextExpectedChunk = 0;
 
     // Update voice mode store if we were playing
@@ -407,9 +475,14 @@ export class AudioQueueManager {
     this.queue = [];
     this.clearPrefetchTimer();
     // Clear preloaded audio that won't be played
-    this.preloadedAudio.forEach((audio) => {
-      audio.src = "";
-    });
+    this.releasePreloads();
+  }
+
+  /** Cancel in-flight preloads and release ready ones (no error events) */
+  private releasePreloads(): void {
+    [...this.pendingPreloads.values()].forEach((cancel) => cancel());
+    this.pendingPreloads.clear();
+    this.preloadedAudio.forEach((audio) => releaseAudio(audio));
     this.preloadedAudio.clear();
   }
 

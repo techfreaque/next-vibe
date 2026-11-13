@@ -105,6 +105,8 @@ interface ParsedSettings {
   resolutions?: string[];
   /** Aspect ratio options (e.g. ["16:9", "9:16"]) */
   aspectRatios?: string[];
+  /** The API takes an `init_image` parameter (image-to-video / image input) */
+  acceptsInitImage?: boolean;
 }
 
 /**
@@ -278,6 +280,11 @@ function normalizeAspectRatio(s: string): string {
  */
 function parseSettingsFromLlmsTxt(text: string): ParsedSettings {
   const settings: ParsedSettings = {};
+
+  // === Image input ===
+  // Parameters are listed as "- **`init_image`** (required|optional): ...".
+  // ModelsLab's img2video endpoint takes one init_image = the first frame.
+  settings.acceptsInitImage = /^-\s*\*\*`init_image`\*\*/m.test(text);
 
   // === Duration ===
   const durSection = extractParamSection(text, "duration");
@@ -619,6 +626,18 @@ export class ModelslabPriceFetcher extends PriceFetcher {
             providerModel: config.providerModel,
             field: "supportedResolutions",
             tsLiteral: `[${resStrings.join(", ")}]`,
+            source: llmsUrl,
+          });
+        }
+
+        // Image input - video only. Written as supportedFrameImages so the
+        // route-level signal matches OpenRouter's; the price updater derives
+        // the model's `inputs` from it (any image-capable route => "image").
+        if (config.isVideo && settings.acceptsInitImage) {
+          settingsUpdates.push({
+            providerModel: config.providerModel,
+            field: "supportedFrameImages",
+            tsLiteral: '["first_frame"]',
             source: llmsUrl,
           });
         }

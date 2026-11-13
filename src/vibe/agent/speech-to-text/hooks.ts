@@ -453,37 +453,25 @@ export function useEdenAISpeech({
       audioChunksRef.current = [];
       silenceStartRef.current = null;
 
-      // Permission already granted (so the device list is trustworthy) but no
-      // input device at all: say so without opening a getUserMedia prompt
-      // that can only fail. Pre-permission lists are unreliable (Safari hides
-      // devices), so only this one case short-circuits.
-      const preDiagnostics = await getMicrophoneDiagnostics();
-      const knownNoDevice =
-        preDiagnostics.permissionState === "granted" &&
-        preDiagnostics.audioInputCount === 0;
-
+      // getUserMedia must be the FIRST await in the tap handler: the
+      // permission prompt is gated on the transient user activation of the
+      // tap, and every await before it (permission query, device list) spends
+      // part of it. No pre-check is needed to avoid a futile prompt: with the
+      // permission already granted the browser rejects NotFoundError directly.
       logger.debug("STT: Requesting microphone access");
-      const micResult = knownNoDevice
-        ? {
-            stream: null,
-            errorName: "NotFoundError",
-            errorMessage: "no audioinput device (pre-check)",
-          }
-        : await requestMicrophoneStream();
+      const micResult = await requestMicrophoneStream();
       const stream = micResult.stream;
       if (!stream) {
         // Map the REAL rejection (permission denied / no device / mic busy /
         // insecure context) to its own message - this used to always say
         // "No microphone found".
         const errorName = micResult.errorName ?? "UnknownError";
-        const diagnostics = knownNoDevice
-          ? preDiagnostics
-          : await getMicrophoneDiagnostics();
+        const diagnostics = await getMicrophoneDiagnostics();
         logger.warn("STT: Microphone stream unavailable", {
           operation: "startRecording",
           errorName,
           errorMessage: micResult.errorMessage,
-          skippedPrompt: knownNoDevice,
+          userActivationActive: micResult.userActivationActive,
           permissionState: diagnostics.permissionState,
           audioInputCount: diagnostics.audioInputCount,
           isSecureContext: diagnostics.isSecureContext,

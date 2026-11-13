@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/cheap-test--parallel-tool-help-exploration-5481ddeb-fc9e-4145-8010-dcd6a9a60559.md\n\n# Cheap Test: Parallel tool-help Exploration\nFolder: private\nDescription: The user set up a quality-gate test suite named 'cheap' and asked for three parallel tool-help calls in a single turn: category='ai', query='search', and toolName='generate_image'. All three returned non-empty results with names and descriptions, and generate_image's full parameter schema was retrie",
+    "encoding_format": "float"
+  }
+}

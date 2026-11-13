@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `cortex-write` call with `callbackMode='wait'` returned inline with a non-empty `responsePath: \"/memories/cb-wait-inline-test\"` and **no** `taskId` — the write completed synchronously as expected (`size: 24`, matching the 24-char payload).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

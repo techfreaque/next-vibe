@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `await-task` call returned the completed background task, with `responsePath: \"/memories/cb-await-task-test\"` present (nested under `result`), `status: \"status.completed\"`, and `waiting: false`. The write succeeded (`size: 23`, matching the 23-char payload; `created: false` because the memory file already existed).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

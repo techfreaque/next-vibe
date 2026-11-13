@@ -23,7 +23,7 @@ import { chatSettings } from "../../chat/settings/db";
 import { DESCRIBE_IMAGE_ALIAS } from "../../describe-image/constants";
 import { DESCRIBE_VIDEO_ALIAS } from "../../describe-video/constants";
 import { getEnvAvailability } from "../../env-availability";
-import { getAvailableModelCount } from "../../models/all-models";
+import { getAvailableChatModelCount } from "../../models/all-models";
 import { MUSIC_GEN_ALIAS } from "../../music-generation/constants";
 import { TRANSCRIBE_AUDIO_ALIAS } from "../../speech-to-text/constants";
 import { TEXT_TO_SPEECH_ALIAS } from "../../text-to-speech/constants";
@@ -226,7 +226,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
     );
     const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
     const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
-    const totalModelCount = getAvailableModelCount(
+    const totalModelCount = getAvailableChatModelCount(
       isAdmin,
       await getEnvAvailability(),
     );

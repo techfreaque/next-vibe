@@ -11,6 +11,7 @@
  * cases.
  */
 import { afterEach, beforeAll, describe, expect, it, mock } from "bun:test";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 const fakeEnv = { NEXT_PUBLIC_APP_URL: "https://unbottled.ai" };
 
@@ -26,10 +27,15 @@ void mock.module("next-vibe/core/env", () => ({ coreEnv: fakeEnv }));
 let makeAbsoluteStorageUrl: (relativeUrl: string) => string;
 let resolveStorageUrl: (url: string) => string;
 let buildStorageFileUrl: (threadId: string, filename: string) => string;
+let isStorageFileOwner: typeof import("./url-utils").isStorageFileOwner;
 
 beforeAll(async () => {
-  ({ makeAbsoluteStorageUrl, resolveStorageUrl, buildStorageFileUrl } =
-    await import("./url-utils"));
+  ({
+    makeAbsoluteStorageUrl,
+    resolveStorageUrl,
+    buildStorageFileUrl,
+    isStorageFileOwner,
+  } = await import("./url-utils"));
 });
 
 afterEach(() => {
@@ -107,5 +113,40 @@ describe("resolveStorageUrl", () => {
     expect(resolveStorageUrl("https://cdn.example.com/x.png")).toBe(
       "https://cdn.example.com/x.png",
     );
+  });
+});
+
+describe("isStorageFileOwner", () => {
+  const LEAD = "11111111-1111-4111-8111-111111111111";
+  const OTHER_LEAD = "22222222-2222-4222-8222-222222222222";
+  const USER = "33333333-3333-4333-8333-333333333333";
+  const publicUser = {
+    isPublic: true as const,
+    leadId: LEAD,
+    roles: [UserPermissionRole.PUBLIC],
+  };
+  const privateUser = {
+    isPublic: false as const,
+    id: USER,
+    leadId: LEAD,
+    roles: [UserPermissionRole.CUSTOMER],
+  };
+
+  it("never grants a public user a file with no owner ids", () => {
+    // Regression: `uploadedBy !== undefined` passed for every public user
+    expect(isStorageFileOwner({}, publicUser)).toBe(false);
+  });
+
+  it("grants by matching leadId, denies a foreign lead", () => {
+    expect(isStorageFileOwner({ leadId: LEAD }, publicUser)).toBe(true);
+    expect(isStorageFileOwner({ leadId: OTHER_LEAD }, publicUser)).toBe(false);
+  });
+
+  it("grants a logged-in uploader and their own incognito files", () => {
+    expect(isStorageFileOwner({ uploadedBy: USER }, privateUser)).toBe(true);
+    expect(isStorageFileOwner({ leadId: LEAD }, privateUser)).toBe(true);
+    expect(
+      isStorageFileOwner({ uploadedBy: "someone-else" }, privateUser),
+    ).toBe(false);
   });
 });

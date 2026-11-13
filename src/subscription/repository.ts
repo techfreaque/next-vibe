@@ -29,7 +29,7 @@ import { getPaymentProvider } from "../payment/providers";
 import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import { getEnvAvailability } from "../vibe/agent/env-availability";
-import { getAvailableModelCount } from "../vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "../vibe/agent/models/all-models";
 import type {
   SubscriptionCancelDeleteRequestOutput,
   SubscriptionCancelDeleteResponseOutput,
@@ -176,11 +176,30 @@ export class SubscriptionRepository {
       currentPeriodEnd: periodEnd,
     };
   }
+  /**
+   * Minimum gap between live Stripe verifications of the same subscription.
+   * Webhooks keep the DB in sync; the live check is only a missed-webhook
+   * safety net, so once per window is plenty.
+   */
+  private static readonly PROVIDER_SYNC_INTERVAL_MS = 10 * 60 * 1000;
+  private static readonly lastProviderSync = new Map<string, number>();
+
+  /**
+   * Get the user's latest subscription.
+   *
+   * `syncWithProvider: false` reads our DB state only (kept current by
+   * webhooks) - use it in page/layout loaders that run on every request.
+   * With the default `true`, a stale-looking subscription is verified
+   * against Stripe at most once per PROVIDER_SYNC_INTERVAL_MS (billing pages,
+   * checkout, the subscription endpoint).
+   */
   static async getSubscription(
     userId: string | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    options: { syncWithProvider?: boolean } = {},
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
+    const syncWithProvider = options.syncWithProvider ?? true;
     if (!userId) {
       return success({ hasSubscription: false });
     }
@@ -204,15 +223,32 @@ export class SubscriptionRepository {
       // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID.
       // Skip for NOWPayments - one-time payments have no recurring subscription to sync.
       if (
+        syncWithProvider &&
         subscription.providerSubscriptionId &&
         subscription.provider !== PaymentProvider.NOWPAYMENTS
       ) {
+        // Terminal statuses never change on Stripe's side; re-checking them
+        // made every page view of a former subscriber hit the Stripe API.
+        const isTerminal =
+          subscription.status === SubscriptionStatus.CANCELED ||
+          subscription.status === SubscriptionStatus.INCOMPLETE_EXPIRED;
+        const lastSync =
+          SubscriptionRepository.lastProviderSync.get(subscription.id) ?? 0;
+        const recentlySynced =
+          Date.now() - lastSync <
+          SubscriptionRepository.PROVIDER_SYNC_INTERVAL_MS;
         const needsSync =
-          subscription.status === SubscriptionStatus.ACTIVE ||
-          (subscription.currentPeriodEnd &&
-            new Date(subscription.currentPeriodEnd) < new Date());
+          !isTerminal &&
+          !recentlySynced &&
+          (subscription.status === SubscriptionStatus.ACTIVE ||
+            (subscription.currentPeriodEnd &&
+              new Date(subscription.currentPeriodEnd) < new Date()));
 
         if (needsSync) {
+          SubscriptionRepository.lastProviderSync.set(
+            subscription.id,
+            Date.now(),
+          );
           try {
             const stripeClient = StripeProvider.getStripe();
             if (!stripeClient) {
@@ -996,7 +1032,7 @@ export class SubscriptionRepository {
                     userId,
                     leadId,
                     planName: t(subRecord.planId),
-                    totalModelCount: getAvailableModelCount(
+                    totalModelCount: getAvailableChatModelCount(
                       false,
                       await getEnvAvailability(),
                     ),

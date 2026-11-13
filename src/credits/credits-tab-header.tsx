@@ -1,6 +1,6 @@
 "use client";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
@@ -73,7 +73,7 @@ export function CreditsTabHeader({
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
   const isAuthenticated = !widgetUser.isPublic;
   const availability = useProviderAvailability();
-  const totalModelCount = getAvailableModelCount(isAdmin, availability);
+  const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   const subscriptionEndpoint = useSubscription(logger, widgetUser);
   const currentSubscription = subscriptionEndpoint.read?.data;

@@ -7,16 +7,19 @@ import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { notFound } from "next-vibe/ui/lib/not-found";
+import { permanentRedirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
   buildPickerModels,
+  findModelPageAlias,
   findPublicModelId,
   getModelFacts,
   type ModelFacts,
   type PickerModel,
+  toModelSlug,
 } from "../../../_shared/model-facts";
 import { MODELS_OG_IMAGE } from "../../../constants";
 import { scopedTranslation } from "../../../i18n";
@@ -26,6 +29,18 @@ export const revalidate = 3600;
 
 interface Props {
   params: Promise<{ locale: CountryLanguage; a: string; b: string }>;
+}
+
+/** A duplicate (alias) slug on either side 308s to the canonical pair. */
+function redirectAliases(locale: CountryLanguage, a: string, b: string): void {
+  const left = findModelPageAlias(a);
+  const right = findModelPageAlias(b);
+  if (left === null && right === null) {
+    return;
+  }
+  permanentRedirect(
+    `/${locale}/models/compare/${left === null ? a : toModelSlug(left)}/${right === null ? b : toModelSlug(right)}`,
+  );
 }
 
 function resolvePair(
@@ -47,6 +62,7 @@ function resolvePair(
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, a, b } = await params;
+  redirectAliases(locale, a, b);
   const pair = resolvePair(a, b);
   if (pair === null) {
     notFound();
@@ -82,6 +98,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ComparePageData> {
   const { locale, a, b } = await params;
+  redirectAliases(locale, a, b);
   const pair = resolvePair(a, b);
   if (pair === null) {
     notFound();

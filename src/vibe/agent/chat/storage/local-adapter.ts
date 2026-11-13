@@ -101,12 +101,14 @@ export class LocalStorageAdapter implements StorageAdapter {
     };
   }
 
-  async deleteFile(fileId: string): Promise<void> {
+  async deleteFile(fileId: string, threadId?: string): Promise<void> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       return;
     }
 
-    const metadata = await this.getFileMetadata(fileId);
+    const metadata = threadId
+      ? await this.readThreadMetadata(threadId, fileId)
+      : await this.getFileMetadata(fileId);
     if (!metadata) {
       return;
     }
@@ -134,6 +136,41 @@ export class LocalStorageAdapter implements StorageAdapter {
     } catch {
       // Metadata already deleted or doesn't exist
     }
+
+    // Drop the namespace dirs once they are empty (rmdir refuses non-empty
+    // dirs, so files still in the thread are never touched).
+    const threadDir = path.join(agentEnv.CHAT_STORAGE_PATH, metadata.threadId);
+    try {
+      await fs.rmdir(path.join(threadDir, ".metadata"));
+      await fs.rmdir(threadDir);
+    } catch {
+      // Not empty yet
+    }
+  }
+
+  private async readThreadMetadata(
+    threadId: string,
+    fileId: string,
+  ): Promise<FileMetadata | null> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
+      return null;
+    }
+    try {
+      const raw = await fs.readFile(
+        path.join(
+          agentEnv.CHAT_STORAGE_PATH,
+          threadId,
+          ".metadata",
+          `${fileId}.json`,
+        ),
+        "utf-8",
+      );
+      const metadata = JSON.parse(raw) as FileMetadata;
+      metadata.uploadedAt = new Date(metadata.uploadedAt);
+      return metadata;
+    } catch {
+      return null;
+    }
   }
 
   async getFileUrl(fileId: string): Promise<string> {
@@ -145,19 +182,26 @@ export class LocalStorageAdapter implements StorageAdapter {
     return buildStorageFileUrl(metadata.threadId, metadata.filename);
   }
 
-  async getFileMetadata(fileId: string): Promise<FileMetadata | null> {
+  async getFileMetadata(
+    fileId: string,
+    threadId?: string,
+  ): Promise<FileMetadata | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       return null;
+    }
+
+    if (threadId) {
+      return this.readThreadMetadata(threadId, fileId);
     }
 
     // Search through all thread directories for this fileId
     try {
       const threads = await fs.readdir(agentEnv.CHAT_STORAGE_PATH);
 
-      for (const threadId of threads) {
+      for (const threadDir of threads) {
         const metadataPath = path.join(
           agentEnv.CHAT_STORAGE_PATH,
-          threadId,
+          threadDir,
           ".metadata",
           `${fileId}.json`,
         );
@@ -270,5 +314,23 @@ export class LocalStorageAdapter implements StorageAdapter {
     }
 
     return results;
+  }
+
+  async listThreadIds(): Promise<string[]> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
+      return [];
+    }
+
+    try {
+      const entries = await fs.readdir(agentEnv.CHAT_STORAGE_PATH, {
+        withFileTypes: true,
+      });
+      return entries
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
+    } catch {
+      // Base path doesn't exist yet
+      return [];
+    }
   }
 }

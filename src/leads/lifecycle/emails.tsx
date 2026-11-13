@@ -8,7 +8,7 @@ import "server-only";
 
 import { render } from "@react-email/render";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableModelCount } from "next-vibe/agent/models/all-models";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import React from "react";
 
@@ -136,7 +136,10 @@ export async function renderLifecycleEmail(
   input: RenderLifecycleEmailInput,
 ): Promise<RenderedLifecycleEmail> {
   const { t } = scopedTranslation.scopedT(input.locale);
-  const modelCount = getAvailableModelCount(false, await getEnvAvailability());
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
   const copy = copyFor(t, input.template, modelCount);
   const tracking = createTrackingContext(
     input.locale,

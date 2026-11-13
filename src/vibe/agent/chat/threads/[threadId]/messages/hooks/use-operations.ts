@@ -31,8 +31,10 @@ import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
 } from "../../../../../models/constants";
+import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
 import { calculateCreditCost } from "../../../../../models/models";
 import type { FavoriteConfig } from "../../../../../skills/favorites/db";
+import { NEW_MESSAGE_ID } from "../../../../enum";
 import { useChatBootContext } from "../../../../hooks/context";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import messageIdDefinitions from "../[messageId]/definition";
@@ -215,6 +217,8 @@ export function useMessageOperations(
   // Keep a ref to deps so async callbacks always use the latest values.
   // Prevents stale closures when React batches state updates during navigation.
   const depsRef = useRef(deps);
+  // Stop pressed while a new thread's first send had no real id yet.
+  const stopRequestedBeforeThreadIdRef = useRef(false);
   useLayoutEffect(() => {
     depsRef.current = deps;
   });
@@ -260,7 +264,8 @@ export function useMessageOperations(
       ) {
         return { success: false, createdThreadId: null };
       }
-      return sendMessageOp(
+      stopRequestedBeforeThreadIdRef.current = false;
+      const result = await sendMessageOp(
         params,
         {
           logger,
@@ -279,6 +284,17 @@ export function useMessageOperations(
         },
         onThreadCreated,
       );
+      if (stopRequestedBeforeThreadIdRef.current) {
+        stopRequestedBeforeThreadIdRef.current = false;
+        if (result.success && result.createdThreadId) {
+          logger.info(
+            "Message operations: applying the stop pressed before the new thread had an id",
+            { threadId: result.createdThreadId },
+          );
+          void depsRef.current.cancelStream(result.createdThreadId);
+        }
+      }
+      return result;
     },
     [logger, user, locale, creditsTotal],
   );
@@ -599,9 +615,20 @@ export function useMessageOperations(
 
   const stopGeneration = useCallback((): void => {
     logger.debug("Message operations: Stopping generation and TTS playback");
-    if (activeThreadId) {
+    if (activeThreadId && activeThreadId !== NEW_MESSAGE_ID) {
       void cancelStream(activeThreadId);
+    } else if (useChatInputStore.getState().isSubmitting) {
+      // Stop pressed on the new-thread page while the first send is still
+      // creating its thread: there is no real id to cancel yet, and cancelling
+      // "new" was a no-op that let the stream run on. sendMessage cancels the
+      // real thread as soon as its stream has started.
+      logger.info(
+        "Message operations: stop pressed before the new thread had an id - cancelling once its stream starts",
+      );
+      stopRequestedBeforeThreadIdRef.current = true;
     }
+    // Otherwise there is no stream on the new-thread page: the button only
+    // stopped TTS playback, handled below.
 
     // Also stop TTS playback if it's playing
     if (typeof window !== "undefined") {

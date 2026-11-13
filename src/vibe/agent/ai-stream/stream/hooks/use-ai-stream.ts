@@ -16,6 +16,7 @@ import {
   isErrorResponseType,
   parseError,
 } from "next-vibe/core/utils/parse-error";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { preWarmChannel } from "next-vibe/realtime/client/client";
 import { buildWsChannel } from "next-vibe/realtime/core/channel";
 import { toast } from "next-vibe/ui/hooks/use-toast";
@@ -165,13 +166,22 @@ export function useAIStream(): UseAIStreamReturn {
         // Credit refusal (402) is an expected outcome, shown as a card below.
         const isCreditRefusal =
           errorType !== null && isOutOfCreditsErrorCode(errorType.errorCode);
+        // HTTP_ERROR = callApi got a response that is not our API's JSON
+        // (e.g. a 200 text/html page from a proxy, captive portal or content
+        // filter). It is not a handler rejection: the HTTP status, headers and
+        // body snippet live on the "callApi: non-JSON response" row with the
+        // same tabId, and errorCode below is only the type's default (500).
+        const isNonApiResponse =
+          errorType?.errorKey === ErrorResponseTypes.HTTP_ERROR.errorKey;
         // Only a request that never got a response is a "network error"; a
         // server answer (4xx/5xx) is labelled as such with its status.
         const label = isBrowserNetworkLoss
           ? "Stream request network error"
-          : errorType !== null
-            ? "Stream request rejected by server"
-            : "Stream request failed (no server response)";
+          : isNonApiResponse
+            ? "Stream request got a non-API response"
+            : errorType !== null
+              ? "Stream request rejected by server"
+              : "Stream request failed (no server response)";
         (isBrowserNetworkLoss || isCreditRefusal
           ? logger.warn
           : logger.error
@@ -350,7 +360,19 @@ export function useAIStream(): UseAIStreamReturn {
 
         if (result.success) {
           cancelOutcome = result.data.cancelled ? "cancelled" : "idle";
-          logger.info("Cancel endpoint called successfully", { threadId });
+          logger.info("Cancel endpoint called successfully", {
+            threadId,
+            cancelOutcome,
+          });
+          // "idle": the server saw no live stream and already reset the thread
+          // to IDLE. Its stream-finished WS event is only a courtesy copy and
+          // is lost whenever the socket is suspended (hidden mobile tab), which
+          // left the stop button spinning until the 15s safety timeout.
+          // The HTTP answer is authoritative: unlock now.
+          if (!result.data.cancelled) {
+            clearTimeout(safetyTimeout);
+            storeClearThread(threadId);
+          }
         } else {
           logger.error("Cancel endpoint returned error", {
             message: result.message,

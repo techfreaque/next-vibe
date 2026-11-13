@@ -12,6 +12,8 @@ export const translations: typeof enTranslations = {
       "Brak klucza API. Wyślij go jako 'Authorization: Bearer <klucz>'. Utwórz klucz w Ustawienia > Klucze API.",
     invalidKey:
       "Nieprawidłowy lub unieważniony klucz API. Sprawdź klucz albo utwórz nowy w Ustawienia > Klucze API.",
+    authUnavailable:
+      "Nie udało się teraz zweryfikować klucza API. Klucz nie został odrzucony. Spróbuj ponownie za {{seconds}} s.",
     modelNotFound:
       "Model '{{model}}' nie istnieje lub nie jest dla Ciebie dostępny. Lista Twoich modeli: GET /v1/models.",
     paidRequired:
