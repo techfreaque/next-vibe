@@ -1127,26 +1127,22 @@
       },
       "children": {
         "email": {
-          "type": "form_field",
-          "fieldType": "email",
+          "type": "text",
           "label": "Email Address",
-          "description": "The email address to check subscription status for",
-          "placeholder": "user@example.com",
-          "helpText": "Enter the email address you want to check",
-          "columns": 12,
           "schema": {
             "def": {
-              "type": "string",
-              "format": "email",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
           },
-          "order": 1,
           "usage": {
-            "request": "data"
+            "response": true
           },
           "schemaType": "primitive"
         },
@@ -1172,6 +1168,20 @@
               "type": "string"
             },
             "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "confirmed": {
+          "type": "text",
+          "label": "Confirmed",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
           },
           "usage": {
             "response": true
@@ -70852,12 +70862,10 @@
               "checks": [
                 {
                   "def": {
-                    "type": "string",
-                    "format": "url",
-                    "check": "string_format",
-                    "abort": false
+                    "type": "custom",
+                    "check": "custom"
                   },
-                  "type": "string"
+                  "type": "custom"
                 }
               ]
             },

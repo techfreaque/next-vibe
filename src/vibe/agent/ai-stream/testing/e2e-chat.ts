@@ -15,9 +15,10 @@ export async function until(
 ): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (!(await check())) {
-    if (Date.now() > deadline) {
-      expect.fail(`[e2e] timed out waiting for: ${what}`);
-    }
+    // Not expect.fail — bun's vitest shim lacks it (TypeError hides `what`)
+    expect(Date.now() <= deadline, `[e2e] timed out waiting for: ${what}`).toBe(
+      true,
+    );
     await new Promise<void>((resolve) => {
       setTimeout(resolve, 200);
     });
@@ -70,18 +71,28 @@ export async function waitVisibleThroughDevReload(
 
 /**
  * Run a send `attempt` (navigate + type + send) and retry it when the shared
- * dev server answered 503 mid-restart (its proxy's plain-text "Service
- * Unavailable" — the request never reached a handler, so no fixture ordinal
- * was consumed). Any real response, success or rejection, is returned as-is.
+ * dev server answered mid-restart/HMR instead of the route: its proxy's
+ * plain-text 503 "Service Unavailable", or the server framework's own
+ * `{ unhandled: true }` error page (no `success` field — never our envelope)
+ * while the route module reloads. Either way the request never reached a
+ * handler, so no fixture ordinal was consumed. Any real response, success or
+ * rejection, is returned as-is.
  */
 export async function sendThroughDevRestart<
-  TResult extends { call: { status: number; contentType: string } },
+  TResult extends {
+    call: {
+      status: number;
+      contentType: string;
+      response: { success?: boolean };
+    };
+  },
 >(baseUrl: string, attempt: () => Promise<TResult>): Promise<TResult> {
   for (let round = 0; ; round++) {
     const result = await attempt();
     const devRestart =
-      result.call.status === 503 &&
-      !result.call.contentType.includes("application/json");
+      (result.call.status === 503 &&
+        !result.call.contentType.includes("application/json")) ||
+      (result.call.status >= 400 && result.call.response.success === undefined);
     if (!devRestart || round >= 3) {
       return result;
     }

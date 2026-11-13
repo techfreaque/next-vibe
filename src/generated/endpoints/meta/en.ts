@@ -9872,11 +9872,22 @@ export const endpointsMeta: EndpointMeta[] = [
         basic: { email: "user@example.com" },
         subscribed: { email: "subscribed@example.com" },
         unsubscribed: { email: "unsubscribed@example.com" },
+        own: {},
       },
       responses: {
-        basic: { subscribed: true, status: "SUBSCRIBED" },
-        subscribed: { subscribed: true, status: "SUBSCRIBED" },
-        unsubscribed: { subscribed: false, status: "UNSUBSCRIBED" },
+        basic: { subscribed: true, status: "SUBSCRIBED", confirmed: true },
+        subscribed: { subscribed: true, status: "SUBSCRIBED", confirmed: true },
+        unsubscribed: {
+          subscribed: false,
+          status: "UNSUBSCRIBED",
+          confirmed: false,
+        },
+        own: {
+          subscribed: true,
+          status: "SUBSCRIBED",
+          confirmed: false,
+          email: "me@example.com",
+        },
       },
     },
   },
@@ -21678,7 +21689,7 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       inputs: {
         default: {
-          url: "https://example.com/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
+          url: "/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
         },
       },
     },

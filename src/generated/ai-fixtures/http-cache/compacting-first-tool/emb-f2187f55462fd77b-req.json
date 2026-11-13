@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/c1-compacting-test--five-sequential-tool-help-call-f2c61d4b-3a1a-4759-a4e0-d58a9571beb3.md\n\n# C1 compacting test: five sequential tool-help calls\nFolder: private\nDescription: A context-compacting stress test (C1) that required five sequential tool-help calls with the queries 'list', 'search', 'chat', 'image', and 'audio'. Each call was issued one at a time and all five returned valid tool listings, confirming the tool-help endpoint responds correctly across categories. T",
+    "encoding_format": "float"
+  }
+}

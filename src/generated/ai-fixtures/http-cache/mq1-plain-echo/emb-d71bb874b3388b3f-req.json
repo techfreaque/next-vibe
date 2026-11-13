@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/echo-bot-stream-tests-5e6f732e-fdb4-43ec-ba70-a04ba21711d9.md\n\n# Echo bot stream tests\nFolder: private\nDescription: A series of echo-bot test messages where the assistant must reply with only a single specified word (ECHO_DONE, QUEUED_DONE) with no extra text. Used to verify streaming and queued message handling in the test harness.",
+    "encoding_format": "float"
+  }
+}

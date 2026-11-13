@@ -210,12 +210,7 @@ export async function createE2EFundedGuest(
   credits: number,
 ): Promise<E2EFundedGuest> {
   const logger = createEndpointLogger(false, defaultLocale);
-  const nonce = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
-  const leadId = await createAnonymousLead(
-    { userAgent: `e2e-guest-${tag}-${nonce}` },
-    defaultLocale,
-    logger,
-  );
+  const { leadId, remove } = await createE2EFreeGuest(tag);
   const { t } = creditsScopedTranslation.scopedT(defaultLocale);
   const funded = await CreditRepository.addCredits(
     { leadId },
@@ -229,6 +224,24 @@ export async function createE2EFundedGuest(
     // eslint-disable-next-line restricted/restricted-syntax -- test setup failure
     throw new Error(`[e2e] funding guest failed: ${JSON.stringify(funded)}`);
   }
+  return { leadId, remove };
+}
+
+/**
+ * Throwaway anonymous visitor on nothing but the guest free allowance — what a
+ * first-time visitor gets. Created without an IP, so it is never pooled with
+ * the other localhost leads (whose shared monthly allowance other suites
+ * spend): the balance starts at exactly FREE_CREDIT_ALLOWANCE.guest.
+ * Put `leadId` in the browser's lead cookie to browse as this guest.
+ */
+export async function createE2EFreeGuest(tag: string): Promise<E2EFundedGuest> {
+  const logger = createEndpointLogger(false, defaultLocale);
+  const nonce = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+  const leadId = await createAnonymousLead(
+    { userAgent: `e2e-guest-${tag}-${nonce}` },
+    defaultLocale,
+    logger,
+  );
   return {
     leadId,
     remove: async (): Promise<void> => {

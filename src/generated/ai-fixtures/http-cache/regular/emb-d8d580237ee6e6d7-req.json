@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/callback-modes---tool-qa-suite-9d22b45f-69f7-43f3-b39c-8a24e6105cfc.md\n\n# Callback Modes & Tool QA Suite\nFolder: private\nDescription: Quality-gate suite exercising tool-help (category, keyword, and detail modes), generate_music, favorites, and the full callbackMode matrix: detach + await-task, endLoop, wait (inline), and wakeUp (deferred and repeat). Also generated a video morphing a wojak photo into a prior generated image, and t",
+    "encoding_format": "float"
+  }
+}

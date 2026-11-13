@@ -1127,26 +1127,22 @@
       },
       "children": {
         "email": {
-          "type": "form_field",
-          "fieldType": "email",
+          "type": "text",
           "label": "Adres e-mail",
-          "description": "Adres e-mail, dla którego chcesz sprawdzić status subskrypcji",
-          "placeholder": "użytkownik@przykład.pl",
-          "helpText": "Wprowadź adres e-mail, który chcesz sprawdzić",
-          "columns": 12,
           "schema": {
             "def": {
-              "type": "string",
-              "format": "email",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
           },
-          "order": 1,
           "usage": {
-            "request": "data"
+            "response": true
           },
           "schemaType": "primitive"
         },
@@ -1172,6 +1168,20 @@
               "type": "string"
             },
             "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "confirmed": {
+          "type": "text",
+          "label": "Potwierdzona",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
           },
           "usage": {
             "response": true
@@ -70852,12 +70862,10 @@
               "checks": [
                 {
                   "def": {
-                    "type": "string",
-                    "format": "url",
-                    "check": "string_format",
-                    "abort": false
+                    "type": "custom",
+                    "check": "custom"
                   },
-                  "type": "string"
+                  "type": "custom"
                 }
               ]
             },

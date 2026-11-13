@@ -16,8 +16,8 @@ import {
   objectField,
   requestField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
-import { z } from "zod";
 
+import { mediaUrlSchema } from "../chat/storage/storage-url";
 import { AGENT_VIEW_IMAGE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -62,12 +62,9 @@ const { POST } = createEndpoint({
         description: "post.url.description",
         placeholder: "post.url.placeholder",
         columns: 12,
-        schema: z
-          .string()
-          .url()
-          .describe(
-            "Storage URL of the image to fetch and display. Pass the URL from the [image: ...] stub in a previous tool result.",
-          ),
+        schema: mediaUrlSchema.describe(
+          "Storage URL of the image to fetch and display. Pass the URL from the [image: ...] stub in a previous tool result.",
+        ),
       }),
     },
   }),
@@ -75,7 +72,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        url: "https://example.com/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
+        url: "/api/en-GLOBAL/vibe/agent/chat/threads/files/thread-123/screenshot-abc.png",
       },
     },
   },

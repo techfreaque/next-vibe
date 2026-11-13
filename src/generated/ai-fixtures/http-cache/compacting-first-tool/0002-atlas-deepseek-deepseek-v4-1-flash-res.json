@@ -1,0 +1,36 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a59e3e69fddb2f12-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Fri, 13 Nov 2026 13:50:09 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794577808-x8c6UteBo4zQrdJ9AeGJ",
+    "x-openrouter-release": "api;4f2ac83c-4965-42b7-8136-42a603c58cd3",
+    "set-cookie": "__cf_bm=KyetQRnn6olCWHJBW5ehU1_BDREY0Y1CvKaUhiPp0k4-1794577808.9604597-1.0.1.1-rpOaKtvuVL0fKSs.CnHt8er6.4_cxUttXZ0j0MmHAZnHDF.9BYSe9ai3DEYXs4JViYby5j8hQ4Rb8704XV9lk49zus1rSP10q8arltfat2PLcALDvJ_jZVEOnFfFPnF5; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Fri, 13 Nov 2026 14:20:09 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"First\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"First\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" call returned a\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" call returned a\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" result. Now second\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" result. Now second\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" call: 'search'.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" call: 'search'.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"chatcmpl-tool-a0bd9c1e9f0b135e\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    ": OPENROUTER PROCESSING",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\": \\\"wait\\\", \\\"input\\\": {\\\"query\\\": \\\"search\\\"}, \\\"toolName\\\": \\\"tool-help\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"system_fingerprint\":\"inference.net\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794577808-x8c6UteBo4zQrdJ9AeGJ\",\"object\":\"chat.completion.chunk\",\"created\":1794577808,\"model\":\"deepseek/deepseek-v4.1-flash\",\"provider\":\"InferenceNet\",\"system_fingerprint\":\"inference.net\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":8692,\"completion_tokens\":93,\"total_tokens\":8785,\"cost\":0.000951076,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.000951076,\"upstream_inference_prompt_cost\":0.000895276,\"upstream_inference_completions_cost\":0.0000558},\"completion_tokens_details\":{\"reasoning_tokens\":13,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}
