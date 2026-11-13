@@ -30,6 +30,7 @@ import type { EvaluatedModules } from "vite/module-runner";
 
 import { getSrcDir, ROOT_LAYOUT_DIR } from "@/env/paths";
 
+import { transformClientLocaleSource } from "../../../core/i18n/core/client-locale-loader.cjs";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -2060,6 +2061,15 @@ class ViteCompiler {
               if (opts?.ssr) {
                 const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
                 return { code: shim + code, map: null };
+              }
+              // Client i18n scopes: load only the page language (de/pl via a
+              // top-level-awaited dynamic import). Same transform as the
+              // webpack prod build (next.config.ts).
+              if (/[\\/]i18n[\\/]index\.ts$/.test(id.replace(/\?.*$/, ""))) {
+                const localeRewritten = transformClientLocaleSource(code);
+                if (localeRewritten !== code) {
+                  return { code: localeRewritten, map: null };
+                }
               }
               // Client: rewrite `require("next-vibe/ui/web/components/icons/X")` → `__cjsImport_X` and add static imports.
               // Matches both relative (./de) and bare package-style (next-vibe/ui/i18n/de)

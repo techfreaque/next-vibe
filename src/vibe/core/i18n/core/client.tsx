@@ -6,6 +6,7 @@ import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { setCookie } from "next-vibe/ui/lib/cookies";
 import { getDocumentLang, setDocumentLang } from "next-vibe/ui/lib/css-vars";
+import { assignUrl } from "next-vibe/ui/lib/location";
 import { storage } from "next-vibe/ui/lib/storage";
 import {
   createContext,
@@ -107,6 +108,28 @@ export function TranslationProvider({
     availableCountries.find((c) => c.code === Countries.GLOBAL) ||
     globalCountryInfo;
 
+  // Swap the locale segment of the current path. Browser bundles only load
+  // the page language's translations (client-locale-loader), so a language
+  // change is a full navigation; a country-only change stays client-side.
+  const navigateToLocale = (newLocale: string): void => {
+    if (!pathname) {
+      return;
+    }
+    const pathSegments = pathname.split("/");
+    if (pathSegments.length > 1 && pathSegments[1]) {
+      const currentLocaleInPath = pathSegments[1];
+      const newPath = pathname.replace(
+        `/${currentLocaleInPath}`,
+        `/${newLocale}`,
+      ) as Route<RouteType>;
+      if (newLocale.split("-")[0] !== language) {
+        assignUrl(newPath);
+        return;
+      }
+      router.push(newPath);
+    }
+  };
+
   // Custom setLanguage that also updates the URL and cookies
   const setLanguage = async (lang: Languages): Promise<void> => {
     if (!mounted) {
@@ -120,17 +143,7 @@ export function TranslationProvider({
     await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Update URL to reflect language change
-    if (pathname) {
-      const pathSegments = pathname.split("/");
-      if (pathSegments.length > 1 && pathSegments[1]) {
-        const currentLocaleInPath = pathSegments[1];
-        const newPath = pathname.replace(
-          `/${currentLocaleInPath}`,
-          `/${newLocale}`,
-        ) as Route<RouteType>;
-        router.push(newPath);
-      }
-    }
+    navigateToLocale(newLocale);
   };
 
   // Custom setCountry that also updates localStorage and cookies
@@ -146,17 +159,7 @@ export function TranslationProvider({
     await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Update URL to reflect country change
-    if (pathname) {
-      const pathSegments = pathname.split("/");
-      if (pathSegments.length > 1 && pathSegments[1]) {
-        const currentLocaleInPath = pathSegments[1];
-        const newPath = pathname.replace(
-          `/${currentLocaleInPath}`,
-          `/${newLocale}`,
-        ) as Route<RouteType>;
-        router.push(newPath);
-      }
-    }
+    navigateToLocale(newLocale);
   };
 
   // Function to change both country and language at once
@@ -173,17 +176,7 @@ export function TranslationProvider({
     await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
 
     // Single navigation - replace the locale segment in the path
-    if (pathname) {
-      const pathSegments = pathname.split("/");
-      if (pathSegments.length > 1 && pathSegments[1]) {
-        const currentLocaleInPath = pathSegments[1];
-        const newPath = pathname.replace(
-          `/${currentLocaleInPath}`,
-          `/${newLocale}`,
-        ) as Route<RouteType>;
-        router.push(newPath);
-      }
-    }
+    navigateToLocale(newLocale);
   };
 
   // Simple mount effect - only save current locale if none exists

@@ -197,6 +197,41 @@ const nextConfig: NextConfig = {
       { test: /[\\/]src[\\/]app-native[\\/]/, loader: "null-loader" },
     );
 
+    // Browser bundles: load only the page language's translations (de/pl as
+    // per-scope async chunks) instead of shipping every locale to everyone.
+    if (!isServer) {
+      // The loader emits top-level await. Every browser Next.js supports has
+      // async functions; without this flag webpack warns once per i18n scope.
+      config.output.environment = {
+        ...config.output.environment,
+        asyncFunction: true,
+      };
+      // de/pl modules imported by several scopes (e.g. models/i18n/de) would
+      // be copied into every per-scope async chunk; share them instead.
+      const splitChunks = config.optimization?.splitChunks;
+      if (splitChunks && typeof splitChunks === "object") {
+        splitChunks.cacheGroups = {
+          ...splitChunks.cacheGroups,
+          i18nLocaleShared: {
+            test: /[\\/]i18n[\\/](de|pl)[\\/]/,
+            chunks: "async",
+            minChunks: 2,
+            minSize: 0,
+            priority: 50,
+            reuseExistingChunk: true,
+          },
+        };
+      }
+      config.module.rules.push({
+        test: /[\\/]i18n[\\/]index\.ts$/,
+        enforce: "pre",
+        loader: path.join(
+          __dirname,
+          "src/vibe/core/i18n/core/client-locale-loader.cjs",
+        ),
+      });
+    }
+
     if (isServer) {
       config.module.rules.push(
         {

@@ -3,8 +3,8 @@ import { translations as enTranslations } from "./en";
 
 export const scopedTranslation = createScopedTranslation({
   en: enTranslations,
-  de: () => import("./de").then((m) => m.translations),
-  pl: () => import("./pl").then((m) => m.translations),
+  de: () => require("./de").translations,
+  pl: () => require("./pl").translations,
 });
 
 export type RevivalTranslationKey =
