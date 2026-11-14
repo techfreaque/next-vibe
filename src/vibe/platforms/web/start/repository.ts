@@ -50,6 +50,7 @@ import {
   formatTask,
   formatWarning,
 } from "../../../logger/formatters";
+import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
 import { ServerFramework } from "../enum";
 import {
@@ -1302,6 +1303,7 @@ export class ServerStartRepository {
         ...process.env,
         PORT: String(port),
         NODE_ENV: "production",
+        VIBE_LOG_TARGET: resolveLogTarget(),
       },
     });
 
@@ -1484,6 +1486,10 @@ export class ServerStartRepository {
               NODE_ENV: "production",
               NEXT_DIST_DIR: ".next-prod",
               PORT: String(nextPort),
+              // Explicit, so the Next.js process persists warn/error rows to
+              // error_logs from its first request (it never loads
+              // logger/env.ts itself, see logger/log-target.ts).
+              VIBE_LOG_TARGET: resolveLogTarget(),
               // Next's own SIGTERM handler exits as soon as no HTTP request is
               // open, which kills the detached AI runs (tokens go over WS, not
               // the request). src/instrumentation.ts owns shutdown instead:

@@ -5,6 +5,7 @@ import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 import { useEffect } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { chunkLoadDiagnostics } from "../../../logger/global-error-listeners";
 import type { EndpointLogger } from "../../../logger/types";
 import { useLogger } from "./use-logger";
 
@@ -97,6 +98,7 @@ export default function useErrorHandler(
       extensionMarkers: domHints.extensionMarkers,
       referrer: domHints.referrer,
       chunkLoadError: chunkError,
+      ...(chunkError ? chunkLoadDiagnostics(error.message) : {}),
       autoReload,
     });
     if (onError) {

@@ -465,6 +465,22 @@ export async function parseRequestBody(
 
     // If body is empty or whitespace only, return empty object
     if (!bodyText || bodyText.trim() === "") {
+      // The sender announced a body that never arrived: lost in transit
+      // (proxy retry, aborted upload). Validation then reports every field as
+      // missing, which reads like a client bug - say what actually happened.
+      // 2026-11-13: a burst of stream POSTs failed this way with no trace.
+      const announcedBytes = Number(request.headers.get("content-length"));
+      if (Number.isFinite(announcedBytes) && announcedBytes > 0) {
+        logger.error("Request body empty despite Content-Length", {
+          contentLength: announcedBytes,
+          receivedBytes: bodyText.length,
+          contentType: contentType || "(none)",
+          transferEncoding: request.headers.get("transfer-encoding") ?? null,
+          via: request.headers.get("via") ?? null,
+          method: request.method,
+          url: request.url,
+        });
+      }
       return {};
     }
 

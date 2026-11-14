@@ -27,6 +27,7 @@ import {
   extractDocumentText,
   isDocumentMimeType,
 } from "../handlers/attachments";
+import { resolveImageMediaType } from "./image-media-type";
 import { buildToolResultOutput } from "./tool-output";
 
 // ─── Stage: convert (single-message, tool grouping, ladder, dedup/remap) ───
@@ -223,7 +224,7 @@ export async function toAiSdkMessage(
               // Images: Add as image part
               contentParts.push({
                 type: "image",
-                image: `data:${attachment.mimeType};base64,${base64Data}`,
+                image: `data:${resolveImageMediaType(base64Data, attachment.mimeType)};base64,${base64Data}`,
               });
             } else if (
               attachment.mimeType.startsWith("text/") ||
@@ -388,7 +389,10 @@ export async function toAiSdkMessage(
           fetchImpl,
         );
         if (base64Data) {
-          const mimeType = generatedMedia.mimeType ?? "image/png";
+          const mimeType = resolveImageMediaType(
+            base64Data,
+            generatedMedia.mimeType,
+          );
           assistantParts.push({
             type: "file",
             data: base64Data,

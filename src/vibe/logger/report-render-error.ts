@@ -5,6 +5,7 @@
  */
 
 import { claimErrorReport } from "./client-context";
+import { chunkLoadDiagnostics } from "./global-error-listeners";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 export function reportRenderError({
@@ -30,6 +31,7 @@ export function reportRenderError({
     boundary,
     digest,
     componentStack: componentStack ? componentStack.slice(0, 2000) : null,
+    ...chunkLoadDiagnostics(error.message),
     ...extra,
   });
 }

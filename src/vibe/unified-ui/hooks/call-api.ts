@@ -199,6 +199,35 @@ interface CallDiagnostics {
   alreadyLogged?: boolean;
   /** Sent as x-request-id; the server stamps it on its rows for this call. */
   requestId: string;
+  /**
+   * What the client actually put on the wire (JSON chars / multipart parts),
+   * so a server that saw an empty body is provably a transit loss.
+   */
+  requestBody?: { kind: "json" | "form-data"; size: number } | null;
+  /** Edge `via` header of the response (Caddy) - which proxy chain answered. */
+  via?: string | null;
+}
+
+/** Size of a request body without reading files (multipart = sum of parts). */
+function describeRequestBody(
+  body: string | FormData | undefined,
+): CallDiagnostics["requestBody"] {
+  if (body === undefined) {
+    return null;
+  }
+  if (typeof body === "string") {
+    return { kind: "json", size: body.length };
+  }
+  let size = 0;
+  try {
+    body.forEach((value) => {
+      size += typeof value === "string" ? value.length : value.size;
+    });
+  } catch {
+    // React Native's FormData has no forEach: report the kind only
+    return { kind: "form-data", size: -1 };
+  }
+  return { kind: "form-data", size };
 }
 
 const CLIENT_LOG_ENDPOINT_PATH = CLIENT_LOG_PATH.join("/");
@@ -271,6 +300,9 @@ function reportApiFailure(
     transport: diag.transport ?? "http",
     redirected: diag.redirected ?? null,
     durationMs,
+    requestBodyKind: diag.requestBody?.kind ?? null,
+    requestBodySize: diag.requestBody?.size ?? null,
+    via: diag.via ?? null,
     isPublicUser: user.isPublic,
     // Match against the server's error_logs rows for the same request
     requestId: diag.requestId,
@@ -424,6 +456,8 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
   }
 
   const postBody = buildBody(endpoint, requestData);
+  diag.requestBody =
+    endpoint.method === Methods.GET ? null : describeRequestBody(postBody);
 
   try {
     const headers: Record<string, string> =
@@ -472,6 +506,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     const response = await fetch(url, options);
     diag.status = response.status;
     diag.redirected = response.redirected;
+    diag.via = response.headers.get("via");
     // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
     // body — report the HTTP status, not a JSON parse error.
     const isJsonBody = (response.headers.get("content-type") ?? "").includes(

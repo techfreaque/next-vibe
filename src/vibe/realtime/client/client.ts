@@ -76,6 +76,12 @@ let lastLogger: EndpointLogger | null = null;
 let disconnectedAt: number | null = null;
 // Navigation/close tears the socket down on purpose - not a reportable drop.
 let pageUnloading = false;
+// When the current socket opened / last delivered a frame. A drop report with
+// these tells a handshake failure (never opened), an idle cut by a proxy or
+// carrier (long silence before the close) and a server kill mid-traffic apart;
+// the close code alone is 1006 for all of them.
+let openedAt: number | null = null;
+let lastFrameAt: number | null = null;
 
 function sendToServer(msg: WsClientMessage): void {
   if (sharedWs?.readyState === WebSocket.OPEN) {
@@ -84,6 +90,8 @@ function sendToServer(msg: WsClientMessage): void {
 }
 
 function handleOpen(): void {
+  openedAt = Date.now();
+  lastFrameAt = null;
   if (disconnectedAt !== null && reconnectAttempts > 0) {
     lastLogger?.warn("[WS Client] Reconnected after disconnect", {
       attempts: reconnectAttempts,
@@ -148,6 +156,7 @@ function connect(logger: EndpointLogger): void {
   sharedWs = ws;
 
   const handleMessage = (event: MessageEvent): void => {
+    lastFrameAt = Date.now();
     if (typeof event.data !== "string") {
       logger.error("[WS Client] Ignored non-string frame");
       return;
@@ -170,6 +179,11 @@ function connect(logger: EndpointLogger): void {
 
   const handleClose = (event: CloseEvent): void => {
     sharedWs = null;
+    const closedAt = Date.now();
+    const socketOpenedAt = openedAt;
+    const socketLastFrameAt = lastFrameAt;
+    openedAt = null;
+    lastFrameAt = null;
     if (channels.size === 0) {
       return;
     }
@@ -183,6 +197,11 @@ function connect(logger: EndpointLogger): void {
         wasClean: event.wasClean,
         channelCount: channels.size,
         online: isOnline(),
+        // null = the socket never opened (handshake/upgrade failed)
+        connectedForMs:
+          socketOpenedAt === null ? null : closedAt - socketOpenedAt,
+        sinceLastFrameMs:
+          socketLastFrameAt === null ? null : closedAt - socketLastFrameAt,
       });
     }
     // After 6 consecutive failures (~63s total), pause the loop and wait for

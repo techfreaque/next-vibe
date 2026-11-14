@@ -17,6 +17,7 @@ import type { Modality } from "../../../models/enum";
 import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { ChatModelOption } from "../../models";
+import { resolveImageMediaType } from "./image-media-type";
 
 // ─── Stage: shape tool results (media-aware buildToolResultOutput) ───
 
@@ -120,7 +121,7 @@ export async function buildToolResultOutput(
         contentParts.push({
           type: "image-data",
           data: block.data,
-          mediaType: block.mimeType,
+          mediaType: resolveImageMediaType(block.data, block.mimeType),
         });
       } else if (block.type === "image_url") {
         if (isCurrentTurn) {
@@ -134,7 +135,7 @@ export async function buildToolResultOutput(
             contentParts.push({
               type: "image-data",
               data: base64,
-              mediaType: block.mimeType,
+              mediaType: resolveImageMediaType(base64, block.mimeType),
             });
           } else {
             logger.error("[MessageConverter] Failed to fetch image_url block", {
@@ -296,7 +297,15 @@ export async function buildToolResultOutput(
           ? (fileUrl?.split(",")[1] ?? null)
           : await fetchStorageFileAsBase64(fileUrl, undefined, fetchImpl);
         if (base64Data) {
-          const mimeType = mediaResult.mediaType ?? "image/png";
+          // generate_image results carry no mediaType: never assume PNG, the
+          // provider 400s when the declared type does not match the bytes.
+          const inlineMediaType = isInlineData
+            ? /^data:([^;,]+)/.exec(fileUrl ?? "")?.[1]
+            : undefined;
+          const mimeType = resolveImageMediaType(
+            base64Data,
+            mediaResult.mediaType ?? inlineMediaType,
+          );
           const contentParts: Array<
             | { type: "text"; text: string }
             | { type: "image-data"; data: string; mediaType: string }

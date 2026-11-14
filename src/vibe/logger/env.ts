@@ -16,6 +16,7 @@ import {
 } from "@/vibe/env/detect";
 
 import { defineEnv } from "../env/define-env";
+import { defaultLogTarget, LOG_TARGETS } from "./log-target";
 
 type VibeServerMode = "atlas-dev" | "hermes-dev" | "hermes-prod" | "mcp";
 
@@ -83,15 +84,7 @@ export const {
     fieldType: "boolean",
   },
   VIBE_LOG_TARGET: {
-    schema: z
-      .enum(["file", "db", "none"])
-      .optional()
-      .default(
-        vibeServerMode === "hermes-prod" &&
-          process.env["NODE_ENV"] === "production"
-          ? "db"
-          : "file",
-      ),
+    schema: z.enum(LOG_TARGETS).optional().default(defaultLogTarget()),
     example: "file",
     comment:
       "Log persistence target. Auto-resolved from VIBE_SERVER_MODE if not set: atlas-dev/hermes-dev/mcp→file, hermes-prod+production→db. Values: 'file' (write to VIBE_LOG_PATH log files), 'db' (errors+warnings to error_logs table only, no file), 'none' (no persistence).",

@@ -5,8 +5,8 @@ import { Button } from "next-vibe/ui/components/button";
 import { Card, CardContent } from "next-vibe/ui/components/card";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Compass } from "next-vibe/ui/components/icons/Compass";
 import { Home } from "next-vibe/ui/components/icons/Home";
-import { Image } from "next-vibe/ui/components/image";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, P } from "next-vibe/ui/components/typography";
@@ -31,12 +31,11 @@ export function NotFoundBackButton({
                 <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1974')] bg-cover bg-center" />
                 <Div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-white">
                   <Div className="animate-float">
-                    <Image
-                      src="https://illustrations.popsy.co/white/crashed-error.svg"
-                      alt={t("pages.notFound.title")}
-                      width={250}
-                      height={250}
-                      className="mx-auto"
+                    {/* Local icon: the external popsy.co illustration went
+                        dead and every 404 rendered a broken image. */}
+                    <Compass
+                      aria-label={t("pages.notFound.title")}
+                      className="mx-auto h-40 w-40"
                     />
                   </Div>
                   <H1 className="text-7xl font-bold mt-4 animate-pulse-slow">

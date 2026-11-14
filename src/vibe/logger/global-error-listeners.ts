@@ -56,6 +56,82 @@ function describeReason(
   }
 }
 
+/** File extension of a URL's last path segment (null = none, e.g. a truncated URL). */
+function urlExtension(raw: string | null | undefined): string | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    const last = new URL(raw, getCurrentUrl()).pathname.split("/").pop() ?? "";
+    const dot = last.lastIndexOf(".");
+    return dot > 0 ? last.slice(dot + 1).slice(0, 10) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * What the network said about a failed resource: Resource Timing knows the
+ * HTTP status (Chromium) and whether bytes arrived, which the error event
+ * never carries. 0/null = blocked, aborted or a cross-origin opaque response.
+ */
+function resourceTiming(raw: string | null | undefined): {
+  responseStatus: number | null;
+  transferSize: number | null;
+  durationMs: number | null;
+} {
+  const empty = { responseStatus: null, transferSize: null, durationMs: null };
+  if (!raw || typeof performance === "undefined") {
+    return empty;
+  }
+  try {
+    const entries = performance.getEntriesByName(
+      new URL(raw, getCurrentUrl()).href,
+    );
+    const entry = entries.at(-1);
+    if (!(entry instanceof PerformanceResourceTiming)) {
+      return empty;
+    }
+    return {
+      responseStatus:
+        "responseStatus" in entry && typeof entry.responseStatus === "number"
+          ? entry.responseStatus
+          : null,
+      transferSize: entry.transferSize,
+      durationMs: Math.round(entry.duration),
+    };
+  } catch {
+    return empty;
+  }
+}
+
+/**
+ * Webpack "Loading chunk N failed. (error|timeout|missing: URL)" => which
+ * chunk, how it failed and what the network saw. Tells a stale client after a
+ * deploy (404) from a slow/blocked network (timeout, status 0) and a scanner
+ * that blocks subresources (Google-Safety). Empty when not a chunk error.
+ */
+export function chunkLoadDiagnostics(message: string | undefined): {
+  chunkUrl?: string | null;
+  chunkFailKind?: string;
+  responseStatus?: number | null;
+  transferSize?: number | null;
+  durationMs?: number | null;
+} {
+  const match =
+    /Loading (?:CSS )?chunk \S+ failed\.?\s*\((\w+): ([^)\s]+)\)/.exec(
+      message ?? "",
+    );
+  if (!match) {
+    return {};
+  }
+  return {
+    chunkFailKind: match[1],
+    chunkUrl: describeUrl(match[2]),
+    ...resourceTiming(match[2]),
+  };
+}
+
 function handleWindowError(logger: EndpointLogger, event: Event): void {
   // Resource load failure (script/img/link/media): fires on the element,
   // reaches window only in the capture phase, and is not an ErrorEvent.
@@ -76,6 +152,11 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         source: "window.error.resource",
         tag,
         resource: describeUrl(src),
+        // ids are redacted from `resource`; a missing extension on a file URL
+        // means the src was cut short (e.g. a markdown image mid-stream)
+        resourceExt: urlExtension(src),
+        isConnected: target.isConnected,
+        ...resourceTiming(src),
       });
     }
     return;
@@ -89,13 +170,25 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
     file: describeUrl(event.filename),
     line: event.lineno,
     column: event.colno,
+    // Thrown from the page document itself (not a /_next/ chunk): an inline
+    // script. Ours are only Next's data pushes; app logic lives in chunks, so
+    // this is usually code injected by an extension (e.g. a wallet's
+    // `window.ethereum` shim) or a page-rewriting proxy.
+    fromPageDocument:
+      !!event.filename &&
+      describeUrl(event.filename) === describeUrl(getCurrentUrl()),
   };
   if (error) {
     logger.error(`Uncaught error: ${error.message}`, error, context);
     return;
   }
-  // Cross-origin scripts surface only as "Script error." with no detail
-  logger.error(`Uncaught error: ${event.message || "unknown"}`, context);
+  // Cross-origin scripts surface only as "Script error." with no detail.
+  // No file + line 0 = an opaque cross-origin script (extension or third-party
+  // embed), never our bundle: our chunks are same-origin and report in full.
+  logger.error(`Uncaught error: ${event.message || "unknown"}`, {
+    ...context,
+    opaqueCrossOrigin: !event.filename && event.lineno === 0,
+  });
 }
 
 function handleUnhandledRejection(
@@ -125,6 +218,7 @@ function handleUnhandledRejection(
     }
     logger.error(`Unhandled promise rejection: ${reason.message}`, reason, {
       source: "unhandledrejection",
+      ...chunkLoadDiagnostics(reason.message),
     });
     return;
   }

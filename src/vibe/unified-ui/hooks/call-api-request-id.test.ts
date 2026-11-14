@@ -6,6 +6,7 @@
  */
 
 import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
+import { hostname } from "node:os";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
 import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
@@ -209,8 +210,12 @@ describe("request id propagation", () => {
     const last = persisted.slice(-2);
     expect(last).toHaveLength(2);
     for (const call of last) {
-      expect(call.extraMeta).toContainEqual({ requestId: "req-abc12345" });
+      expect(call.extraMeta).toContainEqual({
+        requestId: "req-abc12345",
+        node: hostname(),
+      });
       expect(call.ignoreKeys?.has("requestId")).toBe(true);
+      expect(call.ignoreKeys?.has("node")).toBe(true);
     }
   });
 });
