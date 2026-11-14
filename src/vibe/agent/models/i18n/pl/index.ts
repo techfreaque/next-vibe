@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
         "Filtry bezpieczeństwa dużych firm. Omija drażliwe tematy.",
       openHelp: "Lekkie filtry. Podejmie większość drażliwych tematów.",
       uncensoredHelp:
-        "Bez filtrów, granice ustalasz Ty. Mroczny roleplay, polityka, inne poglądy: wybierz UncensoredLM, zbudowany bez cenzury. Reszta ma tylko usunięte odmowy.",
+        "Dwa rodzaje. Z usuniętymi odmowami: modele z głównego nurtu, które przestały się wykręcać, ten sam światopogląd. UncensoredLM: własny tuning i światopogląd, polityka pod prąd mainstreamu.",
     },
   },
   sort: {

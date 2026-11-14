@@ -48,7 +48,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Bez cenzury",
-      line: "Bez odmów, bez pouczania. Do mrocznego roleplay, polityki i innych poglądów wybierz UncensoredLM, jedyny zbudowany bez cenzury. Reszcie usunięto odmowy, spojrzenie modelu bazowego zostało.",
+      line: "Dwa rodzaje, oba odpowiadają na wszystko. Większość to modele z głównego nurtu z wyciętym odruchem odmowy: ten sam trening, ten sam światopogląd, tylko bez wykrętów. UncensoredLM to drugi rodzaj: własny tuning, własny światopogląd, poglądy polityczne pod prąd mainstreamu.",
     },
   },
   modality: {

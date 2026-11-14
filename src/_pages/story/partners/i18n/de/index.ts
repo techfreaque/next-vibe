@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
       "Leicht zu pitchen, weil sie genau das löst, worüber Leute sich beschweren.",
     choice: {
       title: "Etablierte, offene und unzensierte Modelle",
-      body: "Die großen Namen neben offenen und unzensierten Modellen, in einem Chat. Modellwechsel jederzeit.",
+      body: "Die großen Namen neben offenen und unzensierten Modellen, in einem Chat. Unzensiert gibt es in zwei Sorten: Mainstream-Modelle ohne Verweigerungen und UncensoredLM mit eigenem Weltbild. Modellwechsel jederzeit.",
     },
     control: {
       title: "Den Filter stellen sie selbst ein",

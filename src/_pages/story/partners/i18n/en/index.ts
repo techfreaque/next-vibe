@@ -116,7 +116,7 @@ export const translations = {
     intro: "Easy to pitch because it fixes what people complain about.",
     choice: {
       title: "Mainstream, open and uncensored models",
-      body: "The big-name models next to open and uncensored ones, in one chat. Users switch models whenever they want.",
+      body: "The big-name models next to open and uncensored ones, in one chat. Uncensored comes in two kinds: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. Users switch whenever they want.",
     },
     control: {
       title: "They set the filter level",

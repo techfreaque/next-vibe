@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Unzensiert",
-      line: "Keine Verweigerung, keine Moralpredigt. Für düsteres Rollenspiel, Politik und andere Perspektiven: UncensoredLM, als einziges von Grund auf unzensiert. Den übrigen wurden die Verweigerungen entfernt, die Grundhaltung ihres Basismodells bleibt.",
+      line: "Zwei Sorten, beide antworten auf alles. Die meisten sind Mainstream-Modelle ohne Verweigerungsreflex: gleiches Training, gleiches Weltbild, nur ohne Ausweichen. UncensoredLM ist die andere Sorte: eigenes Tuning, eigenes Weltbild, politische Positionen gegen den Mainstream.",
     },
   },
   modality: {

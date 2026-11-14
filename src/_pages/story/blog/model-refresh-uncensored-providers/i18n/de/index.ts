@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
   filter: {
     title: "Was „unzensiert“ hier heißt",
     intro: "Drei Stufen. Du entscheidest.",
-    p1: "Jedes Modell hat eine Inhaltsstufe. Mainstream-Modelle behalten die Filter ihres Anbieters. Offene Modelle sind lockerer. Unzensierte Modelle antworten ohne Belehrung. Eines davon, UncensoredLM, ist von Grund auf unzensiert gebaut; die übrigen sind bestehende Modelle ohne Verweigerungen, ihr Basistraining prägt die Antworten weiter.",
+    p1: "Jedes Modell hat eine Inhaltsstufe. Mainstream-Modelle behalten die Filter ihres Anbieters. Offene Modelle sind lockerer. Unzensierte Modelle antworten ohne Belehrung. Zwei Sorten. Die meisten sind bestehende Modelle ohne Verweigerungen: gleiches Training, gleiches Weltbild, sie weichen nur nicht mehr aus. UncensoredLM ist die andere Sorte, mit eigenem Tuning und eigenem Weltbild.",
     p2: "Niemand wählt die Stufe für dich. Mainstream für die Arbeit, unzensiert für die Frage, die sonst keiner beantwortet - gleicher Chat, gleiches Konto.",
     mainstream: "Mainstream",
     open: "Offen",

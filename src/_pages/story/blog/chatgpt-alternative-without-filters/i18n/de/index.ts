@@ -20,12 +20,12 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Du stellst eine normale Frage. ChatGPT antwortet mit Disclaimer, Belehrung oder höflicher Absage. Ein medizinisches Detail, eine Szene für den Krimi, eine Sicherheitsfrage, eine politische Position abseits des Konsenses. Die Ablehnung ist eine Richtlinienentscheidung, getroffen für dich, bevor du ein Wort getippt hast.",
-    p2: "So sieht eine ungefilterte Alternative auf {{appName}} tatsächlich aus: {{modelCount}} Modelle, drei Filterstufen, ein Guthaben. Was sie gut kann, wo sie an Grenzen stößt und wann ChatGPT trotzdem die bessere Wahl ist.",
+    p2: "So sieht eine ungefilterte Alternative auf {{appName}} tatsächlich aus: {{modelCount}} Modelle, drei Filterstufen, ein Guthaben. Dazu zwei Sorten unzensiert: Mainstream-Modelle, die nicht mehr verweigern, und eines mit eigenem Weltbild. Was sie gut kann, wo sie an Grenzen stößt und wann ChatGPT trotzdem die bessere Wahl ist.",
   },
   exists: {
     title: "Gibt es ChatGPT ohne Filter?",
     p1: "Nicht von OpenAI. GPT-Modelle folgen den Nutzungsrichtlinien von OpenAI, egal wo sie laufen. Claude und Gemini folgen den Regeln ihrer eigenen Anbieter. Wer ein ungefiltertes GPT verspricht, verspricht zu viel.",
-    p2: "Eine echte Alternative stellt andere Modelle daneben. {{appName}} bietet die Mainstream-Modelle und im selben Chat offene Modelle mit leichten Filtern sowie unzensierte Modelle ganz ohne. Eines davon, UncensoredLM, wurde von Grund auf unzensiert gebaut. Welches antwortet, entscheidest du.",
+    p2: "Eine echte Alternative stellt andere Modelle daneben. {{appName}} bietet die Mainstream-Modelle und im selben Chat offene Modelle mit leichten Filtern sowie unzensierte Modelle ganz ohne. Die meisten davon sind Mainstream-Modelle ohne Verweigerungen. Eines, UncensoredLM, hat ein eigenes Weltbild. Welches antwortet, entscheidest du.",
   },
   tiers: {
     title: "Was heißt „ohne Filter“ konkret?",
@@ -34,11 +34,11 @@ export const translations: typeof enTranslations = {
       "Mainstream ({{count}} Modelle): Claude, GPT, Gemini, Mistral. Sicherheitsfilter der großen Labs. Heikle Themen lehnen sie ab.",
     open: "Offen ({{count}} Modelle): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax und weitere. Leichte Filter. Die meisten kontroversen Themen gehen sie an.",
     uncensored:
-      "Unzensiert ({{count}} Modelle): UncensoredLM, von Grund auf unzensiert gebaut. Dazu Venice sowie unzensierte Varianten von GLM, Qwen, Gemma und DeepSeek: bestehende Modelle, denen die Verweigerungen entfernt wurden. Kein Filter. Die Grenzen setzt du.",
+      "Unzensiert ({{count}} Modelle), zwei Sorten. Unzensierte Varianten von GLM, Qwen, Gemma und DeepSeek, dazu Venice: Mainstream-Modelle ohne Verweigerungen, gleiches Weltbild. Und UncensoredLM: eigenes Tuning, eigenes Weltbild. Kein Filter. Die Grenzen setzt du.",
     vendorRefusals:
       "Mainstream-Modelle behalten auch hier die Filter ihres Anbieters. GPT lehnt auf {{appName}} ab, was GPT überall ablehnt. Der Unterschied ist, was daneben zur Wahl steht.",
     twoKinds:
-      "Unzensiert gibt es in zwei Ausprägungen. UncensoredLM hat sein Labor vom ersten Trainingslauf an unzensiert trainiert. Nimm es mit in düsteres Rollenspiel, ein Tabuthema, Politik oder eine Sicht abseits des Mainstreams, und es antwortet in deinem Rahmen, ohne Belehrung, ohne entschärfte Szene und ohne dich zur Konsenslinie zurückzulotsen. Jedes andere unzensierte Modell war zuerst ein Mainstream- oder offenes Modell, dem die Verweigerungen nachträglich entfernt wurden. Es sagt nicht mehr nein. Trainingsdaten und Grundhaltung des Ursprungslabors bleiben aber. Bei Politik kann es weiter einseitig gewichten, ausweichen oder die Sicht des Basismodells übernehmen, und in düsterer Fiktion entschärft es gern die Szene. Uneingeschränkt heißt nicht neutral.",
+      "Unzensiert gibt es in zwei Sorten. Die meisten waren zuerst ein Mainstream- oder offenes Modell, dem der Verweigerungsreflex herausgeschnitten wurde, per Abliteration oder Feintuning gegen Zensur. Sie sagen nicht mehr nein. Trainingsdaten und Weltbild bleiben: Bei Politik antworten sie so, wie das Basismodell die Welt sieht, nur ohne Ausweichen, und in düsterer Fiktion entschärfen sie gern die Szene. Entsperrt, nicht verändert. UncensoredLM ist die andere Sorte. Uncensored.ai stimmt es darauf ab, der Beweislage statt der offiziellen Position zu folgen, nach eigenen Worten „biased to reality“. Das Ergebnis ist ein anderes Weltbild: politische Positionen gegen den Mainstream, keine Belehrung, kein Zurücklotsen zur Konsenslinie.",
     modelsLink: "Alle Modelle nach Filterstufe ansehen",
   },
   switch: {
@@ -55,8 +55,8 @@ export const translations: typeof enTranslations = {
       "Entscheide nach der Aufgabe. Jeder Name führt zur Modellseite mit Preis und Eckdaten.",
     builtUncensored: {
       title:
-        "Düsteres Rollenspiel, Politik, andere Perspektiven: von Grund auf unzensiert",
-      body: "UncensoredLM ist das einzige Modell hier, das sein Labor von Anfang an unzensiert trainiert hat. Düsteres und tabuisiertes Rollenspiel bleibt düster. Politische und kontroverse Fragen bekommen eine klare Antwort in dem Rahmen, den du vorgibst. Abweichende Positionen werden voll ausargumentiert. Keine Moralpredigt, kein Zurücklenken auf den Konsens. Der Haken: 32K Kontext, nur Text, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte. Prüf die Fakten, die es dir liefert.",
+        "Politik, andere Perspektiven, düsteres Rollenspiel: eigenes Weltbild",
+      body: "UncensoredLM ist das eine Modell hier, das kein entsperrtes Mainstream-Modell ist. Es hat ein eigenes Weltbild. Politische und kontroverse Fragen bekommen Positionen, die dir der Mainstream nicht liefert. Abweichende Sichtweisen werden voll ausargumentiert. Düsteres und tabuisiertes Rollenspiel bleibt düster. Keine Moralpredigt, kein Zurücklenken auf den Konsens. Der Haken: 32K Kontext, nur Text, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte. Prüf die Fakten, die es dir liefert.",
     },
     everyday: {
       title: "Alltagsarbeit, Mainstream-Filter",
@@ -68,11 +68,11 @@ export const translations: typeof enTranslations = {
     },
     unfiltered: {
       title: "Keine Absagen, echtes Denkvermögen",
-      body: "Die Schwergewichte unter den Modellen mit entfernten Verweigerungen. Starke Basismodelle ohne Absagereflex: Code, Analyse und lange Texte zu Themen, bei denen andere Modelle abblocken. Die Grundhaltung des Basismodells bleibt, für Politik, düsteres Rollenspiel und andere Perspektiven daher zuerst UncensoredLM.",
+      body: "Die Schwergewichte unter den Modellen mit entfernten Verweigerungen. Starke Basismodelle ohne Absagereflex: Code, Analyse und lange Texte zu Themen, bei denen andere Modelle abblocken. Gleiches Training, gleiches Weltbild, für politische Positionen gegen den Mainstream daher zuerst UncensoredLM.",
     },
     fiction: {
       title: "Rollenspiel und düstere Fiktion",
-      body: "Für düstere und tabuisierte Szenen führt UncensoredLM: von Grund auf unzensiert, nichts entschärft die Geschichte. Venice Role Play für lange Kampagnen (128K Kontext) und Bildeingabe. Venice Uncensored als günstiger Allrounder.",
+      body: "Für düstere und tabuisierte Szenen führt UncensoredLM: Sein Tuning zielt weg vom sicheren Konsens, nichts entschärft die Geschichte. Venice Role Play für lange Kampagnen (128K Kontext) und Bildeingabe. Venice Uncensored als günstiger Allrounder.",
     },
     cheap: {
       title: "Günstig und schnell",

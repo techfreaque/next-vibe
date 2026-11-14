@@ -32,7 +32,7 @@ export const translations = {
       title: "The uncensored models, one by one.",
       category: "Model Guide",
       excerpt:
-        "UncensoredLM for dark roleplay, politics and other viewpoints: the one built uncensored. Then Venice, GLM, Qwen, Gemma, Arya, FreedomGPT and more, with what each does well and where it falls short.",
+        "Two kinds of uncensored: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT and more, with what each does well and where it falls short.",
       readTime: "7 min read",
     },
     modelRefresh: {

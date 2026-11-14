@@ -285,11 +285,13 @@ export function listModelFacts(): ModelFacts[] {
 }
 
 /**
- * The model built to be uncensored (trained that way by its lab), as opposed
- * to the refusal-stripped variants of mainstream/open models in the same tier.
+ * The uncensored model with its own worldview (UncensoredLM: uncensored.ai's
+ * tuning, contrary political takes), as opposed to the refusal-stripped
+ * (abliterated) variants of mainstream/open models in the same tier, which
+ * keep their base model's training and worldview.
  * Every other uncensored-tier text model links to it first.
  */
-export const BUILT_UNCENSORED_MODEL_ID: ChatModelId =
+export const OWN_WORLDVIEW_UNCENSORED_MODEL_ID: ChatModelId =
   ChatModelId.UNCENSORED_LM_V1_2;
 
 /**
@@ -301,19 +303,19 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
   ChatModelId,
   ChatModelId,
 ])[] = [
-  // Built uncensored vs refusals removed.
+  // Own worldview vs refusals removed (abliterated).
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_FLASH_UNCENSORED],
-  // Built uncensored vs the roleplay/fiction picks (dark and taboo scenes).
+  // Own worldview vs the roleplay/fiction picks (dark and taboo scenes).
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.DRUMMER_ARTEMIS_31B],
   [
     ChatModelId.UNCENSORED_LM_V1_2,
     ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   ],
-  // Built uncensored vs the mainstream and open flagships.
+  // Own worldview vs the mainstream and open flagships.
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GROK_4_7],
@@ -330,11 +332,11 @@ function featuredComparisons(facts: ModelFacts): ModelRef[] {
     }
   }
   if (
-    facts.id !== BUILT_UNCENSORED_MODEL_ID &&
+    facts.id !== OWN_WORLDVIEW_UNCENSORED_MODEL_ID &&
     facts.content === ContentLevel.UNCENSORED &&
-    !ids.includes(BUILT_UNCENSORED_MODEL_ID)
+    !ids.includes(OWN_WORLDVIEW_UNCENSORED_MODEL_ID)
   ) {
-    ids.unshift(BUILT_UNCENSORED_MODEL_ID);
+    ids.unshift(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
   }
   const refs: ModelRef[] = [];
   for (const id of ids) {

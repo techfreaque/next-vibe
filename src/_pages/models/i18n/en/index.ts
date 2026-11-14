@@ -46,7 +46,7 @@ export const translations = {
     },
     uncensored: {
       name: "Uncensored",
-      line: "No refusals, no lectures. For dark roleplay, politics and other viewpoints pick UncensoredLM, the one built uncensored. The rest had refusals removed and keep their base framing.",
+      line: "Two kinds, both answer everything. Most are mainstream models with the refusal reflex cut out: same training, same worldview, no more dodging. UncensoredLM is the other kind: its own tuning, its own worldview, political takes that run against the mainstream.",
     },
   },
   modality: {

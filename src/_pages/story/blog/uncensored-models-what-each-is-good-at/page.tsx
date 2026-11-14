@@ -122,8 +122,8 @@ type GroupKey =
  * Use-case sections. `topPick` renders a highlighted lead recommendation
  * (with a compare link against the strongest alternative) above the
  * alternative cards. UncensoredLM leads dark roleplay/fiction and
- * politics/viewpoints: it is the one model trained uncensored, the rest only
- * had refusals removed and keep their base framing.
+ * politics/viewpoints: it is the one with its own worldview (uncensored.ai's
+ * tuning), the rest only had refusals removed and keep their base worldview.
  */
 /** Sections that lead with a top pick (they carry a `topPickReason`). */
 type TopPickGroupKey = "creative" | "viewpoint";
@@ -163,7 +163,7 @@ const GROUPS: readonly {
 ];
 
 /**
- * Built-uncensored vs refusal-stripped, then vs ChatGPT's model. Same URL
+ * Own-worldview vs refusal-stripped, then vs ChatGPT's model. Same URL
  * order as the sitemap (FEATURED_COMPARISON_PAIRS in model-facts).
  */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [

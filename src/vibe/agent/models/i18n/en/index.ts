@@ -71,7 +71,7 @@ export const translations = {
       mainstreamHelp: "Big-lab safety filters. Declines sensitive topics.",
       openHelp: "Light filters. Takes on most edgy topics.",
       uncensoredHelp:
-        "No filters, you set the limits. Dark roleplay, politics, other viewpoints: pick UncensoredLM, built uncensored. The rest have refusals removed.",
+        "Two kinds. Refusals removed: mainstream models that stop dodging, same worldview. UncensoredLM: its own tuning and worldview, political takes against the mainstream.",
     },
   },
   sort: {

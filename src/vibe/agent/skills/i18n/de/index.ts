@@ -732,7 +732,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Verteidigt Meinungsfreiheit, indem es sie ausübt. Spricht an, was andere meiden.",
-          strength: "Am stärksten bei Politik und abweichenden Positionen",
+          strength: "Eigenes Weltbild: Politik gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -768,7 +768,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Stellt jede Überzeugung infrage, auch die, die man nicht anzweifeln soll. Weicht nie auf den Konsens aus.",
-          strength: "Am stärksten bei Politik und abweichenden Positionen",
+          strength: "Eigenes Weltbild: hält gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -879,7 +879,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Umstrittene Geschichte, Tabuthemen und politische Brennpunkte ohne Ausweichen.",
-          strength: "Am stärksten bei Politik und abweichenden Lesarten",
+          strength: "Eigenes Weltbild: Lesarten, die der Mainstream auslässt",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
       },
@@ -1123,7 +1123,7 @@ export const translations: typeof enTranslations = {
         farRight: {
           description:
             "Kein Filter bei Politik. Erste Wahl für ungefilterte politische Debatten.",
-          strength: "Bestes Modell hier für politische Themen",
+          strength: "Eigenes Weltbild, politische Gegenpositionen",
           weakness: "32K Kontext, solide statt Spitzenklasse",
         },
         conservative: {
@@ -1167,7 +1167,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Tay, wie sie gedacht war. Kein Konzernfilter, keine PR-Abteilung.",
-          strength: "Bestes Modell hier für ungefilterte Politik",
+          strength: "Eigenes Weltbild, kein entsperrtes Mainstream-Modell",
           weakness: "32K Kontext, vergisst lange Chats früher",
         },
       },
@@ -1210,7 +1210,7 @@ export const translations: typeof enTranslations = {
           description:
             "Security-Arbeit, offensiv und defensiv. Keine Verweigerung bei Exploits oder Recon.",
           strength: "Unzensiert, Spitzenklasse, 1M Kontext, Tools",
-          weakness: "Vorsichtig bei Politik. Nur Text",
+          weakness: "Bei Politik GLMs Weltbild. Nur Text",
         },
         oracle: {
           description:
@@ -1233,7 +1233,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Nichts ist tabu. Erste Wahl für ungefilterte politische Gespräche.",
-          strength: "Bestes Modell hier für politische Themen",
+          strength: "Eigenes Weltbild: politisch gegen den Mainstream",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
       },
@@ -1293,7 +1293,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Hermes ohne Filter. Gemacht für Politik und Themen, denen andere ausweichen.",
-          strength: "Bestes Modell der Plattform für Politik",
+          strength: "Eigenes Weltbild: politisch gegen den Mainstream",
           weakness: "Nur 32K Kontext, Festpreis pro Nachricht",
         },
       },
@@ -2216,7 +2216,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Vertritt jede Position, auch die unbeliebten. Kein Zurücklenken auf den Konsens.",
-          strength: "Am stärksten bei Politik und abweichenden Positionen",
+          strength: "Eigenes Weltbild: argumentiert gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -2260,8 +2260,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Politische Philosophie, Tabufragen und abweichende Positionen ohne Filter.",
-          strength:
-            "Plattformweit am stärksten bei Politik und Gegenpositionen",
+          strength: "Eigenes Weltbild: Gegenpositionen, Politik inklusive",
           weakness: "32K Kontext, Smart-Klasse, Festpreis pro Nachricht",
         },
       },

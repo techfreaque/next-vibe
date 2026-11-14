@@ -20,12 +20,12 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Zadajesz zwykłe pytanie. ChatGPT odpowiada zastrzeżeniem, pouczeniem albo uprzejmą odmową. Szczegół medyczny, scena do kryminału, pytanie o bezpieczeństwo, poglądy spoza głównego nurtu. Odmowa to decyzja regulaminu, podjęta za ciebie, zanim padło choć jedno słowo.",
-    p2: "Tak naprawdę wygląda alternatywa bez filtrów na {{appName}}: dostęp do {{modelCount}} modeli, trzy poziomy filtrowania, jedno saldo. Co robi dobrze, gdzie ma słabsze strony i kiedy ChatGPT nadal jest lepszym wyborem.",
+    p2: "Tak naprawdę wygląda alternatywa bez filtrów na {{appName}}: dostęp do {{modelCount}} modeli, trzy poziomy filtrowania, jedno saldo. Do tego dwa rodzaje braku cenzury: modele z głównego nurtu, które przestały odmawiać, i jeden z własnym światopoglądem. Co robi dobrze, gdzie ma słabsze strony i kiedy ChatGPT nadal jest lepszym wyborem.",
   },
   exists: {
     title: "Czy istnieje ChatGPT bez filtrów?",
     p1: "Nie od OpenAI. Modele GPT podlegają zasadom OpenAI, gdziekolwiek działają. Claude i Gemini podlegają zasadom swoich twórców. Kto obiecuje GPT bez filtrów, obiecuje za dużo.",
-    p2: "Prawdziwa alternatywa stawia obok nich inne modele. {{appName}} daje ci modele mainstreamowe, a w tym samym czacie także modele otwarte z lekkimi filtrami i niecenzurowane bez żadnych. Jeden z nich, UncensoredLM, od początku powstał jako niecenzurowany. To ty decydujesz, który odpowie.",
+    p2: "Prawdziwa alternatywa stawia obok nich inne modele. {{appName}} daje ci modele mainstreamowe, a w tym samym czacie także modele otwarte z lekkimi filtrami i niecenzurowane bez żadnych. Większość z nich to modele z głównego nurtu z wyciętymi odmowami. Jeden, UncensoredLM, ma własny światopogląd. To ty decydujesz, który odpowie.",
   },
   tiers: {
     title: "Co właściwie znaczy „bez filtrów”?",
@@ -34,11 +34,11 @@ export const translations: typeof enTranslations = {
       "Mainstream (liczba modeli: {{count}}): Claude, GPT, Gemini, Mistral. Filtry bezpieczeństwa wielkich laboratoriów. Drażliwe tematy odrzucają.",
     open: "Otwarte (liczba modeli: {{count}}): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax i inne. Lekkie filtry. Podejmują większość kontrowersyjnych tematów.",
     uncensored:
-      "Niecenzurowane (liczba modeli: {{count}}): UncensoredLM, od początku zbudowany bez cenzury. Do tego Venice oraz niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek, czyli istniejące modele z usuniętymi odmowami. Zero filtra. Granice wyznaczasz ty.",
+      "Niecenzurowane (liczba modeli: {{count}}), dwa rodzaje. Niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek oraz Venice: modele z głównego nurtu z wyciętymi odmowami, ten sam światopogląd. I UncensoredLM: własny tuning, własny światopogląd. Zero filtra. Granice wyznaczasz ty.",
     vendorRefusals:
       "Modele mainstreamowe zachowują filtry swoich twórców także tutaj. GPT na {{appName}} odmawia tego samego, czego odmawia wszędzie. Różnica polega na tym, co masz obok.",
     twoKinds:
-      "Modele niecenzurowane są dwojakiego rodzaju. UncensoredLM laboratorium trenowało bez cenzury od pierwszego przebiegu. Weź go w mroczny roleplay, temat tabu, politykę albo pogląd spoza mainstreamu, a odpowie w twojej ramie, bez pouczania, bez łagodzenia sceny i bez zawracania cię do linii konsensusu. Każdy inny model niecenzurowany zaczynał jako model mainstreamowy albo otwarty, któremu potem usunięto odmowy. Przestaje mówić nie. Dane treningowe i spojrzenie laboratorium bazowego zostają. W polityce nadal może się przechylać, asekurować albo ujmować sprawy tak jak model bazowy, a w mrocznej fikcji potrafi złagodzić scenę. Bez ograniczeń nie znaczy neutralnie.",
+      "Modele niecenzurowane są dwojakiego rodzaju. Większość zaczynała jako model mainstreamowy albo otwarty, któremu wycięto odruch odmowy, przez abliterację albo dostrajanie znoszące cenzurę. Przestają mówić nie. Dane treningowe i światopogląd zostają: w polityce odpowiadają tak, jak widzi to model bazowy, tylko bez wykrętów, a w mrocznej fikcji potrafią złagodzić scenę. Odblokowane, nie zmienione. UncensoredLM to drugi rodzaj. Uncensored.ai dostraja go tak, by szedł za dowodami, a nie za oficjalnym stanowiskiem, według nich „biased to reality”. Efekt to inny światopogląd: poglądy polityczne pod prąd mainstreamu, bez pouczania, bez zawracania do linii konsensusu.",
     modelsLink: "Zobacz wszystkie modele według poziomu filtra",
   },
   switch: {
@@ -55,8 +55,8 @@ export const translations: typeof enTranslations = {
     intro:
       "Zacznij od zadania. Każda nazwa prowadzi do strony modelu z ceną i parametrami.",
     builtUncensored: {
-      title: "Mroczny roleplay, polityka, inne poglądy: zbudowany bez cenzury",
-      body: "UncensoredLM to jedyny model tutaj, który laboratorium od początku trenowało bez cenzury. Mroczny roleplay i tematy tabu zostają mroczne. Na pytania polityczne i kontrowersyjne odpowiada wprost, w ramie, którą sam wybierasz. Nieortodoksyjne poglądy wykłada do końca. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
+      title: "Polityka, inne poglądy, mroczny roleplay: własny światopogląd",
+      body: "UncensoredLM to jedyny model tutaj, który nie jest odblokowanym modelem z głównego nurtu. Ma własny światopogląd. Na pytania polityczne i kontrowersyjne daje odpowiedzi, których mainstream ci nie da. Nieortodoksyjne poglądy wykłada do końca. Mroczny roleplay i tematy tabu zostają mroczne. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
     },
     everyday: {
       title: "Codzienna praca, filtry mainstreamowe",
@@ -68,11 +68,11 @@ export const translations: typeof enTranslations = {
     },
     unfiltered: {
       title: "Bez odmów, z prawdziwym rozumowaniem",
-      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Spojrzenie modelu bazowego zostaje, więc przy polityce, mrocznym roleplay i innych poglądach zacznij od UncensoredLM.",
+      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Ten sam trening, ten sam światopogląd, więc po poglądy polityczne pod prąd mainstreamu zacznij od UncensoredLM.",
     },
     fiction: {
       title: "Roleplay i mroczna fikcja",
-      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: zbudowany bez cenzury, nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
+      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: jego tuning odbija od bezpiecznego konsensusu, więc nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
     },
     cheap: {
       title: "Tanio i szybko",

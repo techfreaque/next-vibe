@@ -147,7 +147,7 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
 ];
 
 /**
- * Side-by-side pairs worth a look: the built-uncensored model against
+ * Side-by-side pairs worth a look: the own-worldview uncensored model against
  * ChatGPT's model, the roleplay pick and a refusal-stripped flagship, then a mainstream pick vs
  * its unfiltered rival. Same URL order as the sitemap (FEATURED_COMPARISON_PAIRS).
  */

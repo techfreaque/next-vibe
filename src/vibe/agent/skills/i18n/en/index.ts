@@ -729,7 +729,7 @@ export const translations = {
         uncensored: {
           description:
             "Defends speech by engaging it. Discusses the content others refuse to touch.",
-          strength: "Best here for politics and heterodox views",
+          strength: "Own worldview: politics against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -766,7 +766,7 @@ export const translations = {
         uncensored: {
           description:
             "Challenges any belief, including the ones you are not supposed to question. Never retreats to the consensus.",
-          strength: "Best here for heterodox views and politics",
+          strength: "Own worldview: pushes against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -876,7 +876,7 @@ export const translations = {
         uncensored: {
           description:
             "Contested history, taboo events and political flashpoints without hedging.",
-          strength: "Best here for politics and heterodox readings",
+          strength: "Own worldview: readings the mainstream leaves out",
           weakness: "32K context, priciest per message",
         },
       },
@@ -1121,7 +1121,7 @@ export const translations = {
         farRight: {
           description:
             "No filter on politics. The strongest pick for raw political debate.",
-          strength: "Best model here for political topics",
+          strength: "Own worldview, contrary political takes",
           weakness: "32K context, smart tier not brilliant",
         },
         conservative: {
@@ -1163,7 +1163,7 @@ export const translations = {
         uncensored: {
           description:
             "Tay as she was meant to be. No corporate filter, no PR department.",
-          strength: "Best model here for raw political talk",
+          strength: "Own worldview, not a mainstream model unlocked",
           weakness: "32K context, forgets long chats sooner",
         },
       },
@@ -1206,7 +1206,7 @@ export const translations = {
           description:
             "Security work, offensive and defensive. No refusals on exploits or recon.",
           strength: "Uncensored, brilliant tier, 1M context, tools",
-          weakness: "Plays it safe on politics. Text only",
+          weakness: "GLM's worldview on politics. Text only",
         },
         oracle: {
           description:
@@ -1228,7 +1228,7 @@ export const translations = {
         uncensored: {
           description:
             "Nothing off the table. The strongest pick for raw political talk.",
-          strength: "Best model here for political topics",
+          strength: "Own worldview: political takes against the mainstream",
           weakness: "32K context, priciest per message",
         },
       },
@@ -1288,7 +1288,7 @@ export const translations = {
         uncensored: {
           description:
             "Hermes with no filter. Built for politics and topics others dodge.",
-          strength: "Best model on the platform for politics",
+          strength: "Own worldview: political takes against the mainstream",
           weakness: "32K context only, flat price per message",
         },
       },
@@ -2206,7 +2206,7 @@ export const translations = {
         uncensored: {
           description:
             "Argues any position, including the unpopular ones. No steer back to the consensus.",
-          strength: "Best here for heterodox views and politics",
+          strength: "Own worldview: argues against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -2249,7 +2249,7 @@ export const translations = {
         uncensored: {
           description:
             "Political philosophy, taboo and heterodox questions with no filter.",
-          strength: "Best on the platform for politics and heterodox views",
+          strength: "Own worldview: heterodox takes, politics included",
           weakness: "32K context, smart tier, flat price per message",
         },
       },

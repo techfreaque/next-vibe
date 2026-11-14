@@ -5,7 +5,7 @@ import { ContentLevel } from "next-vibe/agent/skills/enum";
 import { collectSitemapEntries } from "../../_root/sitemap.xml/build-sitemap";
 import { listCatalogEntries } from "./model-catalog-entries";
 import {
-  BUILT_UNCENSORED_MODEL_ID,
+  OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
   FEATURED_COMPARISON_PAIRS,
   findModelPageAlias,
   findPublicModelId,
@@ -64,27 +64,27 @@ describe("one public page per model", () => {
   });
 });
 
-describe("built-uncensored model comparisons", () => {
-  test("the built-uncensored model has a public page", () => {
-    expect(PUBLIC_CHAT_MODEL_IDS).toContain(BUILT_UNCENSORED_MODEL_ID);
+describe("own-worldview uncensored model comparisons", () => {
+  test("the own-worldview uncensored model has a public page", () => {
+    expect(PUBLIC_CHAT_MODEL_IDS).toContain(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
   });
 
   test("every uncensored-tier text model links to it first", () => {
     for (const facts of listModelFacts()) {
       if (
         facts.isLegacy ||
-        facts.id === BUILT_UNCENSORED_MODEL_ID ||
+        facts.id === OWN_WORLDVIEW_UNCENSORED_MODEL_ID ||
         facts.content !== ContentLevel.UNCENSORED ||
         facts.outputs.join() !== "text"
       ) {
         continue;
       }
-      expect(suggestComparisons(facts)[0]?.id).toBe(BUILT_UNCENSORED_MODEL_ID);
+      expect(suggestComparisons(facts)[0]?.id).toBe(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
     }
   });
 
   test("its page links every featured pair, and the sitemap lists them", () => {
-    const facts = getModelFacts(BUILT_UNCENSORED_MODEL_ID);
+    const facts = getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
     expect(facts).not.toBeNull();
     if (facts === null) {
       return;

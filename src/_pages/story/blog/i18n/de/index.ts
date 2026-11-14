@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       title: "Die unzensierten Modelle, eins nach dem anderen.",
       category: "Modell-Guide",
       excerpt:
-        "UncensoredLM für düsteres Rollenspiel, Politik und andere Perspektiven: das eine von Grund auf unzensierte Modell. Dazu Venice, GLM, Qwen, Gemma, Arya, FreedomGPT und mehr, mit Stärken und Schwächen.",
+        "Zwei Sorten unzensiert: Mainstream-Modelle ohne Verweigerungen und UncensoredLM mit eigenem Weltbild. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT und mehr, mit Stärken und Schwächen.",
       readTime: "7 Min. Lesezeit",
     },
     modelRefresh: {

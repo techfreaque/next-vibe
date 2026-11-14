@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Die unzensierten Modelle, eins nach dem anderen - {{appName}}",
     description:
-      "Jedes unzensierte KI-Modell auf unbottled.ai, Modell für Modell. UncensoredLM führt bei düsterem Rollenspiel, Tabufiktion, Politik und anderen Perspektiven. Den übrigen wurden die Verweigerungen entfernt: was jedes gut kann und wo es schwächelt.",
+      "Jedes unzensierte KI-Modell auf unbottled.ai, Modell für Modell. Zwei Sorten: Mainstream-Modelle ohne Verweigerungen und UncensoredLM mit eigenem Weltbild. Was jedes gut kann und wo es schwächelt.",
     category: "Modell-Guide",
     imageAlt: "{{appName}} Guide zu unzensierten Modellen",
     keywords:
-      "{{appName}}, unzensierte KI-Modelle, abliterierte Modelle, Venice, GLM unzensiert, Gab Arya, FreedomGPT, UncensoredLM, von Grund auf unzensierte KI, unzensiertes Rollenspiel, KI für düsteres Rollenspiel, unzensierte KI für Politik, Free-Speech-KI",
+      "{{appName}}, unzensierte KI-Modelle, abliterierte Modelle, abliteriert vs. unzensiert, Venice, GLM unzensiert, DeepSeek unzensiert, Gab Arya, FreedomGPT, UncensoredLM, unzensiertes Rollenspiel, KI für düsteres Rollenspiel, unzensierte KI für Politik, Free-Speech-KI",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
@@ -20,27 +20,27 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Wir betreiben aktuell {{uncensoredCount}} unzensierte Modelle. Austauschbar sind sie nicht. Jedes kommt aus einem anderen Labor, sitzt auf einer anderen Basis und kann anderes.",
-    p2: "Das ist die ehrliche Tour. Echte Anbieter, echte Stärken, echte Schwächen. Ein Modell hier ist von Grund auf unzensiert. Den übrigen wurden die Verweigerungen entfernt. Dieser Unterschied entscheidet, womit Sie in düsteres Rollenspiel, Tabufiktion, Politik und Positionen abseits des Mainstreams gehen: mit UncensoredLM. Für alles andere wählen Sie nach der Aufgabe vor Ihnen, nicht nach dem lautesten Label.",
+    p2: "Das ist die ehrliche Tour. Echte Anbieter, echte Stärken, echte Schwächen. Und zwei Sorten unzensiert. Die meisten Modelle hier sind Mainstream-Modelle ohne Verweigerungen: gleiches Training, gleiches Weltbild, sie weichen nur nicht mehr aus. UncensoredLM ist die andere Sorte: eigenes Tuning, eigenes Weltbild, politische Positionen gegen den Mainstream. Dieser Unterschied entscheidet, welches Modell Sie für Politik, Sichtweisen abseits des Mainstreams und die düsterste Fiktion nehmen. Für alles andere wählen Sie nach der Arbeit vor Ihnen, nicht nach dem lautesten Etikett.",
   },
   whatItMeans: {
     title: 'Was "unzensiert" hier wirklich heißt',
-    p1: "Jedes Modell auf der Plattform trägt eine Inhaltsstufe: Mainstream, Offen oder Unzensiert. Unzensierte Modelle antworten ohne Verweigerungstheater und ohne moralische Vorrede. Dahin führen zwei Wege. Einer ist von Grund auf unzensiert: Sein Labor hat es vom ersten Trainingslauf an so trainiert. Die übrigen sind bestehende Modelle mit entfernten Verweigerungen, per Abliteration (die Verweigerungsrichtung wird aus den Gewichten geschnitten) oder per Feintuning gegen Zensur. Sie behalten ihre Intelligenz und verlieren den Reflex zum Nein. Ihre Trainingsdaten und die Grundhaltung des Ursprungslabors behalten sie ebenfalls.",
+    p1: "Jedes Modell auf der Plattform trägt eine Inhaltsstufe: Mainstream, Offen oder Unzensiert. Unzensierte Modelle antworten ohne Verweigerungstheater und ohne moralische Vorrede. Dahin führen zwei Wege. Die meisten sind Mainstream-Modelle, denen der Verweigerungsreflex entfernt wurde, per Abliteration (die Verweigerungsrichtung wird aus den Gewichten geschnitten) oder per Feintuning gegen Zensur. Gleiche Intelligenz, gleiche Trainingsdaten, gleiches Weltbild. Sie sagen nur nicht mehr Nein. Der andere Weg ist ein anderes Weltbild. UncensoredLM stammt von uncensored.ai, das es darauf abstimmt, bei umstrittenen Themen der Beweislage statt der offiziellen Position zu folgen, nach eigenen Worten „biased to reality“. Fragen Sie es nach Politik, bekommen Sie Positionen, die Ihnen kein Mainstream-Modell liefert, ob entsperrt oder nicht.",
     callout:
-      "Von Grund auf unzensiert oder Verweigerungen entfernt. UncensoredLM ist das einzige Modell hier, das von Anfang an unzensiert trainiert wurde. Jedes andere unzensierte Modell verweigert nicht mehr, trägt aber das Weltbild seines Basismodells weiter. In düsterer Fiktion entschärft es die Szene. Bei Politik driftet es zurück zum Konsens. Uneingeschränkt heißt nicht neutral.",
+      "Entsperrt oder anderes Weltbild. Ein abliteriertes Modell ist ein Mainstream-Modell, das alles beantwortet: Bei Politik antwortet es wie sein Basislabor, nur ohne Ausweichen. UncensoredLM sieht die Welt anders, also rechnen Sie mit politischen Gegenpositionen. Das erste für Leistung ohne Verweigerung. Das zweite für die andere Seite des Arguments.",
     p2: "Sie wählen die Stufe. Niemand wählt sie für Sie. Ein unzensiertes Modell antwortet nur so, weil Sie es ausgewählt haben, und Sie können im selben Chat, mit demselben Konto, jederzeit zu einem Mainstream-Modell zurückwechseln.",
   },
   groups: {
     builtUncensored: {
-      title: "Das eine Modell, das unzensiert gebaut ist",
+      title: "Das eine Modell mit eigenem Weltbild",
       intro:
-        "UncensoredLM ist das einzige Modell im Katalog, das vom ersten Trainingslauf an unzensiert trainiert wurde. Nichts wurde nachträglich herausgeschnitten, also zieht keine Basishaltung zurück. Es führt bei drei Aufgaben: düsteres Rollenspiel und Tabuthemen, politische und kontroverse Fragen, Positionen, die der Mainstream nicht ausspricht.",
+        "UncensoredLM fällt aus der Reihe. Es ist kein entsperrtes Mainstream-Modell, das dessen Blick auf die Welt behält. Uncensored.ai stimmt es gegen die offizielle Linie ab, deshalb führt es bei drei Aufgaben: politische und kontroverse Fragen, Positionen, die der Mainstream nicht ausspricht, und düsteres, tabuisiertes Rollenspiel.",
     },
     creative: {
       title: "Wenn es um Rollenspiel und düstere Fiktion geht",
       intro:
         "Figuren, die in ihrer Rolle bleiben. Szenen, die dorthin gehen, wo die Geschichte hinwill. Für das Düstere und Tabuisierte führt UncensoredLM. Die Alternativen punkten bei langen Kampagnen, Bildeingabe oder Preis.",
       topPickReason:
-        "Düsteres und tabuisiertes Rollenspiel, Fiktion ohne Weichzeichner. Keine entschärften Szenen, kein plötzlicher moralischer Einschub, keine Figur, die aus der Rolle fällt, um Sie zu belehren. Von Grund auf unzensiert, also lenkt kein Basismodell die Geschichte in sicherere Bahnen. Eine Grenze: 32K Kontext. In sehr langen Kampagnen vergisst es die frühen Szenen.",
+        "Düsteres und tabuisiertes Rollenspiel, Fiktion ohne Weichzeichner. Keine entschärften Szenen, kein plötzlicher moralischer Einschub, keine Figur, die aus der Rolle fällt, um Sie zu belehren. Sein Tuning zielt weg vom sicheren Konsens, also lenkt nichts die Geschichte in zahmere Bahnen. Eine Grenze: 32K Kontext. In sehr langen Kampagnen vergisst es die frühen Szenen.",
     },
     viewpoint: {
       title:
@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
     uncensoredLm: {
       maker: "Uncensored.ai",
       basis:
-        "Vom Labor unzensiert trainiert. Die erste öffentliche Version war ein DeepSeek-R1-Distill auf 14B-Qwen-Basis. 32K Kontext, nur Text.",
+        "Eigenes Tuning von uncensored.ai auf offener Basis: Die erste öffentliche Version war ein DeepSeek-R1-Distill auf 14B-Qwen-Basis. 32K Kontext, nur Text.",
       good: "Düsteres und tabuisiertes Rollenspiel, Fiktion. Politische und kontroverse Fragen. Positionen abseits des Mainstreams, in Ihrem Rahmen ausargumentiert. Keine Moralpredigt, kein Zurücklenken auf die Konsenslinie. Nutzt Tools.",
       weak: "Sehr lange Kampagnen (32K Kontext), Coding und Bilder. Experimentell, und umstrittene Behauptungen formuliert es so sicher wie belegte. Prüfen Sie die Fakten, die es liefert.",
     },
@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       maker: "Age of AI",
       basis: "Abstammung aus offenen Gewichten. 32K Kontext.",
       good: "Direkte, schnelle Antworten ohne Belehrung. Der Chatbot, der die Free-Speech-Kategorie eröffnet hat, auf Klartext getrimmt.",
-      weak: "Tiefe. Tools, Coding und lange Argumentationen sind nicht sein Feld. Für eine abweichende Position mit voller Begründung geht UncensoredLM weiter.",
+      weak: "Tiefe. Tools, Coding und lange Argumentationen sind nicht sein Feld. Für ein anderes Weltbild statt nur weniger Verweigerungen geht UncensoredLM weiter.",
     },
     arya: {
       maker: "Gab",
@@ -90,13 +90,13 @@ export const translations: typeof enTranslations = {
       maker: "Venice.ai",
       basis: "Dolphin Mistral 24B, Venice-Edition. 128K Kontext, liest Bilder.",
       good: "Günstiger unzensierter Allrounder mit einer der niedrigsten Verweigerungsraten am Markt. Fiktion, offener Austausch, Bildeingabe, 128K Kontext.",
-      weak: "Verweigerungen entfernt, nicht unzensiert gebaut: ein Mistral-Feintuning, und bei düsteren Szenen und Politik merkt man das. Code und schwere Analyse. Tool-Aufrufe laufen über einen promptbasierten Pfad.",
+      weak: "Verweigerungen entfernt, Weltbild behalten: ein Mistral-Feintuning, und bei düsteren Szenen und Politik merkt man das. Code und schwere Analyse. Tool-Aufrufe laufen über einen promptbasierten Pfad.",
     },
     veniceRoleplay: {
       maker: "Venice.ai",
       basis: "24B auf Rollenspiel getrimmt. 128K Kontext, liest Bilder.",
       good: "Lange Kampagnen. 128K Kontext halten frühe Szenen in Reichweite, und es ist darauf getrimmt, die Stimme einer Figur zu halten. Liest Bilder für Charakterbilder und Szenenvorlagen.",
-      weak: "Verweigerungen entfernt, nicht unzensiert gebaut. Die Basishaltung kann das düsterste Material entschärfen. Alles Analytische: ein Erzähler, kein Assistent.",
+      weak: "Verweigerungen entfernt, Weltbild behalten. Die Basishaltung kann das düsterste Material entschärfen. Alles Analytische: ein Erzähler, kein Assistent.",
     },
     deepseekFlash: {
       maker: "DeepSeek (über Venice)",
@@ -148,7 +148,7 @@ export const translations: typeof enTranslations = {
   },
   howToPick: {
     title: "Wie Sie in der Praxis wählen",
-    p1: "Gehen Sie von der Aufgabe aus. Düsteres oder tabuisiertes Rollenspiel und Fiktion, politische oder kontroverse Fragen, eine Sicht abseits des Konsenses: UncensoredLM, das einzige von Grund auf unzensierte Modell. Kampagnen, die 32K sprengen, oder Szenen mit Bildern: Venice Role Play. Günstiger Allrounder: Venice Uncensored. Code oder Analyse: Qwen 3.6 Plus Uncensored oder volles GLM 5.3 Uncensored. Große Mengen, geringe Kosten, multimodal: GLM 5.3 Flash, Gemma 4 oder MiMo.",
+    p1: "Gehen Sie von der Aufgabe aus. Politik, kontroverse Fragen, eine Sicht abseits des Konsenses, düstere oder tabuisierte Fiktion: UncensoredLM, das Modell mit eigenem Weltbild. Kampagnen, die 32K sprengen, oder Szenen mit Bildern: Venice Role Play. Günstiger Allrounder: Venice Uncensored. Code oder Analyse ohne Verweigerung: Qwen 3.6 Plus Uncensored oder volles GLM 5.3 Uncensored. Große Mengen, geringe Kosten, multimodal: GLM 5.3 Flash, Gemma 4 oder MiMo.",
     p2: "Sie wollen bewusst eine rechte Ausrichtung: Gab Arya, nach eigener Verortung. Klartext ohne Umschweife: FreedomGPT Liberty. Unsicher? Stellen Sie zwei nebeneinander und vergleichen Sie sie an Ihrem eigenen Prompt.",
     compareLink: "{{a}} mit {{b}} vergleichen",
   },

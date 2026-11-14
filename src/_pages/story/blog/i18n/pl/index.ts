@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       title: "Modele niecenzurowane, jeden po drugim.",
       category: "Przewodnik po modelach",
       excerpt:
-        "UncensoredLM do mrocznego roleplay, polityki i innych punktów widzenia: jedyny zbudowany bez cenzury. Do tego Venice, GLM, Qwen, Gemma, Arya, FreedomGPT i więcej, z mocnymi i słabymi stronami.",
+        "Dwa rodzaje braku cenzury: modele z głównego nurtu z wyciętymi odmowami i UncensoredLM z własnym światopoglądem. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT i więcej, z mocnymi i słabymi stronami.",
       readTime: "7 min czytania",
     },
     modelRefresh: {

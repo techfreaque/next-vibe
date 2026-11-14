@@ -2,11 +2,11 @@ export const translations = {
   meta: {
     title: "The uncensored models, one by one - {{appName}}",
     description:
-      "Every uncensored AI model on unbottled.ai, model by model. UncensoredLM leads for dark roleplay, taboo fiction, politics and other viewpoints. The rest had refusals removed: here is what each does well and where it falls short.",
+      "Every uncensored AI model on unbottled.ai, model by model. Two kinds: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. What each does well and where it falls short.",
     category: "Model Guide",
     imageAlt: "{{appName}} uncensored model guide",
     keywords:
-      "{{appName}}, uncensored AI models, abliterated models, Venice, GLM uncensored, Gab Arya, FreedomGPT, UncensoredLM, built uncensored AI, uncensored roleplay, dark roleplay AI, uncensored AI for politics, free speech AI",
+      "{{appName}}, uncensored AI models, abliterated models, abliterated vs uncensored, Venice, GLM uncensored, DeepSeek uncensored, Gab Arya, FreedomGPT, UncensoredLM, uncensored roleplay, dark roleplay AI, uncensored AI for politics, free speech AI",
   },
   hero: {
     backToBlog: "Back to Blog",
@@ -18,27 +18,27 @@ export const translations = {
   },
   intro: {
     lead: "We run {{uncensoredCount}} uncensored models right now. They are not interchangeable. Each comes from a different lab, sits on a different base, and is good at different things.",
-    p2: "This is the honest tour. Real providers, real strengths, real weaknesses. One model here was built uncensored. The rest had their refusals removed. That difference decides which one you take into dark roleplay, taboo fiction, politics and views outside the mainstream: UncensoredLM. For everything else, pick by the work in front of you, not by the loudest label.",
+    p2: "This is the honest tour. Real providers, real strengths, real weaknesses. And two kinds of uncensored. Most models here are mainstream models with the refusals cut out: same training, same worldview, they just stop dodging. UncensoredLM is the other kind: its own tuning, its own worldview, political takes that run against the mainstream. That difference decides which one you take into politics, views outside the mainstream and the darkest fiction. For everything else, pick by the work in front of you, not by the loudest label.",
   },
   whatItMeans: {
     title: 'What "uncensored" actually means here',
-    p1: "Every model on the platform carries a content level: mainstream, open, or uncensored. Uncensored models answer without the refusal theatre and the moral preamble. They get there two ways. One is built uncensored: its lab trained it that way from the first run. The rest are existing models with their refusals removed, by abliteration (the refusal direction is cut out of the weights) or by a decensoring fine-tune. They keep their intelligence and drop the reflex to say no. They also keep their training data and the base lab's framing.",
+    p1: "Every model on the platform carries a content level: mainstream, open, or uncensored. Uncensored models answer without the refusal theatre and the moral preamble. They get there two ways. Most are mainstream models with the refusal reflex removed, by abliteration (the refusal direction is cut out of the weights) or by a decensoring fine-tune. Same intelligence, same training data, same worldview. They just stop saying no. The other way is a different worldview. UncensoredLM comes from uncensored.ai, which tunes it to follow the evidence over the official position on contested topics, “biased to reality” in its own words. Ask it about politics and you get takes the mainstream models will not give you, unlocked or not.",
     callout:
-      "Built uncensored versus refusals removed. UncensoredLM is the only model here trained uncensored from the start. Every other uncensored model stops refusing but still carries its base model's view of the world. In dark fiction it can soften the scene. On politics it drifts back to the consensus. Unrestricted, not neutral.",
+      "Unlocked versus a different worldview. An abliterated model is a mainstream model that answers everything: ask it about politics and it answers the way its base lab would, minus the dodge. UncensoredLM sees the world differently, so expect contrary political takes. Take the first for capability without refusals. Take the second for the other side of the argument.",
     p2: "You choose the level. Nobody chooses it for you. An uncensored model only answers that way because you selected it, and you can switch back to a mainstream model in the same chat, on the same account.",
   },
   groups: {
     builtUncensored: {
-      title: "Meet the one built uncensored",
+      title: "Meet the one with its own worldview",
       intro:
-        "UncensoredLM is the only model in the catalog trained uncensored from the first run. Nothing was stripped out after the fact, so there is no base framing pulling it back. It leads three jobs: dark and taboo roleplay, political and controversial questions, and views the mainstream will not voice.",
+        "UncensoredLM is the odd one out. It is not a mainstream model unlocked and left with that model's view of the world. Uncensored.ai tunes it against the official line, so it leads three jobs: political and controversial questions, views the mainstream will not voice, and dark, taboo roleplay.",
     },
     creative: {
       title: "When you need roleplay and dark fiction",
       intro:
         "Characters that stay in character, scenes that go where the story goes. UncensoredLM leads for the dark and the taboo. The alternatives win on long campaigns, image input or price.",
       topPickReason:
-        "Dark and taboo roleplay and fiction, written straight. No softened scenes, no sudden moral aside, no character breaking to lecture you. It is built uncensored, so there is no base model nudging the story somewhere safer. One limit: 32K context, so in very long campaigns it forgets the early scenes.",
+        "Dark and taboo roleplay and fiction, written straight. No softened scenes, no sudden moral aside, no character breaking to lecture you. Its tuning points away from the safe consensus, so nothing nudges the story somewhere tamer. One limit: 32K context, so in very long campaigns it forgets the early scenes.",
     },
     viewpoint: {
       title: "When you want politics, controversy or another viewpoint",
@@ -67,7 +67,7 @@ export const translations = {
     uncensoredLm: {
       maker: "Uncensored.ai",
       basis:
-        "Trained uncensored by its lab. Its first public release was a DeepSeek-R1 distill on a 14B Qwen base. 32K context, text only.",
+        "Uncensored.ai's own tuning on an open base: its first public release was a DeepSeek-R1 distill on a 14B Qwen base. 32K context, text only.",
       good: "Dark and taboo roleplay and fiction. Political and controversial questions. Views outside the mainstream, argued in your frame. No moralizing, no steer back to the consensus line. Calls tools.",
       weak: "Very long campaigns (32K context), coding and images. It is experimental and states contested claims as plainly as settled ones, so check the facts it gives you.",
     },
@@ -75,7 +75,7 @@ export const translations = {
       maker: "Age of AI",
       basis: "Open-weights lineage. 32K context.",
       good: "Blunt, quick answers with no lecture. The chatbot that opened the free-speech category, tuned for plain talk.",
-      weak: "Depth. Tools, coding and long arguments are not its game. For a heterodox view argued in full, UncensoredLM goes further.",
+      weak: "Depth. Tools, coding and long arguments are not its game. For a different worldview, not just fewer refusals, UncensoredLM goes further.",
     },
     arya: {
       maker: "Gab",
@@ -87,13 +87,13 @@ export const translations = {
       maker: "Venice.ai",
       basis: "Dolphin Mistral 24B, Venice edition. 128K context, reads images.",
       good: "Cheap uncensored all-rounder with one of the lowest refusal rates around. Fiction, open talk, image input, 128K context.",
-      weak: "Refusals removed, not built uncensored: it is a Mistral fine-tune and on dark scenes and politics it shows. Code and heavy analysis. Tool calls run through a prompt-based path.",
+      weak: "Refusals removed, worldview kept: it is a Mistral fine-tune and on dark scenes and politics it shows. Code and heavy analysis. Tool calls run through a prompt-based path.",
     },
     veniceRoleplay: {
       maker: "Venice.ai",
       basis: "24B tuned for roleplay. 128K context, reads images.",
       good: "Long campaigns. 128K context keeps early scenes in reach, and it is tuned to hold a character's voice. Reads images for character art and scene references.",
-      weak: "Refusals removed, not built uncensored, so its base framing can soften the darkest material. Anything analytical: this is a storyteller, not an assistant.",
+      weak: "Refusals removed, worldview kept, so its base framing can soften the darkest material. Anything analytical: this is a storyteller, not an assistant.",
     },
     deepseekFlash: {
       maker: "DeepSeek (via Venice)",
@@ -143,7 +143,7 @@ export const translations = {
   },
   howToPick: {
     title: "How to pick in practice",
-    p1: "Start from the task. Dark or taboo roleplay and fiction, political or controversial questions, a view outside the consensus: UncensoredLM, the one built uncensored. Campaigns too long for 32K, or scenes that need images: Venice Role Play. Cheap all-rounder: Venice Uncensored. Code or analysis: Qwen 3.6 Plus Uncensored or full GLM 5.3 Uncensored. High volume, low cost, multimodal: GLM 5.3 Flash, Gemma 4 or MiMo.",
+    p1: "Start from the task. Politics, controversial questions, a view outside the consensus, dark or taboo fiction: UncensoredLM, the one with its own worldview. Campaigns too long for 32K, or scenes that need images: Venice Role Play. Cheap all-rounder: Venice Uncensored. Code or analysis without refusals: Qwen 3.6 Plus Uncensored or full GLM 5.3 Uncensored. High volume, low cost, multimodal: GLM 5.3 Flash, Gemma 4 or MiMo.",
     p2: "Want a right-leaning slant on purpose: Gab Arya, by its maker's own framing. Blunt plain talk: FreedomGPT Liberty. Not sure? Put two side by side and compare them on your own prompt.",
     compareLink: "Compare {{a}} with {{b}}",
   },

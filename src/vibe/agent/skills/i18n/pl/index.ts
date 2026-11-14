@@ -724,7 +724,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Broni wolności słowa, korzystając z niej. Porusza to, czego inni nie dotkną.",
-          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
+          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -761,7 +761,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Podważa każde przekonanie, także te, których nie wolno kwestionować. Nie ucieka do konsensusu.",
-          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
+          strength: "Własny światopogląd: idzie pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -873,7 +873,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Sporna historia, tematy tabu i polityczne punkty zapalne bez wykrętów.",
-          strength: "Najlepszy tu do polityki i nieortodoksyjnych odczytań",
+          strength: "Własny światopogląd: odczytania pomijane przez mainstream",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
       },
@@ -1117,7 +1117,7 @@ export const translations: typeof enTranslations = {
         farRight: {
           description:
             "Zero filtra w polityce. Najlepszy wybór do surowej debaty politycznej.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+          strength: "Własny światopogląd, przeciwne poglądy polityczne",
           weakness: "Kontekst 32K, dobra klasa, nie najwyższa",
         },
         conservative: {
@@ -1160,7 +1160,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Tay taka, jaka miała być. Bez korporacyjnego filtra i działu PR.",
-          strength: "Najlepszy model tutaj do surowej polityki",
+          strength:
+            "Własny światopogląd, a nie odblokowany model z mainstreamu",
           weakness: "Kontekst 32K, szybciej gubi długie rozmowy",
         },
       },
@@ -1203,7 +1204,7 @@ export const translations: typeof enTranslations = {
           description:
             "Bezpieczeństwo ofensywne i defensywne. Bez odmów przy exploitach i rekonesansie.",
           strength: "Bez cenzury, najwyższa klasa, kontekst 1M, narzędzia",
-          weakness: "Ostrożny w polityce. Tylko tekst",
+          weakness: "W polityce światopogląd GLM. Tylko tekst",
         },
         oracle: {
           description:
@@ -1225,7 +1226,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Nic nie jest tabu. Najlepszy wybór do surowych rozmów o polityce.",
-          strength: "Najlepszy model tutaj do tematów politycznych",
+          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
       },
@@ -1287,7 +1288,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Hermes bez filtra. Do polityki i tematów, których inni unikają.",
-          strength: "Najlepszy model na platformie do polityki",
+          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -2202,7 +2203,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Broni każdego stanowiska, także niepopularnego. Bez zawracania do konsensusu.",
-          strength: "Najlepszy tu do polityki i nieortodoksyjnych poglądów",
+          strength: "Własny światopogląd: argumentuje pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -2246,7 +2247,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Filozofia polityczna, pytania tabu i nieortodoksyjne poglądy bez filtra.",
-          strength: "Najlepszy na platformie do polityki i nieortodoksji",
+          strength: "Własny światopogląd: nieortodoksja, także w polityce",
           weakness: "Kontekst 32K, klasa smart, stała cena za wiadomość",
         },
       },
