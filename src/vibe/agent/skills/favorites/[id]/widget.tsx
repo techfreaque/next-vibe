@@ -122,6 +122,7 @@ import { SkillVoteButtons } from "../../[id]/vote/vote-buttons";
 import { ModelGroup } from "../../[id]/widget";
 import { NO_SKILL_ID } from "../../constants";
 import { ModelSelectionType, SkillOwnershipType } from "../../enum";
+import { pickSkillVariant } from "../../pick-variant";
 import definitionPatch, { getBestChatModelForFavorite } from "./definition";
 
 /**
@@ -199,10 +200,7 @@ export function FavoriteEditContainer({
   const { skillId: baseSkillId, variantId } = parseSkillId(skillId ?? "");
   const characterEndpoint = useSkill(baseSkillId, user, logger);
   const characterData = characterEndpoint.read?.data;
-  const characterVariant = variantId
-    ? characterData?.variants?.find((v) => v.id === variantId)
-    : (characterData?.variants?.find((v) => v.isDefault) ??
-      characterData?.variants?.[0]);
+  const characterVariant = pickSkillVariant(characterData?.variants, variantId);
   const characterModelSelection = characterVariant?.modelSelection;
 
   // Community/public skills can be voted on; built-in (SYSTEM) and the user's

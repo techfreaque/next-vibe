@@ -44,6 +44,7 @@ import { useFavoriteCreate } from "../../../../../skills/favorites/create/hooks"
 import favoritesDefinition from "../../../../../skills/favorites/definition";
 import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
 import { scopedTranslation as skillsScopedTranslation } from "../../../../../skills/i18n";
+import { pickSkillVariant } from "../../../../../skills/pick-variant";
 import {
   DEFAULT_CHAT_MODEL_ID,
   DEFAULT_CHAT_MODEL_SELECTION,
@@ -332,8 +333,8 @@ export function SetupStep({ locale, onDone }: SetupStepProps): JSX.Element {
           parseSkillId(entry.skillId);
         const skill = DEFAULT_SKILLS.find((s) => s.id === entryBaseId);
         const variant = entryVariantId
-          ? skill?.variants?.find((v) => v.id === entryVariantId)
-          : undefined;
+          ? pickSkillVariant(skill?.variants, entryVariantId)
+          : null;
         const effectiveModelSelection = variant?.modelSelection ?? null;
         const skillVoiceSel =
           variant?.voiceModelSelection ??

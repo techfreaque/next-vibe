@@ -38,6 +38,7 @@ import type { SttModelSelection } from "../../../speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import { scopedTranslation as charactersScopedTranslation } from "../../i18n";
+import { pickSkillVariant } from "../../pick-variant";
 import { SkillsRepository } from "../../repository";
 import { FavoritesCreateRepository } from "../create/repository";
 import { chatFavorites } from "../db";
@@ -212,11 +213,7 @@ export class SingleFavoriteRepository {
           : null;
 
       // Resolve characterModelSelection from the specific variant via skill's variants list
-      const variant = favorite.variantId
-        ? character.variants?.find((v) => v.id === favorite.variantId)
-        : (character.variants?.find((v) => v.isDefault) ??
-          character.variants?.[0] ??
-          null);
+      const variant = pickSkillVariant(character.variants, favorite.variantId);
       const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
         variant?.modelSelection ?? null;
 

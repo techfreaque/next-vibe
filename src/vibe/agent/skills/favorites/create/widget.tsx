@@ -99,6 +99,7 @@ import { DEFAULT_SKILLS } from "../../config";
 import { NO_SKILL_ID } from "../../constants";
 import { ModelSelectionType } from "../../enum";
 import { scopedTranslation as skillsScopedTranslation } from "../../i18n";
+import { pickSkillVariant } from "../../pick-variant";
 import type definition from "./definition";
 
 /**
@@ -306,10 +307,7 @@ export function FavoriteCreateContainer({
 
   const characterEndpoint = useSkill(plainSkillId, user, logger);
   const characterData = characterEndpoint.read?.data;
-  const characterVariant = variantId
-    ? characterData?.variants?.find((v) => v.id === variantId)
-    : (characterData?.variants?.find((v) => v.isDefault) ??
-      characterData?.variants?.[0]);
+  const characterVariant = pickSkillVariant(characterData?.variants, variantId);
   const characterModelSelection = characterVariant?.modelSelection;
 
   const { updateSettings } = useChatSettings(user, logger);

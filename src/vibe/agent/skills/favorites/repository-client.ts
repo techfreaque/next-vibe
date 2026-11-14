@@ -37,10 +37,11 @@ import type {
   VoiceModelSelection,
 } from "../../text-to-speech/models";
 import skillSingleDefinition from "../[id]/definition";
-import { DEFAULT_SKILLS } from "../config";
+import { DEFAULT_SKILLS, type SkillVariant } from "../config";
 import type { SkillVariantData } from "../db";
 import { ModelSelectionType } from "../enum";
 import { scopedTranslation as charactersScopedTranslation } from "../i18n";
+import { pickSkillVariant } from "../pick-variant";
 import type {
   FavoriteGetResponseOutput,
   FavoriteUpdateRequestOutput,
@@ -226,12 +227,9 @@ export class ChatFavoritesRepositoryClient {
           ? undefined
           : DEFAULT_SKILLS.find((c) => c.id === baseSkillId);
 
-        const variants = fetchedSkill?.variants ?? character?.variants ?? [];
-        const variant = configVariantId
-          ? (variants.find((v) => v.id === configVariantId) ??
-            variants.find((v) => v.isDefault) ??
-            variants[0])
-          : (variants.find((v) => v.isDefault) ?? variants[0]);
+        const variants: readonly (SkillVariant | SkillVariantData)[] =
+          fetchedSkill?.variants ?? character?.variants ?? [];
+        const variant = pickSkillVariant(variants, configVariantId);
 
         const icon = fetchedSkill?.icon ?? character?.icon ?? null;
         const name =
@@ -610,9 +608,7 @@ export class ChatFavoritesRepositoryClient {
 
     // Resolve modelSelection from the specific variant
     const { variantId: storedVariantId } = parseSkillId(stored.skillId);
-    const variant = storedVariantId
-      ? character.variants.find((v) => v.id === storedVariantId)
-      : undefined;
+    const variant = pickSkillVariant(character.variants, storedVariantId);
     const effectiveCharacterModelSelection = variant?.modelSelection ?? null;
 
     // Flattened structure - translate default character keys using characters scope

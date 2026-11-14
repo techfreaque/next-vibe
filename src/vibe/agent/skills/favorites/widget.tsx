@@ -83,6 +83,7 @@ import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";
 import { SkillCategory } from "../enum";
 import { scopedTranslation as skillsScopedTranslation } from "../i18n";
+import { pickSkillVariant } from "../pick-variant";
 import definition, { type FavoriteCard } from "./definition";
 import { useFavoriteSelectOverride } from "./favorite-select-context";
 import { scopedTranslation } from "./i18n";
@@ -120,7 +121,7 @@ function getVariantLabel(
     return null;
   }
   const skill = DEFAULT_SKILLS.find((s) => s.id === baseSkillId);
-  const variant = skill?.variants?.find((v) => v.id === variantId);
+  const variant = pickSkillVariant(skill?.variants, variantId);
   if (!variant) {
     return null;
   }

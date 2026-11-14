@@ -43,6 +43,7 @@ import type { VoiceModelSelection } from "../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../config";
 import { NO_SKILL_ID } from "../constants";
 import { scopedTranslation as charactersScopedTranslation } from "../i18n";
+import { pickSkillVariant } from "../pick-variant";
 import { SkillsRepository } from "../repository";
 import {
   chatFavorites,
@@ -298,9 +299,7 @@ export class ChatFavoritesRepository {
         // Resolve variant's model selections from the skill's variants list
         // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
         const variants = skillResult.data.variants;
-        const variant = favorite.variantId
-          ? variants.find((v) => v.id === favorite.variantId)
-          : (variants.find((v) => v.isDefault) ?? variants[0] ?? null);
+        const variant = pickSkillVariant(variants, favorite.variantId);
         characterModelSelection = variant?.modelSelection ?? null;
         // Derive voice from the resolved variant; fall back to skill-level top field
         characterVoice = variant?.voiceModelSelection ?? null;
@@ -463,9 +462,7 @@ export class ChatFavoritesRepository {
       let variantLabel: string | null = null;
       if (row.variantId) {
         const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === row.skillId);
-        const variant = defaultSkill?.variants?.find(
-          (v) => v.id === row.variantId,
-        );
+        const variant = pickSkillVariant(defaultSkill?.variants, row.variantId);
         if (variant?.variantName) {
           variantLabel = charT(variant.variantName);
         }

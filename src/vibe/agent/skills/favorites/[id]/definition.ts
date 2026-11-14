@@ -65,6 +65,7 @@ import {
   ModelSelectionType,
   PriceLevel,
 } from "../../enum";
+import { pickSkillVariant } from "../../pick-variant";
 import {
   FAVORITE_DELETE_ALIAS,
   FAVORITE_GET_ALIAS,
@@ -459,8 +460,9 @@ const { PATCH } = createEndpoint({
                 { urlPathParams: { id: baseSkillId } },
               );
               if (skillData?.success) {
-                const variant = skillData.data.variants.find(
-                  (v) => v.id === parsedVariantId,
+                const variant = pickSkillVariant(
+                  skillData.data.variants,
+                  parsedVariantId,
                 );
                 cachedCharacterModelSelection = variant?.modelSelection ?? null;
               }
@@ -902,9 +904,7 @@ const { PATCH } = createEndpoint({
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
           characterDescription = character.data.description ?? null;
-          const variant = variantId
-            ? character.data.variants?.find((v) => v.id === variantId)
-            : character.data.variants?.[0];
+          const variant = pickSkillVariant(character.data.variants, variantId);
           characterModelSelection =
             requestData.modelSelection ?? variant?.modelSelection ?? null;
         }

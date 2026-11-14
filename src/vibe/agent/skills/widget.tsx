@@ -80,6 +80,7 @@ import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
 import { getBestChatModelForFavorite } from "./favorites/[id]/definition";
 import { useAddToFavorites, useFavoriteCreate } from "./favorites/create/hooks";
 import { useChatFavorites } from "./favorites/hooks/hooks";
+import { pickSkillVariant } from "./pick-variant";
 
 /**
  * Props for custom widget
@@ -1753,12 +1754,7 @@ export function EditFavBeforeAddButton({
 
       // Resolve model selections from the user's selected variant
       const { variantId } = parseSkillId(char.skillId);
-      const selectedVariant =
-        (variantId
-          ? fullChar.variants.find((v) => v.id === variantId)
-          : null) ??
-        fullChar.variants.find((v) => v.isDefault) ??
-        fullChar.variants[0];
+      const selectedVariant = pickSkillVariant(fullChar.variants, variantId);
 
       const modelSelection = selectedVariant?.modelSelection;
       const voiceModelSelection =
@@ -2095,10 +2091,7 @@ export function SkillFavoriteActions({
     const editFavoriteDefinitions = await import("./favorites/[id]/definition");
 
     const { variantId: addVarId } = parseSkillId(char.skillId);
-    const addSelectedVariant =
-      (addVarId ? fullChar.variants.find((v) => v.id === addVarId) : null) ??
-      fullChar.variants.find((v) => v.isDefault) ??
-      fullChar.variants[0];
+    const addSelectedVariant = pickSkillVariant(fullChar.variants, addVarId);
 
     navigate(createFavoriteDefinitions.default.POST, {
       data: {

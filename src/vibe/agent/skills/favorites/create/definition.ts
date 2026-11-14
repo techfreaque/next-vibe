@@ -47,6 +47,7 @@ import type {
   ManualModelSelection,
 } from "../../create/definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../enum";
+import { pickSkillVariant } from "../../pick-variant";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
 
@@ -127,12 +128,7 @@ const { POST } = createEndpoint({
           const variants = character.data.variants;
           // Same variant resolution as the server list (default variant when
           // the favorite names none), so the optimistic card matches it.
-          const variant =
-            (resolvedVariantId
-              ? variants?.find((v) => v.id === resolvedVariantId)
-              : undefined) ??
-            variants?.find((v) => v.isDefault) ??
-            variants?.[0];
+          const variant = pickSkillVariant(variants, resolvedVariantId);
           characterModelSelection = variant?.modelSelection ?? null;
         } else {
           logger.error(

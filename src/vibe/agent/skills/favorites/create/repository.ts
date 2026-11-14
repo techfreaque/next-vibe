@@ -36,6 +36,7 @@ import type { SttModelSelection } from "../../../speech-to-text/models";
 import { DEFAULT_TTS_MODEL_SELECTION } from "../../../text-to-speech/constants";
 import type { VoiceModelSelection } from "../../../text-to-speech/models";
 import { DEFAULT_SKILLS } from "../../config";
+import { pickSkillVariant } from "../../pick-variant";
 import { SkillsRepository } from "../../repository";
 import { chatFavorites } from "../db";
 import { reconcileVariantsMode } from "../variants-mode";
@@ -233,12 +234,10 @@ export class FavoritesCreateRepository {
       // model. A genuinely-overriding selection is kept as provided.
       let modelSelectionToStore = data.modelSelection ?? null;
       if (modelSelectionToStore && character) {
-        const skillVariant =
-          (effectiveVariantId
-            ? character.variants.find((v) => v.id === effectiveVariantId)
-            : undefined) ??
-          character.variants.find((v) => v.isDefault) ??
-          character.variants[0];
+        const skillVariant = pickSkillVariant(
+          character.variants,
+          effectiveVariantId,
+        );
         if (
           skillVariant?.modelSelection &&
           JSON.stringify(modelSelectionToStore) ===

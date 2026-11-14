@@ -88,6 +88,7 @@ import favoritesEndpoint from "../../skills/favorites/definition";
 import { FavoriteSelectProvider } from "../../skills/favorites/favorite-select-context";
 import { useChatFavorites } from "../../skills/favorites/hooks/hooks";
 import { scopedTranslation as skillsScopedTranslation } from "../../skills/i18n";
+import { pickSkillVariant } from "../../skills/pick-variant";
 import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
 import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
 import { parseSkillId } from "../slugify";
@@ -569,7 +570,7 @@ function getVariantLabelForFav(
     return null;
   }
   const skill = DEFAULT_SKILLS.find((s) => s.id === baseSkillId);
-  const variant = skill?.variants?.find((v) => v.id === variantId);
+  const variant = pickSkillVariant(skill?.variants, variantId);
   if (!variant) {
     return null;
   }

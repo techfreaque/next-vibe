@@ -27,6 +27,7 @@ import type { CustomSkill } from "./db";
 import { customSkills } from "./db";
 import type { FavoriteConfig } from "./favorites/db";
 import { resolveFavoriteConfig } from "./favorites/repository";
+import { pickSkillVariant } from "./pick-variant";
 
 /**
  * Raw custom-skill config columns used by the ai-stream setup cascades
@@ -91,14 +92,7 @@ function buildCustomBridgeSkill(
   activeVariantId: string | null,
 ): BridgeSkill {
   const variants = row.variants;
-  const activeVariant =
-    variants && activeVariantId
-      ? (variants.find((v) => v.id === activeVariantId) ??
-        variants.find((v) => v.isDefault) ??
-        variants[0])
-      : variants
-        ? (variants.find((v) => v.isDefault) ?? variants[0])
-        : null;
+  const activeVariant = pickSkillVariant(variants, activeVariantId);
 
   return activeVariant
     ? {
@@ -146,13 +140,7 @@ function buildDefaultBridgeSkill(
   defaultSkill: Skill,
   activeVariantId: string | null,
 ): BridgeSkill | null {
-  const activeVariant = activeVariantId
-    ? (defaultSkill.variants.find((v) => v.id === activeVariantId) ??
-      defaultSkill.variants.find((v) => v.isDefault) ??
-      defaultSkill.variants[0])
-    : (defaultSkill.variants.find((v) => v.isDefault) ??
-      defaultSkill.variants[0]);
-  return activeVariant ?? null;
+  return pickSkillVariant(defaultSkill.variants, activeVariantId);
 }
 
 /**
