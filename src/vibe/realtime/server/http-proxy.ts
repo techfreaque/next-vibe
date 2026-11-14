@@ -46,7 +46,7 @@ function trackRequest(method: string, path: string): void {
  * prefixes a `+N older` count, so a crash dump is a readable line instead of a
  * giant nested array.
  */
-function summarizeRecentRequests(): string {
+export function summarizeRecentRequests(): string {
   if (recentRequests.length === 0) {
     return "none";
   }
@@ -58,6 +58,14 @@ function summarizeRecentRequests(): string {
   );
   return `${older > 0 ? `+${String(older)} older, ` : ""}${parts.join(", ")}`;
 }
+
+/**
+ * Last time Next.js answered a proxied request (0 = never in this process).
+ * Tells a Next.js crash (it was serving, now refuses connections) apart from a
+ * request that arrived while the node was still booting (health probes from the
+ * deploy script / Caddy hit /robots.txt seconds after the container starts).
+ */
+let lastUpstreamOkAt = 0;
 
 // Proxy timeout is always high — timeout enforcement belongs on the app server
 // via the endpoint definition's timeoutMs, not here. The proxy must not cut off
@@ -166,6 +174,7 @@ export async function handleHttpProxy(
           agent: false,
         },
         (proxyRes) => {
+          lastUpstreamOkAt = Date.now();
           // Use Headers so Set-Cookie entries are appended individually (joining
           // multiple Set-Cookie with ", " breaks them).
           const resHeaders = new Headers();
@@ -192,6 +201,17 @@ export async function handleHttpProxy(
                 controller.close();
               });
               proxyRes.on("error", (err) => {
+                // Upstream died mid-body: the browser gets a truncated
+                // response with a 200 status (shows up client-side as a
+                // ChunkLoadError / failed resource with responseStatus 200).
+                logger.error("[Proxy] Upstream response failed mid-body", {
+                  path: url.pathname,
+                  method: req.method,
+                  status: proxyRes.statusCode,
+                  error: err.message,
+                  errorCode: "code" in err ? String(err.code) : undefined,
+                  elapsedMs: Date.now() - proxyStartMs,
+                });
                 controller.error(err);
               });
             },
@@ -214,13 +234,27 @@ export async function handleHttpProxy(
         // Non-idempotent methods and shutdown: return 502/503 immediately.
         if (isConnRefused && !shuttingDown && isIdempotent) {
           lastProxyError = nodeErr.code ?? err.message;
-          // On first ECONNREFUSED, dump recent request history.
+          // On first ECONNREFUSED, dump recent request history. Before
+          // Next.js has ever answered, this is the boot window (it never went
+          // down); that is reported separately so a real crash stays an
+          // unambiguous signal. Both carry uptime.
           if (attempt === 0) {
-            logger.error("[Proxy] Next.js went down before crash", {
-              path: url.pathname,
-              method: req.method,
-              recent: summarizeRecentRequests(),
-            });
+            if (lastUpstreamOkAt === 0) {
+              logger.warn("[Proxy] Request arrived before Next.js was up", {
+                path: url.pathname,
+                method: req.method,
+                uptime: Math.floor(process.uptime()),
+                recent: summarizeRecentRequests(),
+              });
+            } else {
+              logger.error("[Proxy] Next.js went down before crash", {
+                path: url.pathname,
+                method: req.method,
+                uptime: Math.floor(process.uptime()),
+                lastUpstreamOkMsAgo: Date.now() - lastUpstreamOkAt,
+                recent: summarizeRecentRequests(),
+              });
+            }
           }
           settle(null); // null = retry
           return;
@@ -300,6 +334,7 @@ export async function handleHttpProxy(
       elapsedMs: Date.now() - proxyStartMs,
       lastErrorCode: lastProxyError,
       uptime: Math.floor(process.uptime()),
+      nextEverResponded: lastUpstreamOkAt !== 0,
       heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
       rssMb: Math.round(mem.rss / 1024 / 1024),
       targetPort: nextPort,

@@ -856,6 +856,76 @@ export class SkillsRepository {
   }
 
   /**
+   * Which of these stored skill references (`chat_messages.tone`, merged
+   * `skill__variant` ids, legacy aliases) `getSkillById` would resolve for this
+   * user. Same visibility rules, one query for the whole batch, so a reader can
+   * drop references to removed or private skills instead of sending one 404
+   * skill-get per message.
+   */
+  static async filterResolvableSkillIds(
+    rawSkillIds: readonly string[],
+    user: JwtPayloadType,
+  ): Promise<Set<string>> {
+    const resolvable = new Set<string>();
+    const customByRaw = new Map<string, string>();
+    for (const raw of new Set(rawSkillIds)) {
+      const { skillId } = parseSkillId(raw);
+      if (
+        skillId === NO_SKILL_ID ||
+        DEFAULT_SKILLS.some((s) => s.id === skillId)
+      ) {
+        resolvable.add(raw);
+      } else {
+        customByRaw.set(raw, skillId);
+      }
+    }
+    if (customByRaw.size === 0) {
+      return resolvable;
+    }
+
+    const customIds = [...new Set(customByRaw.values())];
+    const uuidIds = customIds.filter((id) => isUuid(id));
+    const slugIds = customIds.filter((id) => !isUuid(id)).map(resolveIdAlias);
+    const idCondition =
+      uuidIds.length > 0 && slugIds.length > 0
+        ? or(
+            inArray(customSkills.id, uuidIds),
+            inArray(customSkills.slug, slugIds),
+          )
+        : uuidIds.length > 0
+          ? inArray(customSkills.id, uuidIds)
+          : inArray(customSkills.slug, slugIds);
+    const userId = user.id;
+    const rows = await db
+      .select({ id: customSkills.id, slug: customSkills.slug })
+      .from(customSkills)
+      .where(
+        and(
+          idCondition,
+          userId
+            ? or(
+                eq(customSkills.userId, userId),
+                eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+              )
+            : eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+        ),
+      );
+    const found = new Set<string>();
+    for (const row of rows) {
+      found.add(row.id);
+      if (row.slug) {
+        found.add(row.slug);
+      }
+    }
+    for (const [raw, skillId] of customByRaw) {
+      if (found.has(isUuid(skillId) ? skillId : resolveIdAlias(skillId))) {
+        resolvable.add(raw);
+      }
+    }
+    return resolvable;
+  }
+
+  /**
    * Get a single skill by ID
    */
   static async getSkillById(

@@ -30,6 +30,7 @@ import { CronTaskStatus } from "next-vibe/tasks/enum";
 
 import type { ChatModelId } from "../../../../ai-stream/models";
 import { fetchAncestorBranch } from "../../../../ai-stream/repository/core/tree-walk";
+import { SkillsRepository } from "../../../../skills/repository";
 import { bubbleFolderActivity } from "../../../bubble-folder-activity";
 import {
   CHAT_MESSAGE_COLUMNS,
@@ -172,9 +173,13 @@ export class MessagesRepository {
       .where(eq(chatThreads.id, threadId))
       .limit(1);
     if (!thread) {
-      // Fresh/optimistic thread not yet persisted (client-minted id mid-stream):
-      // owner-private — deliver on the creator's own channel.
-      return { kind: !ctx.user.isPublic && !!ctx.user.id ? "user" : "deny" };
+      // Fresh/optimistic thread not yet persisted (client-minted id mid-stream),
+      // or an incognito thread (never persisted): owner-private, events ride
+      // the creator's own user channel. Guests have one too
+      // (`user/{leadId}/…`, the emitter's identity for public users), so they
+      // are admitted like a logged-in creator.
+      const ownerId = ctx.user.isPublic ? ctx.user.leadId : ctx.user.id;
+      return { kind: ownerId ? "user" : "deny" };
     }
 
     // Owner → their own channel.
@@ -911,11 +916,24 @@ export class MessagesRepository {
       }
 
       // Get all messages in thread
-      const messages = await db
+      const rawMessages = await db
         .select(CHAT_MESSAGE_COLUMNS)
         .from(chatMessages)
         .where(eq(chatMessages.threadId, data.threadId))
         .orderBy(chatMessages.createdAt);
+
+      // Every message view resolves `skill` with a skill-get to show its name.
+      // Old rows can point at skills that were removed since (March forum
+      // bots: gaming-bot, politics-bot, ...) or at another user's private
+      // skill, which 404s once per message. Drop references this viewer can't
+      // resolve; the DB row keeps its value.
+      const resolvableSkills = await SkillsRepository.filterResolvableSkillIds(
+        rawMessages.flatMap((m) => (m.skill ? [m.skill] : [])),
+        user,
+      );
+      const messages = rawMessages.map((m) =>
+        m.skill && !resolvableSkills.has(m.skill) ? { ...m, skill: null } : m,
+      );
 
       // Get pending/running background tasks for this thread.
       // Revival context lives in the parked resume-stream task's taskInput (not typed columns).

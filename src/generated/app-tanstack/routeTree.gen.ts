@@ -655,6 +655,11 @@ import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteI
 import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-warnings'
 import { Route as ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.$characterSkill'
 import { Route as ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.data-sources.task-health'
+import { Route as ApiLocaleVibeToolingInfraClusterInitRouteImport } from './routes/api.$locale.vibe.tooling.infra.cluster.init'
+import { Route as ApiLocaleVibeToolingInfraClusterStatusRouteImport } from './routes/api.$locale.vibe.tooling.infra.cluster.status'
+import { Route as ApiLocaleVibeToolingInfraDeployPreviewRouteImport } from './routes/api.$locale.vibe.tooling.infra.deploy.preview'
+import { Route as ApiLocaleVibeToolingInfraDeployPushRouteImport } from './routes/api.$locale.vibe.tooling.infra.deploy.push'
+import { Route as ApiLocaleVibeToolingInfraScaleReplicasRouteImport } from './routes/api.$locale.vibe.tooling.infra.scale.replicas'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.create'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.root-permissions'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId'
@@ -4467,6 +4472,36 @@ const ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute =
     path: '/api/$locale/vibe/tasks/watchdog/data-sources/task-health',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeToolingInfraClusterInitRoute =
+  ApiLocaleVibeToolingInfraClusterInitRouteImport.update({
+    id: '/api/$locale/vibe/tooling/infra/cluster/init',
+    path: '/api/$locale/vibe/tooling/infra/cluster/init',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeToolingInfraClusterStatusRoute =
+  ApiLocaleVibeToolingInfraClusterStatusRouteImport.update({
+    id: '/api/$locale/vibe/tooling/infra/cluster/status',
+    path: '/api/$locale/vibe/tooling/infra/cluster/status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeToolingInfraDeployPreviewRoute =
+  ApiLocaleVibeToolingInfraDeployPreviewRouteImport.update({
+    id: '/api/$locale/vibe/tooling/infra/deploy/preview',
+    path: '/api/$locale/vibe/tooling/infra/deploy/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeToolingInfraDeployPushRoute =
+  ApiLocaleVibeToolingInfraDeployPushRouteImport.update({
+    id: '/api/$locale/vibe/tooling/infra/deploy/push',
+    path: '/api/$locale/vibe/tooling/infra/deploy/push',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleVibeToolingInfraScaleReplicasRoute =
+  ApiLocaleVibeToolingInfraScaleReplicasRouteImport.update({
+    id: '/api/$locale/vibe/tooling/infra/scale/replicas',
+    path: '/api/$locale/vibe/tooling/infra/scale/replicas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute =
   ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport.update({
     id: '/create',
@@ -5272,6 +5307,11 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
+  '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
+  '/api/$locale/vibe/tooling/infra/cluster/status': typeof ApiLocaleVibeToolingInfraClusterStatusRoute
+  '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
+  '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
+  '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -5937,6 +5977,11 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
+  '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
+  '/api/$locale/vibe/tooling/infra/cluster/status': typeof ApiLocaleVibeToolingInfraClusterStatusRoute
+  '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
+  '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
+  '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -6610,6 +6655,11 @@ export interface FileRoutesById {
   '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
+  '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
+  '/api/$locale/vibe/tooling/infra/cluster/status': typeof ApiLocaleVibeToolingInfraClusterStatusRoute
+  '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
+  '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
+  '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -7283,6 +7333,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+    | '/api/$locale/vibe/tooling/infra/cluster/init'
+    | '/api/$locale/vibe/tooling/infra/cluster/status'
+    | '/api/$locale/vibe/tooling/infra/deploy/preview'
+    | '/api/$locale/vibe/tooling/infra/deploy/push'
+    | '/api/$locale/vibe/tooling/infra/scale/replicas'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -7948,6 +8003,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+    | '/api/$locale/vibe/tooling/infra/cluster/init'
+    | '/api/$locale/vibe/tooling/infra/cluster/status'
+    | '/api/$locale/vibe/tooling/infra/deploy/preview'
+    | '/api/$locale/vibe/tooling/infra/deploy/push'
+    | '/api/$locale/vibe/tooling/infra/scale/replicas'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -8620,6 +8680,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
+    | '/api/$locale/vibe/tooling/infra/cluster/init'
+    | '/api/$locale/vibe/tooling/infra/cluster/status'
+    | '/api/$locale/vibe/tooling/infra/deploy/preview'
+    | '/api/$locale/vibe/tooling/infra/deploy/push'
+    | '/api/$locale/vibe/tooling/infra/scale/replicas'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -9073,6 +9138,11 @@ export interface RootRouteChildren {
   ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute: typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
+  ApiLocaleVibeToolingInfraClusterInitRoute: typeof ApiLocaleVibeToolingInfraClusterInitRoute
+  ApiLocaleVibeToolingInfraClusterStatusRoute: typeof ApiLocaleVibeToolingInfraClusterStatusRoute
+  ApiLocaleVibeToolingInfraDeployPreviewRoute: typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
+  ApiLocaleVibeToolingInfraDeployPushRoute: typeof ApiLocaleVibeToolingInfraDeployPushRoute
+  ApiLocaleVibeToolingInfraScaleReplicasRoute: typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute: typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
   ApiLocaleVibePlatformsAiSkillsAGENTMdRoute: typeof ApiLocaleVibePlatformsAiSkillsAGENTMdRoute
   ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute: typeof ApiLocaleVibePlatformsAiSkillsPUBLIC_USER_AI_RUNMdRoute
@@ -13605,6 +13675,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/tooling/infra/cluster/init': {
+      id: '/api/$locale/vibe/tooling/infra/cluster/init'
+      path: '/api/$locale/vibe/tooling/infra/cluster/init'
+      fullPath: '/api/$locale/vibe/tooling/infra/cluster/init'
+      preLoaderRoute: typeof ApiLocaleVibeToolingInfraClusterInitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tooling/infra/cluster/status': {
+      id: '/api/$locale/vibe/tooling/infra/cluster/status'
+      path: '/api/$locale/vibe/tooling/infra/cluster/status'
+      fullPath: '/api/$locale/vibe/tooling/infra/cluster/status'
+      preLoaderRoute: typeof ApiLocaleVibeToolingInfraClusterStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tooling/infra/deploy/preview': {
+      id: '/api/$locale/vibe/tooling/infra/deploy/preview'
+      path: '/api/$locale/vibe/tooling/infra/deploy/preview'
+      fullPath: '/api/$locale/vibe/tooling/infra/deploy/preview'
+      preLoaderRoute: typeof ApiLocaleVibeToolingInfraDeployPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tooling/infra/deploy/push': {
+      id: '/api/$locale/vibe/tooling/infra/deploy/push'
+      path: '/api/$locale/vibe/tooling/infra/deploy/push'
+      fullPath: '/api/$locale/vibe/tooling/infra/deploy/push'
+      preLoaderRoute: typeof ApiLocaleVibeToolingInfraDeployPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/vibe/tooling/infra/scale/replicas': {
+      id: '/api/$locale/vibe/tooling/infra/scale/replicas'
+      path: '/api/$locale/vibe/tooling/infra/scale/replicas'
+      fullPath: '/api/$locale/vibe/tooling/infra/scale/replicas'
+      preLoaderRoute: typeof ApiLocaleVibeToolingInfraScaleReplicasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': {
       id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
       path: '/create'
@@ -15553,6 +15658,16 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute,
   ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute:
     ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute,
+  ApiLocaleVibeToolingInfraClusterInitRoute:
+    ApiLocaleVibeToolingInfraClusterInitRoute,
+  ApiLocaleVibeToolingInfraClusterStatusRoute:
+    ApiLocaleVibeToolingInfraClusterStatusRoute,
+  ApiLocaleVibeToolingInfraDeployPreviewRoute:
+    ApiLocaleVibeToolingInfraDeployPreviewRoute,
+  ApiLocaleVibeToolingInfraDeployPushRoute:
+    ApiLocaleVibeToolingInfraDeployPushRoute,
+  ApiLocaleVibeToolingInfraScaleReplicasRoute:
+    ApiLocaleVibeToolingInfraScaleReplicasRoute,
   ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRoute:
     ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren,
   ApiLocaleVibePlatformsAiSkillsAGENTMdRoute:

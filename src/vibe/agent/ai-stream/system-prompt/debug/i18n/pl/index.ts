@@ -100,6 +100,9 @@ export const translations: typeof enTranslations = {
         title: "Nie znaleziono",
         description: "Użytkownik lub zasób nie istnieje",
       },
+      threadNotFound: {
+        title: "Wątek nie istnieje albo go nie widzisz",
+      },
       server: {
         title: "Błąd serwera",
         description: "Nie udało się zbudować promptu",

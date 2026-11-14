@@ -26,6 +26,15 @@ import { logProviderRequest } from "./shared/debug-file-logger";
 
 const NANO_GPT_BASE_URL = "https://api.nano-gpt.com/api/v1";
 
+/** The `model` field of an OpenAI-style JSON request body, if readable. */
+function requestModelOf(body: BodyInit | null | undefined): string | undefined {
+  if (typeof body !== "string") {
+    return undefined;
+  }
+  const match = /"model"\s*:\s*"([^"]+)"/.exec(body);
+  return match?.[1];
+}
+
 /**
  * Create a NanoGPT provider compatible with AI SDK V2
  */
@@ -51,6 +60,9 @@ export function createNanoGPT(
         status: response.status,
         statusText: response.statusText,
         body: errorText,
+        // Which model failed: an upstream outage is usually per model
+        // (e.g. 503 all_fallbacks_failed on one GLM variant).
+        model: requestModelOf(init?.body),
       });
       return new Response(errorText, {
         status: response.status,

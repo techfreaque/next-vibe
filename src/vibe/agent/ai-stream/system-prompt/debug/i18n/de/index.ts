@@ -103,6 +103,9 @@ export const translations: typeof enTranslations = {
         title: "Nicht gefunden",
         description: "Nutzer oder Ressource fehlt",
       },
+      threadNotFound: {
+        title: "Thread fehlt oder ist für dich nicht sichtbar",
+      },
       server: {
         title: "Server-Fehler",
         description: "Prompt konnte nicht erstellt werden",

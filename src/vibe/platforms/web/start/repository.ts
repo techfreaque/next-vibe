@@ -52,6 +52,7 @@ import {
 } from "../../../logger/formatters";
 import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
+import { summarizeRecentRequests } from "../../../realtime/server/http-proxy";
 import { ServerFramework } from "../enum";
 import {
   addPidToFile,
@@ -124,6 +125,8 @@ const SUPERVISOR_MAX_HEAP_MB = 256;
 
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
+  /** Set once the in-process task runner is loaded; the lag monitor reads it. */
+  private static runningTasksProbe: (() => string[]) | null = null;
   private static nextServerProcess: ChildProcess | null = null;
   private static wsServerHandle: WebProxyHandle | null = null;
   private static runningProcesses: Map<string, ChildProcess> = new Map();
@@ -590,6 +593,34 @@ export class ServerStartRepository {
       const histogram = monitorEventLoopDelay({ resolution: 20 });
       histogram.enable();
 
+      // The histogram says HOW long the loop was blocked, not WHEN or by what.
+      // A 50ms ticker records the longest stall of each 5s window with its
+      // wall-clock start, plus what was in flight right after it (running
+      // tasks, recent proxied requests), so a lag row can be matched against
+      // task executions, chat messages and access logs.
+      const STALL_TICK_MS = 50;
+      let lastTickAt = Date.now();
+      let worstStall: {
+        ms: number;
+        startedAt: number;
+        runningTasks: string[];
+        recentRequests: string;
+      } | null = null;
+      const stallTicker = setInterval(() => {
+        const now = Date.now();
+        const stallMs = now - lastTickAt - STALL_TICK_MS;
+        lastTickAt = now;
+        if (stallMs >= EL_LAG_WARN_MS && stallMs > (worstStall?.ms ?? 0)) {
+          worstStall = {
+            ms: stallMs,
+            startedAt: now - stallMs,
+            runningTasks: ServerStartRepository.runningTasksProbe?.() ?? [],
+            recentRequests: summarizeRecentRequests(),
+          };
+        }
+      }, STALL_TICK_MS);
+      void stallTicker;
+
       let lastLagLevel = 0;
       const lagInterval = setInterval(() => {
         try {
@@ -599,9 +630,23 @@ export class ServerStartRepository {
           histogram.reset();
 
           const uptime2 = Math.floor(process.uptime());
-          const heapMb = Math.round(
-            process.memoryUsage().heapUsed / 1024 / 1024,
-          );
+          const mem = process.memoryUsage();
+          const heapMb = Math.round(mem.heapUsed / 1024 / 1024);
+          const stall = worstStall;
+          worstStall = null;
+          // Shared context for every lag level: when, how big the heap was
+          // (a full GC on a large heap is one candidate), what ran.
+          const lagContext = {
+            heapMb,
+            rssMb: Math.round(mem.rss / 1024 / 1024),
+            uptime: uptime2,
+            stallMs: stall?.ms,
+            stallStartedAt: stall
+              ? new Date(stall.startedAt).toISOString()
+              : undefined,
+            runningTasks: stall?.runningTasks.join(", ") || undefined,
+            recentRequests: stall?.recentRequests,
+          };
           // Dynamic values go in metadata, not the message text - see the
           // [Memory] logging above for why (fingerprint groups on message).
           if (maxMs >= EL_LAG_CRITICAL_MS && lastLagLevel < 3) {
@@ -611,8 +656,7 @@ export class ServerStartRepository {
               {
                 maxMs: Math.round(maxMs),
                 meanMs: Math.round(meanMs),
-                heapMb,
-                uptime: uptime2,
+                ...lagContext,
               },
             );
           } else if (maxMs >= EL_LAG_ERROR_MS && lastLagLevel < 2) {
@@ -620,13 +664,14 @@ export class ServerStartRepository {
             logger.error("[EventLoop] High lag - requests may be timing out", {
               maxMs: Math.round(maxMs),
               meanMs: Math.round(meanMs),
-              uptime: uptime2,
+              ...lagContext,
             });
           } else if (maxMs >= EL_LAG_WARN_MS && lastLagLevel < 1) {
             lastLagLevel = 1;
             logger.warn("[EventLoop] Elevated lag", {
               maxMs: Math.round(maxMs),
               meanMs: Math.round(meanMs),
+              ...lagContext,
             });
           } else if (maxMs < EL_LAG_WARN_MS / 2) {
             lastLagLevel = 0;
@@ -844,6 +889,8 @@ export class ServerStartRepository {
         await import("../../../tasks/unified-runner/repository");
 
       UnifiedTaskRunnerRepository.environment = "production";
+      ServerStartRepository.runningTasksProbe = (): string[] =>
+        UnifiedTaskRunnerRepository.getRunningTasks();
 
       // Closure so the restart loop can call itself recursively with backoff.
       const runRunner = (): void => {

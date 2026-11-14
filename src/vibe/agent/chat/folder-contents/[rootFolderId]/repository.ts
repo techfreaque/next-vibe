@@ -69,9 +69,10 @@ export class FolderContentsRepository {
   ): ChannelDecision["kind"] {
     switch (rootFolderId) {
       case DefaultFolderId.INCOGNITO:
-        // Owner's own channel; guests have no user channel (same as the
-        // messages channel's fresh-thread branch).
-        return !user.isPublic && !!user.id ? "user" : "deny";
+        // Owner's own channel. Guests have one too (`user/{leadId}/…`, which is
+        // where emitChannelForFolder delivers their incognito events), same as
+        // the messages channel's fresh-thread branch.
+        return (user.isPublic ? user.leadId : user.id) ? "user" : "deny";
       case DefaultFolderId.PUBLIC:
       case DefaultFolderId.SHARED:
         // Many identities watch one channel.

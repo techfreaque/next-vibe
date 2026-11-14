@@ -4,7 +4,7 @@ import { Methods } from "../../../../core/definition/enums";
 import { endpointsHandler } from "../../../../core/route/multi";
 import scaleReplicasEndpoints from "./definition";
 
-export const { tools } = endpointsHandler({
+export const { POST, tools } = endpointsHandler({
   endpoint: scaleReplicasEndpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) =>

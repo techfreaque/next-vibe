@@ -137,7 +137,7 @@ export async function buildDebugSystemPrompt({
         !(await canViewThread(user, thread, folder ?? null, logger, locale))
       ) {
         return fail({
-          message: t("get.errors.notFound.title"),
+          message: t("get.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

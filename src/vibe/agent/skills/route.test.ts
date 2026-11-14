@@ -25,6 +25,7 @@ import skillSingleEndpoint from "./[id]/definition";
 import skillPublishEndpoint from "./[id]/publish/definition";
 import skillReportEndpoint from "./[id]/report/definition";
 import skillVoteEndpoint from "./[id]/vote/definition";
+import { NO_SKILL_ID } from "./constants";
 import skillCreateEndpoint from "./create/definition";
 import { customSkills } from "./db";
 import skillsListEndpoint from "./definition";
@@ -38,6 +39,7 @@ import {
   SkillVoteDirection,
 } from "./enum";
 import skillModerationEndpoint from "./moderation/definition";
+import { SkillsRepository } from "./repository";
 
 // ── Part A: Auto-generated endpoint tests ────────────────────────────────────
 
@@ -562,6 +564,29 @@ describe("Skills CRUD Integration", () => {
     }
   });
 
+  // ── S14b: batch resolvability mirrors GET ─────────────────────────────
+  fit("S14b: filterResolvableSkillIds keeps exactly what GET resolves", async () => {
+    const ids = [
+      createdSkillSlug,
+      ...(createdSkillUuid ? [createdSkillUuid] : []),
+      `${createdSkillSlug}__some-variant`,
+      "thea",
+      "thea__brilliant",
+      "freeSpeechActivist",
+      NO_SKILL_ID,
+      // March forum-bot tones: never existed in this codebase
+      "gaming-bot",
+      "politics-bot",
+    ];
+    const resolvable = await SkillsRepository.filterResolvableSkillIds(
+      ids,
+      adminUser,
+    );
+    expect([...resolvable].toSorted()).toEqual(
+      ids.filter((id) => !id.endsWith("-bot")).toSorted(),
+    );
+  });
+
   // ── S15: Delete skill ─────────────────────────────────────────────────
   fit("S15: delete skill succeeds", async () => {
     const response = await sendTestRequest({
@@ -593,5 +618,14 @@ describe("Skills CRUD Integration", () => {
     expect(response.errorType?.errorCode).toBe(
       ErrorResponseTypes.NOT_FOUND.errorCode,
     );
+  });
+
+  // ── S17: deleted skill is no longer resolvable ─────────────────────────
+  fit("S17: filterResolvableSkillIds drops a deleted skill", async () => {
+    const resolvable = await SkillsRepository.filterResolvableSkillIds(
+      [createdSkillSlug, "thea"],
+      adminUser,
+    );
+    expect([...resolvable]).toEqual(["thea"]);
   });
 });

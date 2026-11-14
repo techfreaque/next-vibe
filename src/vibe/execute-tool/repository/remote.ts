@@ -46,6 +46,7 @@ import { callToolDirect } from "./transport/direct";
 import { emitToolRequest } from "./transport/events";
 import {
   marshalFilesForWire,
+  repairCallerEnumShorthands,
   resolveCallerFieldDefaults,
   resolveCallerRequestDefaults,
 } from "./transport/wire";
@@ -96,6 +97,13 @@ export class RemoteDispatch {
     // stale AI example values) then fieldDefaults (only fills absent fields).
     // Both run with CALLER context so the peer gets the resolved values.
     const preferredName = getPreferredName(ctx.toolName);
+    // Enum shorthands ("active") are repaired locally for CLI/agent callers;
+    // the peer validates strictly, so repair them here with caller context.
+    strippedInput = await repairCallerEnumShorthands({
+      ctx,
+      toolName: preferredName,
+      input: strippedInput,
+    });
     strippedInput = await resolveCallerRequestDefaults({
       ctx,
       toolName: preferredName,

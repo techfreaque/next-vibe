@@ -122,6 +122,49 @@ export async function authenticateWsRequest(
   };
 }
 
+// ─── Denial diagnostics ───────────────────────────────────────────────────────
+
+/**
+ * Diagnostic fields for a denied subscribe. For `user/{uid}/…` channels it
+ * tells WHY the prefix did not match: a tab that still holds the guest identity
+ * after a login (in this or another tab) asks for `user/{leadId}/…` while its
+ * reconnected socket carries the logged-in cookie (`identityMismatch:
+ * "client-guest-socket-user"`); that tab then receives no user-channel events
+ * until it reloads. `"socket-guest-other-uid"` = a guest socket asked for a uid
+ * that is not its lead (logout elsewhere, expired session, rotated lead
+ * cookie). `"foreign"` = a logged-in socket asked for an unrelated uid.
+ */
+export function describeSubscribeIdentity(
+  user: JwtPayloadType,
+  channel: string,
+): {
+  requestedUid?: string;
+  socketUid?: string;
+  identityMismatch?:
+    | "client-guest-socket-user"
+    | "socket-guest-other-uid"
+    | "foreign";
+} {
+  const match = /^user\/([^/]+)\//.exec(channel);
+  if (!match) {
+    return {};
+  }
+  const requestedUid = match[1];
+  const socketUid = user.isPublic ? user.leadId : user.id;
+  if (!user.isPublic && requestedUid === user.leadId) {
+    return {
+      requestedUid,
+      socketUid,
+      identityMismatch: "client-guest-socket-user",
+    };
+  }
+  return {
+    requestedUid,
+    socketUid,
+    identityMismatch: user.isPublic ? "socket-guest-other-uid" : "foreign",
+  };
+}
+
 // ─── Channel authorization ────────────────────────────────────────────────────
 
 /**

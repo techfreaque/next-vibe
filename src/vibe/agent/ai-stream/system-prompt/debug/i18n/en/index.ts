@@ -93,6 +93,9 @@ export const translations = {
         title: "Not Found",
         description: "User or resource not found",
       },
+      threadNotFound: {
+        title: "Thread not found or not visible to you",
+      },
       server: { title: "Server Error", description: "Failed to build prompt" },
       unknown: { title: "Error", description: "Something went wrong" },
       unsavedChanges: {

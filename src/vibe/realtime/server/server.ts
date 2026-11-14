@@ -46,7 +46,11 @@ import type {
 import { parseWsClientMessage } from "../core/types";
 import { handleHttpProxy } from "./http-proxy";
 import { getPubSubAdapter } from "./pubsub/index";
-import { authenticateWsRequest, authorizeWsChannel } from "./ws-channel-auth";
+import {
+  authenticateWsRequest,
+  authorizeWsChannel,
+  describeSubscribeIdentity,
+} from "./ws-channel-auth";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -605,6 +609,7 @@ export function startWebSocketServer(
                   channel: msg.channel,
                   isPublic: ws.data.user.isPublic,
                   connectorInstanceId: ws.data.connectorInstanceId,
+                  ...describeSubscribeIdentity(ws.data.user, msg.channel),
                 },
               );
               return;

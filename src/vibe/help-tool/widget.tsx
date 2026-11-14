@@ -101,6 +101,7 @@ import {
 } from "../agent/chat/constants";
 import type { EnabledTool } from "../agent/chat/hooks/store";
 import settingsDefinition from "../agent/chat/settings/definition";
+import { isSkillVariantId } from "../agent/chat/slugify";
 import favoriteByIdDefinition from "../agent/skills/favorites/[id]/definition";
 import favoritesListDefinition from "../agent/skills/favorites/definition";
 import { endpointToUrlSegment } from "../core/core-utils/path";
@@ -696,6 +697,14 @@ export function HelpToolsWidget(): JSX.Element {
     [settingsState.read?.data],
   );
 
+  // A merged `skill__variant` activeFavoriteId is a mode picked without a
+  // favorite row (the new-thread spotlight writes it when the user has no
+  // favorite for that variant). It may or may not match one of the user's
+  // favorites, so resolve it against the list instead of fetching it blind
+  // (that 404'd for every user without a matching row).
+  const activeIsMergedSkillId =
+    activeFavoriteId !== null && isSkillVariantId(activeFavoriteId);
+
   // When no activeFavoriteId is set in settings, fall back to the first favorite in the list.
   // This lets the tool toggles work even if the user hasn't explicitly selected a favorite.
   const favoritesListState = useEndpoint(
@@ -705,23 +714,34 @@ export function HelpToolsWidget(): JSX.Element {
         read: {
           queryOptions: {
             enabled:
-              !user?.isPublic && settingsLoaded && activeFavoriteId === null,
+              !user?.isPublic &&
+              settingsLoaded &&
+              (activeFavoriteId === null || activeIsMergedSkillId),
             refetchOnWindowFocus: false,
           },
         },
       }),
-      [user?.isPublic, settingsLoaded, activeFavoriteId],
+      [user?.isPublic, settingsLoaded, activeFavoriteId, activeIsMergedSkillId],
     ),
     logger,
     user,
   );
-  const effectiveFavoriteId = useMemo(
-    () =>
-      activeFavoriteId ??
-      favoritesListState.read?.data?.favorites[0]?.id ??
-      null,
-    [activeFavoriteId, favoritesListState.read?.data],
-  );
+  const effectiveFavoriteId = useMemo((): string | null => {
+    const favorites = favoritesListState.read?.data?.favorites;
+    if (activeFavoriteId === null) {
+      return favorites?.[0]?.id ?? null;
+    }
+    if (!activeIsMergedSkillId) {
+      return activeFavoriteId;
+    }
+    // No matching row: the active mode has no favorite, so there is no
+    // favorite-level tool config to load or save.
+    return (
+      favorites?.find(
+        (f) => f.id === activeFavoriteId || f.skillId === activeFavoriteId,
+      )?.id ?? null
+    );
+  }, [activeFavoriteId, activeIsMergedSkillId, favoritesListState.read?.data]);
 
   // Web sidebar pinned tools — separate from AI pinnedTools on favorites
   const webPinnedTools = useMemo(

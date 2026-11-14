@@ -190,11 +190,15 @@ export async function dev(
 }
 
 /**
- * Production seed — same as dev
+ * Production seed — none. The catalog rows above are demo data (consulting
+ * hour, laptop stand, template pack); a production catalog is created by its
+ * owner. Running dev() here used to warn on every prod boot because prod's
+ * first user is not the demo company's owner.
  */
 export async function prod(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  return dev(logger, locale);
+  void locale;
+  logger.debug("Products catalog: no production seed (demo data only)");
 }

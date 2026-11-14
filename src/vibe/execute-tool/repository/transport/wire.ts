@@ -4,8 +4,10 @@
  */
 import "server-only";
 
+import { repairEnumShorthands } from "../../../core/route/enum-shorthand-repair";
 import type { WidgetData } from "../../../core/utils/json";
 import { filterUserPermissionRoles } from "../../../identity/roles/enum";
+import { isAgentPlatform, isCliPlatform } from "../../../platforms/platforms";
 import { collectServerDefaults } from "../../../unified-ui/_shared/utils";
 import type { RouteExecuteContext } from "../types";
 
@@ -107,6 +109,62 @@ export async function resolveCallerFieldDefaults(params: {
     }
   }
   return input;
+}
+
+/**
+ * Repair enum shorthands ("active" for "statusFilter.active") against the
+ * target tool's schemas with the CALLER's platform, BEFORE dispatch. Locally
+ * the request validator does this for lenient (CLI/agent) callers; the peer
+ * receives the call over HTTP as a machine caller and validates strictly, so
+ * without this the same CLI/AI call succeeds locally and 400s remotely.
+ * Same repair, same leniency rule, either way.
+ */
+export async function repairCallerEnumShorthands(params: {
+  ctx: RouteExecuteContext;
+  toolName: string;
+  input: Record<string, WidgetData> | null;
+}): Promise<Record<string, WidgetData> | null> {
+  const { ctx, toolName, input } = params;
+  if (
+    input === null ||
+    !(isAgentPlatform(ctx.platform) || isCliPlatform(ctx.platform))
+  ) {
+    return input;
+  }
+  const { getEndpoint } = await import("@/generated/endpoints/endpoint");
+  const endpoint = await getEndpoint(toolName);
+  if (!endpoint) {
+    return input;
+  }
+  let current: Record<string, WidgetData> = input;
+  const repairedFields: string[] = [];
+  for (const schema of [
+    endpoint.requestSchema,
+    endpoint.requestUrlPathParamsSchema,
+  ]) {
+    const result = repairEnumShorthands(current, schema);
+    if (result.repaired.length > 0 && isWireRecord(result.data)) {
+      current = result.data;
+      repairedFields.push(...result.repaired);
+    }
+  }
+  if (repairedFields.length > 0) {
+    ctx.logger.debug(
+      "[RouteExecute] Repaired enum shorthand for remote dispatch",
+      { toolName, fields: repairedFields.join(", ") },
+    );
+  }
+  return current;
+}
+
+function isWireRecord(value: WidgetData): value is Record<string, WidgetData> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof Date) &&
+    !(value instanceof File)
+  );
 }
 
 async function marshalWireValue(value: WidgetData): Promise<WidgetData> {

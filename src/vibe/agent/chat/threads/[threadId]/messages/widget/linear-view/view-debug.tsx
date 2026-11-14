@@ -98,12 +98,18 @@ export const DebugLinearMessageView = React.memo(
     // freshly created thread is client-side until its first turn persists
     // (an assistant message only exists once the server wrote the thread).
     // Sending any of those ids made the debug endpoint 404 on every refetch;
-    // thread-less is the correct preview for them anyway.
+    // thread-less is the correct preview for them anyway. The assistant
+    // message must belong to THIS thread: right after navigating, `messages`
+    // can still hold the previous thread's list while `threadId` already
+    // points at the next one (e.g. a background sub-agent thread opened from
+    // its parent before its first turn persisted), which also 404'd.
     const hasServerThread =
       threadId !== null &&
       threadId !== NEW_MESSAGE_ID &&
       rootFolderId !== DefaultFolderId.INCOGNITO &&
-      messages.some((m) => m.role === ChatMessageRole.ASSISTANT);
+      messages.some(
+        (m) => m.role === ChatMessageRole.ASSISTANT && m.threadId === threadId,
+      );
     const debugThreadId = hasServerThread ? threadId : undefined;
 
     const debugOptions = useMemo(

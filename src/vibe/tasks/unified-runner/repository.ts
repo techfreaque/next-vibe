@@ -165,7 +165,8 @@ export class UnifiedTaskRunnerRepository {
     return status?.status === "running";
   }
 
-  private static getRunningTasks(): string[] {
+  /** Names of tasks currently executing (also read by the event-loop lag monitor). */
+  static getRunningTasks(): string[] {
     return [...UnifiedTaskRunnerRepository.runningTasks.keys()].filter(
       (taskName) => UnifiedTaskRunnerRepository.isTaskRunning(taskName),
     );

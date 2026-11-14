@@ -28,6 +28,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { QueryResult, QueryResultRow } from "pg";
 
+import { SkillsRepository } from "../../../../../skills/repository";
 import {
   CHAT_MESSAGE_COLUMNS,
   chatFolders,
@@ -446,7 +447,18 @@ export class pathRepository {
       // Annotate real messages with chunk boundary flags in metadata:
       // - oldest message: hasOlderHistory=true if older chunks exist
       // - leaf messages that continue into a newer chunk: hasNewerHistory=true + newerAnchorId
-      const messagesWithFlags: ChatMessage[] = messages.map((msg) => {
+      // Drop skill references this viewer can't resolve (removed or private
+      // skills), so the views don't fire one 404 skill-get per message. Same
+      // filter as MessagesRepository.listMessages; the DB row is unchanged.
+      const resolvableSkills = await SkillsRepository.filterResolvableSkillIds(
+        messages.flatMap((m) => (m.skill ? [m.skill] : [])),
+        user,
+      );
+      const messagesWithFlags: ChatMessage[] = messages.map((rawMsg) => {
+        const msg =
+          rawMsg.skill && !resolvableSkills.has(rawMsg.skill)
+            ? { ...rawMsg, skill: null }
+            : rawMsg;
         const isOldestAnchor = msg.id === oldestLoadedMessageId;
         const newerAnchorId = leafsWithNewerChunk.get(msg.id) ?? null;
         const needsFlags =

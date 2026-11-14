@@ -146,6 +146,72 @@ function hasHttpExports(file: string): boolean {
   );
 }
 
+const HTTP_METHOD_NAMES = new Set([
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+]);
+
+function exportedHttpMethods(file: string): Set<string> {
+  const found = new Set<string>();
+  let src: string;
+  try {
+    src = readFileSync(file, "utf8");
+  } catch {
+    return found;
+  }
+  for (const m of src.matchAll(/export\s+const\s+\{([^}]*)\}/g)) {
+    for (const name of (m[1] ?? "").split(",")) {
+      const trimmed = name.trim();
+      if (HTTP_METHOD_NAMES.has(trimmed)) {
+        found.add(trimmed);
+      }
+    }
+  }
+  for (const m of src.matchAll(
+    /export\s+(?:async\s+function|function|const)\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g,
+  )) {
+    if (m[1]) {
+      found.add(m[1]);
+    }
+  }
+  return found;
+}
+
+/**
+ * The definition's platform markers are THE source of truth for "is this
+ * endpoint on the web": tool lists, the /tools page and the permission
+ * registry all read them. This generator additionally skips any route.ts that
+ * does not export a method's HTTP handler. When the two disagree, the endpoint
+ * is listed on the web but its API route is missing from the build (404 on
+ * prod). Returns the web-enabled definition methods the route does not export.
+ */
+function findMissingWebExports(
+  routePath: string,
+  definitionModules: Map<string, ApiSection | null>,
+): string[] {
+  if (hasCustomDirective(routePath)) {
+    return [];
+  }
+  const def = definitionModules.get(
+    toPosixPath(routePath).replace(/\/route\.ts$/, "/definition.ts"),
+  );
+  if (def === undefined || def === null) {
+    return [];
+  }
+  if (isWebExcluded(routePath, definitionModules)) {
+    return [];
+  }
+  const exported = exportedHttpMethods(routePath);
+  return Object.keys(def).filter(
+    (method) => HTTP_METHOD_NAMES.has(method) && !exported.has(method),
+  );
+}
+
 /**
  * Returns whether the shell is generator-owned (false only when a "use custom"
  * directive means we must preserve the file) — NOT whether bytes hit the disk.
@@ -447,8 +513,23 @@ export const generator: GeneratorDefinition = {
     }
 
     // — API: route.ts shells, skipping WEB_OFF / PRODUCTION_OFF endpoints —
+    const apiRouteFiles = findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS);
+    // Fail closed on marker/export drift: a web-enabled endpoint whose route.ts
+    // omits the HTTP export would be listed on the web yet 404 in the build.
+    const exportDrift = apiRouteFiles.flatMap((f) => {
+      const missing = findMissingWebExports(f, ctx.computed.definitionModules);
+      return missing.length > 0
+        ? [`${relative(PROJECT_ROOT, f)} (${missing.join(", ")})`]
+        : [];
+    });
+    if (exportDrift.length > 0) {
+      return {
+        summary: `next-app shells (${String(exportDrift.length)} routes missing HTTP exports)`,
+        failed: `Web-enabled endpoints whose route.ts does not export the HTTP handler. Export the method (e.g. \`export const { GET, tools } = endpointsHandler(...)\`) or add UserRole.WEB_OFF to the definition: ${exportDrift.join("; ")}`,
+      };
+    }
     emit(
-      findFiles(API_DIR, "route.ts", [], API_EXCLUDE_DIRS),
+      apiRouteFiles,
       API_DIR,
       OUT_API,
       "route",

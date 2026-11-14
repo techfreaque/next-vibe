@@ -125,7 +125,12 @@ export async function generateWithVenice(params: {
     const data = (await response.json()) as VeniceImageResponse;
     if (!response.ok || data.error) {
       const errorMsg = errorMessageOf(data, response.status);
-      logger.error("[Venice Images] API error", { error: errorMsg });
+      logger.error("[Venice Images] API error", {
+        error: errorMsg,
+        status: response.status,
+        model: providerModel,
+        size: apiSize,
+      });
       return fail({
         message: t("post.errors.externalServiceError", { message: errorMsg }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
