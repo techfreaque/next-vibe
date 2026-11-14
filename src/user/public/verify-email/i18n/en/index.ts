@@ -26,6 +26,14 @@ export const translations = {
     resend: "Send me a new link",
     continue: "Continue",
   },
+  creditsPrompt: {
+    title: "Confirm your email to get your free credits",
+    description:
+      "Click the link we emailed you and your account gets {{credits}} free credits every month.",
+    resend: "Resend link",
+    sending: "Sending...",
+    sent: "Link sent to {{email}}. Check your spam folder too.",
+  },
   email: {
     subject: "Confirm your email for {{appName}}",
     title: "Confirm your email",

@@ -66,6 +66,13 @@ export interface PaidRenewalInvoice {
   customerId: string | null;
   /** Payment intent, when the event carries it */
   paymentIntentId: string | null;
+  /** When the invoice was paid (replays from the webhook log); default now */
+  paidAt?: Date;
+  /**
+   * End of the period this payment bought (replays from the webhook log);
+   * default the subscription's current period end
+   */
+  periodEnd?: Date;
 }
 
 export interface RenewalRecordResult {
@@ -156,10 +163,11 @@ export class PaymentRenewalRepository {
 
       // The renewal credit grant is keyed by subscription + period end; storing
       // that key as the session id lets a refund revoke exactly those credits.
-      const creditSessionId = subscription?.currentPeriodEnd
+      const periodEnd = invoice.periodEnd ?? subscription?.currentPeriodEnd;
+      const creditSessionId = periodEnd
         ? subscriptionRenewalSessionKey(
             invoice.subscriptionId,
-            subscription.currentPeriodEnd.getTime(),
+            periodEnd.getTime(),
           )
         : null;
 
@@ -181,6 +189,9 @@ export class PaymentRenewalRepository {
             invoiceId: invoice.invoiceId,
             billingReason: invoice.billingReason ?? "",
           },
+          ...(invoice.paidAt
+            ? { createdAt: invoice.paidAt, updatedAt: invoice.paidAt }
+            : {}),
         })
         .onConflictDoNothing({ target: paymentTransactions.providerInvoiceId })
         .returning({ id: paymentTransactions.id });

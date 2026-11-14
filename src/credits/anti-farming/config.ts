@@ -20,8 +20,9 @@ export const ACCOUNT_POOLS_PER_SUBNET_PER_MONTH = 3;
 export const GUEST_POOLS_PER_SUBNET_PER_DAY = 5;
 
 /**
- * Deploy cutoff of the account rules. Accounts created before it are
- * grandfathered: no email verification needed for the account tiers and no
- * subnet budget. Newer accounts need both.
+ * Deploy cutoff of the account rules. Accounts created before it never use a
+ * subnet budget. Email verification applies to every account: older ones that
+ * are still unverified keep only what they were already granted in the period
+ * the rule started (until its next monthly refill).
  */
 export const FREE_POOL_CLAIMS_START = new Date("2026-11-14T00:00:00Z");

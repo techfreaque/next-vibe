@@ -94,6 +94,7 @@ export function TanstackPage({
                 <Strong>{configT("group.responsiblePerson.name")}</Strong>
                 <P>{configT("group.address.addressIn1Line")}</P>
               </LegalCard>
+              <LegalP>{t("sections.companyInfo.vat")}</LegalP>
             </>
           ),
         },

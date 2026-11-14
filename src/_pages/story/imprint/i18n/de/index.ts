@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
     companyInfo: {
       title: "Anbieter",
       description: "Betreiber von {{appName}}:",
+      vat: "Umsatzsteuer: Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
     },
     responsiblePerson: {
       title: "Verantwortlich für den Inhalt",

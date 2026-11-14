@@ -41,6 +41,7 @@ import {
   productsRepository,
 } from "@/products/repository-client";
 import { useSubscription } from "@/subscription/hooks";
+import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import creditsDefinition from "./definition";
 import { FreeCreditsStatus } from "./enum";
@@ -298,23 +299,24 @@ export function CreditsTabHeader({
       )}
 
       {/* Free credits held back: say why, and what lifts it */}
-      {!isAdmin &&
-        data?.freeStatus !== undefined &&
-        data.freeStatus !== FreeCreditsStatus.ACTIVE && (
-          <Div className="px-5 pb-5 sm:px-6">
-            <Div
-              className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 text-sm"
-              data-testid="free-credits-status"
-            >
-              <Span className="font-semibold">{t(data.freeStatus)}</Span>
-              <P className="m-0 mt-1 text-muted-foreground">
-                {data.freeStatus === FreeCreditsStatus.VERIFY_EMAIL
-                  ? t("get.freeStatus.verifyEmail", freeTiers)
-                  : t("get.freeStatus.subnetLimit")}
-              </P>
-            </Div>
+      {!isAdmin && data?.freeStatus === FreeCreditsStatus.VERIFY_EMAIL && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <VerifyEmailCreditsPrompt locale={locale} />
+        </Div>
+      )}
+      {!isAdmin && data?.freeStatus === FreeCreditsStatus.SUBNET_LIMIT && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div
+            className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 text-sm"
+            data-testid="free-credits-status"
+          >
+            <Span className="font-semibold">{t(data.freeStatus)}</Span>
+            <P className="m-0 mt-1 text-muted-foreground">
+              {t("get.freeStatus.subnetLimit")}
+            </P>
           </Div>
-        )}
+        </Div>
+      )}
 
       {/* Guests: what they get now and the free step up */}
       {!isAuthenticated && (

@@ -1234,6 +1234,13 @@
       "when": 1794598795011,
       "tag": "20261113193955_renewal_invoice_key",
       "breakpoints": true
+    },
+    {
+      "idx": 176,
+      "version": "7",
+      "when": 1794615378897,
+      "tag": "20261114120000_signup_newsletter_legacy",
+      "breakpoints": true
     }
   ]
 }

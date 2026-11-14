@@ -93,6 +93,7 @@ import { SIGNUP_GUEST_SPEND_LOOKBACK_HOURS } from "./anti-farming/config";
 import {
   type AccountFreeAccess as FreeCreditsAccess,
   claimGuestPool,
+  grandfatheredUnverifiedCap,
   isGuestPoolBlocked,
   resolveAccountFreeAccess,
   signupGuestCarryover,
@@ -1286,10 +1287,34 @@ export class CreditRepository {
       return { allowance: 0, legacyAllowance: 0, tier: "account", access };
     }
     if (access === "verifyEmail") {
-      // Unverified accounts keep the guest share only
-      const guestInput = { isUserPool: false, hasConfirmedNewsletter: false };
+      // Unverified accounts keep the guest share only. Accounts from before
+      // the rule keep the account tier already granted this period (no
+      // upgrades) until the next refill.
+      const guestAllowance = computeFreeAllowance({
+        isUserPool: false,
+        hasConfirmedNewsletter: false,
+      });
+      const graceCap = await grandfatheredUnverifiedCap({
+        userId,
+        leadWalletIds: pool.leadWallets.map((w) => w.id),
+      });
+      if (graceCap > guestAllowance) {
+        return {
+          allowance: graceCap,
+          legacyAllowance,
+          tier:
+            graceCap >
+            computeFreeAllowance({
+              isUserPool: true,
+              hasConfirmedNewsletter: false,
+            })
+              ? "accountNewsletter"
+              : "account",
+          access,
+        };
+      }
       return {
-        allowance: computeFreeAllowance(guestInput),
+        allowance: guestAllowance,
         legacyAllowance,
         tier: "guest",
         access,

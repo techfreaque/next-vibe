@@ -140,9 +140,11 @@ async function claimSlot(
 
 /**
  * Account free access: verified email, then the subnet's monthly budget.
- * Accounts created before FREE_POOL_CLAIMS_START are grandfathered (neither
- * rule applies). Accounts that ever bought credits are never budgeted.
- * A budgeted account keeps its slot for good.
+ * Every account needs a verified email. Accounts created before
+ * FREE_POOL_CLAIMS_START skip the subnet budget; while unverified they keep
+ * only what they were already granted this period
+ * ({@link grandfatheredUnverifiedCap}). Accounts that ever bought credits are
+ * never budgeted. A budgeted account keeps its slot for good.
  */
 export async function resolveAccountFreeAccess(
   userId: string,
@@ -156,12 +158,12 @@ export async function resolveAccountFreeAccess(
   if (!user) {
     return "verifyEmail";
   }
-  // Accounts from before the rules existed keep their tiers as they were
-  if (user.createdAt < FREE_POOL_CLAIMS_START) {
-    return "active";
-  }
   if (!user.emailVerified) {
     return "verifyEmail";
+  }
+  // Accounts from before the subnet budget existed are never budgeted
+  if (user.createdAt < FREE_POOL_CLAIMS_START) {
+    return "active";
   }
   const poolKey = `user:${userId}`;
   const [everGranted] = await db
@@ -211,6 +213,54 @@ export async function resolveAccountFreeAccess(
     logger,
   );
   return granted ? "active" : "subnetLimit";
+}
+
+/**
+ * Account tier an unverified account created before FREE_POOL_CLAIMS_START
+ * already received in the current monthly period: it keeps that cap until the
+ * next refill, then needs a verified email like every new account.
+ * Counts grants made under the current tiers (tier stamped on the row);
+ * pre-2026-11 grants are kept by computeGrandfatheredFreeCap.
+ * Returns 0 when the account is newer or got no account tier this period.
+ */
+export async function grandfatheredUnverifiedCap({
+  userId,
+  leadWalletIds,
+  now = new Date(),
+}: {
+  userId: string;
+  leadWalletIds: string[];
+  now?: Date;
+}): Promise<number> {
+  if (leadWalletIds.length === 0) {
+    return 0;
+  }
+  const [user] = await db
+    .select({ createdAt: users.createdAt })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (!user || user.createdAt >= FREE_POOL_CLAIMS_START) {
+    return 0;
+  }
+  const meta = creditTransactions.metadata;
+  const [row] = await db
+    .select({
+      cap: sql<
+        string | null
+      >`max(COALESCE((${meta}->>'totalPoolFreeCredits')::numeric, ${creditTransactions.amount}))`,
+    })
+    .from(creditTransactions)
+    .where(
+      and(
+        inArray(creditTransactions.walletId, leadWalletIds),
+        eq(creditTransactions.freePeriodId, monthPeriod(now)),
+        eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+        isNotNull(sql`${meta}->>'tierVersion'`),
+        inArray(sql`${meta}->>'tier'`, ["account", "accountNewsletter"]),
+      ),
+    );
+  return Math.max(0, Number(row?.cap ?? 0));
 }
 
 /**

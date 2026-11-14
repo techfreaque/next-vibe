@@ -8,7 +8,7 @@
  * Requires the dev DB, like the other credits repository tests.
  */
 
-import { eq, inArray, like } from "drizzle-orm";
+import { eq, inArray, like, sql } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -29,6 +29,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
+import { creditTransactions, creditWallets } from "../db";
 import { FreeCreditsStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
 import { publicFreeTierDailyCap } from "../public-cap/db";
@@ -349,22 +350,98 @@ describe("accounts", () => {
 });
 
 describe("grandfathered accounts", () => {
+  /** Move the account to before the cutoff (no subnet budget for it) */
+  async function preCutoff(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        createdAt: new Date(FREE_POOL_CLAIMS_START.getTime() - 86_400_000),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async function poolLeadWalletIds(userId: string): Promise<string[]> {
+    const linked = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
+    const wallets = await db
+      .select({ id: creditWallets.id })
+      .from(creditWallets)
+      .where(
+        inArray(
+          creditWallets.leadId,
+          linked.map((l) => l.leadId),
+        ),
+      );
+    return wallets.map((w) => w.id);
+  }
+
   it(
-    "account created before the cutoff, unverified: keeps the 40",
+    "created before the cutoff, unverified, no account tier this period: guest share + verify prompt",
     async () => {
-      const user = await account("pre-cutoff", `${freshNet()}.50`, false);
+      const user = await account("pre-cutoff-new", `${freshNet()}.50`, false);
       if (!user || user.isPublic) {
         return;
       }
+      await preCutoff(user.id);
+      const now = await balance(user);
+      expect(now.free).toBe(guest);
+      expect(now.status).toBe(FreeCreditsStatus.VERIFY_EMAIL);
+    },
+    TIMEOUT_MS,
+  );
+
+  it(
+    "created before the cutoff, already granted the 40 this period: keeps it until the next refill, then needs verification",
+    async () => {
+      const user = await account("pre-cutoff-grace", `${freshNet()}.51`);
+      if (!user || user.isPublic) {
+        return;
+      }
+      await preCutoff(user.id);
+      // Granted the account tier this period while the old rule applied
+      expect((await balance(user)).free).toBe(accountBase);
       await db
         .update(users)
-        .set({
-          createdAt: new Date(FREE_POOL_CLAIMS_START.getTime() - 86_400_000),
-        })
+        .set({ emailVerified: false })
         .where(eq(users.id, user.id));
-      const now = await balance(user);
-      expect(now.free).toBe(accountBase);
-      expect(now.status).toBe(FreeCreditsStatus.ACTIVE);
+
+      const grace = await balance(user);
+      expect(grace.free).toBe(accountBase);
+      expect(grace.status).toBe(FreeCreditsStatus.VERIFY_EMAIL);
+
+      // Next refill: push this period's wallets and grants back one month
+      const walletIds = await poolLeadWalletIds(user.id);
+      const lastMonth = new Date();
+      lastMonth.setDate(1);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      const lastPeriod = `${String(lastMonth.getFullYear())}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
+      await db
+        .update(creditWallets)
+        .set({ freePeriodStart: lastMonth, freePeriodId: lastPeriod })
+        .where(inArray(creditWallets.id, walletIds));
+      await db
+        .update(creditTransactions)
+        // Grant keys name their month: drop them so this month's keys are free
+        .set({
+          freePeriodId: lastPeriod,
+          metadata: sql`${creditTransactions.metadata} - 'grantKey'`,
+        })
+        .where(inArray(creditTransactions.walletId, walletIds));
+
+      const refilled = await balance(user);
+      expect(refilled.free).toBe(guest);
+      expect(refilled.status).toBe(FreeCreditsStatus.VERIFY_EMAIL);
+
+      // Verifying lifts it to the account tier again
+      await db
+        .update(users)
+        .set({ emailVerified: true })
+        .where(eq(users.id, user.id));
+      const verified = await balance(user);
+      expect(verified.free).toBe(accountBase);
+      expect(verified.status).toBe(FreeCreditsStatus.ACTIVE);
     },
     TIMEOUT_MS,
   );

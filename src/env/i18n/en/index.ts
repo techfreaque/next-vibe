@@ -35,7 +35,6 @@ export const translations = {
     twitterHandle: "@unbottled_ai",
     twitterUrl: "https://twitter.com/unbottled_ai",
     discordInvite: "https://discord.gg/hBuA22SzkR",
-    linkedinUrl: "https://linkedin.com/company/unbottled",
   },
   timezone: {
     PL: "Europe/Warsaw",

@@ -22,9 +22,12 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { FreeCreditsStatus } from "@/credits/enum";
+import { useFreeCreditsStatus } from "@/credits/hooks";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
 import { getPricingParams } from "@/products/repository-client";
+import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import { scopedTranslation } from "../i18n";
 
@@ -131,9 +134,34 @@ export function OutOfCreditsCard({
           </Button>
         )}
       </Div>
-      {!isGuest && <NewsletterBonus locale={locale} />}
+      {!isGuest && <MemberFreeCreditsRow locale={locale} />}
     </Div>
   );
+}
+
+/**
+ * Unverified account: confirm the email first (it unlocks the account's free
+ * credits and confirms a signup newsletter opt-in too). Otherwise the
+ * newsletter bonus row.
+ */
+function MemberFreeCreditsRow({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element | null {
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const freeStatus = useFreeCreditsStatus(user, logger, !user.isPublic);
+  if (freeStatus === FreeCreditsStatus.VERIFY_EMAIL) {
+    return (
+      <VerifyEmailCreditsPrompt
+        locale={locale}
+        variant="row"
+        className="@md/ooc:pl-11"
+      />
+    );
+  }
+  return <NewsletterBonus locale={locale} />;
 }
 
 /** Account first: sign up (primary) and log in back to this thread. */

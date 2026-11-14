@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
     companyInfo: {
       title: "Usługodawca",
       description: "Serwis {{appName}} prowadzi:",
+      vat: "VAT: zwolnienie dla małych przedsiębiorców na podstawie § 19 niemieckiej ustawy o VAT (UStG). VAT nie jest naliczany.",
     },
     responsiblePerson: {
       title: "Osoba odpowiedzialna",

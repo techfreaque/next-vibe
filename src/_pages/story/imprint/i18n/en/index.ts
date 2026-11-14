@@ -21,6 +21,7 @@ export const translations = {
     companyInfo: {
       title: "Provider",
       description: "{{appName}} is operated by:",
+      vat: "VAT: Small business under § 19 German VAT Act (UStG), no VAT charged.",
     },
     responsiblePerson: {
       title: "Responsible Person",

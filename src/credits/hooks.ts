@@ -83,3 +83,30 @@ export function useCredits(
 
   return result;
 }
+
+/**
+ * Why the account's free credits are (or are not) active, for prompts outside
+ * the credits pages (chat out-of-credits card). Reads the shared balance
+ * cache; no WS subscription (the balance owner subscribes).
+ */
+export function useFreeCreditsStatus(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+  enabled: boolean,
+): CreditsGetResponseOutput["freeStatus"] | undefined {
+  const endpoint = useEndpoint(
+    definitions,
+    {
+      read: {
+        queryOptions: {
+          enabled: enabled && !user.isPublic,
+          staleTime: 10 * 1000,
+        },
+      },
+    },
+    logger,
+    user,
+  );
+  const response = endpoint.read?.response;
+  return response?.success ? response.data.freeStatus : undefined;
+}

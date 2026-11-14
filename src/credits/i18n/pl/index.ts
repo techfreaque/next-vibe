@@ -311,8 +311,6 @@ export const translations: typeof enTranslations = {
     },
     freeStatus: {
       content: "Status darmowych kredytów",
-      verifyEmail:
-        "Potwierdź e-mail, a to konto dostanie {{signedIn}} darmowych kredytów miesięcznie. Do tego czasu masz {{guest}} jak gość.",
       subnetLimit:
         "Z twojej sieci powstało w tym miesiącu zbyt wiele nowych darmowych kont, więc to konto na razie nie dostaje darmowych kredytów. Zakup kredytów je odblokuje, albo ruszą w przyszłym miesiącu, gdy w sieci zwolni się miejsce.",
     },

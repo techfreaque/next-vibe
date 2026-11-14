@@ -314,8 +314,6 @@ export const translations: typeof enTranslations = {
     },
     freeStatus: {
       content: "Status der Gratis-Credits",
-      verifyEmail:
-        "Bestätige deine E-Mail und dieses Konto bekommt {{signedIn}} Gratis-Credits im Monat. Bis dahin bleiben dir die {{guest}} für Gäste.",
       subnetLimit:
         "Aus deinem Netzwerk kamen diesen Monat zu viele neue Gratis-Konten. Dieses Konto bekommt deshalb vorerst keine Gratis-Credits. Ein Credit-Kauf schaltet sie frei, sonst starten sie nächsten Monat, sobald das Netzwerk wieder Platz hat.",
     },

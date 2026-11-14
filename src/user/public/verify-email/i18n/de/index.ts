@@ -28,6 +28,14 @@ export const translations: typeof enTranslations = {
     resend: "Neuen Link senden",
     continue: "Weiter",
   },
+  creditsPrompt: {
+    title: "E-Mail bestätigen, Gratis-Credits sichern",
+    description:
+      "Klick auf den Link in unserer E-Mail, dann bekommt dein Konto jeden Monat {{credits}} Gratis-Credits.",
+    resend: "Link erneut senden",
+    sending: "Wird gesendet...",
+    sent: "Link an {{email}} gesendet. Schau auch im Spam-Ordner nach.",
+  },
   email: {
     subject: "Bestätige deine E-Mail für {{appName}}",
     title: "E-Mail bestätigen",

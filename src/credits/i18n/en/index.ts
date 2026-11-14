@@ -227,8 +227,6 @@ export const translations = {
     },
     freeStatus: {
       content: "Free credits status",
-      verifyEmail:
-        "Verify your email and this account gets {{signedIn}} free credits a month. Until then you keep the guest {{guest}}.",
       subnetLimit:
         "Too many new free accounts came from your network this month, so this account gets no free credits for now. Buying credits unlocks them, or they start next month when the network has room again.",
     },

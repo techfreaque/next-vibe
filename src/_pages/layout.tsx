@@ -106,7 +106,7 @@ export async function tanstackLoader({
     name: configT("group.name"),
     url: envClient.NEXT_PUBLIC_APP_URL,
     logo: new URL("/logo.png", envClient.NEXT_PUBLIC_APP_URL).toString(),
-    sameAs: [configT("social.twitterUrl"), configT("social.linkedinUrl")],
+    sameAs: [configT("social.twitterUrl")],
     contactPoint: {
       "@type": "ContactPoint",
       email: configT("emails.support"),
