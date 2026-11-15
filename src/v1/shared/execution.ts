@@ -341,7 +341,13 @@ async function bill(params: {
   // provider omitted it) falls back to the listed token price with a warning.
   const { credits: cost, upstreamCost } = TokenAccumulator.chargeSingleCall(
     model,
-    { inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens: 0 },
+    {
+      inputTokens,
+      outputTokens,
+      cachedInputTokens,
+      cacheWriteTokens: 0,
+      imageOutputTokens: usage?.imageOutputTokens ?? 0,
+    },
     params.providerMetadata,
     logger,
   );

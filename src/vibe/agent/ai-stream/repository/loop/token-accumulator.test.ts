@@ -14,6 +14,8 @@ import {
   getChatModelById,
 } from "../../models";
 import {
+  producedImageFile,
+  readImageOutputTokens,
   readStepUpstreamCost,
   TokenAccumulator,
   type TokenCounters,
@@ -38,6 +40,7 @@ function freshCounters(): TokenCounters {
     tokenCachedInput: 0,
     tokenCacheWrite: 0,
     tokenOutput: 0,
+    tokenImageOutput: 0,
     tokenLastInput: 0,
     tokensBilled: false,
     tokenStepCount: 0,
@@ -119,7 +122,12 @@ describe("TokenAccumulator multi-step billing", () => {
     }
     const final = TokenAccumulator.finalize(
       ctx,
-      { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0 },
+      {
+        inputTokens: 0,
+        outputTokens: 0,
+        cachedInputTokens: 0,
+        imageOutputTokens: 0,
+      },
       0,
     );
     expect(final.uncachedInputTokens).toBe(24_000);
@@ -159,6 +167,7 @@ describe("TokenAccumulator multi-step billing", () => {
       outputTokens: 1_400,
       cachedInputTokens: 42_000,
       cacheWriteTokens: 0,
+      imageOutputTokens: 0,
     });
     if (!steps) {
       return;
@@ -194,6 +203,7 @@ describe("TokenAccumulator multi-step billing", () => {
       outputTokens: 0,
       cachedInputTokens: 0,
       cacheWriteTokens: 0,
+      imageOutputTokens: 0,
     });
   });
 
@@ -249,6 +259,7 @@ describe("readStepUpstreamCost", () => {
     expect(readStepUpstreamCost(openRouterMeta(0.0042, "Modal"))).toEqual({
       costUsd: 0.0042,
       provider: "Modal",
+      reportedUsage: { cost: 0.0042 },
     });
   });
 
@@ -256,10 +267,15 @@ describe("readStepUpstreamCost", () => {
     expect(readStepUpstreamCost(undefined)).toEqual({
       costUsd: null,
       provider: null,
+      reportedUsage: null,
     });
     expect(
       readStepUpstreamCost({ openrouter: { usage: { promptTokens: 10 } } }),
-    ).toEqual({ costUsd: null, provider: null });
+    ).toEqual({
+      costUsd: null,
+      provider: null,
+      reportedUsage: { promptTokens: 10 },
+    });
   });
 });
 
@@ -398,5 +414,186 @@ describe("TokenAccumulator actual upstream cost billing", () => {
     );
     expect(charge.credits).toBe(2.6);
     expect(charge.upstreamCost?.billingBasis).toBe("upstream_cost");
+  });
+});
+
+/** OpenRouter raw usage of a live nano-banana-2.1 image turn (2026-11-15). */
+const IMAGE_TURN_RAW_USAGE = {
+  prompt_tokens: 10,
+  completion_tokens: 1_343,
+  total_tokens: 1_353,
+  cost: 0.0352875,
+  completion_tokens_details: {
+    reasoning_tokens: 0,
+    image_tokens: 1_120,
+    audio_tokens: 0,
+  },
+};
+
+describe("image output tokens", () => {
+  /** Nano Banana 2.1 prices: $1.5/M in, $7.5/M text out, $30/M image out. */
+  function imageModel(): ChatModelOption {
+    return {
+      ...getChatModelById(ChatModelId.GEMINI_NANO_BANANA_2_1),
+      apiProvider: ApiProvider.OPENROUTER,
+      creditCost: calculateCreditCost,
+      inputTokenCost: 1.5,
+      outputTokenCost: 7.5,
+      cacheReadTokenCost: undefined,
+      cacheWriteTokenCost: undefined,
+      imageOutputTokenCost: 30,
+    };
+  }
+  const IMAGE_STEP = {
+    inputTokens: 10,
+    outputTokens: 1_343,
+    cachedInputTokens: 0,
+    cacheWriteTokens: 0,
+    imageOutputTokens: 1_120,
+  };
+  // 10 x 1.5 + 223 text x 7.5 + 1120 image x 30 = OpenRouter's reported cost
+  const IMAGE_STEP_USD = (10 * 1.5 + 223 * 7.5 + 1_120 * 30) / 1_000_000;
+
+  it("reads image_tokens from the raw provider usage", () => {
+    expect(
+      readImageOutputTokens(
+        { outputTokens: 1_343, raw: IMAGE_TURN_RAW_USAGE },
+        true,
+      ),
+    ).toBe(1_120);
+    // No image in the step and no split reported: none.
+    expect(readImageOutputTokens({ outputTokens: 500 }, false)).toBe(0);
+    // Clamped to the step's output tokens.
+    expect(
+      readImageOutputTokens(
+        {
+          outputTokens: 100,
+          raw: { completion_tokens_details: { image_tokens: 1_120 } },
+        },
+        true,
+      ),
+    ).toBe(100);
+  });
+
+  it("bills ALL output at the image rate when an image step reports no split", () => {
+    expect(readImageOutputTokens({ outputTokens: 1_343 }, true)).toBe(1_343);
+    expect(
+      readImageOutputTokens(
+        { outputTokens: 1_343, raw: { completion_tokens_details: null } },
+        true,
+      ),
+    ).toBe(1_343);
+  });
+
+  it("detects image files of a step", () => {
+    expect(producedImageFile([{ mediaType: "image/png" }])).toBe(true);
+    expect(producedImageFile([{ mediaType: "audio/mpeg" }])).toBe(false);
+    expect(producedImageFile([])).toBe(false);
+    expect(producedImageFile(undefined)).toBe(false);
+  });
+
+  it("calculateCreditCost prices image tokens at imageOutputTokenCost", () => {
+    const credits = calculateCreditCost(imageModel(), 10, 1_343, 0, 0, 1_120);
+    expect(credits).toBe(expectedCredits(IMAGE_STEP_USD));
+    // Matches the cost OpenRouter reported for the same turn.
+    expect(IMAGE_STEP_USD).toBeCloseTo(IMAGE_TURN_RAW_USAGE.cost, 9);
+    // The old text-rate price was ~3x under the real cost.
+    const textRate = calculateCreditCost(imageModel(), 10, 1_343);
+    expect(credits).toBeGreaterThan(textRate * 3);
+  });
+
+  it("models without imageOutputTokenCost keep the text rate for image tokens", () => {
+    expect(calculateCreditCost(pricedModel(), 10_000, 1_000, 0, 0, 800)).toBe(
+      calculateCreditCost(pricedModel(), 10_000, 1_000),
+    );
+  });
+
+  it("missing upstream cost on an image step falls back at the image rate", () => {
+    const warn = spyOn(logger, "warn");
+    const ctx = freshCounters();
+    TokenAccumulator.accumulate(ctx, IMAGE_STEP);
+    TokenAccumulator.recordUpstreamCost(
+      ctx,
+      imageModel(),
+      IMAGE_STEP,
+      readStepUpstreamCost(undefined),
+      logger,
+    );
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+    expect(ctx.upstreamFallbackCostUsd).toBeCloseTo(IMAGE_STEP_USD, 12);
+    expect(ctx.tokenImageOutput).toBe(1_120);
+
+    // No step reported a cost: the token-price branch, image rate included.
+    const steps = TokenAccumulator.unbilledCompletedSteps(ctx);
+    expect(steps?.imageOutputTokens).toBe(1_120);
+    if (!steps) {
+      return;
+    }
+    const charge = TokenAccumulator.resolveCharge(ctx, imageModel(), steps);
+    expect(charge.credits).toBe(expectedCredits(IMAGE_STEP_USD));
+    expect(charge.upstreamCost).toBeUndefined();
+  });
+
+  it("mixed turn adds the image-rate fallback to the reported costs", () => {
+    const ctx = freshCounters();
+    TokenAccumulator.accumulate(ctx, IMAGE_STEP);
+    TokenAccumulator.recordUpstreamCost(
+      ctx,
+      imageModel(),
+      IMAGE_STEP,
+      readStepUpstreamCost(openRouterMeta(0.0352875, "Google AI Studio")),
+      logger,
+    );
+    const warn = spyOn(logger, "warn");
+    TokenAccumulator.accumulate(ctx, IMAGE_STEP);
+    TokenAccumulator.recordUpstreamCost(
+      ctx,
+      imageModel(),
+      IMAGE_STEP,
+      readStepUpstreamCost(undefined),
+      logger,
+    );
+    warn.mockRestore();
+    const charge = TokenAccumulator.resolveCharge(ctx, imageModel(), {
+      inputTokens: 20,
+      outputTokens: 2_686,
+      cachedInputTokens: 0,
+      cacheWriteTokens: 0,
+      imageOutputTokens: 2_240,
+    });
+    expect(charge.upstreamCost?.billingBasis).toBe("mixed");
+    expect(charge.credits).toBe(
+      upstreamCostToCredits(0.0352875 + IMAGE_STEP_USD),
+    );
+  });
+
+  it("finalize carries the SDK image tokens for tool-less single-step turns", () => {
+    const final = TokenAccumulator.finalize(
+      freshCounters(),
+      {
+        inputTokens: 10,
+        outputTokens: 1_343,
+        cachedInputTokens: 0,
+        imageOutputTokens: 1_120,
+      },
+      0,
+    );
+    expect(final.imageOutputTokens).toBe(1_120);
+  });
+
+  it("every image-output OpenRouter chat model has an image token price", () => {
+    for (const id of Object.values(ChatModelId)) {
+      const model = getChatModelById(id);
+      if (
+        model.apiProvider === ApiProvider.OPENROUTER &&
+        typeof model.creditCost === "function" &&
+        model.outputs.includes("image")
+      ) {
+        expect(
+          { id, imageOutputTokenCost: model.imageOutputTokenCost },
+        ).toEqual({ id, imageOutputTokenCost: expect.any(Number) });
+      }
+    }
   });
 });

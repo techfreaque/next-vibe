@@ -7,7 +7,12 @@
 
 import "server-only";
 
-import type { LanguageModel, ModelMessage, ProviderMetadata } from "ai";
+import type {
+  JSONValue,
+  LanguageModel,
+  ModelMessage,
+  ProviderMetadata,
+} from "ai";
 import {
   generateText,
   jsonSchema,
@@ -19,6 +24,7 @@ import {
 } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { ProviderFactory } from "next-vibe/agent/ai-stream/repository/core/infra";
+import { readImageOutputTokens } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { createFixtureDownload } from "next-vibe/agent/shared/fixture-download";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -65,6 +71,8 @@ export interface InferenceUsage {
   cachedInputTokens: number;
   /** Part of outputTokens spent on reasoning (0 when unknown). */
   reasoningTokens: number;
+  /** Part of outputTokens that are IMAGE tokens (absent = 0). */
+  imageOutputTokens?: number;
 }
 
 /**
@@ -139,6 +147,7 @@ interface RawUsage {
   outputTokens: number | undefined;
   inputTokenDetails?: { cacheReadTokens?: number | undefined } | undefined;
   outputTokenDetails?: { reasoningTokens?: number | undefined } | undefined;
+  raw?: JSONValue;
 }
 
 function mapUsage(usage: RawUsage): InferenceUsage | undefined {
@@ -150,6 +159,7 @@ function mapUsage(usage: RawUsage): InferenceUsage | undefined {
     outputTokens: usage.outputTokens ?? 0,
     cachedInputTokens: usage.inputTokenDetails?.cacheReadTokens ?? 0,
     reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? 0,
+    imageOutputTokens: readImageOutputTokens(usage, false),
   };
 }
 

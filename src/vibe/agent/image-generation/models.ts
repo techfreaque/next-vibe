@@ -1540,6 +1540,7 @@ function chatModelToImageGenOption(
         outputTokenCost: provider.outputTokenCost,
         cacheReadTokenCost: provider.cacheReadTokenCost,
         cacheWriteTokenCost: provider.cacheWriteTokenCost,
+        imageOutputTokenCost: provider.imageOutputTokenCost,
       } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
     }
   }
@@ -1560,6 +1561,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
           outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
+          imageOutputTokenCost: 60, // updated: 2026-11-15 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
         {
           id: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
@@ -1582,6 +1584,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
           outputTokenCost: 12, // updated: 2026-03-31 from openrouter-api
+          imageOutputTokenCost: 120, // updated: 2026-11-15 from openrouter-api
           cacheReadTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
           cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
@@ -1618,6 +1621,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
           outputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
+          imageOutputTokenCost: 8, // updated: 2026-11-15 from openrouter-api
           cacheReadTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
       ],
@@ -1633,6 +1637,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
           outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+          imageOutputTokenCost: 40, // updated: 2026-11-15 from openrouter-api
           cacheReadTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
       ],
@@ -1648,6 +1653,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 8, // released: 2026-04-21 from openrouter
           outputTokenCost: 15, // released: 2026-04-21 from openrouter
+          imageOutputTokenCost: 30, // updated: 2026-11-15 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
       ],
     ),
@@ -1662,6 +1668,7 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
           creditCost: calculateCreditCost,
           inputTokenCost: 1.5, // updated: 2026-11-13 from openrouter-api
           outputTokenCost: 7.5, // updated: 2026-11-13 from openrouter-api (image tokens $30/M, probe 1K image = $0.035)
+          imageOutputTokenCost: 30, // updated: 2026-11-15 from openrouter-api
         } satisfies ModelProviderConfigTokenBased,
       ],
     ),
@@ -1715,6 +1722,7 @@ function buildImageGenOption(
     outputTokenCost: p.outputTokenCost,
     cacheReadTokenCost: p.cacheReadTokenCost,
     cacheWriteTokenCost: p.cacheWriteTokenCost,
+    imageOutputTokenCost: p.imageOutputTokenCost,
   } satisfies ModelOptionTokenBased & { id: ImageGenModelId };
 }
 

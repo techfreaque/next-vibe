@@ -476,6 +476,11 @@ function buildUnbottledEntrySource(
       `        cacheWriteTokenCost: ${op.cacheWriteTokenCost}, ${comment}`,
     );
   }
+  if (typeof op.imageOutputTokenCost === "number") {
+    lines.push(
+      `        imageOutputTokenCost: ${op.imageOutputTokenCost}, ${comment}`,
+    );
+  }
 
   // Flat credit cost (non-token)
   if (typeof op.creditCost === "number") {
@@ -945,13 +950,15 @@ export class ModelPricesRepository {
           update.field === "inputTokenCost" ||
           update.field === "outputTokenCost" ||
           update.field === "cacheReadTokenCost" ||
-          update.field === "cacheWriteTokenCost"
+          update.field === "cacheWriteTokenCost" ||
+          update.field === "imageOutputTokenCost"
         ) {
           const insertAfterMap: Record<string, string> = {
             inputTokenCost: "creditCost",
             outputTokenCost: "inputTokenCost",
             cacheReadTokenCost: "outputTokenCost",
             cacheWriteTokenCost: "cacheReadTokenCost",
+            imageOutputTokenCost: "outputTokenCost",
           };
           const insertAfter = insertAfterMap[update.field] ?? "outputTokenCost";
 
@@ -1195,7 +1202,8 @@ export class ModelPricesRepository {
             (u) =>
               u.field !== "contextWindow" &&
               u.field !== "cacheReadTokenCost" &&
-              u.field !== "cacheWriteTokenCost",
+              u.field !== "cacheWriteTokenCost" &&
+              u.field !== "imageOutputTokenCost",
           )
           .map((u) => u.modelId),
       );

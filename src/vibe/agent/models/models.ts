@@ -141,6 +141,8 @@ export interface ModelProviderConfigTokenBased {
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
+  imageOutputTokenCost?: number;
   adminOnly?: boolean;
   creditCostPerImage?: never;
   creditCostPerSecond?: never;
@@ -387,6 +389,8 @@ export interface ModelOptionTokenBased extends ModelOptionBase {
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
+  imageOutputTokenCost?: number;
   /** Estimated output tokens per generated image, for price display on image-gen LLM models */
   estimatedImageOutputTokens?: number;
   creditCostPerImage?: never;
@@ -809,12 +813,15 @@ interface CreditCostInput extends ModelOptionBase {
   outputTokenCost?: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  imageOutputTokenCost?: number;
 }
 
 /**
  * Upstream USD cost of a token usage at the model's LISTED token prices
  * (no markup). actualInputTokens is the FULL input (uncached + cached); it is
  * clamped so a caller passing an already-uncached count never goes negative.
+ * imageOutputTokens is the IMAGE part of actualOutputTokens (clamped to it):
+ * image-output models price it at imageOutputTokenCost, 4-20x the text rate.
  */
 export function calculateTokenCostUsd(
   modelOption: Pick<
@@ -823,11 +830,13 @@ export function calculateTokenCostUsd(
     | "outputTokenCost"
     | "cacheReadTokenCost"
     | "cacheWriteTokenCost"
+    | "imageOutputTokenCost"
   >,
   actualInputTokens: number,
   actualOutputTokens: number,
   cachedInputTokens = 0,
   cacheWriteTokens = 0,
+  imageOutputTokens = 0,
 ): number {
   const inputTokenCost = modelOption.inputTokenCost ?? 0;
   const outputTokenCost = modelOption.outputTokenCost ?? 0;
@@ -842,7 +851,14 @@ export function calculateTokenCostUsd(
   const cacheWriteCost =
     ((modelOption.cacheWriteTokenCost ?? inputTokenCost) / 1_000_000) *
     cacheWriteTokens;
-  const outputCost = (outputTokenCost / 1_000_000) * actualOutputTokens;
+  const imageTokens = Math.min(
+    Math.max(0, imageOutputTokens),
+    Math.max(0, actualOutputTokens),
+  );
+  const outputCost =
+    (outputTokenCost / 1_000_000) * (actualOutputTokens - imageTokens) +
+    ((modelOption.imageOutputTokenCost ?? outputTokenCost) / 1_000_000) *
+      imageTokens;
   return uncachedInputCost + cachedInputCost + cacheWriteCost + outputCost;
 }
 
@@ -869,6 +885,7 @@ export function calculateCreditCost(
   actualOutputTokens: number,
   cachedInputTokens = 0,
   cacheWriteTokens = 0,
+  imageOutputTokens = 0,
 ): number {
   if (modelOption.creditCostPerImage !== undefined) {
     return roundMediaCost(
@@ -914,6 +931,7 @@ export function calculateCreditCost(
       actualOutputTokens,
       cachedInputTokens,
       cacheWriteTokens,
+      imageOutputTokens,
     ) /
       CREDIT_VALUE_USD) *
     (1 + STANDARD_MARKUP_PERCENTAGE);

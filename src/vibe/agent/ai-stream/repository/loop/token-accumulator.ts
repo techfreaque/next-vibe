@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import type { ProviderMetadata } from "ai";
+import type { JSONValue, ProviderMetadata } from "ai";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { UsageUpstreamCost } from "@/credits/db";
@@ -29,6 +29,7 @@ export type TokenCounters = Pick<
   | "tokenCachedInput"
   | "tokenCacheWrite"
   | "tokenOutput"
+  | "tokenImageOutput"
   | "tokenLastInput"
   | "tokensBilled"
   | "tokenStepCount"
@@ -45,6 +46,9 @@ export interface StepTokens {
   outputTokens: number;
   cachedInputTokens: number;
   cacheWriteTokens: number;
+  /** IMAGE part of outputTokens (image-output models). Billed at the model's
+   *  imageOutputTokenCost in the token-price fallback. Absent = 0. */
+  imageOutputTokens?: number;
 }
 
 /** The real upstream cost one step reported, read from provider metadata. */
@@ -53,6 +57,9 @@ export interface StepUpstreamCost {
   costUsd: number | null;
   /** Upstream endpoint that served the step, when reported. */
   provider: string | null;
+  /** The provider-metadata usage object as reported (null when absent), for
+   *  logging a missing cost. */
+  reportedUsage: JSONValue | null;
 }
 
 /** What a turn (or a set of finished steps) is charged. */
@@ -78,6 +85,49 @@ export function billsUpstreamCost(
   );
 }
 
+/**
+ * IMAGE output tokens of one step. OpenRouter reports them in the raw usage
+ * (`completion_tokens_details.image_tokens`), which the provider package
+ * passes through as `usage.raw` but does not map. When the provider gives no
+ * split but the step produced an image, ALL its output tokens count as image
+ * tokens: the image rate is 4-20x the text rate, so this never bills under
+ * the real cost. Clamped to outputTokens.
+ */
+export function readImageOutputTokens(
+  usage: { outputTokens?: number; raw?: JSONValue },
+  producedImage: boolean,
+): number {
+  const outputTokens = Math.max(0, usage.outputTokens ?? 0);
+  const raw = usage.raw;
+  if (isJsonRecord(raw)) {
+    const details = raw.completion_tokens_details;
+    if (isJsonRecord(details)) {
+      const imageTokens = details.image_tokens;
+      if (
+        typeof imageTokens === "number" &&
+        Number.isFinite(imageTokens) &&
+        imageTokens >= 0
+      ) {
+        return Math.min(imageTokens, outputTokens);
+      }
+    }
+  }
+  return producedImage ? outputTokens : 0;
+}
+
+function isJsonRecord(
+  value: JSONValue | undefined,
+): value is { readonly [key: string]: JSONValue | undefined } {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** True when any generated file of the step is an image. */
+export function producedImageFile(
+  files: ReadonlyArray<{ mediaType: string }> | undefined,
+): boolean {
+  return files?.some((file) => file.mediaType.startsWith("image/")) ?? false;
+}
+
 /** OpenRouter's per-step usage.cost + serving endpoint from provider metadata. */
 export function readStepUpstreamCost(
   providerMetadata: ProviderMetadata | undefined,
@@ -88,13 +138,14 @@ export function readStepUpstreamCost(
       ? openrouter.provider
       : null;
   const usage = openrouter?.usage;
+  const reportedUsage = usage ?? null;
   if (
     usage === null ||
     usage === undefined ||
     typeof usage !== "object" ||
     !("cost" in usage)
   ) {
-    return { costUsd: null, provider };
+    return { costUsd: null, provider, reportedUsage };
   }
   const cost = usage.cost;
   return {
@@ -103,6 +154,7 @@ export function readStepUpstreamCost(
         ? cost
         : null,
     provider,
+    reportedUsage,
   };
 }
 
@@ -126,6 +178,7 @@ export class TokenAccumulator {
     ctx.tokenCachedInput += step.cachedInputTokens;
     ctx.tokenCacheWrite += step.cacheWriteTokens;
     ctx.tokenOutput += step.outputTokens;
+    ctx.tokenImageOutput += step.imageOutputTokens ?? 0;
   }
 
   /**
@@ -139,6 +192,7 @@ export class TokenAccumulator {
       inputTokens: number;
       outputTokens: number;
       cachedInputTokens: number;
+      imageOutputTokens: number;
     },
     providerCacheWriteTokens: number,
   ): {
@@ -147,6 +201,7 @@ export class TokenAccumulator {
     cachedInputTokens: number;
     uncachedInputTokens: number;
     cacheWriteTokens: number;
+    imageOutputTokens: number;
   } {
     const noStepData = ctx.tokenLastInput === 0 && ctx.tokenOutput === 0;
     const cacheWriteTokens =
@@ -161,6 +216,7 @@ export class TokenAccumulator {
             sdk.inputTokens - sdk.cachedInputTokens,
           ),
           cacheWriteTokens,
+          imageOutputTokens: sdk.imageOutputTokens,
         }
       : {
           inputTokens: ctx.tokenLastInput,
@@ -168,6 +224,7 @@ export class TokenAccumulator {
           cachedInputTokens: ctx.tokenCachedInput,
           uncachedInputTokens: ctx.tokenUncachedInput,
           cacheWriteTokens,
+          imageOutputTokens: ctx.tokenImageOutput,
         };
   }
 
@@ -201,6 +258,7 @@ export class TokenAccumulator {
       step.outputTokens,
       step.cachedInputTokens,
       step.cacheWriteTokens,
+      step.imageOutputTokens ?? 0,
     );
     ctx.upstreamFallbackCostUsd += fallbackUsd;
     ctx.upstreamCostMissingSteps += 1;
@@ -213,6 +271,8 @@ export class TokenAccumulator {
         upstreamProvider: upstream.provider,
         ...step,
         fallbackUsd,
+        // What the provider DID report, so the next missing cost is diagnosable.
+        reportedUsage: upstream.reportedUsage,
       },
     );
   }
@@ -249,6 +309,7 @@ export class TokenAccumulator {
         tokens.outputTokens,
         tokens.cachedInputTokens,
         tokens.cacheWriteTokens,
+        tokens.imageOutputTokens ?? 0,
       ),
       upstreamCost: undefined,
     };
@@ -269,6 +330,7 @@ export class TokenAccumulator {
       tokenCachedInput: 0,
       tokenCacheWrite: 0,
       tokenOutput: 0,
+      tokenImageOutput: 0,
       tokenLastInput: 0,
       tokensBilled: false,
       tokenStepCount: 0,
@@ -309,6 +371,7 @@ export class TokenAccumulator {
       outputTokens: ctx.tokenOutput,
       cachedInputTokens: ctx.tokenCachedInput,
       cacheWriteTokens: ctx.tokenCacheWrite,
+      imageOutputTokens: ctx.tokenImageOutput,
     };
   }
 }

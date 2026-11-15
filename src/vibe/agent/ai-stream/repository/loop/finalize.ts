@@ -11,7 +11,12 @@ import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
 import type { StreamLoopState } from "./state";
-import { readStepUpstreamCost, TokenAccumulator } from "./token-accumulator";
+import {
+  producedImageFile,
+  readImageOutputTokens,
+  readStepUpstreamCost,
+  TokenAccumulator,
+} from "./token-accumulator";
 
 /**
  * Finalize ASSISTANT message at stream end.
@@ -168,9 +173,10 @@ export async function complete(
 ): Promise<void> {
   const { modelConfig, messages, model, threadId, logger } = state.p;
 
-  const [usageData, providerMeta] = await Promise.all([
+  const [usageData, providerMeta, generatedFiles] = await Promise.all([
     streamResult.usage,
     streamResult.providerMetadata,
+    streamResult.files,
   ]);
 
   // For reasoning tokens we still read from the SDK's aggregate (output-only, not re-sent).
@@ -185,6 +191,10 @@ export async function complete(
     inputTokens: usageData.inputTokens ?? 0,
     outputTokens: usageData.outputTokens ?? 0,
     cachedInputTokens: usageData.inputTokenDetails?.cacheReadTokens ?? 0,
+    imageOutputTokens: readImageOutputTokens(
+      usageData,
+      producedImageFile(generatedFiles),
+    ),
   };
   // Models without tools never register onStepFinish, so their single step's
   // real upstream cost is read from the aggregate provider metadata here.
@@ -206,6 +216,7 @@ export async function complete(
     cachedInputTokens: finalCachedInputTokens,
     uncachedInputTokens: finalUncachedInputTokens,
     cacheWriteTokens: finalCacheWriteTokens,
+    imageOutputTokens: finalImageOutputTokens,
   } = TokenAccumulator.finalize(
     state.p.ctx,
     sdkTotals,
@@ -225,6 +236,7 @@ export async function complete(
       outputTokens: finalOutputTokens,
       cachedInputTokens: finalCachedInputTokens,
       cacheWriteTokens: finalCacheWriteTokens,
+      imageOutputTokens: finalImageOutputTokens,
     });
   state.p.ctx.tokensBilled = true;
   logger.info("[AI Stream] Turn charge", {
@@ -236,6 +248,7 @@ export async function complete(
     upstreamProvider: upstreamCost?.upstreamProvider ?? null,
     billingBasis: upstreamCost?.billingBasis ?? "token_price",
     steps: state.p.ctx.tokenStepCount,
+    imageOutputTokens: finalImageOutputTokens,
   });
 
   const cachePercentage =

@@ -265,6 +265,10 @@ function readPriceField(
       return "cacheWriteTokenCost" in config
         ? config.cacheWriteTokenCost
         : undefined;
+    case "imageOutputTokenCost":
+      return "imageOutputTokenCost" in config
+        ? config.imageOutputTokenCost
+        : undefined;
     case "creditCostPerImage":
       return config.creditCostPerImage;
     case "creditCostPerClip":

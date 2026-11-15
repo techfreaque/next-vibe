@@ -1014,9 +1014,11 @@ export class StreamLoop implements StreamLoopState {
         cacheReadTokens?: number;
         cacheWriteTokens?: number;
       };
+      raw?: JSONValue;
     };
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
+    files?: ReadonlyArray<{ mediaType: string }>;
   }): void {
     return onStepFinish(this, stepResult);
   }

@@ -58,6 +58,8 @@ interface OpenRouterModel {
     completion: string;
     input_cache_read?: string;
     input_cache_write?: string;
+    /** USD per IMAGE output token (image-output models), 4-20x completion. */
+    image_output?: string;
   };
   architecture?: {
     input_modalities?: string[];
@@ -151,6 +153,9 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
               2,
             )
           : undefined;
+        const imageOutputTokenCost = raw.pricing.image_output
+          ? roundUpPrice(parseFloat(raw.pricing.image_output) * 1_000_000, 2)
+          : undefined;
 
         // Find enum key for contextWindow update (check both chat and image gen enums)
         const enumEntry =
@@ -215,6 +220,19 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
             provider: ApiProvider.OPENROUTER,
             field: "cacheWriteTokenCost",
             value: cacheWriteTokenCost,
+            source: "openrouter-api",
+            providerModel: providerConfig.providerModel,
+          });
+        }
+        // Image tokens bill far above the text completion rate: without this
+        // the token fallback priced a generated image 4-20x too low.
+        if (imageOutputTokenCost !== undefined && imageOutputTokenCost > 0) {
+          updates.push({
+            modelId: providerConfig.id,
+            name: def.name,
+            provider: ApiProvider.OPENROUTER,
+            field: "imageOutputTokenCost",
+            value: imageOutputTokenCost,
             source: "openrouter-api",
             providerModel: providerConfig.providerModel,
           });

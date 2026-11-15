@@ -186,6 +186,8 @@ export class ToolExecutionContextImpl {
   tokenCachedInput = 0;
   tokenCacheWrite = 0;
   tokenOutput = 0;
+  /** IMAGE part of tokenOutput (image-output models, see readImageOutputTokens). */
+  tokenImageOutput = 0;
   /** Full prompt size on the last step — for display/threshold purposes. */
   tokenLastInput = 0;
   /** True once this turn's tokens were billed (complete() or the abort path),

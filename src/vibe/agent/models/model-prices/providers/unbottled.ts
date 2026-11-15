@@ -130,6 +130,12 @@ function buildOp(
   ) {
     op.cacheWriteTokenCost = markup(primary.cacheWriteTokenCost);
   }
+  if (
+    "imageOutputTokenCost" in primary &&
+    primary.imageOutputTokenCost !== undefined
+  ) {
+    op.imageOutputTokenCost = markup(primary.imageOutputTokenCost);
+  }
   if (typeof primary.creditCost === "number") {
     op.creditCost = markup(primary.creditCost);
   }

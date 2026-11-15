@@ -35,6 +35,7 @@ export interface PriceUpdate {
     | "outputTokenCost"
     | "cacheReadTokenCost"
     | "cacheWriteTokenCost"
+    | "imageOutputTokenCost"
     | "contextWindow";
   value: number;
   source: string;
@@ -86,6 +87,7 @@ export interface ProviderEntryOperation {
   outputTokenCost?: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  imageOutputTokenCost?: number;
   creditCostPerImage?: number;
   creditCostPerClip?: number;
   creditCostPerSecond?: number;

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { ModelMessage, ProviderMetadata } from "ai";
+import type { JSONValue, ModelMessage, ProviderMetadata } from "ai";
 
 import { ThreadStreamingState } from "../../../chat/enum";
 import {
@@ -26,6 +26,8 @@ import { FINAL_STEP_INSTRUCTIONS } from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
   billsUpstreamCost,
+  producedImageFile,
+  readImageOutputTokens,
   readStepUpstreamCost,
   TokenAccumulator,
 } from "./token-accumulator";
@@ -577,9 +579,11 @@ export function onStepFinish(
         cacheReadTokens?: number;
         cacheWriteTokens?: number;
       };
+      raw?: JSONValue;
     };
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
+    files?: ReadonlyArray<{ mediaType: string }>;
   },
 ): void {
   const { ctx, modelConfig } = state.p;
@@ -600,11 +604,16 @@ export function onStepFinish(
     state.p.ctx.lastStepInputTokens = inputTokens;
   }
 
+  const imageOutputTokens = readImageOutputTokens(
+    stepResult.usage,
+    producedImageFile(stepResult.files),
+  );
   const stepTokens = {
     inputTokens,
     outputTokens,
     cachedInputTokens,
     cacheWriteTokens,
+    imageOutputTokens,
   };
   TokenAccumulator.accumulate(state.p.ctx, stepTokens);
   const upstream = readStepUpstreamCost(stepResult.providerMetadata);
@@ -635,6 +644,7 @@ export function onStepFinish(
             outputTokens,
             cachedInputTokens,
             cacheWriteTokens,
+            imageOutputTokens,
           );
     ctx.dbWriter.emitTokensUpdated({
       messageId: stepAssistantMessageId,
