@@ -373,6 +373,7 @@ import { Route as ApiLocalePurchasingOrderCreateRouteImport } from './routes/api
 import { Route as ApiLocalePurchasingOrderListRouteImport } from './routes/api.$locale.purchasing.order.list'
 import { Route as ApiLocalePurchasingVendorCreateRouteImport } from './routes/api.$locale.purchasing.vendor.create'
 import { Route as ApiLocalePurchasingVendorListRouteImport } from './routes/api.$locale.purchasing.vendor.list'
+import { Route as ApiLocaleReferralAdminCodeReassignRouteImport } from './routes/api.$locale.referral.admin.code-reassign'
 import { Route as ApiLocaleReferralAdminPayoutsRouteImport } from './routes/api.$locale.referral.admin.payouts'
 import { Route as ApiLocaleReferralCodesListRouteImport } from './routes/api.$locale.referral.codes.list'
 import { Route as ApiLocaleReferralDataSourcesReferralsCodesCreatedRouteImport } from './routes/api.$locale.referral.data-sources.referrals-codes-created'
@@ -2782,6 +2783,12 @@ const ApiLocalePurchasingVendorListRoute =
     path: '/api/$locale/purchasing/vendor/list',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleReferralAdminCodeReassignRoute =
+  ApiLocaleReferralAdminCodeReassignRouteImport.update({
+    id: '/admin/code-reassign',
+    path: '/admin/code-reassign',
+    getParentRoute: () => ApiLocaleReferralRoute,
+  } as any)
 const ApiLocaleReferralAdminPayoutsRoute =
   ApiLocaleReferralAdminPayoutsRouteImport.update({
     id: '/admin/payouts',
@@ -5012,6 +5019,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -5684,6 +5692,7 @@ export interface FileRoutesByTo {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -6364,6 +6373,7 @@ export interface FileRoutesById {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -7044,6 +7054,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -7716,6 +7727,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -8395,6 +8407,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -11727,6 +11740,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePurchasingVendorListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/referral/admin/code-reassign': {
+      id: '/api/$locale/referral/admin/code-reassign'
+      path: '/admin/code-reassign'
+      fullPath: '/api/$locale/referral/admin/code-reassign'
+      preLoaderRoute: typeof ApiLocaleReferralAdminCodeReassignRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
     '/api/$locale/referral/admin/payouts': {
       id: '/api/$locale/referral/admin/payouts'
       path: '/admin/payouts'
@@ -14378,6 +14398,7 @@ interface ApiLocaleReferralRouteChildren {
   ApiLocaleReferralLinksRoute: typeof ApiLocaleReferralLinksRoute
   ApiLocaleReferralPayoutRoute: typeof ApiLocaleReferralPayoutRoute
   ApiLocaleReferralStatsRoute: typeof ApiLocaleReferralStatsRoute
+  ApiLocaleReferralAdminCodeReassignRoute: typeof ApiLocaleReferralAdminCodeReassignRoute
   ApiLocaleReferralAdminPayoutsRoute: typeof ApiLocaleReferralAdminPayoutsRoute
   ApiLocaleReferralCodesListRoute: typeof ApiLocaleReferralCodesListRoute
   ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute: typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -14395,6 +14416,8 @@ const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
   ApiLocaleReferralLinksRoute: ApiLocaleReferralLinksRoute,
   ApiLocaleReferralPayoutRoute: ApiLocaleReferralPayoutRoute,
   ApiLocaleReferralStatsRoute: ApiLocaleReferralStatsRoute,
+  ApiLocaleReferralAdminCodeReassignRoute:
+    ApiLocaleReferralAdminCodeReassignRoute,
   ApiLocaleReferralAdminPayoutsRoute: ApiLocaleReferralAdminPayoutsRoute,
   ApiLocaleReferralCodesListRoute: ApiLocaleReferralCodesListRoute,
   ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute:

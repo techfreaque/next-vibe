@@ -216663,6 +216663,264 @@
     "credits": 0
   },
   {
+    "toolName": "referral-code-reassign",
+    "title": "Przenieś kod polecający",
+    "titleShort": "Przenieś kod",
+    "description": "Przenosi kod polecający na inne konto. Poleceni użytkownicy zostają przy kodzie, więc ich przyszła prowizja trafia do nowego właściciela. Dotychczasowe zarobki zostają u tego, kto je zarobił. Domyślnie próba.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "code": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Kod polecający",
+          "description": "Dokładny kod do przeniesienia",
+          "placeholder": "quelllm",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "targetUser": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Nowy właściciel",
+          "description": "ID użytkownika lub e-mail konta, które dostaje kod",
+          "placeholder": "creator@example.com",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Próba",
+          "description": "Sprawdź przeniesienie bez żadnych zmian",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Próba",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "reassignedCode": {
+          "type": "text",
+          "label": "Kod",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromUserId": {
+          "type": "text",
+          "label": "ID poprzedniego właściciela",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromEmail": {
+          "type": "text",
+          "label": "Poprzedni właściciel",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toUserId": {
+          "type": "text",
+          "label": "ID nowego właściciela",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toEmail": {
+          "type": "text",
+          "label": "Nowy właściciel",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "referralsMoved": {
+          "type": "text",
+          "label": "Przeniesieni poleceni użytkownicy",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "selfReferralsKept": {
+          "type": "text",
+          "label": "Samopolecenia u poprzedniego właściciela",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksMoved": {
+          "type": "text",
+          "label": "Przeniesione linki śledzące",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksTotal": {
+          "type": "text",
+          "label": "Linki kampanii z tym kodem",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "referral",
+    "tags": ["polecenia", "admin"],
+    "aliases": ["referral-code-reassign"],
+    "credits": 0
+  },
+  {
     "toolName": "referral_admin_payouts_GET",
     "title": "Żądania wypłat",
     "titleShort": "Wypłaty",

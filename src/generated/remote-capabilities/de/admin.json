@@ -216663,6 +216663,264 @@
     "credits": 0
   },
   {
+    "toolName": "referral-code-reassign",
+    "title": "Empfehlungscode übertragen",
+    "titleShort": "Code übertragen",
+    "description": "Überträgt einen Empfehlungscode auf ein anderes Konto. Bereits geworbene Nutzer bleiben dem Code zugeordnet, ihre künftige Provision geht an den neuen Inhaber. Bisherige Einnahmen bleiben bei dem, der sie verdient hat. Standardmäßig Probelauf.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "code": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Empfehlungscode",
+          "description": "Der exakte Code, der übertragen wird",
+          "placeholder": "quelllm",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "targetUser": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Neuer Inhaber",
+          "description": "Nutzer-ID oder E-Mail des Kontos, das den Code erhält",
+          "placeholder": "creator@example.com",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Probelauf",
+          "description": "Übertragung prüfen, ohne etwas zu ändern",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Probelauf",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "reassignedCode": {
+          "type": "text",
+          "label": "Code",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromUserId": {
+          "type": "text",
+          "label": "ID bisheriger Inhaber",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromEmail": {
+          "type": "text",
+          "label": "Bisheriger Inhaber",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toUserId": {
+          "type": "text",
+          "label": "ID neuer Inhaber",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toEmail": {
+          "type": "text",
+          "label": "Neuer Inhaber",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "referralsMoved": {
+          "type": "text",
+          "label": "Übertragene geworbene Nutzer",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "selfReferralsKept": {
+          "type": "text",
+          "label": "Selbstempfehlungen beim bisherigen Inhaber",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksMoved": {
+          "type": "text",
+          "label": "Übertragene Tracking-Links",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksTotal": {
+          "type": "text",
+          "label": "Kampagnenlinks mit diesem Code",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "referral",
+    "tags": ["empfehlung", "admin"],
+    "aliases": ["referral-code-reassign"],
+    "credits": 0
+  },
+  {
     "toolName": "referral_admin_payouts_GET",
     "title": "Auszahlungsanfragen",
     "titleShort": "Auszahlungen",

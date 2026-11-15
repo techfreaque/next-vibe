@@ -216663,6 +216663,264 @@
     "credits": 0
   },
   {
+    "toolName": "referral-code-reassign",
+    "title": "Reassign Referral Code",
+    "titleShort": "Reassign Code",
+    "description": "Move a referral code to another account. Users it already referred stay attributed to the code, so their future commission goes to the new owner. Past earnings stay with whoever earned them. Dry run by default.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "code": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Referral code",
+          "description": "The exact code to move",
+          "placeholder": "quelllm",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "targetUser": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "New owner",
+          "description": "User ID or email of the account that gets the code",
+          "placeholder": "creator@example.com",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Dry run",
+          "description": "Preview the move without changing anything",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Dry run",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "reassignedCode": {
+          "type": "text",
+          "label": "Code",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromUserId": {
+          "type": "text",
+          "label": "Previous owner ID",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fromEmail": {
+          "type": "text",
+          "label": "Previous owner",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toUserId": {
+          "type": "text",
+          "label": "New owner ID",
+          "schema": {
+            "def": {
+              "type": "string",
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "toEmail": {
+          "type": "text",
+          "label": "New owner",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "referralsMoved": {
+          "type": "text",
+          "label": "Referred users moved",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "selfReferralsKept": {
+          "type": "text",
+          "label": "Self-referrals kept with previous owner",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksMoved": {
+          "type": "text",
+          "label": "Tracked links moved",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "linksTotal": {
+          "type": "text",
+          "label": "Campaign links using the code",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "referral",
+    "tags": ["referral", "admin"],
+    "aliases": ["referral-code-reassign"],
+    "credits": 0
+  },
+  {
     "toolName": "referral_admin_payouts_GET",
     "title": "Payout Requests",
     "titleShort": "Requests",
