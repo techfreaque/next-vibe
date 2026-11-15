@@ -2,7 +2,7 @@
 
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { useTranslation } from "../../core/i18n/core/client";
@@ -12,7 +12,11 @@ import type {
 } from "../../core/route/response.schema";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { executeMutation } from "./mutation-executor";
+import {
+  buildMutationExceptionResponse,
+  executeMutation,
+  settleMutationResult,
+} from "./mutation-executor";
 import type { ApiMutationOptions } from "./types";
 
 /**
@@ -204,6 +208,42 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
     },
   });
 
+  // RQ's mutateAsync rejects with the ErrorResponseType thrown above. Our
+  // contract is Promise<ResponseType<T>>: failure resolves as a value, so
+  // callers' `if (!result.success)` branches run and nothing leaks an
+  // unhandled rejection. Depends only on RQ's (stable) mutateAsync; the
+  // unexpected-error context is read from a ref so a caller passing a fresh
+  // logger/endpoint per render cannot destabilise it.
+  const unexpectedContextRef = useRef({ endpoint, locale, logger });
+  useLayoutEffect(() => {
+    unexpectedContextRef.current = { endpoint, locale, logger };
+  });
+  const rqMutateAsync = mutation.mutateAsync;
+  const mutateAsync = useCallback(
+    (
+      variables: MutationVariables<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
+    ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> =>
+      settleMutationResult(
+        () => rqMutateAsync(variables),
+        (parsedError) => {
+          const ctx = unexpectedContextRef.current;
+          ctx.logger.error("Mutation rejected with a non-response error", {
+            endpoint: ctx.endpoint.path.join("/"),
+            error: parsedError,
+          });
+          return buildMutationExceptionResponse(
+            ctx.endpoint,
+            ctx.locale,
+            parsedError,
+          );
+        },
+      ),
+    [rqMutateAsync],
+  );
+
   // Stable setErrorType function
   const setErrorType = useCallback((error: ErrorResponseType | null): void => {
     setLocalError(error);
@@ -211,7 +251,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
 
   // Return enhanced mutation result with stable references.
   // Only include deps that have real functional impact on consumers:
-  // - mutate/mutateAsync: the callable functions (stable useCallbacks from RQ)
+  // - mutate/mutateAsync: the callable functions (stable useCallbacks)
   // - status/isPending/isError/isSuccess: primitive state flags
   // - data/error: the actual result values
   // - reset: stable function from RQ
@@ -223,7 +263,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   return useMemo(
     () => ({
       mutate: mutation.mutate,
-      mutateAsync: mutation.mutateAsync,
+      mutateAsync,
       isPending: mutation.isPending,
       isError: mutation.isError,
       error: localError || mutation.error,
@@ -239,7 +279,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
     }),
     [
       mutation.mutate,
-      mutation.mutateAsync,
+      mutateAsync,
       mutation.isPending,
       mutation.isError,
       mutation.error,

@@ -43,7 +43,11 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["vibe", "tasks", "execute"],
   aliases: [TASK_EXECUTE_ALIAS, "task-execute"],
-  allowedRoles: [UserRole.ADMIN],
+  // Customers run their OWN tasks (ownership enforced in the repository): the
+  // chat-settings "Run now" for Dreaming / Autopilot calls this for every
+  // signed-in user. ADMIN-only made that button a silent 403 for customers
+  // (prod 2026-11-14 23:41 + 23:47).
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
 
   title: "post.title",
   titleShort: "post.titleShort",

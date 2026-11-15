@@ -346,43 +346,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           endpoint: endpoint.path.join("/"),
           keys: Object.keys(validatedData ?? {}),
         });
-        try {
-          // Clear any previous errors
-          clearFormError();
-
-          const result = await mutation.mutateAsync({
-            requestData: validatedData,
-            urlPathParams,
-          });
-
-          if (result === undefined) {
-            logger.error("Mutation result is undefined", {
-              endpoint: [...endpoint.path].join("/"),
-            });
-            return undefined;
-          }
-
-          // Extract the data from the ResponseType
-          const responseData = result.success
-            ? result.data
-            : (undefined as TEndpoint["types"]["ResponseOutput"]);
-
-          const onSuccessResult = submitOptions?.onSuccess?.({
-            responseData: responseData as TEndpoint["types"]["ResponseOutput"],
-            pathParams: urlPathParams,
-            requestData: validatedData,
-          });
-
-          // If onSuccess returns an error, treat it as an error
-          if (onSuccessResult) {
-            setError(onSuccessResult);
-            submitOptions?.onError?.({
-              error: onSuccessResult,
-              requestData: validatedData,
-              pathParams: urlPathParams,
-            });
-          }
-        } catch (error) {
+        // Failure path: a failed ResponseType from mutateAsync, or an
+        // unexpected exception thrown while handling the result.
+        const handleFailure = (error: ErrorResponseType | Error): void => {
           const formSnapshot = formMethods.getValues();
           // No manual "[client] " prefix - the client-log receiver
           // (error-monitor/client-log/repository.ts) already prepends it to
@@ -404,7 +370,6 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             hasFiles: containsFile(formSnapshot),
           };
 
-          // Handle any errors that occur during submission
           // If the error is already an ErrorResponseType, use it directly
           let errorResponse: ErrorResponseType;
           if (isErrorResponseType(error)) {
@@ -419,8 +384,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             );
             errorResponse = error;
           } else {
-            // Unexpected throw (network failure, code bug) — real error.
-            logger.error("Error in submitForm", parseError(error), logMeta);
+            // Unexpected throw (code bug in a callback) — real error.
+            logger.error("Error in submitForm", error, logMeta);
             errorResponse = fail({
               message: hooksTranslation
                 .scopedT(locale)
@@ -435,6 +400,40 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             requestData: validatedData,
             pathParams: urlPathParams,
           });
+        };
+
+        try {
+          // Clear any previous errors
+          clearFormError();
+
+          // mutateAsync resolves with the ErrorResponseType on failure
+          const result = await mutation.mutateAsync({
+            requestData: validatedData,
+            urlPathParams,
+          });
+
+          if (!result.success) {
+            handleFailure(result);
+            return undefined;
+          }
+
+          const onSuccessResult = submitOptions?.onSuccess?.({
+            responseData: result.data,
+            pathParams: urlPathParams,
+            requestData: validatedData,
+          });
+
+          // If onSuccess returns an error, treat it as an error
+          if (onSuccessResult) {
+            setError(onSuccessResult);
+            submitOptions?.onError?.({
+              error: onSuccessResult,
+              requestData: validatedData,
+              pathParams: urlPathParams,
+            });
+          }
+        } catch (error) {
+          handleFailure(isErrorResponseType(error) ? error : parseError(error));
         }
       };
       void formMethods.handleSubmit(_submitForm, (errors) => {

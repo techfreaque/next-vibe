@@ -284190,5 +284190,280 @@
     "tags": ["Połączenie zdalne"],
     "aliases": ["rename-self", "rename-instance"],
     "credits": 0
+  },
+  {
+    "toolName": "execute-task",
+    "title": "Wykonaj zadanie",
+    "titleShort": "Wykonaj zadanie",
+    "description": "Wyzwól pojedyncze zadanie po ID i odbierz wynik synchronicznie",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "taskId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "ID zadania",
+          "description": "ID zadania do wykonania",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "type": "submit_button",
+          "text": "post.submitButton.label",
+          "loadingText": "post.submitButton.loadingText",
+          "variant": "default",
+          "size": "default"
+        },
+        "success": {
+          "type": "text",
+          "label": "Sukces",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "message": {
+          "type": "text",
+          "label": "Wiadomość",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "taskName": {
+          "type": "text",
+          "label": "Nazwa zadania",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "executedAt": {
+          "type": "text",
+          "label": "Wykonano o",
+          "schema": {
+            "def": {
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "date"
+                      },
+                      "type": "date"
+                    },
+                    {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "out": {
+                "def": {
+                  "type": "transform"
+                },
+                "type": "transform"
+              }
+            },
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "date"
+                    },
+                    "type": "date"
+                  },
+                  {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                ]
+              },
+              "type": "union",
+              "options": [
+                {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                {
+                  "def": {
+                    "type": "date"
+                  },
+                  "type": "date"
+                },
+                {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                }
+              ]
+            },
+            "out": {
+              "def": {
+                "type": "transform"
+              },
+              "type": "transform"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "duration": {
+          "type": "text",
+          "label": "Czas trwania (ms)",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "status": {
+          "type": "text",
+          "label": "Status",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Wykonaj"],
+    "aliases": ["execute-task", "task-execute"],
+    "credits": 0
   }
 ]

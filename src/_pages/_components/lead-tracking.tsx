@@ -2,7 +2,6 @@
 
 import {
   isBrowserNetworkLossMessage,
-  isErrorResponseType,
   parseError,
 } from "next-vibe/core/utils/parse-error";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
@@ -125,19 +124,17 @@ export function LeadTracking(): null {
     };
 
     const send = async (attempt: number): Promise<void> => {
-      try {
-        const result = await mutateAsync({ requestData });
-        if (result.success) {
-          lastTrackedTimeRef.current = Date.now();
-          logger.debug("info.leads.tracking.engagement.visit_recorded", {
-            leadId: result.data.responseLeadId,
-            attempt,
-          });
-        }
-      } catch (err) {
-        // mutateAsync throws the ErrorResponseType on any failure
-        const errorMessage = parseError(err).message;
-        const errorType = isErrorResponseType(err) ? err.errorType : null;
+      // mutateAsync resolves with the ErrorResponseType on any failure
+      const result = await mutateAsync({ requestData });
+      if (result.success) {
+        lastTrackedTimeRef.current = Date.now();
+        logger.debug("info.leads.tracking.engagement.visit_recorded", {
+          leadId: result.data.responseLeadId,
+          attempt,
+        });
+      } else {
+        const errorMessage = parseError(result).message;
+        const { errorType } = result;
         const isNetworkLoss = isBrowserNetworkLossMessage(errorMessage);
         if (isNetworkLoss && attempt < MAX_ATTEMPTS && !run.pageHidden) {
           logger.debug("Lead tracking: network loss, retrying visit once", {
@@ -162,8 +159,8 @@ export function LeadTracking(): null {
         }
         logger.error("Lead tracking: failed to record website visit", {
           error: errorMessage,
-          errorKey: errorType?.errorKey ?? null,
-          errorCode: errorType?.errorCode ?? null,
+          errorKey: errorType.errorKey,
+          errorCode: errorType.errorCode,
           engagementType: requestData.engagementType,
           attempt,
           isNetworkLoss,

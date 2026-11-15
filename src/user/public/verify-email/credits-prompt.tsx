@@ -9,7 +9,6 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { isErrorResponseType } from "next-vibe/core/utils/parse-error";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -66,20 +65,13 @@ export function VerifyEmailCreditsPrompt({
   const sending = mutation.isPending;
 
   const resend = async (): Promise<void> => {
-    try {
-      const result = await mutation.mutateAsync({ requestData: {} });
-      setState(
-        result.success
-          ? { kind: "sent", email: result.data.email }
-          : { kind: "error", message: result.message },
-      );
-    } catch (err) {
-      // useApiMutation rejects with the ErrorResponseType on failure
-      setState({
-        kind: "error",
-        message: isErrorResponseType(err) ? err.message : String(err),
-      });
-    }
+    // mutateAsync resolves with the ErrorResponseType on failure
+    const result = await mutation.mutateAsync({ requestData: {} });
+    setState(
+      result.success
+        ? { kind: "sent", email: result.data.email }
+        : { kind: "error", message: result.message },
+    );
   };
 
   return (

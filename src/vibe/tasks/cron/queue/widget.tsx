@@ -762,7 +762,10 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
       const ids = [...selectedIds];
       void bulkMutation
         .mutateAsync({ requestData: { ids, action } })
-        .then(async () => {
+        .then(async (result) => {
+          if (!result.success) {
+            return undefined;
+          }
           handleClearSelection();
           // Update caches optimistically - no refetch needed
           const { apiClient } = await import("../../../unified-ui/hooks/store");

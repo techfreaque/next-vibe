@@ -157,6 +157,14 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   useEffect(() => {
     if (formResult?.form && prefillKey !== prevPrefillKeyRef.current) {
       prevPrefillKeyRef.current = prefillKey;
+      // A reset while handleSubmit is validating makes react-hook-form drop
+      // that submit silently (its resetCallId check). An optimistic cache
+      // write right before submitting (chat settings: turning Dreaming off)
+      // changes the prefill and lost the save. The submitted values already
+      // match that optimistic data, so skipping this one reset is safe.
+      if (formResult.form.formState.isSubmitting) {
+        return;
+      }
       // reset() REPLACES every value, so the form's own defaults have to be
       // carried along. Without them a prefill of `{interactive: true}` — which
       // is all the interactive CLI supplies — wiped every `.default(…)` the

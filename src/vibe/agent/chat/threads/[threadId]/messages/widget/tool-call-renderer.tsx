@@ -672,9 +672,11 @@ export function ToolCallRenderer({
         .mutateAsync({
           urlPathParams: { id: taskId },
         })
-        .then(() => undefined)
-        .catch(() => {
-          setIsCancelling(false);
+        .then((result) => {
+          if (!result.success) {
+            setIsCancelling(false);
+          }
+          return undefined;
         });
     },
     [cancelMutation, toolCall.remoteTaskId, isCancelling],
@@ -702,9 +704,11 @@ export function ToolCallRenderer({
       setIsDetaching(true);
       void detachMutation
         .mutateAsync({ requestData: { callId: controlCallId } })
-        .then(() => undefined)
-        .catch(() => {
-          setIsDetaching(false);
+        .then((result) => {
+          if (!result.success) {
+            setIsDetaching(false);
+          }
+          return undefined;
         });
     },
     [detachMutation, controlCallId, isDetaching],
@@ -725,9 +729,11 @@ export function ToolCallRenderer({
       setIsResuming(true);
       void resumeMutation
         .mutateAsync({ requestData: { callId: controlCallId } })
-        .then(() => undefined)
-        .catch(() => {
-          setIsResuming(false);
+        .then((result) => {
+          if (!result.success) {
+            setIsResuming(false);
+          }
+          return undefined;
         });
     },
     [resumeMutation, controlCallId, isResuming],
@@ -748,9 +754,11 @@ export function ToolCallRenderer({
       setIsCancellingCall(true);
       void cancelCallMutation
         .mutateAsync({ requestData: { callId: controlCallId } })
-        .then(() => undefined)
-        .catch(() => {
-          setIsCancellingCall(false);
+        .then((result) => {
+          if (!result.success) {
+            setIsCancellingCall(false);
+          }
+          return undefined;
         });
     },
     [cancelCallMutation, controlCallId, isCancellingCall],

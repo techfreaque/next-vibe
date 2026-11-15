@@ -263,13 +263,11 @@ export function NewsletterPendingNotice({
     if (!email) {
       return;
     }
-    try {
-      const response = await mutateAsync({ requestData: { email } });
-      setResult(response.success ? "sent" : "error");
+    // mutateAsync resolves with the error response; show it inline
+    const response = await mutateAsync({ requestData: { email } });
+    setResult(response.success ? "sent" : "error");
+    if (response.success) {
       await refetchOwnNewsletterStatus(logger);
-    } catch {
-      // useApiMutation rejects with the error response; show it inline
-      setResult("error");
     }
   }, [email, mutateAsync, logger]);
 

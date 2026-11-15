@@ -434,31 +434,37 @@ const { DELETE } = createEndpoint({
   options: {
     mutationOptions: {
       onSuccess: async (data) => {
-        const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
-        const messagesDefinition = await import("../definition");
-
-        apiClient.updateEndpointData(
-          messagesDefinition.default.GET,
+        // removeMessage reparents the deleted row's children onto its parent,
+        // matching the server. A bare filter orphaned them: they rendered as
+        // a phantom root branch ("2 / 2") until reload.
+        const { removeMessage } = await import("../hooks/update-messages");
+        removeMessage(
+          data.pathParams.threadId,
+          data.requestData.rootFolderId,
           data.logger,
-          (oldData) => {
-            if (!oldData?.success) {
-              return oldData;
-            }
-            return {
-              success: true,
-              data: {
-                streamingState: oldData.data.streamingState,
-                backgroundTasks: oldData.data.backgroundTasks,
-                messages: oldData.data.messages.filter(
-                  (msg) => msg.id !== data.pathParams.messageId,
-                ),
-              },
-            };
-          },
+          data.pathParams.messageId,
+        );
+      },
+      // 404: the message is already gone on the server (deleted in another
+      // tab/device, or a double tap). The local cache row is stale - drop it
+      // so the UI matches the server instead of keeping a ghost message.
+      onError: async (data) => {
+        if (data.error.errorType.errorCode !== 404) {
+          return;
+        }
+        const { removeMessage } = await import("../hooks/update-messages");
+        data.logger.warn(
+          "Delete message: not found on server, removing from local cache",
           {
-            urlPathParams: { threadId: data.pathParams.threadId },
-            requestData: { rootFolderId: data.requestData.rootFolderId },
+            messageId: data.pathParams.messageId,
+            threadId: data.pathParams.threadId,
           },
+        );
+        removeMessage(
+          data.pathParams.threadId,
+          data.requestData.rootFolderId,
+          data.logger,
+          data.pathParams.messageId,
         );
       },
     },

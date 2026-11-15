@@ -314,9 +314,12 @@ function UnbottledLoginField({
     if (!providerInstanceId) {
       return;
     }
-    await disconnectMutation.mutateAsync({
+    const result = await disconnectMutation.mutateAsync({
       urlPathParams: { instanceId: providerInstanceId },
     });
+    if (!result.success) {
+      return;
+    }
     await refetchConnections?.();
   }, [providerInstanceId, disconnectMutation, refetchConnections]);
 

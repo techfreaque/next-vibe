@@ -321,8 +321,13 @@ export class ExecuteToolGuards {
         deniedToolIds: [...permissions.deniedToolIds],
         whitelistSize: permissions.availableTools?.length ?? null,
       });
+      // The message is the model's tool result: a bare "Forbidden" gave it
+      // nothing to correct, so incognito turns kept wrapping rename-thread in
+      // execute-tool (2026-11-14 23:41). Name the tool and the way out.
       return fail({
-        message: t("executeTool.post.errors.forbidden.title"),
+        message: t("executeTool.post.errors.toolDeniedHere.title", {
+          toolName,
+        }),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }

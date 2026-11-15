@@ -566,8 +566,12 @@ export function useMessageOperations(
         });
 
         if (!result.success) {
+          // A 404 here means the message is in the client cache but not in the
+          // DB (client-only row, unpersisted stream, mirror id drift) - the
+          // context below says which.
           logger.error("Message operations: Failed to vote on message", {
             message: result.message,
+            errorCode: result.errorType.errorCode,
             ...voteContext,
           });
           return;
@@ -601,9 +605,6 @@ export function useMessageOperations(
           },
         });
       } catch (error) {
-        // A 404 here means the message is in the client cache but not in the
-        // DB (client-only row, unpersisted stream, mirror id drift) - the
-        // context below says which.
         logger.error(
           "Message operations: Failed to vote on message",
           parseError(error),

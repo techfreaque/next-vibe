@@ -47,6 +47,18 @@ describe("describeSubscribeIdentity", () => {
     ).toBe("foreign");
   });
 
+  it("flags a guest-state tab whose lead rotated on signup (linked lead)", () => {
+    const rotated: JwtPrivatePayloadType = { ...loggedIn, leadId: OTHER };
+    expect(
+      describeSubscribeIdentity(rotated, `user/${LEAD}/ws-credits-GET`, true)
+        .identityMismatch,
+    ).toBe("client-guest-socket-user");
+    expect(
+      describeSubscribeIdentity(rotated, `user/${LEAD}/ws-credits-GET`, false)
+        .identityMismatch,
+    ).toBe("foreign");
+  });
+
   it("flags a guest socket asking for another uid", () => {
     expect(
       describeSubscribeIdentity(guest, `user/${USER}/ws-credits-GET`),

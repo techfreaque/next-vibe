@@ -14,7 +14,6 @@
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import {
   isBrowserNetworkLossMessage,
-  isErrorResponseType,
   parseError,
 } from "next-vibe/core/utils/parse-error";
 import { preWarmChannel } from "next-vibe/realtime/client/client";
@@ -45,7 +44,6 @@ import {
 } from "../../../models/uncensored-consent/hooks";
 import cancelEndpoints from "../../cancel/definition";
 import { getChatModelById } from "../../models";
-import { serializeError } from "../../repository/errors/error-utils";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
 import { scopedTranslation } from "../i18n";
@@ -187,59 +185,54 @@ export function useAIStream(): UseAIStreamReturn {
         messageHistoryLength: data.messageHistory?.length ?? 0,
       });
 
-      let result: Awaited<ReturnType<typeof streamMutation.mutateAsync>>;
-      try {
-        result = await streamMutation.mutateAsync({
-          requestData: data,
-        });
-      } catch (err) {
+      const result = await streamMutation.mutateAsync({
+        requestData: data,
+      });
+      if (!result.success) {
         if (threadId) {
           storeSetPending(threadId, false);
         }
         if (isIncognitoStream) {
           useAIStreamStore.getState().removeIncognitoStream(threadId);
         }
-        // mutateAsync throws the full ErrorResponseType on non-success
+        // mutateAsync resolves with the full ErrorResponseType on non-success
         // responses - BOTH a server-returned failure (403, 402, 500 ...) AND a
         // browser-level fetch failure (callApi wraps those as an
         // INTERNAL_ERROR "Request to ... failed: Failed to fetch").
-        const parsedErr = parseError(err);
+        const parsedErr = parseError(result);
         const failMessage = parsedErr.message;
-        const errorType = isErrorResponseType(err) ? err.errorType : null;
+        const { errorType } = result;
         // Browser-level connectivity loss ("Load failed" on Safari, "Failed
         // to fetch" on Chrome, Firefox's NetworkError) is most likely the
         // user's network (a server outage looks the same) - warn. Anything
         // else (timeout, malformed response, server rejection) stays an error.
         const isBrowserNetworkLoss = isBrowserNetworkLossMessage(failMessage);
         // Credit refusal (402) is an expected outcome, shown as a card below.
-        const isCreditRefusal =
-          errorType !== null && isOutOfCreditsErrorCode(errorType.errorCode);
+        const isCreditRefusal = isOutOfCreditsErrorCode(errorType.errorCode);
         // Consent refusal (403 CONSENT_REQUIRED) is expected too: dialog below.
         const isConsentRefusal =
-          errorType?.errorKey === ErrorResponseTypes.CONSENT_REQUIRED.errorKey;
+          errorType.errorKey === ErrorResponseTypes.CONSENT_REQUIRED.errorKey;
         // HTTP_ERROR = callApi got a response that is not our API's JSON
         // (e.g. a 200 text/html page from a proxy, captive portal or content
         // filter). It is not a handler rejection: the HTTP status, headers and
         // body snippet live on the "callApi: non-JSON response" row with the
         // same tabId, and errorCode below is only the type's default (500).
         const isNonApiResponse =
-          errorType?.errorKey === ErrorResponseTypes.HTTP_ERROR.errorKey;
+          errorType.errorKey === ErrorResponseTypes.HTTP_ERROR.errorKey;
         // Only a request that never got a response is a "network error"; a
         // server answer (4xx/5xx) is labelled as such with its status.
         const label = isBrowserNetworkLoss
           ? "Stream request network error"
           : isNonApiResponse
             ? "Stream request got a non-API response"
-            : errorType !== null
-              ? "Stream request rejected by server"
-              : "Stream request failed (no server response)";
+            : "Stream request rejected by server";
         (isBrowserNetworkLoss || isCreditRefusal || isConsentRefusal
           ? logger.warn
           : logger.error
         ).bind(logger)(label, {
           message: failMessage,
-          errorKey: errorType?.errorKey ?? null,
-          errorCode: errorType?.errorCode ?? null,
+          errorKey: errorType.errorKey,
+          errorCode: errorType.errorCode,
           errorName: parsedErr.name,
           operation: data.operation,
           model: data.model,
@@ -282,67 +275,6 @@ export function useAIStream(): UseAIStreamReturn {
         toast({
           title: t("error.title"),
           description: failMessage,
-          variant: "destructive",
-          duration: Infinity,
-        });
-
-        return false;
-      }
-
-      if (!result.success) {
-        if (threadId) {
-          storeSetPending(threadId, false);
-        }
-        if (isIncognitoStream) {
-          useAIStreamStore.getState().removeIncognitoStream(threadId);
-        }
-        const resultMessage = result.message;
-        // 4xx (no credits, forbidden folder) is shown to the user - warn;
-        // a server failure is an error.
-        const isServerFailure = (result.errorType?.errorCode ?? 500) >= 500;
-        (isServerFailure ? logger.error : logger.warn).bind(logger)(
-          "Stream request failed",
-          {
-            message: resultMessage,
-            errorType: result.errorType?.errorCode,
-            operation: data.operation,
-            model: data.model,
-            threadId: data.threadId,
-          },
-        );
-
-        if (
-          result.errorType?.errorKey ===
-          ErrorResponseTypes.CONSENT_REQUIRED.errorKey
-        ) {
-          markUncensoredConsentMissing(logger);
-          holdForConsent(data, model?.name ?? data.model);
-          return false;
-        }
-
-        const activeThreadId = data.threadId;
-        if (isOutOfCreditsErrorCode(result.errorType?.errorCode)) {
-          if (activeThreadId) {
-            discardOptimisticTurn(activeThreadId, data.rootFolderId, logger);
-          }
-          useAIStreamStore.getState().setCreditRefusal(true);
-          return false;
-        }
-        if (activeThreadId) {
-          addErrorMessageToChat(
-            activeThreadId,
-            data.rootFolderId,
-            serializeError(result),
-            "HTTP_ERROR",
-            null,
-            null,
-            logger,
-          );
-        }
-
-        toast({
-          title: t("error.title"),
-          description: resultMessage,
           variant: "destructive",
           duration: Infinity,
         });

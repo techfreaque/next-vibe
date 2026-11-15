@@ -18,6 +18,8 @@ interface RunningTaskEntry {
   controller: AbortController;
   /** Set when the watchdog / an admin cancelled this run */
   cancelReason: string | null;
+  /** Human-readable name (task display name / tool name) for diagnostics */
+  label: string;
 }
 
 declare global {
@@ -30,8 +32,12 @@ function entries(): Map<string, RunningTaskEntry> {
 }
 
 export class RunningTaskRegistry {
-  static register(taskId: string, controller: AbortController): void {
-    entries().set(taskId, { controller, cancelReason: null });
+  static register(
+    taskId: string,
+    controller: AbortController,
+    label: string,
+  ): void {
+    entries().set(taskId, { controller, cancelReason: null, label });
   }
 
   /**
@@ -65,6 +71,15 @@ export class RunningTaskRegistry {
 
   static has(taskId: string): boolean {
     return entries().has(taskId);
+  }
+
+  /**
+   * Names of the runs this process holds right now. The event-loop lag monitor
+   * stamps these on a stall, so a lag row names the cron task / async tool
+   * that was executing instead of only the long-lived pulse runner.
+   */
+  static labels(): string[] {
+    return [...entries().values()].map((entry) => entry.label);
   }
 
   /** Runs this process holds right now (deploy drain status). */

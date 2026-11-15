@@ -53,6 +53,10 @@ export const translations: typeof enTranslations = {
           title: "Verboten",
           description: "Zugriff verweigert",
         },
+        toolDeniedHere: {
+          title:
+            "{{toolName}} steht in diesem Thread nicht zur Verfügung. Ruf die Tools aus deiner Tool-Liste direkt auf.",
+        },
         notFound: {
           title: "Tool nicht gefunden",
           description: "Kein registriertes Tool mit diesem Namen gefunden",

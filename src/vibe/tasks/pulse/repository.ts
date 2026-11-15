@@ -484,7 +484,11 @@ export class PulseHealthRepository {
                 const attemptStart = Date.now();
                 const taskAbortController = new AbortController();
                 // The watchdog / an admin cancels a run through this entry.
-                RunningTaskRegistry.register(dbTask.id, taskAbortController);
+                RunningTaskRegistry.register(
+                  dbTask.id,
+                  taskAbortController,
+                  `cron:${resolvedTaskName}`,
+                );
                 let timedOut = false;
                 let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
                 let typedResult: ResponseType<

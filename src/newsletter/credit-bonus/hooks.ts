@@ -5,7 +5,6 @@
  * Used by the chat's out-of-credits card. Accounts only: never enable for guests.
  */
 
-import { isErrorResponseType } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
@@ -49,23 +48,16 @@ export function useNewsletterCreditBonus(
   const { mutateAsync } = mutation;
 
   const claim = useCallback(async (): Promise<NewsletterCreditClaimResult> => {
-    try {
-      const result = await mutateAsync({});
-      if (!result.success) {
-        return { kind: "error", message: result.message };
-      }
-      await apiClient.refetchEndpoint(creditBonusDefinitions.GET, logger);
-      if (result.data.offer === NewsletterCreditOffer.ACTIVE) {
-        await apiClient.refetchEndpoint(creditsDefinitions.GET, logger);
-      }
-      return { kind: "ok", data: result.data };
-    } catch (err) {
-      // useApiMutation rejects with the ErrorResponseType on failure
-      return {
-        kind: "error",
-        message: isErrorResponseType(err) ? err.message : String(err),
-      };
+    // mutateAsync resolves with the ErrorResponseType on failure
+    const result = await mutateAsync({});
+    if (!result.success) {
+      return { kind: "error", message: result.message };
     }
+    await apiClient.refetchEndpoint(creditBonusDefinitions.GET, logger);
+    if (result.data.offer === NewsletterCreditOffer.ACTIVE) {
+      await apiClient.refetchEndpoint(creditsDefinitions.GET, logger);
+    }
+    return { kind: "ok", data: result.data };
   }, [mutateAsync, logger]);
 
   const response = endpoint.read?.response;

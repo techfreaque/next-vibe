@@ -8,7 +8,7 @@ import type {
   ResponseType,
 } from "../../core/route/response.schema";
 import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
-import { parseError } from "../../core/utils/parse-error";
+import { isErrorResponseType, parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { callApi as CallApiFn } from "./call-api";
@@ -42,6 +42,59 @@ interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
 async function loadCallApi(): Promise<typeof CallApiFn> {
   const mod = await import("./call-api");
   return mod.callApi;
+}
+
+/**
+ * Turn an exception thrown while running a mutation into the endpoint's
+ * SERVER_ERROR-flavoured fail() response.
+ */
+export function buildMutationExceptionResponse(
+  endpoint: CreateApiEndpointAny,
+  locale: CountryLanguage,
+  parsedError: Error,
+): ErrorResponseType {
+  const serverErrorConfig =
+    endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+  const errorMessage = t(serverErrorConfig?.description);
+
+  // The endpoint's declared description is placeholder-free by contract, so
+  // it rides in as an already-translated `reason` rather than gaining one.
+  return fail({
+    message: hooksTranslation
+      .scopedT(locale)
+      .t("apiUtils.errors.endpointFailed", {
+        reason: errorMessage,
+        path: endpoint.path.join("/"),
+        error: parsedError.message,
+      }),
+    errorType: ErrorResponseTypes.INTERNAL_ERROR,
+  });
+}
+
+/**
+ * Settle a React Query `mutateAsync` call into the `ResponseType` contract.
+ *
+ * useApiMutation's mutationFn throws the ErrorResponseType so React Query's
+ * isError/onError/error state work, which makes RQ's own `mutateAsync` REJECT
+ * on failure. Callers are typed (and written) against
+ * `Promise<ResponseType<T>>`, so failure must come back as a resolved value:
+ * a rejected ErrorResponseType is returned as-is, anything else (a bug in a
+ * callback, an RQ internal) becomes a fail() via `onUnexpected` so no caller
+ * can leak an unhandled rejection.
+ */
+export async function settleMutationResult<TResponse>(
+  run: () => Promise<ResponseType<TResponse>>,
+  onUnexpected: (parsedError: Error) => ErrorResponseType,
+): Promise<ResponseType<TResponse>> {
+  try {
+    return await run();
+  } catch (error) {
+    if (isErrorResponseType(error)) {
+      return error;
+    }
+    return onUnexpected(parseError(error));
+  }
 }
 
 export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
@@ -144,24 +197,11 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     return response;
   } catch (error) {
     const parsedError = parseError(error);
-
-    const serverErrorConfig =
-      endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
-    const { t } = endpoint.scopedTranslation.scopedT(locale);
-    const errorMessage = t(serverErrorConfig?.description);
-
-    // The endpoint's declared description is placeholder-free by contract, so
-    // it rides in as an already-translated `reason` rather than gaining one.
-    const errorResponse: ErrorResponseType = fail({
-      message: hooksTranslation
-        .scopedT(locale)
-        .t("apiUtils.errors.endpointFailed", {
-          reason: errorMessage,
-          path: endpoint.path.join("/"),
-          error: parsedError.message,
-        }),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
+    const errorResponse = buildMutationExceptionResponse(
+      endpoint,
+      locale,
+      parsedError,
+    );
 
     logger.error("Mutation failed", {
       endpoint: endpoint.path.join("/"),

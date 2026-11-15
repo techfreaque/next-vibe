@@ -192,15 +192,32 @@ export async function handleHttpProxy(
           }
 
           // Stream the raw (possibly compressed) body straight to the browser.
+          // `downstreamClosed`: the browser cancelled the body (navigation,
+          // closed tab, aborted fetch). Enqueueing after that throws
+          // ERR_INVALID_STATE "Controller is already closed", which used to
+          // surface as a fake "[Proxy] Upstream response failed mid-body"
+          // (2026-11-15 00:21, /en-US/story) while Next.js was fine.
+          let downstreamClosed = false;
           const stream = new ReadableStream({
             start(controller): void {
               proxyRes.on("data", (chunk: Buffer) => {
+                if (downstreamClosed) {
+                  return;
+                }
                 controller.enqueue(chunk);
               });
               proxyRes.on("end", () => {
+                if (downstreamClosed) {
+                  return;
+                }
                 controller.close();
               });
               proxyRes.on("error", (err) => {
+                if (downstreamClosed) {
+                  // Our own destroy() after the browser cancelled, not an
+                  // upstream failure.
+                  return;
+                }
                 // Upstream died mid-body: the browser gets a truncated
                 // response with a 200 status (shows up client-side as a
                 // ChunkLoadError / failed resource with responseStatus 200).
@@ -214,6 +231,18 @@ export async function handleHttpProxy(
                 });
                 controller.error(err);
               });
+            },
+            cancel(reason): void {
+              downstreamClosed = true;
+              // The browser went away: stop reading from Next.js.
+              logger.debug("[Proxy] Client closed response mid-body", {
+                path: url.pathname,
+                method: req.method,
+                status: proxyRes.statusCode,
+                reason: String(reason),
+                elapsedMs: Date.now() - proxyStartMs,
+              });
+              proxyRes.destroy();
             },
           });
 

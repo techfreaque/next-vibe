@@ -151,7 +151,7 @@ describe("task watchdog sweep", () => {
       0,
     );
     const controller = new AbortController();
-    RunningTaskRegistry.register(taskId, controller);
+    RunningTaskRegistry.register(taskId, controller, "test-task");
 
     await TaskWatchdogRepository.sweep(user, logger);
 

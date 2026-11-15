@@ -172,7 +172,12 @@ export function TaskHealthWidget(): JSX.Element {
     void mutations?.read?.refetch?.();
   };
   const run = (requestData: { taskId?: string; incidentId?: string }): void => {
-    void cancelMutation.mutateAsync({ requestData }).then(refetch);
+    void cancelMutation.mutateAsync({ requestData }).then((result) => {
+      if (result.success) {
+        refetch();
+      }
+      return undefined;
+    });
   };
   const busyId = cancelMutation.isPending
     ? (cancelMutation.variables?.requestData?.taskId ??

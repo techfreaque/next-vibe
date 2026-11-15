@@ -166,10 +166,14 @@ export class UnifiedTaskRunnerRepository {
   }
 
   /** Names of tasks currently executing (also read by the event-loop lag monitor). */
-  static getRunningTasks(): string[] {
-    return [...UnifiedTaskRunnerRepository.runningTasks.keys()].filter(
-      (taskName) => UnifiedTaskRunnerRepository.isTaskRunning(taskName),
-    );
+  static getRunningTasks(type?: "cron" | "task-runner"): string[] {
+    return [...UnifiedTaskRunnerRepository.runningTasks.values()]
+      .filter(
+        (task) =>
+          (type === undefined || task.type === type) &&
+          UnifiedTaskRunnerRepository.isTaskRunning(task.name),
+      )
+      .map((task) => task.name);
   }
 
   static start(

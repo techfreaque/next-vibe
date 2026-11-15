@@ -133,10 +133,17 @@ export async function authenticateWsRequest(
  * until it reloads. `"socket-guest-other-uid"` = a guest socket asked for a uid
  * that is not its lead (logout elsewhere, expired session, rotated lead
  * cookie). `"foreign"` = a logged-in socket asked for an unrelated uid.
+ *
+ * `requestedUidIsLinkedLead`: the requested uid is an older lead of the socket
+ * user (user_lead_links). The JWT only carries the CURRENT lead cookie, so a
+ * guest tab left open across a signup (lead rotated on signup) asks for a lead
+ * the socket no longer names; without the link check that read as "foreign"
+ * (2026-11-15, lead 04de8f9b of user f6e5cfb8).
  */
 export function describeSubscribeIdentity(
   user: JwtPayloadType,
   channel: string,
+  requestedUidIsLinkedLead = false,
 ): {
   requestedUid?: string;
   socketUid?: string;
@@ -151,7 +158,10 @@ export function describeSubscribeIdentity(
   }
   const requestedUid = match[1];
   const socketUid = user.isPublic ? user.leadId : user.id;
-  if (!user.isPublic && requestedUid === user.leadId) {
+  if (
+    !user.isPublic &&
+    (requestedUid === user.leadId || requestedUidIsLinkedLead)
+  ) {
     return {
       requestedUid,
       socketUid,
@@ -163,6 +173,44 @@ export function describeSubscribeIdentity(
     socketUid,
     identityMismatch: user.isPublic ? "socket-guest-other-uid" : "foreign",
   };
+}
+
+/**
+ * Denial-path only: is `channel`'s `user/{uid}/` an older lead of the
+ * logged-in socket user? One indexed lookup per denied subscribe.
+ */
+export async function isRequestedUidLinkedLead(
+  user: JwtPayloadType,
+  channel: string,
+): Promise<boolean> {
+  if (user.isPublic) {
+    return false;
+  }
+  const requestedUid = /^user\/([^/]+)\//.exec(channel)?.[1];
+  if (!requestedUid || requestedUid === user.leadId) {
+    return false;
+  }
+  try {
+    const [{ db }, { userLeadLinks }, { and, eq }] = await Promise.all([
+      import("../../database"),
+      import("../../identity/lead/db"),
+      import("drizzle-orm"),
+    ]);
+    const [row] = await db
+      .select({ id: userLeadLinks.id })
+      .from(userLeadLinks)
+      .where(
+        and(
+          eq(userLeadLinks.userId, user.id),
+          eq(userLeadLinks.leadId, requestedUid),
+        ),
+      )
+      .limit(1);
+    return row !== undefined;
+  } catch {
+    // Not a uuid / DB hiccup: the denial still logs, just unclassified.
+    return false;
+  }
 }
 
 // ─── Channel authorization ────────────────────────────────────────────────────

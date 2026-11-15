@@ -79,7 +79,12 @@ function tryParseValue(value: string): ParsedValue {
 export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
   const result: ParsedObject = {};
 
-  for (const [key, value] of searchParams.entries()) {
+  for (const [rawKey, value] of searchParams.entries()) {
+    // Object bracket notation (qs / PHP style, what most HTTP clients emit):
+    // paginationInfo[page]=1 => paginationInfo.page=1. Numeric brackets stay
+    // array indexes. Without this a hand-written API call got "paginationInfo:
+    // expected object" with the value sitting right there (prod 2026-11-14).
+    const key = rawKey.replace(/\[([^\]\d][^\]]*)\]/g, ".$1");
     // Handle bracket notation for arrays: name[0], name[1], etc.
     // Also handles dot+bracket combined: a.b[0] => { a: { b: [...] } }
     const bracketMatch = /^([^[]+)\[(\d+)\]$/.exec(key);

@@ -162,7 +162,9 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
 
   return {
     form,
-    response: mutation.data,
+    // RQ leaves `data` undefined on failure: surface the error response so
+    // FormAlertWidget shows it (a failed delete left the modal silent).
+    response: mutation.data ?? mutation.error ?? undefined,
     submitError: mutation.error,
     isSubmitSuccessful: mutation.isSuccess,
     submit,

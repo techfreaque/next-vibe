@@ -25243,7 +25243,7 @@ export const endpointsMeta: EndpointMeta[] = [
     toolName: "execute-task",
     method: "POST",
     path: ["vibe", "tasks", "execute"],
-    allowedRoles: ["enums.userRole.admin"],
+    allowedRoles: ["enums.userRole.customer", "enums.userRole.admin"],
     aliases: ["task-execute"],
     title: "Aufgabe ausführen",
     titleShort: "Task ausführen",

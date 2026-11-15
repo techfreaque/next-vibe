@@ -50,6 +50,7 @@ import {
   authenticateWsRequest,
   authorizeWsChannel,
   describeSubscribeIdentity,
+  isRequestedUidLinkedLead,
 } from "./ws-channel-auth";
 
 // ============================================================================
@@ -609,7 +610,11 @@ export function startWebSocketServer(
                   channel: msg.channel,
                   isPublic: ws.data.user.isPublic,
                   connectorInstanceId: ws.data.connectorInstanceId,
-                  ...describeSubscribeIdentity(ws.data.user, msg.channel),
+                  ...describeSubscribeIdentity(
+                    ws.data.user,
+                    msg.channel,
+                    await isRequestedUidLinkedLead(ws.data.user, msg.channel),
+                  ),
                 },
               );
               return;

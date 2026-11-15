@@ -579,8 +579,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     (taskId: string) => {
       void deleteTaskMutation
         .mutateAsync({ urlPathParams: { id: taskId } })
-        .then(() => {
-          if (!activeThreadId) {
+        .then((result) => {
+          if (!result.success || !activeThreadId) {
             return;
           }
           apiClient.updateEndpointData(

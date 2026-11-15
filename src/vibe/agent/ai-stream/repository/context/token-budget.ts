@@ -138,6 +138,13 @@ export function truncateToContextWindow(
     droppedCount: dropped.size,
     remainingCount: truncated.length,
     estimatedTokensAfter: tokens,
+    // Only system messages + the last user message left (they are never
+    // dropped) and the estimate still exceeds the limit: the provider call
+    // goes out over budget. The estimate is chars/3.5, so a call can still
+    // succeed (prod 2026-11-14 21:26: 4 messages, 0 droppable, call fine);
+    // a following provider context-length error is the real failure.
+    protectedCount: systemIndices.size,
+    stillOverLimit: tokens > limit,
   });
 
   return truncated;

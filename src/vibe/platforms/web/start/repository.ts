@@ -15,6 +15,7 @@ import "../../../agent/env";
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { loadavg } from "node:os";
 import { monitorEventLoopDelay } from "node:perf_hooks";
 
 import { coreEnv } from "../../../core/env";
@@ -622,12 +623,21 @@ export class ServerStartRepository {
       void stallTicker;
 
       let lastLagLevel = 0;
+      // CPU this process burned in the window. A stall with high own CPU is
+      // in-process work (sync code, GC); a stall with ~0 own CPU means the
+      // process was not scheduled (box CPU contention / swap, e.g. the Next.js
+      // child or a docker build hogging the cores). Prod 2026-11-14/15 showed
+      // stalls ~645 s after every boot with no task running, which only this
+      // split can attribute.
+      let lastCpu = process.cpuUsage();
       const lagInterval = setInterval(() => {
         try {
           // histogram.mean is in nanoseconds
           const meanMs = histogram.mean / 1e6;
           const maxMs = histogram.max / 1e6;
           histogram.reset();
+          const cpuDelta = process.cpuUsage(lastCpu);
+          lastCpu = process.cpuUsage();
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -646,6 +656,9 @@ export class ServerStartRepository {
               : undefined,
             runningTasks: stall?.runningTasks.join(", ") || undefined,
             recentRequests: stall?.recentRequests,
+            cpuUserMs: Math.round(cpuDelta.user / 1000),
+            cpuSystemMs: Math.round(cpuDelta.system / 1000),
+            loadAvg1m: Math.round(loadavg()[0] * 100) / 100,
           };
           // Dynamic values go in metadata, not the message text - see the
           // [Memory] logging above for why (fingerprint groups on message).
@@ -889,8 +902,15 @@ export class ServerStartRepository {
         await import("../../../tasks/unified-runner/repository");
 
       UnifiedTaskRunnerRepository.environment = "production";
-      ServerStartRepository.runningTasksProbe = (): string[] =>
-        UnifiedTaskRunnerRepository.getRunningTasks();
+      const { RunningTaskRegistry } =
+        await import("../../../tasks/watchdog/registry");
+      // What this process was executing at a stall. The pulse runner itself is
+      // a permanent task-runner (always "running"), so it names nothing; the
+      // cron tasks it dispatches and async tool runs live in the registry.
+      ServerStartRepository.runningTasksProbe = (): string[] => [
+        ...UnifiedTaskRunnerRepository.getRunningTasks("cron"),
+        ...RunningTaskRegistry.labels(),
+      ];
 
       // Closure so the restart loop can call itself recursively with backoff.
       const runRunner = (): void => {

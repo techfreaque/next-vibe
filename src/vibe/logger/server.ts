@@ -28,6 +28,26 @@ export interface ServerLogContext {
 export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "requestId",
   "node",
+  // Per-occurrence measurements and snapshots. Each value is unique, so in
+  // the fingerprint they turned every "[EventLoop] Elevated lag" and every
+  // boot-time "[Proxy] Server not ready" into its own row (2026-11-15: ~45 of
+  // 103 active rows). The row keeps the latest values; occurrences count up.
+  "uptime",
+  "maxMs",
+  "meanMs",
+  "stallMs",
+  "stallStartedAt",
+  "heapMb",
+  "heapUsedMb",
+  "rssMb",
+  "recentRequests",
+  "recent",
+  "elapsedMs",
+  "durationMs",
+  "lastUpstreamOkMsAgo",
+  "cpuUserMs",
+  "cpuSystemMs",
+  "loadAvg1m",
 ]);
 
 /**

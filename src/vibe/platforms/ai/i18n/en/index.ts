@@ -51,6 +51,10 @@ export const translations = {
           title: "Forbidden",
           description: "Access denied",
         },
+        toolDeniedHere: {
+          title:
+            "{{toolName}} is not available in this thread. Call the tools in your tool list directly.",
+        },
         notFound: {
           title: "Tool Not Found",
           description: "No registered tool matches the given toolName",

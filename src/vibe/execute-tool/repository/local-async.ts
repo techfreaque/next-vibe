@@ -209,7 +209,11 @@ export class LocalExecutionAsync {
       let errorMessage: string | null = null;
 
       // The task watchdog / an admin cancels a runaway goroutine through this.
-      RunningTaskRegistry.register(taskId, goroutineAbortController);
+      RunningTaskRegistry.register(
+        taskId,
+        goroutineAbortController,
+        `tool:${toolName}`,
+      );
 
       try {
         const executed = await LocalExecutionAsync.executeInGoroutine({

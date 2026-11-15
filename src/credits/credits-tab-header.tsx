@@ -152,7 +152,9 @@ export function CreditsTabHeader({
     },
     { id: "buy", label: tSub("subscription.tabs.buy"), icon: ShoppingCart },
     { id: "history", label: tSub("subscription.tabs.history"), icon: History },
-    ...(isAuthenticated
+    // remote-connection/list is ADMIN-only: for customers this tab only ever
+    // rendered a 403 (prod 2026-11-14 21:25, /subscription/buy on iPhone).
+    ...(isAdmin
       ? [
           {
             id: "remote" as TabId,
