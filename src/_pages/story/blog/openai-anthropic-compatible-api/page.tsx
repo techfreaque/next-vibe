@@ -145,15 +145,7 @@ const FAQ_KEYS: readonly (
   | "pricing"
   | "models"
   | "data"
-)[] = [
-  "openrouter",
-  "claudeCode",
-  "sdk",
-  "free",
-  "pricing",
-  "models",
-  "data",
-];
+)[] = ["openrouter", "claudeCode", "sdk", "free", "pricing", "models", "data"];
 
 export interface CompatibleApiPostPageData {
   locale: CountryLanguage;
