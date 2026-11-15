@@ -46,6 +46,7 @@ import type { VideoGenerationT } from "./i18n";
 import {
   filterVideoGenModels,
   getVideoGenModelById,
+  resolveVideoClipSeconds,
   resolveVideoGenRouteForImageInput,
   videoGenModelOptions,
   type VideoGenModelSelection,
@@ -181,29 +182,8 @@ export class VideoGenerationRepository {
     // duration is now raw seconds from the widget
     const rawDuration = data.duration ?? videoModel.defaultDurationSeconds;
 
-    // Clamp to model's supported duration range first
-    const clampedDuration = Math.min(
-      Math.max(rawDuration, videoModel.minDurationSeconds ?? 0),
-      videoModel.maxDurationSeconds ?? Infinity,
-    );
-
-    // If model has a specific list of allowed durations, snap to the closest one
-    let durationSeconds = clampedDuration;
-    if (
-      videoModel.supportedDurations &&
-      videoModel.supportedDurations.length > 0
-    ) {
-      if (!videoModel.supportedDurations.includes(String(clampedDuration))) {
-        // Snap to the nearest supported duration
-        const supported = videoModel.supportedDurations.map(Number);
-        const nearest = supported.reduce((prev, curr) =>
-          Math.abs(curr - clampedDuration) < Math.abs(prev - clampedDuration)
-            ? curr
-            : prev,
-        );
-        durationSeconds = nearest;
-      }
-    }
+    // Clamp to the route's range, then snap to its listed durations.
+    const durationSeconds = resolveVideoClipSeconds(videoModel, rawDuration);
 
     // Snap aspect ratio to nearest supported
     let aspectRatio = data.aspectRatio;

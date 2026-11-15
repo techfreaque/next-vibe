@@ -180,6 +180,12 @@ export function TanstackPage({
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
+    post("ai-video-generators-compared", {
+      title: t("posts.videoGenerators.title"),
+      category: t("posts.videoGenerators.category"),
+      excerpt: t("posts.videoGenerators.excerpt"),
+      readTime: t("posts.videoGenerators.readTime"),
+    }),
     post("openai-anthropic-compatible-api", {
       title: t("posts.compatibleApi.title"),
       category: t("posts.compatibleApi.category"),

@@ -169,6 +169,7 @@ import { Route as ApiLocaleV1ModelsRouteImport } from './routes/api.$locale.v1.m
 import { Route as ApiLocaleV1ResponsesRouteImport } from './routes/api.$locale.v1.responses'
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
+import { Route as LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport } from './routes/$locale.story.blog.ai-video-generators-compared.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
@@ -1560,6 +1561,12 @@ const ApiLocaleVibeHelpToolRoute = ApiLocaleVibeHelpToolRouteImport.update({
   path: '/api/$locale/vibe/help-tool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute =
+  LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport.update({
+    id: '/blog/ai-video-generators-compared/',
+    path: '/blog/ai-video-generators-compared/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute =
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport.update({
     id: '/blog/chatgpt-alternative-without-filters/',
@@ -5077,6 +5084,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -5748,6 +5756,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/ai-video-generators-compared': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -6427,6 +6436,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -7106,6 +7116,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -7777,6 +7788,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/ai-video-generators-compared'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
@@ -8455,6 +8467,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -10285,6 +10298,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/vibe/help-tool'
       preLoaderRoute: typeof ApiLocaleVibeHelpToolRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/story/blog/ai-video-generators-compared/': {
+      id: '/$locale/story/blog/ai-video-generators-compared/'
+      path: '/blog/ai-video-generators-compared'
+      fullPath: '/$locale/story/blog/ai-video-generators-compared/'
+      preLoaderRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/chatgpt-alternative-without-filters/': {
       id: '/$locale/story/blog/chatgpt-alternative-without-filters/'
@@ -13957,6 +13977,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
+  LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -13998,6 +14019,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
+  LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute:
+    LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute,
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute:
     LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:

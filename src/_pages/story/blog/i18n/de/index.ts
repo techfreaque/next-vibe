@@ -16,6 +16,14 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    videoGenerators: {
+      title:
+        "KI-Videogeneratoren im Vergleich. Kling, Seedance, Veo, Wan und mehr.",
+      category: "Ratgeber",
+      excerpt:
+        "Alle Videomodelle in einem Account, direkt nebeneinander: Text oder Bild zu Video, erstes und letztes Frame, Cliplänge, Auflösung, Ton und der echte Preis pro Sekunde. Welches Modell für welchen Job taugt und wo jedes an Grenzen stößt.",
+      readTime: "10 Min. Lesezeit",
+    },
     compatibleApi: {
       title: "Ein API-Key, jedes Modell. OpenAI- und Anthropic-Format.",
       category: "Entwickler-Guide",

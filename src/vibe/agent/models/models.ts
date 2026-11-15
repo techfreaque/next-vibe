@@ -576,7 +576,7 @@ export const modelProviders: Record<string, ModelProvider> = {
     icon: "si-alibabacloud",
   },
   xAI: {
-    name: "X-AI",
+    name: "xAI",
     icon: "si-x",
   },
   uncensoredAI: {

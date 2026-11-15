@@ -16,6 +16,14 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    videoGenerators: {
+      title:
+        "Generatory wideo AI w porównaniu. Kling, Seedance, Veo, Wan i inne.",
+      category: "Poradnik",
+      excerpt:
+        "Wszystkie modele wideo na jednym koncie, obok siebie: tekst albo obraz na wideo, pierwsza i ostatnia klatka, długość klipu, rozdzielczość, dźwięk i prawdziwa cena za sekundę. Który model do jakiej roboty i gdzie każdy ma swoje granice.",
+      readTime: "10 min czytania",
+    },
     compatibleApi: {
       title: "Jeden klucz API, każdy model. Formaty OpenAI i Anthropic.",
       category: "Przewodnik dla programistów",

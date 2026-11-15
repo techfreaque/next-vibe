@@ -14,6 +14,14 @@ export const translations = {
     },
   },
   posts: {
+    videoGenerators: {
+      title:
+        "AI video generators compared. Kling, Seedance, Veo, Wan and more.",
+      category: "Guide",
+      excerpt:
+        "Every video model on one account, side by side: text or image to video, first and last frame, clip length, resolution, sound and the real price per second. Which one fits which job, and where each one falls short.",
+      readTime: "10 min read",
+    },
     compatibleApi: {
       title: "One API key, every model. OpenAI and Anthropic formats.",
       category: "Developer Guide",

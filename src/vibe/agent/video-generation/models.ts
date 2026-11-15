@@ -2184,7 +2184,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2_5]: {
     name: "Seedance 2.5",
-    by: "byteDance",
+    by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance25",
     parameterCount: undefined,
     contextWindow: 0,
@@ -3082,5 +3082,30 @@ export function resolveVideoGenRouteForImageInput(
     imageRoutes.toSorted(
       (a, b) => a.creditCostPerSecond - b.creditCostPerSecond,
     )[0] ?? null
+  );
+}
+
+/**
+ * Clip length a request actually runs at: clamped to the route's min/max,
+ * then snapped to the nearest listed duration when the route lists them.
+ * Shared by the generator (billing) and the public price tables.
+ */
+export function resolveVideoClipSeconds(
+  route: Pick<
+    VideoGenModelOption,
+    "minDurationSeconds" | "maxDurationSeconds" | "supportedDurations"
+  >,
+  requestedSeconds: number,
+): number {
+  const clamped = Math.min(
+    Math.max(requestedSeconds, route.minDurationSeconds ?? 0),
+    route.maxDurationSeconds ?? Infinity,
+  );
+  const supported = route.supportedDurations?.map(Number) ?? [];
+  if (supported.length === 0 || supported.includes(clamped)) {
+    return clamped;
+  }
+  return supported.reduce((prev, curr) =>
+    Math.abs(curr - clamped) < Math.abs(prev - clamped) ? curr : prev,
   );
 }
