@@ -500,12 +500,13 @@ function parseSettingsFromLlmsTxt(text: string): ParsedSettings {
   // === Resolution ===
   const resSection = extractParamSection(text, "resolution");
   if (resSection) {
-    // Extract tokens that look like resolutions
+    // Extract every word that looks like a resolution. Splitting on commas
+    // only and keeping each chunk's first word dropped the first option of
+    // "Type: select (options: 480p, 720p, 1080p)" (the chunk starts "Type:").
     const tokens = resSection
-      .split(/[,|]/)
-      .map(
-        (s) => s.trim().replaceAll(/[()]/g, "").split(/\s/)[0]?.trim() ?? "",
-      );
+      .replaceAll(/[()]/g, " ")
+      .split(/[\s,|]+/)
+      .map((s) => s.trim());
     const resValues = tokens.filter(isResolutionValue).map(normalizeResolution);
     if (resValues.length > 0) {
       settings.resolutions = [...new Set(resValues)];

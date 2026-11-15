@@ -17,7 +17,7 @@ import {
 import type { Modality } from "../../enum";
 import { ApiProvider } from "../../models";
 import type { ModalityUpdate, ProviderPriceResult } from "./base";
-import { PriceFetcher } from "./base";
+import { PriceFetcher, roundUpPrice } from "./base";
 
 /** Canonical ordering for modalities: text first, then image, video, audio */
 const MODALITY_ORDER: Record<Modality, number> = {
@@ -130,20 +130,26 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           continue;
         }
 
-        const inputTokenCost =
-          Math.round(parseFloat(raw.pricing.prompt) * 1_000_000 * 100) / 100;
-        const outputTokenCost =
-          Math.round(parseFloat(raw.pricing.completion) * 1_000_000 * 100) /
-          100;
+        // USD per 1M tokens, rounded UP to the cent (never undercharge).
+        const inputTokenCost = roundUpPrice(
+          parseFloat(raw.pricing.prompt) * 1_000_000,
+          2,
+        );
+        const outputTokenCost = roundUpPrice(
+          parseFloat(raw.pricing.completion) * 1_000_000,
+          2,
+        );
         const cacheReadTokenCost = raw.pricing.input_cache_read
-          ? Math.round(
-              parseFloat(raw.pricing.input_cache_read) * 1_000_000 * 100,
-            ) / 100
+          ? roundUpPrice(
+              parseFloat(raw.pricing.input_cache_read) * 1_000_000,
+              2,
+            )
           : undefined;
         const cacheWriteTokenCost = raw.pricing.input_cache_write
-          ? Math.round(
-              parseFloat(raw.pricing.input_cache_write) * 1_000_000 * 100,
-            ) / 100
+          ? roundUpPrice(
+              parseFloat(raw.pricing.input_cache_write) * 1_000_000,
+              2,
+            )
           : undefined;
 
         // Find enum key for contextWindow update (check both chat and image gen enums)

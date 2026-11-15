@@ -1081,6 +1081,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-05-03 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-05-03 from openrouter-api
+        cacheReadTokenCost: 0.2, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GROK_4_3,
@@ -2076,9 +2077,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2.5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.53, // updated: 2026-11-09 from openrouter-api
-        outputTokenCost: 3.33, // updated: 2026-11-09 from openrouter-api
-        cacheReadTokenCost: 0.21, // updated: 2026-11-09 from openrouter-api
+        inputTokenCost: 0.5, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 2.5, // updated: 2026-11-15 from openrouter-api
+        cacheReadTokenCost: 0.15, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.KIMI_K2_5,
@@ -2331,7 +2332,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.06, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 0.07, // updated: 2026-11-15 from openrouter-api
         outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-03-31 from openrouter-api
       },
@@ -2482,7 +2483,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.21, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 0.84, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.04, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.05, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.MINIMAX_M2_7,
@@ -2522,9 +2523,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "xiaomi/mimo-v2.5-pro", // v2-pro deprecated by provider, redirected to v2.5-pro
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.48, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 1.8, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.44, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 0.87, // updated: 2026-11-15 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.MIMO_V2_PRO,
@@ -2567,7 +2568,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 0.4, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-04-07 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_2_5_FLASH_LITE,
@@ -2608,7 +2609,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_2_5_FLASH,
@@ -2776,7 +2777,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.25, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 1.5, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.03, // updated: 2026-03-31 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
@@ -2822,7 +2823,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 1.5, // updated: 2026-07-02 from openrouter-api
         outputTokenCost: 9, // updated: 2026-07-02 from openrouter-api
         cacheReadTokenCost: 0.15, // updated: 2026-07-02 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-05-21 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_5_FLASH,
@@ -2868,7 +2869,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.05, // updated: 2026-03-31 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-03-31 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_FLASH,
@@ -2930,9 +2931,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-v4-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.89, // updated: 2026-11-09 from openrouter-api
-        outputTokenCost: 1.78, // updated: 2026-11-09 from openrouter-api
-        cacheReadTokenCost: 0.07, // updated: 2026-11-09 from openrouter-api
+        inputTokenCost: 0.9, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 1.5, // updated: 2026-11-15 from openrouter-api
+        cacheReadTokenCost: 0.25, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.DEEPSEEK_V4_PRO,
@@ -3089,8 +3090,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-r1-0528",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.5, // updated: 2026-07-02 from openrouter-api
-        outputTokenCost: 2.15, // updated: 2026-03-31 from openrouter-api
+        inputTokenCost: 0.58, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 2.29, // updated: 2026-11-15 from openrouter-api
         cacheReadTokenCost: 0.35, // updated: 2026-07-02 from openrouter-api
       },
       {
@@ -4217,7 +4218,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.75, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 3.75, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.08, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 0.04, // updated: 2026-11-07 from openrouter-api
+        cacheWriteTokenCost: 0.05, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_6_FLASH,
@@ -4260,7 +4261,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.3, // updated: 2026-08-16 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-08-16 from openrouter-api
         cacheReadTokenCost: 0.03, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-11-07 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_5_FLASH_LITE,
@@ -4298,7 +4299,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.75, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 3.75, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.08, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 0.04, // updated: 2026-11-07 from openrouter-api
+        cacheWriteTokenCost: 0.05, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_7_FLASH,
@@ -4339,9 +4340,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.19, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.2, // updated: 2026-11-15 from openrouter-api
         outputTokenCost: 16, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.18, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.19, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.KIMI_K3,
@@ -4587,8 +4588,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "xiaomi/mimo-v2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.305, // updated: 2026-08-16 from openrouter-api
-        outputTokenCost: 0.609, // updated: 2026-08-16 from openrouter-api
+        inputTokenCost: 0.44, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 0.87, // updated: 2026-11-15 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.MIMO_V2_5_PRO,
@@ -5178,8 +5180,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.83, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 4.13, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.08, // updated: 2026-11-07 from openrouter-api
-        cacheWriteTokenCost: 0.04, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
+        cacheWriteTokenCost: 0.05, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GEMINI_3_8_FLASH,
@@ -5388,9 +5390,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5.3",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.07, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 1.4, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.07, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 3.6, // updated: 2026-11-15 from openrouter-api
+        cacheReadTokenCost: 0.08, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.GLM_5_3,
@@ -5429,8 +5431,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5.3-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.15, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.04, // updated: 2026-11-15 from openrouter-api
+        outputTokenCost: 0.08, // updated: 2026-11-15 from openrouter-api
         cacheReadTokenCost: 0.03, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -5472,7 +5474,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.44, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 0.87, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.MIMO_V2_6_PRO,
@@ -5514,7 +5516,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.14, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 0.28, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
       },
       {
         id: ChatModelId.MIMO_V2_6_FLASH,
@@ -5682,7 +5684,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 1.5, // updated: 2026-11-13 from openrouter-api
         outputTokenCost: 7.5, // updated: 2026-11-13 from openrouter-api
         cacheReadTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
-        cacheWriteTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
+        cacheWriteTokenCost: 0.09, // updated: 2026-11-15 from openrouter-api
       },
     ],
     utilities: [
@@ -5783,7 +5785,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1, // updated: 2026-11-13 from openrouter-api
         outputTokenCost: 0.5, // updated: 2026-11-13 from openrouter-api
-        cacheReadTokenCost: 0, // updated: 2026-11-13 from openrouter-api
+        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
         cacheWriteTokenCost: 0.13, // updated: 2026-11-13 from openrouter-api
       },
     ],

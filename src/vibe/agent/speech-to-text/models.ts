@@ -96,7 +96,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         id: SttModelId.DEEPGRAM_NOVA_2,
         apiProvider: ApiProvider.DEEPGRAM,
         providerModel: "nova-2",
-        creditCostPerSecond: 0.0097, // updated: 2026-11-13 from deepgram.com/pricing ($0.35/hour)
+        creditCostPerSecond: 0.0098, // updated: 2026-11-15 from deepgram.com/pricing ($0.35/hour, rounded up)
       },
       {
         id: SttModelId.DEEPGRAM_NOVA_2,

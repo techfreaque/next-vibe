@@ -963,7 +963,7 @@ export const imageGenModelDefinitions: Record<
         id: ImageGenModelId.IMAGEN_4_FAST,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "imagen-4.0-fast",
-        creditCostPerImage: 2.4, // updated: 2026-04-04 from modelslab.com
+        creditCostPerImage: 2.5, // updated: 2026-11-15 from modelslab.com
         supportedAspectRatios: ["1:1", "3:4", "4:3", "9:16", "16:9"], // updated: 2026-04-04 from modelslab.com
         supportedSizes: [],
         supportedQualities: [],

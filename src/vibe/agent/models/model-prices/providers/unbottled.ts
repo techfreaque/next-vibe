@@ -44,7 +44,7 @@ import {
 import type { ModelDefinition, ModelProviderConfig } from "../../models";
 import { ApiProvider } from "../../models";
 import type { ProviderEntryOperation, ProviderPriceResult } from "./base";
-import { PriceFetcher } from "./base";
+import { PriceFetcher, roundUpPrice } from "./base";
 
 const MODEL_ID_ENUMS: Record<string, Record<string, string>> = {
   chat: ChatModelId,
@@ -80,7 +80,7 @@ function findEnumKey(
 
 function markup(value: number): number {
   const raw = value * (1 + STANDARD_MARKUP_PERCENTAGE);
-  return Math.round(raw * 10000) / 10000;
+  return roundUpPrice(raw, 4);
 }
 
 function markupRecord(

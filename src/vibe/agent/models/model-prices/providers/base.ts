@@ -127,6 +127,17 @@ export interface ProviderPriceResult {
   failedApiProviders?: ApiProvider[];
 }
 
+/**
+ * Round a price UP to `decimals` places. Listed prices feed pre-flight credit
+ * checks and non-OpenRouter billing, so rounding down would undercharge
+ * (e.g. a $0.0036/M cache read must not become $0). The epsilon absorbs
+ * float noise like 0.9000000000000001 so exact prices never gain a step.
+ */
+export function roundUpPrice(value: number, decimals: number): number {
+  const factor = 10 ** decimals;
+  return Math.ceil(value * factor - 1e-6) / factor;
+}
+
 export abstract class PriceFetcher {
   abstract readonly providerName: string;
 
@@ -134,7 +145,7 @@ export abstract class PriceFetcher {
 
   protected usdToCredits(usd: number): number {
     const raw = usd / CREDIT_VALUE_USD;
-    const rounded = Math.round(raw * 10000) / 10000;
+    const rounded = roundUpPrice(raw, 4);
     return rounded % 1 === 0 ? Math.round(rounded) : rounded;
   }
 

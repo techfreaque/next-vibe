@@ -11,6 +11,7 @@ import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import type { Modality } from "../../enum";
 import type { ApiProvider } from "../../models";
 import type { ModalityUpdate, PriceFailure, PriceUpdate } from "./base";
+import { roundUpPrice } from "./base";
 
 export interface TokenPriceEntry {
   /** USD per 1M input tokens */
@@ -31,8 +32,9 @@ export interface TokenPriceCollection {
   failures: PriceFailure[];
 }
 
+/** USD per 1M tokens, rounded UP (never undercharge). */
 function roundUsd(value: number): number {
-  return Math.round(value * 100_000) / 100_000;
+  return roundUpPrice(value, 5);
 }
 
 export function collectTokenPriceUpdates(params: {
