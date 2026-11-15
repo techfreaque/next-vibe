@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   errorTypes: {
     auth_error: "Błąd uwierzytelniania",
     bad_request: "Nieprawidłowe żądanie",
+    conflict: "Konflikt",
     consent_required: "Wymagana zgoda",
     database_error: "Błąd bazy danych",
     email_error: "Błąd e-mail",

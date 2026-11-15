@@ -438,6 +438,9 @@ export class AbortErrorHandler {
               "[AI Stream] Upstream cost missing for cut-off step - billing estimated token price",
               {
                 model,
+                // Why the step was cut off (user stop, client gone, timeout)
+                abortReason: streamAbort?.reason ?? error.name,
+                messageId: partialMessageId,
                 apiProvider: modelInfo.apiProvider,
                 providerModel: modelInfo.providerModel,
                 promptTokens: tokenEstimate.promptTokens,

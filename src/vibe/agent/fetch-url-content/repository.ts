@@ -247,7 +247,13 @@ function truncateMiddle(content: string): TruncateResult {
 // ─── FetchUrlService ──────────────────────────────────────────────────────────
 
 class FetchUrlService {
-  private readonly TIMEOUT = 30000;
+  /**
+   * Scrappey solves anti-bot pages in a real browser; ordinary pages (Google
+   * Books, Open Library, fandom wikis, AliExpress) regularly passed 30 s, and
+   * every such run came back as a timeout (prod error log, Aug-Nov 2026).
+   * 60 s stays under the 90 s default tool timeout (transport/direct.ts).
+   */
+  readonly TIMEOUT = 60_000;
   private readonly SCRAPPEY_API_URL = "https://publisher.scrappey.com/api/v1";
   private turndownService: TurndownService;
 
@@ -526,6 +532,7 @@ export class FetchUrlContentRepository {
           error: result.error,
           isTimeout: result.isTimeout ?? false,
           isCallerError: result.isCallerError ?? false,
+          timeoutMs: fetchService.TIMEOUT,
           url,
         },
       );

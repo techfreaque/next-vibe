@@ -540,7 +540,7 @@ export const ErrorResponseTypes: ErrorResponseTypesElements = {
     errorCode: 207,
   },
   CONFLICT: {
-    errorKey: "errorTypes.unknown_error",
+    errorKey: "errorTypes.conflict",
     errorCode: 409,
   },
 } as const;

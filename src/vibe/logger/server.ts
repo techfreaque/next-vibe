@@ -39,8 +39,10 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "stallStartedAt",
   "heapMb",
   "heapUsedMb",
+  "prevHeapMb",
   "rssMb",
   "recentRequests",
+  "taskTimings",
   "recent",
   "elapsedMs",
   "durationMs",
@@ -48,6 +50,13 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "cpuUserMs",
   "cpuSystemMs",
   "loadAvg1m",
+  // Per-request usage figures ("[AI Stream] Upstream cost missing for cut-off
+  // step"): one row per model + abort reason, not one per stopped message.
+  "messageId",
+  "promptTokens",
+  "completionTokens",
+  "imageOutputTokens",
+  "modelCreditCost",
 ]);
 
 /**

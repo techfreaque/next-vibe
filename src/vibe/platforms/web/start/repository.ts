@@ -127,7 +127,9 @@ const SUPERVISOR_MAX_HEAP_MB = 256;
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
   /** Set once the in-process task runner is loaded; the lag monitor reads it. */
-  private static runningTasksProbe: (() => string[]) | null = null;
+  private static runningTasksProbe:
+    | ((sinceMs: number) => { labels: string[]; timings: string })
+    | null = null;
   private static nextServerProcess: ChildProcess | null = null;
   private static wsServerHandle: WebProxyHandle | null = null;
   private static runningProcesses: Map<string, ChildProcess> = new Map();
@@ -605,6 +607,7 @@ export class ServerStartRepository {
         ms: number;
         startedAt: number;
         runningTasks: string[];
+        taskTimings: string;
         recentRequests: string;
       } | null = null;
       const stallTicker = setInterval(() => {
@@ -612,10 +615,17 @@ export class ServerStartRepository {
         const stallMs = now - lastTickAt - STALL_TICK_MS;
         lastTickAt = now;
         if (stallMs >= EL_LAG_WARN_MS && stallMs > (worstStall?.ms ?? 0)) {
+          const startedAt = now - stallMs;
+          // Running now, or finished up to 1 s before the stall began: the
+          // probe runs only after the stall, when its cause may be done.
+          const probed = ServerStartRepository.runningTasksProbe?.(
+            startedAt - 1000,
+          );
           worstStall = {
             ms: stallMs,
-            startedAt: now - stallMs,
-            runningTasks: ServerStartRepository.runningTasksProbe?.() ?? [],
+            startedAt,
+            runningTasks: probed?.labels ?? [],
+            taskTimings: probed?.timings ?? "",
             recentRequests: summarizeRecentRequests(),
           };
         }
@@ -630,6 +640,9 @@ export class ServerStartRepository {
       // stalls ~645 s after every boot with no task running, which only this
       // split can attribute.
       let lastCpu = process.cpuUsage();
+      // Heap of the previous 5 s window: a large drop next to a stall with
+      // high own CPU points at a major GC rather than application code.
+      let lastHeapMb: number | undefined;
       const lagInterval = setInterval(() => {
         try {
           // histogram.mean is in nanoseconds
@@ -642,12 +655,15 @@ export class ServerStartRepository {
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
           const heapMb = Math.round(mem.heapUsed / 1024 / 1024);
+          const prevHeapMb = lastHeapMb;
+          lastHeapMb = heapMb;
           const stall = worstStall;
           worstStall = null;
           // Shared context for every lag level: when, how big the heap was
           // (a full GC on a large heap is one candidate), what ran.
           const lagContext = {
             heapMb,
+            prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),
             uptime: uptime2,
             stallMs: stall?.ms,
@@ -655,6 +671,8 @@ export class ServerStartRepository {
               ? new Date(stall.startedAt).toISOString()
               : undefined,
             runningTasks: stall?.runningTasks.join(", ") || undefined,
+            // Per run: start/end wall clock, to place it against stallStartedAt
+            taskTimings: stall?.taskTimings || undefined,
             recentRequests: stall?.recentRequests,
             cpuUserMs: Math.round(cpuDelta.user / 1000),
             cpuSystemMs: Math.round(cpuDelta.system / 1000),
@@ -907,10 +925,29 @@ export class ServerStartRepository {
       // What this process was executing at a stall. The pulse runner itself is
       // a permanent task-runner (always "running"), so it names nothing; the
       // cron tasks it dispatches and async tool runs live in the registry.
-      ServerStartRepository.runningTasksProbe = (): string[] => [
-        ...UnifiedTaskRunnerRepository.getRunningTasks("cron"),
-        ...RunningTaskRegistry.labels(),
-      ];
+      ServerStartRepository.runningTasksProbe = (
+        sinceMs: number,
+      ): { labels: string[]; timings: string } => {
+        const runs = RunningTaskRegistry.activeSince(sinceMs);
+        return {
+          labels: [
+            ...new Set([
+              ...UnifiedTaskRunnerRepository.getRunningTasks("cron"),
+              ...runs.map((run) => run.label),
+            ]),
+          ],
+          timings: runs
+            .map(
+              (run) =>
+                `${run.label} ${new Date(run.startedAt).toISOString()}..${
+                  run.endedAt === null
+                    ? "running"
+                    : new Date(run.endedAt).toISOString()
+                }`,
+            )
+            .join("; "),
+        };
+      };
 
       // Closure so the restart loop can call itself recursively with backoff.
       const runRunner = (): void => {

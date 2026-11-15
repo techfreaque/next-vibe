@@ -20,15 +20,38 @@ interface RunningTaskEntry {
   cancelReason: string | null;
   /** Human-readable name (task display name / tool name) for diagnostics */
   label: string;
+  /** Wall clock (ms) the run was registered */
+  startedAt: number;
 }
+
+interface FinishedTaskEntry {
+  label: string;
+  startedAt: number;
+  endedAt: number;
+}
+
+/**
+ * How many finished runs to remember. The event-loop lag probe samples on the
+ * first tick AFTER a stall, so a run that caused the stall and then finished
+ * (or whose bookkeeping blocked right after it unregistered) was invisible:
+ * prod lag rows 2026-11-15 named no task although a cron run had ended a few
+ * ms before the stall began.
+ */
+const FINISHED_RING_SIZE = 20;
 
 declare global {
   var __vibeRunningTasks: Map<string, RunningTaskEntry> | undefined;
+  var __vibeFinishedTasks: FinishedTaskEntry[] | undefined;
 }
 
 function entries(): Map<string, RunningTaskEntry> {
   globalThis.__vibeRunningTasks ??= new Map();
   return globalThis.__vibeRunningTasks;
+}
+
+function finished(): FinishedTaskEntry[] {
+  globalThis.__vibeFinishedTasks ??= [];
+  return globalThis.__vibeFinishedTasks;
 }
 
 export class RunningTaskRegistry {
@@ -37,7 +60,12 @@ export class RunningTaskRegistry {
     controller: AbortController,
     label: string,
   ): void {
-    entries().set(taskId, { controller, cancelReason: null, label });
+    entries().set(taskId, {
+      controller,
+      cancelReason: null,
+      label,
+      startedAt: Date.now(),
+    });
   }
 
   /**
@@ -53,6 +81,15 @@ export class RunningTaskRegistry {
       return null;
     }
     entries().delete(taskId);
+    const ring = finished();
+    ring.push({
+      label: entry.label,
+      startedAt: entry.startedAt,
+      endedAt: Date.now(),
+    });
+    if (ring.length > FINISHED_RING_SIZE) {
+      ring.splice(0, ring.length - FINISHED_RING_SIZE);
+    }
     return entry.cancelReason;
   }
 
@@ -74,12 +111,20 @@ export class RunningTaskRegistry {
   }
 
   /**
-   * Names of the runs this process holds right now. The event-loop lag monitor
-   * stamps these on a stall, so a lag row names the cron task / async tool
-   * that was executing instead of only the long-lived pulse runner.
+   * Runs that were in flight at any point since `sinceMs`: the ones still
+   * running (endedAt null) plus the ones that finished after it. The lag
+   * monitor passes the stall start minus a margin.
    */
-  static labels(): string[] {
-    return [...entries().values()].map((entry) => entry.label);
+  static activeSince(
+    sinceMs: number,
+  ): { label: string; startedAt: number; endedAt: number | null }[] {
+    const running = [...entries().values()].map((entry) => ({
+      label: entry.label,
+      startedAt: entry.startedAt,
+      endedAt: null,
+    }));
+    const ended = finished().filter((entry) => entry.endedAt >= sinceMs);
+    return [...running, ...ended];
   }
 
   /** Runs this process holds right now (deploy drain status). */

@@ -455,7 +455,43 @@ export class PulseHealthRepository {
             tasksFailed.push(dbTask.displayName);
             logger.error(
               `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
+              { taskId: dbTask.id, resolvedPath: path ?? "none" },
             );
+            // The claim above set RUNNING. Release it, or overlap prevention
+            // skips this task forever ("still running from previous pulse").
+            // lastExecutedAt moves so it is not retried on every pulse.
+            const unresolvedConsecutiveFailures =
+              (dbTask.consecutiveFailures ?? 0) + 1;
+            await db
+              .update(cronTasksTable)
+              .set({
+                lastExecutedAt: startedAt,
+                lastExecutionStatus: CronTaskStatus.FAILED,
+                lastExecutionDuration: 0,
+                runStartedAt: null,
+                consecutiveFailures: unresolvedConsecutiveFailures,
+                executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                errorCount: sql`${cronTasksTable.errorCount} + 1`,
+                updatedAt: new Date(),
+              })
+              .where(eq(cronTasksTable.id, dbTask.id));
+            const { emitTaskList, emitTaskQueue } = createTaskEmitters(
+              logger,
+              cronUser,
+            );
+            const unresolvedPayload = {
+              tasks: [
+                {
+                  id: dbTask.id,
+                  lastExecutionStatus: CronTaskStatus.FAILED,
+                  lastExecutedAt: startedAt.toISOString(),
+                  lastExecutionDuration: 0,
+                  consecutiveFailures: unresolvedConsecutiveFailures,
+                },
+              ],
+            };
+            emitTaskList("task-updated", { responseData: unresolvedPayload });
+            emitTaskQueue("task-updated", { responseData: unresolvedPayload });
           } else {
             try {
               const taskInput = dbTask.taskInput ?? {};

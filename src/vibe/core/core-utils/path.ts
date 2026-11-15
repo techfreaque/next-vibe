@@ -16,13 +16,31 @@ let _aliasMap: Record<string, string> | null = null;
 
 function getAliasMap(): Record<string, string> {
   if (_aliasMap === null) {
+    let map: Record<string, string> = {};
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports -- Lazy bootstrap: alias-map is a generated file that may not exist yet during first generator run. Using require() so we can catch the missing-module error gracefully.
-      _aliasMap = require("@/generated/endpoints/alias-map")
-        .pathToAliasMap as Record<string, string>;
+      map = require("@/generated/endpoints/alias-map").pathToAliasMap as Record<
+        string,
+        string
+      >;
     } catch {
-      _aliasMap = {};
+      map = {};
     }
+    // Dev serves PRODUCTION_OFF endpoints too (handlers.ts falls back to
+    // handlers-dev.ts), but their aliases exist only in alias-map-dev.ts.
+    // Without this, dev-only cron tasks (e.g. "update-model-prices") fail in
+    // the pulse with "unknown routeId". Statically false in prod bundles.
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- Same lazy bootstrap as above for the dev-only alias map.
+        const devMap = require("@/generated/endpoints/alias-map-dev")
+          .pathToAliasMap as Record<string, string>;
+        map = { ...map, ...devMap };
+      } catch {
+        // dev map not generated yet: prod map only
+      }
+    }
+    _aliasMap = map;
   }
   return _aliasMap;
 }
