@@ -45,6 +45,9 @@ export async function onFilePart(
       : generatedType === "video"
         ? "mp4"
         : "mp3";
+  if (generatedType === "image") {
+    ctx.stepImageCount += 1;
+  }
   const ext = mediaType.split("/")[1] ?? defaultExt;
   const filename = `generated-${generatedType}-${Date.now()}.${ext}`;
 

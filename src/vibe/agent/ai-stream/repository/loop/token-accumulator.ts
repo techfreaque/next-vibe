@@ -17,6 +17,7 @@ import {
   ApiProvider,
   calculateCreditCost,
   calculateTokenCostUsd,
+  DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
   upstreamCostToCredits,
 } from "../../../models/models";
 import type { ChatModelOption } from "../../models";
@@ -126,6 +127,50 @@ export function producedImageFile(
   files: ReadonlyArray<{ mediaType: string }> | undefined,
 ): boolean {
   return files?.some((file) => file.mediaType.startsWith("image/")) ?? false;
+}
+
+/** Estimated charge of a step cut off before the provider reported usage. */
+export interface CutOffStepEstimate {
+  credits: number;
+  /** Text estimate + the estimated image tokens. */
+  completionTokens: number;
+  /** IMAGE part of completionTokens. */
+  imageOutputTokens: number;
+}
+
+/**
+ * Credits for an in-flight step that was cut off (user stop, disconnect):
+ * no usage arrives, so the prompt and the streamed text are estimated from
+ * context. Images the step already delivered never show up in that text
+ * estimate, so each adds the model's estimated image tokens, priced at its
+ * imageOutputTokenCost (models without one fall back to the output rate).
+ */
+export function estimateCutOffStepCost(
+  modelConfig: Parameters<typeof calculateCreditCost>[0] & {
+    estimatedImageOutputTokens?: number;
+  },
+  promptTokens: number,
+  textCompletionTokens: number,
+  imageCount: number,
+): CutOffStepEstimate {
+  const imageOutputTokens =
+    Math.max(0, imageCount) *
+    (modelConfig.estimatedImageOutputTokens ??
+      DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS);
+  const completionTokens =
+    Math.max(0, textCompletionTokens) + imageOutputTokens;
+  return {
+    credits: calculateCreditCost(
+      modelConfig,
+      promptTokens,
+      completionTokens,
+      0,
+      0,
+      imageOutputTokens,
+    ),
+    completionTokens,
+    imageOutputTokens,
+  };
 }
 
 /** OpenRouter's per-step usage.cost + serving endpoint from provider metadata. */

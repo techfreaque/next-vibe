@@ -393,7 +393,8 @@ export interface ModelOptionTokenBased extends ModelOptionBase {
   cacheWriteTokenCost?: number;
   /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
   imageOutputTokenCost?: number;
-  /** Estimated output tokens per generated image, for price display on image-gen LLM models */
+  /** Estimated IMAGE output tokens per generated image, for price display on
+   *  image-output models. Unset = DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS. */
   estimatedImageOutputTokens?: number;
   creditCostPerImage?: never;
   creditCostPerSecond?: never;
@@ -816,6 +817,7 @@ interface CreditCostInput extends ModelOptionBase {
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
   imageOutputTokenCost?: number;
+  estimatedImageOutputTokens?: number;
 }
 
 /**
@@ -966,6 +968,51 @@ export const defaultLlmModality = {
 const PRICE_REFERENCE_INPUT_TOKENS = 5000;
 const PRICE_REFERENCE_OUTPUT_TOKENS = 1500;
 
+/**
+ * Image output tokens per generated image, used to ESTIMATE (display, sort)
+ * the price of image-output chat models. A live Nano Banana 2.1 turn reported
+ * 1,120 image tokens for a 1K image (the probe: $0.035 at $30/M = ~1,170), and
+ * Gemini 3 image models document 1,120 per 1K/2K image. Billing never uses
+ * this: it reads the real image token count from the provider usage.
+ */
+export const DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS = 1_120;
+
+/**
+ * Estimated image tokens of one generated image for an image-output model
+ * (one with an imageOutputTokenCost); 0 for every other model.
+ */
+export function getEstimatedImageOutputTokens(model: CreditCostInput): number {
+  if (model.imageOutputTokenCost === undefined) {
+    return 0;
+  }
+  return (
+    model.estimatedImageOutputTokens ?? DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS
+  );
+}
+
+/**
+ * ESTIMATED credits of one reference turn (display, sorting, comparison; never
+ * billing). Image-output models also generate one image per turn, its tokens
+ * priced at imageOutputTokenCost (4-20x the text rate): pricing them as text
+ * showed 3-6x too little. Every price surface (selector badge, model pages,
+ * getModelPrice) goes through here so they agree.
+ */
+export function estimateTurnCredits(
+  model: CreditCostInput,
+  inputTokens: number,
+  textOutputTokens: number,
+): number {
+  const imageTokens = getEstimatedImageOutputTokens(model);
+  return calculateCreditCost(
+    model,
+    inputTokens,
+    textOutputTokens + imageTokens,
+    0,
+    0,
+    imageTokens,
+  );
+}
+
 /** Reference sizes for TTS/STT representative pricing (typical single usage) */
 export const PRICE_REFERENCE_TTS_CHARS = 600; // ~100 words spoken aloud
 export const PRICE_REFERENCE_STT_SECONDS = 30; // typical voice message
@@ -998,7 +1045,7 @@ export function getModelPrice(model: CreditCostInput): number {
         (1 + STANDARD_MARKUP_PERCENTAGE),
     );
   }
-  return calculateCreditCost(
+  return estimateTurnCredits(
     model,
     PRICE_REFERENCE_INPUT_TOKENS,
     PRICE_REFERENCE_OUTPUT_TOKENS,

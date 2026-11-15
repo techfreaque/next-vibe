@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import {
+  ChatModelId,
+  chatModelOptionsPool,
+} from "next-vibe/agent/ai-stream/models";
+import {
+  calculateCreditCost,
+  estimateTurnCredits,
+} from "next-vibe/agent/models/models";
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 
 import { collectSitemapEntries } from "../../_root/sitemap.xml/build-sitemap";
@@ -13,6 +20,8 @@ import {
   isModelPageAlias,
   listModelFacts,
   PUBLIC_CHAT_MODEL_IDS,
+  REFERENCE_INPUT_TOKENS,
+  REFERENCE_OUTPUT_TOKENS,
   suggestComparisons,
   toModelSlug,
 } from "./model-facts";
@@ -57,9 +66,9 @@ describe("one public page per model", () => {
     for (const [alias, canonical] of CLAUDE_CODE_ALIASES) {
       expect(paths).not.toContain(`/models/${toModelSlug(alias)}`);
       expect(paths).toContain(`/models/${toModelSlug(canonical)}`);
-      expect(
-        paths.some((p) => p.includes(`/${toModelSlug(alias)}`)),
-      ).toBe(false);
+      expect(paths.some((p) => p.includes(`/${toModelSlug(alias)}`))).toBe(
+        false,
+      );
     }
   });
 });
@@ -79,7 +88,9 @@ describe("own-worldview uncensored model comparisons", () => {
       ) {
         continue;
       }
-      expect(suggestComparisons(facts)[0]?.id).toBe(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
+      expect(suggestComparisons(facts)[0]?.id).toBe(
+        OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
+      );
     }
   });
 
@@ -96,6 +107,51 @@ describe("own-worldview uncensored model comparisons", () => {
       expect(
         paths.has(`/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`),
       ).toBe(true);
+    }
+  });
+});
+
+describe("model page price per message", () => {
+  test("image-output models include one image at the image token rate", () => {
+    const imageModelIds = new Set(
+      chatModelOptionsPool
+        .filter(
+          (o) =>
+            "imageOutputTokenCost" in o &&
+            o.imageOutputTokenCost !== undefined &&
+            PUBLIC_CHAT_MODEL_IDS.includes(o.id),
+        )
+        .map((o) => o.id),
+    );
+    expect(imageModelIds.size).toBeGreaterThan(0);
+    for (const id of imageModelIds) {
+      const options = chatModelOptionsPool.filter(
+        (o) => o.id === id && !o.adminOnly,
+      );
+      const cheapestText = Math.min(
+        ...options.map((o) =>
+          calculateCreditCost(
+            o,
+            REFERENCE_INPUT_TOKENS,
+            REFERENCE_OUTPUT_TOKENS,
+          ),
+        ),
+      );
+      const cheapestEstimate = Math.min(
+        ...options.map((o) =>
+          estimateTurnCredits(
+            o,
+            REFERENCE_INPUT_TOKENS,
+            REFERENCE_OUTPUT_TOKENS,
+          ),
+        ),
+      );
+      const shown = getModelFacts(id)?.creditsPerMessage ?? 0;
+      expect({ id, shown }).toEqual({
+        id,
+        shown: Math.round(cheapestEstimate * 100) / 100,
+      });
+      expect(shown).toBeGreaterThan(cheapestText);
     }
   });
 });

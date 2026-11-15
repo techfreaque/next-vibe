@@ -44,11 +44,12 @@ import { musicGenModelOptions } from "../../music-generation/models";
 import { sttModelOptions } from "../../speech-to-text/models";
 import { ttsModelOptions } from "../../text-to-speech/models";
 import { videoGenModelOptions } from "../../video-generation/models";
-import { getCreditCostFromModel } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {
   type AnyModelId,
   type AnyModelOption,
+  estimateTurnCredits,
+  getEstimatedImageOutputTokens,
   getModelPrice,
   PRICE_REFERENCE_STT_SECONDS,
   PRICE_REFERENCE_TTS_CHARS,
@@ -127,10 +128,14 @@ function calculateCostRanges(model: ChatModelOption): {
     { name: "Long conversation", input: effectiveTrigger, output: 2_000 },
   ];
 
+  // Image-output models: every scenario also generates one image.
+  const imageTokens = getEstimatedImageOutputTokens(model);
+
   return {
     ranges: scenarios.map((scenario) => ({
       ...scenario,
-      cost: getCreditCostFromModel(model, scenario.input, scenario.output),
+      output: scenario.output + imageTokens,
+      cost: estimateTurnCredits(model, scenario.input, scenario.output),
       willCompact: scenario.input >= effectiveTrigger,
     })),
     effectiveTrigger,

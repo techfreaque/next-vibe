@@ -21,7 +21,7 @@ import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
   ApiProvider,
   apiProviderDisplayNames,
-  calculateCreditCost,
+  estimateTurnCredits,
   type ModelDefinition,
   modelProviders,
 } from "next-vibe/agent/models/models";
@@ -230,7 +230,7 @@ export function getModelFacts(id: ChatModelId): ModelFacts | null {
   const options = publicOptionsFor(id);
 
   const costs = options.map((option) =>
-    calculateCreditCost(
+    estimateTurnCredits(
       option,
       REFERENCE_INPUT_TOKENS,
       REFERENCE_OUTPUT_TOKENS,

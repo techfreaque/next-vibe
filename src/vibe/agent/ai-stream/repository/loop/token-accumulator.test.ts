@@ -5,6 +5,10 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   ApiProvider,
   calculateCreditCost,
+  DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+  estimateTurnCredits,
+  getEstimatedImageOutputTokens,
+  getModelPrice,
   roundMediaCost,
   upstreamCostToCredits,
 } from "../../../models/models";
@@ -14,6 +18,7 @@ import {
   getChatModelById,
 } from "../../models";
 import {
+  estimateCutOffStepCost,
   producedImageFile,
   readImageOutputTokens,
   readStepUpstreamCost,
@@ -60,7 +65,10 @@ function nanoGptModel(): ChatModelOption {
 const logger = createEndpointLogger(false, defaultLocale);
 
 /** OpenRouter step metadata as the provider package exposes it. */
-function openRouterMeta(cost: number, provider = "Parasail"): {
+function openRouterMeta(
+  cost: number,
+  provider = "Parasail",
+): {
   openrouter: { provider: string; usage: { cost: number } };
 } {
   return { openrouter: { provider, usage: { cost } } };
@@ -590,10 +598,107 @@ describe("image output tokens", () => {
         typeof model.creditCost === "function" &&
         model.outputs.includes("image")
       ) {
-        expect(
-          { id, imageOutputTokenCost: model.imageOutputTokenCost },
-        ).toEqual({ id, imageOutputTokenCost: expect.any(Number) });
+        expect({
+          id,
+          imageOutputTokenCost:
+            "imageOutputTokenCost" in model
+              ? model.imageOutputTokenCost
+              : undefined,
+        }).toEqual({ id, imageOutputTokenCost: expect.any(Number) });
       }
     }
+  });
+
+  it("price display estimates one image per turn at the image rate", () => {
+    const model = imageModel();
+    expect(getEstimatedImageOutputTokens(model)).toBe(
+      DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+    );
+    // Normal chat (16k in, 1.5k text out) plus one image's tokens.
+    expect(estimateTurnCredits(model, 16_000, 1_500)).toBe(
+      expectedCredits(
+        (16_000 * 1.5 +
+          1_500 * 7.5 +
+          DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30) /
+          1_000_000,
+      ),
+    );
+    // getModelPrice uses the same estimate (5k in, 1.5k text out).
+    expect(getModelPrice(model)).toBe(estimateTurnCredits(model, 5_000, 1_500));
+    // The old text-only price showed well under half of it.
+    expect(getModelPrice(model)).toBeGreaterThan(
+      calculateCreditCost(model, 5_000, 1_500) * 2,
+    );
+    // A per-model estimate overrides the default.
+    expect(
+      estimateTurnCredits(
+        { ...model, estimatedImageOutputTokens: 2_000 },
+        16_000,
+        1_500,
+      ),
+    ).toBe(calculateCreditCost(model, 16_000, 3_500, 0, 0, 2_000));
+  });
+
+  it("price display of text-only models is unchanged", () => {
+    expect(getEstimatedImageOutputTokens(pricedModel())).toBe(0);
+    expect(estimateTurnCredits(pricedModel(), 16_000, 1_500)).toBe(
+      calculateCreditCost(pricedModel(), 16_000, 1_500),
+    );
+    expect(getModelPrice(pricedModel())).toBe(
+      calculateCreditCost(pricedModel(), 5_000, 1_500),
+    );
+  });
+
+  it("every image-output chat model shows a price above its text-only price", () => {
+    for (const id of Object.values(ChatModelId)) {
+      const model = getChatModelById(id);
+      if (
+        !("imageOutputTokenCost" in model) ||
+        model.imageOutputTokenCost === undefined
+      ) {
+        continue;
+      }
+      expect({
+        id,
+        image: getModelPrice(model) > calculateCreditCost(model, 5_000, 1_500),
+      }).toEqual({ id, image: true });
+    }
+  });
+
+  it("cut-off step bills delivered images at the image rate", () => {
+    const model = imageModel();
+    const estimate = estimateCutOffStepCost(model, 1_000, 200, 1);
+    expect(estimate.imageOutputTokens).toBe(
+      DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+    );
+    expect(estimate.completionTokens).toBe(
+      200 + DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+    );
+    expect(estimate.credits).toBe(
+      expectedCredits(
+        (1_000 * 1.5 + 200 * 7.5 + DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30) /
+          1_000_000,
+      ),
+    );
+    // Two images, no text (image-only step): both billed.
+    const two = estimateCutOffStepCost(model, 1_000, 0, 2);
+    expect(two.imageOutputTokens).toBe(
+      2 * DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+    );
+    expect(two.credits).toBe(
+      expectedCredits(
+        (1_000 * 1.5 + 2 * DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30) /
+          1_000_000,
+      ),
+    );
+  });
+
+  it("cut-off step without images keeps the text estimate", () => {
+    const estimate = estimateCutOffStepCost(imageModel(), 1_000, 200, 0);
+    expect(estimate).toEqual({
+      credits: calculateCreditCost(imageModel(), 1_000, 200),
+      completionTokens: 200,
+      imageOutputTokens: 0,
+    });
   });
 });

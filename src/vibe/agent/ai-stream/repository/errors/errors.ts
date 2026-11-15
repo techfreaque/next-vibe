@@ -22,7 +22,6 @@ import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import { calculateCreditCost } from "../../../models/models";
 import { type ChatModelId, getChatModelById } from "../../models";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
@@ -37,7 +36,10 @@ import type { MessageDbWriter } from "../core/message-db-writer";
 import type { ToolExecutionContextImpl } from "../core/stream";
 import { clearStreamingState } from "../core/stream";
 import { estimateTokensFromContext } from "../core/token-estimator";
-import { billsUpstreamCost } from "../loop/token-accumulator";
+import {
+  billsUpstreamCost,
+  estimateCutOffStepCost,
+} from "../loop/token-accumulator";
 import { serializeError } from "./error-utils";
 
 /**
@@ -384,7 +386,15 @@ export class AbortErrorHandler {
       try {
         let totalCredits = 0;
 
-        if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
+        // Images the in-flight step already delivered: onFilePart closes and
+        // detaches their message, so a step that produced only an image has
+        // no partial text but still cost the provider its image tokens.
+        const cutOffImageCount = ctx.stepImageCount;
+        const partialMessageId = ctx.currentAssistantContent
+          ? ctx.currentAssistantMessageId
+          : null;
+
+        if (partialMessageId || cutOffImageCount > 0) {
           // The in-flight step was cut off mid-generation: the provider still
           // charged its prompt and every token streamed so far. Estimate and
           // bill it for EVERY payer (incognito and guests included; those
@@ -402,14 +412,22 @@ export class AbortErrorHandler {
             aiResponse: ctx.currentAssistantContent,
           });
 
+          // Delivered images are priced at the image token rate: the text
+          // estimate above never sees them.
           const modelInfo = getChatModelById(model);
-          const modelCreditCost = modelInfo
-            ? calculateCreditCost(
+          const stepEstimate = modelInfo
+            ? estimateCutOffStepCost(
                 modelInfo,
                 tokenEstimate.promptTokens,
                 tokenEstimate.completionTokens,
+                cutOffImageCount,
               )
-            : 0;
+            : null;
+          const modelCreditCost = stepEstimate?.credits ?? 0;
+          const completionTokens =
+            stepEstimate?.completionTokens ?? tokenEstimate.completionTokens;
+          const imageOutputTokens = stepEstimate?.imageOutputTokens ?? 0;
+          const totalTokens = tokenEstimate.promptTokens + completionTokens;
 
           totalCredits += modelCreditCost;
 
@@ -423,50 +441,63 @@ export class AbortErrorHandler {
                 apiProvider: modelInfo.apiProvider,
                 providerModel: modelInfo.providerModel,
                 promptTokens: tokenEstimate.promptTokens,
-                completionTokens: tokenEstimate.completionTokens,
+                completionTokens,
+                imageCount: cutOffImageCount,
+                imageOutputTokens,
                 modelCreditCost,
               },
             );
           }
 
           logger.debug("[AI Stream] Estimated usage for aborted stream", {
-            messageId: ctx.currentAssistantMessageId,
+            messageId: partialMessageId,
             promptTokens: tokenEstimate.promptTokens,
-            completionTokens: tokenEstimate.completionTokens,
-            totalTokens: tokenEstimate.totalTokens,
+            completionTokens,
+            imageCount: cutOffImageCount,
+            imageOutputTokens,
+            totalTokens,
             modelCreditCost,
           });
 
-          if (!isIncognito) {
+          if (!partialMessageId) {
+            // Image-only step: its message is already closed by onFilePart.
+            // Close the pre-generated slot like an abort without content.
+            ctx.dbWriter.emitContentDoneRaw({
+              messageId: ctx.preGeneratedAssistantMessageId,
+              content: "",
+              totalTokens: null,
+              finishReason: "stop",
+            });
+          } else if (!isIncognito) {
             logger.debug("[AI Stream] Saving partial content to database", {
-              messageId: ctx.currentAssistantMessageId,
+              messageId: partialMessageId,
               contentLength: ctx.currentAssistantContent.length,
             });
 
             // Flush + write final partial content to DB, emit CONTENT_DONE SSE
             await ctx.dbWriter.emitContentDone({
-              messageId: ctx.currentAssistantMessageId,
+              messageId: partialMessageId,
               content: ctx.currentAssistantContent,
               finishReason: "stop",
-              totalTokens: tokenEstimate.totalTokens,
+              totalTokens,
               promptTokens: tokenEstimate.promptTokens,
-              completionTokens: tokenEstimate.completionTokens,
+              completionTokens,
               reasoningSignature: ctx.currentReasoningSignature ?? undefined,
               reasoningRedactedData:
                 ctx.currentReasoningRedactedData ?? undefined,
             });
 
             logger.debug("[AI Stream] Saved partial content to database", {
-              messageId: ctx.currentAssistantMessageId,
-              totalTokens: tokenEstimate.totalTokens,
+              messageId: partialMessageId,
+              totalTokens,
             });
 
             // Emit TOKENS_UPDATED for credit accounting
             ctx.dbWriter.emitTokensUpdated({
-              messageId: ctx.currentAssistantMessageId,
+              messageId: partialMessageId,
               promptTokens: tokenEstimate.promptTokens,
-              completionTokens: tokenEstimate.completionTokens,
-              totalTokens: tokenEstimate.totalTokens,
+              completionTokens,
+              totalTokens,
               cachedInputTokens: 0,
               cacheWriteTokens: 0,
               timeToFirstToken: null,
@@ -477,7 +508,7 @@ export class AbortErrorHandler {
           } else {
             // Incognito: emit CONTENT_DONE SSE only (no DB write) so frontend cache is updated
             ctx.dbWriter.emitContentDoneRaw({
-              messageId: ctx.currentAssistantMessageId,
+              messageId: partialMessageId,
               content: ctx.currentAssistantContent,
               totalTokens: null,
               finishReason: "stop",

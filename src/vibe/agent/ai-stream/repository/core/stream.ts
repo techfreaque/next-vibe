@@ -188,6 +188,10 @@ export class ToolExecutionContextImpl {
   tokenOutput = 0;
   /** IMAGE part of tokenOutput (image-output models, see readImageOutputTokens). */
   tokenImageOutput = 0;
+  /** Images delivered (file parts) in the in-flight step, reset when the step
+   *  finishes and is billed. A cut-off step bills them as estimated image
+   *  tokens (see estimateCutOffStepCost). */
+  stepImageCount = 0;
   /** Full prompt size on the last step — for display/threshold purposes. */
   tokenLastInput = 0;
   /** True once this turn's tokens were billed (complete() or the abort path),

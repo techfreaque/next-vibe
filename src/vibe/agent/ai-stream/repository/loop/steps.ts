@@ -616,6 +616,9 @@ export function onStepFinish(
     imageOutputTokens,
   };
   TokenAccumulator.accumulate(state.p.ctx, stepTokens);
+  // This step's images are billed from its real usage now; only images of a
+  // later, cut-off step are left for the abort path's estimate.
+  state.p.ctx.stepImageCount = 0;
   const upstream = readStepUpstreamCost(stepResult.providerMetadata);
   TokenAccumulator.recordUpstreamCost(
     state.p.ctx,
