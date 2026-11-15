@@ -177,6 +177,7 @@ import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from '
 import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
+import { Route as LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport } from './routes/$locale.story.blog.openai-anthropic-compatible-api.index'
 import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from './routes/$locale.story.blog.referral-for-affiliate-pros.index'
 import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './routes/$locale.story.blog.referral-for-beginners.index'
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
@@ -1605,6 +1606,12 @@ const LocaleStoryBlogOneEndpointEverySurfaceIndexRoute =
   LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport.update({
     id: '/blog/one-endpoint-every-surface/',
     path: '/blog/one-endpoint-every-surface/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute =
+  LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport.update({
+    id: '/blog/openai-anthropic-compatible-api/',
+    path: '/blog/openai-anthropic-compatible-api/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogReferralForAffiliateProsIndexRoute =
@@ -5078,6 +5085,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
+  '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -5748,6 +5756,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
+  '/$locale/story/blog/openai-anthropic-compatible-api': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -6426,6 +6435,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
+  '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -7104,6 +7114,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
+    | '/$locale/story/blog/openai-anthropic-compatible-api/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -7774,6 +7785,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/model-refresh-uncensored-providers'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
+    | '/$locale/story/blog/openai-anthropic-compatible-api'
     | '/$locale/story/blog/referral-for-affiliate-pros'
     | '/$locale/story/blog/referral-for-beginners'
     | '/$locale/story/blog/referral-for-developers'
@@ -8451,6 +8463,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
+    | '/$locale/story/blog/openai-anthropic-compatible-api/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -10327,6 +10340,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/one-endpoint-every-surface'
       fullPath: '/$locale/story/blog/one-endpoint-every-surface/'
       preLoaderRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/openai-anthropic-compatible-api/': {
+      id: '/$locale/story/blog/openai-anthropic-compatible-api/'
+      path: '/blog/openai-anthropic-compatible-api'
+      fullPath: '/$locale/story/blog/openai-anthropic-compatible-api/'
+      preLoaderRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/referral-for-affiliate-pros/': {
@@ -13945,6 +13965,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
+  LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   LocaleStoryBlogReferralForAffiliateProsIndexRoute: typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   LocaleStoryBlogReferralForBeginnersIndexRoute: typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -13993,6 +14014,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogOneCodebase13PlatformsIndexRoute,
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute:
     LocaleStoryBlogOneEndpointEverySurfaceIndexRoute,
+  LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute:
+    LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute,
   LocaleStoryBlogReferralForAffiliateProsIndexRoute:
     LocaleStoryBlogReferralForAffiliateProsIndexRoute,
   LocaleStoryBlogReferralForBeginnersIndexRoute:

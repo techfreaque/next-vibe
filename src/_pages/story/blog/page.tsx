@@ -180,6 +180,12 @@ export function TanstackPage({
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
+    post("openai-anthropic-compatible-api", {
+      title: t("posts.compatibleApi.title"),
+      category: t("posts.compatibleApi.category"),
+      excerpt: t("posts.compatibleApi.excerpt"),
+      readTime: t("posts.compatibleApi.readTime"),
+    }),
     post("chatgpt-alternative-without-filters", {
       title: t("posts.chatgptAlternative.title"),
       category: t("posts.chatgptAlternative.category"),

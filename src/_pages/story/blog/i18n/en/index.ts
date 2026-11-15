@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    compatibleApi: {
+      title: "One API key, every model. OpenAI and Anthropic formats.",
+      category: "Developer Guide",
+      excerpt:
+        "OpenAI chat completions, the Responses API and Anthropic Messages on one endpoint. Your SDK, Claude Code and Codex CLI on every model. What it costs, and when going direct or using OpenRouter is the better call.",
+      readTime: "11 min read",
+    },
     chatgptAlternative: {
       title: "A ChatGPT alternative without filters. You set the level.",
       category: "Guide",

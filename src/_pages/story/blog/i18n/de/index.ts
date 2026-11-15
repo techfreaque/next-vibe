@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    compatibleApi: {
+      title: "Ein API-Key, jedes Modell. OpenAI- und Anthropic-Format.",
+      category: "Entwickler-Guide",
+      excerpt:
+        "OpenAI Chat Completions, Responses API und Anthropic Messages an einem Endpoint. Dein SDK, Claude Code und Codex CLI mit jedem Modell. Was es kostet und wann der direkte Weg oder OpenRouter besser passt.",
+      readTime: "11 Min. Lesezeit",
+    },
     chatgptAlternative: {
       title: "ChatGPT-Alternative ohne Filter. Den Filtergrad bestimmst du.",
       category: "Ratgeber",
