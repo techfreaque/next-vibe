@@ -507,9 +507,13 @@ const mockHttp: FinanceHttp = async (
     return {
       status: 200,
       json: {
-        data: { total_credits: 500, total_usage: openRouterUsage },
+        // Account-wide usage includes other (dev) keys: never booked as spend.
+        data: { total_credits: 500, total_usage: openRouterUsage + 40 },
       },
     };
+  }
+  if (request.url.includes("openrouter.ai/api/v1/key")) {
+    return { status: 200, json: { data: { usage: openRouterUsage } } };
   }
   if (request.url.includes("nano-gpt.com")) {
     return { status: 200, json: { usd_balance: "19.5" } };
@@ -701,7 +705,20 @@ describe("finance ingest (mocked externals)", () => {
 
     const or = data.sources.find((s) => s.source === FinanceSource.OPENROUTER);
     expect(or?.status).toBe(SourceRunStatus.OK);
-    expect(or?.balanceUsd).toBe(400);
+    // Balance is the shared account wallet (500 - 140 account-wide usage)...
+    expect(or?.balanceUsd).toBe(360);
+    // ...but spend is THIS key's usage counter, never the account-wide total.
+    expect(httpCalls.some((u) => u.includes("openrouter.ai/api/v1/key"))).toBe(true);
+    const [orSnap] = await db
+      .select()
+      .from(financeProviderSnapshots)
+      .where(
+        and(
+          eq(financeProviderSnapshots.provider, FinanceSource.OPENROUTER),
+          eq(financeProviderSnapshots.bucketAt, new Date(Date.UTC(2031, 2, 4, 12))),
+        ),
+      );
+    expect(orSnap?.cumulativeUsageUsd).toBe(100);
     // A failing provider (Venice 500) is recorded, not thrown
     const venice = data.sources.find((s) => s.source === FinanceSource.VENICE);
     expect(venice?.status).toBe(SourceRunStatus.FAILED);

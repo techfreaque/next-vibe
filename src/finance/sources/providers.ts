@@ -2,7 +2,8 @@
  * Finance provider adapters (upstream spend / balance, READ-ONLY).
  *
  * Endpoints (found by probing our own accounts):
- *  - OpenRouter  GET  /api/v1/credits                 documented  total_credits, total_usage
+ *  - OpenRouter  GET  /api/v1/credits                 documented  total_credits, total_usage (balance)
+ *                GET  /api/v1/key                     documented  data.usage (this key's spend)
  *  - NanoGPT     POST /api/check-balance              documented  usd_balance
  *  - Venice      GET  /api/v1/api_keys/rate_limits    documented  data.balances.USD
  *  - Gab         GET  /v1/credits                     undocumented total_available (own credit unit)
@@ -74,6 +75,10 @@ const openRouterSchema = z.object({
   data: z.object({ total_credits: numeric, total_usage: numeric }),
 });
 
+const openRouterKeySchema = z.object({
+  data: z.object({ usage: numeric }),
+});
+
 const openRouter: ProviderAdapter = {
   source: FinanceSource.OPENROUTER,
   label: "OpenRouter",
@@ -94,12 +99,34 @@ const openRouter: ProviderAdapter = {
     }
     const { total_credits, total_usage } = parsed.data.data;
     const balance = total_credits - total_usage;
+    // Spend comes from THIS key's usage counter (/api/v1/key), not the
+    // account-wide total_usage: dev / local keys share the account and were
+    // booked as prod cost (~11% of the week of 2026-11-09). The balance stays
+    // account-wide (it is one shared wallet). No per-key reading = null usage,
+    // so the spend delta falls back to the balance drop instead of mixing the
+    // two counters.
+    const keyRes = await http({
+      url: "https://openrouter.ai/api/v1/key",
+      method: "GET",
+      headers: bearer(apiKey),
+    });
+    const keyParsed =
+      keyRes.status === 200 ? openRouterKeySchema.safeParse(keyRes.json) : null;
+    const keyUsage =
+      keyParsed?.success && Number.isFinite(keyParsed.data.data.usage)
+        ? keyParsed.data.data.usage
+        : null;
     return {
       status: "ok",
       balanceUsd: balance,
       balanceNative: balance,
       unit: "usd",
-      cumulativeUsageUsd: total_usage,
+      cumulativeUsageUsd: keyUsage,
+      ...(keyUsage === null
+        ? {
+            note: `per-key usage unavailable (HTTP ${keyRes.status}); spend from account balance drop (account usage $${total_usage.toFixed(2)})`,
+          }
+        : {}),
     };
   },
 };
