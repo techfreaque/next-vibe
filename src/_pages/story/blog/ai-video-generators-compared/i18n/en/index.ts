@@ -35,6 +35,8 @@ export const translations = {
     colClip: "Chat clip",
     i2v: "Text or image",
     t2v: "Text",
+    v2v: "Text and video",
+    videoAudio: "Video and audio",
     framesFirst: "First frame",
     framesFirstLast: "First and last frame",
     framesNone: "No frame control",

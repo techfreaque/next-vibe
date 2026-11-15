@@ -5,7 +5,7 @@
  * which avoids ESM circular dependency TDZ errors in Vite SSR.
  */
 
-/** 1 credit = €0.01 = $0.01 = 0.24 PLN */
+/** 1 credit = €0.01 = $0.01 (PL pack: 40 zł / 500 credits = 0.08 zł) */
 export const CREDIT_VALUE_USD = 0.01;
 
 /** Standard markup percentage applied to all external API costs */

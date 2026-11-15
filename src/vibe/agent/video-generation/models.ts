@@ -127,7 +127,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.7-t2v",
         creditCostPerSecond: 10, // updated: 2026-04-04 from modelslab.com
-        supportedResolutions: ["1080p"], // updated: 2026-04-04 from modelslab.com
+        supportedResolutions: ["720p", "1080p"], // updated: 2026-11-15 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-04-04 from modelslab.com
@@ -188,7 +188,10 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.WAN_2_6_I2V,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "alibaba/wan-2.6",
-        creditCostPerSecond: 8, // updated: 2026-07-10 from openrouter.ai
+        // Image-to-video SKU: OpenRouter bills 0.10/0.15 $/s once a frame is
+        // attached (text-only 0.08/0.12). This is the I2V model, so bill the
+        // image rate and never under-bill.
+        creditCostPerSecond: 10, // updated: 2026-11-15 from openrouter.ai
         allowedPassthroughParameters: [
           "negative_prompt",
           "enable_prompt_expansion",
@@ -204,7 +207,7 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["5", "10"], // updated: 2026-11-09 from openrouter.ai
         supportedResolutions: ["720p", "1080p"], // updated: 2026-11-09 from openrouter.ai
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
-        pricingByResolution: { "480p": 4, "720p": 8, "1080p": 12 }, // updated: 2026-11-09 from openrouter.ai
+        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-11-15 from openrouter.ai
         defaultDurationSeconds: 5,
       },
       {
@@ -213,7 +216,7 @@ export const videoGenModelDefinitions: Record<
         providerModel: "wan2.6-i2v",
         creditCostPerSecond: 10, // updated: 2026-04-04 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
-        supportedResolutions: ["1080p"], // updated: 2026-07-10 from modelslab.com
+        supportedResolutions: ["720p", "1080p"], // updated: 2026-11-15 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 15, // updated: 2026-07-10 from modelslab.com
         supportedDurations: ["5", "10", "15"], // updated: 2026-07-10 from modelslab.com
@@ -224,7 +227,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.WAN_2_6_I2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "wan-2-6-i2v",
-        creditCostPerSecond: 10.4, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerSecond: 13, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
@@ -232,7 +235,7 @@ export const videoGenModelDefinitions: Record<
         supportedResolutions: ["720p", "1080p"],
         supportedAspectRatios: ["16:9", "9:16"],
         supportedSizes: ["1280x720", "1080x1920", "720x1280", "1920x1080"],
-        pricingByResolution: { "480p": 5.2, "720p": 10.4, "1080p": 15.6 }, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-11-15 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -261,7 +264,7 @@ export const videoGenModelDefinitions: Record<
         providerModel: "wan2.6-i2v-flash",
         creditCostPerSecond: 10, // updated: 2026-07-02 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
-        supportedResolutions: ["1080p"], // updated: 2026-07-10 from modelslab.com
+        supportedResolutions: ["720p", "1080p"], // updated: 2026-11-15 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-07-10 from openrouter.ai
         supportedDurations: ["5", "10"], // updated: 2026-07-10 from openrouter.ai
@@ -277,7 +280,7 @@ export const videoGenModelDefinitions: Record<
         minDurationSeconds: 5,
         maxDurationSeconds: 10,
         supportedDurations: ["5", "10"],
-        supportedResolutions: ["1080p"],
+        supportedResolutions: ["720p", "1080p"],
         pricingByResolution: { "720p": 13, "1080p": 19.5 }, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -307,59 +310,22 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 6.24, // updated: 2026-11-13 from modelslab.com (720p; the 3/s rate is 480p, which this route does not offer)
-        pricingByResolution: { "720p": 6.24, "1080p": 13.92 }, // updated: 2026-11-13 from modelslab.com
-        supportedResolutions: ["720p", "1080p"], // updated: 2026-07-10 from modelslab.com
+        creditCostPerSecond: 6.24, // updated: 2026-11-13 from modelslab.com (720p base; 480p via pricingByResolution)
+        pricingByResolution: { "480p": 3, "720p": 6.24, "1080p": 13.92 }, // updated: 2026-11-15 from modelslab.com
+        supportedResolutions: ["480p", "720p", "1080p"], // updated: 2026-11-15 from modelslab.com
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-07-10 from modelslab.com
+        generateAudio: true, // updated: 2026-11-15 from modelslab.com (native audio-visual sync)
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-1-5-pro",
-        creditCostPerSecond: 6.7392, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerSecond: 8.112, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
-        minDurationSeconds: 4,
-        maxDurationSeconds: 12,
-        supportedDurations: ["4", "5", "6", "7", "8", "9", "10", "11", "12"],
         supportedResolutions: ["480p", "720p", "1080p"],
-        supportedAspectRatios: [
-          "1:1",
-          "3:4",
-          "9:16",
-          "9:21",
-          "4:3",
-          "16:9",
-          "21:9",
-        ],
-        supportedSizes: [
-          "480x480",
-          "480x640",
-          "480x854",
-          "480x1120",
-          "640x480",
-          "720x720",
-          "720x960",
-          "720x1280",
-          "720x1680",
-          "854x480",
-          "960x720",
-          "1080x1080",
-          "1080x1440",
-          "1080x1920",
-          "1080x2520",
-          "1120x480",
-          "1280x720",
-          "1440x1080",
-          "1680x720",
-          "1920x1080",
-          "2520x1080",
-        ],
-        pricingByResolution: {
-          "480p": 2.9975,
-          "720p": 6.7392,
-          "1080p": 15.1632,
-        }, // updated: 2026-11-09 from unbottled.ai
+        supportedAspectRatios: ["16:9", "9:16"],
+        pricingByResolution: { "480p": 3.9, "720p": 8.112, "1080p": 18.096 }, // updated: 2026-11-15 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -447,6 +413,7 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["4", "6", "8"], // updated: 2026-11-09 from openrouter.ai
         supportedResolutions: ["720p", "1080p", "4K"], // updated: 2026-11-09 from openrouter.ai
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
+        pricingByResolution: { "720p": 40, "1080p": 40, "4K": 60 }, // updated: 2026-11-15 from openrouter.ai
         defaultDurationSeconds: 5,
       },
       {
@@ -454,6 +421,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "veo-3-1",
         creditCostPerSecond: 52, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: { "720p": 52, "1080p": 52, "4K": 78 }, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 8,
@@ -517,7 +485,7 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["4", "6", "8"], // updated: 2026-11-09 from openrouter.ai
         supportedResolutions: ["720p", "1080p", "4K"], // updated: 2026-11-09 from openrouter.ai
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
-        pricingByResolution: { "4k": 30, "720p": 10 }, // updated: 2026-11-09 from openrouter.ai
+        pricingByResolution: { "720p": 10, "1080p": 12, "4K": 30 }, // updated: 2026-11-15 from openrouter.ai
         defaultDurationSeconds: 5,
       },
       {
@@ -550,7 +518,7 @@ export const videoGenModelDefinitions: Record<
           "3840x2160",
           "2160x3840",
         ],
-        pricingByResolution: { "4k": 39, "720p": 13 }, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: { "720p": 13, "1080p": 15.6, "4K": 39 }, // updated: 2026-11-15 from unbottled.ai
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -745,7 +713,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_3_0_T2V,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "kwaivgi/kling-v3.0-pro",
-        creditCostPerSecond: 11.2, // updated: 2026-07-10 from openrouter.ai
+        creditCostPerSecond: 16.8, // updated: 2026-11-15 from openrouter.ai (with-audio SKU; generate_audio is always sent)
         allowedPassthroughParameters: ["negative_prompt", "cfg_scale"], // updated: 2026-11-09 from openrouter.ai
         supportedSizes: ["1280x720", "720x1280", "720x720"], // updated: 2026-11-09 from openrouter.ai
         generateAudio: true, // updated: 2026-07-10 from openrouter.ai
@@ -938,6 +906,9 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-t2v",
         creditCostPerSecond: 6.7, // updated: 2026-07-02 from modelslab.com
+        minDurationSeconds: 6, // updated: 2026-11-15 from modelslab.com
+        maxDurationSeconds: 10, // updated: 2026-11-15 from modelslab.com
+        supportedDurations: ["6", "10"], // updated: 2026-11-15 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
@@ -1064,9 +1035,11 @@ export const videoGenModelDefinitions: Record<
         providerModel: "sora-2",
         creditCostPerSecond: 12.5, // updated: 2026-03-31 from modelslab.com
         supportedAspectRatios: ["16:9"], // updated: 2026-07-10 from openrouter.ai
+        supportedResolutions: ["720p"], // updated: 2026-11-15 from modelslab.com
+        generateAudio: true, // updated: 2026-11-15 from modelslab.com (synced audio)
         minDurationSeconds: 4, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 12, // updated: 2026-04-04 from modelslab.com
-        supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
+        supportedDurations: ["4", "8", "12"], // updated: 2026-11-15 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
@@ -1077,7 +1050,8 @@ export const videoGenModelDefinitions: Record<
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 12,
-        supportedDurations: ["2", "4", "8", "12"],
+        supportedDurations: ["4", "8", "12"],
+        supportedResolutions: ["720p"],
         supportedAspectRatios: ["16:9"],
       },
     ],
@@ -1105,26 +1079,27 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SORA_2_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "sora-2-pro-t2v",
+        // 1280x720 base rate; the 1080p sizes (x2.4) are not requested by this route.
         creditCostPerSecond: 36, // updated: 2026-03-31 from modelslab.com
         supportedAspectRatios: ["16:9"], // updated: 2026-07-02 from modelslab.com
+        supportedResolutions: ["720p"], // updated: 2026-11-15 from modelslab.com
+        generateAudio: true, // updated: 2026-11-15 from modelslab.com (synced audio)
         minDurationSeconds: 4, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 12, // updated: 2026-04-04 from modelslab.com
-        supportedDurations: ["2", "4", "8", "12"], // updated: 2026-04-04 from modelslab.com
+        supportedDurations: ["4", "8", "12"], // updated: 2026-11-15 from modelslab.com
         defaultDurationSeconds: 5,
       },
       {
         id: VideoGenModelId.SORA_2_PRO,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "sora-2-pro",
-        creditCostPerSecond: 39, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerSecond: 46.8, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
-        maxDurationSeconds: 20,
-        supportedDurations: ["4", "8", "12", "16", "20"],
-        supportedResolutions: ["720p", "1080p"],
-        supportedAspectRatios: ["16:9", "9:16"],
-        supportedSizes: ["1280x720", "1080x1920", "1920x1080", "720x1280"],
-        pricingByResolution: { "720p": 39, "1024p": 65, "1080p": 65 }, // updated: 2026-11-09 from unbottled.ai
+        maxDurationSeconds: 12,
+        supportedDurations: ["4", "8", "12"],
+        supportedResolutions: ["720p"],
+        supportedAspectRatios: ["16:9"],
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
@@ -1144,7 +1119,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "video"], // updated: 2026-11-15 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1152,6 +1127,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "gen4_aleph",
         creditCostPerSecond: 18, // updated: 2026-03-31 from modelslab.com
+        sourceMedia: ["video"], // ModelsLab init_video (required): edits existing footage
         supportedAspectRatios: [
           "16:9",
           "9:16",
@@ -1199,7 +1175,7 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text"], // updated: 2026-04-03 from video-gen-deterministic
+    inputs: ["text", "video", "audio"], // updated: 2026-11-15 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
       {
@@ -1207,6 +1183,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "lipsync-2",
         creditCostPerSecond: 7, // updated: 2026-03-31 from modelslab.com
+        sourceMedia: ["video", "audio"], // ModelsLab init_video + init_audio (both required)
         defaultDurationSeconds: 5,
       },
       {
@@ -1436,7 +1413,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V3_STD_T2V,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "kwaivgi/kling-v3.0-std",
-        creditCostPerSecond: 8.4, // updated: 2026-07-10 from openrouter.ai
+        creditCostPerSecond: 12.6, // updated: 2026-11-15 from openrouter.ai (with-audio SKU; generate_audio is always sent)
         allowedPassthroughParameters: ["negative_prompt", "cfg_scale"], // updated: 2026-11-09 from openrouter.ai
         supportedSizes: ["1280x720", "720x1280", "720x720"], // updated: 2026-11-09 from openrouter.ai
         generateAudio: true, // updated: 2026-07-10 from openrouter.ai
@@ -1466,7 +1443,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V3_STD_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kling-v3-std-t2v",
-        creditCostPerSecond: 10.92, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerSecond: 16.38, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 3,
         maxDurationSeconds: 15,
@@ -1574,6 +1551,7 @@ export const videoGenModelDefinitions: Record<
         supportedDurations: ["4", "6", "8"], // updated: 2026-11-09 from openrouter.ai
         supportedResolutions: ["720p", "1080p"], // updated: 2026-11-09 from openrouter.ai
         supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
+        pricingByResolution: { "720p": 5, "1080p": 8 }, // updated: 2026-11-15 from openrouter.ai
         defaultDurationSeconds: 5,
       },
       {
@@ -1581,6 +1559,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "veo-3-1-lite",
         creditCostPerSecond: 10.4, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: { "720p": 6.5, "1080p": 10.4 }, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 8,
@@ -2329,6 +2308,7 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux-3-video",
         creditCostPerSecond: 17, // updated: 2026-08-16 from openrouter-api ($0.17/sec → 17 credits)
+        pricingByResolution: { "720p": 17, "1080p": 29, "2K": 28, "4K": 41 }, // updated: 2026-11-15 from openrouter.ai
         allowedPassthroughParameters: ["safety_tolerance", "version", "draft"], // updated: 2026-11-09 from openrouter.ai
         generateAudio: true, // updated: 2026-11-09 from openrouter.ai
         supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
@@ -2362,6 +2342,12 @@ export const videoGenModelDefinitions: Record<
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "flux-3-video",
         creditCostPerSecond: 22.1, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: {
+          "720p": 22.1,
+          "1080p": 37.7,
+          "2K": 36.4,
+          "4K": 53.3,
+        }, // updated: 2026-11-15 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
         maxDurationSeconds: 20,
@@ -2511,8 +2497,8 @@ export const videoGenModelDefinitions: Record<
           "360p": 2.3172,
           "720p": 6.9504,
           "1080p": 10.4256,
-          "4k": 20.8512,
-        }, // updated: 2026-11-13 from openrouter.ai
+          "4K": 20.8512,
+        }, // updated: 2026-11-15 from openrouter.ai
         allowedPassthroughParameters: ["task"], // updated: 2026-11-13 from openrouter.ai
         generateAudio: true, // updated: 2026-11-13 from openrouter.ai
         supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-13 from openrouter.ai
@@ -2914,8 +2900,9 @@ export function videoRouteReportsImage(provider: ModelProviderConfig): boolean {
 
 /**
  * A video model's `inputs`: text, plus image when any of its routes takes a
- * reference image. `frameOverrides` (providerModel → accepts image) carries
- * fresh provider data that is not in the definitions yet (price updater run).
+ * reference image, plus the existing media (video, audio) a route edits.
+ * `frameOverrides` (providerModel → accepts image) carries fresh provider data
+ * that is not in the definitions yet (price updater run).
  */
 export function deriveVideoModelInputs(
   def: ModelDefinition,
@@ -2930,7 +2917,19 @@ export function deriveVideoModelInputs(
       videoRouteReportsImage(provider)
     );
   });
-  return acceptsImage ? ["text", "image"] : ["text"];
+  const inputs: Modality[] = acceptsImage ? ["text", "image"] : ["text"];
+  for (const media of ["video", "audio"] as const) {
+    const edited = def.providers.some(
+      (provider) =>
+        provider.apiProvider !== ApiProvider.UNBOTTLED &&
+        "sourceMedia" in provider &&
+        provider.sourceMedia?.includes(media) === true,
+    );
+    if (edited) {
+      inputs.push(media);
+    }
+  }
+  return inputs;
 }
 
 /**

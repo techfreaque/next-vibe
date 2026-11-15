@@ -1,0 +1,52 @@
+/**
+ * Credit pack price consistency: every surface (checkout, pricing page, API
+ * notice, emails, system prompt) must show the price checkout charges.
+ * Checkout reads the one-time price; other surfaces read the default price
+ * or the pricing params.
+ */
+
+import { describe, expect, test } from "bun:test";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+
+import {
+  CREDIT_PACK_PRODUCT_IDS,
+  getPricingParams,
+  productsRepository,
+} from "../repository-client";
+
+const LOCALES: readonly CountryLanguage[] = [
+  "en-US",
+  "en-GLOBAL",
+  "de-DE",
+  "pl-PL",
+];
+
+describe("credit pack price", () => {
+  test("default price equals the one-time checkout price", () => {
+    const definitions = productsRepository.getProductDefinitions();
+    for (const id of CREDIT_PACK_PRODUCT_IDS) {
+      const def = definitions[id];
+      expect(def.oneTimePriceByCountry).toEqual(def.priceByCountry);
+    }
+  });
+
+  test("every read path returns the checkout price", () => {
+    for (const locale of LOCALES) {
+      for (const id of CREDIT_PACK_PRODUCT_IDS) {
+        const checkout = productsRepository.getProduct(id, locale, "one_time");
+        expect(productsRepository.getProduct(id, locale).price).toBe(
+          checkout.price,
+        );
+        expect(productsRepository.getProducts(locale)[id].price).toBe(
+          checkout.price,
+        );
+      }
+    }
+  });
+
+  test("pricing params show the Polish pack as 40 zł", () => {
+    expect(getPricingParams("pl-PL").packPrice).toBe("40 zł");
+    expect(getPricingParams("en-US").packPrice).toBe("$5");
+    expect(getPricingParams("de-DE").packPrice).toBe("€5");
+  });
+});

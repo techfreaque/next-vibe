@@ -1637,9 +1637,9 @@ export const translations = {
         modelsLabWan26T2V:
           "Wan 2.6 T2V - ModelsLab's Wan 2.6 text-to-video generation model",
         modelsLabWan26I2V:
-          "Alibaba's Wan 2.6 image-to-video model: hand it a starting frame and it animates the scene, with native audio. 5 or 10 second clips at 720p or 1080p, landscape or portrait. Cheaper than Wan 2.7. Pick Wan 2.7 T2V when you also want a target end frame or more aspect ratios.",
+          "Alibaba's Wan 2.6 image-to-video model: hand it a starting frame and it animates the scene, with native audio. 5 or 10 second clips at 720p or 1080p, landscape or portrait. About the same price per second as Wan 2.7. Pick Wan 2.7 T2V when you also want a target end frame or more aspect ratios.",
         modelsLabWan26I2VFlash:
-          "The speed variant of Wan 2.6 image-to-video. Turns a still into a 5 or 10 second 1080p clip with shorter waits. It is not cheaper per second than standard Wan 2.6 I2V, often slightly pricier, so it only pays off when turnaround matters. Native audio is not listed for this variant; the standard model has it.",
+          "The speed variant of Wan 2.6 image-to-video. Turns a still into a 5 or 10 second clip at 720p or 1080p with shorter waits. Same price per second as standard Wan 2.6 I2V, so pick it when turnaround matters. Native audio is not listed for this variant; the standard model has it.",
         modelsLabSeedanceT2V:
           "Seedance T2V - BytePlus's text-to-video generation model",
         modelsLabSeedanceI2V:
@@ -1655,7 +1655,7 @@ export const translations = {
         modelsLabOmnihuman15:
           "ByteDance's OmniHuman 1.5 animates a person from a single photo, driven by an audio track: talking heads, singing, gestures. A specialist for avatars and dubbing, not a general text-to-video model. Pricier per second than most mid-range video models. For scenes without a speaking person, pick Kling 3.0 or Wan 2.7.",
         modelsLabSeedance15Pro:
-          "ByteDance's Seedance 1.5 Pro, sold through its BytePlus cloud. Native audio, 4 to 12 second clips from 480p to 1080p, first and last frame control, a wide range of aspect ratios. One of the cheapest video models here per clip. Great for testing ideas and volume; Seedance 2.0 is the step up for consistency and 4K.",
+          "ByteDance's Seedance 1.5 Pro, sold through its BytePlus cloud. Text to video with native audio, 480p to 1080p, landscape or portrait. One of the cheapest video models here per clip, and 480p costs half the 720p rate. Great for testing ideas and volume; Seedance 2.0 is the step up for frame control, consistency and 4K.",
         modelsLabVeo2:
           "Veo 2 - Google's high-quality video generation model via ModelsLab",
         modelsLabVeo3:
@@ -1685,7 +1685,7 @@ export const translations = {
         modelsLabKlingV16MultiI2V:
           "Kling V1.6 Multi I2V - Kling AI's multi-image-to-video model version 1.6",
         modelsLabKling30T2V:
-          "Kling 3.0 Pro from Kuaishou. Native audio, 3 to 15 second clips at 720p, first and last frame control, 16:9, 9:16 or 1:1. Lively, convincing motion for a mid-range price. 720p is the ceiling; for 1080p and above look at Veo 3.1 Fast or Hailuo 3. Kling 3.0 Std is the cheaper tier.",
+          "Kling 3.0 Pro from Kuaishou. Native audio, 3 to 15 second clips at 720p, first and last frame control, 16:9, 9:16 or 1:1. Lively, convincing motion for a mid-range price. 720p is the ceiling; for 1080p and above look at Veo 3.1 Fast or Hailuo 3. Kling 3.0 Std costs less when you start from an image.",
         modelsLabLtx2ProT2V:
           "Lightricks' LTX-2 Pro. Text-to-video at 2K or 4K, in clips of roughly 6 to 10 seconds. A mid-range price for that resolution, which makes it the budget route to 4K next to Veo 3.1. No native audio listed here; for sound with 4K use Veo 3.1 Fast.",
         modelsLabLtx2ProI2V:
@@ -1693,7 +1693,7 @@ export const translations = {
         modelsLabLtx23ProI2V:
           "Lightricks' LTX 2.3 Pro for image-to-video: animates a still at 2K or 4K in 6 to 10 second clips. Newer than LTX 2 Pro and priced a bit higher. The pick when a high-resolution image must stay sharp in motion. No native audio listed.",
         modelsLabHailuo23T2V:
-          "MiniMax's Hailuo 2.3 from text, known for lively, physical motion like dance and action. 6 or 10 second clips at 1080p in 16:9. No native audio. Mid-range price. Hailuo 3 adds sound, 2K and frame control for about twice the cost.",
+          "MiniMax's Hailuo 2.3 from text or a starting image, known for lively, physical motion like dance and action. 6 or 10 second clips up to 1080p in 16:9. No native audio. Mid-range price. Hailuo 3 adds sound, 2K and frame control for about twice the cost.",
         modelsLabHailuo02T2V:
           "Hailuo 02 T2V - MiniMax's text-to-video generation model 02",
         modelsLabHailuo23I2V:
@@ -1705,9 +1705,9 @@ export const translations = {
         modelsLabHailuo02StartEnd:
           "Hailuo 02 Start/End - MiniMax's start-end frame video generation model",
         modelsLabSora2:
-          "OpenAI's Sora 2. Believable physics, synced audio and dialogue, clips up to 12 seconds. 16:9 only on this route. Mid-to-high price. Sora 2 Pro goes to 20 seconds and 1080p for roughly two to three times the cost.",
+          "OpenAI's Sora 2. Believable physics, synced audio and dialogue, 4, 8 or 12 second clips at 720p. 16:9 only on this route. Mid-to-high price. Sora 2 Pro renders the same lengths in finer detail for about three times the cost.",
         modelsLabSora2Pro:
-          "The premium tier of OpenAI's Sora 2. Synced audio, clips up to 20 seconds, 720p or 1080p, landscape or portrait. One of the most expensive video models here. Worth it for long, polished shots; Sora 2 covers drafts for less than half the price.",
+          "The premium tier of OpenAI's Sora 2. Synced audio and higher fidelity, 4, 8 or 12 second clips at 720p, 16:9 only on this route. One of the most expensive video models here. Worth it for polished final shots; Sora 2 covers drafts for about a third of the price.",
         modelsLabGen4Aleph:
           "Runway's Aleph is a video editor more than a generator: give it existing footage and it adds or removes objects, restyles, relights or changes the camera angle. Many aspect ratios, including wide cinema formats. Pricier than most generators. For fresh clips from a prompt, use Veo 3.1 Fast or Kling 3.0.",
         modelsLabLipsync2:
@@ -1717,9 +1717,9 @@ export const translations = {
         modelsLabGrokI2V:
           "xAI's Grok Imagine for image-to-video. Animates a still into a clip of up to 15 seconds in HD. A little cheaper than Grok T2V. Fine for quick animated stills; for higher resolution, step up to Grok Imagine Video 1.5. Legacy: Grok Imagine Video 1.5 Lite animates stills for less.",
         klingV30Std:
-          "The standard tier of Kuaishou's Kling 3.0. The same 3 to 15 second clips with native audio and frame control as Kling 3.0 T2V, the Pro tier, at a lower price per second. 720p output. The value pick in the Kling 3 line; go Pro when fine detail counts.",
+          "The standard tier of Kuaishou's Kling 3.0. The same 3 to 15 second clips with native audio and frame control as Kling 3.0 T2V, the Pro tier, at 720p. The cheaper Kling 3 pick when you start from an image; for plain text prompts Kling 3.0 T2V often costs less.",
         klingVideoO1:
-          "Kling's unified multimodal video model, designed to generate clips and edit them from references within one model. Native audio, 5 or 10 seconds at 720p, first and last frame control. Priced like Kling 3.0 Pro. Pick it for reference-driven work; for plain text-to-video, Kling 3.0 Std is cheaper.",
+          "Kling's unified multimodal video model, designed to generate clips and edit them from references within one model. Native audio, 5 or 10 seconds at 720p, first and last frame control. Mid-range price. Pick it for reference-driven work; for plain text-to-video, Kling 3.0 T2V is cheaper.",
         veo31Lite:
           "Google's budget Veo 3.1 tier. Native audio, 4 to 8 second clips at 720p or 1080p, first and last frame control. The cheapest way into Veo, but no 4K. Good for high-volume social clips; step up to Veo 3.1 Fast when quality matters.",
         seedance2:
@@ -1727,9 +1727,9 @@ export const translations = {
         seedance2Fast:
           "The faster, cheaper tier of ByteDance's Seedance 2.0. Native audio, clips up to 15 seconds and frame control, but capped at 720p. About 60 percent of the full model's price. Good for drafts and social clips; use full Seedance 2.0 when you need 1080p or 4K.",
         happyhorse11:
-          "The second release of Alibaba's HappyHorse video model, which generates picture and synced sound in one pass. Text-to-video, image-to-video and reference images, up to 15 seconds at 720p or 1080p. Same price as HappyHorse 1.0, with improvements to motion and consistency per Alibaba, so it is the default pick of the two. Mid-range cost.",
+          "The second release of Alibaba's HappyHorse video model. Text-to-video, image-to-video and reference images, 3 to 15 seconds at 720p or 1080p. No native audio on this route. Same 720p price as HappyHorse 1.0 and cheaper at 1080p, with better motion and consistency per Alibaba, so it is the default pick of the two. Mid-range cost.",
         happyhorse10:
-          "The first release of Alibaba's HappyHorse video model, which generates picture and synced sound in one pass. Text-to-video, image-to-video and reference images, up to 15 seconds at 720p or 1080p. Costs the same as HappyHorse 1.1, so the newer version is usually the better pick. Worth keeping for prompts tuned on 1.0.",
+          "The first release of Alibaba's HappyHorse video model. Text-to-video, image-to-video and reference images, 3 to 15 seconds at 720p or 1080p. No native audio on this route. Same 720p price as HappyHorse 1.1 but pricier at 1080p, so the newer version is usually the better pick. Worth keeping for prompts tuned on 1.0.",
         modelsLabGen4T2ITurbo:
           "The faster, cheaper variant of Runway's Gen-4 image model. Text in, image out, at under a third of the price of Gen4 Image. Good for quick drafts and iterating on Runway's cinematic look. No reference-image editing here; for edits use FLUX.2 Pro or Seedream 4.5.",
         modelsLabGen4Image:

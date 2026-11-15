@@ -1632,9 +1632,9 @@ export const translations: typeof enTranslations = {
         modelsLabWan26T2V:
           "Wan 2.6 T2V - ModelsLabs Wan 2.6 Text-zu-Video-Generierungsmodell",
         modelsLabWan26I2V:
-          "Alibabas Bild-zu-Video-Modell Wan 2.6: Startbild rein, animierte Szene raus, inklusive Ton aus dem Modell. Clips mit 5 oder 10 Sekunden in 720p oder 1080p, quer oder hochkant. Günstiger als Wan 2.7. Wan 2.7 T2V ist die bessere Wahl, wenn zusätzlich ein Endbild oder mehr Seitenverhältnisse gefragt sind.",
+          "Alibabas Bild-zu-Video-Modell Wan 2.6: Startbild rein, animierte Szene raus, inklusive Ton aus dem Modell. Clips mit 5 oder 10 Sekunden in 720p oder 1080p, quer oder hochkant. Pro Sekunde etwa so teuer wie Wan 2.7. Wan 2.7 T2V ist die bessere Wahl, wenn zusätzlich ein Endbild oder mehr Seitenverhältnisse gefragt sind.",
         modelsLabWan26I2VFlash:
-          "Die Tempovariante von Wan 2.6 Bild zu Video. Macht aus einem Standbild einen 5- oder 10-Sekunden-Clip in 1080p, mit kürzerer Wartezeit. Pro Sekunde nicht günstiger als das normale Wan 2.6 I2V, oft sogar etwas teurer; lohnt sich also nur, wenn es schnell gehen muss. Ton aus dem Modell ist für diese Variante nicht ausgewiesen, beim Standardmodell schon.",
+          "Die Tempovariante von Wan 2.6 Bild zu Video. Macht aus einem Standbild einen 5- oder 10-Sekunden-Clip in 720p oder 1080p, mit kürzerer Wartezeit. Pro Sekunde genauso teuer wie das normale Wan 2.6 I2V, also die Wahl, wenn es schnell gehen muss. Ton aus dem Modell ist für diese Variante nicht ausgewiesen, beim Standardmodell schon.",
         modelsLabSeedanceT2V:
           "Seedance T2V - BytePlus Text-zu-Video-Generierungsmodell",
         modelsLabSeedanceI2V:
@@ -1650,7 +1650,7 @@ export const translations: typeof enTranslations = {
         modelsLabOmnihuman15:
           "OmniHuman 1.5 von ByteDance erweckt eine Person aus einem einzigen Foto zum Leben, gesteuert von einer Audiospur: sprechende Köpfe, Gesang, Gestik. Ein Spezialist für Avatare und Vertonung, kein allgemeines Text-zu-Video-Modell. Pro Sekunde teurer als die meisten Videomodelle der Mittelklasse. Für Szenen ohne sprechende Person lieber Kling 3.0 oder Wan 2.7.",
         modelsLabSeedance15Pro:
-          "Seedance 1.5 Pro von ByteDance, vertrieben über die BytePlus-Cloud. Ton aus dem Modell, Clips mit 4 bis 12 Sekunden von 480p bis 1080p, Steuerung über Start- und Endbild, viele Seitenverhältnisse. Pro Clip eines der günstigsten Videomodelle hier. Stark für Ideentests und Masse; Seedance 2.0 ist der nächste Schritt für Konsistenz und 4K.",
+          "Seedance 1.5 Pro von ByteDance, vertrieben über die BytePlus-Cloud. Text zu Video mit Ton aus dem Modell, 480p bis 1080p, quer oder hochkant. Pro Clip eines der günstigsten Videomodelle hier, und 480p kostet nur die Hälfte von 720p. Stark für Ideentests und Masse; Seedance 2.0 ist der nächste Schritt für Bildsteuerung, Konsistenz und 4K.",
         modelsLabVeo2:
           "Veo 2 - Googles hochwertiges Video-Generierungsmodell via ModelsLab",
         modelsLabVeo3:
@@ -1680,7 +1680,7 @@ export const translations: typeof enTranslations = {
         modelsLabKlingV16MultiI2V:
           "Kling V1.6 Multi I2V - Kling AIs Multi-Bild-zu-Video-Modell Version 1.6",
         modelsLabKling30T2V:
-          "Kling 3.0 Pro von Kuaishou. Ton aus dem Modell, Clips mit 3 bis 15 Sekunden in 720p, Steuerung über Start- und Endbild, 16:9, 9:16 oder 1:1. Lebendige, überzeugende Bewegung zum mittleren Preis. Bei 720p ist Schluss; für 1080p und mehr Veo 3.1 Fast oder Hailuo 3. Kling 3.0 Std ist die günstigere Stufe.",
+          "Kling 3.0 Pro von Kuaishou. Ton aus dem Modell, Clips mit 3 bis 15 Sekunden in 720p, Steuerung über Start- und Endbild, 16:9, 9:16 oder 1:1. Lebendige, überzeugende Bewegung zum mittleren Preis. Bei 720p ist Schluss; für 1080p und mehr Veo 3.1 Fast oder Hailuo 3. Mit Startbild ist Kling 3.0 Std günstiger.",
         modelsLabLtx2ProT2V:
           "LTX-2 Pro von Lightricks. Text zu Video in 2K oder 4K, mit Clips von etwa 6 bis 10 Sekunden. Für diese Auflösung ein mittlerer Preis und damit der günstige Weg zu 4K neben Veo 3.1. Kein Ton aus dem Modell ausgewiesen; für 4K mit Ton Veo 3.1 Fast nutzen.",
         modelsLabLtx2ProI2V:
@@ -1688,7 +1688,7 @@ export const translations: typeof enTranslations = {
         modelsLabLtx23ProI2V:
           "LTX 2.3 Pro von Lightricks für Bild zu Video: animiert ein Standbild in 2K oder 4K, mit Clips von 6 bis 10 Sekunden. Neuer als LTX 2 Pro und etwas teurer. Die Wahl, wenn ein hochaufgelöstes Bild auch in Bewegung scharf bleiben soll. Kein Ton aus dem Modell ausgewiesen.",
         modelsLabHailuo23T2V:
-          "Hailuo 2.3 von MiniMax aus Text, bekannt für lebendige, körperliche Bewegung wie Tanz und Action. Clips mit 6 oder 10 Sekunden in 1080p im Format 16:9. Kein Ton aus dem Modell. Mittleres Preisniveau. Hailuo 3 bringt Ton, 2K und Bildsteuerung für etwa den doppelten Preis.",
+          "Hailuo 2.3 von MiniMax aus Text oder einem Startbild, bekannt für lebendige, körperliche Bewegung wie Tanz und Action. Clips mit 6 oder 10 Sekunden in bis zu 1080p im Format 16:9. Kein Ton aus dem Modell. Mittleres Preisniveau. Hailuo 3 bringt Ton, 2K und Bildsteuerung für etwa den doppelten Preis.",
         modelsLabHailuo02T2V:
           "Hailuo 02 T2V - MiniMax Text-zu-Video-Generierungsmodell 02",
         modelsLabHailuo23I2V:
@@ -1700,9 +1700,9 @@ export const translations: typeof enTranslations = {
         modelsLabHailuo02StartEnd:
           "Hailuo 02 Start/End - MiniMax Start-End-Frame Video-Generierungsmodell",
         modelsLabSora2:
-          "Sora 2 von OpenAI. Glaubwürdige Physik, synchroner Ton samt Dialog, Clips bis 12 Sekunden. Über diesen Weg nur im Format 16:9. Mittleres bis gehobenes Preisniveau. Sora 2 Pro schafft 20 Sekunden und 1080p für etwa das Zwei- bis Dreifache.",
+          "Sora 2 von OpenAI. Glaubwürdige Physik, synchroner Ton samt Dialog, Clips mit 4, 8 oder 12 Sekunden in 720p. Über diesen Weg nur im Format 16:9. Mittleres bis gehobenes Preisniveau. Sora 2 Pro liefert dieselben Längen mit feineren Details für etwa den dreifachen Preis.",
         modelsLabSora2Pro:
-          "Die Premiumstufe von OpenAIs Sora 2. Synchroner Ton, Clips bis 20 Sekunden, 720p oder 1080p, quer oder hochkant. Eines der teuersten Videomodelle hier. Lohnt sich für lange, ausgefeilte Einstellungen; für Entwürfe reicht Sora 2 zu weniger als dem halben Preis.",
+          "Die Premiumstufe von OpenAIs Sora 2. Synchroner Ton und höhere Detailtreue, Clips mit 4, 8 oder 12 Sekunden in 720p, über diesen Weg nur 16:9. Eines der teuersten Videomodelle hier. Lohnt sich für ausgefeilte finale Einstellungen; für Entwürfe reicht Sora 2 zu etwa einem Drittel des Preises.",
         modelsLabGen4Aleph:
           "Runways Aleph ist eher Videoeditor als Generator: Vorhandenes Material rein, und es fügt Objekte hinzu oder entfernt sie, ändert Stil, Licht oder Kamerawinkel. Viele Seitenverhältnisse, auch breite Kinoformate. Teurer als die meisten Generatoren. Für neue Clips aus einem Prompt Veo 3.1 Fast oder Kling 3.0 nutzen.",
         modelsLabLipsync2:
@@ -1712,9 +1712,9 @@ export const translations: typeof enTranslations = {
         modelsLabGrokI2V:
           "Grok Imagine von xAI für Bild zu Video. Macht aus einem Standbild einen HD-Clip mit bis zu 15 Sekunden. Etwas günstiger als Grok T2V. Gut für schnell animierte Standbilder; für höhere Auflösung auf Grok Imagine Video 1.5 wechseln. Legacy: Grok Imagine Video 1.5 Lite animiert Standbilder günstiger.",
         klingV30Std:
-          "Die Standardstufe von Kling 3.0 von Kuaishou. Dieselben Clips mit 3 bis 15 Sekunden, Ton aus dem Modell und Bildsteuerung wie Kling 3.0 T2V, die Pro-Stufe, aber günstiger pro Sekunde. Ausgabe in 720p. Die Preis-Leistungs-Wahl der Kling-3-Reihe; Pro nehmen, wenn feine Details zählen.",
+          "Die Standardstufe von Kling 3.0 von Kuaishou. Dieselben Clips mit 3 bis 15 Sekunden, Ton aus dem Modell und Bildsteuerung wie Kling 3.0 T2V, die Pro-Stufe, in 720p. Die günstigere Kling-3-Wahl, wenn ein Startbild mitkommt; für reine Text-Prompts ist Kling 3.0 T2V oft billiger.",
         klingVideoO1:
-          "Klings vereinheitlichtes multimodales Videomodell, gebaut, um Clips in einem Modell zu erzeugen und anhand von Referenzen zu bearbeiten. Ton aus dem Modell, 5 oder 10 Sekunden in 720p, Steuerung über Start- und Endbild. Preislich auf dem Niveau von Kling 3.0 Pro. Die Wahl für referenzgetriebene Arbeit; für reines Text zu Video ist Kling 3.0 Std günstiger.",
+          "Klings vereintes multimodales Videomodell, gebaut, um Clips in einem Modell zu erzeugen und anhand von Referenzen zu bearbeiten. Ton aus dem Modell, 5 oder 10 Sekunden in 720p, Steuerung über Start- und Endbild. Mittleres Preisniveau. Die Wahl für Arbeit mit Referenzen; für reines Text zu Video ist Kling 3.0 T2V günstiger.",
         veo31Lite:
           "Die Sparstufe von Googles Veo 3.1. Ton aus dem Modell, Clips mit 4 bis 8 Sekunden in 720p oder 1080p, Steuerung über Start- und Endbild. Der günstigste Einstieg in Veo, allerdings ohne 4K. Gut für Social-Clips in großer Zahl; wenn Qualität zählt, auf Veo 3.1 Fast wechseln.",
         seedance2:
@@ -1722,9 +1722,9 @@ export const translations: typeof enTranslations = {
         seedance2Fast:
           "Die schnellere, günstigere Stufe von Seedance 2.0 von ByteDance. Ton aus dem Modell, Clips bis 15 Sekunden und Bildsteuerung, aber maximal 720p. Etwa 60 Prozent des Preises des vollen Modells. Gut für Entwürfe und Social-Clips; für 1080p oder 4K das volle Seedance 2.0 nehmen.",
         happyhorse11:
-          "Die zweite Version von Alibabas Videomodell HappyHorse, das Bild und synchronen Ton in einem Durchgang erzeugt. Text zu Video, Bild zu Video und Referenzbilder, bis 15 Sekunden in 720p oder 1080p. Gleicher Preis wie HappyHorse 1.0, laut Alibaba mit besserer Bewegung und Konsistenz, daher die erste Wahl der beiden. Mittleres Preisniveau.",
+          "Die zweite Version von Alibabas Videomodell HappyHorse. Text zu Video, Bild zu Video und Referenzbilder, 3 bis 15 Sekunden in 720p oder 1080p. Über diesen Weg kein Ton aus dem Modell. Gleicher 720p-Preis wie HappyHorse 1.0 und günstiger in 1080p, laut Alibaba mit besserer Bewegung und Konsistenz, daher die erste Wahl der beiden. Mittleres Preisniveau.",
         happyhorse10:
-          "Die erste Version von Alibabas Videomodell HappyHorse, das Bild und synchronen Ton in einem Durchgang erzeugt. Text zu Video, Bild zu Video und Referenzbilder, bis 15 Sekunden in 720p oder 1080p. Kostet dasselbe wie HappyHorse 1.1, die neuere Version ist also meist die bessere Wahl. Sinnvoll für Prompts, die auf 1.0 abgestimmt sind.",
+          "Die erste Version von Alibabas Videomodell HappyHorse. Text zu Video, Bild zu Video und Referenzbilder, 3 bis 15 Sekunden in 720p oder 1080p. Über diesen Weg kein Ton aus dem Modell. Gleicher 720p-Preis wie HappyHorse 1.1, in 1080p aber teurer, die neuere Version ist also meist die bessere Wahl. Sinnvoll für Prompts, die auf 1.0 abgestimmt sind.",
         modelsLabGen4T2ITurbo:
           "Die schnellere, günstigere Variante von Runways Gen-4-Bildmodell. Text rein, Bild raus, für weniger als ein Drittel des Preises von Gen4 Image. Ideal für schnelle Entwürfe und zum Ausloten von Runways Kino-Look. Keine Bearbeitung von Referenzbildern; dafür FLUX.2 Pro oder Seedream 4.5 nehmen.",
         modelsLabGen4Image:

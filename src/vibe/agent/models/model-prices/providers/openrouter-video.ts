@@ -56,17 +56,60 @@ const VIDEO_TOKEN_PIXELS: Record<string, number> = {
   "4k": 3840 * 2160,
 };
 
-function parsePricingSkus(
-  skus: Record<string, string>,
-  supportedResolutions: string[],
-): {
+interface ParsedSkus {
   baseUsdPerSecond: number | null;
   byResolution: Record<string, number>;
-} {
+}
+
+/**
+ * Parse pricing_skus, then align the per-resolution keys with the model's
+ * `supported_resolutions` spelling ("4k" SKU → "4K"): billing looks prices up
+ * by the requested resolution string, so a key in another case silently
+ * falls back to the base rate. Keys for resolutions the model does not offer
+ * are dropped; offered resolutions without their own SKU get the base rate.
+ *
+ * `withAudio`: the route always sends generate_audio=true, so the with-audio
+ * SKU is what OpenRouter bills (even when a flat duration_seconds SKU exists).
+ */
+export function parsePricingSkus(
+  skus: Record<string, string>,
+  supportedResolutions: string[],
+  withAudio: boolean,
+): ParsedSkus {
+  const raw = parseRawPricingSkus(skus, supportedResolutions, withAudio);
+  const entries = Object.entries(raw.byResolution);
+  if (entries.length === 0 || supportedResolutions.length === 0) {
+    return raw;
+  }
+  const byResolution: Record<string, number> = {};
+  for (const [key, usd] of entries) {
+    const canonical = supportedResolutions.find(
+      (res) => res.toLowerCase() === key.toLowerCase(),
+    );
+    if (canonical !== undefined) {
+      byResolution[canonical] = usd;
+    }
+  }
+  if (raw.baseUsdPerSecond !== null) {
+    for (const res of supportedResolutions) {
+      byResolution[res] ??= raw.baseUsdPerSecond;
+    }
+  }
+  return { baseUsdPerSecond: raw.baseUsdPerSecond, byResolution };
+}
+
+function parseRawPricingSkus(
+  skus: Record<string, string>,
+  supportedResolutions: string[],
+  withAudio: boolean,
+): ParsedSkus {
   const byResolution: Record<string, number> = {};
 
-  // Flat duration_seconds → direct $/s
-  if (skus.duration_seconds) {
+  // Flat duration_seconds → direct $/s (unless audio is requested and priced separately)
+  if (
+    skus.duration_seconds &&
+    !(withAudio && skus.duration_seconds_with_audio)
+  ) {
     const v = parseFloat(skus.duration_seconds);
     if (v > 0) {
       return { baseUsdPerSecond: v, byResolution };
@@ -119,12 +162,14 @@ function parsePricingSkus(
     return { baseUsdPerSecond: base ?? null, byResolution };
   }
 
-  // text_to_video_duration_seconds_<resolution> — use 720p T2V
+  // (text|image)_to_video_duration_seconds_<resolution>: one route serves
+  // both modes, so bill the higher of the two per resolution (never under-bill
+  // an image-to-video request). Base = 720p.
   const t2vSku: Record<string, number> = {};
   for (const [k, val] of Object.entries(skus)) {
-    const m = /text_to_video_duration_seconds_(\w+)/.exec(k);
+    const m = /(?:text|image)_to_video_duration_seconds_(\w+)/.exec(k);
     if (m?.[1]) {
-      t2vSku[m[1]] = parseFloat(val);
+      t2vSku[m[1]] = Math.max(t2vSku[m[1]] ?? 0, parseFloat(val));
     }
   }
   if (Object.keys(t2vSku).length > 0) {
@@ -136,10 +181,13 @@ function parsePricingSkus(
     return { baseUsdPerSecond: base ?? null, byResolution };
   }
 
-  // cents_per_video_output_second_<resolution> → ÷100 for $/s
+  // cents_per_video_output_second_<resolution> / cents_per_second_output_<resolution>
+  // → ÷100 for $/s (cents_per_second_video_continuation_* is a different mode)
   const centsSku: Record<string, number> = {};
   for (const [k, val] of Object.entries(skus)) {
-    const m = /cents_per_video_output_second_(\w+)/.exec(k);
+    const m =
+      /^cents_per_video_output_second_(\w+)$/.exec(k) ??
+      /^cents_per_second_output_(\w+)$/.exec(k);
     if (m?.[1]) {
       centsSku[m[1]] = parseFloat(val) / 100;
     }
@@ -151,6 +199,14 @@ function parsePricingSkus(
       Object.values(centsSku).toSorted((a, b) => a - b)[0] ??
       null;
     return { baseUsdPerSecond: base ?? null, byResolution };
+  }
+
+  // Flat cents_per_second_output (no per-resolution split)
+  if (skus.cents_per_second_output) {
+    const v = parseFloat(skus.cents_per_second_output) / 100;
+    if (v > 0) {
+      return { baseUsdPerSecond: v, byResolution };
+    }
   }
 
   // video_tokens pricing (BytePlus Seedance family) — convert $/token to $/s using
@@ -272,6 +328,7 @@ export class OpenRouterVideoPriceFetcher extends PriceFetcher {
           const { baseUsdPerSecond, byResolution } = parsePricingSkus(
             apiModel.pricing_skus,
             apiModel.supported_resolutions ?? [],
+            apiModel.generate_audio === true,
           );
 
           if (baseUsdPerSecond !== null && baseUsdPerSecond > 0) {

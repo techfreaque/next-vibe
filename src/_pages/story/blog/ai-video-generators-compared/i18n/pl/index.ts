@@ -37,6 +37,8 @@ export const translations: typeof enTranslations = {
     colClip: "Klip z czatu",
     i2v: "Tekst lub obraz",
     t2v: "Tekst",
+    v2v: "Tekst i wideo",
+    videoAudio: "Wideo i dźwięk",
     framesFirst: "Pierwsza klatka",
     framesFirstLast: "Pierwsza i ostatnia klatka",
     framesNone: "Bez kontroli klatek",

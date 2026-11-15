@@ -3,9 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
-import { languageConfig } from "next-vibe/core/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -20,7 +18,11 @@ import { Main } from "next-vibe/ui/components/main";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
-import { ProductIds, productsRepository } from "@/products/platform-products";
+import {
+  getPricingParams,
+  ProductIds,
+  productsRepository,
+} from "@/products/platform-products";
 
 import { scopedTranslation as pageT } from "./i18n";
 import HelpPageClient from "./page-client";
@@ -79,13 +81,9 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   );
 
   const products = productsRepository.getProducts(locale);
-  const country = getCountryFromLocale(locale);
-  const countryInfo = languageConfig.countryInfo[country];
-  const subPrice = products[ProductIds.SUBSCRIPTION].price;
+  const pricing = getPricingParams(locale);
   const subCredits = products[ProductIds.SUBSCRIPTION].credits;
-  const packPrice = products[ProductIds.CREDIT_PACK].price;
   const packCredits = products[ProductIds.CREDIT_PACK].credits;
-  const currencySymbol = countryInfo.symbol;
 
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
   const modelCount = getAvailableChatModelCount(
@@ -111,9 +109,9 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
     jwtUser,
     platform: Platform.NEXT_PAGE,
     userEmail,
-    subPrice: `${currencySymbol}${subPrice}`,
+    subPrice: pricing.subscriptionPrice,
     subCredits,
-    packPrice: `${currencySymbol}${packPrice}`,
+    packPrice: pricing.packPrice,
     packCredits,
     modelCount,
   };

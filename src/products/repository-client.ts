@@ -31,7 +31,7 @@ import type { ProductsTranslationKey } from "./i18n";
 
 /**
  * Credit Value Definition
- * 1 credit = €0.01 = $0.01 = 0.24 PLN
+ * 1 credit = €0.01 = $0.01 (PL pack: 40 zł / 500 credits = 0.08 zł)
  */
 export const CREDIT_VALUE_USD = 0.01;
 
@@ -270,9 +270,11 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
   credit_pack: {
     name: "creditPack.name",
     description: "creditPack.description",
+    // Must equal oneTimePriceByCountry (what checkout charges): a pack has no
+    // other interval, and some surfaces read the default price.
     priceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
-      PL: { price: 5, currency: "PLN" as const },
+      PL: { price: 40, currency: "PLN" as const },
       US: { price: 5, currency: "USD" as const },
       GLOBAL: { price: 5, currency: "USD" as const },
     },
@@ -375,13 +377,18 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   ): Product {
     const country = getCountryFromLocale(locale);
     const definition = productDefinitions[productId];
+    // An interval the product is not sold in falls back to its first one, so a
+    // credit pack read without "one_time" still shows the checkout price.
+    const effectiveInterval = definition.allowedIntervals.includes(interval)
+      ? interval
+      : (definition.allowedIntervals[0] ?? interval);
 
     // Get price and currency based on interval and country
     // Let TypeScript infer the literal type from the data
     const priceData =
-      interval === "year" && definition.yearlyPriceByCountry
+      effectiveInterval === "year" && definition.yearlyPriceByCountry
         ? definition.yearlyPriceByCountry[country]
-        : interval === "one_time" && definition.oneTimePriceByCountry
+        : effectiveInterval === "one_time" && definition.oneTimePriceByCountry
           ? definition.oneTimePriceByCountry[country]
           : definition.priceByCountry[country];
 
@@ -502,6 +509,13 @@ function currencySymbol(c: string): string {
   return c === "EUR" ? "€" : c === "PLN" ? "zł" : "$";
 }
 
+/** "$5", "€8", "40 zł": the złoty sign follows the amount. */
+function formatPriceLabel(price: number, currency: string): string {
+  return currency === "PLN"
+    ? `${price} ${currencySymbol(currency)}`
+    : `${currencySymbol(currency)}${price}`;
+}
+
 /**
  * Returns interpolation params for pricing-related i18n strings.
  * Use as second argument to t() calls that contain {{subscriptionCredits}},
@@ -521,8 +535,6 @@ export function getPricingParams(
   const packPriceData = (pack.oneTimePriceByCountry ?? pack.priceByCountry)[
     country
   ];
-  const subSymbol = currencySymbol(subPriceData.currency);
-  const packSymbol = currencySymbol(packPriceData.currency);
 
   return {
     freeCredits: String(free.credits),
@@ -532,8 +544,11 @@ export function getPricingParams(
     freeCreditsMax: String(FREE_CREDIT_MAX_TOTAL),
     subscriptionCredits: String(sub.credits),
     packCredits: String(pack.credits),
-    subscriptionPrice: `${subSymbol}${subPriceData.price}`,
-    packPrice: `${packSymbol}${packPriceData.price}`,
+    subscriptionPrice: formatPriceLabel(
+      subPriceData.price,
+      subPriceData.currency,
+    ),
+    packPrice: formatPriceLabel(packPriceData.price, packPriceData.currency),
   };
 }
 

@@ -59,6 +59,17 @@ describe("video model inputs", () => {
     ).toEqual(["text"]);
   });
 
+  test("video editors list the footage (and audio) they take", () => {
+    expect(videoGenModelDefinitions[VideoGenModelId.GEN4_ALEPH].inputs).toEqual(
+      ["text", "video"],
+    );
+    expect(videoGenModelDefinitions[VideoGenModelId.LIPSYNC_2].inputs).toEqual([
+      "text",
+      "video",
+      "audio",
+    ]);
+  });
+
   test("UNBOTTLED routes never count as provider evidence", () => {
     for (const def of Object.values(videoGenModelDefinitions)) {
       for (const p of def.providers) {
@@ -114,5 +125,27 @@ describe("image-to-video capability guard", () => {
     expect(route?.id).toBe(VideoGenModelId.GROK_T2V);
     expect(route?.inputs).toContain("image");
     expect(route?.apiProvider).toBe(ApiProvider.OPENROUTER);
+  });
+});
+
+describe("video resolution pricing", () => {
+  // Billing looks the price up by the requested resolution string
+  // (repository.ts), so a key the route does not offer, or one spelled in
+  // another case ("4k" vs "4K"), silently bills the base rate.
+  test("every priced resolution is an offered one, and vice versa", () => {
+    for (const def of Object.values(videoGenModelDefinitions)) {
+      for (const p of def.providers) {
+        if (!("creditCostPerSecond" in p) || !p.pricingByResolution) {
+          continue;
+        }
+        const offered = p.supportedResolutions ?? [];
+        const priced = Object.keys(p.pricingByResolution);
+        const label = `${p.id}/${p.apiProvider}`;
+        expect({ label, priced: priced.toSorted() }).toEqual({
+          label,
+          priced: [...offered].toSorted(),
+        });
+      }
+    }
   });
 });

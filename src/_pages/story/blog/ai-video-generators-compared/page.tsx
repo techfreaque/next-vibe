@@ -105,6 +105,10 @@ export interface VideoModelRow {
   lab: string;
   /** Any route takes a reference image (image-to-video). */
   imageToVideo: boolean;
+  /** Any route edits existing footage (video-to-video, lip sync). */
+  videoInput: boolean;
+  /** Any route takes an audio track to sync the footage to. */
+  audioInput: boolean;
   firstFrame: boolean;
   lastFrame: boolean;
   audio: boolean;
@@ -335,6 +339,8 @@ function buildRow(
     name: def.name,
     lab: facts.labName,
     imageToVideo: facts.inputs.includes("image"),
+    videoInput: facts.inputs.includes("video"),
+    audioInput: facts.inputs.includes("audio"),
     firstFrame: frames.has("first_frame"),
     lastFrame: frames.has("last_frame"),
     audio: routes.some((p) => p.generateAudio === true),
@@ -491,6 +497,14 @@ export function TanstackPage({
     packCredits,
   };
 
+  const inputText = (row: VideoModelRow): string =>
+    row.videoInput
+      ? row.audioInput
+        ? t("table.videoAudio")
+        : t("table.v2v")
+      : row.imageToVideo
+        ? t("table.i2v")
+        : t("table.t2v");
   const framesText = (row: VideoModelRow): string =>
     row.firstFrame && row.lastFrame
       ? t("table.framesFirstLast")
@@ -569,7 +583,7 @@ export function TanstackPage({
                         </Span>
                       </TableCell>
                       <TableCell className="align-top text-sm text-muted-foreground">
-                        {row.imageToVideo ? t("table.i2v") : t("table.t2v")}
+                        {inputText(row)}
                       </TableCell>
                       <TableCell className="align-top text-sm text-muted-foreground">
                         {framesText(row)}

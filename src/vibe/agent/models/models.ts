@@ -221,6 +221,8 @@ export interface ModelProviderConfigVideoBased {
   supportedSizes?: readonly string[];
   /** Extra parameters this model's provider accepts (e.g. ["negative_prompt", "cfg_scale"]) */
   allowedPassthroughParameters?: readonly string[];
+  /** Existing media this route edits (e.g. ModelsLab init_video / init_audio); shown as model inputs */
+  sourceMedia?: readonly Extract<Modality, "video" | "audio">[];
   creditCost?: never;
   inputTokenCost?: never;
   outputTokenCost?: never;
