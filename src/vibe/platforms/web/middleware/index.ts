@@ -113,10 +113,14 @@ export async function middleware(
   // have no locale prefix, return 404 immediately: they matched the [locale] catch-all
   // only because no real static file exists at that path. Routes under a locale
   // (e.g. /en-US/files/thread/image.png) start with a locale segment and never
-  // reach this branch.
+  // reach this branch. API routes carry the locale after /api/: chat files are
+  // served at /api/{locale}/vibe/agent/chat/threads/files/{threadId}/{id}.png,
+  // and without the /api/ form here every png/jpg/svg chat file got an empty
+  // 404 from this line on the Next.js build (prod 2026-11-14/15: generated and
+  // uploaded images never loaded, while .mp3/.webp files reached the handler).
   if (shouldSkipPath(path)) {
     const hasFileExtension = /\.[a-zA-Z0-9]{2,5}$/.test(path);
-    const hasLocalePrefix = /^\/[a-z]{2}-[A-Z]+\//.test(path);
+    const hasLocalePrefix = /^\/(?:api\/)?[a-z]{2}-[A-Z]+\//.test(path);
     if (hasFileExtension && !hasLocalePrefix) {
       return new NextResponseClass(null, { status: 404 });
     }
