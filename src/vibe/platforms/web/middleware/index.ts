@@ -324,7 +324,22 @@ export async function middleware(
         return loginResp;
       }
 
-      // All other API routes with invalid or missing leadId: auth error
+      // Cookie carries a well-formed leadId whose lead is confirmed gone (DB
+      // reset, deleted lead). Pass through: the route's auth resolution
+      // (AuthRepository.getAuthenticatedUser) mints a live lead and rewrites
+      // the cookie for guests, or uses the user's linked lead when signed in.
+      // A 401 here stranded the SPA until a full page load.
+      if (
+        leadIdCheck === LeadIdCheckResult.INVALID &&
+        UUID_REGEX.test(getLeadIdFromRequest(request) ?? "")
+      ) {
+        const staleResp = NextResponseClass.next();
+        stampCsrfCookie(request, staleResp);
+        addCorsHeaders(request, staleResp, path);
+        return staleResp;
+      }
+
+      // All other API routes with a malformed or missing leadId: auth error
       const origin = request.headers.get("origin") ?? "*";
       return NextResponseClass.json(
         {

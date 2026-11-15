@@ -17,6 +17,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { getForeignKeyViolation } from "next-vibe/database/utils/repository-helpers";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { getNewsletterSubscriptionStatus } from "next-vibe/identity/lead/enum";
@@ -209,18 +210,53 @@ export class NewsletterSubscribeRepository {
         preferencesCount: data.preferences?.length || 0,
       });
 
-      const newSubscription = await db
-        .insert(newsletterSubscriptions)
-        .values({
-          email: data.email,
-          name: data.name,
-          status: NewsletterSubscriptionStatus.SUBSCRIBED,
-          marketingConsent: true,
-          leadId,
-          userId: user.isPublic ? null : user.id,
-          confirmationToken: NewsletterSubscribeRepository.createToken(),
-        })
-        .returning();
+      const insertSubscription = (
+        linkLeadId: string | null,
+      ): Promise<NewsletterSubscriptionRow[]> =>
+        db
+          .insert(newsletterSubscriptions)
+          .values({
+            email: data.email,
+            name: data.name,
+            status: NewsletterSubscriptionStatus.SUBSCRIBED,
+            marketingConsent: true,
+            leadId: linkLeadId,
+            userId: user.isPublic ? null : user.id,
+            confirmationToken: NewsletterSubscribeRepository.createToken(),
+          })
+          .returning();
+
+      let newSubscription: NewsletterSubscriptionRow[];
+      try {
+        newSubscription = await insertSubscription(leadId);
+      } catch (insertError) {
+        // Auth resolves a live lead, so a dangling leadId here means the lead
+        // vanished mid-request. Subscribe unlinked rather than 500.
+        const fk = getForeignKeyViolation(parseError(insertError));
+        if (!fk) {
+          const parsedInsertError = parseError(insertError);
+          logger.error("Newsletter subscription failed", {
+            error: parsedInsertError.message,
+            email: data.email,
+          });
+          return fail({
+            message: t("errors.internal.detail", {
+              error: parsedInsertError.message,
+            }),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+        logger.error(
+          "Newsletter subscription lead link broken, saving unlinked",
+          {
+            constraint: fk.constraint,
+            detail: fk.detail,
+            leadId,
+            userId: user.isPublic ? null : user.id,
+          },
+        );
+        newSubscription = await insertSubscription(null);
+      }
 
       logger.debug("Newsletter subscription created successfully", {
         email: data.email,

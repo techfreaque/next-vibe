@@ -4,9 +4,13 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
+import { randomUUID } from "node:crypto";
+
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { describe, expect } from "vitest";
+
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 
 import { NewsletterPreference } from "../enum";
 import unsubscribeEndpoints from "../unsubscribe/definition";
@@ -67,5 +71,45 @@ describe("E2E: newsletter subscribe", () => {
     });
     expect(call.requestBody).toMatchObject({ email });
     expect(call.response.success, JSON.stringify(call.response)).toBe(true);
+  });
+
+  e2e.it("subscribes when the lead cookie points at a lead that no longer exists", async ({ goto, page, capture, uniqueEmail, cleanup }) => {
+    const email = uniqueEmail("newsletter-stale-lead");
+    cleanup(() => unsubscribe(email));
+
+    await goto("/story/newsletter");
+    const input = page.locator("[data-hydrated] #newsletter-email-page");
+    await input.waitFor();
+    // A well-formed id no lead row has (DB reset / deleted lead), set after
+    // the page load so only the API call carries it.
+    const pageCookies = await page.context().cookies(page.url());
+    expect(pageCookies.map((c) => c.name)).toContain(LEAD_ID_COOKIE_NAME);
+    const staleLeadId = randomUUID();
+    // Same host + path "/" as the real cookie, so it replaces it
+    await page.context().addCookies([
+      {
+        name: LEAD_ID_COOKIE_NAME,
+        value: staleLeadId,
+        domain: new URL(page.url()).hostname,
+        path: "/",
+        httpOnly: true,
+        sameSite: "Lax",
+      },
+    ]);
+    await input.fill(email);
+
+    const call = await capture(endpoint, async () => {
+      await input.press("Enter");
+    });
+    expect(call.response.success, JSON.stringify(call.response)).toBe(true);
+    // The server minted a live lead and rewrote the cookie
+    const after = await page.context().cookies(page.url());
+    const leadCookies = after.filter((c) => c.name === LEAD_ID_COOKIE_NAME);
+    expect(leadCookies).toHaveLength(1);
+    expect(leadCookies[0]?.value).toBeTruthy();
+    expect(leadCookies[0]?.value).not.toBe(staleLeadId);
+    if (call.response.success) {
+      expect(call.response.data.leadId).toBe(leadCookies[0]?.value);
+    }
   });
 });

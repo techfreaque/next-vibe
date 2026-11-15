@@ -5,6 +5,7 @@
 
 "use client";
 
+import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
@@ -23,9 +24,10 @@ interface UseChatSettingsReturn {
   settings: ChatSettingsGetResponseOutput | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  /** Resolves with the error when the save failed (cache already rolled back), else null. */
   updateSettings: (
     updates: Partial<ChatSettingsUpdateRequestOutput>,
-  ) => Promise<void>;
+  ) => Promise<ErrorResponseType | null>;
   // Convenience setters
   setActiveFavorite: (
     favoriteId: string,
@@ -82,7 +84,7 @@ export function useChatSettings(
   const updateSettings = useCallback(
     async (
       updates: Partial<ChatSettingsUpdateRequestOutput>,
-    ): Promise<void> => {
+    ): Promise<ErrorResponseType | null> => {
       // Optimistic update: immediately update cache with submitted values
       apiClient.updateEndpointData(
         settingsDefinition.GET,
@@ -129,8 +131,28 @@ export function useChatSettings(
       setIf("mamaEnabled", updates.mamaEnabled);
       setIf("mamaSchedule", updates.mamaSchedule);
       setIf("mamaPrompt", updates.mamaPrompt);
-      // Submit through endpoint (endpoint handles API vs localStorage based on config)
-      await endpoint.create?.onSubmit();
+      // Submit through endpoint (endpoint handles API vs localStorage based on config).
+      // submitForm is fire-and-forget, so resolve from its callbacks.
+      const submitForm = endpoint.create?.submitForm;
+      if (!submitForm) {
+        return null;
+      }
+      const error = await new Promise<ErrorResponseType | null>((resolve) => {
+        void submitForm({
+          onSuccess: () => {
+            resolve(null);
+          },
+          onError: ({ error: submitError }) => {
+            resolve(submitError);
+          },
+        });
+      });
+      if (error) {
+        // Roll back the optimistic update: never leave a toggle "on" that
+        // the server did not save.
+        await apiClient.refetchEndpoint(settingsDefinition.GET, logger);
+      }
+      return error;
     },
     [logger, endpoint],
   );

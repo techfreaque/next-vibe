@@ -20,6 +20,7 @@ import { identityEnv } from "next-vibe/identity/env";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import { validateLeadIdExists } from "next-vibe/identity/lead/middleware-ops";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 
 import {
@@ -394,6 +395,34 @@ export class AuthRepository {
       logger.error("Error getting user roles", parseError(error));
       return [];
     }
+  }
+
+  /**
+   * The JWT's leadId when that lead still exists, else the user's linked lead
+   * (created when none is left). A failed lookup keeps the JWT value: never
+   * swap identity on a DB blip.
+   */
+  private static async resolveLiveUserLeadId(
+    userId: string,
+    jwtLeadId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<string> {
+    const exists = await validateLeadIdExists(jwtLeadId);
+    if (exists !== false) {
+      return jwtLeadId;
+    }
+    const liveLeadId = await AuthRepository.getLeadIdForUser(
+      userId,
+      locale,
+      logger,
+    );
+    logger.warn("JWT leadId no longer exists, using the user's live lead", {
+      userId,
+      staleLeadId: jwtLeadId,
+      liveLeadId,
+    });
+    return liveLeadId ?? jwtLeadId;
   }
 
   /**
@@ -1011,7 +1040,26 @@ export class AuthRepository {
 
       // For public users, return directly (no roles to fetch)
       if (verifyResult.data.isPublic) {
-        return success(verifyResult.data);
+        if ((await validateLeadIdExists(verifyResult.data.leadId)) !== false) {
+          return success(verifyResult.data);
+        }
+        // Lead behind the public token is gone: mint a live one (same path
+        // as a stale cookie) instead of handing out a dangling FK.
+        const { leadId, shouldUpdateCookie } =
+          await AuthRepository.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+            context.platform,
+          );
+        if (shouldUpdateCookie && leadId) {
+          await AuthRepository.updateLeadIdCookieIfPossible(
+            leadId,
+            context.platform,
+            logger,
+          );
+        }
+        return success(AuthRepository.createPublicUser(leadId || ""));
       }
 
       // For authenticated users, always refetch roles from database
@@ -1025,11 +1073,22 @@ export class AuthRepository {
         ? userRolesResponse.data.map((r) => r.role)
         : [UserPermissionRole.CUSTOMER];
 
+      // The JWT's leadId is frozen at login; the lead can be gone since (DB
+      // reset, admin delete). Every lead-FK insert (newsletter, credits,
+      // consent) would then 500 on a foreign-key violation, so resolve a live
+      // lead here, once, for every caller.
+      const leadId = await AuthRepository.resolveLiveUserLeadId(
+        verifyResult.data.id,
+        verifyResult.data.leadId,
+        context.locale,
+        logger,
+      );
+
       // Construct JWT payload with fresh roles from database
       const payload: JwtPrivatePayloadType = {
         isPublic: false,
         id: verifyResult.data.id,
-        leadId: verifyResult.data.leadId,
+        leadId,
         roles,
       };
 

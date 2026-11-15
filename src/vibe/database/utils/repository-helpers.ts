@@ -1,5 +1,7 @@
 import "server-only";
 
+import { DatabaseError } from "pg";
+
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import { db } from "..";
@@ -27,4 +29,29 @@ export async function withTransaction<T>(
     // eslint-disable-next-line restricted/restricted-syntax -- Database transaction wrapper needs to propagate errors
     throw error;
   }
+}
+
+/** Postgres SQLSTATE for foreign_key_violation. */
+const PG_FOREIGN_KEY_VIOLATION = "23503";
+
+/**
+ * The violated constraint when `error` (or the pg error drizzle wraps in
+ * `cause`) is a foreign-key violation, else null. Pass `parseError(caught)`.
+ */
+export function getForeignKeyViolation(
+  error: Error,
+): { constraint: string; detail: string | null } | null {
+  for (let current: Error | undefined = error; current;) {
+    if (
+      current instanceof DatabaseError &&
+      current.code === PG_FOREIGN_KEY_VIOLATION
+    ) {
+      return {
+        constraint: current.constraint ?? "unknown",
+        detail: current.detail ?? null,
+      };
+    }
+    current = current.cause instanceof Error ? current.cause : undefined;
+  }
+  return null;
 }

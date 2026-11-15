@@ -554,6 +554,18 @@ function SettingsRow({
 // ChatSettingsWidget - Main custom widget for the settings POST endpoint
 // ---------------------------------------------------------------------------
 
+/** Inline failure note for a save or run that did not go through. */
+function ErrorNote({ message }: { message: string }): JSX.Element {
+  return (
+    <Div
+      role="alert"
+      className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+    >
+      {message}
+    </Div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // FavSlotCollapsed - compact card showing the selected favorite
 // ---------------------------------------------------------------------------
@@ -648,6 +660,9 @@ function FavSlotCollapsed({
                     variant="text"
                     className="text-xs text-muted-foreground"
                     locale={locale}
+                    // Rendered inside the slot <Button>: the popover trigger
+                    // would be a nested <button> (hydration error).
+                    interactive={false}
                   />
                 </>
               )}
@@ -815,10 +830,13 @@ function PulseSectionDreaming({
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
 
+  const [runError, setRunError] = useState<string | null>(null);
+
   const handleRunNow = useCallback(async (): Promise<void> => {
     setIsRunning(true);
+    setRunError(null);
     try {
-      await apiClient.mutate(
+      const result = await apiClient.mutate(
         taskExecuteEndpoints.POST,
         logger,
         user,
@@ -826,6 +844,10 @@ function PulseSectionDreaming({
         undefined,
         locale,
       );
+      if (!result.success) {
+        setRunError(result.message);
+        return;
+      }
       if (folderUrl) {
         router.push(folderUrl);
       }
@@ -905,6 +927,7 @@ function PulseSectionDreaming({
         )}
         {t("post.dreaming.runNow")}
       </Button>
+      {runError && <ErrorNote message={runError} />}
     </SettingsSection>
   );
 }
@@ -933,10 +956,13 @@ function PulseSectionAutopilot({
     ? buildFolderUrl(locale, DefaultFolderId.BACKGROUND, subFolderId)
     : null;
 
+  const [runError, setRunError] = useState<string | null>(null);
+
   const handleRunNow = useCallback(async (): Promise<void> => {
     setIsRunning(true);
+    setRunError(null);
     try {
-      await apiClient.mutate(
+      const result = await apiClient.mutate(
         taskExecuteEndpoints.POST,
         logger,
         user,
@@ -944,6 +970,10 @@ function PulseSectionAutopilot({
         undefined,
         locale,
       );
+      if (!result.success) {
+        setRunError(result.message);
+        return;
+      }
       if (folderUrl) {
         router.push(folderUrl);
       }
@@ -1023,6 +1053,7 @@ function PulseSectionAutopilot({
         )}
         {t("post.autopilot.runNow")}
       </Button>
+      {runError && <ErrorNote message={runError} />}
     </SettingsSection>
   );
 }
@@ -1054,10 +1085,13 @@ function PulseSectionMama({
   const user = useWidgetUser();
   const [isRunning, setIsRunning] = useState(false);
 
+  const [runError, setRunError] = useState<string | null>(null);
+
   const handleRunNow = useCallback(async (): Promise<void> => {
     setIsRunning(true);
+    setRunError(null);
     try {
-      await apiClient.mutate(
+      const result = await apiClient.mutate(
         taskExecuteEndpoints.POST,
         logger,
         user,
@@ -1065,6 +1099,9 @@ function PulseSectionMama({
         undefined,
         locale,
       );
+      if (!result.success) {
+        setRunError(result.message);
+      }
     } finally {
       setIsRunning(false);
     }
@@ -1112,6 +1149,7 @@ function PulseSectionMama({
         )}
         {t("post.mama.runNow")}
       </Button>
+      {runError && <ErrorNote message={runError} />}
     </SettingsSection>
   );
 }
@@ -1137,14 +1175,21 @@ export function ChatSettingsWidget({
   const { addFavorite } = useFavoriteCreate(user, logger);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
+  // Every save goes through here: a failed save rolls the cache back (hook)
+  // and shows the reason, never a silent "on".
   const handleUpdate = useCallback(
     async (
       updates: Partial<ChatSettingsUpdateRequestOutput>,
     ): Promise<void> => {
       setIsSaving(true);
+      setSaveError(null);
       try {
-        await updateSettings(updates);
+        const error = await updateSettings(updates);
+        if (error) {
+          setSaveError(error.message);
+        }
       } finally {
         setIsSaving(false);
       }
@@ -1192,7 +1237,7 @@ export function ChatSettingsWidget({
         const schedule =
           settings?.dreamerSchedule ??
           generateRandomDreamerSchedule(getDefaultTimezone(locale));
-        await updateSettings({
+        await handleUpdate({
           dreamerEnabled: true,
           dreamerSchedule: schedule,
           ...(favId && !settings?.dreamerFavoriteId
@@ -1205,7 +1250,6 @@ export function ChatSettingsWidget({
     },
     [
       ensureBackgroundFavorite,
-      updateSettings,
       settings?.dreamerFavoriteId,
       settings?.dreamerSchedule,
       handleUpdate,
@@ -1221,7 +1265,7 @@ export function ChatSettingsWidget({
         const schedule =
           settings?.autopilotSchedule ??
           generateRandomAutopilotSchedule(getDefaultTimezone(locale));
-        await updateSettings({
+        await handleUpdate({
           autopilotEnabled: true,
           autopilotSchedule: schedule,
           ...(favId && !settings?.autopilotFavoriteId
@@ -1234,7 +1278,6 @@ export function ChatSettingsWidget({
     },
     [
       ensureBackgroundFavorite,
-      updateSettings,
       settings?.autopilotFavoriteId,
       settings?.autopilotSchedule,
       handleUpdate,
@@ -1263,6 +1306,7 @@ export function ChatSettingsWidget({
           <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground ml-auto" />
         )}
       </Div>
+      {saveError && <ErrorNote message={saveError} />}
 
       {/* Search Provider */}
       <SettingsSection

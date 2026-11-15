@@ -42,7 +42,7 @@ import type { QueryResultRow } from "pg";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db, isPglite, serialisePgliteAccess } from "..";
+import { db, isPglite } from "..";
 import { pool } from "../client";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
@@ -274,12 +274,15 @@ async function callInPglite(
   try {
     // eslint-disable-next-line @typescript-eslint/no-implied-eval -- intentional: executes serialized logic in async context for PGlite mode
     const fn = new Function("__q", "plv8", "__params", `return ${logicCall};`);
-    const result = await serialisePgliteAccess(async () => {
-      return (await fn(asyncQ, plv8Shim, declaredParams)) as Record<
-        string,
-        string | number | boolean | null
-      >;
-    });
+    // NOT wrapped in serialisePgliteAccess: every q.*() / plv8.execute() goes
+    // over the loopback pool, whose socket server serialises each statement
+    // on the same FIFO queue. Holding the queue here while awaiting those
+    // statements deadlocked the whole PGlite instance ("queue is blocked:
+    // direct") on the first credit balance read.
+    const result = (await fn(asyncQ, plv8Shim, declaredParams)) as Record<
+      string,
+      string | number | boolean | null
+    >;
     return mapRow(result, returnEntries);
   } catch (error) {
     logger.error(`PGlite db function ${name} failed`, parseError(error));

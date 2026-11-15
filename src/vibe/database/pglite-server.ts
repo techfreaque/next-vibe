@@ -256,6 +256,11 @@ function toPgText(value: PgliteValue, typeId: number): string | null {
   if (value === null || value === undefined) {
     return null;
   }
+  // JSON first: a jsonb `true` / `"x"` / `[1]` is JSON text on the wire, never
+  // the boolean "t" or an array literal (the client JSON.parses it by OID).
+  if (typeId === OID_JSON || typeId === OID_JSONB) {
+    return JSON.stringify(value);
+  }
   if (value instanceof Date) {
     const iso = value.toISOString();
     if (typeId === OID_DATE) {
@@ -269,9 +274,6 @@ function toPgText(value: PgliteValue, typeId: number): string | null {
   }
   if (value instanceof Uint8Array) {
     return `\\x${Buffer.from(value).toString("hex")}`;
-  }
-  if (typeId === OID_JSON || typeId === OID_JSONB) {
-    return JSON.stringify(value);
   }
   if (Array.isArray(value)) {
     // Postgres array literal: {a,"b c",NULL}
