@@ -20,6 +20,9 @@ export const translations = {
   intro: {
     lead: "GPT from OpenAI, Claude from Anthropic, Gemini from Google. Three SDKs, three keys, three bills, three dashboards. Or worse: the tool you like only speaks one format, so it only gets one vendor's models.",
     p2: "{{appName}} puts {{modelCount}} chat models from {{providerCount}} labs behind one key and one credit balance. Call them in the OpenAI format, the Responses format or the Anthropic format. Same models on every endpoint. Here is exactly how it works, what it costs, and where going direct or using a router is the better call.",
+    access:
+      "Up front: the API needs a paid account. Any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}) unlocks it. Free and bonus credits don't.",
+    accessLink: "Unlock the API",
   },
   endpoints: {
     title: "Five endpoints, one key",
@@ -31,7 +34,7 @@ export const translations = {
     messages:
       "POST /v1/messages: the Anthropic Messages API. Streaming and tool use. This is what Claude Code and the Anthropic SDKs talk to.",
     countTokens:
-      "POST /v1/messages/count_tokens: free. A local estimate, no model call, and it does not count against your per-minute rate limit. Claude Code calls it constantly to size its context.",
+      "POST /v1/messages/count_tokens: costs no credits. A local estimate, no model call, and it does not count against your per-minute rate limit. Claude Code calls it constantly to size its context.",
     models:
       "GET /v1/models: every model your key can call right now, with context length, tool support and prices. One response body that both the OpenAI and the Anthropic SDKs parse.",
     auth: "Auth works two ways, on every endpoint. Authorization: Bearer sk-unb-... for OpenAI clients and for Claude Code with ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... for the Anthropic SDKs. Keys start with sk-unb-, are shown once and stored only as a hash. Create them under Settings > API keys, up to 20 active keys per account.",
@@ -64,7 +67,7 @@ export const translations = {
       body: "Set base_url without /v1 and your key as api_key, then call messages.create. Reasoning models put a thinking block first, so the sample prints the text block, not the first block.",
       caption: "Messages API with the Anthropic SDK",
       countTokens:
-        "Need a size before you send? count_tokens returns an estimate for free, without calling a model.",
+        "Need a size before you send? count_tokens returns an estimate without calling a model. No credits spent.",
       countTokensCaption: "Count tokens with curl",
     },
     models: {

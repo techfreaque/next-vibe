@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
     step1: {
       title: "Weź klucz",
       description:
-        "Utwórz klucz sk-unb w Ustawienia > Klucze API. Widać go tylko raz. API jest częścią każdego płatnego planu: odblokowuje je aktywna subskrypcja albo zakup pakietu kredytów.",
+        "Utwórz klucz sk-unb w Ustawienia > Klucze API. Widać go tylko raz.",
     },
     step2: {
       title: "Wyślij zapytanie",
@@ -59,8 +59,9 @@ export const translations: typeof enTranslations = {
     },
   },
   access: {
-    title: "Tylko plany płatne",
-    body: "Tworzenie kluczy i wywołania /v1 wymagają płatnego konta: aktywnej subskrypcji albo co najmniej jednego zakupu kredytów. Konta na planie darmowym dostają HTTP 402 z kodem paid_plan_required, dokumentację nadal mogą czytać. Kredyty zostają twoje: kupujesz pakiet raz, a API działa, dopóki saldo się nie wyczerpie.",
+    title: "Wymaga płatnego konta",
+    body: "Klucze i wywołania /v1 wymagają płatnego konta: dowolnego planu ({{subPrice}} miesięcznie) albo jednorazowego pakietu kredytów ({{packPrice}}). Darmowe konto może tworzyć klucze i czytać tę dokumentację, ale do pierwszego zakupu każde wywołanie zwraca HTTP 402 paid_plan_required. Darmowe i bonusowe kredyty nie odblokowują API. Kupujesz pakiet raz, a API działa, dopóki saldo się nie wyczerpie.",
+    cta: "Odblokuj API",
   },
   auth: {
     title: "Uwierzytelnianie",
@@ -177,9 +178,9 @@ export const translations: typeof enTranslations = {
       missingKey:
         "Nie wysłano klucza. Wyślij Authorization: Bearer sk-unb-... albo x-api-key.",
       invalidKey: "Klucz jest błędny albo unieważniony.",
-      paid: "Konto nie ma płatnego planu. Wykup subskrypcję albo kup kredyty.",
+      paid: "Na koncie nie ma jeszcze planu ani zakupu kredytów. Odblokuje je dowolny plan albo jeden pakiet kredytów.",
       credits: "Saldo za niskie na to wywołanie. Doładuj.",
-      cap: "Osiągnięty dzienny limit planu darmowego. Kredyty to naprawiają.",
+      cap: "Płatne saldo puste i dzienny limit darmowych kredytów osiągnięty. Doładuj.",
       notFound: "Model nie istnieje albo nie jest dla ciebie dostępny.",
       invalid:
         "Błędne zapytanie: nieobsługiwany parametr, zły tool_choice, zły adres obrazu.",

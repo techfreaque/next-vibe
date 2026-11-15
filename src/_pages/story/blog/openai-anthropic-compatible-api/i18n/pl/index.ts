@@ -22,6 +22,9 @@ export const translations: typeof enTranslations = {
   intro: {
     lead: "GPT od OpenAI, Claude od Anthropic, Gemini od Google. Trzy SDK, trzy klucze, trzy rachunki, trzy panele. Albo gorzej: twoje ulubione narzędzie mówi tylko jednym formatem, więc dostaje modele tylko jednego dostawcy.",
     p2: "{{appName}} daje {{modelCount}} modeli czatu z {{providerCount}} laboratoriów pod jednym kluczem i jednym saldem kredytów. Wołasz je w formacie OpenAI, Responses albo Anthropic. Te same modele na każdym endpoincie. Poniżej dokładnie: jak to działa, ile kosztuje i kiedy lepiej iść bezpośrednio do dostawcy albo do routera.",
+    access:
+      "Na start: API wymaga płatnego konta. Odblokuje je dowolny plan ({{subPrice}} miesięcznie) albo jednorazowy pakiet kredytów ({{packPrice}}). Darmowe i bonusowe kredyty nie wystarczą.",
+    accessLink: "Odblokuj API",
   },
   endpoints: {
     title: "Pięć endpointów, jeden klucz",
@@ -33,7 +36,7 @@ export const translations: typeof enTranslations = {
     messages:
       "POST /v1/messages: Anthropic Messages API. Streaming i tool use. Z tym rozmawiają Claude Code i SDK Anthropic.",
     countTokens:
-      "POST /v1/messages/count_tokens: za darmo. Lokalne oszacowanie bez wywołania modelu, które nie zjada limitu zapytań na minutę. Claude Code woła go non stop, żeby mierzyć swój kontekst.",
+      "POST /v1/messages/count_tokens: nie zużywa kredytów. Lokalne oszacowanie bez wywołania modelu, które nie zjada limitu zapytań na minutę. Claude Code woła go non stop, żeby mierzyć swój kontekst.",
     models:
       "GET /v1/models: każdy model, który twój klucz może teraz wywołać, z długością kontekstu, obsługą narzędzi i cenami. Jedna odpowiedź, którą parsują zarówno SDK OpenAI, jak i Anthropic.",
     auth: "Uwierzytelnianie działa na dwa sposoby, na każdym endpoincie. Authorization: Bearer sk-unb-... dla klientów OpenAI i dla Claude Code z ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... dla SDK Anthropic. Klucze zaczynają się od sk-unb-, widzisz je tylko raz, a my przechowujemy wyłącznie hash. Tworzysz je w Ustawienia > Klucze API, do 20 aktywnych kluczy na konto.",
@@ -66,7 +69,7 @@ export const translations: typeof enTranslations = {
       body: "Ustaw base_url bez /v1 i swój klucz jako api_key, potem messages.create. Modele rozumujące zaczynają od bloku thinking, dlatego przykład wypisuje blok text, a nie pierwszy blok.",
       caption: "Messages API z SDK Anthropic",
       countTokens:
-        "Chcesz znać rozmiar przed wysłaniem? count_tokens zwraca oszacowanie za darmo, bez wywołania modelu.",
+        "Chcesz znać rozmiar przed wysłaniem? count_tokens zwraca oszacowanie bez wywołania modelu i bez zużycia kredytów.",
       countTokensCaption: "Liczenie tokenów przez curl",
     },
     models: {

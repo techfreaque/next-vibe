@@ -21,10 +21,12 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Plug } from "next-vibe/ui/components/icons/Plug";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import {
   buildCodingToolSnippets,
   buildPublicApiBaseUrl,
@@ -115,6 +117,8 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
 export interface CodingToolsPostPageData {
   locale: CountryLanguage;
   baseUrl: string;
+  subPrice: string;
+  packPrice: string;
 }
 
 export async function tanstackLoader({
@@ -124,6 +128,7 @@ export async function tanstackLoader({
   return {
     locale,
     baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
+    ...getApiAccessPrices(locale),
   };
 }
 
@@ -187,6 +192,8 @@ function toolIntro(
 export function TanstackPage({
   locale,
   baseUrl,
+  subPrice,
+  packPrice,
 }: CodingToolsPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -211,6 +218,15 @@ export function TanstackPage({
         <Div className="flex flex-col gap-5">
           <ArticleLead>{t("intro.lead")}</ArticleLead>
           <ArticleP>{t("intro.p2", { appName })}</ArticleP>
+          <Callout icon={Key} tone="warning">
+            {t("intro.access", { subPrice, packPrice })}{" "}
+            <Link
+              href={`/${locale}/${API_UNLOCK_PATH}`}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t("intro.accessLink")}
+            </Link>
+          </Callout>
         </Div>
 
         <ArticleSection title={t("why.title")}>

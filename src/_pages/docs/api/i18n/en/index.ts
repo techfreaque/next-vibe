@@ -43,7 +43,7 @@ export const translations = {
     step1: {
       title: "Get a key",
       description:
-        "Create an sk-unb key under Settings > API keys. It is shown once. The API is part of every paid plan: an active subscription or a credit pack purchase unlocks it.",
+        "Create an sk-unb key under Settings > API keys. It is shown once.",
     },
     step2: {
       title: "Send a request",
@@ -57,8 +57,9 @@ export const translations = {
     },
   },
   access: {
-    title: "Paid plans only",
-    body: "Creating keys and calling /v1 requires a paid account: an active subscription, or at least one credit purchase. Free-tier accounts get HTTP 402 with code paid_plan_required, and can still read these docs. Credits stay yours: buy a pack once and the API keeps working until the balance runs out.",
+    title: "Needs a paid account",
+    body: "Keys and /v1 calls need a paid account: any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}). Free accounts can create keys and read these docs, but every call answers HTTP 402 paid_plan_required until the first purchase. Free and bonus credits do not unlock it. Buy a pack once and the API keeps working until the balance runs out.",
+    cta: "Unlock the API",
   },
   auth: {
     title: "Authentication",
@@ -173,9 +174,9 @@ export const translations = {
       missingKey:
         "No key sent. Send Authorization: Bearer sk-unb-..., or x-api-key.",
       invalidKey: "Key is wrong or revoked.",
-      paid: "Account has no paid plan. Subscribe or buy credits.",
+      paid: "No plan and no credit purchase on the account yet. Any plan or one credit pack unlocks it.",
       credits: "Balance too low for this call. Top up.",
-      cap: "Free-tier daily cap reached. Credits fix it.",
+      cap: "Paid balance is empty and today's free-credit cap is hit. Top up.",
       notFound: "Model does not exist or is not available to you.",
       invalid:
         "Bad request: unsupported parameter, bad tool_choice, bad image URL.",

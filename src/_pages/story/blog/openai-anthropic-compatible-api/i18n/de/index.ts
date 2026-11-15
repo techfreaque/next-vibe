@@ -22,6 +22,9 @@ export const translations: typeof enTranslations = {
   intro: {
     lead: "GPT bei OpenAI, Claude bei Anthropic, Gemini bei Google. Drei SDKs, drei Keys, drei Rechnungen, drei Dashboards. Oder schlimmer: Dein Lieblingstool spricht nur ein Format und bekommt damit nur die Modelle eines Anbieters.",
     p2: "{{appName}} bündelt {{modelCount}} Chat-Modelle von {{providerCount}} Labs hinter einem Key und einem Credit-Guthaben. Du rufst sie im OpenAI-Format, im Responses-Format oder im Anthropic-Format auf. Dieselben Modelle an jedem Endpoint. Hier steht genau, wie es funktioniert, was es kostet und wann der direkte Weg oder ein Router die bessere Wahl ist.",
+    access:
+      "Vorab: Die API braucht ein bezahltes Konto. Jeder Tarif ({{subPrice}} im Monat) oder ein einmaliges Credit-Paket ({{packPrice}}) schaltet sie frei. Gratis- und Bonus-Credits nicht.",
+    accessLink: "API freischalten",
   },
   endpoints: {
     title: "Fünf Endpoints, ein Key",
@@ -33,7 +36,7 @@ export const translations: typeof enTranslations = {
     messages:
       "POST /v1/messages: die Anthropic Messages API. Streaming und Tool Use. Damit reden Claude Code und die Anthropic-SDKs.",
     countTokens:
-      "POST /v1/messages/count_tokens: kostenlos. Eine lokale Schätzung ohne Modellaufruf, die nicht auf dein Rate-Limit pro Minute zählt. Claude Code ruft das ständig auf, um seinen Kontext zu bemessen.",
+      "POST /v1/messages/count_tokens: kostet keine Credits. Eine lokale Schätzung ohne Modellaufruf, die nicht auf dein Rate-Limit pro Minute zählt. Claude Code ruft das ständig auf, um seinen Kontext zu bemessen.",
     models:
       "GET /v1/models: jedes Modell, das dein Key gerade aufrufen darf, mit Kontextlänge, Tool-Support und Preisen. Ein Response-Body, den die OpenAI- und die Anthropic-SDKs gleichermaßen parsen.",
     auth: "Authentifizierung geht auf zwei Arten, an jedem Endpoint. Authorization: Bearer sk-unb-... für OpenAI-Clients und für Claude Code mit ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... für die Anthropic-SDKs. Keys beginnen mit sk-unb-, werden genau einmal angezeigt und nur als Hash gespeichert. Du erstellst sie unter Einstellungen > API-Keys, bis zu 20 aktive Keys pro Konto.",
@@ -66,7 +69,7 @@ export const translations: typeof enTranslations = {
       body: "Setz base_url ohne /v1 und deinen Key als api_key, dann messages.create. Reasoning-Modelle stellen einen thinking-Block an den Anfang. Das Beispiel gibt deshalb den text-Block aus, nicht den ersten Block.",
       caption: "Messages API mit dem Anthropic SDK",
       countTokens:
-        "Größe vor dem Senden prüfen? count_tokens liefert kostenlos eine Schätzung, ganz ohne Modellaufruf.",
+        "Größe vor dem Senden prüfen? count_tokens liefert eine Schätzung, ganz ohne Modellaufruf und ohne Credits.",
       countTokensCaption: "Tokens zählen mit curl",
     },
     models: {

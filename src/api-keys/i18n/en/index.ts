@@ -2,10 +2,12 @@ export const translations = {
   category: "Account",
 
   widget: {
-    upgradeTitle: "API access is a paid feature",
+    upgradeTitle:
+      "API access comes with any plan or a one-time {{packPrice}} credit pack",
     upgradeBody:
-      "Subscribe or buy a credit pack to unlock API keys. One key runs your own code, Codex CLI, Claude Code and every OpenAI-compatible tool. Free-tier accounts can still read the docs.",
-    upgradeCta: "Upgrade to unlock",
+      "Create your key now. It activates after your first purchase: a plan ({{subPrice}} a month) or one credit pack. Until then /v1 answers HTTP 402. Free and bonus credits don't unlock it.",
+    upgradeCta: "Unlock the API",
+    createInactiveHint: "This key activates after your first purchase.",
     docsLink: "Read the API docs",
     back: "Back",
     loading: "Loading API keys…",
@@ -129,8 +131,6 @@ export const translations = {
       description: "Copy the key now. It won't be shown again.",
     },
     errors: {
-      paidRequired:
-        "The API is for paid plans. Subscribe or buy credits to create API keys.",
       limit: "You already have {{max}} active keys. Revoke one first.",
     },
   },

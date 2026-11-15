@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     modelNotFound:
       "Model '{{model}}' nie istnieje lub nie jest dla Ciebie dostępny. Lista Twoich modeli: GET /v1/models.",
     paidRequired:
-      "API jest dostępne w planach płatnych. Wykup subskrypcję lub kup kredyty, aby wywoływać /v1: zobacz Ustawienia > Klucze API.",
+      "API wymaga płatnego konta: dowolnego planu albo jednorazowego pakietu kredytów ({{packPrice}}). Kupisz je na {{url}}.",
     toolsUnsupportedByModel:
       "Ten model nie obsługuje wywoływania narzędzi. Wybierz model z obsługą narzędzi albo usuń 'tools'.",
     badToolArguments:
@@ -269,7 +269,7 @@ export const translations: typeof enTranslations = {
       title: "Liczenie tokenów Anthropic",
       titleShort: "v1 count tokens",
       description:
-        "Szacuje tokeny wejściowe zapytania Anthropic Messages. Za darmo: bez wywołania modelu, bez kredytów.",
+        "Szacuje tokeny wejściowe zapytania Anthropic Messages. Bez wywołania modelu, bez kredytów.",
       fields: {
         action: { label: "Akcja", description: "Zawsze count_tokens" },
         model: { label: "Model", description: "ID modelu" },

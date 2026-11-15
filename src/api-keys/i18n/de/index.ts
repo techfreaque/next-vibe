@@ -4,10 +4,12 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
-    upgradeTitle: "API-Zugang ist ein Bezahlfeature",
+    upgradeTitle:
+      "API-Zugang gibt es mit jedem Tarif oder einem einmaligen Credit-Paket für {{packPrice}}",
     upgradeBody:
-      "Abonniere oder kaufe ein Credit-Paket, um API-Schlüssel freizuschalten. Ein Schlüssel für deinen eigenen Code, Codex CLI, Claude Code und jedes OpenAI-kompatible Tool. Die Doku kannst du auch im kostenlosen Tarif lesen.",
-    upgradeCta: "Jetzt freischalten",
+      "Erstell deinen Schlüssel schon jetzt. Er wird mit deinem ersten Kauf aktiv: ein Tarif ({{subPrice}} im Monat) oder ein Credit-Paket. Bis dahin antwortet /v1 mit HTTP 402. Gratis- und Bonus-Credits schalten die API nicht frei.",
+    upgradeCta: "API freischalten",
+    createInactiveHint: "Der Schlüssel wird mit deinem ersten Kauf aktiv.",
     docsLink: "API-Doku lesen",
     back: "Zurück",
     loading: "API-Schlüssel werden geladen…",
@@ -132,8 +134,6 @@ export const translations: typeof enTranslations = {
       description: "Kopiere ihn jetzt. Er wird nicht noch einmal angezeigt.",
     },
     errors: {
-      paidRequired:
-        "Die API gibt es nur mit bezahltem Tarif. Abonniere oder kaufe Credits, um API-Schlüssel zu erstellen.",
       limit:
         "Du hast bereits {{max}} aktive Schlüssel. Widerrufe zuerst einen.",
     },

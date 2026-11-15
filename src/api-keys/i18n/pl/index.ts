@@ -4,10 +4,12 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
-    upgradeTitle: "Dostęp do API jest funkcją płatną",
+    upgradeTitle:
+      "Dostęp do API daje każdy plan albo jednorazowy pakiet kredytów za {{packPrice}}",
     upgradeBody:
-      "Wykup subskrypcję albo kup pakiet kredytów, aby odblokować klucze API. Jeden klucz do twojego kodu, Codex CLI, Claude Code i każdego narzędzia zgodnego z OpenAI. Dokumentację możesz czytać także na darmowym koncie.",
-    upgradeCta: "Odblokuj",
+      "Utwórz klucz już teraz. Zadziała po pierwszym zakupie: planu ({{subPrice}} miesięcznie) albo pakietu kredytów. Do tego czasu /v1 zwraca HTTP 402. Darmowe i bonusowe kredyty nie odblokowują API.",
+    upgradeCta: "Odblokuj API",
+    createInactiveHint: "Klucz zadziała po pierwszym zakupie.",
     docsLink: "Czytaj dokumentację API",
     back: "Wstecz",
     loading: "Wczytywanie kluczy API…",
@@ -131,8 +133,6 @@ export const translations: typeof enTranslations = {
       description: "Skopiuj go teraz. Nie pokażemy go ponownie.",
     },
     errors: {
-      paidRequired:
-        "API jest dostępne w planach płatnych. Wykup subskrypcję lub kup kredyty, aby tworzyć klucze API.",
       limit: "Masz już {{max}} aktywnych kluczy. Najpierw unieważnij jeden.",
     },
   },

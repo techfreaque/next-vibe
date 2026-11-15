@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     modelNotFound:
       "Das Modell '{{model}}' existiert nicht oder steht dir nicht zur Verfügung. Deine Modelle: GET /v1/models.",
     paidRequired:
-      "Die API ist in bezahlten Tarifen verfügbar. Abonniere oder kaufe Credits, um /v1 aufzurufen: siehe Einstellungen > API-Schlüssel.",
+      "Die API braucht ein bezahltes Konto: einen beliebigen Tarif oder ein einmaliges Credit-Paket ({{packPrice}}). Hol es dir unter {{url}}.",
     toolsUnsupportedByModel:
       "Dieses Modell unterstützt keine Tool-Aufrufe. Wähle ein Modell mit Tool-Unterstützung oder entferne 'tools'.",
     badToolArguments:
@@ -272,7 +272,7 @@ export const translations: typeof enTranslations = {
       title: "Anthropic-Tokenzählung",
       titleShort: "v1 count tokens",
       description:
-        "Schätzt die Eingabe-Tokens einer Anthropic-Messages-Anfrage. Kostenlos: kein Modellaufruf, keine Credits.",
+        "Schätzt die Eingabe-Tokens einer Anthropic-Messages-Anfrage. Kein Modellaufruf, keine Credits.",
       fields: {
         action: { label: "Aktion", description: "Immer count_tokens" },
         model: { label: "Modell", description: "Modell-ID" },

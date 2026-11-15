@@ -19,6 +19,9 @@ export const translations = {
   intro: {
     lead: "Your coding agent is locked to one vendor's models. Want a second opinion from another lab, a cheaper model for grunt work, or a model that does not refuse? That means another account, another key, another bill.",
     p2: "{{appName}} speaks all three formats coding agents use: OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API. Nothing to install in between. Point a tool at us once, then switch between Claude, GPT, DeepSeek, GLM, Kimi, Qwen and the uncensored models by changing one model id.",
+    access:
+      "Before you start: the API needs a paid account. Any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}) unlocks it. Free and bonus credits don't.",
+    accessLink: "Unlock the API",
   },
   why: {
     title: "Why bother",
@@ -34,7 +37,7 @@ export const translations = {
   setup: {
     title: "Get a key and a base URL",
     intro: "Two values. Every tool below needs exactly these.",
-    p1: "Create a key under Settings > API keys. It starts with sk-unb- and is shown once. The API is part of every paid plan: an active subscription or any credit pack unlocks it.",
+    p1: "Create a key under Settings > API keys. It starts with sk-unb- and is shown once.",
     shortcut:
       "Fastest path: right after you create a key, the API keys page shows every block below with your key already filled in. Pick your tool, copy, run.",
     baseUrlLabel: "Base URL",
@@ -119,7 +122,7 @@ export const translations = {
       "Claude Code gets the base URL without /v1. With /v1 it calls /v1/v1/messages and gets a 404.",
     modelId:
       "Use the exact id from GET /v1/models, like {{model}}. Aider wants openai/ in front. Claude Code's built-in Claude ids are mapped for you to our newest Claude of the same family. Any other unknown id returns 404 model_not_found.",
-    paid: "HTTP 402 with paid_plan_required means the account has no paid plan yet. Any credit pack fixes it.",
+    paid: "HTTP 402 with paid_plan_required means the account has no plan and no credit purchase yet. Any plan or one credit pack fixes it.",
     tools:
       "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /v1/models.",
     rateLimit:

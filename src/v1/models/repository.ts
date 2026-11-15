@@ -6,6 +6,7 @@
 import "server-only";
 
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -25,10 +26,11 @@ export class V1ModelsRepository {
   static async list(
     user: JwtPayloadType,
     request: Request | undefined,
+    locale: CountryLanguage,
     t: V1T,
     logger: EndpointLogger,
   ): Promise<StreamingResponse> {
-    const gate = await gateApiKeyRequest(user, request, t, logger);
+    const gate = await gateApiKeyRequest(user, request, locale, t, logger);
     if (!gate.ok) {
       return openAiErrorResponse(gate.error);
     }

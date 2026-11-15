@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
     step1: {
       title: "Schlüssel holen",
       description:
-        "Erstelle unter Einstellungen > API-Schlüssel einen sk-unb-Schlüssel. Er wird nur einmal angezeigt. Die API gehört zu jedem bezahlten Tarif: ein aktives Abo oder ein gekauftes Credit-Paket schaltet sie frei.",
+        "Erstelle unter Einstellungen > API-Schlüssel einen sk-unb-Schlüssel. Er wird nur einmal angezeigt.",
     },
     step2: {
       title: "Anfrage senden",
@@ -59,8 +59,9 @@ export const translations: typeof enTranslations = {
     },
   },
   access: {
-    title: "Nur mit bezahltem Tarif",
-    body: "Schlüssel erstellen und /v1 aufrufen geht nur mit bezahltem Konto: aktives Abo oder mindestens ein Credit-Kauf. Konten im kostenlosen Tarif bekommen HTTP 402 mit dem Code paid_plan_required, die Doku können sie trotzdem lesen. Deine Credits bleiben dein: Einmal ein Paket kaufen, und die API läuft, bis das Guthaben aufgebraucht ist.",
+    title: "Braucht ein bezahltes Konto",
+    body: "Schlüssel und /v1-Aufrufe brauchen ein bezahltes Konto: einen beliebigen Tarif ({{subPrice}} im Monat) oder ein einmaliges Credit-Paket ({{packPrice}}). Kostenlose Konten können Schlüssel erstellen und die Doku lesen, jeder Aufruf antwortet bis zum ersten Kauf aber mit HTTP 402 paid_plan_required. Gratis- und Bonus-Credits schalten die API nicht frei. Einmal ein Paket kaufen, und die API läuft, bis das Guthaben aufgebraucht ist.",
+    cta: "API freischalten",
   },
   auth: {
     title: "Authentifizierung",
@@ -177,9 +178,9 @@ export const translations: typeof enTranslations = {
       missingKey:
         "Kein Schlüssel gesendet. Sende Authorization: Bearer sk-unb-... oder x-api-key.",
       invalidKey: "Schlüssel ist falsch oder widerrufen.",
-      paid: "Das Konto hat keinen bezahlten Tarif. Abonniere oder kaufe Credits.",
+      paid: "Auf dem Konto gibt es noch keinen Tarif und keinen Credit-Kauf. Jeder Tarif oder ein Credit-Paket schaltet die API frei.",
       credits: "Guthaben reicht für diesen Aufruf nicht. Auffüllen.",
-      cap: "Tageslimit des kostenlosen Tarifs erreicht. Credits lösen das.",
+      cap: "Bezahltes Guthaben leer und Tageslimit für Gratis-Credits erreicht. Auffüllen.",
       notFound:
         "Das Modell existiert nicht oder steht dir nicht zur Verfügung.",
       invalid:

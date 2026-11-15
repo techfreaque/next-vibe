@@ -127,7 +127,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Start za darmo",
-      body: "Nowi użytkownicy testują bez karty. Łatwe tak dla twoich odbiorców, łatwa konwersja dla ciebie.",
+      body: "Nowi użytkownicy testują czat bez karty. Łatwe tak dla twoich odbiorców, łatwa konwersja dla ciebie. Dla programistów: API wymaga dowolnego planu albo jednorazowego pakietu kredytów za {{packPrice}}.",
     },
   },
   faq: {

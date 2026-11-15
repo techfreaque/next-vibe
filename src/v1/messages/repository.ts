@@ -59,7 +59,7 @@ export class V1MessagesRepository {
       params;
     const runner = params.runner ?? aiSdkRunner;
 
-    const gate = await gateApiKeyRequest(user, request, t, logger);
+    const gate = await gateApiKeyRequest(user, request, locale, t, logger);
     if (!gate.ok) {
       return anthropicErrorResponse(gate.error);
     }

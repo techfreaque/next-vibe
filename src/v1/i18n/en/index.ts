@@ -15,7 +15,7 @@ export const translations = {
     modelNotFound:
       "The model '{{model}}' does not exist or is not available to you. List your models with GET /v1/models.",
     paidRequired:
-      "The API is available on paid plans. Subscribe or buy credits to call /v1: see Settings > API keys.",
+      "The API needs a paid account: any plan or a one-time credit pack ({{packPrice}}). Add one at {{url}}.",
     toolsUnsupportedByModel:
       "This model does not support tool calling. Pick a model with tool support or remove 'tools'.",
     badToolArguments:
@@ -261,7 +261,7 @@ export const translations = {
       title: "Anthropic token count",
       titleShort: "v1 count tokens",
       description:
-        "Estimate the input tokens of an Anthropic Messages request. Free: no model call, no credits.",
+        "Estimate the input tokens of an Anthropic Messages request. No model call, no credits.",
       fields: {
         action: { label: "Action", description: "Always count_tokens" },
         model: { label: "Model", description: "Model ID" },

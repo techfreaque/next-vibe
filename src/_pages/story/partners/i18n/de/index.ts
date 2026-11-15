@@ -128,7 +128,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Kostenloser Einstieg",
-      body: "Neue Nutzer testen ohne Karte. Leichtes Ja für deine Community, leichte Conversion für dich.",
+      body: "Neue Nutzer testen den Chat ohne Karte. Leichtes Ja für deine Community, leichte Conversion für dich. Für Entwickler: Die API braucht einen Tarif oder ein einmaliges Credit-Paket für {{packPrice}}.",
     },
   },
   faq: {

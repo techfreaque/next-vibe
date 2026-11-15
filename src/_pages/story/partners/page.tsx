@@ -19,6 +19,7 @@ import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { getReferralParams } from "@/_pages/user/(account)/referral/i18n/utils";
+import { getApiAccessPrices } from "@/api-keys/access";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -223,7 +224,9 @@ export function TanstackPage({ locale }: PartnersPageData): JSX.Element {
             {t("product.control.body")}
           </FeatureCard>
           <FeatureCard icon={Sparkles} title={t("product.free.title")}>
-            {t("product.free.body")}
+            {t("product.free.body", {
+              packPrice: getApiAccessPrices(locale).packPrice,
+            })}
           </FeatureCard>
         </FeatureGrid>
       </PageSection>

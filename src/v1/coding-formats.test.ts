@@ -26,10 +26,12 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
 import { resetRateLimit } from "@/api-keys/keys";
+import { resetPaidCache } from "@/api-keys/paid";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
@@ -217,12 +219,14 @@ function sseEvents(text: string): SseEvent[] {
 describe("coding-agent formats", () => {
   let user: E2ECreditUser;
   let broke: E2ECreditUser;
+  let free: E2ECreditUser;
   let toolModelId = "";
   let claudeSonnetId: string | undefined;
 
   beforeAll(async () => {
     user = await createE2ECreditUser("v1-formats", 500);
     broke = await createE2ECreditUser("v1-formats-broke", 500);
+    free = await createE2ECreditUser("v1-formats-free", 0);
     const models = listUserCallableModels(user.user, await getEnvAvailability());
     toolModelId = models.find((m) => m.supportsTools)?.id ?? "";
     claudeSonnetId = models.find((m) => /^claude-sonnet-\d/.test(m.id))?.id;
@@ -231,6 +235,7 @@ describe("coding-agent formats", () => {
   afterAll(async () => {
     await user.remove();
     await broke.remove();
+    await free.remove();
   });
 
   it("a tool-capable model is servable in this environment", () => {
@@ -528,6 +533,7 @@ describe("coding-agent formats", () => {
           },
           user: await authed(request),
           request,
+          locale: defaultLocale,
           t,
           logger,
         });
@@ -544,7 +550,7 @@ describe("coding-agent formats", () => {
     it("works with x-api-key and carries both OpenAI and Anthropic fields", async () => {
       const { key } = await createKey(user.user, "models-anthropic");
       const request = v1Request("/models", { "x-api-key": key });
-      const out = await V1ModelsRepository.list(await authed(request), request, t, logger);
+      const out = await V1ModelsRepository.list(await authed(request), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(200);
       const body = (await out.response.json()) as {
         object: string;
@@ -556,6 +562,35 @@ describe("coding-agent formats", () => {
       expect(body.data[0]).toMatchObject({ object: "model", type: "model" });
       expect(typeof body.data[0]?.display_name).toBe("string");
       expect(Number.isNaN(Date.parse(body.data[0]?.created_at ?? ""))).toBe(false);
+    });
+  });
+  describe("402 paid_plan_required (free account)", () => {
+    function expectGuidance(message: string): void {
+      const { packPrice } = getApiAccessPrices(defaultLocale);
+      expect(message).toContain("any plan or a one-time credit pack");
+      expect(message).toContain(`(${packPrice})`);
+      expect(message).toContain(`http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`);
+    }
+
+    it("Responses format: OpenAI envelope, stable code, message says what to buy and where", async () => {
+      resetPaidCache(free.user.id);
+      const { key } = await createKey(free.user, "free-responses");
+      const res = await responsesCall({ Authorization: `Bearer ${key}` }, { model: toolModelId }, textRunner);
+      expect(res.status).toBe(402);
+      const body = (await res.json()) as { error: { code: string; type: string; message: string } };
+      expect(body.error).toMatchObject({ code: "paid_plan_required", type: "insufficient_quota" });
+      expectGuidance(body.error.message);
+    });
+
+    it("Anthropic format: billing_error, no retry, message says what to buy and where", async () => {
+      resetPaidCache(free.user.id);
+      const { key } = await createKey(free.user, "free-messages");
+      const res = await messagesCall({ "x-api-key": key }, { model: toolModelId }, textRunner);
+      expect(res.status).toBe(402);
+      expect(res.headers.get("x-should-retry")).toBe("false");
+      const body = (await res.json()) as { type: string; error: { type: string; message: string } };
+      expect(body).toMatchObject({ type: "error", error: { type: "billing_error" } });
+      expectGuidance(body.error.message);
     });
   });
 });

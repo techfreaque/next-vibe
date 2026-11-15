@@ -11,11 +11,13 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
+import { Link } from "next-vibe/ui/components/link";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 
+import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import {
   buildCodingToolSnippets,
   buildPublicApiBaseUrl,
@@ -216,6 +218,7 @@ export function TanstackPage({
   const { t: toolT } = apiKeysScopedTranslation.scopedT(locale);
   const snippets = buildDocsSnippets(baseUrl);
   const toolSnippets = buildCodingToolSnippets({ baseUrl });
+  const prices = getApiAccessPrices(locale);
 
   return (
     <Div className="min-h-screen bg-background">
@@ -253,6 +256,21 @@ export function TanstackPage({
         title={t("quickstart.title")}
         intro={t("quickstart.intro")}
       >
+        <Callout icon={CreditCard} tone="warning" className="mb-8 max-w-3xl">
+          <Span className="font-semibold">{t("access.title")}. </Span>
+          {t("access.body", {
+            subPrice: prices.subPrice,
+            packPrice: prices.packPrice,
+          })}
+          <P className="mt-3 mb-0">
+            <Link
+              href={`/${locale}/${API_UNLOCK_PATH}`}
+              className="font-semibold text-primary hover:underline"
+            >
+              {t("access.cta")}
+            </Link>
+          </P>
+        </Callout>
         <Div className="max-w-3xl">
           <StepList>
             <Step
@@ -310,10 +328,6 @@ export function TanstackPage({
             </Step>
           </StepList>
         </Div>
-        <Callout icon={CreditCard} tone="warning" className="mt-8 max-w-3xl">
-          <Span className="font-semibold">{t("access.title")}. </Span>
-          {t("access.body")}
-        </Callout>
       </PageSection>
 
       <PageSection

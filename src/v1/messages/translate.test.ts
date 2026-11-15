@@ -464,14 +464,27 @@ describe("Claude Code specifics", () => {
   it("deferred tools stay hidden until a tool_reference loads them", () => {
     const tools = [
       { name: "Read", input_schema: { type: "object" } },
-      { name: "WebFetch", input_schema: { type: "object" }, defer_loading: true },
+      {
+        name: "WebFetch",
+        input_schema: { type: "object" },
+        defer_loading: true,
+      },
     ];
-    expect(convertAnthropicTools(tools).map((tool) => tool.name)).toEqual(["Read"]);
+    expect(convertAnthropicTools(tools).map((tool) => tool.name)).toEqual([
+      "Read",
+    ]);
     const messages = [
       { role: "user" as const, content: "fetch it" },
       {
         role: "assistant" as const,
-        content: [{ type: "tool_use" as const, id: "t1", name: "ToolSearch", input: {} }],
+        content: [
+          {
+            type: "tool_use" as const,
+            id: "t1",
+            name: "ToolSearch",
+            input: {},
+          },
+        ],
       },
       {
         role: "user" as const,
@@ -479,13 +492,17 @@ describe("Claude Code specifics", () => {
           {
             type: "tool_result" as const,
             tool_use_id: "t1",
-            content: [{ type: "tool_reference" as const, tool_name: "WebFetch" }],
+            content: [
+              { type: "tool_reference" as const, tool_name: "WebFetch" },
+            ],
           },
         ],
       },
     ];
     expect(
-      convertAnthropicTools(tools, referencedToolNames(messages)).map((tool) => tool.name),
+      convertAnthropicTools(tools, referencedToolNames(messages)).map(
+        (tool) => tool.name,
+      ),
     ).toEqual(["Read", "WebFetch"]);
   });
 
@@ -498,12 +515,19 @@ describe("Claude Code specifics", () => {
       encoder.finish("stop", totals);
     expect(text).not.toContain("secret plan");
     const signature = parseSse(text)
-      .map((e) => e["delta"] as { type?: string; signature?: string } | undefined)
+      .map(
+        (e) => e["delta"] as { type?: string; signature?: string } | undefined,
+      )
       .find((d) => d?.type === "signature_delta")?.signature;
     const converted = convertAnthropicMessages({
       messages: [
         { role: "user", content: "x" },
-        { role: "assistant", content: [{ type: "thinking", thinking: "", signature: signature ?? "" }] },
+        {
+          role: "assistant",
+          content: [
+            { type: "thinking", thinking: "", signature: signature ?? "" },
+          ],
+        },
       ],
     });
     expect(converted.ok && converted.messages[1]).toEqual({

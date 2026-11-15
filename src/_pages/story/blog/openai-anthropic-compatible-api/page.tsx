@@ -21,7 +21,6 @@ import {
 } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
@@ -37,6 +36,7 @@ import type { JSX } from "react";
 
 import { buildDocsSnippets } from "@/_pages/docs/api/snippets";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import {
   buildCodingToolSnippets,
   buildPublicApiBaseUrl,
@@ -171,9 +171,8 @@ export async function tanstackLoader({
     baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
     modelCount: getAvailableChatModelCount(false, availability),
     providerCount: getAvailableChatProviderCount(false, availability),
-    subPrice: formatCurrency(subscription.price, subscription.currency, locale),
+    ...getApiAccessPrices(locale),
     subCredits: subscription.credits,
-    packPrice: formatCurrency(pack.price, pack.currency, locale),
     packCredits: pack.credits,
   };
 }
@@ -286,6 +285,15 @@ export function TanstackPage({
           <ArticleP>
             {t("intro.p2", { appName, modelCount, providerCount })}
           </ArticleP>
+          <Callout icon={Key} tone="warning">
+            {t("intro.access", prices)}{" "}
+            <Link
+              href={`/${locale}/${API_UNLOCK_PATH}`}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t("intro.accessLink")}
+            </Link>
+          </Callout>
         </Div>
 
         <ArticleSection

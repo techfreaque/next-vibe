@@ -43,6 +43,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import revokeEndpoints from "./[id]/definition";
+import { API_UNLOCK_PATH, getApiAccessPrices } from "./access";
 import {
   API_KEY_PLACEHOLDER,
   buildCodingToolSnippets,
@@ -228,6 +229,7 @@ export function ApiKeysContainer(): JSX.Element {
     return <LoadingBlock message={t("widget.loading")} />;
   }
 
+  const prices = getApiAccessPrices(locale);
   const snippets = buildCodingToolSnippets({
     baseUrl: data.baseUrl,
     apiKey: newKey,
@@ -266,15 +268,18 @@ export function ApiKeysContainer(): JSX.Element {
       ) : undefined}
 
       {data.isPaid ? undefined : (
-        <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">
+        <Div
+          data-testid="api-keys-paid-notice"
+          className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4"
+        >
           <Span className="text-sm font-semibold">
-            {t("widget.upgradeTitle")}
+            {t("widget.upgradeTitle", { packPrice: prices.packPrice })}
           </Span>
           <P className="m-0 text-xs text-muted-foreground">
-            {t("widget.upgradeBody")}
+            {t("widget.upgradeBody", { subPrice: prices.subPrice })}
           </P>
           <Link
-            href={`/${locale}/subscription`}
+            href={`/${locale}/${API_UNLOCK_PATH}`}
             className="inline-flex h-10 items-center self-start rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             {t("widget.upgradeCta")}
@@ -282,56 +287,59 @@ export function ApiKeysContainer(): JSX.Element {
         </Div>
       )}
 
-      {data.isPaid ? (
-        <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
-          <Span className="text-sm font-semibold">{t("widget.nameLabel")}</Span>
-          <Div className="flex flex-col gap-2 sm:flex-row">
-            <Input
-              name="apiKeyName"
-              value={name}
-              onChange={(e): void => setName(e.target.value)}
-              onKeyDown={(e): void => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleCreate();
-                }
-              }}
-              placeholder={t("widget.namePlaceholder")}
-              aria-label={t("widget.nameLabel")}
-              disabled={creating}
-              className="h-10 flex-1"
-            />
-            <Button
-              type="button"
-              className="h-10 shrink-0"
-              disabled={creating || name.trim().length === 0}
-              onClick={handleCreate}
+      <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
+        <Span className="text-sm font-semibold">{t("widget.nameLabel")}</Span>
+        <Div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            name="apiKeyName"
+            value={name}
+            onChange={(e): void => setName(e.target.value)}
+            onKeyDown={(e): void => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleCreate();
+              }
+            }}
+            placeholder={t("widget.namePlaceholder")}
+            aria-label={t("widget.nameLabel")}
+            disabled={creating}
+            className="h-10 flex-1"
+          />
+          <Button
+            type="button"
+            className="h-10 shrink-0"
+            disabled={creating || name.trim().length === 0}
+            onClick={handleCreate}
+          >
+            {creating ? t("widget.creating") : t("widget.create")}
+          </Button>
+        </Div>
+        {data.isPaid ? undefined : (
+          <P className="m-0 text-xs text-muted-foreground">
+            {t("widget.createInactiveHint")}
+          </P>
+        )}
+        <Div className="mt-1 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/5 p-3">
+          <Checkbox
+            id="api-keys-uncensored-consent"
+            className="mt-0.5"
+            checked={consent.consented === true}
+            disabled={consent.consented === null || consent.isSaving}
+            onCheckedChange={handleUncensoredToggle}
+          />
+          <Div className="flex min-w-0 flex-col gap-1">
+            <Label
+              htmlFor="api-keys-uncensored-consent"
+              className="cursor-pointer text-sm font-semibold leading-snug"
             >
-              {creating ? t("widget.creating") : t("widget.create")}
-            </Button>
-          </Div>
-          <Div className="mt-1 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/5 p-3">
-            <Checkbox
-              id="api-keys-uncensored-consent"
-              className="mt-0.5"
-              checked={consent.consented === true}
-              disabled={consent.consented === null || consent.isSaving}
-              onCheckedChange={handleUncensoredToggle}
-            />
-            <Div className="flex min-w-0 flex-col gap-1">
-              <Label
-                htmlFor="api-keys-uncensored-consent"
-                className="cursor-pointer text-sm font-semibold leading-snug"
-              >
-                {t("widget.uncensoredLabel")}
-              </Label>
-              <Span className="text-xs leading-relaxed text-muted-foreground">
-                {t("widget.uncensoredHint")}
-              </Span>
-            </Div>
+              {t("widget.uncensoredLabel")}
+            </Label>
+            <Span className="text-xs leading-relaxed text-muted-foreground">
+              {t("widget.uncensoredHint")}
+            </Span>
           </Div>
         </Div>
-      ) : undefined}
+      </Div>
 
       {newKey ? (
         <Div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4">

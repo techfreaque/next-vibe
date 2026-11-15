@@ -35,16 +35,20 @@ export function buildApiBaseUrl(
   request: Request | undefined,
   locale: CountryLanguage,
 ): string {
+  return `${buildPublicOrigin(request)}/api/${locale}/v1`;
+}
+
+/** Public origin the caller reached us on (proxy-aware), app URL without one. */
+export function buildPublicOrigin(request: Request | undefined): string {
   const forwardedHost = request?.headers.get("x-forwarded-host");
   const forwardedProto = request?.headers.get("x-forwarded-proto") ?? "https";
-  const origin = forwardedHost
+  return forwardedHost
     ? `${forwardedProto}://${forwardedHost}`
     : request
       ? new URL(request.url).origin
       : // CLI / MCP / in-process calls have no request: use the public app URL
         // so printed snippets stay copy-pasteable.
         coreClientEnv.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "");
-  return `${origin}/api/${locale}/v1`;
 }
 
 export class ApiKeysRepository {
@@ -95,13 +99,8 @@ export class ApiKeysRepository {
     t: ApiKeysT,
   ): Promise<ResponseType<ApiKeysPostResponseOutput>> {
     try {
-      // /v1 is a paid feature: no plan and no purchase history, no key.
-      if (!(await isPaidUser(user.id))) {
-        return fail({
-          message: t("create.errors.paidRequired"),
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        });
-      }
+      // Free accounts may create keys so they are ready: /v1 itself answers 402
+      // (gate.ts) until the account has a plan or a credit purchase.
       const [active] = await db
         .select({ n: count() })
         .from(userApiKeys)

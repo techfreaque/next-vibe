@@ -28,6 +28,7 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import revokeEndpoints from "@/api-keys/[id]/definition";
+import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
@@ -128,6 +129,14 @@ async function completionsCall(
     runner,
   });
   return out.response;
+}
+
+/** The 402 paid_plan_required message names the fix: plan or pack, price, absolute buy URL. */
+function expectPaidGuidance(message: string): void {
+  const { packPrice } = getApiAccessPrices(defaultLocale);
+  expect(message).toContain("any plan or a one-time credit pack");
+  expect(message).toContain(`(${packPrice})`);
+  expect(message).toContain(`http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`);
 }
 
 function ApiKeyAuthAnonymous(): JWTPublicPayloadType {
@@ -248,7 +257,7 @@ describe("OpenAI-compatible API", () => {
       const { key } = await createKey(alice.user, "models");
       const request = v1Request("/models", key);
       const user = await authed(request);
-      const out = await V1ModelsRepository.list(user ?? ApiKeyAuthAnonymous(), request, t, logger);
+      const out = await V1ModelsRepository.list(user ?? ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(200);
       const body = (await out.response.json()) as {
         object: string;
@@ -265,7 +274,7 @@ describe("OpenAI-compatible API", () => {
 
     it("401 with OpenAI error body for a bad key", async () => {
       const request = v1Request("/models", "sk-unb-bad");
-      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(401);
       const body = (await out.response.json()) as { error: { code: string; type: string } };
       expect(body.error.code).toBe("invalid_api_key");
@@ -279,7 +288,7 @@ describe("OpenAI-compatible API", () => {
         Promise.reject(new Error("timeout exceeded when trying to connect"));
       const auth = await ApiKeyAuth.authenticateRequest(request, defaultLocale, logger, timedOut);
       expect(auth?.success && auth.data.isPublic).toBe(true);
-      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(503);
       expect(out.response.headers.get("Retry-After")).toBe("5");
       const body = (await out.response.json()) as { error: { code: string; type: string } };
@@ -297,7 +306,7 @@ describe("OpenAI-compatible API", () => {
         Promise.reject(new Error("canceling statement due to statement timeout")),
       );
       expect(resolution.status).toBe("unavailable");
-      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, t, logger);
+      const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(503);
     });
   });
@@ -379,27 +388,19 @@ describe("OpenAI-compatible API", () => {
   });
 
   describe("paid-plan gate", () => {
-    it("a free-tier account cannot create a key (402 PAYMENT_REQUIRED)", async () => {
+    it("a free-tier account can create a key ahead of its first purchase", async () => {
       resetPaidCache(free.user.id);
-      const res = await sendTestRequest({
-        endpoint: apiKeysEndpoints.POST,
-        data: { name: "free" },
-        user: free.user,
-        toolExecutionContext: undefined,
-      });
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.errorType.errorKey).toContain("payment_required");
-      }
       const list = await sendTestRequest({
         endpoint: apiKeysEndpoints.GET,
         user: free.user,
         toolExecutionContext: undefined,
       });
       expect(list.success && list.data.isPaid).toBe(false);
+      const { key } = await createKey(free.user, "ready");
+      expect(key.startsWith("sk-unb-")).toBe(true);
     });
 
-    it("a free-tier key (made before lapsing) gets 402 paid_plan_required on /v1", async () => {
+    it("a free-tier key gets 402 paid_plan_required with what to buy and where", async () => {
       const generated = generateApiKey();
       await db.insert(userApiKeys).values({
         userId: free.user.id,
@@ -413,9 +414,13 @@ describe("OpenAI-compatible API", () => {
       const body = (await res.json()) as { error: { code: string; type: string; message: string } };
       expect(body.error.code).toBe("paid_plan_required");
       expect(body.error.type).toBe("insufficient_quota");
+      expectPaidGuidance(body.error.message);
       const request = v1Request("/models", generated.plaintext);
-      const models = await V1ModelsRepository.list((await authed(request)) ?? ApiKeyAuthAnonymous(), request, t, logger);
+      const models = await V1ModelsRepository.list((await authed(request)) ?? ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(models.response.status).toBe(402);
+      const modelsBody = (await models.response.json()) as { error: { code: string; message: string } };
+      expect(modelsBody.error.code).toBe("paid_plan_required");
+      expectPaidGuidance(modelsBody.error.message);
     });
 
     it("a user with purchased credits is paid", async () => {

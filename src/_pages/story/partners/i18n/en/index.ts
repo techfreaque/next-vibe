@@ -124,7 +124,7 @@ export const translations = {
     },
     free: {
       title: "Free to start",
-      body: "New users try it without a card. Easy yes for your audience, easy conversion for you.",
+      body: "New users try the chat without a card. Easy yes for your audience, easy conversion for you. Developers: the API needs any plan or a one-time {{packPrice}} credit pack.",
     },
   },
   faq: {

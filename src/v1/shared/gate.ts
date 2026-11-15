@@ -6,12 +6,14 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { buildApiUnlockUrl, getApiAccessPrices } from "@/api-keys/access";
 import {
   API_KEY_LOOKUP_RETRY_AFTER_SECONDS,
   ApiKeyAuth,
@@ -20,6 +22,7 @@ import {
 import type { UserApiKey } from "@/api-keys/db";
 import { consumeRateLimit } from "@/api-keys/keys";
 import { isPaidUser } from "@/api-keys/paid";
+import { buildPublicOrigin } from "@/api-keys/repository";
 
 import type { V1T } from "../i18n";
 import { type V1Error, v1Error } from "./errors";
@@ -39,6 +42,7 @@ export interface GateOptions {
 export async function gateApiKeyRequest(
   user: JwtPayloadType,
   request: Request | undefined,
+  locale: CountryLanguage,
   t: V1T,
   logger: EndpointLogger,
   options: GateOptions = {},
@@ -88,14 +92,18 @@ export async function gateApiKeyRequest(
       ),
     };
   }
-  // /v1 is a paid feature. A key created before the account lapsed to free-tier
-  // stops working too: 402 with a pointer to upgrade.
+  // /v1 is a paid feature. Free accounts may hold keys (made ahead of their
+  // first purchase), but every call answers 402 with the exact fix: what to
+  // buy, what it costs, and the absolute URL to buy it at.
   if (!(await isPaidUser(user.id))) {
     return {
       ok: false,
       error: v1Error(
         402,
-        t("openai.paidRequired"),
+        t("openai.paidRequired", {
+          packPrice: getApiAccessPrices(locale).packPrice,
+          url: buildApiUnlockUrl(buildPublicOrigin(request), locale),
+        }),
         "insufficient_quota",
         "paid_plan_required",
       ),

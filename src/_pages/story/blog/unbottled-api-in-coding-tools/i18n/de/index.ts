@@ -21,6 +21,9 @@ export const translations: typeof enTranslations = {
   intro: {
     lead: "Dein Coding-Agent hängt an den Modellen eines einzigen Anbieters. Zweitmeinung von einem anderen Lab, ein günstiges Modell für Fleißarbeit oder eines, das nicht ablehnt? Heißt: noch ein Konto, noch ein Key, noch eine Rechnung.",
     p2: "{{appName}} spricht alle drei Formate, die Coding-Agents nutzen: OpenAI Chat Completions, die OpenAI Responses API und die Anthropic Messages API. Kein Zwischenstück, nichts zu installieren. Einmal eingerichtet, wechselst du zwischen Claude, GPT, DeepSeek, GLM, Kimi, Qwen und den unzensierten Modellen über eine einzige Modell-ID.",
+    access:
+      "Bevor du loslegst: Die API braucht ein bezahltes Konto. Jeder Tarif ({{subPrice}} im Monat) oder ein einmaliges Credit-Paket ({{packPrice}}) schaltet sie frei. Gratis- und Bonus-Credits nicht.",
+    accessLink: "API freischalten",
   },
   why: {
     title: "Warum sich das lohnt",
@@ -36,7 +39,7 @@ export const translations: typeof enTranslations = {
   setup: {
     title: "Key und Basis-URL holen",
     intro: "Zwei Werte. Jedes Tool unten braucht genau diese.",
-    p1: "Erstelle unter Einstellungen > API-Keys einen Key. Er beginnt mit sk-unb- und wird genau einmal angezeigt. Die API gehört zu jedem bezahlten Tarif: ein aktives Abo oder ein beliebiges Credit-Paket schaltet sie frei.",
+    p1: "Erstelle unter Einstellungen > API-Keys einen Key. Er beginnt mit sk-unb- und wird genau einmal angezeigt.",
     shortcut:
       "Der schnellste Weg: Direkt nach dem Erstellen zeigt die Seite API-Keys jeden Block unten, mit deinem Key schon eingesetzt. Tool wählen, kopieren, starten.",
     baseUrlLabel: "Basis-URL",
@@ -121,7 +124,7 @@ export const translations: typeof enTranslations = {
       "Claude Code bekommt die Basis-URL ohne /v1. Mit /v1 ruft es /v1/v1/messages auf und landet bei 404.",
     modelId:
       "Nutze exakt die ID aus GET /v1/models, etwa {{model}}. Aider will openai/ davor. Die eingebauten Claude-IDs von Claude Code landen automatisch beim neuesten Claude derselben Familie. Jede andere unbekannte ID liefert 404 model_not_found.",
-    paid: "HTTP 402 mit paid_plan_required heißt: das Konto hat noch keinen bezahlten Tarif. Jedes Credit-Paket behebt das.",
+    paid: "HTTP 402 mit paid_plan_required heißt: das Konto hat noch keinen Tarif und keinen Credit-Kauf. Jeder Tarif oder ein Credit-Paket behebt das.",
     tools:
       "Ein Modell ohne Tool-Support antwortet mit 400 tools_not_supported, sobald der Agent Tools mitschickt. Prüf supports_tools in GET /v1/models.",
     rateLimit:
