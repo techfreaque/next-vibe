@@ -10,6 +10,7 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
+import { roundMediaCost } from "../../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -53,8 +54,10 @@ export async function generateImageWithUnbottled(params: {
   }
 
   const remoteCreditCost = remoteResult.data.creditCost ?? 0;
-  const creditCost =
-    Math.round(remoteCreditCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10) / 10;
+  // Rounded UP to 0.1 credit (never under-bills).
+  const creditCost = roundMediaCost(
+    remoteCreditCost * (1 + STANDARD_MARKUP_PERCENTAGE),
+  );
 
   const balanceCheck = await checkMediaBalance(
     user,

@@ -23,6 +23,7 @@ import { until } from "../ai-stream/testing/e2e-chat";
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { submitAndAwaitResponse } from "../ai-stream/testing/e2e-slow-submit";
 import { cacheDir } from "../ai-stream/testing/fetch-cache";
+import { roundMediaCost } from "../models/models";
 import { scopedTranslation as consentScopedTranslation } from "../models/uncensored-consent/i18n";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
@@ -236,13 +237,11 @@ describe("E2E: image generation", () => {
     });
     const chroma = getImageGenModelById(ImageGenModelId.CHROMA);
     expect(chroma).toBeDefined();
-    // Provider price + standard markup, rounded to 0.1 credit (as billed)
-    const billed =
-      Math.round(
-        (chroma?.creditCostPerImage ?? Number.NaN) *
-          (1 + STANDARD_MARKUP_PERCENTAGE) *
-          10,
-      ) / 10;
+    // Provider price + standard markup, rounded UP to 0.1 credit (as billed)
+    const billed = roundMediaCost(
+      (chroma?.creditCostPerImage ?? Number.NaN) *
+        (1 + STANDARD_MARKUP_PERCENTAGE),
+    );
     expect(before - (await balanceOf(buyer.user))).toBeCloseTo(billed, 5);
   }, 150_000);
 

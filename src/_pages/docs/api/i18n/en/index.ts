@@ -147,15 +147,15 @@ export const translations = {
   billing: {
     title: "Credits and billing",
     intro:
-      "The API draws from the same credits as the chat app, at the same prices. One balance, one bill.",
+      "The API draws from the same credits as the chat app, billed by the same rules. One balance, one bill.",
     points: {
       price:
-        "Cost = input tokens plus output tokens at the model's credit price. Prices per million tokens are listed in GET /v1/models.",
+        "Cost = input tokens plus output tokens at the model's credit price, listed per million tokens in GET /v1/models. OpenRouter models are the exception: you pay what the provider really charged for the call, plus our markup. Their listed price is an estimate. Chat bills them the same way.",
       usage:
         "Every response reports usage.credits_charged. Your balance is in the app under Credits.",
       preflight:
         "Before a call runs we check your balance against a worst-case estimate. Not enough: HTTP 402 insufficient_credits, nothing runs, nothing is charged.",
-      real: "After the call you pay the real token usage the provider reports, not the estimate.",
+      real: "After the call you pay real usage, not the estimate: the token count the provider reports, or the provider's real cost for OpenRouter models. If a provider reports no cost, the call falls back to the listed price.",
       topup:
         "Out of credits? Buy a pack or renew your plan. The next call works immediately.",
     },

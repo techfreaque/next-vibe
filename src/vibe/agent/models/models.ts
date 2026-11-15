@@ -41,6 +41,7 @@ import type {
   VideoGenModelOption,
 } from "../video-generation/models";
 import { type Modality, ModelUtility, type ModelUtilityValue } from "./enum";
+import { roundUpPrice } from "./model-prices/providers/base";
 
 // ============================================
 // CORE TYPES AND INTERFACES
@@ -772,8 +773,19 @@ export function isModelProviderAvailable(
   return isApiProviderAvailable(model.apiProvider, availability);
 }
 
-function roundMediaCost(v: number): number {
-  const r = Math.round(v * 10) / 10;
+/**
+ * Media / fixed-price charges in credits, rounded UP to 0.1 credit: rounding to
+ * nearest under-billed every charge that landed below a .05 boundary. Same
+ * float tolerance as roundUpPrice (an exact 0.3 computed as 0.30000000000000004
+ * stays 0.3). Zero or invalid stays 0; whole numbers come back as integers.
+ */
+export function roundMediaCost(v: number): number {
+  if (!(v > 0)) {
+    return 0;
+  }
+  const up = roundUpPrice(v, 1);
+  // Snap float noise (0.30000000000000004) back onto the 0.1 grid.
+  const r = Math.round(up * 10) / 10;
   return r % 1 === 0 ? Math.round(r) : r;
 }
 

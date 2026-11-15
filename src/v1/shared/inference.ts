@@ -94,6 +94,8 @@ export interface InferenceResult {
   finishReason: OpenAiFinishReason;
   /** undefined when the provider reported no usage (billing falls back to an estimate). */
   usage: InferenceUsage | undefined;
+  /** Provider metadata of the call; carries OpenRouter's real usage.cost. */
+  providerMetadata?: ProviderMetadata | undefined;
 }
 
 export type InferenceStreamEvent =
@@ -110,6 +112,8 @@ export type InferenceStreamEvent =
       type: "finish";
       finishReason: OpenAiFinishReason;
       usage: InferenceUsage | undefined;
+      /** Provider metadata of the finished step (OpenRouter usage.cost). */
+      providerMetadata?: ProviderMetadata | undefined;
     };
 
 export interface InferenceRunner {
@@ -275,6 +279,7 @@ export const aiSdkRunner: InferenceRunner = {
       parts,
       finishReason: mapFinishReason(result.finishReason),
       usage: mapUsage(result.usage),
+      providerMetadata: result.providerMetadata,
     };
   },
 
@@ -284,6 +289,9 @@ export const aiSdkRunner: InferenceRunner = {
     const streamedCalls = new Set<string>();
     let replay: ReasoningReplay | undefined;
     let inReasoning = false;
+    // Client tools have no execute, so a call is one step: its finish-step
+    // metadata holds the real upstream cost billed for the call.
+    let stepMetadata: ProviderMetadata | undefined;
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         yield { type: "text", text: part.text };
@@ -339,11 +347,14 @@ export const aiSdkRunner: InferenceRunner = {
               : String(part.error),
         };
         return;
+      } else if (part.type === "finish-step") {
+        stepMetadata = part.providerMetadata ?? stepMetadata;
       } else if (part.type === "finish") {
         yield {
           type: "finish",
           finishReason: mapFinishReason(part.finishReason),
           usage: mapUsage(part.totalUsage),
+          providerMetadata: stepMetadata,
         };
       }
     }

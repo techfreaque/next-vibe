@@ -151,15 +151,15 @@ export const translations: typeof enTranslations = {
   billing: {
     title: "Kredyty i rozliczenia",
     intro:
-      "API czerpie z tych samych kredytów co czat, po tych samych cenach. Jedno saldo, jeden rachunek.",
+      "API czerpie z tych samych kredytów co czat i rozlicza się według tych samych zasad. Jedno saldo, jeden rachunek.",
     points: {
       price:
-        "Koszt = tokeny wejściowe plus wyjściowe po cenie modelu w kredytach. Ceny za milion tokenów podaje GET /v1/models.",
+        "Koszt = tokeny wejściowe plus wyjściowe po cenie modelu w kredytach, podanej za milion tokenów w GET /v1/models. Wyjątek to modele OpenRouter: płacisz tyle, ile dostawca naprawdę policzył za wywołanie, plus naszą marżę. Ich cena na liście to szacunek. Czat rozlicza je tak samo.",
       usage:
         "Każda odpowiedź zawiera usage.credits_charged. Saldo znajdziesz w aplikacji w zakładce Kredyty.",
       preflight:
         "Przed wywołaniem porównujemy saldo z oszacowaniem na najgorszy przypadek. Za mało: HTTP 402 insufficient_credits, nic się nie wykonuje, nic nie jest pobierane.",
-      real: "Po wywołaniu płacisz za rzeczywiste zużycie tokenów zgłoszone przez dostawcę, nie za oszacowanie.",
+      real: "Po wywołaniu płacisz za rzeczywiste zużycie, nie za oszacowanie: liczbę tokenów zgłoszoną przez dostawcę, a przy modelach OpenRouter jego prawdziwy koszt. Gdy dostawca nie poda kosztu, obowiązuje cena z listy.",
       topup:
         "Skończyły się kredyty? Kup pakiet albo odnów plan. Następne wywołanie działa od razu.",
     },

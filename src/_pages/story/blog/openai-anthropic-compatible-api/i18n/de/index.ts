@@ -125,14 +125,14 @@ export const translations: typeof enTranslations = {
     title: "Was es kostet",
     intro: "Credits, abgerechnet pro Token. Keine Lizenzgebühr pro Nutzer.",
     price:
-      "Jeder Aufruf wird zum gelisteten Token-Preis des Modells plus unserem Aufschlag abgerechnet. Gecachte Input-Tokens laufen zum Cache-Preis des Modells.",
+      "Die meisten Modelle rechnen zum gelisteten Token-Preis plus unserem Aufschlag ab. Gecachte Input-Tokens laufen zum Cache-Preis des Modells. Modelle über OpenRouter rechnen die echten Kosten ab, die OpenRouter für den Aufruf berechnet hat, plus denselben Aufschlag.",
     reported:
       "Jede Antwort meldet usage.credits_charged. Was ein Aufruf gekostet hat, musst du nie raten.",
     preflight:
       "Bevor ein Aufruf startet, wird dein Guthaben gegen eine Worst-Case-Schätzung geprüft. Reicht es nicht, kommt HTTP 402 insufficient_credits: Nichts läuft, nichts wird berechnet.",
     abort:
       "Beim Streaming gilt: Verbindung schließen stoppt die Generierung. Du zahlst nur, was gelaufen ist. Dasselbe gilt, wenn der Provider mitten im Stream ausfällt.",
-    chat: "Ein Unterschied zur Chat-App. Dort rechnen Modelle, die über OpenRouter laufen, die echten Providerkosten ab, die OpenRouter pro Schritt meldet, plus denselben Aufschlag. Über die API nutzt jeder Aufruf den gelisteten Token-Preis plus Aufschlag. Der Preis auf der Modellseite ist der Preis, den du zahlst.",
+    chat: "Chat und API rechnen identisch ab. OpenRouter verteilt ein Modell auf mehrere Hoster, und manche sind teurer als der günstigste, den wir listen. Bei diesen Modellen ist der gelistete Preis deshalb eine Schätzung, usage.credits_charged der echte Betrag. Meldet OpenRouter für einen Aufruf keine Kosten, gilt der gelistete Preis.",
     paid: "Dasselbe Credit-Guthaben wie in der Chat-App, das dort auch Bild, Video, Musik, Sprache und Websuche abdeckt. Die API selbst braucht ein bezahltes Konto: ein aktives Abo oder mindestens ein gekauftes Credit-Paket. Gratis-Credits schalten sie nicht frei.",
     sub: "Abo: {{subCredits}} Credits im Monat für {{subPrice}}.",
     pack: "Credit-Paket: {{packCredits}} Credits für {{packPrice}}. Pakete verfallen nie. Bezahlung per Karte oder Krypto.",
@@ -203,6 +203,10 @@ export const translations: typeof enTranslations = {
     free: {
       q: "Gibt es einen kostenlosen API-Tarif?",
       a: "Nein. Die Chat-App hat Gratis-Credits, die API nicht. Sie braucht ein Abo ({{subCredits}} Credits im Monat für {{subPrice}}) oder ein Credit-Paket ({{packCredits}} Credits für {{packPrice}}). Ein einmal gekauftes Paket hält die API aktiv, bis das Guthaben aufgebraucht ist.",
+    },
+    pricing: {
+      q: "Zahle ich den gelisteten Preis?",
+      a: "Bei den meisten Modellen ja: gelisteter Token-Preis plus unser Aufschlag. Modelle über OpenRouter rechnen die echten Kosten ab, die OpenRouter für den Aufruf berechnet hat, plus denselben Aufschlag, in der Chat-App wie über die API. Ihr gelisteter Preis ist eine Schätzung. Den exakten Betrag meldet jede Antwort in usage.credits_charged.",
     },
     models: {
       q: "Welche Modelle kann ich aufrufen?",

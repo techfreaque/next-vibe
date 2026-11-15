@@ -5,6 +5,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   ApiProvider,
   calculateCreditCost,
+  roundMediaCost,
   upstreamCostToCredits,
 } from "../../../models/models";
 import {
@@ -217,6 +218,29 @@ describe("upstreamCostToCredits", () => {
     expect(upstreamCostToCredits(0)).toBe(0);
     expect(upstreamCostToCredits(-1)).toBe(0);
     expect(upstreamCostToCredits(Number.NaN)).toBe(0);
+  });
+});
+
+describe("roundMediaCost (media + fixed-price charges)", () => {
+  it("rounds UP to 0.1 credit, never to nearest", () => {
+    // nearest rounding billed 1.0 for 1.04 (video 8s x 0.1 x 1.3)
+    expect(roundMediaCost(1.04)).toBe(1.1);
+    expect(roundMediaCost(0.01)).toBe(0.1);
+    expect(roundMediaCost(2.0001)).toBe(2.1);
+  });
+
+  it("keeps exact tenths and whole numbers despite float noise", () => {
+    expect(roundMediaCost(0.1 + 0.2)).toBe(0.3);
+    expect(roundMediaCost(1.3 * 3)).toBe(3.9);
+    expect(roundMediaCost(5 * 1.3)).toBe(6.5);
+    expect(roundMediaCost(10 * 1.3)).toBe(13);
+  });
+
+  it("charges nothing for zero or invalid amounts", () => {
+    expect(roundMediaCost(0)).toBe(0);
+    expect(Object.is(roundMediaCost(0), -0)).toBe(false);
+    expect(roundMediaCost(-1)).toBe(0);
+    expect(roundMediaCost(Number.NaN)).toBe(0);
   });
 });
 

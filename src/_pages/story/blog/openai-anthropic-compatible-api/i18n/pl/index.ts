@@ -125,14 +125,14 @@ export const translations: typeof enTranslations = {
     title: "Ile to kosztuje",
     intro: "Kredyty, rozliczane za token. Bez opłat za stanowisko.",
     price:
-      "Każde wywołanie kosztuje tyle, ile podana cena za token modelu plus nasza marża. Tokeny wejściowe z cache liczymy po cenie cache modelu.",
+      "Większość modeli rozliczamy po podanej cenie za token plus nasza marża. Tokeny wejściowe z cache liczymy po cenie cache modelu. Modele obsługiwane przez OpenRouter rozliczają rzeczywisty koszt, który OpenRouter policzył za wywołanie, plus tę samą marżę.",
     reported:
       "Każda odpowiedź podaje usage.credits_charged. Nigdy nie musisz zgadywać, ile kosztowało wywołanie.",
     preflight:
       "Zanim wywołanie ruszy, sprawdzamy saldo względem najgorszego scenariusza. Za mało oznacza HTTP 402 insufficient_credits: nic nie rusza, nic nie jest pobierane.",
     abort:
       "Przy streamingu zamknięcie połączenia zatrzymuje generowanie. Płacisz tylko za to, co się wykonało. Tak samo, gdy dostawca padnie w trakcie streamu.",
-    chat: "Jedna różnica względem aplikacji czatu. Tam modele obsługiwane przez OpenRouter rozliczają rzeczywisty koszt dostawcy, który OpenRouter podaje dla każdego kroku, plus tę samą marżę. W API każde wywołanie liczy podaną cenę za token plus marżę. Cena na stronie modelu to cena, którą płacisz.",
+    chat: "Czat i API rozliczają się tak samo. OpenRouter rozkłada model na kilku dostawców, a niektórzy biorą więcej niż najtańszy, którego podajemy. Dlatego przy tych modelach cena na liście to szacunek, a usage.credits_charged to prawdziwa kwota. Gdy OpenRouter nie poda kosztu wywołania, liczymy cenę z listy.",
     paid: "To samo saldo kredytów co w aplikacji czatu, które pokrywa tam też obrazy, wideo, muzykę, głos i wyszukiwanie w sieci. Samo API wymaga płatnego konta: aktywnej subskrypcji albo co najmniej jednego kupionego pakietu kredytów. Darmowe kredyty go nie odblokowują.",
     sub: "Subskrypcja: {{subCredits}} kredytów miesięcznie za {{subPrice}}.",
     pack: "Pakiet kredytów: {{packCredits}} kredytów za {{packPrice}}. Pakiety nigdy nie wygasają. Płacisz kartą albo kryptowalutą.",
@@ -204,6 +204,10 @@ export const translations: typeof enTranslations = {
     free: {
       q: "Czy API ma darmowy plan?",
       a: "Nie. Aplikacja czatu ma darmowe kredyty, API nie. Potrzebuje subskrypcji ({{subCredits}} kredytów miesięcznie za {{subPrice}}) albo jednego pakietu kredytów ({{packCredits}} kredytów za {{packPrice}}). Raz kupiony pakiet utrzymuje API aktywne, dopóki starczy salda.",
+    },
+    pricing: {
+      q: "Czy płacę cenę z listy?",
+      a: "Przy większości modeli tak: cena za token z listy plus nasza marża. Modele obsługiwane przez OpenRouter rozliczają rzeczywisty koszt, który OpenRouter policzył za wywołanie, plus tę samą marżę, w czacie i w API tak samo. Ich cena na liście to szacunek. Dokładną kwotę podaje każda odpowiedź w usage.credits_charged.",
     },
     models: {
       q: "Jakie modele mogę wywołać?",

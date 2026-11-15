@@ -31,7 +31,7 @@ import {
   parseStorageUrl,
   resolveStorageUrl,
 } from "../chat/storage/url-utils";
-import { ApiProvider } from "../models/models";
+import { ApiProvider, roundMediaCost } from "../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -246,10 +246,10 @@ export class VideoGenerationRepository {
         ? videoModel.pricingByResolution?.[data.resolution]
         : undefined) ?? videoModel.creditCostPerSecond;
 
-    const rawCost =
-      perSecondCost * durationSeconds * (1 + STANDARD_MARKUP_PERCENTAGE);
-    const rounded = Math.round(rawCost * 10) / 10;
-    const creditCost = rounded % 1 === 0 ? Math.round(rounded) : rounded;
+    // Rounded UP to 0.1 credit (never under-bills).
+    const creditCost = roundMediaCost(
+      perSecondCost * durationSeconds * (1 + STANDARD_MARKUP_PERCENTAGE),
+    );
 
     logger.debug("[VideoGen] Starting video generation", {
       model: data.model,
@@ -376,7 +376,7 @@ export class VideoGenerationRepository {
     const reportedCost = generationResult.data.creditCost;
     const finalCreditCost =
       reportedCost !== undefined && reportedCost > 0
-        ? Math.round(reportedCost * (1 + STANDARD_MARKUP_PERCENTAGE) * 10) / 10
+        ? roundMediaCost(reportedCost * (1 + STANDARD_MARKUP_PERCENTAGE))
         : creditCost;
 
     // Upload to our storage so the URL is persistent and access-controlled.

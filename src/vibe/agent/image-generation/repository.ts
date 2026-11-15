@@ -39,6 +39,7 @@ import {
   isModelProviderAvailable,
   type ModelOptionImageBased,
   type ModelOptionTokenBased,
+  roundMediaCost,
 } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
@@ -101,9 +102,8 @@ function calculateImageCreditCost(
     finalCost = model.pricingByQuality[quality] ?? baseCost;
   }
 
-  const withMarkup = finalCost * (1 + STANDARD_MARKUP_PERCENTAGE);
-  const rounded = Math.round(withMarkup * 10) / 10;
-  return rounded % 1 === 0 ? Math.round(rounded) : rounded;
+  // Rounded UP to 0.1 credit (never under-bills).
+  return roundMediaCost(finalCost * (1 + STANDARD_MARKUP_PERCENTAGE));
 }
 
 /** Plain-language size hint for token-based (headless) image models. */

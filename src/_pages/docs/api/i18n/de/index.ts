@@ -151,15 +151,15 @@ export const translations: typeof enTranslations = {
   billing: {
     title: "Credits und Abrechnung",
     intro:
-      "Die API zieht von denselben Credits wie die Chat-App, zu denselben Preisen. Ein Guthaben, eine Rechnung.",
+      "Die API zieht von denselben Credits wie die Chat-App, abgerechnet nach denselben Regeln. Ein Guthaben, eine Rechnung.",
     points: {
       price:
-        "Kosten = Eingabe- plus Ausgabe-Token zum Credit-Preis des Modells. Die Preise pro Million Token stehen in GET /v1/models.",
+        "Kosten = Eingabe- plus Ausgabe-Token zum Credit-Preis des Modells, pro Million Token gelistet in GET /v1/models. Ausnahme sind OpenRouter-Modelle: Du zahlst, was der Anbieter für den Aufruf tatsächlich berechnet hat, plus unseren Aufschlag. Ihr gelisteter Preis ist eine Schätzung. Im Chat gilt dieselbe Abrechnung.",
       usage:
         "Jede Antwort nennt usage.credits_charged. Dein Guthaben findest du in der App unter Credits.",
       preflight:
         "Vor jedem Aufruf prüfen wir dein Guthaben gegen eine Worst-Case-Schätzung. Reicht es nicht: HTTP 402 insufficient_credits, nichts läuft, nichts wird berechnet.",
-      real: "Nach dem Aufruf zahlst du die echte Token-Nutzung, die der Anbieter meldet, nicht die Schätzung.",
+      real: "Nach dem Aufruf zahlst du die echte Nutzung, nicht die Schätzung: die gemeldete Token-Zahl, bei OpenRouter-Modellen die echten Anbieterkosten. Meldet ein Anbieter keine Kosten, gilt der gelistete Preis.",
       topup:
         "Credits leer? Kaufe ein Paket oder verlängere deinen Tarif. Der nächste Aufruf läuft sofort.",
     },

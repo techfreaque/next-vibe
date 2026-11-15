@@ -10,8 +10,9 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ProviderMetadata } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import { TokenAccumulator } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { calculateCreditCost } from "next-vibe/agent/models/models";
 import { UncensoredConsentRepository } from "next-vibe/agent/models/uncensored-consent/repository";
@@ -123,10 +124,15 @@ export interface V1Call {
   estimatedInputTokens: number;
   logger: EndpointLogger;
   logTag: string;
-  /** charges real usage (estimate when the provider reported none) */
+  /**
+   * Charges real usage (estimate when the provider reported none). OpenRouter
+   * models bill the call's real upstream cost from providerMetadata, exactly
+   * like chat turns.
+   */
   bill: (
     usage: InferenceUsage | undefined,
     outputChars: number,
+    providerMetadata: ProviderMetadata | undefined,
   ) => Promise<V1Totals>;
 }
 
@@ -238,11 +244,12 @@ export async function prepareV1Call(
       estimatedInputTokens,
       logger,
       logTag: input.logTag,
-      bill: (usage, outputChars) =>
+      bill: (usage, outputChars, providerMetadata) =>
         bill({
           user: payer,
           model,
           usage,
+          providerMetadata,
           estimatedInputTokens,
           outputChars,
           locale,
@@ -317,6 +324,7 @@ async function bill(params: {
   user: JwtPrivatePayloadType;
   model: ChatModelOption;
   usage: InferenceUsage | undefined;
+  providerMetadata: ProviderMetadata | undefined;
   estimatedInputTokens: number;
   outputChars: number;
   locale: CountryLanguage;
@@ -328,12 +336,22 @@ async function bill(params: {
   const outputTokens =
     usage?.outputTokens ?? Math.ceil(params.outputChars / CHARS_PER_TOKEN);
   const cachedInputTokens = usage?.cachedInputTokens ?? 0;
-  const cost = calculateCreditCost(
+  // Same rule as chat turns: OpenRouter per-token models bill the call's
+  // real upstream cost x markup; a call without a reported cost (stream cut,
+  // provider omitted it) falls back to the listed token price with a warning.
+  const { credits: cost, upstreamCost } = TokenAccumulator.chargeSingleCall(
     model,
-    inputTokens,
-    outputTokens,
-    cachedInputTokens,
+    { inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens: 0 },
+    params.providerMetadata,
+    logger,
   );
+  logger.info(`[${params.logTag}] Call charge`, {
+    model: model.id,
+    creditCost: cost,
+    upstreamCostUsd: upstreamCost?.upstreamCostUsd ?? null,
+    upstreamProvider: upstreamCost?.upstreamProvider ?? null,
+    billingBasis: upstreamCost?.billingBasis ?? "token_price",
+  });
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const deducted = await CreditRepository.deductCreditsForModelUsage(
     user,
@@ -342,6 +360,7 @@ async function bill(params: {
     logger,
     creditsT,
     locale,
+    upstreamCost,
   );
   if (!deducted.success) {
     logger.error(
@@ -384,7 +403,11 @@ export async function runV1Generate(
 > {
   try {
     const result = await runner.generate(call.inference);
-    const totals = await call.bill(result.usage, resultChars(result));
+    const totals = await call.bill(
+      result.usage,
+      resultChars(result),
+      result.providerMetadata,
+    );
     return { ok: true, result, totals };
   } catch (error) {
     const message = parseError(error).message;
@@ -462,6 +485,7 @@ export function runV1Stream(
 
       let outputChars = 0;
       let usage: InferenceUsage | undefined;
+      let providerMetadata: ProviderMetadata | undefined;
       let finishReason: OpenAiFinishReason = "stop";
       let failed: string | undefined;
       send(encoder.start());
@@ -469,6 +493,7 @@ export function runV1Stream(
         for await (const event of runner.stream(run)) {
           if (event.type === "finish") {
             usage = event.usage;
+            providerMetadata = event.providerMetadata;
             finishReason = event.finishReason;
             continue;
           }
@@ -490,7 +515,7 @@ export function runV1Stream(
       }
       clearInterval(heartbeat);
       // Bill what ran - even on provider error or client abort.
-      const totals = await call.bill(usage, outputChars);
+      const totals = await call.bill(usage, outputChars, providerMetadata);
       if (failed !== undefined) {
         call.logger.error(`[${call.logTag}] Stream failed`, {
           model: call.model.id,
