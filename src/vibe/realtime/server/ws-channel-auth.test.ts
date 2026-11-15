@@ -69,7 +69,9 @@ describe("describeSubscribeIdentity", () => {
     });
   });
 
-  it("adds nothing for endpoint channels", () => {
-    expect(describeSubscribeIdentity(guest, "ws-credits-GET")).toEqual({});
+  it("names only the socket identity for endpoint channels", () => {
+    expect(describeSubscribeIdentity(guest, "ws-credits-GET")).toEqual({
+      socketUid: LEAD,
+    });
   });
 });

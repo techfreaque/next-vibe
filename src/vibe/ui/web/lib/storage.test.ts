@@ -4,7 +4,10 @@ import type { EndpointLogger, LoggerMetadata } from "../../../logger/types";
 import {
   createLargeStorage,
   type LargeStoreBackend,
+  getLocalItem,
   type LargeStoreResult,
+  removeLocalItem,
+  resetWebStorageFallbackForTests,
   setLocalItem,
 } from "./storage";
 
@@ -89,7 +92,7 @@ function createMemoryBackend(failPut = false): {
   };
 }
 
-function installLocalStorage(fake: FakeLocalStorage | undefined): void {
+function installLocalStorage(fake: FakeLocalStorage | undefined | null): void {
   Object.defineProperty(globalThis, "localStorage", {
     value: fake,
     configurable: true,
@@ -222,5 +225,48 @@ describe("setLocalItem quota failure", () => {
       largestKey: "hog",
       largestChars: 93,
     });
+  });
+});
+
+describe("localStorage disabled by the browser (null, Android WebView)", () => {
+  afterEach(() => {
+    installLocalStorage(undefined);
+    resetWebStorageFallbackForTests();
+  });
+
+  it("reports once per page and keeps values in memory for the page view", () => {
+    installLocalStorage(null);
+    const calls: LoggedCall[] = [];
+    const logger = createCapturingLogger(calls);
+
+    expect(getLocalItem("theme_v2", logger)).toBeNull();
+    setLocalItem("locale", "en-GLOBAL", logger);
+    setLocalItem("chat-draft:incognito:new", "hello", logger);
+    expect(getLocalItem("locale", logger)).toBe("en-GLOBAL");
+    removeLocalItem("locale", logger);
+    expect(getLocalItem("locale", logger)).toBeNull();
+    expect(getLocalItem("chat-draft:incognito:new", logger)).toBe("hello");
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.level).toBe("error");
+    expect(calls[0]?.message).toBe(
+      "[storage] localStorage disabled by the browser, using in-memory storage for this page",
+    );
+    expect(calls[0]?.context).toMatchObject({
+      key: "theme_v2",
+      operation: "open",
+      disabled: true,
+    });
+  });
+
+  it("still uses real storage when it works", () => {
+    const local = new FakeLocalStorage();
+    installLocalStorage(local);
+    const calls: LoggedCall[] = [];
+
+    setLocalItem("k", "v", createCapturingLogger(calls));
+
+    expect(local.items.get("k")).toBe("v");
+    expect(calls).toHaveLength(0);
   });
 });

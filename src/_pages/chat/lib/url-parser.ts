@@ -26,6 +26,15 @@ export function isUUID(str: string): boolean {
 }
 
 /**
+ * Folder ids are UUIDs. Anything else in a folder slot (`/threads/shared/1`,
+ * typos, crawler junk) is dropped instead of reaching a uuid column, where
+ * Postgres fails the whole page query ("invalid input syntax for type uuid").
+ */
+function folderSegment(segment: string | undefined): string | null {
+  return segment && isUUID(segment) ? segment : null;
+}
+
+/**
  * Parse chat URL path
  * URL structure: /threads/[rootId] OR /threads/[rootId]/[subFolderId] OR /threads/[rootId]/[subFolderId]/[threadId]
  */
@@ -61,7 +70,7 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   // Check if last segment is "new" (new thread)
   if (lastSegment === NEW_MESSAGE_ID) {
     // URL is /rootId/new or /rootId/subfolderId/new
-    const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
+    const subFolderId = urlPath.length >= 3 ? folderSegment(urlPath[1]) : null;
     return {
       initialRootFolderId: rootId,
       initialSubFolderId: subFolderId,
@@ -74,7 +83,7 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
     // Last segment is a thread (UUID format)
     // URL is /rootId/threadId or /rootId/subfolderId/threadId
     const threadId = lastSegment;
-    const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
+    const subFolderId = urlPath.length >= 3 ? folderSegment(urlPath[1]) : null;
     return {
       initialRootFolderId: rootId,
       initialSubFolderId: subFolderId,
@@ -84,16 +93,8 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
 
   // Last segment is a sub folder (or just root if length is 1)
   // URL is /rootId or /rootId/subfolderId
-  // IMPORTANT: Check if urlPath[1] is a root folder ID - if so, it's NOT a subfolder
-  const secondSegment = urlPath.length >= 2 ? urlPath[1] : null;
-  const isSecondSegmentRootFolder =
-    secondSegment === "private" ||
-    secondSegment === "shared" ||
-    secondSegment === "public" ||
-    secondSegment === "incognito";
-
-  const subFolderId =
-    secondSegment && !isSecondSegmentRootFolder ? secondSegment : null;
+  // A root folder id (private/shared/...) is not a UUID, so it drops too.
+  const subFolderId = urlPath.length >= 2 ? folderSegment(urlPath[1]) : null;
 
   return {
     initialRootFolderId: rootId,

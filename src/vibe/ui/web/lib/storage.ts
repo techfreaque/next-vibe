@@ -36,23 +36,100 @@ export const storage: Storage = {
   },
 };
 
+type WebStorageArea = "localStorage" | "sessionStorage";
+
+/** The part of the DOM `Storage` interface these helpers use. */
+interface WebStorageLike {
+  readonly length: number;
+  key: (index: number) => string | null;
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+}
+
+/** Page-lifetime stand-in for a Web Storage area the browser has disabled. */
+class MemoryWebStorage implements WebStorageLike {
+  private readonly items = new Map<string, string>();
+  get length(): number {
+    return this.items.size;
+  }
+  key(index: number): string | null {
+    return [...this.items.keys()][index] ?? null;
+  }
+  getItem(key: string): string | null {
+    return this.items.get(key) ?? null;
+  }
+  setItem(key: string, value: string): void {
+    this.items.set(key, value);
+  }
+  removeItem(key: string): void {
+    this.items.delete(key);
+  }
+}
+
+const memoryFallback: Record<WebStorageArea, MemoryWebStorage | null> = {
+  localStorage: null,
+  sessionStorage: null,
+};
+
 /**
- * SSR / workers have no Web Storage at all: that is "nothing stored", not a
- * failure, so it is debug-logged instead of reported.
+ * The Web Storage area to use, or null when there is none (SSR / workers:
+ * "nothing stored", debug-logged only).
+ *
+ * Some browsers disable Web Storage for the whole page: Android WebViews with
+ * DOM storage off expose `localStorage === null`, sandboxed frames and some
+ * privacy modes throw a SecurityError on access. Every get/set/remove would
+ * then fail the same way (one log row per key per call). Instead the page
+ * switches to an in-memory store and reports the condition ONCE per area:
+ * values still work for this page view but are lost on reload, so it is an
+ * error. Per-call failures on a working area (quota) are still reported by
+ * the callers below.
  */
-function storageUnavailable(
-  area: "localStorage" | "sessionStorage",
+function resolveWebStorage(
+  area: WebStorageArea,
   key: string,
   logger: EndpointLogger,
-): boolean {
+): WebStorageLike | null {
   const missing =
     area === "localStorage"
       ? typeof localStorage === "undefined"
       : typeof sessionStorage === "undefined";
   if (missing) {
     logger.debug(`[storage] ${area} unavailable (SSR/worker)`, { key });
+    return null;
   }
-  return missing;
+  const fallback = memoryFallback[area];
+  if (fallback) {
+    return fallback;
+  }
+  let disabledBy: Error | string | null = null;
+  try {
+    const store: WebStorageLike | null =
+      area === "localStorage" ? localStorage : sessionStorage;
+    if (store) {
+      return store;
+    }
+    disabledBy = `${area} is null (Web Storage disabled by the browser)`;
+  } catch (error) {
+    disabledBy = error instanceof Error ? error : String(error);
+  }
+  const memory = new MemoryWebStorage();
+  memoryFallback[area] = memory;
+  reportStorageFailure(logger, {
+    platform: "web",
+    area,
+    operation: "open",
+    key,
+    error: disabledBy,
+    disabled: true,
+  });
+  return memory;
+}
+
+/** Test hook: forget a previous disabled-storage fallback. */
+export function resetWebStorageFallbackForTests(): void {
+  memoryFallback.localStorage = null;
+  memoryFallback.sessionStorage = null;
 }
 
 // ─── Sync localStorage helpers ────────────────────────────────────────────────
@@ -62,11 +139,12 @@ export function getLocalItem(
   key: string,
   logger: EndpointLogger,
 ): string | null {
-  if (storageUnavailable("localStorage", key, logger)) {
+  const store = resolveWebStorage("localStorage", key, logger);
+  if (!store) {
     return null;
   }
   try {
-    return localStorage.getItem(key);
+    return store.getItem(key);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",
@@ -84,11 +162,12 @@ export function setLocalItem(
   value: string,
   logger: EndpointLogger,
 ): void {
-  if (storageUnavailable("localStorage", key, logger)) {
+  const store = resolveWebStorage("localStorage", key, logger);
+  if (!store) {
     return;
   }
   try {
-    localStorage.setItem(key, value);
+    store.setItem(key, value);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",
@@ -97,27 +176,26 @@ export function setLocalItem(
       key,
       error: error instanceof Error ? error : String(error),
       valueLength: value.length,
-      usage: localStorageUsage(),
+      usage: storageUsage(store),
     });
   }
 }
 
 /**
- * What fills localStorage right now (key names + lengths only), so a quota
+ * What fills the area right now (key names + lengths only), so a quota
  * failure says which key is hogging the ~5 MB origin budget.
  */
-function localStorageUsage(): StorageUsage {
+function storageUsage(store: WebStorageLike): StorageUsage {
   try {
     let usedChars = 0;
     let largestKey: string | null = null;
     let largestChars = 0;
-    for (let i = 0; i < localStorage.length; i++) {
-      const storedKey = localStorage.key(i);
+    for (let i = 0; i < store.length; i++) {
+      const storedKey = store.key(i);
       if (storedKey === null) {
         continue;
       }
-      const chars =
-        storedKey.length + (localStorage.getItem(storedKey)?.length ?? 0);
+      const chars = storedKey.length + (store.getItem(storedKey)?.length ?? 0);
       usedChars += chars;
       if (chars > largestChars) {
         largestChars = chars;
@@ -126,7 +204,7 @@ function localStorageUsage(): StorageUsage {
     }
     return {
       usedChars,
-      keyCount: localStorage.length,
+      keyCount: store.length,
       largestKey,
       largestChars,
     };
@@ -137,11 +215,12 @@ function localStorageUsage(): StorageUsage {
 }
 
 export function removeLocalItem(key: string, logger: EndpointLogger): void {
-  if (storageUnavailable("localStorage", key, logger)) {
+  const store = resolveWebStorage("localStorage", key, logger);
+  if (!store) {
     return;
   }
   try {
-    localStorage.removeItem(key);
+    store.removeItem(key);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",
@@ -159,11 +238,12 @@ export function getSessionItem(
   key: string,
   logger: EndpointLogger,
 ): string | null {
-  if (storageUnavailable("sessionStorage", key, logger)) {
+  const store = resolveWebStorage("sessionStorage", key, logger);
+  if (!store) {
     return null;
   }
   try {
-    return sessionStorage.getItem(key);
+    return store.getItem(key);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",
@@ -181,11 +261,12 @@ export function setSessionItem(
   value: string,
   logger: EndpointLogger,
 ): void {
-  if (storageUnavailable("sessionStorage", key, logger)) {
+  const store = resolveWebStorage("sessionStorage", key, logger);
+  if (!store) {
     return;
   }
   try {
-    sessionStorage.setItem(key, value);
+    store.setItem(key, value);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",
@@ -199,11 +280,12 @@ export function setSessionItem(
 }
 
 export function removeSessionItem(key: string, logger: EndpointLogger): void {
-  if (storageUnavailable("sessionStorage", key, logger)) {
+  const store = resolveWebStorage("sessionStorage", key, logger);
+  if (!store) {
     return;
   }
   try {
-    sessionStorage.removeItem(key);
+    store.removeItem(key);
   } catch (error) {
     reportStorageFailure(logger, {
       platform: "web",

@@ -152,12 +152,14 @@ export function describeSubscribeIdentity(
     | "socket-guest-other-uid"
     | "foreign";
 } {
+  const socketUid = user.isPublic ? user.leadId : user.id;
   const match = /^user\/([^/]+)\//.exec(channel);
   if (!match) {
-    return {};
+    // Endpoint (resource) channel: the socket identity still tells a guest
+    // socket left over from a signup (private folder denied) from a stranger.
+    return { socketUid };
   }
   const requestedUid = match[1];
-  const socketUid = user.isPublic ? user.leadId : user.id;
   if (
     !user.isPublic &&
     (requestedUid === user.leadId || requestedUidIsLinkedLead)

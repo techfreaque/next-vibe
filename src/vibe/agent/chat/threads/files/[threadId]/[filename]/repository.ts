@@ -116,12 +116,28 @@ export class ChatFileRepository {
           data.threadId,
           data.filename,
         );
-        if (!fileMetadata || !isStorageFileOwner(fileMetadata, user)) {
+        if (!fileMetadata) {
+          // Not a permission question: nothing exists under this thread id
+          // (deleted file, wrong link, probe). Served as 404 like a denial.
+          logger.error(
+            "Chat file not found: no thread row and no file metadata",
+            {
+              leadId: user.leadId,
+              storageType: agentEnv.CHAT_STORAGE_TYPE,
+              threadId: data.threadId,
+              filename: data.filename,
+            },
+          );
+          return {
+            buffer: Buffer.from(""),
+            contentType: "text/plain",
+          };
+        }
+        if (!isStorageFileOwner(fileMetadata, user)) {
           logger.error("Lead does not have permission to access file", {
             leadId: user.leadId,
-            hasFileLeadId: !!fileMetadata?.leadId,
-            hasFileUploadedBy: !!fileMetadata?.uploadedBy,
-            metadataFound: fileMetadata !== null,
+            hasFileLeadId: !!fileMetadata.leadId,
+            hasFileUploadedBy: !!fileMetadata.uploadedBy,
             storageType: agentEnv.CHAT_STORAGE_TYPE,
             threadId: data.threadId,
             filename: data.filename,

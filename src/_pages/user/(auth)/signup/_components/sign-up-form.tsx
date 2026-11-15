@@ -5,7 +5,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { assignUrl } from "next-vibe/ui/lib/location";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import { useEffect, useState } from "react";
 
@@ -28,7 +28,6 @@ export default function SignUpForm({
   platform,
 }: SignUpFormProps): React.JSX.Element {
   const logger = useLogger();
-  const router = useRouter();
 
   const [autoPrefillData, setAutoPrefillData] = useState<
     | {
@@ -71,7 +70,12 @@ export default function SignUpForm({
           autoPrefillData,
           mutationOptions: {
             onSuccess: () => {
-              router.push(callbackUrl ?? `/${locale}`);
+              // Full page load, same as login: signup swaps the lead cookie
+              // for a session, and only a fresh load reconnects the shared
+              // WebSocket with it. A client push kept the guest socket, so
+              // every user channel (credits, folders, favorites, private
+              // threads) was denied until the next reload.
+              assignUrl(callbackUrl ?? `/${locale}`);
             },
           },
         },

@@ -16778,7 +16778,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Liczenie tokenów Anthropic",
     titleShort: "v1 count tokens",
     description:
-      "Szacuje tokeny wejściowe zapytania Anthropic Messages. Za darmo: bez wywołania modelu, bez kredytów.",
+      "Szacuje tokeny wejściowe zapytania Anthropic Messages. Bez wywołania modelu, bez kredytów.",
     icon: "hash",
     category: "ai",
     subCategory: "Inference",

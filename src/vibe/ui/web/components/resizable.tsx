@@ -5,6 +5,8 @@ import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { useLogger } from "../hooks/use-logger";
+import { setLocalItem } from "../lib/storage";
 import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
 import { DragHandleDots2Icon } from "./icons/DragHandleDots2Icon";
@@ -40,6 +42,7 @@ export function ResizableContainer({
   storageId,
   collapsed,
 }: ResizableContainerProps): JSX.Element {
+  const logger = useLogger();
   const [width, setWidth] = useState<number>(defaultWidth);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,10 +82,10 @@ export function ResizableContainer({
       setWidth(clampedWidth);
       onWidthChange?.(clampedWidth);
       if (storageId) {
-        localStorage.setItem(`resizable-${storageId}`, clampedWidth.toString());
+        setLocalItem(`resizable-${storageId}`, clampedWidth.toString(), logger);
       }
     },
-    [isResizing, minWidth, getMaxWidthPx, onWidthChange, storageId],
+    [isResizing, minWidth, getMaxWidthPx, onWidthChange, storageId, logger],
   );
 
   const handleMouseUp = useCallback(() => {

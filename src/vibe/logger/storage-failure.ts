@@ -53,6 +53,11 @@ export interface StorageFailure {
   valueLength?: number;
   /** Area usage at failure time (never values). */
   usage?: StorageUsage;
+  /**
+   * The whole area is unusable for this page (disabled by the browser): the
+   * caller switched to an in-memory store and reports this once per page.
+   */
+  disabled?: boolean;
 }
 
 /** Error class name: QuotaExceededError, SecurityError, ENOENT, SyntaxError ... */
@@ -101,6 +106,14 @@ export function reportStorageFailure(
         /quota/i.test(name) || /quota/i.test(String(failure.error)),
       securityBlocked: name === "SecurityError",
     };
+    if (failure.disabled) {
+      // Values only live for this page view: data is lost on reload
+      logger.error(
+        `[storage] ${failure.area} disabled by the browser, using in-memory storage for this page`,
+        { ...context, disabled: true },
+      );
+      return;
+    }
     const message = `[storage] ${failure.area}.${failure.operation} failed`;
     if (failure.operation === "set") {
       logger.error(message, context);
