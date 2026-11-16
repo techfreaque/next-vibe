@@ -162,7 +162,7 @@ export const translations: typeof enTranslations = {
           description: "Nie masz uprawnień do dostępu do tego zasobu",
         },
         notFound: {
-          title: "Skill nie zostaÅ znaleziony",
+          title: "Skill nie został znaleziony",
           description: "Żądany skill nie istnieje",
         },
         server: {
@@ -420,7 +420,7 @@ export const translations: typeof enTranslations = {
           description: "Nie masz uprawnień do aktualizacji tego skilla",
         },
         notFound: {
-          title: "Skill nie zostaÅ znaleziony",
+          title: "Skill nie został znaleziony",
           description: "Skill, którą próbujesz zaktualizować, nie istnieje",
         },
         server: {
@@ -483,7 +483,7 @@ export const translations: typeof enTranslations = {
           description: "Nie masz uprawnień do usunięcia tego skilla",
         },
         notFound: {
-          title: "Skill nie zostaÅ znaleziony",
+          title: "Skill nie został znaleziony",
           description: "Skill, którą próbujesz usunąć, nie istnieje",
         },
         server: {

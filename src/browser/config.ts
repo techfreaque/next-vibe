@@ -88,6 +88,10 @@ export const chromeMCPConfig: ChromeMCPConfig = {
     // page-scoped tool. repository.ts routes by select_page under a global
     // mutex instead, so keep the selected-page model.
     "--no-page-id-routing",
+    // Our MCP client does not negotiate the `roots` capability, so file tools
+    // (upload_file, screenshot/trace filePath) are limited to the OS temp dir
+    // by default. Allow the project dir too; the temp dir always stays allowed.
+    `--workspace=${process.cwd()}`,
   ],
   env: {},
   timeout: 120000,

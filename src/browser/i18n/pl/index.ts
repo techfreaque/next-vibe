@@ -9,121 +9,120 @@ export const translations: typeof enTranslations = {
     title: "Kliknij element",
     titleShort: "Kliknij",
     description:
-      "Kliknij element po UID z migawki. Najpierw wywoÅaj take-snapshot.",
+      "Kliknij element po UID z migawki. Najpierw wywołaj take-snapshot.",
     dynamicTitle: "Klik: {{uid}}",
 
     form: {
       label: "Kliknij element",
-      description: "Kliknij na okreÅlony element na stronie",
+      description: "Kliknij na określony element na stronie",
       fields: {
         uid: {
           label: "UID elementu",
-          description: "UID elementu na stronie z migawki zawartoÅci strony",
-          placeholder: "WprowadÅº UID elementu",
+          description: "UID elementu na stronie z migawki zawartości strony",
+          placeholder: "Wprowadź UID elementu",
         },
         dblClick: {
-          label: "PodwÃ³jne klikniÄcie",
-          description:
-            "Ustaw na true dla podwÃ³jnych klikniÄÄ. DomyÅlnie false",
+          label: "Podwójne kliknięcie",
+          description: "Ustaw na true dla podwójnych kliknięć. Domyślnie false",
         },
       },
     },
 
     response: {
-      success: "Operacja klikniÄcia pomyÅlna",
-      result: "Wynik operacji klikniÄcia",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja kliknięcia pomyślna",
+      result: "Wynik operacji kliknięcia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas operacji klikniÄcia",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji kliknięcia",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do wykonywania operacji klikniÄcia",
+        description: "Nie masz uprawnień do wykonywania operacji kliknięcia",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja klikniÄcia jest zabroniona",
+        description: "Operacja kliknięcia jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany element nie zostaÅ znaleziony",
+        description: "Żądany element nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji klikniÄcia",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji kliknięcia",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas operacji klikniÄcia",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas operacji kliknięcia",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji klikniÄcia",
+        description: "Wystąpił konflikt podczas operacji kliknięcia",
       },
     },
 
     success: {
-      title: "Operacja klikniÄcia pomyÅlna",
-      description: "Element zostaÅ pomyÅlnie klikniÄty",
+      title: "Operacja kliknięcia pomyślna",
+      description: "Element został pomyślnie kliknięty",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
   "close-page": {
-    title: "Zamknij stronÄ",
+    title: "Zamknij stronę",
     titleShort: "Zamknij",
     description:
-      "Zamknij bieÅ¼ÄcÄ stronÄ sesji. Ostatniej otwartej strony nie moÅ¼na zamknÄÄ.",
+      "Zamknij bieżącą stronę sesji. Ostatniej otwartej strony nie można zamknąć.",
 
     form: {
-      label: "Zamknij stronÄ",
-      description: "Zamknij stronÄ przeglÄdarki wedÅug jej indeksu",
+      label: "Zamknij stronę",
+      description: "Zamknij stronę przeglądarki według jej indeksu",
       fields: {
         pageIdx: {
           label: "Indeks strony",
           description:
-            "Indeks strony do zamkniÄcia. WywoÅaj list_pages, aby wyÅwietliÄ strony",
-          placeholder: "WprowadÅº indeks strony (np. 0)",
+            "Indeks strony do zamknięcia. Wywołaj list_pages, aby wyświetlić strony",
+          placeholder: "Wprowadź indeks strony (np. 0)",
         },
       },
     },
 
     response: {
-      success: "Strona pomyÅlnie zamkniÄta",
+      success: "Strona pomyślnie zamknięta",
       result: "Wynik operacji zamykania strony",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas zamykania strony",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas zamykania strony",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do zamykania stron",
+        description: "Nie masz uprawnień do zamykania stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -131,420 +130,415 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädana strona nie zostaÅa znaleziona",
+        description: "Żądana strona nie została znaleziona",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas zamykania strony",
+          "Wystąpił wewnętrzny błąd serwera podczas zamykania strony",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas zamykania strony",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas zamykania strony",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas zamykania strony",
+        description: "Wystąpił konflikt podczas zamykania strony",
       },
     },
 
     success: {
-      title: "Strona pomyÅlnie zamkniÄta",
-      description: "Strona zostaÅa pomyÅlnie zamkniÄta",
+      title: "Strona pomyślnie zamknięta",
+      description: "Strona została pomyślnie zamknięta",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       navigationAutomation: "Automatyzacja nawigacji",
     },
   },
   drag: {
-    title: "PrzeciÄgnij element",
-    titleShort: "PrzeciÄgnij",
+    title: "Przeciągnij element",
+    titleShort: "Przeciągnij",
     description:
-      "PrzeciÄgnij jeden element na drugi po UID. UID-y pobierz z take-snapshot.",
-    dynamicTitle: "PrzeciÄgnij: {{from}} \u2192 {{to}}",
+      "Przeciągnij jeden element na drugi po UID. UID-y pobierz z take-snapshot.",
+    dynamicTitle: "Przeciągnij: {{from}} \u2192 {{to}}",
 
     form: {
-      label: "PrzeciÄgnij element",
-      description: "PrzeciÄgnij jeden element na inny element",
+      label: "Przeciągnij element",
+      description: "Przeciągnij jeden element na inny element",
       fields: {
         from_uid: {
-          label: "UID elementu ÅºrÃ³dÅowego",
-          description: "UID elementu do przeciÄgniÄcia",
-          placeholder: "WprowadÅº UID elementu ÅºrÃ³dÅowego",
+          label: "UID elementu źródłowego",
+          description: "UID elementu do przeciągnięcia",
+          placeholder: "Wprowadź UID elementu źródłowego",
         },
         to_uid: {
           label: "UID elementu docelowego",
           description: "UID elementu docelowego",
-          placeholder: "WprowadÅº UID elementu docelowego",
+          placeholder: "Wprowadź UID elementu docelowego",
         },
       },
     },
 
     response: {
-      success: "Operacja przeciÄgniÄcia pomyÅlna",
-      result: "Wynik operacji przeciÄgniÄcia",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja przeciągnięcia pomyślna",
+      result: "Wynik operacji przeciągnięcia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas operacji przeciÄgania",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji przeciągania",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Nie masz uprawnieÅ do wykonywania operacji przeciÄgania",
+        description: "Nie masz uprawnień do wykonywania operacji przeciągania",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja przeciÄgania jest zabroniona",
+        description: "Operacja przeciągania jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany element nie zostaÅ znaleziony",
+        description: "Żądany element nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji przeciÄgania",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji przeciągania",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description:
-          "WystÄpiÅ nieznany bÅÄd podczas operacji przeciÄgania",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas operacji przeciągania",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji przeciÄgania",
+        description: "Wystąpił konflikt podczas operacji przeciągania",
       },
     },
 
     success: {
-      title: "Operacja przeciÄgania pomyÅlna",
-      description: "Element zostaÅ pomyÅlnie przeciÄgniÄty",
+      title: "Operacja przeciągania pomyślna",
+      description: "Element został pomyślnie przeciągnięty",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
   fill: {
-    title: "WypeÅnij",
-    titleShort: "WypeÅnij",
+    title: "Wypełnij",
+    titleShort: "Wypełnij",
     description:
-      "Wpisz tekst do input/textarea lub wybierz opcjÄ z listy po UID. UID-y pobierz z take-snapshot.",
-    dynamicTitle: "WypeÅnij: {{uid}}",
+      "Wpisz tekst do input/textarea lub wybierz opcję z listy po UID. UID-y pobierz z take-snapshot.",
+    dynamicTitle: "Wypełnij: {{uid}}",
 
     form: {
-      label: "WypeÅnij element",
+      label: "Wypełnij element",
       description: "Wpisz tekst do elementu formularza",
       fields: {
         uid: {
           label: "UID elementu",
-          description: "UID elementu na stronie z migawki treÅci strony",
-          placeholder: "WprowadÅº UID elementu",
+          description: "UID elementu na stronie z migawki treści strony",
+          placeholder: "Wprowadź UID elementu",
         },
         value: {
-          label: "WartoÅÄ",
-          description: "WartoÅÄ do wpisania",
-          placeholder: "WprowadÅº wartoÅÄ do wypeÅnienia",
+          label: "Wartość",
+          description: "Wartość do wpisania",
+          placeholder: "Wprowadź wartość do wypełnienia",
         },
       },
     },
 
     response: {
-      success: "Operacja wypeÅniania pomyÅlna",
-      result: "Wynik operacji wypeÅniania",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja wypełniania pomyślna",
+      result: "Wynik operacji wypełniania",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas operacji wypeÅniania",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji wypełniania",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do wykonywania operacji wypeÅniania",
+        description: "Nie masz uprawnień do wykonywania operacji wypełniania",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja wypeÅniania jest zabroniona",
+        description: "Operacja wypełniania jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji wypeÅniania",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji wypełniania",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas operacji wypeÅniania",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas operacji wypełniania",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji wypeÅniania",
+        description: "Wystąpił konflikt podczas operacji wypełniania",
       },
     },
 
     success: {
-      title: "Operacja wypeÅniania pomyÅlna",
-      description: "Element zostaÅ pomyÅlnie wypeÅniony",
+      title: "Operacja wypełniania pomyślna",
+      description: "Element został pomyślnie wypełniony",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
   "fill-form": {
-    category: "PrzeglÄdarka",
+    category: "Przeglądarka",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      inputAutomation: "Automatyzacja wejÅcia",
+      browserAutomation: "Automatyzacja przeglądarki",
+      inputAutomation: "Automatyzacja wejścia",
     },
-    title: "WypeÅnij formularz",
+    title: "Wypełnij formularz",
     titleShort: "Formularz",
     description:
-      "WypeÅnij wiele pÃ³l formularza naraz tablicÄ UID-Ã³w. Wydajniejsze niÅ¼ pojedyncze wywoÅania fill.",
+      "Wypełnij wiele pól formularza naraz tablicą UID-ów. Wydajniejsze niż pojedyncze wywołania fill.",
 
     form: {
-      label: "WypeÅnij elementy formularza",
-      description: "WypeÅnij wiele elementÃ³w formularza jednoczeÅnie",
+      label: "Wypełnij elementy formularza",
+      description: "Wypełnij wiele elementów formularza jednocześnie",
       fields: {
         elements: {
           label: "Elementy formularza",
-          description: "Tablica elementÃ³w z migawki do wypeÅnienia",
-          placeholder: "WprowadÅº elementy formularza (tablica JSON)",
+          description: "Tablica elementów z migawki do wypełnienia",
+          placeholder: "Wprowadź elementy formularza (tablica JSON)",
           uid: {
             label: "UID elementu",
-            description: "Unikalny identyfikator elementu do wypeÅnienia",
+            description: "Unikalny identyfikator elementu do wypełnienia",
           },
           value: {
-            label: "WartoÅÄ",
-            description: "WartoÅÄ do wprowadzenia do elementu",
+            label: "Wartość",
+            description: "Wartość do wprowadzenia do elementu",
           },
         },
       },
     },
 
     response: {
-      success: "Operacja wypeÅniania formularza pomyÅlna",
+      success: "Operacja wypełniania formularza pomyślna",
       result: {
         title: "Wynik",
-        description: "Wynik operacji wypeÅniania formularza",
-        filled: "Wszystko wypeÅnione",
-        filledCount: "Liczba wypeÅnionych",
+        description: "Wynik operacji wypełniania formularza",
+        filled: "Wszystko wypełnione",
+        filledCount: "Liczba wypełnionych",
         elements: {
           uid: "UID elementu",
-          filled: "PomyÅlnie wypeÅniono",
+          filled: "Pomyślnie wypełniono",
         },
       },
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas wypeÅniania formularza",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas wypełniania formularza",
       },
       unauthorized: {
         title: "Nieautoryzowany",
         description:
-          "Nie masz uprawnieÅ do wykonywania operacji wypeÅniania formularza",
+          "Nie masz uprawnień do wykonywania operacji wypełniania formularza",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja wypeÅniania formularza jest zabroniona",
+        description: "Operacja wypełniania formularza jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas wypeÅniania formularza",
+          "Wystąpił wewnętrzny błąd serwera podczas wypełniania formularza",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description:
-          "WystÄpiÅ nieznany bÅÄd podczas wypeÅniania formularza",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas wypełniania formularza",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas wypeÅniania formularza",
+        description: "Wystąpił konflikt podczas wypełniania formularza",
       },
     },
 
     success: {
-      title: "WypeÅnianie formularza pomyÅlne",
-      description:
-        "Wszystkie elementy formularza zostaÅy pomyÅlnie wypeÅnione",
+      title: "Wypełnianie formularza pomyślne",
+      description: "Wszystkie elementy formularza zostały pomyślnie wypełnione",
     },
   },
   "handle-dialog": {
-    title: "ObsÅuÅ¼ dialog",
+    title: "Obsłuż dialog",
     titleShort: "Dialog",
     description:
-      "Zaakceptuj lub odrzuÄ dialog przeglÄdarki (alert/confirm/prompt). WywoÅaj przed akcjÄ, ktÃ³ra go wyzwala.",
+      "Zaakceptuj lub odrzuć dialog przeglądarki (alert/confirm/prompt). Wywołaj przed akcją, która go wyzwala.",
     dynamicTitle: "Dialog: {{action}}",
 
     form: {
-      label: "ObsÅuÅ¼ dialog przeglÄdarki",
-      description: "Zaakceptuj lub odrzuÄ dialog przeglÄdarki",
+      label: "Obsłuż dialog przeglądarki",
+      description: "Zaakceptuj lub odrzuć dialog przeglądarki",
       fields: {
         action: {
           label: "Akcja",
-          description: "Czy odrzuciÄ czy zaakceptowaÄ dialog",
-          placeholder: "Wybierz akcjÄ",
+          description: "Czy odrzucić czy zaakceptować dialog",
+          placeholder: "Wybierz akcję",
           options: {
             accept: "Zaakceptuj",
-            dismiss: "OdrzuÄ",
+            dismiss: "Odrzuć",
           },
         },
         promptText: {
           label: "Tekst promptu",
           description: "Opcjonalny tekst do wprowadzenia do dialogu",
-          placeholder: "WprowadÅº tekst promptu (opcjonalnie)",
+          placeholder: "Wprowadź tekst promptu (opcjonalnie)",
         },
       },
     },
 
     response: {
-      success: "Operacja obsÅugi dialogu pomyÅlna",
-      result: "Wynik obsÅugi dialogu",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja obsługi dialogu pomyślna",
+      result: "Wynik obsługi dialogu",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas obsÅugi dialogu",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas obsługi dialogu",
       },
       unauthorized: {
         title: "Nieautoryzowany",
         description:
-          "Nie masz uprawnieÅ do wykonywania operacji obsÅugi dialogu",
+          "Nie masz uprawnień do wykonywania operacji obsługi dialogu",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja obsÅugi dialogu jest zabroniona",
+        description: "Operacja obsługi dialogu jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
-        description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas obsÅugi dialogu",
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera podczas obsługi dialogu",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas obsÅugi dialogu",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas obsługi dialogu",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas obsÅugi dialogu",
+        description: "Wystąpił konflikt podczas obsługi dialogu",
       },
     },
 
     success: {
-      title: "ObsÅuga dialogu pomyÅlna",
-      description: "Dialog przeglÄdarki zostaÅ pomyÅlnie obsÅuÅ¼ony",
+      title: "Obsługa dialogu pomyślna",
+      description: "Dialog przeglądarki został pomyślnie obsłużony",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      dialogAutomation: "Automatyzacja dialogÃ³w",
+      browserAutomation: "Automatyzacja przeglądarki",
+      dialogAutomation: "Automatyzacja dialogów",
     },
   },
   hover: {
-    title: "NajedÅº",
-    titleShort: "NajedÅº",
+    title: "Najedź",
+    titleShort: "Najedź",
     description:
-      "NajedÅº na element po UID, aby pokazaÄ tooltip lub ukryte elementy sterujÄce.",
+      "Najedź na element po UID, aby pokazać tooltip lub ukryte elementy sterujące.",
     dynamicTitle: "Hover: {{uid}}",
 
     form: {
-      label: "NajedÅº na element",
-      description: "PrzesuÅ kursor myszy nad element",
+      label: "Najedź na element",
+      description: "Przesuń kursor myszy nad element",
       fields: {
         uid: {
           label: "UID elementu",
-          description: "UID elementu na stronie z migawki treÅci strony",
-          placeholder: "WprowadÅº UID elementu",
+          description: "UID elementu na stronie z migawki treści strony",
+          placeholder: "Wprowadź UID elementu",
         },
       },
     },
 
     response: {
-      success: "Operacja najechania pomyÅlna",
+      success: "Operacja najechania pomyślna",
       result: "Wynik operacji najechania",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas operacji najechania",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji najechania",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do wykonywania operacji najechania",
+        description: "Nie masz uprawnień do wykonywania operacji najechania",
       },
       forbidden: {
         title: "Zabronione",
@@ -552,190 +546,193 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji najechania",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji najechania",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas operacji najechania",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas operacji najechania",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji najechania",
+        description: "Wystąpił konflikt podczas operacji najechania",
       },
     },
 
     success: {
-      title: "Operacja najechania pomyÅlna",
-      description: "Element zostaÅ pomyÅlnie najechany",
+      title: "Operacja najechania pomyślna",
+      description: "Element został pomyślnie najechany",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
   "press-key": {
-    title: "NaciÅnij klawisz",
+    title: "Naciśnij klawisz",
     titleShort: "Klawisz",
     dynamicTitle: "Klawisz: {{key}}",
-    description: "NaciÅnij klawisz lub kombinacjÄ klawiszy",
+    description: "Naciśnij klawisz lub kombinację klawiszy",
     form: {
-      label: "NaciÅnij klawisz",
-      description: "NaciÅnij klawisz lub kombinacjÄ klawiszy",
+      label: "Naciśnij klawisz",
+      description: "Naciśnij klawisz lub kombinację klawiszy",
       fields: {
         key: {
           label: "Klawisz",
           description:
             "Klawisz lub kombinacja (np. Enter, Control+A, Control+Shift+R)",
-          placeholder: "WprowadÅº klawisz lub kombinacjÄ",
+          placeholder: "Wprowadź klawisz lub kombinację",
         },
       },
     },
     response: {
-      success: "Operacja naciÅniÄcia klawisza pomyÅlna",
-      result: "Wynik operacji naciÅniÄcia klawisza",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja naciśnięcia klawisza pomyślna",
+      result: "Wynik operacji naciśnięcia klawisza",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas operacji naciÅniÄcia klawisza",
+          "Wystąpił błąd sieci podczas operacji naciśnięcia klawisza",
       },
       unauthorized: {
         title: "Nieautoryzowany",
         description:
-          "Nie masz uprawnieÅ do wykonywania operacji naciÅniÄcia klawisza",
+          "Nie masz uprawnień do wykonywania operacji naciśnięcia klawisza",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja naciÅniÄcia klawisza jest zabroniona",
+        description: "Operacja naciśnięcia klawisza jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji naciÅniÄcia klawisza",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji naciśnięcia klawisza",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas operacji naciÅniÄcia klawisza",
+          "Wystąpił nieznany błąd podczas operacji naciśnięcia klawisza",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas operacji naciÅniÄcia klawisza",
+        description: "Wystąpił konflikt podczas operacji naciśnięcia klawisza",
       },
     },
     success: {
-      title: "Operacja naciÅniÄcia klawisza pomyÅlna",
-      description: "Klawisz zostaÅ pomyÅlnie naciÅniÄty",
+      title: "Operacja naciśnięcia klawisza pomyślna",
+      description: "Klawisz został pomyślnie naciśnięty",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
   "upload-file": {
-    title: "PrzeÅlij plik",
-    titleShort: "PrzeÅlij",
+    title: "Prześlij plik",
+    titleShort: "Prześlij",
     dynamicTitle: "Upload: {{file}}",
-    description: "PrzeÅlij plik przez podany element",
+    description: "Prześlij plik przez podany element",
     form: {
-      label: "PrzeÅlij plik",
-      description: "PrzeÅlij plik do elementu wejÅcia pliku",
+      label: "Prześlij plik",
+      description: "Prześlij plik do elementu wejścia pliku",
       fields: {
         uid: {
           label: "UID elementu",
           description:
-            "UID elementu wejÅcia pliku lub elementu, ktÃ³ry otworzy wybÃ³r pliku",
-          placeholder: "WprowadÅº UID elementu",
+            "UID elementu wejścia pliku lub elementu, który otworzy wybór pliku",
+          placeholder: "Wprowadź UID elementu",
         },
-        filePath: {
-          label: "ÅcieÅ¼ka pliku",
-          description: "Lokalna ÅcieÅ¼ka pliku do przesÅania",
-          placeholder: "WprowadÅº ÅcieÅ¼kÄ pliku",
+        filePaths: {
+          label: "Ścieżki plików",
+          description:
+            "Bezwzględna ścieżka pliku do przesłania, przy wyborze wielu plików kilka ścieżek. Dozwolony katalog projektu lub systemowy katalog tymczasowy.",
+          placeholder: "/tmp/zdjecie.png",
+        },
+        includeSnapshot: {
+          label: "Dołącz snapshot",
+          description: "Zwróć snapshot strony po przesłaniu",
         },
       },
     },
     response: {
-      success: "Operacja przesyÅania pliku pomyÅlna",
-      result: "Wynik operacji przesyÅania pliku",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja przesyłania pliku pomyślna",
+      result: "Wynik operacji przesyłania pliku",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description:
-          "WystÄpiÅ bÅÄd sieci podczas operacji przesyÅania pliku",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji przesyłania pliku",
       },
       unauthorized: {
         title: "Nieautoryzowany",
         description:
-          "Nie masz uprawnieÅ do wykonywania operacji przesyÅania pliku",
+          "Nie masz uprawnień do wykonywania operacji przesyłania pliku",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja przesyÅania pliku jest zabroniona",
+        description: "Operacja przesyłania pliku jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji przesyÅania pliku",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji przesyłania pliku",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas operacji przesyÅania pliku",
+          "Wystąpił nieznany błąd podczas operacji przesyłania pliku",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji przesyÅania pliku",
+        description: "Wystąpił konflikt podczas operacji przesyłania pliku",
       },
     },
     success: {
-      title: "Operacja przesyÅania pliku pomyÅlna",
-      description: "Plik zostaÅ pomyÅlnie przesÅany",
+      title: "Operacja przesyłania pliku pomyślna",
+      description: "Plik został pomyślnie przesłany",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       inputAutomation: "Automatyzacja wprowadzania",
     },
   },
@@ -743,40 +740,40 @@ export const translations: typeof enTranslations = {
     title: "Lista stron",
     titleShort: "Strony",
     description:
-      "Wylistuj wszystkie otwarte karty z URL-ami. KaÅ¼da sesja ma jednÄ kartÄ; new-page jÄ zastÄpuje.",
+      "Wylistuj wszystkie otwarte karty z URL-ami. Każda sesja ma jedną kartę; new-page ją zastępuje.",
     form: {
       label: "Lista stron",
-      description: "Pobierz wszystkie otwarte strony przeglÄdarki",
+      description: "Pobierz wszystkie otwarte strony przeglądarki",
       fields: {},
     },
     response: {
-      success: "Operacja listowania stron pomyÅlna",
+      success: "Operacja listowania stron pomyślna",
       result: {
         title: "Wynik",
         description: "Wynik listowania stron",
         pages: {
           idx: "Indeks",
-          title: "TytuÅ",
+          title: "Tytuł",
           url: "URL",
           active: "Aktywny",
         },
-        totalCount: "ÅÄczna liczba",
+        totalCount: "Łączna liczba",
       },
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas listowania stron",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas listowania stron",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do listowania stron",
+        description: "Nie masz uprawnień do listowania stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -784,95 +781,94 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas listowania stron",
+          "Wystąpił wewnętrzny błąd serwera podczas listowania stron",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas listowania stron",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas listowania stron",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas listowania stron",
+        description: "Wystąpił konflikt podczas listowania stron",
       },
     },
     success: {
-      title: "Strony pomyÅlnie wylistowane",
-      description: "Otwarte strony zostaÅy pomyÅlnie wylistowane",
+      title: "Strony pomyślnie wylistowane",
+      description: "Otwarte strony zostały pomyślnie wylistowane",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       navigationAutomation: "Automatyzacja nawigacji",
     },
   },
   "navigate-page": {
-    title: "Nawiguj stronÄ",
+    title: "Nawiguj stronę",
     titleShort: "Nawiguj",
     dynamicTitle: "Nawiguj: {{target}}",
     description:
-      "Nawiguj stronÄ sesji do URL, wstecz, naprzÃ³d lub przeÅaduj. Preferuj nad new-page dla tej samej karty.",
+      "Nawiguj stronę sesji do URL, wstecz, naprzód lub przeładuj. Preferuj nad new-page dla tej samej karty.",
     form: {
-      label: "Nawiguj stronÄ",
-      description:
-        "Nawiguj aktualnie wybranÄ stronÄ do URL lub przez historiÄ",
+      label: "Nawiguj stronę",
+      description: "Nawiguj aktualnie wybraną stronę do URL lub przez historię",
       fields: {
         type: {
           label: "Typ nawigacji",
           description:
-            "Nawiguj po URL, wstecz lub do przodu w historii, lub odÅwieÅ¼",
+            "Nawiguj po URL, wstecz lub do przodu w historii, lub odśwież",
           placeholder: "Wybierz typ nawigacji",
           options: {
             url: "URL",
             back: "Wstecz",
             forward: "Do przodu",
-            reload: "OdÅwieÅ¼",
+            reload: "Odśwież",
           },
         },
         url: {
           label: "URL",
           description: "Docelowy URL (tylko dla type=url)",
-          placeholder: "WprowadÅº URL",
+          placeholder: "Wprowadź URL",
         },
         ignoreCache: {
           label: "Ignoruj cache",
-          description: "Czy ignorowaÄ cache podczas odÅwieÅ¼ania",
+          description: "Czy ignorować cache podczas odświeżania",
           placeholder: "Ignoruj cache",
         },
         timeout: {
           label: "Limit czasu",
           description:
-            "Maksymalny czas oczekiwania w milisekundach (0 dla domyÅlnego)",
-          placeholder: "WprowadÅº limit czasu",
+            "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
+          placeholder: "Wprowadź limit czasu",
         },
       },
     },
     response: {
-      success: "Operacja nawigacji pomyÅlna",
+      success: "Operacja nawigacji pomyślna",
       result: "Wynik nawigacji",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas nawigacji",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas nawigacji",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do nawigacji stron",
+        description: "Nie masz uprawnień do nawigacji stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -880,32 +876,32 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
-        description: "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas nawigacji",
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera podczas nawigacji",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas nawigacji",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas nawigacji",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas nawigacji",
+        description: "Wystąpił konflikt podczas nawigacji",
       },
     },
     success: {
-      title: "Nawigacja pomyÅlna",
-      description: "Strona zostaÅa pomyÅlnie znawigowana",
+      title: "Nawigacja pomyślna",
+      description: "Strona została pomyślnie znawigowana",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       navigationAutomation: "Automatyzacja nawigacji",
     },
   },
@@ -914,15 +910,15 @@ export const translations: typeof enTranslations = {
     titleShort: "Nowa strona",
     dynamicTitle: "Nowa strona: {{url}}",
     description:
-      "OtwÃ³rz nowÄ kartÄ pod danym URL. Sesja przejmuje kartÄ â wszystkie kolejne wywoÅania dziaÅajÄ na niej.",
+      "Otwórz nową kartę pod danym URL. Sesja przejmuje kartę — wszystkie kolejne wywołania działają na niej.",
     form: {
       label: "Nowa strona",
-      description: "UtwÃ³rz nowÄ stronÄ przeglÄdarki i zaÅaduj URL",
+      description: "Utwórz nową stronę przeglądarki i załaduj URL",
       fields: {
         url: {
           label: "URL",
-          description: "URL do zaÅadowania na nowej stronie",
-          placeholder: "WprowadÅº URL",
+          description: "URL do załadowania na nowej stronie",
+          placeholder: "Wprowadź URL",
         },
         replacePage: {
           label: "Zastąp stronę",
@@ -935,29 +931,29 @@ export const translations: typeof enTranslations = {
         timeout: {
           label: "Limit czasu",
           description:
-            "Maksymalny czas oczekiwania w milisekundach (0 dla domyÅlnego)",
-          placeholder: "WprowadÅº limit czasu",
+            "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
+          placeholder: "Wprowadź limit czasu",
         },
       },
     },
     response: {
-      success: "Operacja tworzenia nowej strony pomyÅlna",
+      success: "Operacja tworzenia nowej strony pomyślna",
       result: "Wynik tworzenia nowej strony",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas tworzenia nowej strony",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas tworzenia nowej strony",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do tworzenia nowych stron",
+        description: "Nie masz uprawnień do tworzenia nowych stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -965,73 +961,72 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas tworzenia nowej strony",
+          "Wystąpił wewnętrzny błąd serwera podczas tworzenia nowej strony",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description:
-          "WystÄpiÅ nieznany bÅÄd podczas tworzenia nowej strony",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas tworzenia nowej strony",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas tworzenia nowej strony",
+        description: "Wystąpił konflikt podczas tworzenia nowej strony",
       },
     },
     success: {
-      title: "Nowa strona pomyÅlnie utworzona",
-      description: "Nowa strona zostaÅa pomyÅlnie utworzona",
+      title: "Nowa strona pomyślnie utworzona",
+      description: "Nowa strona została pomyślnie utworzona",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       navigationAutomation: "Automatyzacja nawigacji",
     },
   },
   "select-page": {
-    title: "Wybierz stronÄ",
+    title: "Wybierz stronę",
     titleShort: "Wybierz",
     dynamicTitle: "Wybierz: {{page}}",
     description:
-      "PrzeÅÄcz sesjÄ na konkretnÄ stronÄ po indeksie. Indeks znajdziesz przez list-pages. Nie aktualizuje Åledzonej karty sesji.",
+      "Przełącz sesję na konkretną stronę po indeksie. Indeks znajdziesz przez list-pages. Nie aktualizuje śledzonej karty sesji.",
     form: {
-      label: "Wybierz stronÄ",
-      description: "Wybierz stronÄ wedÅug jej indeksu",
+      label: "Wybierz stronę",
+      description: "Wybierz stronę według jej indeksu",
       fields: {
         pageIdx: {
           label: "Indeks strony",
           description:
-            "Indeks strony do wybrania (wywoÅaj list_pages aby wylistowaÄ strony)",
-          placeholder: "WprowadÅº indeks strony",
+            "Indeks strony do wybrania (wywołaj list_pages aby wylistować strony)",
+          placeholder: "Wprowadź indeks strony",
         },
       },
     },
     response: {
-      success: "Operacja wyboru strony pomyÅlna",
+      success: "Operacja wyboru strony pomyślna",
       result: "Wynik wyboru strony",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas wybierania strony",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas wybierania strony",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do wybierania stron",
+        description: "Nie masz uprawnień do wybierania stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -1039,33 +1034,33 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas wybierania strony",
+          "Wystąpił wewnętrzny błąd serwera podczas wybierania strony",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas wybierania strony",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas wybierania strony",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas wybierania strony",
+        description: "Wystąpił konflikt podczas wybierania strony",
       },
     },
     success: {
-      title: "Strona pomyÅlnie wybrana",
-      description: "Strona zostaÅa pomyÅlnie wybrana",
+      title: "Strona pomyślnie wybrana",
+      description: "Strona została pomyślnie wybrana",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       navigationAutomation: "Automatyzacja nawigacji",
     },
   },
@@ -1073,16 +1068,15 @@ export const translations: typeof enTranslations = {
     title: "Emuluj",
     titleShort: "Emuluj",
     description:
-      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieÅ¼Äcej stronie. Każde wywołanie jest bezwzględne: pominięte pola są resetowane. Nadpisanie user agenta działa od następnej nawigacji, więc po ustawieniu odśwież stronę.",
+      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieżącej stronie. Każde wywołanie jest bezwzględne: pominięte pola są resetowane. Nadpisanie user agenta działa od następnej nawigacji, więc po ustawieniu odśwież stronę.",
     dynamicTitle: "Emuluj: {{config}}",
     form: {
-      label: "Emuluj urzÄdzenie",
-      description: "Emuluj warunki sieciowe i dÅawienie CPU",
+      label: "Emuluj urządzenie",
+      description: "Emuluj warunki sieciowe i dławienie CPU",
       fields: {
         networkConditions: {
           label: "Warunki sieciowe",
-          description:
-            "Ogranicz sieÄ (ustaw na Brak emulacji aby wyÅÄczyÄ)",
+          description: "Ogranicz sieć (ustaw na Brak emulacji aby wyłączyć)",
           placeholder: "Wybierz warunek sieciowy",
           options: {
             noEmulation: "Brak emulacji",
@@ -1094,107 +1088,106 @@ export const translations: typeof enTranslations = {
           },
         },
         cpuThrottlingRate: {
-          label: "WspÃ³Åczynnik dÅawienia CPU",
-          description:
-            "WspÃ³Åczynnik spowolnienia CPU (1 aby wyÅÄczyÄ, 1-20)",
-          placeholder: "WprowadÅº wspÃ³Åczynnik dÅawienia",
+          label: "Współczynnik dławienia CPU",
+          description: "Współczynnik spowolnienia CPU (1 aby wyłączyć, 1-20)",
+          placeholder: "Wprowadź współczynnik dławienia",
         },
       },
     },
     response: {
-      success: "Operacja emulacji pomyÅlna",
+      success: "Operacja emulacji pomyślna",
       result: "Wynik operacji emulacji",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas emulacji",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas emulacji",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do emulacji funkcji urzÄdzenia",
+        description: "Nie masz uprawnień do emulacji funkcji urządzenia",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja emulacji urzÄdzenia jest zabroniona",
+        description: "Operacja emulacji urządzenia jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
-        description: "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas emulacji",
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera podczas emulacji",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas emulacji",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas emulacji",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas emulacji",
+        description: "Wystąpił konflikt podczas emulacji",
       },
     },
     success: {
-      title: "Emulacja pomyÅlna",
-      description: "Funkcje urzÄdzenia zostaÅy pomyÅlnie zemulowane",
+      title: "Emulacja pomyślna",
+      description: "Funkcje urządzenia zostały pomyślnie zemulowane",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      performanceAutomation: "Automatyzacja wydajnoÅci",
+      browserAutomation: "Automatyzacja przeglądarki",
+      performanceAutomation: "Automatyzacja wydajności",
     },
   },
   "resize-page": {
-    title: "ZmieÅ rozmiar strony",
-    titleShort: "ZmieÅ rozmiar",
+    title: "Zmień rozmiar strony",
+    titleShort: "Zmień rozmiar",
     dynamicTitle: "Rozmiar: {{width}}x{{height}}",
     description:
-      "ZmieÅ rozmiar viewportu przeglÄdarki do podanych wymiarÃ³w w pikselach.",
+      "Zmień rozmiar viewportu przeglądarki do podanych wymiarów w pikselach.",
     form: {
-      label: "ZmieÅ rozmiar strony",
-      description: "ZmieÅ rozmiar strony do okreÅlonych wymiarÃ³w",
+      label: "Zmień rozmiar strony",
+      description: "Zmień rozmiar strony do określonych wymiarów",
       fields: {
         width: {
-          label: "SzerokoÅÄ",
-          description: "SzerokoÅÄ strony w pikselach",
-          placeholder: "WprowadÅº szerokoÅÄ",
+          label: "Szerokość",
+          description: "Szerokość strony w pikselach",
+          placeholder: "Wprowadź szerokość",
         },
         height: {
-          label: "WysokoÅÄ",
-          description: "WysokoÅÄ strony w pikselach",
-          placeholder: "WprowadÅº wysokoÅÄ",
+          label: "Wysokość",
+          description: "Wysokość strony w pikselach",
+          placeholder: "Wprowadź wysokość",
         },
       },
     },
     response: {
-      success: "Operacja zmiany rozmiaru strony pomyÅlna",
+      success: "Operacja zmiany rozmiaru strony pomyślna",
       result: "Wynik operacji zmiany rozmiaru strony",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas zmiany rozmiaru strony",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas zmiany rozmiaru strony",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do zmiany rozmiaru stron",
+        description: "Nie masz uprawnień do zmiany rozmiaru stron",
       },
       forbidden: {
         title: "Zabronione",
@@ -1202,34 +1195,33 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas zmiany rozmiaru strony",
+          "Wystąpił wewnętrzny błąd serwera podczas zmiany rozmiaru strony",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description:
-          "WystÄpiÅ nieznany bÅÄd podczas zmiany rozmiaru strony",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas zmiany rozmiaru strony",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas zmiany rozmiaru strony",
+        description: "Wystąpił konflikt podczas zmiany rozmiaru strony",
       },
     },
     success: {
-      title: "Rozmiar strony pomyÅlnie zmieniony",
-      description: "Rozmiar strony zostaÅ pomyÅlnie zmieniony",
+      title: "Rozmiar strony pomyślnie zmieniony",
+      description: "Rozmiar strony został pomyślnie zmieniony",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       viewportAutomation: "Automatyzacja widoku",
     },
   },
@@ -1237,11 +1229,11 @@ export const translations: typeof enTranslations = {
     title: "Oceniaj skrypt",
     titleShort: "Skrypt",
     description:
-      "Uruchom JavaScript na stronie i zwrÃ³Ä wynik. Dla stanu, ktÃ³rego take-snapshot nie ujawnia.",
+      "Uruchom JavaScript na stronie i zwróć wynik. Dla stanu, którego take-snapshot nie ujawnia.",
     dynamicTitle: "Skrypt: {{snippet}}",
     form: {
       label: "Oceniaj skrypt",
-      description: "Wykonaj JavaScript na stronie przeglÄdarki",
+      description: "Wykonaj JavaScript na stronie przeglądarki",
       fields: {
         function: {
           label: "Funkcja",
@@ -1251,7 +1243,7 @@ export const translations: typeof enTranslations = {
         args: {
           label: "Argumenty",
           description:
-            "Opcjonalna lista argumentÃ³w (UID elementÃ³w) do przekazania do funkcji",
+            "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
           placeholder: '[{"uid": "element-uid"}]',
           uid: {
             label: "UID elementu",
@@ -1261,28 +1253,28 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
-      success: "Operacja oceny skryptu pomyÅlna",
+      success: "Operacja oceny skryptu pomyślna",
       result: {
         title: "Wynik",
         description: "Wynik oceny skryptu",
         executed: "Wykonano",
-        result: "WartoÅÄ zwracana",
+        result: "Wartość zwracana",
       },
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas oceny skryptu",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas oceny skryptu",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do oceny skryptÃ³w",
+        description: "Nie masz uprawnień do oceny skryptów",
       },
       forbidden: {
         title: "Zabronione",
@@ -1290,366 +1282,360 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
-        description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas oceny skryptu",
+        title: "Błąd serwera",
+        description: "Wystąpił wewnętrzny błąd serwera podczas oceny skryptu",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas oceny skryptu",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas oceny skryptu",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas oceny skryptu",
+        description: "Wystąpił konflikt podczas oceny skryptu",
       },
     },
     success: {
-      title: "Skrypt pomyÅlnie oceniony",
-      description: "JavaScript zostaÅ pomyÅlnie wykonany",
+      title: "Skrypt pomyślnie oceniony",
+      description: "JavaScript został pomyślnie wykonany",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      scriptExecution: "Wykonywanie skryptÃ³w",
+      browserAutomation: "Automatyzacja przeglądarki",
+      scriptExecution: "Wykonywanie skryptów",
     },
   },
   "get-console-message": {
-    title: "Pobierz wiadomoÅÄ konsoli",
+    title: "Pobierz wiadomość konsoli",
     titleShort: "Konsola",
     description:
-      "Pobierz peÅnÄ treÅÄ konkretnej wiadomoÅci konsoli po msgid z list-console-messages.",
+      "Pobierz pełną treść konkretnej wiadomości konsoli po msgid z list-console-messages.",
     dynamicTitle: "Konsola #{{id}}",
     form: {
-      label: "Pobierz wiadomoÅÄ konsoli",
-      description: "Pobierz okreÅlonÄ wiadomoÅÄ konsoli",
+      label: "Pobierz wiadomość konsoli",
+      description: "Pobierz określoną wiadomość konsoli",
       fields: {
         msgid: {
-          label: "ID wiadomoÅci",
+          label: "ID wiadomości",
           description:
-            "ID wiadomoÅci konsoli z wylistowanych wiadomoÅci konsoli",
-          placeholder: "WprowadÅº ID wiadomoÅci",
+            "ID wiadomości konsoli z wylistowanych wiadomości konsoli",
+          placeholder: "Wprowadź ID wiadomości",
         },
       },
     },
     response: {
-      success: "Operacja pobierania wiadomoÅci konsoli pomyÅlna",
-      result: "Wynik pobierania wiadomoÅci konsoli",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Operacja pobierania wiadomości konsoli pomyślna",
+      result: "Wynik pobierania wiadomości konsoli",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas pobierania wiadomoÅci konsoli",
+          "Wystąpił błąd sieci podczas pobierania wiadomości konsoli",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do pobierania wiadomoÅci konsoli",
+        description: "Nie masz uprawnień do pobierania wiadomości konsoli",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Operacja pobierania wiadomoÅci konsoli jest zabroniona",
+        description: "Operacja pobierania wiadomości konsoli jest zabroniona",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas pobierania wiadomoÅci konsoli",
+          "Wystąpił wewnętrzny błąd serwera podczas pobierania wiadomości konsoli",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas pobierania wiadomoÅci konsoli",
+          "Wystąpił nieznany błąd podczas pobierania wiadomości konsoli",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas pobierania wiadomoÅci konsoli",
+        description: "Wystąpił konflikt podczas pobierania wiadomości konsoli",
       },
     },
     success: {
-      title: "WiadomoÅÄ konsoli pomyÅlnie pobrana",
-      description: "WiadomoÅÄ konsoli zostaÅa pomyÅlnie pobrana",
+      title: "Wiadomość konsoli pomyślnie pobrana",
+      description: "Wiadomość konsoli została pomyślnie pobrana",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       debugging: "Debugowanie",
     },
   },
   "list-console-messages": {
-    title: "Lista wiadomoÅci konsoli",
+    title: "Lista wiadomości konsoli",
     titleShort: "Logi konsoli",
     description:
-      "Lista wiadomoÅci konsoli od ostatniej nawigacji. Filtruj po typie (error/warn/log). UÅ¼ywaj po akcjach, by wykryÄ bÅÄdy JS.",
+      "Lista wiadomości konsoli od ostatniej nawigacji. Filtruj po typie (error/warn/log). Używaj po akcjach, by wykryć błędy JS.",
     form: {
-      label: "Lista wiadomoÅci konsoli",
+      label: "Lista wiadomości konsoli",
       description:
-        "Pobierz wszystkie wiadomoÅci konsoli ze strony przeglÄdarki",
+        "Pobierz wszystkie wiadomości konsoli ze strony przeglądarki",
       fields: {
         includePreservedMessages: {
-          label: "UwzglÄdnij zachowane wiadomoÅci",
+          label: "Uwzględnij zachowane wiadomości",
           description:
-            "Ustaw na true, aby zwrÃ³ciÄ zachowane wiadomoÅci z ostatnich 3 nawigacji",
+            "Ustaw na true, aby zwrócić zachowane wiadomości z ostatnich 3 nawigacji",
           placeholder: "false",
         },
         pageIdx: {
           label: "Indeks strony",
           description:
-            "Numer strony do zwrÃ³cenia (0-based, pomiÅ dla pierwszej strony)",
-          placeholder: "WprowadÅº indeks strony",
+            "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
+          placeholder: "Wprowadź indeks strony",
         },
         pageSize: {
           label: "Rozmiar strony",
           description:
-            "Maksymalna liczba wiadomoÅci do zwrÃ³cenia (pomiÅ, aby zwrÃ³ciÄ wszystkie wiadomoÅci)",
-          placeholder: "WprowadÅº rozmiar strony",
+            "Maksymalna liczba wiadomości do zwrócenia (pomiń, aby zwrócić wszystkie wiadomości)",
+          placeholder: "Wprowadź rozmiar strony",
         },
         types: {
-          label: "Typy wiadomoÅci",
+          label: "Typy wiadomości",
           description:
-            "Filtruj wiadomoÅci, aby zwracaÄ tylko wiadomoÅci okreÅlonych typÃ³w (pomiÅ dla wszystkich)",
-          placeholder: "Wybierz typy wiadomoÅci",
+            "Filtruj wiadomości, aby zwracać tylko wiadomości określonych typów (pomiń dla wszystkich)",
+          placeholder: "Wybierz typy wiadomości",
           options: {
             log: "Log",
             debug: "Debug",
             info: "Info",
-            error: "BÅÄd",
-            warn: "OstrzeÅ¼enie",
+            error: "Błąd",
+            warn: "Ostrzeżenie",
             dir: "Dir",
             dirxml: "Dirxml",
             table: "Tabela",
             trace: "Trace",
-            clear: "WyczyÅÄ",
-            startGroup: "Rozpocznij grupÄ",
-            startGroupCollapsed: "Rozpocznij grupÄ zwiniÄte",
-            endGroup: "ZakoÅcz grupÄ",
+            clear: "Wyczyść",
+            startGroup: "Rozpocznij grupę",
+            startGroupCollapsed: "Rozpocznij grupę zwinięte",
+            endGroup: "Zakończ grupę",
             assert: "Assert",
             profile: "Profil",
             profileEnd: "Koniec profilu",
             count: "Licznik",
             timeEnd: "Koniec czasu",
-            verbose: "SzczegÃ³Åowe",
+            verbose: "Szczegółowe",
             issue: "Problem",
           },
         },
       },
     },
     response: {
-      success: "WiadomoÅci konsoli pobrane pomyÅlnie",
+      success: "Wiadomości konsoli pobrane pomyślnie",
       result: {
         title: "Wynik",
-        description: "Wynik listy wiadomoÅci konsoli",
+        description: "Wynik listy wiadomości konsoli",
         messages: {
-          msgid: "ID wiadomoÅci",
+          msgid: "ID wiadomości",
           type: "Typ",
-          text: "WiadomoÅÄ",
+          text: "Wiadomość",
           timestamp: "Znacznik czasu",
         },
-        totalCount: "ÅÄczna liczba",
+        totalCount: "Łączna liczba",
       },
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas listowania wiadomoÅci konsoli",
+          "Wystąpił błąd sieci podczas listowania wiadomości konsoli",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do listowania wiadomoÅci konsoli",
+        description: "Nie masz uprawnień do listowania wiadomości konsoli",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Listowanie wiadomoÅci konsoli jest zabronione",
+        description: "Listowanie wiadomości konsoli jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas listowania wiadomoÅci konsoli",
+          "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości konsoli",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas listowania wiadomoÅci konsoli",
+          "Wystąpił nieznany błąd podczas listowania wiadomości konsoli",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas listowania wiadomoÅci konsoli",
+        description: "Wystąpił konflikt podczas listowania wiadomości konsoli",
       },
     },
     success: {
-      title: "WiadomoÅci konsoli pobrane pomyÅlnie",
-      description: "WiadomoÅci konsoli zostaÅy pomyÅlnie pobrane",
+      title: "Wiadomości konsoli pobrane pomyślnie",
+      description: "Wiadomości konsoli zostały pomyślnie pobrane",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       debugging: "Debugowanie",
     },
   },
   "get-network-request": {
-    title: "Pobierz Å¼Ädanie sieciowe",
-    titleShort: "Å»Ädanie",
+    title: "Pobierz żądanie sieciowe",
+    titleShort: "Żądanie",
     description:
-      "Pobierz peÅne szczegÃ³Åy (nagÅÃ³wki, body) Å¼Ädania po reqid z list-network-requests.",
-    dynamicTitle: "SieÄ #{{id}}",
+      "Pobierz pełne szczegóły (nagłówki, body) żądania po reqid z list-network-requests.",
+    dynamicTitle: "Sieć #{{id}}",
     form: {
-      label: "Pobierz Å¼Ädanie sieciowe",
-      description:
-        "Pobierz okreÅlone Å¼Ädanie sieciowe lub aktualnie wybrane",
+      label: "Pobierz żądanie sieciowe",
+      description: "Pobierz określone żądanie sieciowe lub aktualnie wybrane",
       fields: {
         reqid: {
-          label: "ID Å¼Ädania",
+          label: "ID żądania",
           description:
-            "Reqid Å¼Ädania sieciowego (pomiÅ, aby pobraÄ aktualnie wybrane Å¼Ädanie w DevTools)",
-          placeholder: "WprowadÅº ID Å¼Ädania",
+            "Reqid żądania sieciowego (pomiń, aby pobrać aktualnie wybrane żądanie w DevTools)",
+          placeholder: "Wprowadź ID żądania",
         },
         maxBodyLength: {
-          label: "Maks. dÅugoÅÄ treÅci",
+          label: "Maks. długość treści",
           description:
-            "Maksymalna liczba znakÃ³w zwracanych z treÅci Å¼Ädania/odpowiedzi. Nadmiar jest obcinany z powiadomieniem.",
+            "Maksymalna liczba znaków zwracanych z treści żądania/odpowiedzi. Nadmiar jest obcinany z powiadomieniem.",
           placeholder: "np. 10000",
         },
       },
     },
     response: {
-      success: "Å»Ädanie sieciowe pobrane pomyÅlnie",
-      result: "Wynik pobierania Å¼Ädania sieciowego",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Żądanie sieciowe pobrane pomyślnie",
+      result: "Wynik pobierania żądania sieciowego",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas pobierania Å¼Ädania sieciowego",
+          "Wystąpił błąd sieci podczas pobierania żądania sieciowego",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do pobierania Å¼ÄdaÅ sieciowych",
+        description: "Nie masz uprawnień do pobierania żądań sieciowych",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Pobieranie Å¼ÄdaÅ sieciowych jest zabronione",
+        description: "Pobieranie żądań sieciowych jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas pobierania Å¼Ädania sieciowego",
+          "Wystąpił wewnętrzny błąd serwera podczas pobierania żądania sieciowego",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas pobierania Å¼Ädania sieciowego",
+          "Wystąpił nieznany błąd podczas pobierania żądania sieciowego",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas pobierania Å¼Ädania sieciowego",
+        description: "Wystąpił konflikt podczas pobierania żądania sieciowego",
       },
     },
     success: {
-      title: "Å»Ädanie sieciowe pobrane pomyÅlnie",
-      description: "Å»Ädanie sieciowe zostaÅo pomyÅlnie pobrane",
+      title: "Żądanie sieciowe pobrane pomyślnie",
+      description: "Żądanie sieciowe zostało pomyślnie pobrane",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       networkAnalysis: "Analiza sieci",
     },
   },
   "list-network-requests": {
-    title: "Lista Å¼ÄdaÅ sieciowych",
+    title: "Lista żądań sieciowych",
     titleShort: "Logi sieci",
     description:
-      "Lista Å¼ÄdaÅ sieciowych od ostatniej nawigacji. Filtruj po typie zasobu (fetch/xhr/doc). Do inspekcji wywoÅaÅ API.",
+      "Lista żądań sieciowych od ostatniej nawigacji. Filtruj po typie zasobu (fetch/xhr/doc). Do inspekcji wywołań API.",
     form: {
-      label: "Lista Å¼ÄdaÅ sieciowych",
-      description:
-        "Pobierz wszystkie Å¼Ädania sieciowe ze strony przeglÄdarki",
+      label: "Lista żądań sieciowych",
+      description: "Pobierz wszystkie żądania sieciowe ze strony przeglądarki",
       fields: {
         includePreservedRequests: {
-          label: "UwzglÄdnij zachowane Å¼Ädania",
+          label: "Uwzględnij zachowane żądania",
           description:
-            "Ustaw na true, aby zwrÃ³ciÄ zachowane Å¼Ädania z ostatnich 3 nawigacji",
+            "Ustaw na true, aby zwrócić zachowane żądania z ostatnich 3 nawigacji",
           placeholder: "false",
         },
         pageIdx: {
           label: "Indeks strony",
           description:
-            "Numer strony do zwrÃ³cenia (0-based, pomiÅ dla pierwszej strony)",
-          placeholder: "WprowadÅº indeks strony",
+            "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
+          placeholder: "Wprowadź indeks strony",
         },
         pageSize: {
           label: "Rozmiar strony",
           description:
-            "Maksymalna liczba Å¼ÄdaÅ do zwrÃ³cenia (pomiÅ, aby zwrÃ³ciÄ wszystkie Å¼Ädania)",
-          placeholder: "WprowadÅº rozmiar strony",
+            "Maksymalna liczba żądań do zwrócenia (pomiń, aby zwrócić wszystkie żądania)",
+          placeholder: "Wprowadź rozmiar strony",
         },
         resourceTypes: {
-          label: "Typy zasobÃ³w",
+          label: "Typy zasobów",
           description:
-            "Filtruj Å¼Ädania, aby zwracaÄ tylko Å¼Ädania okreÅlonych typÃ³w zasobÃ³w (pomiÅ dla wszystkich)",
-          placeholder: "Wybierz typy zasobÃ³w",
+            "Filtruj żądania, aby zwracać tylko żądania określonych typów zasobów (pomiń dla wszystkich)",
+          placeholder: "Wybierz typy zasobów",
           options: {
             document: "Dokument",
-            stylesheet: "Arkusz stylÃ³w",
+            stylesheet: "Arkusz stylów",
             image: "Obraz",
             media: "Media",
             font: "Czcionka",
             script: "Skrypt",
-            texttrack: "ÅcieÅ¼ka tekstowa",
+            texttrack: "Ścieżka tekstowa",
             xhr: "XHR",
             fetch: "Fetch",
             prefetch: "Prefetch",
-            eventsource: "Å¹rÃ³dÅo zdarzeÅ",
+            eventsource: "Źródło zdarzeń",
             websocket: "WebSocket",
             manifest: "Manifest",
             signedexchange: "Podpisana wymiana",
@@ -1663,333 +1649,328 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
-      success: "Å»Ädania sieciowe pobrane pomyÅlnie",
+      success: "Żądania sieciowe pobrane pomyślnie",
       result: {
         title: "Wynik",
-        description: "Wynik listy Å¼ÄdaÅ sieciowych",
+        description: "Wynik listy żądań sieciowych",
         requests: {
-          reqid: "ID Å¼Ädania",
+          reqid: "ID żądania",
           url: "URL",
           method: "Metoda",
           status: "Status",
           type: "Typ",
         },
-        totalCount: "ÅÄczna liczba",
+        totalCount: "Łączna liczba",
       },
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description:
-          "WystÄpiÅ bÅÄd sieci podczas listowania Å¼ÄdaÅ sieciowych",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas listowania żądań sieciowych",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do listowania Å¼ÄdaÅ sieciowych",
+        description: "Nie masz uprawnień do listowania żądań sieciowych",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Listowanie Å¼ÄdaÅ sieciowych jest zabronione",
+        description: "Listowanie żądań sieciowych jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas listowania Å¼ÄdaÅ sieciowych",
+          "Wystąpił wewnętrzny błąd serwera podczas listowania żądań sieciowych",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas listowania Å¼ÄdaÅ sieciowych",
+          "Wystąpił nieznany błąd podczas listowania żądań sieciowych",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas listowania Å¼ÄdaÅ sieciowych",
+        description: "Wystąpił konflikt podczas listowania żądań sieciowych",
       },
     },
     success: {
-      title: "Å»Ädania sieciowe pobrane pomyÅlnie",
-      description: "Å»Ädania sieciowe zostaÅy pomyÅlnie pobrane",
+      title: "Żądania sieciowe pobrane pomyślnie",
+      description: "Żądania sieciowe zostały pomyślnie pobrane",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       networkAnalysis: "Analiza sieci",
     },
   },
   "performance-analyze-insight": {
-    title: "Analizuj insight wydajnoÅci",
+    title: "Analizuj insight wydajności",
     titleShort: "Analiza",
     description:
-      "WejdÅº gÅÄbiej w konkretny insight z wyniku trace (np. DocumentLatency, LCPBreakdown). WywoÅaj po performance-stop-trace.",
+      "Wejdź głębiej w konkretny insight z wyniku trace (np. DocumentLatency, LCPBreakdown). Wywołaj po performance-stop-trace.",
     form: {
-      label: "Analizuj insight wydajnoÅci",
+      label: "Analizuj insight wydajności",
       description:
-        "Pobierz szczegÃ³Åowe informacje o okreÅlonym insightu wydajnoÅci",
+        "Pobierz szczegółowe informacje o określonym insightu wydajności",
       fields: {
         insightSetId: {
-          label: "ID zestawu insightÃ³w",
+          label: "ID zestawu insightów",
           description:
-            "ID okreÅlonego zestawu insightÃ³w (uÅ¼ywaj tylko ID podanych na liÅcie DostÄpne zestawy insightÃ³w)",
-          placeholder: "WprowadÅº ID zestawu insightÃ³w",
+            "ID określonego zestawu insightów (używaj tylko ID podanych na liście Dostępne zestawy insightów)",
+          placeholder: "Wprowadź ID zestawu insightów",
         },
         insightName: {
           label: "Nazwa insightu",
           description:
-            "Nazwa insightu, o ktÃ³rym chcesz uzyskaÄ wiÄcej informacji (np. DocumentLatency lub LCPBreakdown)",
-          placeholder: "WprowadÅº nazwÄ insightu",
+            "Nazwa insightu, o którym chcesz uzyskać więcej informacji (np. DocumentLatency lub LCPBreakdown)",
+          placeholder: "Wprowadź nazwę insightu",
         },
       },
     },
     response: {
-      success: "Insight wydajnoÅci przeanalizowany pomyÅlnie",
-      result: "Wynik analizy insightu wydajnoÅci",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Insight wydajności przeanalizowany pomyślnie",
+      result: "Wynik analizy insightu wydajności",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas analizowania insightu wydajnoÅci",
+          "Wystąpił błąd sieci podczas analizowania insightu wydajności",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Nie masz uprawnieÅ do analizowania insightÃ³w wydajnoÅci",
+        description: "Nie masz uprawnień do analizowania insightów wydajności",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Analizowanie insightÃ³w wydajnoÅci jest zabronione",
+        description: "Analizowanie insightów wydajności jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas analizowania insightu wydajnoÅci",
+          "Wystąpił wewnętrzny błąd serwera podczas analizowania insightu wydajności",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas analizowania insightu wydajnoÅci",
+          "Wystąpił nieznany błąd podczas analizowania insightu wydajności",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
         description:
-          "WystÄpiÅ konflikt podczas analizowania insightu wydajnoÅci",
+          "Wystąpił konflikt podczas analizowania insightu wydajności",
       },
     },
     success: {
-      title: "Insight wydajnoÅci przeanalizowany pomyÅlnie",
-      description: "Insight wydajnoÅci zostaÅ pomyÅlnie przeanalizowany",
+      title: "Insight wydajności przeanalizowany pomyślnie",
+      description: "Insight wydajności został pomyślnie przeanalizowany",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      performanceAutomation: "Automatyzacja wydajnoÅci",
+      browserAutomation: "Automatyzacja przeglądarki",
+      performanceAutomation: "Automatyzacja wydajności",
     },
   },
   "performance-start-trace": {
-    title: "Rozpocznij trace wydajnoÅci",
-    titleShort: "Start Åladu",
+    title: "Rozpocznij trace wydajności",
+    titleShort: "Start śladu",
     description:
-      "Uruchom trace wydajnoÅci, aby przechwyciÄ Core Web Vitals i metryki Åadowania. NastÄpnie wywoÅaj performance-stop-trace.",
+      "Uruchom trace wydajności, aby przechwycić Core Web Vitals i metryki ładowania. Następnie wywołaj performance-stop-trace.",
     form: {
-      label: "Rozpocznij trace wydajnoÅci",
+      label: "Rozpocznij trace wydajności",
       description:
-        "Rozpocznij nagrywanie metryk wydajnoÅci dla strony przeglÄdarki",
+        "Rozpocznij nagrywanie metryk wydajności dla strony przeglądarki",
       fields: {
         reload: {
-          label: "PrzeÅaduj stronÄ",
+          label: "Przeładuj stronę",
           description:
-            "OkreÅla, czy po rozpoczÄciu Åledzenia strona powinna zostaÄ automatycznie przeÅadowana",
+            "Określa, czy po rozpoczęciu śledzenia strona powinna zostać automatycznie przeładowana",
           placeholder: "true",
         },
         autoStop: {
           label: "Automatyczne zatrzymanie",
           description:
-            "OkreÅla, czy nagrywanie trace powinno zostaÄ automatycznie zatrzymane",
+            "Określa, czy nagrywanie trace powinno zostać automatycznie zatrzymane",
           placeholder: "true",
         },
       },
     },
     response: {
-      success: "Trace wydajnoÅci rozpoczÄty pomyÅlnie",
-      result: "Wynik rozpoczÄcia trace wydajnoÅci",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Trace wydajności rozpoczęty pomyślnie",
+      result: "Wynik rozpoczęcia trace wydajności",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas rozpoczynania trace wydajnoÅci",
+          "Wystąpił błąd sieci podczas rozpoczynania trace wydajności",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do rozpoczynania trace wydajnoÅci",
+        description: "Nie masz uprawnień do rozpoczynania trace wydajności",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Rozpoczynanie trace wydajnoÅci jest zabronione",
+        description: "Rozpoczynanie trace wydajności jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas rozpoczynania trace wydajnoÅci",
+          "Wystąpił wewnętrzny błąd serwera podczas rozpoczynania trace wydajności",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas rozpoczynania trace wydajnoÅci",
+          "Wystąpił nieznany błąd podczas rozpoczynania trace wydajności",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas rozpoczynania trace wydajnoÅci",
+        description: "Wystąpił konflikt podczas rozpoczynania trace wydajności",
       },
     },
     success: {
-      title: "Trace wydajnoÅci rozpoczÄty pomyÅlnie",
-      description: "Trace wydajnoÅci zostaÅ pomyÅlnie rozpoczÄty",
+      title: "Trace wydajności rozpoczęty pomyślnie",
+      description: "Trace wydajności został pomyślnie rozpoczęty",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      performanceAutomation: "Automatyzacja wydajnoÅci",
+      browserAutomation: "Automatyzacja przeglądarki",
+      performanceAutomation: "Automatyzacja wydajności",
     },
   },
   "performance-stop-trace": {
-    title: "Zatrzymaj trace wydajnoÅci",
-    titleShort: "Stop Åladu",
+    title: "Zatrzymaj trace wydajności",
+    titleShort: "Stop śladu",
     description:
-      "Zatrzymaj aktywny trace i zwrÃ³Ä metryki wydajnoÅci z ID zestawÃ³w insightÃ³w dla performance-analyze-insight.",
+      "Zatrzymaj aktywny trace i zwróć metryki wydajności z ID zestawów insightów dla performance-analyze-insight.",
     form: {
-      label: "Zatrzymaj trace wydajnoÅci",
-      description: "Zatrzymaj aktywne nagrywanie trace wydajnoÅci",
+      label: "Zatrzymaj trace wydajności",
+      description: "Zatrzymaj aktywne nagrywanie trace wydajności",
       fields: {},
     },
     response: {
-      success: "Trace wydajnoÅci zatrzymany pomyÅlnie",
-      result: "Wynik zatrzymania trace wydajnoÅci z metrykami",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      success: "Trace wydajności zatrzymany pomyślnie",
+      result: "Wynik zatrzymania trace wydajności z metrykami",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas zatrzymywania trace wydajnoÅci",
+          "Wystąpił błąd sieci podczas zatrzymywania trace wydajności",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do zatrzymywania trace wydajnoÅci",
+        description: "Nie masz uprawnień do zatrzymywania trace wydajności",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Zatrzymywanie trace wydajnoÅci jest zabronione",
+        description: "Zatrzymywanie trace wydajności jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas zatrzymywania trace wydajnoÅci",
+          "Wystąpił wewnętrzny błąd serwera podczas zatrzymywania trace wydajności",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas zatrzymywania trace wydajnoÅci",
+          "Wystąpił nieznany błąd podczas zatrzymywania trace wydajności",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas zatrzymywania trace wydajnoÅci",
+        description: "Wystąpił konflikt podczas zatrzymywania trace wydajności",
       },
     },
     success: {
-      title: "Trace wydajnoÅci zatrzymany pomyÅlnie",
-      description: "Trace wydajnoÅci zostaÅ pomyÅlnie zatrzymany",
+      title: "Trace wydajności zatrzymany pomyślnie",
+      description: "Trace wydajności został pomyślnie zatrzymany",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
-      performanceAutomation: "Automatyzacja wydajnoÅci",
+      browserAutomation: "Automatyzacja przeglądarki",
+      performanceAutomation: "Automatyzacja wydajności",
     },
   },
   "take-screenshot": {
-    title: "ZrÃ³b zrzut ekranu",
+    title: "Zrób zrzut ekranu",
     titleShort: "Zrzut ekranu",
     dynamicTitle: "Zrzut: {{target}}",
     description:
-      "ZrÃ³b wizualny zrzut ekranu strony lub elementu. Zwraca obraz. Do weryfikacji stanu UI.",
+      "Zrób wizualny zrzut ekranu strony lub elementu. Zwraca obraz. Do weryfikacji stanu UI.",
     form: {
-      label: "ZrÃ³b zrzut ekranu",
-      description: "PrzechwyÄ zrzut ekranu strony przeglÄdarki lub elementu",
+      label: "Zrób zrzut ekranu",
+      description: "Przechwyć zrzut ekranu strony przeglądarki lub elementu",
       fields: {
         uid: {
           label: "UID elementu",
           description:
-            "UID elementu do zrzutu ekranu (pomiÅ, aby zrobiÄ zrzut ekranu caÅej strony)",
-          placeholder: "WprowadÅº UID elementu",
+            "UID elementu do zrzutu ekranu (pomiń, aby zrobić zrzut ekranu całej strony)",
+          placeholder: "Wprowadź UID elementu",
         },
         fullPage: {
-          label: "CaÅa strona",
+          label: "Cała strona",
           description:
-            "JeÅli ustawiono na true, zrobi zrzut ekranu caÅej strony zamiast aktualnie widocznego obszaru (niekompatybilne z uid)",
+            "Jeśli ustawiono na true, zrobi zrzut ekranu całej strony zamiast aktualnie widocznego obszaru (niekompatybilne z uid)",
           placeholder: "false",
         },
         format: {
           label: "Format",
           description:
-            "Typ formatu do zapisania zrzutu ekranu (domyÅlnie: png)",
+            "Typ formatu do zapisania zrzutu ekranu (domyślnie: png)",
           placeholder: "png",
           options: {
             png: "PNG",
@@ -1998,119 +1979,118 @@ export const translations: typeof enTranslations = {
           },
         },
         quality: {
-          label: "JakoÅÄ",
+          label: "Jakość",
           description:
-            "JakoÅÄ kompresji dla formatÃ³w JPEG i WebP (0-100). WyÅ¼sze wartoÅci oznaczajÄ lepszÄ jakoÅÄ, ale wiÄksze rozmiary plikÃ³w. Ignorowane dla formatu PNG.",
+            "Jakość kompresji dla formatów JPEG i WebP (0-100). Wyższe wartości oznaczają lepszą jakość, ale większe rozmiary plików. Ignorowane dla formatu PNG.",
           placeholder: "80",
         },
         filePath: {
-          label: "ÅcieÅ¼ka pliku",
+          label: "Ścieżka pliku",
           description:
-            "ÅcieÅ¼ka bezwzglÄdna lub wzglÄdna do bieÅ¼Äcego katalogu roboczego, aby zapisaÄ zrzut ekranu zamiast doÅÄczaÄ go do odpowiedzi",
-          placeholder: "/ÅcieÅ¼ka/do/zrzutu-ekranu.png",
+            "Ścieżka bezwzględna lub względna do bieżącego katalogu roboczego, aby zapisać zrzut ekranu zamiast dołączać go do odpowiedzi",
+          placeholder: "/ścieżka/do/zrzutu-ekranu.png",
         },
       },
     },
     response: {
-      success: "Zrzut ekranu przechwycony pomyÅlnie",
+      success: "Zrzut ekranu przechwycony pomyślnie",
       result: "Wynik przechwytywania zrzutu ekranu",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
+        title: "Błąd sieci",
         description:
-          "WystÄpiÅ bÅÄd sieci podczas przechwytywania zrzutu ekranu",
+          "Wystąpił błąd sieci podczas przechwytywania zrzutu ekranu",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do przechwytywania zrzutÃ³w ekranu",
+        description: "Nie masz uprawnień do przechwytywania zrzutów ekranu",
       },
       forbidden: {
         title: "Zabronione",
-        description: "Przechwytywanie zrzutÃ³w ekranu jest zabronione",
+        description: "Przechwytywanie zrzutów ekranu jest zabronione",
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas przechwytywania zrzutu ekranu",
+          "Wystąpił wewnętrzny błąd serwera podczas przechwytywania zrzutu ekranu",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
+        title: "Nieznany błąd",
         description:
-          "WystÄpiÅ nieznany bÅÄd podczas przechwytywania zrzutu ekranu",
+          "Wystąpił nieznany błąd podczas przechwytywania zrzutu ekranu",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "WystÄpiÅ konflikt podczas przechwytywania zrzutu ekranu",
+        description: "Wystąpił konflikt podczas przechwytywania zrzutu ekranu",
       },
     },
     success: {
-      title: "Zrzut ekranu przechwycony pomyÅlnie",
-      description: "Zrzut ekranu zostaÅ pomyÅlnie przechwycony",
+      title: "Zrzut ekranu przechwycony pomyślnie",
+      description: "Zrzut ekranu został pomyślnie przechwycony",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       captureAutomation: "Automatyzacja przechwytywania",
     },
   },
   "take-snapshot": {
-    title: "ZrÃ³b snapshot",
+    title: "Zrób snapshot",
     titleShort: "Migawka",
     description:
-      "Pobierz drzewo a11y strony jako tekst. Wymagane przed click/fill/drag â dostarcza UID-Ã³w elementÃ³w.",
+      "Pobierz drzewo a11y strony jako tekst. Wymagane przed click/fill/drag — dostarcza UID-ów elementów.",
     form: {
-      label: "ZrÃ³b snapshot",
+      label: "Zrób snapshot",
       description:
-        "PrzechwyÄ tekstowy snapshot strony przeglÄdarki na podstawie drzewa a11y",
+        "Przechwyć tekstowy snapshot strony przeglądarki na podstawie drzewa a11y",
       fields: {
         verbose: {
-          label: "SzczegÃ³Åowy",
+          label: "Szczegółowy",
           description:
-            "Czy doÅÄczyÄ wszystkie dostÄpne informacje w peÅnym drzewie a11y (domyÅlnie: false)",
+            "Czy dołączyć wszystkie dostępne informacje w pełnym drzewie a11y (domyślnie: false)",
           placeholder: "false",
         },
         filePath: {
-          label: "ÅcieÅ¼ka pliku",
+          label: "Ścieżka pliku",
           description:
-            "ÅcieÅ¼ka bezwzglÄdna lub wzglÄdna do bieÅ¼Äcego katalogu roboczego, aby zapisaÄ snapshot zamiast doÅÄczaÄ go do odpowiedzi",
-          placeholder: "/ÅcieÅ¼ka/do/snapshot.txt",
+            "Ścieżka bezwzględna lub względna do bieżącego katalogu roboczego, aby zapisać snapshot zamiast dołączać go do odpowiedzi",
+          placeholder: "/ścieżka/do/snapshot.txt",
         },
       },
     },
     response: {
-      success: "Snapshot przechwycony pomyÅlnie",
+      success: "Snapshot przechwycony pomyślnie",
       result: "Wynik przechwytywania snapshot",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas przechwytywania snapshot",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas przechwytywania snapshot",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do przechwytywania snapshot",
+        description: "Nie masz uprawnień do przechwytywania snapshot",
       },
       forbidden: {
         title: "Zabronione",
@@ -2118,34 +2098,33 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas przechwytywania snapshot",
+          "Wystąpił wewnętrzny błąd serwera podczas przechwytywania snapshot",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description:
-          "WystÄpiÅ nieznany bÅÄd podczas przechwytywania snapshot",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas przechwytywania snapshot",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas przechwytywania snapshot",
+        description: "Wystąpił konflikt podczas przechwytywania snapshot",
       },
     },
     success: {
-      title: "Snapshot przechwycony pomyÅlnie",
-      description: "Snapshot zostaÅ pomyÅlnie przechwycony",
+      title: "Snapshot przechwycony pomyślnie",
+      description: "Snapshot został pomyślnie przechwycony",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       captureAutomation: "Automatyzacja przechwytywania",
     },
   },
@@ -2154,50 +2133,50 @@ export const translations: typeof enTranslations = {
     titleShort: "Czekaj",
     dynamicTitle: "Czekaj: {{text}}",
     description:
-      "Poczekaj, aÅ¼ dany tekst pojawi siÄ na stronie. UÅ¼ywaj po nawigacji lub akcjach asynchronicznych.",
+      "Poczekaj, aż dany tekst pojawi się na stronie. Używaj po nawigacji lub akcjach asynchronicznych.",
 
     form: {
       label: "Poczekaj na tekst",
-      description: "Poczekaj, aÅ¼ okreÅlony tekst pojawi siÄ na stronie",
+      description: "Poczekaj, aż określony tekst pojawi się na stronie",
       fields: {
         text: {
           label: "Tekst",
-          description: "Tekst, ktÃ³ry ma pojawiÄ siÄ na stronie",
-          placeholder: "WprowadÅº tekst, na ktÃ³ry czekaÄ",
+          description: "Tekst, który ma pojawić się na stronie",
+          placeholder: "Wprowadź tekst, na który czekać",
         },
         timeout: {
           label: "Limit czasu",
           description:
-            "Maksymalny czas oczekiwania w milisekundach. JeÅli ustawione na 0, zostanie uÅ¼yty domyÅlny limit",
-          placeholder: "WprowadÅº limit czasu (ms)",
+            "Maksymalny czas oczekiwania w milisekundach. Jeśli ustawione na 0, zostanie użyty domyślny limit",
+          placeholder: "Wprowadź limit czasu (ms)",
         },
         captureSnapshot: {
-          label: "PrzechwyÄ snapshot",
+          label: "Przechwyć snapshot",
           description:
-            "Gdy wÅÄczone, doÅÄcza peÅny snapshot dostÄpnoÅci do odpowiedzi. DomyÅlnie wyÅÄczone.",
+            "Gdy włączone, dołącza pełny snapshot dostępności do odpowiedzi. Domyślnie wyłączone.",
         },
       },
     },
 
     response: {
-      success: "Operacja oczekiwania pomyÅlna",
+      success: "Operacja oczekiwania pomyślna",
       result: "Wynik operacji oczekiwania",
-      error: "Komunikat bÅÄdu",
-      executionId: "ID wykonania do Åledzenia",
+      error: "Komunikat błędu",
+      executionId: "ID wykonania do śledzenia",
     },
 
     errors: {
       validation: {
-        title: "BÅÄd walidacji",
-        description: "SprawdÅº wprowadzone dane i sprÃ³buj ponownie",
+        title: "Błąd walidacji",
+        description: "Sprawdź wprowadzone dane i spróbuj ponownie",
       },
       network: {
-        title: "BÅÄd sieci",
-        description: "WystÄpiÅ bÅÄd sieci podczas operacji oczekiwania",
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci podczas operacji oczekiwania",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Nie masz uprawnieÅ do wykonywania operacji oczekiwania",
+        description: "Nie masz uprawnień do wykonywania operacji oczekiwania",
       },
       forbidden: {
         title: "Zabronione",
@@ -2205,74 +2184,74 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Å»Ädany zasÃ³b nie zostaÅ znaleziony",
+        description: "Żądany zasób nie został znaleziony",
       },
       serverError: {
-        title: "BÅÄd serwera",
+        title: "Błąd serwera",
         description:
-          "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas operacji oczekiwania",
+          "Wystąpił wewnętrzny błąd serwera podczas operacji oczekiwania",
       },
       unknown: {
-        title: "Nieznany bÅÄd",
-        description: "WystÄpiÅ nieznany bÅÄd podczas operacji oczekiwania",
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd podczas operacji oczekiwania",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+        description: "Masz niezapisane zmiany, które mogą zostać utracone",
       },
       conflict: {
         title: "Konflikt",
-        description: "WystÄpiÅ konflikt podczas operacji oczekiwania",
+        description: "Wystąpił konflikt podczas operacji oczekiwania",
       },
     },
 
     success: {
-      title: "Operacja oczekiwania pomyÅlna",
-      description: "OkreÅlony tekst pojawiÅ siÄ na stronie",
+      title: "Operacja oczekiwania pomyślna",
+      description: "Określony tekst pojawił się na stronie",
     },
     category: "Browser",
     tags: {
-      browserAutomation: "Automatyzacja przeglÄdarki",
+      browserAutomation: "Automatyzacja przeglądarki",
       waitAutomation: "Automatyzacja oczekiwania",
     },
   },
   title: "Chrome DevTools MCP Tools",
   description:
-    "Automatyzacja przeglÄdarki przez Chrome DevTools. PrzepÅyw: new-page â take-snapshot â interakcja (click/fill) â weryfikacja.",
+    "Automatyzacja przeglądarki przez Chrome DevTools. Przepływ: new-page → take-snapshot → interakcja (click/fill) → weryfikacja.",
   category: "Core API",
   summary:
-    "DostÄp do narzÄdzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
+    "Dostęp do narzędzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
   tags: {
-    browserAutomation: "Automatyzacja przeglÄdarki",
+    browserAutomation: "Automatyzacja przeglądarki",
     chromeDevTools: "Chrome DevTools",
-    mcpTools: "NarzÄdzia MCP",
+    mcpTools: "Narzędzia MCP",
     webDebugging: "Debugowanie webowe",
-    performanceAnalysis: "Analiza wydajnoÅci",
+    performanceAnalysis: "Analiza wydajności",
     inputAutomation: "Automatyzacja wprowadzania",
     captureAutomation: "Automatyzacja przechwytywania",
     debugging: "Debugowanie",
-    dialogAutomation: "Automatyzacja dialogÃ³w",
+    dialogAutomation: "Automatyzacja dialogów",
     navigationAutomation: "Automatyzacja nawigacji",
     networkAnalysis: "Analiza sieci",
-    performanceAutomation: "Automatyzacja wydajnoÅci",
-    scriptExecution: "Wykonywanie skryptÃ³w",
+    performanceAutomation: "Automatyzacja wydajności",
+    scriptExecution: "Wykonywanie skryptów",
     viewportAutomation: "Automatyzacja widoku",
     waitAutomation: "Automatyzacja oczekiwania",
   },
 
   form: {
-    label: "Wykonanie narzÄdzia przeglÄdarki",
+    label: "Wykonanie narzędzia przeglądarki",
     description:
-      "Wykonaj narzÄdzia Chrome DevTools MCP dla sterowania przeglÄdarkÄ i analizy",
+      "Wykonaj narzędzia Chrome DevTools MCP dla sterowania przeglądarką i analizy",
     fields: {
       tool: {
-        label: "NarzÄdzie",
-        description: "Wybierz narzÄdzie Chrome DevTools MCP do wykonania",
-        placeholder: "Wybierz narzÄdzie...",
+        label: "Narzędzie",
+        description: "Wybierz narzędzie Chrome DevTools MCP do wykonania",
+        placeholder: "Wybierz narzędzie...",
       },
       arguments: {
         label: "Argumenty",
-        description: "Argumenty JSON dla wybranego narzÄdzia (opcjonalne)",
+        description: "Argumenty JSON dla wybranego narzędzia (opcjonalne)",
         placeholder: '{"url": "https://example.com"}',
       },
     },
@@ -2281,79 +2260,79 @@ export const translations: typeof enTranslations = {
   tool: {
     // Input automation tools (8)
     click: "Kliknij element",
-    drag: "PrzeciÄgnij element",
-    fill: "WypeÅnij pole wejÅciowe",
-    fillForm: "WypeÅnij formularz",
-    handleDialog: "ObsÅuÅ¼ dialog",
-    hover: "NajedÅº na element",
-    pressKey: "NaciÅnij klawisz",
-    uploadFile: "PrzeÅlij plik",
+    drag: "Przeciągnij element",
+    fill: "Wypełnij pole wejściowe",
+    fillForm: "Wypełnij formularz",
+    handleDialog: "Obsłuż dialog",
+    hover: "Najedź na element",
+    pressKey: "Naciśnij klawisz",
+    uploadFile: "Prześlij plik",
 
     // Navigation automation tools (6)
-    closePage: "Zamknij stronÄ",
+    closePage: "Zamknij stronę",
     listPages: "Lista stron",
-    navigatePage: "Nawiguj stronÄ",
+    navigatePage: "Nawiguj stronę",
     newPage: "Nowa strona",
-    selectPage: "Wybierz stronÄ",
+    selectPage: "Wybierz stronę",
     waitFor: "Czekaj na",
 
     // Emulation tools (2)
-    emulate: "Emuluj urzÄdzenie",
-    resizePage: "ZmieÅ rozmiar strony",
+    emulate: "Emuluj urządzenie",
+    resizePage: "Zmień rozmiar strony",
 
     // Performance tools (3)
-    performanceAnalyzeInsight: "Analizuj insight wydajnoÅci",
-    performanceStartTrace: "Rozpocznij trace wydajnoÅci",
-    performanceStopTrace: "Zatrzymaj trace wydajnoÅci",
+    performanceAnalyzeInsight: "Analizuj insight wydajności",
+    performanceStartTrace: "Rozpocznij trace wydajności",
+    performanceStopTrace: "Zatrzymaj trace wydajności",
 
     // Network tools (2)
-    getNetworkRequest: "Pobierz Å¼Ädanie sieciowe",
-    listNetworkRequests: "Lista Å¼ÄdaÅ sieciowych",
+    getNetworkRequest: "Pobierz żądanie sieciowe",
+    listNetworkRequests: "Lista żądań sieciowych",
 
     // Debugging tools (5)
     evaluateScript: "Oceniaj skrypt",
-    getConsoleMessage: "Pobierz wiadomoÅÄ konsoli",
-    listConsoleMessages: "Lista wiadomoÅci konsoli",
-    takeScreenshot: "ZrÃ³b zrzut ekranu",
-    takeSnapshot: "ZrÃ³b snapshot",
+    getConsoleMessage: "Pobierz wiadomość konsoli",
+    listConsoleMessages: "Lista wiadomości konsoli",
+    takeScreenshot: "Zrób zrzut ekranu",
+    takeSnapshot: "Zrób snapshot",
   },
 
   status: {
-    pending: "OczekujÄcy",
+    pending: "Oczekujący",
     running: "Uruchomiony",
-    completed: "UkoÅczony",
+    completed: "Ukończony",
     failed: "Niepowodzenie",
   },
 
   response: {
-    success: "NarzÄdzie wykonane pomyÅlnie",
+    success: "Narzędzie wykonane pomyślnie",
     result: "Wynik wykonania",
     status: "Aktualny status wykonania",
     statusItem: "Status item",
-    executionId: "ID wykonania do Åledzenia",
+    executionId: "ID wykonania do śledzenia",
   },
 
   examples: {
     requests: {
       navigate: {
         title: "Nawiguj do URL",
-        description: "Nawiguj przeglÄdarkÄ do okreÅlonego URL",
+        description: "Nawiguj przeglądarkę do określonego URL",
       },
       screenshot: {
-        title: "ZrÃ³b zrzut ekranu",
-        description: "ZrÃ³b zrzut ekranu aktualnej strony",
+        title: "Zrób zrzut ekranu",
+        description: "Zrób zrzut ekranu aktualnej strony",
       },
       click: {
         title: "Kliknij element",
-        description: "Kliknij na okreÅlony element",
+        description: "Kliknij na określony element",
       },
       performance: {
-        title: "Rozpocznij trace wydajnoÅci",
-        description: "Rozpocznij nagrywanie metryk wydajnoÅci",
+        title: "Rozpocznij trace wydajności",
+        description: "Rozpocznij nagrywanie metryk wydajności",
       },
       script: {
         title: "Oceniaj skrypt",
-        description: "Wykonaj JavaScript w przeglÄdarce",
+        description: "Wykonaj JavaScript w przeglądarce",
       },
     },
     responses: {
@@ -2366,12 +2345,12 @@ export const translations: typeof enTranslations = {
         description: "Wynik wykonania zrzutu ekranu",
       },
       click: {
-        title: "Wynik klikniÄcia",
-        description: "Wynik klikniÄcia elementu",
+        title: "Wynik kliknięcia",
+        description: "Wynik kliknięcia elementu",
       },
       performance: {
-        title: "Trace wydajnoÅci rozpoczÄty",
-        description: "Åledzenie wydajnoÅci zainicjowane",
+        title: "Trace wydajności rozpoczęty",
+        description: "Śledzenie wydajności zainicjowane",
       },
       script: {
         title: "Wynik oceny skryptu",
@@ -2382,65 +2361,65 @@ export const translations: typeof enTranslations = {
 
   errors: {
     toolExecutionFailed: {
-      title: "Wykonanie narzÄdzia nie powiodÅo siÄ",
-      description: "Wybrane narzÄdzie nie mogÅo zostaÄ wykonane pomyÅlnie",
+      title: "Wykonanie narzędzia nie powiodło się",
+      description: "Wybrane narzędzie nie mogło zostać wykonane pomyślnie",
     },
     invalidArguments: {
-      title: "NieprawidÅowe argumenty",
-      description: "Podane argumenty sÄ nieprawidÅowe dla tego narzÄdzia",
+      title: "Nieprawidłowe argumenty",
+      description: "Podane argumenty są nieprawidłowe dla tego narzędzia",
     },
     browserNotAvailable: {
-      title: "PrzeglÄdarka niedostÄpna",
-      description: "Instancja przeglÄdarki Chrome jest niedostÄpna",
+      title: "Przeglądarka niedostępna",
+      description: "Instancja przeglądarki Chrome jest niedostępna",
     },
     toolNotFound: {
-      title: "NarzÄdzie nie znalezione",
-      description: "Å»Ädane narzÄdzie jest niedostÄpne",
+      title: "Narzędzie nie znalezione",
+      description: "Żądane narzędzie jest niedostępne",
     },
     validation: {
-      title: "BÅÄd walidacji",
-      description: "SprawdÅº swoje dane wejÅciowe i sprÃ³buj ponownie",
-      toolRequired: "Wymagany jest wybÃ³r narzÄdzia",
-      argumentsInvalid: "Argumenty muszÄ byÄ prawidÅowym JSON",
+      title: "Błąd walidacji",
+      description: "Sprawdź swoje dane wejściowe i spróbuj ponownie",
+      toolRequired: "Wymagany jest wybór narzędzia",
+      argumentsInvalid: "Argumenty muszą być prawidłowym JSON",
     },
     network: {
-      title: "BÅÄd sieci",
-      description: "WystÄpiÅ bÅÄd sieci podczas wykonywania narzÄdzia",
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas wykonywania narzędzia",
     },
     unauthorized: {
       title: "Nieautoryzowany",
-      description: "Nie masz uprawnieÅ do wykonywania narzÄdzi przeglÄdarki",
+      description: "Nie masz uprawnień do wykonywania narzędzi przeglądarki",
     },
     forbidden: {
       title: "Zabronione",
-      description: "Wykonywanie narzÄdzi przeglÄdarki jest zabronione",
+      description: "Wykonywanie narzędzi przeglądarki jest zabronione",
     },
     notFound: {
       title: "Nie znaleziono",
-      description: "Å»Ädane narzÄdzie przeglÄdarki nie zostaÅo znalezione",
+      description: "Żądane narzędzie przeglądarki nie zostało znalezione",
     },
     serverError: {
-      title: "BÅÄd serwera",
+      title: "Błąd serwera",
       description:
-        "WystÄpiÅ wewnÄtrzny bÅÄd serwera podczas wykonywania narzÄdzia",
+        "Wystąpił wewnętrzny błąd serwera podczas wykonywania narzędzia",
     },
     unknown: {
-      title: "Nieznany bÅÄd",
-      description: "WystÄpiÅ nieznany bÅÄd podczas wykonywania narzÄdzia",
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd podczas wykonywania narzędzia",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",
-      description: "Masz niezapisane zmiany, ktÃ³re mogÄ zostaÄ utracone",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
     },
     conflict: {
       title: "Konflikt",
-      description: "WystÄpiÅ konflikt podczas wykonywania narzÄdzia",
+      description: "Wystąpił konflikt podczas wykonywania narzędzia",
     },
   },
 
   success: {
-    title: "NarzÄdzie wykonane pomyÅlnie",
-    description: "NarzÄdzie przeglÄdarki zostaÅo wykonane pomyÅlnie",
+    title: "Narzędzie wykonane pomyślnie",
+    description: "Narzędzie przeglądarki zostało wykonane pomyślnie",
   },
 
   shared: {
@@ -2454,17 +2433,17 @@ export const translations: typeof enTranslations = {
 
   repository: {
     execute: {
-      start: "Rozpoczynam wykonywanie narzÄdzia przeglÄdarki",
-      success: "NarzÄdzie przeglÄdarki wykonane pomyÅlnie",
-      error: "BÅÄd podczas wykonywania narzÄdzia przeglÄdarki",
+      start: "Rozpoczynam wykonywanie narzędzia przeglądarki",
+      success: "Narzędzie przeglądarki wykonane pomyślnie",
+      error: "Błąd podczas wykonywania narzędzia przeglądarki",
     },
     mcp: {
       connect: {
-        start: "ÅÄczenie z serwerem Chrome DevTools MCP",
-        success: "PomyÅlnie poÅÄczono z serwerem MCP",
-        error: "BÅÄd podczas ÅÄczenia z serwerem MCP",
+        start: "Łączenie z serwerem Chrome DevTools MCP",
+        success: "Pomyślnie połączono z serwerem MCP",
+        error: "Błąd podczas łączenia z serwerem MCP",
         failedToInitialize:
-          "Nie udaÅo siÄ zainicjowaÄ serwera Chrome DevTools MCP",
+          "Nie udało się zainicjować serwera Chrome DevTools MCP",
       },
       closePage: {
         noSession: "Brak aktywnej sesji — nic do zamknięcia",
@@ -2474,13 +2453,13 @@ export const translations: typeof enTranslations = {
       },
       tool: {
         call: {
-          start: "WywoÅujÄ narzÄdzie MCP",
-          success: "NarzÄdzie MCP wywoÅane pomyÅlnie",
-          error: "BÅÄd podczas wywoÅywania narzÄdzia MCP",
-          invalidJsonArguments: "NieprawidÅowe argumenty JSON",
-          executionFailed: "Wykonanie narzÄdzia nie powiodÅo siÄ: {{error}}",
+          start: "Wywołuję narzędzie MCP",
+          success: "Narzędzie MCP wywołane pomyślnie",
+          error: "Błąd podczas wywoływania narzędzia MCP",
+          invalidJsonArguments: "Nieprawidłowe argumenty JSON",
+          executionFailed: "Wykonanie narzędzia nie powiodło się: {{error}}",
           newPageFailed: "Nie udało się otworzyć nowej strony",
-          toolExecutionFailed: "Nie udaÅo siÄ wykonaÄ {{toolName}}",
+          toolExecutionFailed: "Nie udało się wykonać {{toolName}}",
         },
       },
     },

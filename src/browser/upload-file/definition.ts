@@ -35,11 +35,17 @@ const { POST } = createEndpoint({
   titleShort: "upload-file.titleShort",
   description: "upload-file.description",
   dynamicTitle: ({ request }) => {
-    if (request?.filePath) {
-      const filePath = String(request.filePath);
-      const fileName = filePath.split("/").pop() || filePath;
-      const short =
+    const filePaths = request?.filePaths;
+    const first = Array.isArray(filePaths) ? filePaths[0] : filePaths;
+    if (first) {
+      const fileName = first.split("/").pop() || first;
+      const name =
         fileName.length > 40 ? `${fileName.slice(0, 40)}…` : fileName;
+      const extra =
+        Array.isArray(filePaths) && filePaths.length > 1
+          ? ` +${filePaths.length - 1}`
+          : "";
+      const short = `${name}${extra}`;
       return {
         message: "upload-file.dynamicTitle" as const,
         messageParams: { file: short },
@@ -74,14 +80,33 @@ const { POST } = createEndpoint({
             "The uid of the file input element or an element that will open file chooser on the page from the page content snapshot",
           ),
       }),
-      filePath: requestField(scopedTranslation, {
+      filePaths: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "upload-file.form.fields.filePath.label",
-        description: "upload-file.form.fields.filePath.description",
-        placeholder: "upload-file.form.fields.filePath.placeholder",
+        label: "upload-file.form.fields.filePaths.label",
+        description: "upload-file.form.fields.filePaths.description",
+        placeholder: "upload-file.form.fields.filePaths.placeholder",
         columns: 6,
-        schema: z.string().describe("The local path of the file to upload"),
+        schema: z
+          .union([z.string(), z.array(z.string())])
+          .transform((v) => (Array.isArray(v) ? v : [v]))
+          .pipe(z.array(z.string().min(1)).min(1))
+          .describe(
+            "Absolute path of the file to upload, or a list of paths for a multi-file input. Paths must be inside the project directory or the OS temp directory, on the machine running the browser.",
+          ),
+      }),
+      includeSnapshot: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "upload-file.form.fields.includeSnapshot.label",
+        description: "upload-file.form.fields.includeSnapshot.description",
+        columns: 12,
+        schema: z
+          .boolean()
+          .optional()
+          .describe(
+            "Whether to include a page snapshot in the response. Default is false.",
+          ),
       }),
 
       instanceId: browserInstanceIdField,
@@ -127,7 +152,12 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         uid: "element_123",
-        filePath: "/path/to/file.txt",
+        filePaths: ["/tmp/report.pdf"],
+      },
+      multiple: {
+        uid: "element_123",
+        filePaths: ["/tmp/photo-1.png", "/tmp/photo-2.png"],
+        includeSnapshot: true,
       },
     },
     responses: {
@@ -136,10 +166,20 @@ const { POST } = createEndpoint({
         result: [
           {
             type: "text",
-            text: "# upload_file response\nUploaded file: file.txt",
+            text: "# upload_file response\nFile uploaded from /tmp/report.pdf.",
           },
         ],
         executionId: "exec_123",
+      },
+      multiple: {
+        success: true,
+        result: [
+          {
+            type: "text",
+            text: "# upload_file response\nFile uploaded from /tmp/photo-1.png, /tmp/photo-2.png.",
+          },
+        ],
+        executionId: "exec_124",
       },
     },
   },

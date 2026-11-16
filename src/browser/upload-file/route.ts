@@ -18,7 +18,8 @@ export const { POST, tools } = endpointsHandler({
           toolName: BrowserTool.UPLOAD_FILE,
           args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,
-            filePath: data.filePath,
+            filePaths: data.filePaths,
+            includeSnapshot: data.includeSnapshot,
           }),
           instanceId: data.instanceId,
         },

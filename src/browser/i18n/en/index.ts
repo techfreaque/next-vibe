@@ -666,10 +666,15 @@ export const translations = {
             "The uid of the file input element or an element that will open file chooser",
           placeholder: "Enter element uid",
         },
-        filePath: {
-          label: "File Path",
-          description: "The local path of the file to upload",
-          placeholder: "Enter file path",
+        filePaths: {
+          label: "File Paths",
+          description:
+            "Absolute path of the file to upload, or several for a multi-file input. Must sit inside the project directory or the OS temp directory.",
+          placeholder: "/tmp/photo.png",
+        },
+        includeSnapshot: {
+          label: "Include Snapshot",
+          description: "Return a page snapshot after the upload",
         },
       },
     },

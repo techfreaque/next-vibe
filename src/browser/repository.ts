@@ -950,20 +950,24 @@ async function reconcilePages(
 
   // Re-resolve MCP integer IDs if the stored ones are no longer valid.
   const mcpPages = await listMCPPages(mcp);
-  const validMcpIds = new Set(mcpPages.map((p) => p.id));
   const result: SessionPage[] = [];
   for (const page of surviving) {
     // Keep the latest URL from CDP for accurate re-resolution next time.
     const cdpTarget = cdpTargets.find((t) => t.id === page.cdpTargetId);
     const url = cdpTarget?.url ?? page.url;
     let mcpPageId = page.mcpPageId;
-    if (!validMcpIds.has(mcpPageId)) {
+    // MCP ids restart at 1 in every chrome-devtools-mcp process, so a stored
+    // id can exist again but point at another tab. Trust it only while it
+    // still shows this page's URL.
+    const storedPage = mcpPages.find((p) => p.id === mcpPageId);
+    if (storedPage?.url !== url) {
       const resolved = findMCPPageForUrl(mcpPages, url);
-      if (resolved === null) {
+      if (resolved !== null) {
+        mcpPageId = resolved;
+      } else if (storedPage === undefined) {
         // Can't find the page in MCP — treat it as gone.
         continue;
       }
-      mcpPageId = resolved;
     }
     result.push({ ...page, mcpPageId, url });
   }

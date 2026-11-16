@@ -1004,11 +1004,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Kliknij element",
     titleShort: "Kliknij",
     description:
-      "Kliknij element po UID z migawki. Najpierw wywoÅaj take-snapshot.",
+      "Kliknij element po UID z migawki. Najpierw wywołaj take-snapshot.",
     icon: "mouse-pointer",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: {
         singleClick: { uid: "element-123", dblClick: false },
@@ -1031,14 +1031,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "close-page"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Zamknij stronÄ",
+    title: "Zamknij stronę",
     titleShort: "Zamknij",
     description:
-      "Zamknij bieÅ¼ÄcÄ stronÄ sesji. Ostatniej otwartej strony nie moÅ¼na zamknÄÄ.",
+      "Zamknij bieżącą stronę sesji. Ostatniej otwartej strony nie można zamknąć.",
     icon: "x-square",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja nawigacji"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja nawigacji"],
     examples: {
       inputs: { default: { pageId: 0 } },
       responses: {
@@ -1058,14 +1058,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "drag"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "PrzeciÄgnij element",
-    titleShort: "PrzeciÄgnij",
+    title: "Przeciągnij element",
+    titleShort: "Przeciągnij",
     description:
-      "PrzeciÄgnij jeden element na drugi po UID. UID-y pobierz z take-snapshot.",
+      "Przeciągnij jeden element na drugi po UID. UID-y pobierz z take-snapshot.",
     icon: "move",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: {
         dragDrop: { from_uid: "draggable-123", to_uid: "dropzone-456" },
@@ -1093,11 +1093,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Emuluj",
     titleShort: "Emuluj",
     description:
-      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieÅ¼Äcej stronie. Każde wywołanie jest bezwzględne: pominięte pola są resetowane. Nadpisanie user agenta działa od następnej nawigacji, więc po ustawieniu odśwież stronę.",
+      "Emuluj warunki sieciowe (offline/3G/4G) lub throttling CPU na bieżącej stronie. Każde wywołanie jest bezwzględne: pominięte pola są resetowane. Nadpisanie user agenta działa od następnej nawigacji, więc po ustawieniu odśwież stronę.",
     icon: "settings",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wydajnoÅci"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wydajności"],
     examples: {
       inputs: {
         default: { networkConditions: "Fast 3G", cpuThrottlingRate: 2 },
@@ -1125,11 +1125,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Oceniaj skrypt",
     titleShort: "Skrypt",
     description:
-      "Uruchom JavaScript na stronie i zwrÃ³Ä wynik. Dla stanu, ktÃ³rego take-snapshot nie ujawnia.",
+      "Uruchom JavaScript na stronie i zwróć wynik. Dla stanu, którego take-snapshot nie ujawnia.",
     icon: "code",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Wykonywanie skryptÃ³w"],
+    tags: ["Automatyzacja przeglądarki", "Wykonywanie skryptów"],
     examples: {
       inputs: {
         default: { function: "() => { return document.title; }", args: null },
@@ -1154,14 +1154,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "fill-form"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "WypeÅnij formularz",
+    title: "Wypełnij formularz",
     titleShort: "Formularz",
     description:
-      "WypeÅnij wiele pÃ³l formularza naraz tablicÄ UID-Ã³w. Wydajniejsze niÅ¼ pojedyncze wywoÅania fill.",
+      "Wypełnij wiele pól formularza naraz tablicą UID-ów. Wydajniejsze niż pojedyncze wywołania fill.",
     icon: "pen-tool",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wejÅcia"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wejścia"],
     examples: {
       inputs: { default: { elements: [{ uid: "field-1", value: "value1" }] } },
       responses: {
@@ -1184,14 +1184,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "fill"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "WypeÅnij",
-    titleShort: "WypeÅnij",
+    title: "Wypełnij",
+    titleShort: "Wypełnij",
     description:
-      "Wpisz tekst do input/textarea lub wybierz opcjÄ z listy po UID. UID-y pobierz z take-snapshot.",
+      "Wpisz tekst do input/textarea lub wybierz opcję z listy po UID. UID-y pobierz z take-snapshot.",
     icon: "edit",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: { default: { uid: "element-123", value: "test value" } },
       responses: {
@@ -1214,14 +1214,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "get-console-message"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Pobierz wiadomoÅÄ konsoli",
+    title: "Pobierz wiadomość konsoli",
     titleShort: "Konsola",
     description:
-      "Pobierz peÅnÄ treÅÄ konkretnej wiadomoÅci konsoli po msgid z list-console-messages.",
+      "Pobierz pełną treść konkretnej wiadomości konsoli po msgid z list-console-messages.",
     icon: "terminal",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Debugowanie"],
+    tags: ["Automatyzacja przeglądarki", "Debugowanie"],
     examples: {
       inputs: { default: { msgid: 123 } },
       responses: {
@@ -1244,14 +1244,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "get-network-request"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Pobierz Å¼Ädanie sieciowe",
-    titleShort: "Å»Ädanie",
+    title: "Pobierz żądanie sieciowe",
+    titleShort: "Żądanie",
     description:
-      "Pobierz peÅne szczegÃ³Åy (nagÅÃ³wki, body) Å¼Ädania po reqid z list-network-requests.",
+      "Pobierz pełne szczegóły (nagłówki, body) żądania po reqid z list-network-requests.",
     icon: "network",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Analiza sieci"],
+    tags: ["Automatyzacja przeglądarki", "Analiza sieci"],
     examples: {
       inputs: { default: { reqid: 456 } },
       responses: {
@@ -1274,14 +1274,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "handle-dialog"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "ObsÅuÅ¼ dialog",
+    title: "Obsłuż dialog",
     titleShort: "Dialog",
     description:
-      "Zaakceptuj lub odrzuÄ dialog przeglÄdarki (alert/confirm/prompt). WywoÅaj przed akcjÄ, ktÃ³ra go wyzwala.",
+      "Zaakceptuj lub odrzuć dialog przeglądarki (alert/confirm/prompt). Wywołaj przed akcją, która go wyzwala.",
     icon: "message-square",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja dialogÃ³w"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja dialogów"],
     examples: {
       inputs: { default: { action: "accept" } },
       responses: {
@@ -1304,14 +1304,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "hover"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "NajedÅº",
-    titleShort: "NajedÅº",
+    title: "Najedź",
+    titleShort: "Najedź",
     description:
-      "NajedÅº na element po UID, aby pokazaÄ tooltip lub ukryte elementy sterujÄce.",
+      "Najedź na element po UID, aby pokazać tooltip lub ukryte elementy sterujące.",
     icon: "mouse-pointer",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: { default: { uid: "element-123" } },
       responses: {
@@ -1334,14 +1334,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "list-console-messages"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Lista wiadomoÅci konsoli",
+    title: "Lista wiadomości konsoli",
     titleShort: "Logi konsoli",
     description:
-      "Lista wiadomoÅci konsoli od ostatniej nawigacji. Filtruj po typie (error/warn/log). UÅ¼ywaj po akcjach, by wykryÄ bÅÄdy JS.",
+      "Lista wiadomości konsoli od ostatniej nawigacji. Filtruj po typie (error/warn/log). Używaj po akcjach, by wykryć błędy JS.",
     icon: "terminal",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Debugowanie"],
+    tags: ["Automatyzacja przeglądarki", "Debugowanie"],
     examples: {
       inputs: { default: { pageIdx: 0 } },
       responses: {
@@ -1364,14 +1364,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "list-network-requests"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Lista Å¼ÄdaÅ sieciowych",
+    title: "Lista żądań sieciowych",
     titleShort: "Logi sieci",
     description:
-      "Lista Å¼ÄdaÅ sieciowych od ostatniej nawigacji. Filtruj po typie zasobu (fetch/xhr/doc). Do inspekcji wywoÅaÅ API.",
+      "Lista żądań sieciowych od ostatniej nawigacji. Filtruj po typie zasobu (fetch/xhr/doc). Do inspekcji wywołań API.",
     icon: "network",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Analiza sieci"],
+    tags: ["Automatyzacja przeglądarki", "Analiza sieci"],
     examples: {
       inputs: { default: { pageIdx: 0 } },
       responses: {
@@ -1397,11 +1397,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Lista stron",
     titleShort: "Strony",
     description:
-      "Wylistuj wszystkie otwarte karty z URL-ami. KaÅ¼da sesja ma jednÄ kartÄ; new-page jÄ zastÄpuje.",
+      "Wylistuj wszystkie otwarte karty z URL-ami. Każda sesja ma jedną kartę; new-page ją zastępuje.",
     icon: "layers",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja nawigacji"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja nawigacji"],
     examples: {
       inputs: { default: {} },
       responses: {
@@ -1424,14 +1424,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "navigate-page"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Nawiguj stronÄ",
+    title: "Nawiguj stronę",
     titleShort: "Nawiguj",
     description:
-      "Nawiguj stronÄ sesji do URL, wstecz, naprzÃ³d lub przeÅaduj. Preferuj nad new-page dla tej samej karty.",
+      "Nawiguj stronę sesji do URL, wstecz, naprzód lub przeładuj. Preferuj nad new-page dla tej samej karty.",
     icon: "navigation",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja nawigacji"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja nawigacji"],
     examples: {
       inputs: { default: { type: "url", url: "https://example.com" } },
       responses: {
@@ -1457,11 +1457,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Nowa strona",
     titleShort: "Nowa strona",
     description:
-      "OtwÃ³rz nowÄ kartÄ pod danym URL. Sesja przejmuje kartÄ â wszystkie kolejne wywoÅania dziaÅajÄ na niej.",
+      "Otwórz nową kartę pod danym URL. Sesja przejmuje kartę — wszystkie kolejne wywołania działają na niej.",
     icon: "file-plus",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja nawigacji"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja nawigacji"],
     examples: {
       inputs: { default: { url: "https://example.com", replacePage: true } },
       responses: {
@@ -1484,14 +1484,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "performance-analyze-insight"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Analizuj insight wydajnoÅci",
+    title: "Analizuj insight wydajności",
     titleShort: "Analiza",
     description:
-      "WejdÅº gÅÄbiej w konkretny insight z wyniku trace (np. DocumentLatency, LCPBreakdown). WywoÅaj po performance-stop-trace.",
+      "Wejdź głębiej w konkretny insight z wyniku trace (np. DocumentLatency, LCPBreakdown). Wywołaj po performance-stop-trace.",
     icon: "trending-up",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wydajnoÅci"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wydajności"],
     examples: {
       inputs: {
         default: { insightSetId: "set_123", insightName: "LCPBreakdown" },
@@ -1516,14 +1516,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "performance-start-trace"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Rozpocznij trace wydajnoÅci",
-    titleShort: "Start Åladu",
+    title: "Rozpocznij trace wydajności",
+    titleShort: "Start śladu",
     description:
-      "Uruchom trace wydajnoÅci, aby przechwyciÄ Core Web Vitals i metryki Åadowania. NastÄpnie wywoÅaj performance-stop-trace.",
+      "Uruchom trace wydajności, aby przechwycić Core Web Vitals i metryki ładowania. Następnie wywołaj performance-stop-trace.",
     icon: "activity",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wydajnoÅci"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wydajności"],
     examples: {
       inputs: { default: { reload: true, autoStop: true } },
       responses: {
@@ -1546,14 +1546,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "performance-stop-trace"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Zatrzymaj trace wydajnoÅci",
-    titleShort: "Stop Åladu",
+    title: "Zatrzymaj trace wydajności",
+    titleShort: "Stop śladu",
     description:
-      "Zatrzymaj aktywny trace i zwrÃ³Ä metryki wydajnoÅci z ID zestawÃ³w insightÃ³w dla performance-analyze-insight.",
+      "Zatrzymaj aktywny trace i zwróć metryki wydajności z ID zestawów insightów dla performance-analyze-insight.",
     icon: "pause-circle",
     category: "browser",
     subCategory: "DevTools",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wydajnoÅci"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wydajności"],
     examples: {
       inputs: { default: {} },
       responses: {
@@ -1576,13 +1576,13 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "press-key"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "NaciÅnij klawisz",
+    title: "Naciśnij klawisz",
     titleShort: "Klawisz",
-    description: "NaciÅnij klawisz lub kombinacjÄ klawiszy",
+    description: "Naciśnij klawisz lub kombinację klawiszy",
     icon: "keyboard",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: { default: { key: "Enter" } },
       responses: {
@@ -1602,14 +1602,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "resize-page"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "ZmieÅ rozmiar strony",
-    titleShort: "ZmieÅ rozmiar",
+    title: "Zmień rozmiar strony",
+    titleShort: "Zmień rozmiar",
     description:
-      "ZmieÅ rozmiar viewportu przeglÄdarki do podanych wymiarÃ³w w pikselach.",
+      "Zmień rozmiar viewportu przeglądarki do podanych wymiarów w pikselach.",
     icon: "maximize",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja widoku"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja widoku"],
     examples: {
       inputs: { default: { width: 1920, height: 1080 } },
       responses: {
@@ -1632,14 +1632,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "select-page"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "Wybierz stronÄ",
+    title: "Wybierz stronę",
     titleShort: "Wybierz",
     description:
-      "PrzeÅÄcz sesjÄ na konkretnÄ stronÄ po indeksie. Indeks znajdziesz przez list-pages. Nie aktualizuje Åledzonej karty sesji.",
+      "Przełącz sesję na konkretną stronę po indeksie. Indeks znajdziesz przez list-pages. Nie aktualizuje śledzonej karty sesji.",
     icon: "square-check",
     category: "browser",
     subCategory: "Pages",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja nawigacji"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja nawigacji"],
     examples: {
       inputs: { default: { pageId: 0 } },
       responses: {
@@ -1662,14 +1662,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "take-screenshot"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "ZrÃ³b zrzut ekranu",
+    title: "Zrób zrzut ekranu",
     titleShort: "Zrzut ekranu",
     description:
-      "ZrÃ³b wizualny zrzut ekranu strony lub elementu. Zwraca obraz. Do weryfikacji stanu UI.",
+      "Zrób wizualny zrzut ekranu strony lub elementu. Zwraca obraz. Do weryfikacji stanu UI.",
     icon: "camera",
     category: "browser",
     subCategory: "Inspection",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja przechwytywania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja przechwytywania"],
     examples: {
       inputs: { default: { format: "png", filePath: "/path/to/file.txt" } },
       responses: {
@@ -1693,14 +1693,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "take-snapshot"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "ZrÃ³b snapshot",
+    title: "Zrób snapshot",
     titleShort: "Migawka",
     description:
-      "Pobierz drzewo a11y strony jako tekst. Wymagane przed click/fill/drag â dostarcza UID-Ã³w elementÃ³w.",
+      "Pobierz drzewo a11y strony jako tekst. Wymagane przed click/fill/drag — dostarcza UID-ów elementów.",
     icon: "file-text",
     category: "browser",
     subCategory: "Inspection",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja przechwytywania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja przechwytywania"],
     examples: {
       inputs: { default: { filePath: "/path/to/file.txt" } },
       responses: {
@@ -1723,16 +1723,21 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["browser", "upload-file"],
     allowedRoles: ["enums.userRole.admin", "enums.userRole.productionOff"],
     aliases: [],
-    title: "PrzeÅlij plik",
-    titleShort: "PrzeÅlij",
-    description: "PrzeÅlij plik przez podany element",
+    title: "Prześlij plik",
+    titleShort: "Prześlij",
+    description: "Prześlij plik przez podany element",
     icon: "upload",
     category: "browser",
     subCategory: "Interaction",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja wprowadzania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja wprowadzania"],
     examples: {
       inputs: {
-        default: { uid: "element_123", filePath: "/path/to/file.txt" },
+        default: { uid: "element_123", filePaths: ["/tmp/report.pdf"] },
+        multiple: {
+          uid: "element_123",
+          filePaths: ["/tmp/photo-1.png", "/tmp/photo-2.png"],
+          includeSnapshot: true,
+        },
       },
       responses: {
         default: {
@@ -1740,10 +1745,20 @@ export const endpointsMeta: EndpointMeta[] = [
           result: [
             {
               type: "text",
-              text: "# upload_file response\nUploaded file: file.txt",
+              text: "# upload_file response\nFile uploaded from /tmp/report.pdf.",
             },
           ],
           executionId: "exec_123",
+        },
+        multiple: {
+          success: true,
+          result: [
+            {
+              type: "text",
+              text: "# upload_file response\nFile uploaded from /tmp/photo-1.png, /tmp/photo-2.png.",
+            },
+          ],
+          executionId: "exec_124",
         },
       },
     },
@@ -1757,11 +1772,11 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Poczekaj na",
     titleShort: "Czekaj",
     description:
-      "Poczekaj, aÅ¼ dany tekst pojawi siÄ na stronie. UÅ¼ywaj po nawigacji lub akcjach asynchronicznych.",
+      "Poczekaj, aż dany tekst pojawi się na stronie. Używaj po nawigacji lub akcjach asynchronicznych.",
     icon: "clock",
     category: "browser",
     subCategory: "Inspection",
-    tags: ["Automatyzacja przeglÄdarki", "Automatyzacja oczekiwania"],
+    tags: ["Automatyzacja przeglądarki", "Automatyzacja oczekiwania"],
     examples: {
       inputs: { default: { text: ["Loading..."] } },
       responses: {
@@ -21163,7 +21178,7 @@ export const endpointsMeta: EndpointMeta[] = [
               isDefault: true,
               modelSelection: {
                 selectionType: "enums.selectionType.manual",
-                manualModelId: "gpt-5",
+                manualModelId: "gpt-6.1-sol",
               },
             },
           ],
@@ -21528,7 +21543,7 @@ export const endpointsMeta: EndpointMeta[] = [
               id: "thea",
               skillId: "default",
               customVariantName: null,
-              modelId: "claude-sonnet-4.5",
+              modelId: "claude-sonnet-5.5",
               voiceId: "openai-nova",
               position: 0,
               icon: "sparkles",

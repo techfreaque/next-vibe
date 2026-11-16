@@ -1727,7 +1727,12 @@ export const endpointsMeta: EndpointMeta[] = [
     tags: ["Browser Automation", "Input Automation"],
     examples: {
       inputs: {
-        default: { uid: "element_123", filePath: "/path/to/file.txt" },
+        default: { uid: "element_123", filePaths: ["/tmp/report.pdf"] },
+        multiple: {
+          uid: "element_123",
+          filePaths: ["/tmp/photo-1.png", "/tmp/photo-2.png"],
+          includeSnapshot: true,
+        },
       },
       responses: {
         default: {
@@ -1735,10 +1740,20 @@ export const endpointsMeta: EndpointMeta[] = [
           result: [
             {
               type: "text",
-              text: "# upload_file response\nUploaded file: file.txt",
+              text: "# upload_file response\nFile uploaded from /tmp/report.pdf.",
             },
           ],
           executionId: "exec_123",
+        },
+        multiple: {
+          success: true,
+          result: [
+            {
+              type: "text",
+              text: "# upload_file response\nFile uploaded from /tmp/photo-1.png, /tmp/photo-2.png.",
+            },
+          ],
+          executionId: "exec_124",
         },
       },
     },
@@ -21154,7 +21169,7 @@ export const endpointsMeta: EndpointMeta[] = [
               isDefault: true,
               modelSelection: {
                 selectionType: "enums.selectionType.manual",
-                manualModelId: "gpt-5",
+                manualModelId: "gpt-6.1-sol",
               },
             },
           ],
@@ -21518,7 +21533,7 @@ export const endpointsMeta: EndpointMeta[] = [
               id: "thea",
               skillId: "default",
               customVariantName: null,
-              modelId: "claude-sonnet-4.5",
+              modelId: "claude-sonnet-5.5",
               voiceId: "openai-nova",
               position: 0,
               icon: "sparkles",

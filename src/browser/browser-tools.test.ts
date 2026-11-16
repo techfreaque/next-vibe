@@ -20,6 +20,9 @@
 
 import "server-only";
 
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { eq } from "drizzle-orm";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -51,6 +54,7 @@ import resizePageEndpoints from "@/browser/resize-page/definition";
 import selectPageEndpoints from "@/browser/select-page/definition";
 import takeScreenshotEndpoints from "@/browser/take-screenshot/definition";
 import takeSnapshotEndpoints from "@/browser/take-snapshot/definition";
+import uploadFileEndpoints from "@/browser/upload-file/definition";
 import waitForEndpoints from "@/browser/wait-for/definition";
 
 // ---------------------------------------------------------------------------
@@ -1664,6 +1668,78 @@ describe("Browser Tools", () => {
       } finally {
         await closeTestTabs([SID], testUser);
         await assertTabCount(localBase, 0, "B_EVAL_ARGS: cleaned up");
+      }
+    },
+  );
+  it(
+    "B_UPLOAD: upload-file sets one or several files on a file input",
+    { timeout: TEST_TIMEOUT },
+    async () => {
+      const SID = "browser-test-upload";
+      await closeTestTabs([SID], testUser);
+      const localBase = (await getChromeTabs()).length;
+      // Inside the project dir: allowed via the --workspace root in config.ts.
+      const dir = join(process.cwd(), ".tmp", "browser-test-upload");
+      mkdirSync(dir, { recursive: true });
+      const fileA = join(dir, "a.txt");
+      const fileB = join(dir, "b.txt");
+      writeFileSync(fileA, "aaa");
+      writeFileSync(fileB, "bbbbb");
+      try {
+        await run(
+          newPageEndpoints.POST,
+          {
+            url: "data:text/html,<title>Upload</title><input type=file id=f multiple>",
+            replacePage: true,
+            instanceId: SID,
+          },
+          testUser,
+        );
+        const snap = await run(
+          takeSnapshotEndpoints.POST,
+          { instanceId: SID },
+          testUser,
+        );
+        const uid = /uid=(\S+) button "Choose Files"/.exec(
+          extractText(snap.data),
+        )?.[1];
+        expect(uid, "file input uid not found in snapshot").toBeTruthy();
+
+        const readFiles = async (): Promise<string> => {
+          const res = await run(
+            evaluateScriptEndpoints.POST,
+            {
+              function:
+                "() => [...document.getElementById('f').files].map((f) => f.name + ':' + f.size).join(',')",
+              instanceId: SID,
+            },
+            testUser,
+          );
+          return extractText(res.data);
+        };
+
+        // One file, then two (multi-file input).
+        const single = await run(
+          uploadFileEndpoints.POST,
+          { uid: String(uid), filePaths: [fileA], instanceId: SID },
+          testUser,
+        );
+        expect(single.success, `upload single: ${single.error ?? ""}`).toBe(
+          true,
+        );
+        expect(extractText(single.data)).toContain("File uploaded from");
+        expect(await readFiles()).toContain("a.txt:3");
+
+        const multi = await run(
+          uploadFileEndpoints.POST,
+          { uid: String(uid), filePaths: [fileA, fileB], instanceId: SID },
+          testUser,
+        );
+        expect(multi.success, `upload multi: ${multi.error ?? ""}`).toBe(true);
+        expect(await readFiles()).toContain("a.txt:3,b.txt:5");
+      } finally {
+        await closeTestTabs([SID], testUser);
+        await assertTabCount(localBase, 0, "B_UPLOAD: cleaned up");
       }
     },
   );

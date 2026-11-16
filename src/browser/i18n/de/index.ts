@@ -699,10 +699,15 @@ export const translations: typeof enTranslations = {
             "Die UID des Dateiauswahl-Elements oder eines Elements, das den Dateiwähler öffnet",
           placeholder: "Element-UID eingeben",
         },
-        filePath: {
-          label: "Dateipfad",
-          description: "Der lokale Pfad der hochzuladenden Datei",
-          placeholder: "Dateipfad eingeben",
+        filePaths: {
+          label: "Dateipfade",
+          description:
+            "Absoluter Pfad der hochzuladenden Datei, bei Mehrfachauswahl auch mehrere. Erlaubt sind Projektverzeichnis und System-Temp-Verzeichnis.",
+          placeholder: "/tmp/foto.png",
+        },
+        includeSnapshot: {
+          label: "Snapshot anhängen",
+          description: "Nach dem Upload einen Seiten-Snapshot zurückgeben",
         },
       },
     },
