@@ -366,6 +366,7 @@ export const templateMetadataMap: Record<
     exampleProps: {
       name: "Max",
       verifyUrl: "https://example.com/en-US/user/verify-email/token123",
+      credits: "40",
     },
   },
   "verify-email-signup": {
@@ -378,6 +379,7 @@ export const templateMetadataMap: Record<
     exampleProps: {
       name: "Max",
       verifyUrl: "https://example.com/en-US/user/verify-email/token123",
+      credits: "40",
     },
   },
 };

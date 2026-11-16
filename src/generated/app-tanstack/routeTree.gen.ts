@@ -162,6 +162,7 @@ import { Route as ApiLocaleSubscriptionDashboardRouteImport } from './routes/api
 import { Route as ApiLocaleSubscriptionUpdateRouteImport } from './routes/api.$locale.subscription.update'
 import { Route as ApiLocaleTaxReportRouteImport } from './routes/api.$locale.tax.report'
 import { Route as ApiLocaleUserSessionCleanupRouteImport } from './routes/api.$locale.user.session-cleanup'
+import { Route as ApiLocaleUserVerifyEmailReminderRouteImport } from './routes/api.$locale.user.verify-email-reminder'
 import { Route as ApiLocaleUsersCreateRouteImport } from './routes/api.$locale.users.create'
 import { Route as ApiLocaleUsersListRouteImport } from './routes/api.$locale.users.list'
 import { Route as ApiLocaleUsersStatsRouteImport } from './routes/api.$locale.users.stats'
@@ -1527,6 +1528,12 @@ const ApiLocaleUserSessionCleanupRoute =
   ApiLocaleUserSessionCleanupRouteImport.update({
     id: '/api/$locale/user/session-cleanup',
     path: '/api/$locale/user/session-cleanup',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleUserVerifyEmailReminderRoute =
+  ApiLocaleUserVerifyEmailReminderRouteImport.update({
+    id: '/api/$locale/user/verify-email-reminder',
+    path: '/api/$locale/user/verify-email-reminder',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleUsersCreateRoute = ApiLocaleUsersCreateRouteImport.update({
@@ -4830,6 +4837,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
+  '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
@@ -5506,6 +5514,7 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
+  '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
@@ -6190,6 +6199,7 @@ export interface FileRoutesById {
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
+  '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
@@ -6874,6 +6884,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/update'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
+    | '/api/$locale/user/verify-email-reminder'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
@@ -7550,6 +7561,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/update'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
+    | '/api/$locale/user/verify-email-reminder'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
@@ -8233,6 +8245,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/update'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
+    | '/api/$locale/user/verify-email-reminder'
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
@@ -8892,6 +8905,7 @@ export interface RootRouteChildren {
   ApiLocalePurchasingDashboardRoute: typeof ApiLocalePurchasingDashboardRoute
   ApiLocaleTaxReportRoute: typeof ApiLocaleTaxReportRoute
   ApiLocaleUserSessionCleanupRoute: typeof ApiLocaleUserSessionCleanupRoute
+  ApiLocaleUserVerifyEmailReminderRoute: typeof ApiLocaleUserVerifyEmailReminderRoute
   ApiLocaleUsersCreateRoute: typeof ApiLocaleUsersCreateRoute
   ApiLocaleUsersListRoute: typeof ApiLocaleUsersListRoute
   ApiLocaleUsersStatsRoute: typeof ApiLocaleUsersStatsRoute
@@ -10300,6 +10314,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/user/session-cleanup'
       fullPath: '/api/$locale/user/session-cleanup'
       preLoaderRoute: typeof ApiLocaleUserSessionCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/user/verify-email-reminder': {
+      id: '/api/$locale/user/verify-email-reminder'
+      path: '/api/$locale/user/verify-email-reminder'
+      fullPath: '/api/$locale/user/verify-email-reminder'
+      preLoaderRoute: typeof ApiLocaleUserVerifyEmailReminderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/users/create': {
@@ -15279,6 +15300,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocalePurchasingDashboardRoute: ApiLocalePurchasingDashboardRoute,
   ApiLocaleTaxReportRoute: ApiLocaleTaxReportRoute,
   ApiLocaleUserSessionCleanupRoute: ApiLocaleUserSessionCleanupRoute,
+  ApiLocaleUserVerifyEmailReminderRoute: ApiLocaleUserVerifyEmailReminderRoute,
   ApiLocaleUsersCreateRoute: ApiLocaleUsersCreateRoute,
   ApiLocaleUsersListRoute: ApiLocaleUsersListRoute,
   ApiLocaleUsersStatsRoute: ApiLocaleUsersStatsRoute,

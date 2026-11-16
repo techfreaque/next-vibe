@@ -424,13 +424,13 @@ export const translations = {
     footer: "This is an automated notification from {{appName}}",
   },
   email: {
-    subject: "You're in - {{appName}} is ready for you",
+    subject: "You're in. {{appName}} is ready for you",
     previewText:
-      "Hey {{privateName}}, your account is ready. Chat with Claude, GPT, Gemini, DeepSeek, and {{modelCount}} more - free, no card needed.",
+      "Hey {{privateName}}, your account is ready. Chat with Claude, GPT, Gemini, DeepSeek and {{modelCount}} more. Free, no card needed.",
     headline: "Your AI is waiting.",
     greeting: "Hey {{privateName}},",
     intro:
-      "Welcome to {{appName}}. You just unlocked access to the most complete AI chat platform out there - everything you love about ChatGPT, plus open-source models, and models without content filters.",
+      "Welcome to {{appName}}. Everything you like about ChatGPT, plus open-source models and models without content filters. One account, one place.",
     models: {
       title: "{{modelCount}} models across 3 categories",
       mainstream: "Mainstream",
@@ -442,18 +442,22 @@ export const translations = {
       credits:
         "{{freeCreditsSignedIn}} free credits every month, +{{freeCreditsNewsletterBonus}} with the newsletter. No card needed",
       allModels: "Access to all {{modelCount}} AI models",
-      uncensored: "4 uncensored models that actually answer your questions",
+      uncensored: "Uncensored models that actually answer your questions",
       chatModes: "Private, Incognito, Shared, and Public chat modes",
-      noCard: "No credit card required - ever",
+      noCard: "No credit card required. Ever.",
+    },
+    verify: {
+      note: "Your free credits switch on when you confirm this address.",
+      cta: "Confirm email, get {{freeCreditsSignedIn}} credits",
     },
     ctaButton: "Start Chatting Now",
     upgrade: {
       title: "Want more?",
-      desc: "{{subscriptionPrice}}/month gets you {{subscriptionCredits}} credits - that's 40× more. Plus you can buy extra credit packs that never expire. Perfect if you use AI daily.",
+      desc: "{{subscriptionPrice}}/month gets you {{subscriptionCredits}} credits every month. Or grab a pack: {{packCredits}} credits for {{packPrice}} that never expire.",
       cta: "Upgrade to Pro",
     },
     signoff: "Happy chatting,\nThe {{appName}} Team",
-    ps: "P.S. Use Incognito mode to keep conversations on your device only - we never store them on our servers (generated media is stored temporarily for technical reasons).",
+    ps: "P.S. Use Incognito mode to keep conversations on your device only. We never store them on our servers (generated media is stored temporarily for technical reasons).",
   },
   emailTemplates: {
     welcome: {

@@ -15,7 +15,8 @@ export const translations: typeof enTranslations = {
         visitWebsite: "Website besuchen",
         allRightsReserved:
           "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
-        feedbackHook: "Etwas zu sagen? Antworten - wir lesen es wirklich.",
+        feedbackHook:
+          "Etwas zu sagen? Einfach antworten. Wir lesen es wirklich.",
         feedbackBody:
           "Fehler melden, Funktion anfragen oder sagen, was fehlt. Nützliches Feedback bringt dir {{credits}} Credits. Ein ganzer Monat gratis.",
         feedbackLink: "Feedback senden →",

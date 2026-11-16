@@ -37,17 +37,23 @@ export const translations: typeof enTranslations = {
     sent: "Link an {{email}} gesendet. Schau auch im Spam-Ordner nach.",
   },
   email: {
-    subject: "Bestätige deine E-Mail für {{appName}}",
+    subject: "Schalte deine {{credits}} Gratis-Credits bei {{appName}} frei",
     title: "E-Mail bestätigen",
-    previewText: "Ein Klick bestätigt deine {{appName}}-Adresse",
+    previewText:
+      "Ein Klick bestätigt deine Adresse und aktiviert deine Gratis-Credits.",
     greeting: "Hallo {{name}},",
-    body: "Bestätige diese Adresse, damit wir dich zu Konto, Credits und Sicherheit erreichen können.",
+    body: "Dein Konto steht. Bestätige diese Adresse und es bekommt jeden Monat {{credits}} Gratis-Credits. Ganz ohne Karte.",
     newsletter:
       "Derselbe Klick bestätigt auch dein Newsletter-Abo: Dein Konto erhält jeden Monat {{credits}} Gratis-Credits zusätzlich, solange du abonniert bleibst.",
-    button: "E-Mail bestätigen",
+    button: "Bestätigen und Credits freischalten",
+    reminder: {
+      subject: "Deine {{credits}} Gratis-Credits warten noch",
+      previewText: "Ein Klick auf den Link schaltet sie frei.",
+      body: "Du hast gestern dein {{appName}}-Konto erstellt, aber diese Adresse ist noch nicht bestätigt. Bis dahin liegen deine {{credits}} Gratis-Credits pro Monat auf Eis. Ein Klick genügt.",
+    },
     expiry:
       "Dieser Link ist {{days}} Tage gültig. Falls du kein Konto erstellt hast, ignoriere diese E-Mail.",
-    signoff: "- {{appName}}",
+    signoff: "Dein {{appName}} Team",
   },
   emailTemplates: {
     name: "E-Mail-Bestätigung",

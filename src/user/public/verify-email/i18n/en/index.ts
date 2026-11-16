@@ -35,17 +35,23 @@ export const translations = {
     sent: "Link sent to {{email}}. Check your spam folder too.",
   },
   email: {
-    subject: "Confirm your email for {{appName}}",
+    subject: "Unlock your {{credits}} free credits on {{appName}}",
     title: "Confirm your email",
-    previewText: "One click to verify your {{appName}} address",
+    previewText:
+      "One click confirms your address and switches on your free credits.",
     greeting: "Hi {{name}},",
-    body: "Confirm this address so we can reach you about your account, credits and security.",
+    body: "Your account is ready. Confirm this address and it gets {{credits}} free credits every month. No card needed.",
     newsletter:
       "This same click also confirms your newsletter subscription: your account gets {{credits}} extra free credits every month while you stay subscribed.",
-    button: "Verify my email",
+    button: "Confirm and unlock credits",
+    reminder: {
+      subject: "Your {{credits}} free credits are still on hold",
+      previewText: "One click on the link switches them on.",
+      body: "You created your {{appName}} account yesterday, but this address is not confirmed yet. Until it is, your {{credits}} free credits per month stay on hold. One click fixes that.",
+    },
     expiry:
       "This link works for {{days}} days. If you didn't create an account, ignore this email.",
-    signoff: "- {{appName}}",
+    signoff: "The {{appName}} team",
   },
   emailTemplates: {
     name: "Email verification",

@@ -19,6 +19,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -34,6 +35,7 @@ import type {
   EmailTemplateDefinition,
 } from "@/messenger/registry/template";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+import { getPricingParams } from "@/products/platform-products";
 
 import type signupDefinition from "../signup/definition";
 import type {
@@ -51,6 +53,10 @@ import { createVerificationToken, VERIFY_TOKEN_TTL_DAYS } from "./token";
 const propsSchema = z.object({
   name: z.string(),
   verifyUrl: z.string(),
+  /** Monthly free credits the account gets once verified */
+  credits: z.string(),
+  /** Follow-up sent when the first link was not clicked */
+  reminder: z.boolean().optional(),
   /** Newsletter ticked at signup and not yet confirmed: this link confirms it too */
   newsletterBonusCredits: z.number().optional(),
 });
@@ -72,11 +78,16 @@ function VerifyEmail({
 }): ReactElement {
   const { t: globalT } = configScopedTranslation.scopedT(locale);
   const appName = globalT("appName");
+  const params = { appName, credits: props.credits };
   return (
     <EmailTemplate
       locale={locale}
       title={t("email.title")}
-      previewText={t("email.previewText", { appName })}
+      previewText={
+        props.reminder
+          ? t("email.reminder.previewText", params)
+          : t("email.previewText", params)
+      }
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -91,7 +102,9 @@ function VerifyEmail({
           marginBottom: "28px",
         }}
       >
-        {t("email.body")}
+        {props.reminder
+          ? t("email.reminder.body", params)
+          : t("email.body", params)}
       </Text>
       {props.newsletterBonusCredits !== undefined && (
         <Text
@@ -119,7 +132,7 @@ function VerifyEmail({
             textDecoration: "none",
           }}
         >
-          {t("email.button")}
+          {t("email.button", params)}
         </Button>
       </Section>
       <Text
@@ -150,6 +163,7 @@ async function buildVerificationEmail(
   recipient: VerifyRecipient,
   locale: CountryLanguage,
   template: { component: typeof VerifyEmail },
+  reminder = false,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: globalT } = configScopedTranslation.scopedT(locale);
@@ -168,15 +182,23 @@ async function buildVerificationEmail(
       recipient.id,
       recipient.email,
     );
+  const subjectParams = {
+    appName: globalT("appName"),
+    credits: getPricingParams(locale).freeCreditsSignedIn,
+  };
   return success({
     toEmail: recipient.email,
     toName: recipient.name,
-    subject: t("email.subject", { appName: globalT("appName") }),
+    subject: reminder
+      ? t("email.reminder.subject", subjectParams)
+      : t("email.subject", subjectParams),
     leadId: recipient.leadId,
     jsx: template.component({
       props: {
         name: recipient.name,
         verifyUrl,
+        credits: subjectParams.credits,
+        reminder,
         ...(newsletterPending
           ? { newsletterBonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus }
           : {}),
@@ -218,6 +240,46 @@ async function renderForUser(
   );
 }
 
+/**
+ * Reminder for an account that has not clicked its signup link yet
+ * (verify-email-reminder cron). Skips verified or missing accounts.
+ */
+export async function renderVerificationReminder(
+  userId: string,
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): Promise<
+  SuccessResponseType<EmailResolvedData | EmailRenderSkip> | ErrorResponseType
+> {
+  const found = await UserRepository.getUserById(
+    userId,
+    UserDetailLevel.STANDARD,
+    locale,
+    logger,
+  );
+  if (!found.success) {
+    return fail({
+      message: found.message,
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      cause: found,
+    });
+  }
+  if (found.data.emailVerified) {
+    return success({ skip: true as const, reason: "already verified" });
+  }
+  return buildVerificationEmail(
+    {
+      id: found.data.id,
+      leadId: found.data.leadId,
+      email: found.data.email,
+      name: found.data.privateName,
+    },
+    locale,
+    verifyEmailResendEmailTemplate,
+    true,
+  );
+}
+
 const meta = {
   version: "1.0.0",
   name: "emailTemplates.name",
@@ -229,6 +291,7 @@ const meta = {
 const exampleProps = {
   name: "Max",
   verifyUrl: "https://example.com/en-US/user/verify-email/token123",
+  credits: "40",
 };
 
 /** Resend: logged-in user asks for a fresh link (POST /user/public/verify-email, no token). */

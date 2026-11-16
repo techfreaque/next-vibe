@@ -37,17 +37,22 @@ export const translations: typeof enTranslations = {
     sent: "Link wysłany na {{email}}. Zajrzyj też do spamu.",
   },
   email: {
-    subject: "Potwierdź e-mail w {{appName}}",
+    subject: "Odblokuj {{credits}} darmowych kredytów w {{appName}}",
     title: "Potwierdź e-mail",
-    previewText: "Jedno kliknięcie potwierdza Twój adres w {{appName}}",
+    previewText: "Jedno kliknięcie potwierdza adres i włącza darmowe kredyty.",
     greeting: "Cześć {{name}},",
-    body: "Potwierdź ten adres, abyśmy mogli się z Tobą skontaktować w sprawie konta, kredytów i bezpieczeństwa.",
+    body: "Twoje konto jest gotowe. Potwierdź ten adres, a co miesiąc dostaniesz {{credits}} darmowych kredytów. Bez karty.",
     newsletter:
       "Ten sam klik potwierdza też Twoją subskrypcję newslettera: konto dostaje co miesiąc dodatkowe {{credits}} darmowych kredytów, dopóki subskrybujesz.",
-    button: "Potwierdź mój e-mail",
+    button: "Potwierdź i odblokuj kredyty",
+    reminder: {
+      subject: "{{credits}} darmowych kredytów wciąż na Ciebie czeka",
+      previewText: "Jedno kliknięcie w link je odblokuje.",
+      body: "Wczoraj powstało Twoje konto w {{appName}}, ale ten adres nie jest jeszcze potwierdzony. Do tego czasu {{credits}} darmowych kredytów miesięcznie jest wstrzymanych. Wystarczy jedno kliknięcie.",
+    },
     expiry:
       "Link działa przez {{days}} dni. Jeśli nie zakładałeś konta, zignoruj tę wiadomość.",
-    signoff: "- {{appName}}",
+    signoff: "Zespół {{appName}}",
   },
   emailTemplates: {
     name: "Potwierdzenie e-maila",

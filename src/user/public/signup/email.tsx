@@ -54,6 +54,7 @@ import {
   type UserCreateResponseOutput,
 } from "../../../users/create/definition";
 import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
+import { createVerificationToken } from "../verify-email/token";
 import type signupDefinition from "./definition";
 import {
   type SignupPostRequestOutput,
@@ -73,6 +74,8 @@ const signupWelcomePropsSchema = z.object({
   userId: z.string(),
   leadId: z.string(),
   totalModelCount: z.number(),
+  /** Unverified account: primary CTA confirms the email (free credits need it) */
+  verifyUrl: z.string().optional(),
 });
 
 type SignupWelcomeProps = z.infer<typeof signupWelcomePropsSchema>;
@@ -279,10 +282,23 @@ function SignupWelcomeEmail({
         ))}
       </Section>
 
-      {/* Primary CTA */}
+      {/* Primary CTA: confirm the email first, the free credits need it */}
+      {props.verifyUrl && (
+        <Text
+          style={{
+            fontSize: "15px",
+            lineHeight: "1.6",
+            color: "#374151",
+            textAlign: "center",
+            marginBottom: "14px",
+          }}
+        >
+          {t("email.verify.note")}
+        </Text>
+      )}
       <Section style={{ textAlign: "center", marginBottom: "28px" }}>
         <Button
-          href={`${tracking.baseUrl}/${locale}`}
+          href={props.verifyUrl ?? `${tracking.baseUrl}/${locale}`}
           style={{
             backgroundColor: "#2563eb",
             borderRadius: "8px",
@@ -294,7 +310,9 @@ function SignupWelcomeEmail({
             boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)",
           }}
         >
-          {t("email.ctaButton")}
+          {props.verifyUrl
+            ? t("email.verify.cta", pricingParams)
+            : t("email.ctaButton")}
         </Button>
       </Section>
 
@@ -458,6 +476,9 @@ async function renderWelcomeEmailByEmail(
   }
   const user = userResponse.data;
 
+  const verifyToken = user.emailVerified
+    ? null
+    : createVerificationToken(user.id, user.email);
   const templateProps: SignupWelcomeProps = {
     privateName: user.privateName,
     userId: user.id,
@@ -466,6 +487,11 @@ async function renderWelcomeEmailByEmail(
       false,
       await getEnvAvailability(),
     ),
+    ...(verifyToken
+      ? {
+          verifyUrl: `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/verify-email/${encodeURIComponent(verifyToken)}`,
+        }
+      : {}),
   };
   const { t: globalT } = configScopedTranslation.scopedT(locale);
 

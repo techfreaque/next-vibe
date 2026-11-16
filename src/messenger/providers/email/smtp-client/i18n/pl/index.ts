@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
         allRightsReserved:
           "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
         feedbackHook:
-          "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
+          "Masz coś do powiedzenia? Po prostu odpowiedz. Naprawdę to czytamy.",
         feedbackBody:
           "Zgłoś błąd, poproś o funkcję albo napisz, czego brakuje. Za przydatną opinię dostajesz {{credits}} kredytów. Pełny miesiąc za darmo.",
         feedbackLink: "Wyślij opinię →",

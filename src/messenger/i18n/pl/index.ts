@@ -505,7 +505,7 @@ export const translations: typeof enTranslations = {
           allRightsReserved:
             "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
           feedbackHook:
-            "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
+            "Masz coś do powiedzenia? Po prostu odpowiedz. Naprawdę to czytamy.",
           feedbackBody:
             "Zglos blad, popros o funkcje albo napisz, czego brakuje. Za przydatna opinie dostajesz {{credits}} kredytow — pelny miesiac za darmo.",
           feedbackLink: "Wyślij opinię →",
@@ -2089,7 +2089,7 @@ export const translations: typeof enTranslations = {
           allRightsReserved:
             "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
           feedbackHook:
-            "Masz coś do powiedzenia? Odpowiedz - naprawdę to czytamy.",
+            "Masz coś do powiedzenia? Po prostu odpowiedz. Naprawdę to czytamy.",
           feedbackBody:
             "Zglos blad, popros o funkcje albo napisz, czego brakuje. Za przydatna opinie dostajesz {{credits}} kredytow — pelny miesiac za darmo.",
           feedbackLink: "Wyślij opinię →",

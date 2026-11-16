@@ -1,0 +1,157 @@
+/**
+ * Verify-Email Reminder API Definition
+ * POST: one reminder to accounts that did not click their signup link
+ * (called hourly by cron)
+ */
+
+import { createEndpoint } from "next-vibe/core/definition/create-i18n";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import {
+  objectField,
+  requestField,
+  responseField,
+} from "next-vibe/unified-ui/_shared/utils-i18n";
+import { z } from "zod";
+
+import { scopedTranslation } from "./i18n";
+
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["user", "verify-email-reminder"],
+  title: "post.title",
+  titleShort: "post.titleShort",
+  description: "post.description",
+  category: "account",
+  icon: "mail",
+  tags: ["post.tag"],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      batchSize: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.fields.batchSize.label",
+        description: "post.fields.batchSize.description",
+        columns: 6,
+        schema: z.coerce.number().min(1).max(500).default(100),
+      }),
+
+      dryRun: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+
+      candidates: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.candidates",
+        schema: z.number(),
+      }),
+
+      sent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.sent",
+        schema: z.number(),
+      }),
+
+      skipped: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.skipped",
+        schema: z.number(),
+      }),
+
+      failed: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.failed",
+        schema: z.number(),
+      }),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+  },
+
+  successTypes: {
+    title: "post.success.title",
+    description: "post.success.description",
+  },
+
+  examples: {
+    requests: {
+      default: {
+        batchSize: 100,
+        dryRun: false,
+      },
+    },
+    responses: {
+      default: {
+        candidates: 3,
+        sent: 2,
+        skipped: 1,
+        failed: 0,
+      },
+    },
+  },
+});
+
+export type VerifyEmailReminderPostRequestOutput =
+  typeof POST.types.RequestOutput;
+export type VerifyEmailReminderPostResponseOutput =
+  typeof POST.types.ResponseOutput;
+
+const definitions = { POST };
+export default definitions;

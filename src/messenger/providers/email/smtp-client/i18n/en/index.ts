@@ -13,7 +13,7 @@ export const translations = {
         visitWebsite: "Visit Website",
         allRightsReserved:
           "© {{currentYear}} {{appName}}. All rights reserved.",
-        feedbackHook: "Got something to say? Reply - we actually read it.",
+        feedbackHook: "Got something to say? Hit reply. We actually read it.",
         feedbackBody:
           "Report a bug, request a feature, or tell us what's missing. Useful feedback earns you {{credits}} credits. That's a full month on us.",
         feedbackLink: "Reply with feedback →",
