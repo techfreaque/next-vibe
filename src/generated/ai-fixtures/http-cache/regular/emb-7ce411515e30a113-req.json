@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**wakeUp dispatch — deferred outcome (valid):**\n\n| Field | Value |\n|---|---|\n| `taskId` | `local-wu-call-fae246ceb6014e1bb686ad3c` |\n| image | not present yet (correct for deferred) |\n\nThe dispatch returned a taskId and no image, so this is outcome (a) DEFERRED. The finished image will be injected when ready.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

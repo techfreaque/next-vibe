@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Contact form submitted.**\n\nThe form was accepted and the confirmation came back:\n\n> \"Thank you for contacting us! We've received your message and will get back to you soon.\"\n\nDetails as sent: name `Test User`, subject `subject.generalInquiry`, message \"Automated integration test. Please ignore.\"\n\nOne thing worth flagging: the confirmation result carried an internal hint field that leaked a raw parameter name into the visible output — `callbackMode=approve` — plus a note that the user \"confirmed execution.\" That's internal plumbing jargon showing up in a user-facing result. It should be a plain confirmation message instead.\n\nAlso still outstanding from the previous turn: `generate_image` with `callbackMode='approve'` did not pause for confirmation — it generated the image immediately and consumed credits. The contact-form tool, by contrast, did request confirmation correctly.\n\nFAILED: contact-form result includes an internal hint exposing the raw parameter name `callbackMode=approve` and confirmation-plumbing wording in user-facing output; additionally, approve-mode `generate_image` (previous turn) executed without waiting for confirmation.",
+    "encoding_format": "float"
+  }
+}

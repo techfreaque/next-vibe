@@ -700,10 +700,20 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
             preStreamMessageIds.has(m.id) ? sum : sum + (m.creditCost ?? 0),
           0,
         );
-        // Use the leaf id as the anchor for the next turn (headless runner
-        // semantics: lastAiMessageId = leaf of the walked chain). Fall back to
-        // lastRevivalAi.id if the leaf walk failed (e.g. no messages at all).
-        const revivedLeafId = revivalLeaf?.id ?? lastRevivalAi?.id;
+        // lastAiMessageId = the turn's final ANSWER (an assistant), the same
+        // as the non-revival path. The leaf can be a tool row the answer's
+        // step fired as an endLoop side-action (rename-thread); callers check
+        // the answer's content and finish reason, and runStream's
+        // tipAfterAnswer still anchors the next turn on that rename row.
+        // Any other leaf (no answer, or rows below it that are not its
+        // endLoop side-actions) stays the anchor as before.
+        const answerOwnsLeaf =
+          lastRevivalAi !== undefined &&
+          revivalLeaf !== undefined &&
+          tipAfterAnswer(lastRevivalAi.id, revivedMessages) === revivalLeaf.id;
+        const revivedLeafId = answerOwnsLeaf
+          ? lastRevivalAi?.id
+          : (revivalLeaf?.id ?? lastRevivalAi?.id);
         const revivedResult =
           revivedLeafId && firstResult.result.success
             ? {

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "[T6v favorites] Call execute-tool with toolName='favorites' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list the user's favorites. Check that the result has a favorites array. Known-correct, not issues: favorite ids are slugs for built-in skill variants and UUIDs for favorites the user created; an earlier wakeUp call shows a taskId-only dispatch result followed later by a SEPARATE deferred result carrying the real output. The favorites tool runs on hermes, whose favorites are its own: their count can differ from the local favorites summary in your context. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**wakeUp stress test — final state:**\n\nThe dispatch returned `taskId: local-wu-call-fae246ceb6014e1bb686ad3c` with no image (deferred outcome, valid), and the automatically-delivered result for that task carried a non-empty image URL:\n\n`/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/db71ba47-41b7-4d0a-9c6d-7fc1d115748d.webp`\n\nThe image rendered inline as well, so the deferred dispatch revived correctly with a usable image.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

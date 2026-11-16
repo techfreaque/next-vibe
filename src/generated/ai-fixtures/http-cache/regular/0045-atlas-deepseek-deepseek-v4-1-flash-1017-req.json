@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7e771ece | Posted:Nov 16, 17:53]",
+            "text": "[Context: ID:941ceeb7 | Posted:Nov 16, 18:01]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4f815053 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:53]",
+            "text": "[Context: ID:7e1cbe43 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:01]",
             "type": "text"
           }
         ],
@@ -113,7 +113,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:53:58.567Z\",\"updatedPreview\":\"Ran three parallel tool-help calls to validate the tool catalog. The category='ai' call returned 92 tools, each with a name and description. The query='search' call returned 11 matching tools with names and descriptions, with a consistent per-category breakdown. The toolName='generate_image' detail call returned the tool with its name, description, and a full JSON Schema parameters object including the required prompt field and the model enum. All checks passed with no errors or empty results.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool-help catalog checks: category, search, schema\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:01:50.829Z\",\"updatedPreview\":\"Ran three parallel tool-help calls to validate the tool catalog. The category='ai' call returned 92 tools, each with a name and description. The query='search' call returned 11 matching tools with names and descriptions, with a consistent per-category breakdown. The toolName='generate_image' detail call returned the tool with its name, description, and a full JSON Schema parameters object including the required prompt field and the model enum. All checks passed with no errors or empty results.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool-help catalog checks: category, search, schema\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-78c86792-76db-44fe-92b1-22dd6ed8a849"
@@ -121,7 +121,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7d23f346 | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:fec8e9cd | Posted:Nov 16, 18:01]",
             "type": "text"
           }
         ],
@@ -134,7 +134,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3c092df4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:d4653aa7 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:01]",
             "type": "text"
           }
         ],
@@ -147,7 +147,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c74fcd11 | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:ea2f6e40 | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -160,7 +160,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dd1cb3fe | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:e670b5fe | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -189,7 +189,7 @@
           "ttl": "1h",
           "type": "ephemeral"
         },
-        "content": "{\"audioUrl\":\"/api/en-GLOBAL/vibe/agent/chat/threads/files/e835429d-b17b-4137-ae16-d496fc3e6a32/6b052dc6-6349-4fe3-b208-4e977366d442.mp3\",\"creditCost\":10.4,\"durationSeconds\":8,\"mediaType\":null,\"text\":null}",
+        "content": "{\"audioUrl\":\"/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/504fb996-cb58-45fb-a211-9dab37663163.mp3\",\"creditCost\":10.4,\"durationSeconds\":8,\"mediaType\":null,\"text\":null}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-a2b2dce4-fb5f-49c8-a51b-3b429812971d"
@@ -213,7 +213,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:54:09.044Z\",\"updatedPreview\":\"The thread validated the tool catalog with three parallel tool-help calls: the ai category returned 92 tools each with a name and description, the search query returned 11 matches with a consistent per-category breakdown, and the generate_image detail call returned a full parameters schema. A retry-branch prompt was answered, then generate_music was called with an upbeat electronic remix prompt and an input mp3, returning a non-empty audioUrl, a positive creditCost of 10.4, and an 8-second duration within range.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool catalog checks and music generation test\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:02:03.258Z\",\"updatedPreview\":\"The thread validated the tool catalog with three parallel tool-help calls: the ai category returned 92 tools each with a name and description, the search query returned 11 matches with a consistent per-category breakdown, and the generate_image detail call returned a full parameters schema. A retry-branch prompt was answered, then generate_music was called with an upbeat electronic remix prompt and an input mp3, returning a non-empty audioUrl, a positive creditCost of 10.4, and an 8-second duration within range.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool catalog checks and music generation test\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-1d0e20fc-2498-40d8-b524-014bc2824c44"
@@ -221,7 +221,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:73cd34da | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:055cda9c | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -234,7 +234,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:44c6d396 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:b29b350e | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -283,7 +283,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:54:12.238Z\",\"updatedPreview\":\"The thread exercised the tool catalog: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results. A fork-branch prompt was answered, then generate_music produced a valid audio URL, positive credit cost and 8-second duration. Finally the favorites tool listed 34 favorites across 2 pages with the Quality Tester - Budget favorite active.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool catalog, music generation and favorites checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:02:08.481Z\",\"updatedPreview\":\"The thread exercised the tool catalog: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results. A fork-branch prompt was answered, then generate_music produced a valid audio URL, positive credit cost and 8-second duration. Finally the favorites tool listed 34 favorites across 2 pages with the Quality Tester - Budget favorite active.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool catalog, music generation and favorites checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-faf863ac-14d7-4d95-9550-65192ba4bd41"
@@ -295,7 +295,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2f99142f | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:40cb3b9d | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -308,7 +308,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f9164167 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:d222c1d2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -357,7 +357,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:54:22.744Z\",\"updatedPreview\":\"The thread ran a series of tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; and a detached generate_image call returned a taskId with no imageUrl, confirming background dispatch.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool catalog, music, favorites and detach checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:02:11.495Z\",\"updatedPreview\":\"The thread ran a series of tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; and a detached generate_image call returned a taskId with no imageUrl, confirming background dispatch.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool catalog, music, favorites and detach checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-51a84386-74df-4fd4-bdad-584cf11735ca"
@@ -369,7 +369,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:579e0ea9 | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:bee0f47e | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -394,7 +394,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":1.3,\"imageUrl\":\"/api/en-GLOBAL/vibe/agent/chat/threads/files/e835429d-b17b-4137-ae16-d496fc3e6a32/f418b4d0-37ee-4d86-9ddb-92812c660518.webp\"},\"status\":\"status.completed\",\"waiting\":false}}",
+        "content": "{\"result\":{\"originalArgs\":{\"prompt\":\"await-task-test\"},\"originalToolName\":\"generate_image\",\"result\":{\"creditCost\":1.3,\"imageUrl\":\"/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/f3a2aed5-367d-41fb-b864-4c503ecb5dbe.webp\"},\"status\":\"status.completed\",\"waiting\":false}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-8f2aa30c-218e-4217-b023-260558b9a529"
@@ -402,7 +402,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:47770fab | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:24f70646 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -427,7 +427,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:54:32.925Z\",\"updatedPreview\":\"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image call returned a taskId with no imageUrl; and await-task then returned the completed result with a valid imageUrl.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool catalog, music, favorites and async task checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:02:15.458Z\",\"updatedPreview\":\"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image call returned a taskId with no imageUrl; and await-task then returned the completed result with a valid imageUrl.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool catalog, music, favorites and async task checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-36f535bd-5aa0-45ec-b57d-1c6c79bc7dd4"
@@ -435,7 +435,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:8e5042da | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:c023684d | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -448,7 +448,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6324be15 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:10736f51 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -481,7 +481,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4b89ea0c | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:26d860e2 | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -494,7 +494,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d714c1e2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:54]",
+            "text": "[Context: ID:40ec95df | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -527,7 +527,7 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: /api/en-GLOBAL/vibe/agent/chat/threads/files/e835429d-b17b-4137-ae16-d496fc3e6a32/38bc936d-e729-4f54-b892-dd60495fde7d.webp",
+            "text": "imageUrl: /api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/77d931f6-5f3b-4f08-92f0-d7cdf3347fba.webp",
             "type": "text"
           }
         ],
@@ -554,7 +554,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T17:54:44.215Z\",\"updatedPreview\":\"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image returned a taskId with no imageUrl; await-task returned the completed result with a valid imageUrl; self-instance-id returned atlas; and a wait-mode generate_image returned an inline imageUrl with no taskId.\",\"updatedThreadId\":\"e835429d-b17b-4137-ae16-d496fc3e6a32\",\"updatedTitle\":\"Tool catalog, media and callback-mode checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:02:22.497Z\",\"updatedPreview\":\"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image returned a taskId with no imageUrl; await-task returned the completed result with a valid imageUrl; self-instance-id returned atlas; and a wait-mode generate_image returned an inline imageUrl with no taskId.\",\"updatedThreadId\":\"32765211-cf2e-4d4e-a4cf-67c062409f70\",\"updatedTitle\":\"Tool catalog, media and callback-mode checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-00a64513-3896-4fed-ac20-ae8eac935c61"
@@ -566,7 +566,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b1da0251 | Posted:Nov 16, 17:55]",
+            "text": "[Context: ID:eb24e22c | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -579,7 +579,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:ca9c86a8 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 17:55]",
+            "text": "[Context: ID:108a82cf | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],
@@ -604,7 +604,7 @@
         ]
       },
       {
-        "content": "{\"hint\":\"Task completed. Its result has been delivered below in this conversation — do NOT call this tool again; respond using that result.\",\"status\":\"completed\"}",
+        "content": "{\"hint\":\"Dispatched as task local-wu-call-fec00a1f-5152-4e4b-b137-57af1473c9ca. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"local-wu-call-fec00a1f-5152-4e4b-b137-57af1473c9ca\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-fec00a1f-5152-4e4b-b137-57af1473c9ca"
@@ -636,13 +636,22 @@
             "type": "image_url"
           },
           {
-            "text": "imageUrl: /api/en-GLOBAL/vibe/agent/chat/threads/files/e835429d-b17b-4137-ae16-d496fc3e6a32/964c12e8-664e-49c9-b4d8-7f90316d3b01.webp",
+            "text": "imageUrl: /api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/de568d4d-7810-4bc5-bc05-fbddeb2a027d.webp",
             "type": "text"
           }
         ],
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "deferred-call-fec00a1f-5152-4e4b-b137-57af1473c9ca"
+      },
+      {
+        "content": [
+          {
+            "text": "[Deferred result] The generate_image result above was delivered automatically after its wakeUp dispatch (task local-wu-call-fec00a1f-5152-4e4b-b137-57af1473c9ca) had already returned a taskId. It is that dispatch's outcome, not a new call.",
+            "type": "text"
+          }
+        ],
+        "role": "system"
       },
       {
         "content": [
@@ -656,7 +665,7 @@
       {
         "content": [
           {
-            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Tool catalog, media and callback-mode checks\" / \"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image returned a taskId with no imageUrl; await-task returned the completed result with a valid imageUrl; self-instance-id returned atlas; and a wait-mode generate_image returned an inline imageUrl with no taskId.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── cb-await-task-test [82%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [81%]\n│   │   wait-inline-test-payload\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── t7-approve-test\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 56 · 7 background)\n│   └── tool-help-catalog-checks-and-image-generation-test-aef10079-99e1-4ad5-a981-0f9592acbe9b [73%]\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-6) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── test-skill-layout-preview-bot-standard [77%]\n│   ├── test-skill-layout-preview-bot-verbose [77%]\n│   ├── test-skill-unlisted-skill [71%]\n│   └── test-skill-unlisted-skill-stealth [71%]\n├── tasks/ (5)\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-11-16\n│   ├── Background: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-11-16\n│   ├── Autopilot\n│   │   0 8 * * 1-5\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] ⚠ 1 consecutive failure\n│   └── Escalated: escalated-1794819684090-u62dk9\n│       * * * * * [disabled]\n└── favorites/ (active: quality-tester)\n    ├── thea-elon-tusk\n    │   model: skill:thea\n    ├── thea-vision\n    │   model: skill:thea\n    ├── thea-uncensored\n    │   model: skill:thea\n    ├── vibe-coder-open\n    │   model: skill:vibe-coder\n    ├── vibe-coder-fast\n    │   model: skill:vibe-coder\n    ├── vibe-coder-max\n    │   model: skill:vibe-coder\n    ├── vibe-coder-broad\n    │   model: skill:vibe-coder\n    ├── test-vibe-coder\n    │   model:kimi-k3 skill:vibe-coder\n    ├── quality-tester\n    │   model: skill:quality-tester [ACTIVE]\n    ├── My Technical\n    │   model: skill:technical\n    └── +24 more\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Tool catalog, media and callback-mode checks\" / \"The thread ran a series of platform tool checks: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed results; a fork-branch prompt was answered; generate_music returned a valid audio URL, positive credit cost and 8-second duration; favorites listed 34 entries across 2 pages; a detached generate_image returned a taskId with no imageUrl; await-task returned the completed result with a valid imageUrl; self-instance-id returned atlas; and a wait-mode generate_image returned an inline imageUrl with no taskId.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── cb-await-task-test [82%]\n│   │   await-task-test-payload\n│   ├── cb-wait-inline-test [81%]\n│   │   wait-inline-test-payload\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── t7-approve-test\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (6)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 62 · 7 background)\n│   └── tool-help-catalog-checks-and-image-generation-test-aef10079-99e1-4ad5-a981-0f9592acbe9b [73%]\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-6) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── test-skill-layout-preview-bot-standard [77%]\n│   ├── test-skill-layout-preview-bot-verbose [77%]\n│   ├── test-skill-unlisted-skill [71%]\n│   └── test-skill-unlisted-skill-stealth [71%]\n├── tasks/ (5)\n│   ├── WakeUp: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-11-16\n│   ├── Background: generate_image\n│   │   * * * * * [disabled] last:status.completed@2026-11-16\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] ⚠ 1 consecutive failure\n│   ├── Autopilot\n│   │   0 8 * * 1-5 [disabled] last:status.completed@2026-11-16\n│   └── Escalated: escalated-1794819684090-u62dk9\n│       * * * * * [disabled]\n├── favorites/ (active: quality-tester)\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-broad\n│   │   model: skill:vibe-coder\n│   ├── test-vibe-coder\n│   │   model:kimi-k3 skill:vibe-coder\n│   ├── quality-tester\n│   │   model: skill:quality-tester [ACTIVE]\n│   ├── My Technical\n│   │   model: skill:technical\n│   └── +24 more\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
             "type": "text"
           }
         ],
@@ -669,7 +678,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:b9a4ade9 | Model:deepseek-v4.1-flash | Skill:quality-tester | Posted:Nov 16, 17:55]",
+            "text": "[Context: ID:caf5f962 | Model:deepseek-v4.1-flash | Skill:quality-tester | Posted:Nov 16, 18:02]",
             "type": "text"
           }
         ],

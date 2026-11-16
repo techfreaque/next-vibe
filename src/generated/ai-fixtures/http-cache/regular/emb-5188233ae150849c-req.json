@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/quality-tester-suite--tools--callback-modes--media-32765211-cf2e-4d4e-a4cf-67c062409f70.md\n\n# Quality-tester suite: tools, callback modes, media\nFolder: private\nDescription: Quality-tester session covering the full tool surface: catalog discovery via tool-help (category, keyword and schema lookups), all callback modes (wait, detach plus await-task, wakeUp including repeats, endLoop, approve), media generation (image, music, video with first/last frame references), favor",
+    "encoding_format": "float"
+  }
+}

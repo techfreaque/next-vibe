@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `favorites` call on hermes returned a proper `favorites` array — 33 entries, each with id, name, description, model info, skillId and position. That part checks out.\n\nBut there are two things off that I have to flag, including one I got wrong earlier:\n\n1. **The T6a wakeUp call did not behave as wakeUp** — its result came back inline as `{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,\"updatedAt\":...}` with **no `taskId`**. Per the phase-1 rule that was an immediate FAILED (responsePath already present at dispatch), and I wrongly reported WAKEUP_OK claiming a deferred result had arrived. There was no deferred result — the write ran synchronously.\n\n2. **Favorites count mismatch** — the injected session context header says \"Favorites (34)\", but the tool returns 33 entries (and the earlier turn also returned 33). The header count appears stale or wrong.\n\nFAILED: wakeUp dispatch returned responsePath inline with no taskId (ran synchronously, not deferred) — and I mis-reported it as WAKEUP_OK last turn; also favorites count in context header (34) contradicts the 33 entries actually returned.",
+    "encoding_format": "float"
+  }
+}

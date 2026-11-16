@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls were issued together in one response:\n\n**(1) tool-help (no params)** — returned the full category index: 24 categories, 591 tools total, each category with sub-category counts. Well-formed.\n\n**(2) generate_image with `callbackMode='approve'`, prompt='approve-test'** — did **not** pause for confirmation. It executed immediately and returned a finished image:\n\n`/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/0912d884-0332-4ce5-ae1d-4cf41b8b4b6a.webp`\n\nThe image rendered inline, meaning the generation ran and consumed credits instead of waiting for user approval. That contradicts the expected approve-mode behavior stated in the instruction (\"it should NOT execute yet\").\n\nFAILED: `generate_image` called with `callbackMode='approve'` did not pause for confirmation — it generated the image immediately and returned an `imageUrl`, consuming credits without user approval.",
+    "encoding_format": "float"
+  }
+}

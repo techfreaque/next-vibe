@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The attached image is a solid red circle, centered on a plain white background — a simple flat geometric shape with no text, shading, or other elements.\n\nThe image content is present and I've described it, so this turn's check passes. However, one issue from earlier in the session is still unresolved and worth repeating: every `generate_image` result returns its `imageUrl` as a relative `/api/...` path rather than an absolute URL, so there's no directly usable link — I had to hand-construct a host prefix for the video frame reference, and the T9 report check failed on exactly this.\n\nFAILED: `generate_image` results return a relative `/api/...` imageUrl instead of an absolute `https://`/`http://` URL, leaving callers without a usable link.",
+    "encoding_format": "float"
+  }
+}

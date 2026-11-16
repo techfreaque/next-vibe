@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog--callback-modes--media-and-contact-fo-32765211-cf2e-4d4e-a4cf-67c062409f70.md\n\n# Tool catalog, callback modes, media and contact-form tests\nFolder: private\nDescription: The thread ran a broad platform test suite: three parallel tool-help calls (ai category, search keyword, generate_image schema) all returned well-formed catalog data. Media and callback modes were exercised — generate_music returned a valid audio URL with positive credit cost and 8s duration; favori",
+    "encoding_format": "float"
+  }
+}

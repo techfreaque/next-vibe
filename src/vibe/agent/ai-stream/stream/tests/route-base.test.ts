@@ -2952,7 +2952,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           // cross-instance handoff. Replays finish in seconds.
           settleTimeoutMs: 900_000,
           prompt: cfg.cheapMode
-            ? `[T6v favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. Known-correct, not issues: favorite ids are slugs for built-in skill variants and UUIDs for favorites the user created; an earlier wakeUp call shows a taskId-only dispatch result followed later by a SEPARATE deferred result carrying the real output. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
+            ? `[T6v favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. Known-correct, not issues: favorite ids are slugs for built-in skill variants and UUIDs for favorites the user created; an earlier wakeUp call shows a taskId-only dispatch result followed later by a SEPARATE deferred result carrying the real output.${cfg.remoteInstanceId ? ` The favorites tool runs on ${cfg.remoteInstanceId}, whose favorites are its own: their count can differ from the local favorites summary in your context.` : ""} End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
             : `[T6v video-gen] Generate a 'spinning cube' video that morphs from this photo ${wojakUrl} (the FIRST frame) into the image YOU generated earlier in this conversation (that earlier generated image is the LAST frame — find its URL in your own prior tool results / conversation history; do NOT reuse the first-frame photo for it). ${cfg.remoteInstanceId ? `Call execute-tool with toolName='generate_video', instanceId='${cfg.remoteInstanceId}', input containing prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].` : `Call the generate_video tool with prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].`} Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. You must end your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong as the very last step.`,
           threadId,
           favoriteId: mainFavoriteId,
@@ -3222,10 +3222,15 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
             // ── Each cbTool wakeUp call must produce original + deferred ──
             // Model may call cbTool multiple times → N originals + N deferred.
+            // Only wakeUp dispatches get a deferred row: a call the model
+            // made in another mode (e.g. a mistaken 'wait' it then corrected)
+            // completes inline and is not counted.
             const branchMsgs = newMessages(messages, roundInitialIds);
             const allCbToolMsgs = branchMsgs.filter((m) => isCbToolMsg(m));
             const originals = allCbToolMsgs.filter(
-              (m) => !m.toolCall?.isDeferred,
+              (m) =>
+                !m.toolCall?.isDeferred &&
+                m.toolCall?.callbackMode === "wakeUp",
             );
             const deferreds = allCbToolMsgs.filter(
               (m) => m.toolCall?.isDeferred === true,

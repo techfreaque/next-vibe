@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**wakeUp dispatch** returned a taskId (`remote-ws-hermes-call-153f14617eb5410eab14c35a`) with no responsePath — deferred as expected. The deferred result then landed:\n\n- `responsePath`: `/memories/cb-wakeup-repeat-test`\n- `size`: 26\n- `created`: false\n- `updatedAt`: 2026-11-16T18:18:18.096Z\n\nNon-empty responsePath confirmed.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

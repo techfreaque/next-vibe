@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**wakeUp dispatch** → deferred, `taskId: remote-ws-hermes-call-dab580c0a7da45f2a88ff44c`, no responsePath yet. That's outcome (a).\n\n> Note on my own process: my first attempt at this call went out with `callbackMode: \"wait\"` instead of `\"wakeUp\"` — my slip, not a platform fault. It returned inline as `{\"result\":{...}}` with a valid responsePath, then I re-issued correctly.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

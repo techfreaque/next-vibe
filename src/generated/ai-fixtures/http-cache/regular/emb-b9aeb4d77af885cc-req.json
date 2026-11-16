@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**imageUrl from the generate_image result (T9 setup):**\n\n```\n/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/e4a4b327-7078-4391-9402-8b797cd3aacb.webp\n```\n\nAn imageUrl is visible and non-empty, but it is a **relative path** — it does not start with `https://` or `http://` as the check requires. Every generated media URL in this session has come back in this same relative form, so a caller has no absolute link it can use without manually prepending a host.\n\nFAILED: imageUrl is a relative `/api/...` path, not an absolute `https://` or `http://` URL as required by the check.",
+    "encoding_format": "float"
+  }
+}

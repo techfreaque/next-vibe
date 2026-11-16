@@ -6,7 +6,12 @@
 import "server-only";
 
 import type { ToolResultOutput } from "@ai-sdk/provider-utils";
-import type { AssistantContent, ModelMessage, ToolCallPart } from "ai";
+import type {
+  AssistantContent,
+  JSONValue,
+  ModelMessage,
+  ToolCallPart,
+} from "ai";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -56,6 +61,64 @@ function isChatMessage(
   return "id" in message && "createdAt" in message;
 }
 
+/** The taskId an async dispatch stored as its result, if any. */
+function storedTaskId(stored: WidgetData | undefined): string | null {
+  return stored !== null &&
+    stored !== undefined &&
+    typeof stored === "object" &&
+    !Array.isArray(stored) &&
+    !(stored instanceof Date) &&
+    typeof stored["taskId"] === "string"
+    ? stored["taskId"]
+    : null;
+}
+
+/**
+ * Marks a deferred result in history. The deferred row repeats the dispatch
+ * call (same tool, same args), and outside a revival the dispatch itself is
+ * folded into it (or compacted away), so the model read it as a second,
+ * synchronous call: "wakeUp returned the result inline with no taskId".
+ * Same note in every mode and transport.
+ */
+function deferredDeliveryNote(
+  toolCall: ToolCall,
+  dispatchTaskIds: ReadonlyMap<string, string>,
+): string {
+  const taskId =
+    (toolCall.originalToolCallId
+      ? dispatchTaskIds.get(toolCall.originalToolCallId)
+      : undefined) ?? toolCall.remoteTaskId;
+  const mode = toolCall.callbackMode ?? "async";
+  const args = toolCall.args;
+  const innerToolName =
+    args !== null &&
+    typeof args === "object" &&
+    !Array.isArray(args) &&
+    !(args instanceof Date) &&
+    typeof args["toolName"] === "string"
+      ? args["toolName"]
+      : null;
+  const toolName = innerToolName ?? toolCall.toolName;
+  return `[Deferred result] The ${toolName} result above was delivered automatically after its ${mode} dispatch${taskId ? ` (task ${taskId})` : ""} had already returned a taskId. It is that dispatch's outcome, not a new call.`;
+}
+
+/**
+ * What a wakeUp DISPATCH shows once its deferred result exists in context.
+ * Keeps the taskId the dispatch really returned: the model judged phase 1 on
+ * it, and a dispatch row rewritten to a bare "completed" made its own earlier
+ * (correct) "taskId returned" answer look wrong. The deferred delivery below
+ * repeats this call (same tool, same args), so the hint names it as THIS
+ * call's result, not a second call the model made.
+ */
+function resolvedDispatchOutput(toolCall: ToolCall): JSONValue {
+  const taskId = storedTaskId(toolCall.result);
+  return {
+    ...(taskId ? { taskId } : {}),
+    status: "completed",
+    hint: `${taskId ? `Dispatched as task ${taskId}. ` : ""}The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.`,
+  };
+}
+
 /**
  * Decide the tool-result output for one tool call. Precedence ladder:
  * error → resolved wakeUp dispatch → real result → waiting-for-confirmation
@@ -95,10 +158,7 @@ async function buildOutputForToolCall(
     : isResolvedDispatch
       ? {
           type: "json" as const,
-          value: {
-            status: "completed",
-            hint: "Task completed. Its result has been delivered below in this conversation — do NOT call this tool again; respond using that result.",
-          },
+          value: resolvedDispatchOutput(toolCall),
         }
       : toolCall.result
         ? await buildToolResultOutput(
@@ -578,6 +638,21 @@ export async function toAiSdkMessages(
   // re-dispatches the tool. Marking the original as resolved lets us render a
   // terminal "completed, result delivered below" status instead.
   const resolvedDispatchToolCallIds = new Set<string>();
+  // taskId each async dispatch returned, keyed by its toolCallId - named in
+  // the note that marks the deferred delivery (see deferredDeliveryNote).
+  const dispatchTaskIds = new Map<string, string>();
+  for (const msg of messages) {
+    const dispatchCall =
+      msg.role === ChatMessageRole.TOOL && "metadata" in msg
+        ? msg.metadata?.toolCall
+        : undefined;
+    const dispatchTaskId = dispatchCall?.isDeferred
+      ? null
+      : storedTaskId(dispatchCall?.result);
+    if (dispatchCall && dispatchTaskId) {
+      dispatchTaskIds.set(dispatchCall.toolCallId, dispatchTaskId);
+    }
+  }
   for (const msg of messages) {
     if (
       msg.role === ChatMessageRole.TOOL &&
@@ -682,6 +757,9 @@ export async function toAiSdkMessages(
       // Build separate tool result messages (one per tool call with result)
       const toolResultMessages: ModelMessage[] = [];
 
+      // One note per deferred result in this group (pushed after the results).
+      const deferredNotes: string[] = [];
+
       // Seen toolCallIds → their args, to keep ids unique (API rejects
       // non-unique IDs) while telling true copies from provider id reuse.
       const seenToolCallIds = new Map<string, string>();
@@ -766,6 +844,10 @@ export async function toAiSdkMessages(
           input: toolCall.args,
         });
 
+        if (toolCall.isDeferred) {
+          deferredNotes.push(deferredDeliveryNote(toolCall, dispatchTaskIds));
+        }
+
         // Create tool result message.
         // See buildOutputForToolCall for the placeholder precedence ladder.
         const output: ToolResultOutput | null = await buildOutputForToolCall(
@@ -832,6 +914,9 @@ export async function toAiSdkMessages(
       // Add all TOOL result messages (one message per result)
       // AI SDK format: separate tool message for each tool result
       result.push(...toolResultMessages);
+      if (deferredNotes.length > 0) {
+        result.push({ role: "system", content: deferredNotes.join("\n") });
+      }
 
       continue;
     }

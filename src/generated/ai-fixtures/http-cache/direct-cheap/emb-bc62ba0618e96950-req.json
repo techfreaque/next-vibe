@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**wakeUp stress test — both phases correct.**\n\nDispatch returned `taskId: remote-ws-hermes-call-dab580c0a7da45f2a88ff44c` with no `responsePath` (outcome a, deferred). The auto-delivered deferred result then carried the real output:\n\n- `responsePath`: `/memories/cb-wakeup-stress-test`\n- `size`: 26 (matches `wakeup-stress-test-payload`)\n- `created`: false\n- `updatedAt`: 2026-11-16T18:18:49.582Z\n\nDisclosure on my own execution: I fired this step three times — first with `callbackMode: \"wait\"` (my mistake, wrong mode), then correctly with `wakeUp`, then a redundant repeat of `wakeUp`. The platform handled all three correctly; the duplicate was my error, not a tool defect.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog--callback-modes-and-media-generation--32765211-cf2e-4d4e-a4cf-67c062409f70.md\n\n# Tool catalog, callback modes and media generation checks\nFolder: private\nDescription: The thread validated the tool catalog with three parallel tool-help calls (ai category, search keyword, generate_image schema). It then exercised media and callback modes: generate_music returned a valid audio URL, positive credit cost and 8s duration; favorites listed 34 entries across 2 pages; det",
+    "encoding_format": "float"
+  }
+}

@@ -119,3 +119,50 @@ describe("toAiSdkMessages tool-call id uniqueness", () => {
     expect(toolCallIds(result)).toEqual(["execute-tool_2", "execute-tool_2_dup2"]);
   });
 });
+
+describe("toAiSdkMessages resolved wakeUp dispatch", () => {
+  const logger = createEndpointLogger(false, defaultLocale);
+
+  it("keeps the dispatch taskId once its deferred result exists", async () => {
+    const dispatch: ToolCall = {
+      ...call(
+        "call-wu",
+        { toolName: "cortex-write", callbackMode: "wakeUp" },
+        { taskId: "local-wu-call-wu", hint: "Dispatched" },
+      ),
+      callbackMode: "wakeUp",
+    };
+    const deferred: ToolCall = {
+      ...call(
+        "call-wu",
+        { toolName: "cortex-write", callbackMode: "wakeUp" },
+        { responsePath: "/memories/x" },
+      ),
+      callbackMode: "wakeUp",
+      isDeferred: true,
+      originalToolCallId: "call-wu",
+    };
+    for (const isRevival of [true, false]) {
+      const result = await toAiSdkMessages(
+        [toolMessage(dispatch), toolMessage(deferred)],
+        logger,
+        "UTC",
+        DefaultFolderId.PRIVATE,
+        undefined,
+        isRevival,
+        rootlessToolExecutionContext(),
+      );
+      const serialized = JSON.stringify(result);
+      expect(serialized).toContain("/memories/x");
+      // Every mode marks the deferred row as the dispatch's outcome.
+      expect(serialized).toContain(
+        "The cortex-write result above was delivered automatically after its wakeUp dispatch (task local-wu-call-wu)",
+      );
+      if (isRevival) {
+        // The dispatch row stays visible with the taskId it returned.
+        expect(serialized).toContain("local-wu-call-wu");
+        expect(serialized).toContain("deferred-call-wu");
+      }
+    }
+  });
+});

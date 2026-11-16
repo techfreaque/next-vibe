@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Phase 2 (deferred result):** the automatically-delivered result for task `local-wu-call-fec00a1f-5152-4e4b-b137-57af1473c9ca` contains a non-empty storage path:\n\n`/api/en-GLOBAL/vibe/agent/chat/threads/files/32765211-cf2e-4d4e-a4cf-67c062409f70/de568d4d-7810-4bc5-bc05-fbddeb2a027d.webp`\n\nThe image rendered inline as well, so the wakeUp flow completed end-to-end: dispatch returned a `taskId` with no image, and the revived turn delivered the finished image URL.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

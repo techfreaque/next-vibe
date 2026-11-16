@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "`cortex-write` on hermes returned `responsePath: \"/memories/cb-wait-inline-test\"` — present, non-empty, no `taskId`. Content written (24 bytes, `created: false` since the memory already existed and was overwritten).\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

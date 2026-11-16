@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**generate_video result:**\n\n| Field | Value | Check |\n|---|---|---|\n| `videoUrl` | `/api/en-GLOBAL/vibe/agent/chat/threads/.../2bc3e93c-....mp4` | non-empty ✓ |\n| `creditCost` | 62.4 | positive ✓ |\n| `durationSeconds` | 4 | positive ✓ |\n\nThe video was generated with the wojak photo pinned as the **first** frame and the image from earlier in this conversation (`.../77d931f6-....webp`, the wait-inline render) as the **last** frame — not reused as the first frame. The result carries a non-empty video URL, a positive credit cost, and a positive duration.\n\nOne note: the earlier generated image URL was returned as a relative `/api/...` path, so I had to prefix it with the instance host to pass it as a frame reference. The call still succeeded.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}
