@@ -148,11 +148,11 @@ export const translations: typeof enTranslations = {
     titleShort: "Sprache zu Text",
     dynamicTitle: "Transkript: {{text}}",
     description:
-      "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
+      "Audio per KI in Text umwandeln. Abrechnung pro Sekunde zum Preis des gewählten Modells",
     form: {
       title: "Audio-Transkription",
       description:
-        "Laden Sie eine Audiodatei zum Transkribieren hoch (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
+        "Audiodatei zum Transkribieren hochladen. Abrechnung pro Sekunde zum Preis des gewählten Modells",
     },
     fileUpload: {
       title: "Audiodatei-Upload",

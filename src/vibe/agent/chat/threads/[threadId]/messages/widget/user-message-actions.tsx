@@ -15,9 +15,9 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { useWidgetNavigation } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type React from "react";
 
-import { FEATURE_COSTS } from "@/products/repository-client";
-
+import { DEFAULT_TTS_VOICE_ID } from "../../../../../text-to-speech/constants";
 import { useTTSAudio } from "../../../../../text-to-speech/hooks";
+import { estimateReadAloudCredits } from "../../../../../text-to-speech/models";
 import type { ChatMessage } from "../../../../db";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
@@ -51,7 +51,8 @@ export function UserMessageActions({
   const { push: navigate } = useWidgetNavigation();
 
   const ttsText = message.content ?? "";
-  const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
+  // useTTSAudio below reads with the default voice: price it at that rate.
+  const ttsCreditCost = estimateReadAloudCredits(ttsText, DEFAULT_TTS_VOICE_ID);
 
   const {
     isLoading,

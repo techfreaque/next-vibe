@@ -22,8 +22,11 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
 
-import { FEATURE_COSTS } from "@/products/repository-client";
-
+import { DEFAULT_TTS_VOICE_ID } from "../../../../../../text-to-speech/constants";
+import {
+  estimateReadAloudCredits,
+  type TtsModelId,
+} from "../../../../../../text-to-speech/models";
 import type { ChatMessage } from "../../../../../db";
 import {
   type ChatNavigationState,
@@ -47,6 +50,8 @@ interface ThreadedMessageActionsProps {
   currentChunk: number;
   totalChunks: number;
   ttsText: string;
+  /** Voice the player reads with (prices the play button hint) */
+  voiceId: TtsModelId | undefined;
   // Vote props
   userVote: "up" | "down" | null;
   voteScore: number;
@@ -76,6 +81,7 @@ export function ThreadedMessageActions({
   currentChunk,
   totalChunks,
   ttsText,
+  voiceId,
   userVote,
   voteScore,
   onVoteMessage,
@@ -113,8 +119,11 @@ export function ThreadedMessageActions({
     })();
   };
 
-  // Calculate TTS credit cost based on text length
-  const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
+  // Same voice and chunking useTTSAudio bills with
+  const ttsCreditCost = estimateReadAloudCredits(
+    ttsText,
+    voiceId ?? DEFAULT_TTS_VOICE_ID,
+  );
 
   // When collapsed, only show the reply count badge (always visible, not gated by hover)
   if (isCollapsed && hasReplies) {

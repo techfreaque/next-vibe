@@ -144,7 +144,7 @@ export const translations = {
     titleShort: "Speech to Text",
     dynamicTitle: "Transcript: {{text}}",
     description:
-      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: ~0.013 credits/second. Returns the transcribed text, provider used, and confidence score.",
+      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: per second of audio at the chosen model's own rate (see list-models). Returns the transcribed text, provider used, and confidence score.",
     form: {
       title: "Audio Transcription",
       description: "Upload an audio file to transcribe",

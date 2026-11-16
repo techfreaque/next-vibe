@@ -2353,11 +2353,11 @@ export const translations = {
     post: {
       title: "Speech to Text",
       description:
-        "Convert audio to text using AI transcription (0.013 credits per second, 0.78 credits per minute)",
+        "Convert audio to text using AI transcription. Billed per second of audio at the chosen model's rate",
       form: {
         title: "Audio Transcription",
         description:
-          "Upload an audio file to transcribe (0.013 credits per second, 0.78 credits per minute)",
+          "Upload an audio file to transcribe. Billed per second at the chosen model's rate",
       },
       fileUpload: {
         title: "Audio File Upload",
@@ -2470,11 +2470,11 @@ export const translations = {
     post: {
       title: "Text to Speech",
       description:
-        "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
+        "Convert text to natural-sounding speech using AI. Billed per character at the chosen voice's rate",
       form: {
         title: "Text to Speech Conversion",
         description:
-          "Enter text to convert to speech (OpenAI TTS: ~0.00052 credits per character)",
+          "Enter text to convert to speech. Billed per character at the chosen voice's rate",
       },
       text: {
         label: "Text",

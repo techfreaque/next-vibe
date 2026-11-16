@@ -53,8 +53,8 @@ const { POST } = createEndpoint({
     firstCliArgKey: "action",
   },
 
-  // Credit cost
-  credits: 2, // Same as regular STT
+  // No endpoint-level credits: START/STATUS are free and STOP bills the
+  // transcription itself at the selected model's per-second rate.
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -26,14 +26,16 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useState } from "react";
 
-import { FEATURE_COSTS } from "@/products/repository-client";
-
+import { DEFAULT_TTS_VOICE_ID } from "../../../../../text-to-speech/constants";
 import {
   prepareTextForTTS,
   stripThinkTags,
 } from "../../../../../text-to-speech/content-processing";
 import { useTTSAudio } from "../../../../../text-to-speech/hooks";
-import type { TtsModelId } from "../../../../../text-to-speech/models";
+import {
+  estimateReadAloudCredits,
+  type TtsModelId,
+} from "../../../../../text-to-speech/models";
 import type messagesDefinition from "../definition";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
@@ -157,8 +159,11 @@ export function AssistantMessageActions({
     messageId,
   });
 
-  // Calculate TTS credit cost based on text length
-  const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
+  // Same voice and chunking useTTSAudio bills with
+  const ttsCreditCost = estimateReadAloudCredits(
+    ttsText,
+    voiceId ?? DEFAULT_TTS_VOICE_ID,
+  );
 
   return (
     <Div

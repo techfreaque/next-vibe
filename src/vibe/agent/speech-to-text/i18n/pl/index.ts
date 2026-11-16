@@ -147,11 +147,11 @@ export const translations: typeof enTranslations = {
     titleShort: "Mowa na tekst",
     dynamicTitle: "Transkrypt: {{text}}",
     description:
-      "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
+      "Zamień audio na tekst dzięki transkrypcji AI. Płacisz za każdą sekundę według stawki wybranego modelu",
     form: {
       title: "Transkrypcja audio",
       description:
-        "Prześlij plik audio do transkrypcji (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
+        "Prześlij plik audio do transkrypcji. Płacisz za każdą sekundę według stawki wybranego modelu",
     },
     fileUpload: {
       title: "Przesyłanie pliku audio",

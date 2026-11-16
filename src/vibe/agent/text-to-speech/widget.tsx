@@ -136,7 +136,8 @@ export function TextToSpeechContainer({
 
   // Load and auto-play the current audio URL
   useEffect(() => {
-    if (!currentAudioUrl) {
+    // No HTMLAudioElement in the CLI / MCP renderers: nothing to play there.
+    if (!currentAudioUrl || typeof Audio === "undefined") {
       return;
     }
 

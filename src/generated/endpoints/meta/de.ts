@@ -21683,7 +21683,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Sprache zu Text",
     titleShort: "Sprache zu Text",
     description:
-      "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
+      "Audio per KI in Text umwandeln. Abrechnung pro Sekunde zum Preis des gewählten Modells",
     icon: "mic",
     category: "ai",
     subCategory: "Generation",
@@ -21727,7 +21727,6 @@ export const endpointsMeta: EndpointMeta[] = [
     category: "ai",
     subCategory: "Generation",
     tags: ["Sprache", "Hotkey", "CLI"],
-    credits: 2,
     examples: {
       inputs: {
         default: {
@@ -21761,7 +21760,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Text zu Sprache",
     titleShort: "Text zu Sprache",
     description:
-      "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
+      "Text per KI in natürlich klingende Sprache umwandeln. Abrechnung pro Zeichen zum Preis der gewählten Stimme",
     icon: "volume-2",
     category: "ai",
     subCategory: "Generation",

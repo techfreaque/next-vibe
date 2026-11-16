@@ -15,11 +15,11 @@ export const translations: typeof enTranslations = {
     titleShort: "Tekst na mowę",
     dynamicTitle: "Mowa: {{text}}",
     description:
-      "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (~0,00052 kredytów na znak)",
+      "Zamień tekst na naturalnie brzmiącą mowę dzięki AI. Płacisz za każdy znak według stawki wybranego głosu",
     form: {
       title: "Konwersja tekstu na mowę",
       description:
-        "Wprowadź tekst do przekształcenia na mowę (OpenAI TTS: ~0,00052 kredytów na znak)",
+        "Wpisz tekst do zamiany na mowę. Płacisz za każdy znak według stawki wybranego głosu",
     },
     text: {
       label: "Tekst",

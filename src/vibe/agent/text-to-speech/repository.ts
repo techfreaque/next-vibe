@@ -23,24 +23,20 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import {
-  TTS_COST_PER_CHARACTER,
-  TTS_MINIMUM_BALANCE,
-} from "@/products/repository-client";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
-import { ApiProvider } from "../models/models";
+import { ApiProvider, calculateTtsCreditCost } from "../models/models";
 import { ModelSelectionType } from "../skills/enum";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
 } from "./definition";
 import type { TextToSpeechT } from "./i18n";
-import { getBestTtsModel } from "./models";
+import { calculateTtsCharge, getBestTtsModel } from "./models";
 
 interface EdenAITTSResponse {
   [provider: string]: {
@@ -237,7 +233,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<ResponseType<string>> {
+  ): Promise<ResponseType<{ audioUrl: string; costUsd: number | undefined }>> {
     if (!agentEnv.EDEN_AI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.edenAiTts;
       return fail({
@@ -307,12 +303,20 @@ export class TextToSpeechRepository {
       });
     }
 
-    return TextToSpeechRepository.fetchAndConvertAudio(
+    const audioResult = await TextToSpeechRepository.fetchAndConvertAudio(
       audioResourceUrl,
       logger,
       t,
       fetchImpl,
     );
+    if (!audioResult.success) {
+      return audioResult;
+    }
+    // Eden AI reports what it charged us; billing prefers it over the list rate.
+    return success({
+      audioUrl: audioResult.data,
+      costUsd: providerResult?.cost,
+    });
   }
 
   /**
@@ -438,26 +442,35 @@ export class TextToSpeechRepository {
       });
     }
 
-    if (balanceResult.data.total < TTS_MINIMUM_BALANCE) {
+    // Price of THIS request at the selected voice's own rate: the balance
+    // must cover it (a deduction later only takes what is left).
+    const characterCount = data.text.length;
+    const estimatedCredits = calculateTtsCreditCost(
+      modelOption,
+      characterCount,
+    );
+
+    if (balanceResult.data.total < estimatedCredits) {
       logger.warn("[TTS] Insufficient credits", {
         balance: balanceResult.data.total,
-        minimum: TTS_MINIMUM_BALANCE,
+        minimum: estimatedCredits,
+        voiceId: modelOption.id,
+        apiProvider: modelOption.apiProvider,
+        characterCount,
       });
       return fail({
         message: t("post.errors.insufficientCredits", {
           balance: balanceResult.data.total.toString(),
-          minimum: TTS_MINIMUM_BALANCE.toString(),
+          minimum: estimatedCredits.toString(),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
     }
 
-    const characterCount = data.text.length;
-    const creditsNeeded = characterCount * TTS_COST_PER_CHARACTER;
-
     logger.debug("[TTS] Calculating TTS credits", {
       characterCount,
-      creditsNeeded,
+      estimatedCredits,
+      creditCostPerCharacter: modelOption.creditCostPerCharacter,
     });
 
     // One fixture-aware fetch per conversion - carries the repeat counter, so
@@ -466,6 +479,8 @@ export class TextToSpeechRepository {
 
     try {
       let audioResult: ResponseType<string>;
+      /** Real upstream charge in USD, when the provider reports one. */
+      let providerCostUsd: number | undefined;
 
       switch (modelOption.apiProvider) {
         case ApiProvider.OPENAI_TTS:
@@ -482,7 +497,7 @@ export class TextToSpeechRepository {
         case ApiProvider.EDEN_AI_TTS: {
           const gender =
             modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
-          audioResult = await TextToSpeechRepository.callEdenAITTS(
+          const edenResult = await TextToSpeechRepository.callEdenAITTS(
             data.text,
             modelOption.providerModel,
             gender,
@@ -491,6 +506,11 @@ export class TextToSpeechRepository {
             t,
             fetchImpl,
           );
+          if (!edenResult.success) {
+            return edenResult;
+          }
+          audioResult = success(edenResult.data.audioUrl);
+          providerCostUsd = edenResult.data.costUsd;
           break;
         }
 
@@ -576,6 +596,22 @@ export class TextToSpeechRepository {
       logger.debug("[TTS] Text-to-speech conversion successful", {
         audioSize: audioUrl.length,
         provider: modelOption.apiProvider,
+      });
+
+      // Bill the real upstream charge when the provider reported one,
+      // otherwise the voice's own per-character rate. Same markup either way.
+      const creditsNeeded = calculateTtsCharge(
+        modelOption,
+        characterCount,
+        providerCostUsd,
+      );
+
+      logger.debug("[TTS] Billing TTS request", {
+        characterCount,
+        creditsNeeded,
+        providerCostUsd,
+        voiceId: modelOption.id,
+        apiProvider: modelOption.apiProvider,
       });
 
       // Deduct credits AFTER successful completion

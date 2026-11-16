@@ -21655,7 +21655,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Speech to Text",
     titleShort: "Speech to Text",
     description:
-      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: ~0.013 credits/second. Returns the transcribed text, provider used, and confidence score.",
+      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: per second of audio at the chosen model's own rate (see list-models). Returns the transcribed text, provider used, and confidence score.",
     icon: "mic",
     category: "ai",
     subCategory: "Generation",
@@ -21698,7 +21698,6 @@ export const endpointsMeta: EndpointMeta[] = [
     category: "ai",
     subCategory: "Generation",
     tags: ["Speech", "Hotkey", "CLI"],
-    credits: 2,
     examples: {
       inputs: {
         default: {
@@ -21732,7 +21731,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Text to Speech",
     titleShort: "Text to Speech",
     description:
-      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models — each has a unique id to pass as the voice parameter. Cost: ~0.00052 credits per character. Returns audioUrl.",
+      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: per character at the chosen voice's own rate (see list-models). Returns audioUrl.",
     icon: "volume-2",
     category: "ai",
     subCategory: "Generation",

@@ -16,7 +16,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { TTS_COST_PER_CHARACTER } from "@/products/repository-client";
 
 import type { ToolExecutionContext } from "../../../../core/execution-context";
 import { ChatMessageRole } from "../../../chat/enum";
@@ -29,6 +28,7 @@ import {
 import { ApiProvider } from "../../../models/models";
 import {
   getBestTtsModel,
+  TtsChargeMeter,
   type TtsModelOption,
   type VoiceModelSelection,
 } from "../../../text-to-speech/models";
@@ -89,6 +89,11 @@ export class StreamingTTSHandler {
    */
   private resolvedTtsModel: TtsModelOption | null | false = false;
   private totalSkillsProcessed = 0;
+  /**
+   * Bills each chunk at the voice's own rate (or the provider's real cost),
+   * deducting only the growth of the rounded total across chunks.
+   */
+  private readonly chargeMeter = new TtsChargeMeter();
   /**
    * Sequential generation chain: at most one TTS API call in-flight at a time.
    * The next chunk's generation starts as soon as the previous one resolves,
@@ -288,9 +293,10 @@ export class StreamingTTSHandler {
     });
 
     try {
-      const audioDataUrl = await this.generateTTS(cleanText);
+      const generated = await this.generateTTS(cleanText);
+      const audioDataUrl = generated?.audioUrl;
 
-      if (audioDataUrl) {
+      if (generated && audioDataUrl) {
         if (this.wsEmit) {
           this.wsEmit("audio-chunk", {
             urlPathParams: { threadId: this.threadId ?? "" },
@@ -313,7 +319,13 @@ export class StreamingTTSHandler {
         // Track skill count for credit deduction
         this.totalSkillsProcessed += cleanText.length;
 
-        const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
+        // Real upstream cost when the provider reported one (Eden AI),
+        // otherwise the selected voice's own per-character rate.
+        const creditsNeeded = this.chargeMeter.addChunk(
+          generated,
+          cleanText.length,
+          generated.providerCostUsd,
+        );
         if (creditsNeeded > 0) {
           const { t: creditsT } = creditsScopedTranslation.scopedT(this.locale);
           const deductResult = await CreditRepository.deductCreditsForTTS(
@@ -361,7 +373,13 @@ export class StreamingTTSHandler {
    * Resolves the cheapest available provider via the standard filterTtsModels path.
    * Returns base64 data URL or null on failure.
    */
-  private async generateTTS(text: string): Promise<string | null> {
+  private async generateTTS(text: string): Promise<{
+    audioUrl: string | null;
+    /** Real upstream charge in USD, when the provider reports one */
+    providerCostUsd: number | undefined;
+    /** Rate of the route that served it (credits per character, no markup) */
+    creditCostPerCharacter: number;
+  } | null> {
     const language = getLanguageFromLocale(this.locale);
 
     // Resolve model once and cache. Emit WS error only on first failed resolution.
@@ -421,24 +439,45 @@ export class StreamingTTSHandler {
       language,
     });
 
+    const priced = (
+      audioUrl: string | null,
+      providerCostUsd?: number,
+    ): {
+      audioUrl: string | null;
+      providerCostUsd: number | undefined;
+      creditCostPerCharacter: number;
+    } => ({
+      audioUrl,
+      providerCostUsd,
+      creditCostPerCharacter: modelOption.creditCostPerCharacter,
+    });
+
     try {
       switch (modelOption.apiProvider) {
         case ApiProvider.OPENAI_TTS:
-          return await this.callOpenAITTS(text, modelOption);
+          return priced(await this.callOpenAITTS(text, modelOption));
 
         case ApiProvider.EDEN_AI_TTS: {
           const gender =
             modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
-          return await this.callEdenAITTS(
+          const eden = await this.callEdenAITTS(
             text,
             modelOption.providerModel,
             gender,
             language,
           );
+          return eden ? priced(eden.audioUrl, eden.costUsd) : null;
         }
 
         case ApiProvider.ELEVENLABS:
-          return await this.callElevenLabsTTS(text, modelOption.providerModel);
+          return priced(
+            await this.callElevenLabsTTS(text, modelOption.providerModel),
+          );
+
+        case ApiProvider.NANO_GPT:
+          return priced(
+            await this.callNanoGptTTS(text, modelOption.providerModel),
+          );
 
         default:
           this.logger.error("[Streaming TTS] Unsupported TTS provider", {
@@ -512,10 +551,11 @@ export class StreamingTTSHandler {
     providerModel: string,
     voiceGender: "MALE" | "FEMALE",
     language: string,
-  ): Promise<string | null> {
+  ): Promise<{ audioUrl: string; costUsd: number | undefined } | null> {
     interface EdenAITTSResponse {
       [provider: string]: {
         audio_resource_url?: string;
+        cost?: number;
         error?: { message?: string };
         status?: string;
       };
@@ -588,6 +628,57 @@ export class StreamingTTSHandler {
 
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
     this.logger.debug("[Streaming TTS] Eden AI TTS succeeded", {
+      audioSizeBytes: audioBuffer.byteLength,
+      costUsd: providerResult?.cost,
+    });
+    return {
+      // eslint-disable-next-line i18next/no-literal-string
+      audioUrl: `data:${contentType};base64,${base64Audio}`,
+      costUsd: providerResult?.cost,
+    };
+  }
+
+  /**
+   * Call NanoGPT TTS (OpenAI-compatible /audio/speech).
+   * providerModel = "<nanoModelId>:<voice>" (e.g. "Kokoro-82m:af_bella").
+   */
+  private async callNanoGptTTS(
+    text: string,
+    providerModel: string,
+  ): Promise<string | null> {
+    const sep = providerModel.indexOf(":");
+    const model = sep === -1 ? providerModel : providerModel.slice(0, sep);
+    const voice = sep === -1 ? undefined : providerModel.slice(sep + 1);
+
+    const response = await this.fetchImpl(
+      "https://api.nano-gpt.com/api/v1/audio/speech",
+      {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.NANO_GPT_API_KEY ?? ""}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model, input: text, voice }),
+        signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error("[Streaming TTS] NanoGPT TTS API error", {
+        status: response.status,
+        error: errorText,
+        model,
+        voice,
+      });
+      return null;
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    this.logger.debug("[Streaming TTS] NanoGPT TTS succeeded", {
       audioSizeBytes: audioBuffer.byteLength,
     });
     // eslint-disable-next-line i18next/no-literal-string

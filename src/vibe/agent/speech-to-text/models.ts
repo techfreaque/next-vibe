@@ -1,10 +1,13 @@
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
+import { CREDIT_VALUE_USD } from "@/products/repository-client";
+
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
+  chargeForProviderCredits,
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
@@ -297,6 +300,45 @@ function buildSttModelOptions(): SttModelOption[] {
 }
 
 export const sttModelOptions: SttModelOption[] = buildSttModelOptions();
+
+/** One transcribed chunk as the provider reported it. */
+export interface SttChunkUsage {
+  /** Seconds of audio (0 when the provider did not say) */
+  duration: number;
+  /** What the provider charged us in USD, when it reports that */
+  providerCostUsd: number | undefined;
+}
+
+/**
+ * Credits for a transcription. Per chunk the provider's real cost wins (like
+ * OpenRouter's usage.cost); otherwise the route's own per-second rate x the
+ * reported duration; a chunk with neither is charged one second. The sum gets
+ * the standard markup and the media round-up once.
+ */
+export function calculateSttCharge(
+  option: Pick<ModelOptionSttBased, "creditCostPerSecond">,
+  chunks: readonly SttChunkUsage[],
+): { credits: number; providerCostChunks: number; minimumChunks: number } {
+  let providerCredits = 0;
+  let providerCostChunks = 0;
+  let minimumChunks = 0;
+  for (const chunk of chunks) {
+    if (chunk.providerCostUsd !== undefined && chunk.providerCostUsd > 0) {
+      providerCredits += chunk.providerCostUsd / CREDIT_VALUE_USD;
+      providerCostChunks++;
+    } else if (chunk.duration > 0) {
+      providerCredits += chunk.duration * option.creditCostPerSecond;
+    } else {
+      providerCredits += option.creditCostPerSecond;
+      minimumChunks++;
+    }
+  }
+  return {
+    credits: chargeForProviderCredits(providerCredits),
+    providerCostChunks,
+    minimumChunks,
+  };
+}
 
 // ============================================================
 // STT MODEL SELECTION SCHEMA

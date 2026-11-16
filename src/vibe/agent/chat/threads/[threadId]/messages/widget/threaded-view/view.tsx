@@ -492,6 +492,7 @@ export function ThreadedMessage({
               currentChunk={currentChunk}
               totalChunks={totalChunks}
               ttsText={ttsText}
+              voiceId={voiceId}
               userVote={userVote}
               voteScore={voteScore}
               onVoteMessage={onVoteMessage}

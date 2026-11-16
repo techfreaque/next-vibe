@@ -2357,11 +2357,11 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Sprache zu Text",
       description:
-        "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
+        "Audio per KI in Text umwandeln. Abrechnung pro Sekunde zum Preis des gewählten Modells",
       form: {
         title: "Audio-Transkription",
         description:
-          "Laden Sie eine Audiodatei zum Transkribieren hoch (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
+          "Audiodatei zum Transkribieren hochladen. Abrechnung pro Sekunde zum Preis des gewählten Modells",
       },
       fileUpload: {
         title: "Audiodatei-Upload",
@@ -2474,11 +2474,11 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Text zu Sprache",
       description:
-        "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
+        "Text per KI in natürlich klingende Sprache umwandeln. Abrechnung pro Zeichen zum Preis der gewählten Stimme",
       form: {
         title: "Text-zu-Sprache-Konvertierung",
         description:
-          "Geben Sie Text ein, um ihn in Sprache umzuwandeln (OpenAI TTS: ~0,00052 Credits pro Zeichen)",
+          "Text für die Sprachausgabe eingeben. Abrechnung pro Zeichen zum Preis der gewählten Stimme",
       },
       text: {
         label: "Text",

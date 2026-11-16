@@ -817,6 +817,44 @@ export function roundMediaCost(v: number): number {
 }
 
 /**
+ * What a user pays for a media call whose upstream cost is `providerCredits`
+ * (provider price in credits, no markup): standard markup, rounded UP to 0.1
+ * credit like every other media charge. A real provider-reported USD cost goes
+ * in as `costUsd / CREDIT_VALUE_USD`.
+ */
+export function chargeForProviderCredits(providerCredits: number): number {
+  return roundMediaCost(providerCredits * (1 + STANDARD_MARKUP_PERCENTAGE));
+}
+
+/**
+ * Credits billed for speaking `characterCount` characters with a voice route:
+ * that route's own per-character rate x standard markup, rounded up to 0.1.
+ * Single source for billing, pre-flight checks and price hints.
+ */
+export function calculateTtsCreditCost(
+  option: Pick<ModelOptionTtsBased, "creditCostPerCharacter">,
+  characterCount: number,
+): number {
+  return chargeForProviderCredits(
+    option.creditCostPerCharacter * Math.max(0, characterCount),
+  );
+}
+
+/**
+ * Credits billed for transcribing `seconds` of audio with an STT route: that
+ * route's own per-second rate x standard markup, rounded up to 0.1.
+ * Single source for billing, pre-flight checks and price hints.
+ */
+export function calculateSttCreditCost(
+  option: Pick<ModelOptionSttBased, "creditCostPerSecond">,
+  seconds: number,
+): number {
+  return chargeForProviderCredits(
+    option.creditCostPerSecond * Math.max(0, seconds),
+  );
+}
+
+/**
  * Calculate credit cost based on token pricing
  * 1 credit = $0.01 (1 cent)
  */

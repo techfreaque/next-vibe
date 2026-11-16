@@ -19,11 +19,6 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import type { CreditsT as CreditModuleT } from "@/credits/i18n";
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
-import { CreditRepository } from "@/credits/repository";
-import { STT_COST_PER_SECOND } from "@/products/repository-client";
-
 import type { SpeechToTextT } from "../i18n";
 import { SpeechToTextRepository } from "../repository";
 import { createAdapters } from "./adapters/factory";
@@ -100,32 +95,16 @@ export class SttHotkeyRepository {
         SttHotkeyRepository.sessions.set(sessionKey, session);
       }
 
-      const tCredits = creditsScopedTranslation.scopedT(locale).t;
-
       // Handle action
       switch (data.action) {
         case HotkeyAction.START:
           return await SttHotkeyRepository.handleStart(session, logger, t);
 
         case HotkeyAction.STOP:
-          return await SttHotkeyRepository.handleStop(
-            session,
-            user,
-            logger,
-            t,
-            tCredits,
-            locale,
-          );
+          return await SttHotkeyRepository.handleStop(session, logger, t);
 
         case HotkeyAction.TOGGLE:
-          return await SttHotkeyRepository.handleToggle(
-            session,
-            user,
-            logger,
-            t,
-            tCredits,
-            locale,
-          );
+          return await SttHotkeyRepository.handleToggle(session, logger, t);
 
         case HotkeyAction.STATUS:
           return SttHotkeyRepository.handleStatus(session, logger);
@@ -259,11 +238,8 @@ export class SttHotkeyRepository {
    */
   private static async handleStop(
     session: SpeechHotkeySession,
-    user: JwtPayloadType,
     logger: EndpointLogger,
     t: SpeechToTextT,
-    tCredits: CreditModuleT,
-    locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (!session.isRecording) {
       logger.warn("No recording in progress");
@@ -277,26 +253,12 @@ export class SttHotkeyRepository {
     const text = await session.stopAndInsert();
     const duration = Date.now() - startTime;
 
-    // Calculate cost based on duration (STT is charged per second)
-    const durationInSeconds = Math.ceil(duration / 1000); // Round up to nearest second
-    const cost = durationInSeconds * STT_COST_PER_SECOND;
-
+    // No charge here: the transcription inside stopAndInsert() already
+    // billed the selected model's rate (SpeechToTextRepository.transcribeAudio).
     logger.debug("Recording stopped and text inserted", {
       textLength: text.length,
       duration,
-      durationInSeconds,
-      cost,
     });
-
-    // Deduct credits AFTER successful completion based on recording duration
-    await CreditRepository.deductCreditsForFeature(
-      user,
-      cost,
-      "stt-hotkey",
-      logger,
-      tCredits,
-      locale,
-    );
 
     return success({
       response: {
@@ -314,21 +276,11 @@ export class SttHotkeyRepository {
    */
   private static async handleToggle(
     session: SpeechHotkeySession,
-    user: JwtPayloadType,
     logger: EndpointLogger,
     t: SpeechToTextT,
-    tCredits: CreditModuleT,
-    locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
-      return await SttHotkeyRepository.handleStop(
-        session,
-        user,
-        logger,
-        t,
-        tCredits,
-        locale,
-      );
+      return await SttHotkeyRepository.handleStop(session, logger, t);
     }
     return await SttHotkeyRepository.handleStart(session, logger, t);
   }

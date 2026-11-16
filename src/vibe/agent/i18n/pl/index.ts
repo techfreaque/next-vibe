@@ -2334,11 +2334,11 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Mowa na tekst",
       description:
-        "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
+        "Zamień audio na tekst dzięki transkrypcji AI. Płacisz za każdą sekundę według stawki wybranego modelu",
       form: {
         title: "Transkrypcja audio",
         description:
-          "Prześlij plik audio do transkrypcji (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
+          "Prześlij plik audio do transkrypcji. Płacisz za każdą sekundę według stawki wybranego modelu",
       },
       fileUpload: {
         title: "Przesyłanie pliku audio",
@@ -2450,11 +2450,11 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Tekst na mowę",
       description:
-        "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (~0,00052 kredytów na znak)",
+        "Zamień tekst na naturalnie brzmiącą mowę dzięki AI. Płacisz za każdy znak według stawki wybranego głosu",
       form: {
         title: "Konwersja tekstu na mowę",
         description:
-          "Wprowadź tekst do przekształcenia na mowę (OpenAI TTS: ~0,00052 kredytów na znak)",
+          "Wpisz tekst do zamiany na mowę. Płacisz za każdy znak według stawki wybranego głosu",
       },
       text: {
         label: "Tekst",

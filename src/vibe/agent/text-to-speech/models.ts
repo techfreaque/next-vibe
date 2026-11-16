@@ -2,10 +2,14 @@ import { objectEntries } from "next-vibe/core/utils/object";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
+import { CREDIT_VALUE_USD } from "@/products/repository-client";
+
 import type { AgentEnvAvailability } from "../env-availability";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
+  calculateTtsCreditCost,
+  chargeForProviderCredits,
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
@@ -23,6 +27,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../skills/enum";
+import { chunkTextForTTS } from "./chunking";
 
 export enum TtsModelId {
   OPENAI_ALLOY = "openai-alloy",
@@ -873,6 +878,75 @@ export function getTtsModelById(
   modelId: TtsModelId,
 ): TtsModelOption | undefined {
   return ttsModelOptions.find((m) => m.id === modelId);
+}
+
+/**
+ * Credits for one TTS request: the provider's real cost when it reported one
+ * (Eden AI does), else the voice route's own per-character rate. Standard
+ * markup, rounded up to 0.1 credit.
+ */
+export function calculateTtsCharge(
+  option: Pick<ModelOptionTtsBased, "creditCostPerCharacter">,
+  characterCount: number,
+  providerCostUsd: number | undefined,
+): number {
+  return providerCostUsd !== undefined && providerCostUsd > 0
+    ? chargeForProviderCredits(providerCostUsd / CREDIT_VALUE_USD)
+    : calculateTtsCreditCost(option, characterCount);
+}
+
+/**
+ * Billing for TTS spoken in pieces (call mode / streamed replies). Each chunk
+ * adds its upstream cost; addChunk returns only the growth of the rounded
+ * total, so a reply split into 20 short chunks costs the same as one request
+ * of the same length instead of 20 separate 0.1-credit round-ups.
+ */
+export class TtsChargeMeter {
+  private providerCredits = 0;
+  private billed = 0;
+
+  /** Credits to deduct now for this chunk (0 while the total stays put). */
+  addChunk(
+    option: Pick<ModelOptionTtsBased, "creditCostPerCharacter">,
+    characterCount: number,
+    providerCostUsd: number | undefined,
+  ): number {
+    this.providerCredits +=
+      providerCostUsd !== undefined && providerCostUsd > 0
+        ? providerCostUsd / CREDIT_VALUE_USD
+        : option.creditCostPerCharacter * Math.max(0, characterCount);
+    const target = chargeForProviderCredits(this.providerCredits);
+    const due = Math.round((target - this.billed) * 10) / 10;
+    this.billed = target;
+    return Math.max(0, due);
+  }
+
+  /** Everything billed so far */
+  get total(): number {
+    return this.billed;
+  }
+}
+
+/**
+ * Price hint for reading `text` aloud with `voiceId` in the chat: the player
+ * sends it chunk by chunk (chunkTextForTTS) and each chunk is billed as its own
+ * request, so the hint sums the per-chunk charges. Uses the voice's cheapest
+ * sellable route, the same rate /models shows.
+ */
+export function estimateReadAloudCredits(
+  text: string,
+  voiceId: TtsModelId,
+): number {
+  const option = getTtsModelById(voiceId);
+  if (!option) {
+    return 0;
+  }
+  const total = chunkTextForTTS(text).reduce(
+    (sum, chunk) => sum + calculateTtsCreditCost(option, chunk.length),
+    0,
+  );
+  // Snap float noise from summing 0.1 steps (0.30000000000000004).
+  return Math.round(total * 10) / 10;
 }
 
 // ============================================================

@@ -21666,7 +21666,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Mowa na tekst",
     titleShort: "Mowa na tekst",
     description:
-      "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
+      "Zamień audio na tekst dzięki transkrypcji AI. Płacisz za każdą sekundę według stawki wybranego modelu",
     icon: "mic",
     category: "ai",
     subCategory: "Generation",
@@ -21710,7 +21710,6 @@ export const endpointsMeta: EndpointMeta[] = [
     category: "ai",
     subCategory: "Generation",
     tags: ["Mowa", "Hotkey", "CLI"],
-    credits: 2,
     examples: {
       inputs: {
         default: {
@@ -21744,7 +21743,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Tekst na mowę",
     titleShort: "Tekst na mowę",
     description:
-      "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (~0,00052 kredytów na znak)",
+      "Zamień tekst na naturalnie brzmiącą mowę dzięki AI. Płacisz za każdy znak według stawki wybranego głosu",
     icon: "volume-2",
     category: "ai",
     subCategory: "Generation",

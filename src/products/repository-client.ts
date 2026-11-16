@@ -41,40 +41,10 @@ export const CREDIT_VALUE_USD = 0.01;
 export const STANDARD_MARKUP_PERCENTAGE = 0.3; // 30% markup
 
 /**
- * TTS Pricing (Amazon Polly)
- * Base: $4.00/1M characters
- * With 30% markup: $5.20/1M characters
- * Per character: $0.0000052 = 0.00052 credits
+ * TTS and STT have no flat rate: each voice / transcription route bills its
+ * own provider price x STANDARD_MARKUP_PERCENTAGE (calculateTtsCharge in
+ * text-to-speech/models.ts, calculateSttCharge in speech-to-text/models.ts).
  */
-const TTS_BASE_COST_PER_MILLION_USD = 4.0;
-const TTS_COST_WITH_MARKUP_USD =
-  TTS_BASE_COST_PER_MILLION_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
-export const TTS_COST_PER_CHARACTER =
-  TTS_COST_WITH_MARKUP_USD / 1_000_000 / CREDIT_VALUE_USD;
-
-/**
- * Minimum balance required for HTTP TTS endpoint
- * Cost of ~50 characters (a short sentence)
- */
-export const TTS_MINIMUM_BALANCE = Math.ceil(TTS_COST_PER_CHARACTER * 50);
-
-/**
- * STT Pricing (OpenAI Whisper)
- * Base: $0.006/60 seconds (per minute)
- * With 30% markup: $0.0078/60 seconds
- * Per second: $0.00013 = 0.013 credits
- */
-const STT_BASE_COST_PER_MINUTE_USD = 0.006;
-const STT_COST_WITH_MARKUP_USD =
-  STT_BASE_COST_PER_MINUTE_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
-const STT_COST_PER_SECOND_USD = STT_COST_WITH_MARKUP_USD / 60;
-export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
-
-/**
- * Minimum balance required for HTTP STT endpoint
- * Cost of ~5 seconds (a short audio clip)
- */
-export const STT_MINIMUM_BALANCE = Math.ceil(STT_COST_PER_SECOND * 5);
 
 /**
  * Brave Search Pricing
@@ -149,20 +119,6 @@ export const FEATURE_COSTS = {
    * Based on $10/10,000 requests + 30% markup
    */
   FETCH_URL_CONTENT: SCRAPPEY_COST_PER_REQUEST,
-
-  /**
-   * STT: 0.013 credits per second
-   * Based on OpenAI Whisper $0.006/minute + 30% markup
-   * NOTE: Multiply by recording duration in seconds
-   */
-  STT: STT_COST_PER_SECOND,
-
-  /**
-   * TTS: 0.00052 credits per character
-   * Based on Amazon Polly $4/1M chars + 30% markup
-   * NOTE: Multiply by text length in characters
-   */
-  TTS: TTS_COST_PER_CHARACTER,
 } as const;
 
 /**

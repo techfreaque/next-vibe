@@ -20,12 +20,6 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import {
-  CREDIT_VALUE_USD,
-  STANDARD_MARKUP_PERCENTAGE,
-  STT_COST_PER_SECOND,
-  STT_MINIMUM_BALANCE,
-} from "@/products/repository-client";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../env";
@@ -34,7 +28,7 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
-import { ApiProvider } from "../models/models";
+import { ApiProvider, calculateSttCreditCost } from "../models/models";
 import { pollDelay } from "../shared/poll-delay";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
@@ -44,7 +38,11 @@ import {
   type SpeechToTextT,
 } from "./i18n";
 import type { SttModelId } from "./models";
-import { getBestSttModel, type SttModelSelection } from "./models";
+import {
+  calculateSttCharge,
+  getBestSttModel,
+  type SttModelSelection,
+} from "./models";
 /**
  * Map from MIME type to file extension for Eden AI filename hints.
  * Eden AI uses the filename extension as an additional format signal on top of Content-Type.
@@ -82,6 +80,9 @@ export class SpeechToTextRepository {
   /** Max parallel transcription requests per user request */
   private static readonly CHUNK_CONCURRENCY = 4;
 
+  /** Pre-flight: the balance must cover this many seconds at the model's rate */
+  private static readonly MINIMUM_BALANCE_SECONDS = 5;
+
   /**
    * Transcribe one chunk using the resolved provider
    */
@@ -97,7 +98,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     if (!modelOption) {
@@ -231,15 +232,23 @@ export class SpeechToTextRepository {
       });
     }
 
-    if (balanceResult.data.total < STT_MINIMUM_BALANCE) {
+    // Duration is only known after transcription: require at least the
+    // selected model's price for a short clip at its own per-second rate.
+    const minimumCredits = calculateSttCreditCost(
+      modelOption,
+      SpeechToTextRepository.MINIMUM_BALANCE_SECONDS,
+    );
+    if (balanceResult.data.total < minimumCredits) {
       logger.warn("[STT] Insufficient credits", {
         balance: balanceResult.data.total,
-        minimum: STT_MINIMUM_BALANCE,
+        minimum: minimumCredits,
+        sttModelId: modelOption.id,
+        apiProvider: modelOption.apiProvider,
       });
       return fail({
         message: t("post.errors.insufficientCredits", {
           balance: balanceResult.data.total.toString(),
-          minimum: STT_MINIMUM_BALANCE.toString(),
+          minimum: minimumCredits.toString(),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
@@ -256,7 +265,7 @@ export class SpeechToTextRepository {
           text: string;
           confidence: number | undefined;
           duration: number;
-          edenAiCostUsd: number | undefined;
+          providerCostUsd: number | undefined;
         }>
       > = Array.from({ length: files.length });
 
@@ -323,41 +332,35 @@ export class SpeechToTextRepository {
           (sum, r) => sum + (r.success ? r.data.duration : 0),
           0,
         ),
-        edenAiCostUsd: results.reduce(
-          (sum, r) =>
-            sum +
-            (r.success &&
-            r.data.edenAiCostUsd !== null &&
-            r.data.edenAiCostUsd !== undefined
-              ? r.data.edenAiCostUsd
-              : 0),
-          0,
-        ),
       };
 
-      const { text, confidence, duration, edenAiCostUsd } = transcriptionResult;
+      const { text, confidence, duration } = transcriptionResult;
 
-      // Calculate credits
-      let creditsNeeded: number;
-      if (
-        edenAiCostUsd !== null &&
-        edenAiCostUsd !== undefined &&
-        edenAiCostUsd > 0
-      ) {
-        creditsNeeded =
-          (edenAiCostUsd * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD;
-        logger.debug("[STT] Using actual cost for credit calculation", {
-          edenAiCostUsd,
-          creditsNeeded,
-        });
-      } else if (duration > 0) {
-        creditsNeeded = duration * STT_COST_PER_SECOND;
-      } else {
+      // Bill per chunk: the provider's reported cost when it gave one, else
+      // the model's own per-second rate x duration. One markup + rounding.
+      const charge = calculateSttCharge(
+        modelOption,
+        results.flatMap((r) =>
+          r.success
+            ? [
+                {
+                  duration: r.data.duration,
+                  providerCostUsd: r.data.providerCostUsd,
+                },
+              ]
+            : [],
+        ),
+      );
+      const creditsNeeded = charge.credits;
+      if (charge.minimumChunks > 0) {
         logger.error(
           "[STT] Provider did not return cost or duration - charging 1-second minimum",
-          { sttModelId: modelOption.id },
+          {
+            sttModelId: modelOption.id,
+            apiProvider: modelOption.apiProvider,
+            chunks: charge.minimumChunks,
+          },
         );
-        creditsNeeded = STT_COST_PER_SECOND;
       }
 
       logger.debug("[STT] Transcription successful", {
@@ -366,6 +369,8 @@ export class SpeechToTextRepository {
         apiProvider: modelOption.apiProvider,
         duration,
         creditsNeeded,
+        providerCostChunks: charge.providerCostChunks,
+        creditCostPerSecond: modelOption.creditCostPerSecond,
       });
 
       // Deduct credits AFTER successful completion
@@ -437,7 +442,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     // NanoGPT exposes an OpenAI-compatible /audio/transcriptions endpoint
@@ -524,6 +529,8 @@ export class SpeechToTextRepository {
       text?: string;
       duration?: number;
       segments?: Array<{ avg_logprob?: number }>;
+      /** NanoGPT only: what the call cost us, e.g. { cost: 0.001, currency: "USD" } */
+      usage?: { cost?: number; currency?: string };
     };
 
     const text = data.text ?? "";
@@ -537,7 +544,13 @@ export class SpeechToTextRepository {
           )
         : undefined;
 
-    return success({ text, confidence, duration, edenAiCostUsd: undefined });
+    const providerCostUsd =
+      data.usage?.cost !== undefined &&
+      (data.usage.currency === undefined || data.usage.currency === "USD")
+        ? data.usage.cost
+        : undefined;
+
+    return success({ text, confidence, duration, providerCostUsd });
   }
 
   /**
@@ -555,7 +568,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     if (!(await getEnvAvailability()).voice) {
@@ -628,7 +641,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     const formData = new FormData();
@@ -725,7 +738,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     if (!agentEnv.DEEPGRAM_API_KEY) {
@@ -791,7 +804,7 @@ export class SpeechToTextRepository {
     const confidence = alt?.confidence;
     const duration = data.metadata?.duration ?? 0;
 
-    return success({ text, confidence, duration, edenAiCostUsd: undefined });
+    return success({ text, confidence, duration, providerCostUsd: undefined });
   }
 
   /**
@@ -809,7 +822,7 @@ export class SpeechToTextRepository {
       text: string;
       confidence: number | undefined;
       duration: number;
-      edenAiCostUsd: number | undefined;
+      providerCostUsd: number | undefined;
     }>
   > {
     let attempts = 0;
@@ -907,14 +920,14 @@ export class SpeechToTextRepository {
           const transcription = providerResult?.text ?? "";
           const confidence = providerResult?.confidence;
           const duration = providerResult?.audio_duration ?? 0;
-          const edenAiCostUsd = providerResult?.cost;
+          const providerCostUsd = providerResult?.cost;
 
           logger.debug("[STT] Transcription completed", {
             textLength: transcription.length,
             attempts,
             confidence,
             duration,
-            edenAiCostUsd,
+            providerCostUsd,
           });
 
           if (!transcription || transcription.length === 0) {
@@ -925,7 +938,7 @@ export class SpeechToTextRepository {
             text: transcription,
             confidence,
             duration,
-            edenAiCostUsd,
+            providerCostUsd,
           });
         } else if (resultData.status === "failed") {
           logger.error("[STT] Transcription failed", { publicId, provider });

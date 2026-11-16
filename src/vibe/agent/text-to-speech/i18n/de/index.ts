@@ -15,11 +15,11 @@ export const translations: typeof enTranslations = {
     titleShort: "Text zu Sprache",
     dynamicTitle: "Sprache: {{text}}",
     description:
-      "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
+      "Text per KI in natürlich klingende Sprache umwandeln. Abrechnung pro Zeichen zum Preis der gewählten Stimme",
     form: {
       title: "Text-zu-Sprache-Konvertierung",
       description:
-        "Geben Sie Text ein, um ihn in Sprache umzuwandeln (OpenAI TTS: ~0,00052 Credits pro Zeichen)",
+        "Text für die Sprachausgabe eingeben. Abrechnung pro Zeichen zum Preis der gewählten Stimme",
     },
     text: {
       label: "Text",
