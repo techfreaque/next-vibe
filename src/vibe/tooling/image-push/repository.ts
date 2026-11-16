@@ -32,6 +32,7 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
+import { ImagePushCleanup } from "./cleanup";
 import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
@@ -61,6 +62,37 @@ interface DrainPlan {
 
 export class ImagePushRepository {
   static async execute(
+    data: ImagePushRequestOutput,
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): Promise<ResponseType<ImagePushResponseOutput>> {
+    const result = await ImagePushRepository.buildAndDeploy(data, logger, t);
+    // Keep the LOCAL build machine bounded once the run succeeded: old local
+    // tags, stale build cache, old export dirs. Remote boxes are never touched.
+    if (result.success && data.cleanup) {
+      const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
+      const sha = ImagePushRepository.git([
+        "rev-parse",
+        "--verify",
+        "--quiet",
+        `${data.commit}^{commit}`,
+      ]).stdout;
+      ImagePushCleanup.afterDeploy(
+        {
+          image: result.data.resolvedImage,
+          currentTags: result.data.tags,
+          buildRoot,
+          repoRoot,
+          currentSha: sha,
+        },
+        logger,
+        t,
+      );
+    }
+    return result;
+  }
+
+  private static async buildAndDeploy(
     data: ImagePushRequestOutput,
     logger: EndpointLogger,
     t: ImagePushT,
@@ -96,6 +128,14 @@ export class ImagePushRepository {
       return exportResult;
     }
     const contextDir = exportResult.data;
+
+    // A full disk mid-build also kills the local dev databases: free space
+    // first when the docker root runs low.
+    ImagePushCleanup.ensureFreeSpace(
+      { image, cleanup: data.cleanup },
+      logger,
+      t,
+    );
 
     const tag = data.tag ?? shortSha;
     // First ref is the one `docker save`d for the ssh transfer; the short sha
@@ -1534,6 +1574,13 @@ export class ImagePushRepository {
     );
   }
 
+  /** Repo root and the `.tmp/image-build/` folder holding commit exports. */
+  private static buildPaths(): { repoRoot: string; buildRoot: string } {
+    const top = ImagePushRepository.git(["rev-parse", "--show-toplevel"]);
+    const repoRoot = top.ok && top.stdout ? top.stdout : process.cwd();
+    return { repoRoot, buildRoot: join(repoRoot, ".tmp", "image-build") };
+  }
+
   /**
    * Exports the commit's tree into `.tmp/image-build/<sha>/` via
    * `git archive <sha> | tar -x`. A finished export is marked by a sibling
@@ -1547,9 +1594,7 @@ export class ImagePushRepository {
     logger: EndpointLogger,
     t: ImagePushT,
   ): ResponseType<string> {
-    const top = ImagePushRepository.git(["rev-parse", "--show-toplevel"]);
-    const repoRoot = top.ok && top.stdout ? top.stdout : process.cwd();
-    const buildRoot = join(repoRoot, ".tmp", "image-build");
+    const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
     const dir = join(buildRoot, sha);
     const doneMarker = join(buildRoot, `${sha}.done`);
 

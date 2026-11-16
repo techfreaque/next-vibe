@@ -133,6 +133,14 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(30).max(3600).default(900),
       }),
 
+      cleanup: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.cleanup.title",
+        description: "post.fields.cleanup.description",
+        schema: z.boolean().default(true),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -229,6 +237,9 @@ const { POST } = createEndpoint({
       noDrain: {
         drain: false,
       },
+      noCleanup: {
+        cleanup: false,
+      },
       specificCommit: {
         commit: "a1b2c3d",
         push: false,
@@ -260,6 +271,14 @@ const { POST } = createEndpoint({
         duration: 150000,
       },
       noDrain: {
+        success: true,
+        output:
+          "🚀 Rolled ghcr.io/techfreaque/next-vibe-app:a1b2c3d to root@203.0.113.5 and Server 2 (root@203.0.113.6)",
+        resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
+        tags: ["a1b2c3d", "latest"],
+        duration: 900000,
+      },
+      noCleanup: {
         success: true,
         output:
           "🚀 Rolled ghcr.io/techfreaque/next-vibe-app:a1b2c3d to root@203.0.113.5 and Server 2 (root@203.0.113.6)",

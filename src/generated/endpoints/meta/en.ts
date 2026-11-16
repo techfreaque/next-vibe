@@ -26201,6 +26201,7 @@ export const endpointsMeta: EndpointMeta[] = [
         },
         viaSsh: { sshTarget: "root@203.0.113.5" },
         noDrain: { drain: false },
+        noCleanup: { cleanup: false },
         specificCommit: { commit: "a1b2c3d", push: false },
       },
       responses: {
@@ -26229,6 +26230,14 @@ export const endpointsMeta: EndpointMeta[] = [
           duration: 150000,
         },
         noDrain: {
+          success: true,
+          output:
+            "🚀 Rolled ghcr.io/techfreaque/next-vibe-app:a1b2c3d to root@203.0.113.5 and Server 2 (root@203.0.113.6)",
+          resolvedImage: "ghcr.io/techfreaque/next-vibe-app",
+          tags: ["a1b2c3d", "latest"],
+          duration: 900000,
+        },
+        noCleanup: {
           success: true,
           output:
             "🚀 Rolled ghcr.io/techfreaque/next-vibe-app:a1b2c3d to root@203.0.113.5 and Server 2 (root@203.0.113.6)",

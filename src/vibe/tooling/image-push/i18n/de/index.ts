@@ -67,6 +67,11 @@ export const translations: typeof enTranslations = {
         description:
           "Maximale Wartezeit eines Knotens auf laufende KI-Arbeit vor dem Neustart. Was danach noch läuft, bekommt den Shutdown-Drain (STREAM_DRAIN_TIMEOUT_MS) und wird abgebrochen, der Teilinhalt bleibt gespeichert.",
       },
+      cleanup: {
+        title: "Lokal aufräumen",
+        description:
+          "Standardmäßig an. Nach einem erfolgreichen Lauf bleibt DIESE Build-Maschine schlank: lokale Builds von ghcr.io/techfreaque/next-vibe-app älter als die neuesten 3 verlieren ihre Tags (nie :latest, :rollback, :prod-current-good, der gerade deployte Build oder ein von einem Container genutztes Image), Docker-Build-Cache älter als 48h wird gelöscht, alte .tmp/image-build-Exporte wandern nach .tmp/todelete/image-build/. Unter 40 GB frei im Docker-Root wird schon vor dem Build aufgeräumt. Remote-Server bleiben unberührt. Aus = nur warnen.",
+      },
       success: {
         title: "Erfolg",
       },
@@ -186,6 +191,28 @@ export const translations: typeof enTranslations = {
           "ha-node-drain.sh {{step}} auf {{target}} fehlgeschlagen: {{error}}",
         envSyncFailed:
           "Kopieren der .env von Server 1 auf Server 2 fehlgeschlagen: {{error}}",
+        cleanupSkippedImage:
+          "🧹 Lokales Aufräumen übersprungen: {{image}} ist nicht {{allowed}}",
+        cleanupListFailed:
+          "Lokales Aufräumen übersprungen, Images von {{image}} nicht auflistbar: {{error}}",
+        cleanupTagFailed:
+          "Lokales {{ref}} konnte nicht entfernt werden: {{error}}",
+        cleanupTagsRemoved:
+          "🧹 {{count}} alte lokale Ref(s) von {{image}} entfernt, die neuesten {{keep}} Builds bleiben: {{tags}}",
+        cleanupCachePruned:
+          "🧹 Docker-Build-Cache älter als {{hours}}h gelöscht ({{reclaimed}} frei)",
+        cleanupCacheFailed:
+          "Löschen des Docker-Build-Caches fehlgeschlagen: {{error}}",
+        cleanupExportsParked:
+          "🧹 {{count}} alte Commit-Export(e) nach {{dir}} verschoben",
+        cleanupExportFailed:
+          "Verschieben des alten Commit-Exports {{dir}} fehlgeschlagen: {{error}}",
+        diskLow:
+          "⚠️ Nur {{free}} GB frei auf {{path}} (Minimum {{min}} GB). Räume alte lokale Images und Build-Cache vor dem Build auf ...",
+        diskLowNoCleanup:
+          "⚠️ Nur {{free}} GB frei auf {{path}} (Minimum {{min}} GB). Aufräumen ist aus, nichts gelöscht. Der Build kann die Platte füllen.",
+        diskAfterPrune: "💽 {{free}} GB frei auf {{path}} nach dem Aufräumen",
+        diskCheckFailed: "Freier Speicher auf {{path}} nicht lesbar: {{error}}",
       },
     },
   },

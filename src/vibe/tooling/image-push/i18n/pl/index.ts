@@ -67,6 +67,11 @@ export const translations: typeof enTranslations = {
         description:
           "Najdłuższy czas, przez jaki węzeł czeka na trwającą pracę AI przed restartem. To, co nadal działa, dostaje drain przy wyłączaniu (STREAM_DRAIN_TIMEOUT_MS) i zostaje przerwane z zapisaną częściową treścią.",
       },
+      cleanup: {
+        title: "Sprzątanie lokalne",
+        description:
+          "Domyślnie włączone. Po udanym przebiegu TA maszyna budująca nie puchnie: lokalne buildy ghcr.io/techfreaque/next-vibe-app starsze niż 3 najnowsze tracą tagi (nigdy :latest, :rollback, :prod-current-good, właśnie wdrożony build ani obraz używany przez kontener), cache buildów Dockera starszy niż 48h jest usuwany, a stare eksporty z .tmp/image-build trafiają do .tmp/todelete/image-build/. Poniżej 40 GB wolnego miejsca w katalogu Dockera sprząta też przed buildem. Serwery zdalne pozostają nietknięte. Wyłączone = tylko ostrzeżenie.",
+      },
       success: {
         title: "Sukces",
       },
@@ -186,6 +191,28 @@ export const translations: typeof enTranslations = {
           "ha-node-drain.sh {{step}} na {{target}} nie powiódł się: {{error}}",
         envSyncFailed:
           "Kopiowanie .env z Servera 1 na Server 2 nie powiodło się: {{error}}",
+        cleanupSkippedImage:
+          "🧹 Lokalne sprzątanie pominięte: {{image}} to nie {{allowed}}",
+        cleanupListFailed:
+          "Lokalne sprzątanie pominięte, nie można wylistować obrazów {{image}}: {{error}}",
+        cleanupTagFailed: "Nie można usunąć lokalnego {{ref}}: {{error}}",
+        cleanupTagsRemoved:
+          "🧹 Usunięto {{count}} starych lokalnych ref(ów) {{image}}, zostaje {{keep}} najnowszych buildów: {{tags}}",
+        cleanupCachePruned:
+          "🧹 Usunięto cache buildów Dockera starszy niż {{hours}}h (odzyskano {{reclaimed}})",
+        cleanupCacheFailed:
+          "Czyszczenie cache buildów Dockera nie powiodło się: {{error}}",
+        cleanupExportsParked:
+          "🧹 Przeniesiono {{count}} starych eksportów commitów do {{dir}}",
+        cleanupExportFailed:
+          "Przeniesienie starego eksportu commita {{dir}} nie powiodło się: {{error}}",
+        diskLow:
+          "⚠️ Tylko {{free}} GB wolne na {{path}} (minimum {{min}} GB). Sprzątam stare lokalne obrazy i cache buildów przed buildem ...",
+        diskLowNoCleanup:
+          "⚠️ Tylko {{free}} GB wolne na {{path}} (minimum {{min}} GB). Sprzątanie wyłączone, nic nie usunięto. Build może zapełnić dysk.",
+        diskAfterPrune: "💽 {{free}} GB wolne na {{path}} po sprzątaniu",
+        diskCheckFailed:
+          "Nie można odczytać wolnego miejsca na {{path}}: {{error}}",
       },
     },
   },

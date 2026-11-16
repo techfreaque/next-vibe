@@ -65,6 +65,11 @@ export const translations = {
         description:
           "Longest a node waits for its in-flight AI work before the restart. Whatever still runs then gets the shutdown drain (STREAM_DRAIN_TIMEOUT_MS) and is aborted with partial content saved.",
       },
+      cleanup: {
+        title: "Clean up locally",
+        description:
+          "Default on. After a successful run, keep THIS build machine bounded: untag local builds of ghcr.io/techfreaque/next-vibe-app older than the newest 3 (never :latest, :rollback, :prod-current-good, the build just deployed, or an image a container uses), prune Docker build cache older than 48h, and move old .tmp/image-build exports to .tmp/todelete/image-build/. Below 40 GB free on the Docker root it also prunes before the build. Remote servers are never touched. Off = warn only.",
+      },
       success: {
         title: "Success",
       },
@@ -179,6 +184,26 @@ export const translations = {
         drainStepFailed:
           "ha-node-drain.sh {{step}} on {{target}} failed: {{error}}",
         envSyncFailed: "Copying Server 1's .env to Server 2 failed: {{error}}",
+        cleanupSkippedImage:
+          "🧹 Local cleanup skipped: {{image}} is not {{allowed}}",
+        cleanupListFailed:
+          "Local cleanup skipped, could not list images of {{image}}: {{error}}",
+        cleanupTagFailed: "Could not remove local {{ref}}: {{error}}",
+        cleanupTagsRemoved:
+          "🧹 Removed {{count}} old local ref(s) of {{image}}, kept the newest {{keep}} builds: {{tags}}",
+        cleanupCachePruned:
+          "🧹 Pruned Docker build cache older than {{hours}}h ({{reclaimed}} reclaimed)",
+        cleanupCacheFailed: "Pruning the Docker build cache failed: {{error}}",
+        cleanupExportsParked:
+          "🧹 Moved {{count}} old commit export(s) to {{dir}}",
+        cleanupExportFailed:
+          "Moving old commit export {{dir}} failed: {{error}}",
+        diskLow:
+          "⚠️ Only {{free}} GB free on {{path}} (minimum {{min}} GB). Pruning old local images and build cache before the build ...",
+        diskLowNoCleanup:
+          "⚠️ Only {{free}} GB free on {{path}} (minimum {{min}} GB). Cleanup is off, nothing pruned. The build may fill the disk.",
+        diskAfterPrune: "💽 {{free}} GB free on {{path}} after pruning",
+        diskCheckFailed: "Could not read free space on {{path}}: {{error}}",
       },
     },
   },
