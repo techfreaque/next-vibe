@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-favorites-list-and-callback-mode-checks-bf18b7b4-a5e8-4165-9447-85c8e57072b3.md\n\n# Hermes favorites list and callback mode checks\nFolder: private\nDescription: Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath",
+    "encoding_format": "float"
+  }
+}

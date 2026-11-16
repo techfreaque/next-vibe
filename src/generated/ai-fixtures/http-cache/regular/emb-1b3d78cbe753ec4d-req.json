@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Audio (T10c):** a 16-second lo-fi hip-hop loop at roughly 80–85 BPM in 4/4. Crisp, slightly compressed drum-machine kit with kick on 1 and 3, snare on 2 and 4, and swung hi-hats with a subtle stereo delay. Underneath sits a deep sustained synth bass on a simple two-note pattern, and a clean, reverb-washed keyboard plays a sparse two-bar melancholic phrase. No vocals or speech — just a continuous, well-balanced verse-section groove.\n\n**One thing I have to flag from the previous turn (T10b):** the injected audio description there specified an *instrumental hip-hop / boom-bap / jazz-hop* beat at **88–90 BPM, ~27 seconds**. My reply described it as an \"electro-funk / chiptune-infused electronic track at ~120 BPM, 26.7 seconds\" — a different genre and tempo than the ground-truth description I was given. That was a fabricated description contradicting the supplied content, and it should not have passed as STEP_OK.\n\nFAILED: my T10b audio description contradicted the injected audio description (claimed electro-funk/chiptune at ~120 BPM vs. the actual lo-fi hip-hop at 88–90 BPM) yet was marked STEP_OK.",
+    "encoding_format": "float"
+  }
+}

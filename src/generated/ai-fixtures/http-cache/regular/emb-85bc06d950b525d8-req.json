@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Phase 1 (dispatch):** the `wakeUp` call returned a `taskId` (`local-wu-call-8edec80f-5968-499e-8b74-e6f969e20de3`) with **no** image — the expected deferred outcome. The result will be injected automatically when ready.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

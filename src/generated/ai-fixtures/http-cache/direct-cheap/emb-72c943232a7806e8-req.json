@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Revival confirmed: the deferred result for task `remote-ws-hermes-call-71497fa45bea4923bdd73731` carries a non-empty `responsePath` (`/memories/cb-wakeup-repeat-test`, 26 bytes, `created: false`). Deferred path behaved correctly end to end.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

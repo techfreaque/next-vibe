@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-catalog--callback-modes-and-approval-gate-t-bf18b7b4-a5e8-4165-9447-85c8e57072b3.md\n\n# Hermes catalog, callback modes and approval gate tests\nFolder: private\nDescription: Quality-gate testing on the hermes instance covering the tool catalog (ai category, keyword search, generate_image schema), instance identity, credits balance, and the favorites list. Exercised every callback mode: detach plus await-task, inline wait, and repeated wakeUp dispatches that each returne",
+    "encoding_format": "float"
+  }
+}

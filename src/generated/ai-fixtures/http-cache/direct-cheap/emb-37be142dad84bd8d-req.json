@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Deferred as expected — `taskId: remote-ws-hermes-call-66d44590d55a475abda71c29` returned with no `responsePath` yet. Awaiting the revival to confirm delivery.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

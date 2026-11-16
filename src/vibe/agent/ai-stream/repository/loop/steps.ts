@@ -275,20 +275,26 @@ export async function prepareStep(
   // deferred message at the live chain tip and inject the result
   // into the in-flight context — the model acknowledges it as the
   // natural next step (no separate revival turn).
+  // Fixture runs leave them for the post-stream revival instead, so the
+  // call sequence never depends on task timing (testing/fixture-wakeup.ts).
   const { ctx } = state.p;
-  const wakeUpDrained =
-    ctx.pendingWakeUpInjections.length > 0
-      ? await injectPendingWakeUpResults({
-          messages: compacted,
-          payloads: ctx.pendingWakeUpInjections.splice(0),
-          ctx,
-          toolExecutionContext: state.p.toolExecutionContext,
-          threadId: state.p.threadId,
-          modelConfig: state.p.modelConfig,
-          user: state.p.user,
-          logger: state.p.logger,
-        })
-      : null;
+  const injectWakeUpNow =
+    ctx.pendingWakeUpInjections.length > 0 &&
+    !(await (
+      await import("../../testing/fixture-wakeup")
+    ).deliversWakeUpAtTurnEnd(state.p.threadId));
+  const wakeUpDrained = injectWakeUpNow
+    ? await injectPendingWakeUpResults({
+        messages: compacted,
+        payloads: ctx.pendingWakeUpInjections.splice(0),
+        ctx,
+        toolExecutionContext: state.p.toolExecutionContext,
+        threadId: state.p.threadId,
+        modelConfig: state.p.modelConfig,
+        user: state.p.user,
+        logger: state.p.logger,
+      })
+    : null;
   const activeMessages = wakeUpDrained ?? compacted;
 
   // If a user message was queued while this stream is running, inject

@@ -72,6 +72,7 @@ import {
   type ToolExecutionContext,
 } from "../../../../core/execution-context";
 import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
+import { isThreadRenameCall } from "../../repository/loop/helpers";
 import type { ImageGenModelId } from "../../../image-generation/models";
 import { scopedTranslation as consentScopedTranslation } from "../../../models/uncensored-consent/i18n";
 import { UncensoredConsentRepository } from "../../../models/uncensored-consent/repository";
@@ -4085,7 +4086,23 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           }
 
           const added = newMessages(messages, prevIds);
-          const toolMsgs = added.filter((m) => m.role === "tool");
+          // The batch's own tools: the rename-thread side-action the answer
+          // step may fire (mandated on a stale title) is a separate step and
+          // not part of the parallel pair.
+          const toolMsgs = added.filter(
+            (m) =>
+              m.role === "tool" &&
+              !isThreadRenameCall(
+                m.toolCall?.toolName ?? "",
+                typeof m.toolCall?.args === "object" &&
+                  m.toolCall.args !== null &&
+                  !Array.isArray(m.toolCall.args) &&
+                  !(m.toolCall.args instanceof Date) &&
+                  typeof m.toolCall.args["toolName"] === "string"
+                  ? m.toolCall.args["toolName"]
+                  : undefined,
+              ),
+          );
           expect(toolMsgs.length).toBeGreaterThanOrEqual(2);
 
           // ── Both results populated ──

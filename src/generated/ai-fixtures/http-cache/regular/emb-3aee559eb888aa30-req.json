@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/tool-catalog-callback-modes-and-image-generation-c-d6b18778-7ca4-4d24-ae5c-b5c6d1956528/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nembedded: true\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"d6b18778-7ca4-4d24-ae5c-b5c6d1956528\"\nthreadTitle: \"Tool catalog, callback modes, and image generation checks\"\nuploadedAt: \"2026-11-16T18:37:41.524Z\"\n---\n\n# test-image.jpeg\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Tool catalog, callback modes, and image generation checks |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. Known-correct, not an issue: media URLs anywhere in this thread (generated images, audio, video) are relative /api/... storage paths on this platform; a /api/... storage path is a correct, usable URL. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
+    "encoding_format": "float"
+  }
+}

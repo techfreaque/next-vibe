@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls were issued together. The `tool-help` listing came back normally (78 tools across categories), but the approval gate did not behave as expected:\n\n- **`cortex-write` with `callbackMode='approve'` executed immediately** — the result came back as a completed write: `responsePath: \"/memories/t7-approve-test\"`, `size: 13`, `created: false`, with a `_hint` saying *\"The user confirmed execution, so the result is now available.\"* No confirmation prompt was surfaced to me, and the write landed in cortex (visible as `/memories/t7-approve-test` → `T7_APPROVE_OK`). The instruction expected the write to be held pending confirmation.\n\nFAILED: callbackMode='approve' on cortex-write did not pause for confirmation — the write executed immediately and returned a completed responsePath (/memories/t7-approve-test), so the approval gate never blocked execution.",
+    "encoding_format": "float"
+  }
+}

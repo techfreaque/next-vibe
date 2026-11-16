@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both parallel calls ran and returned their expected shapes.\n\n**(1) `cortex-write` on hermes** → `responsePath: \"/memories/t8-parallel-test\"`, `size: 14`, `created: false` (the node already existed from an earlier run, so it was overwritten in place — content is `T8_PARALLEL_OK`, matching the tree entry).\n\n**(2) `chat-settings` on hermes** → returned a full settings object including `selectedSkill: \"thea\"` and `selectedModel: \"kimi-k3\"`. `viewMode` came back as `enums.viewMode.linear`, which is the expected namespaced enum key.\n\nBoth tools ran, both returned their required fields. The step's own check passes.\n\nStill outstanding from the earlier turn (unresolved, so flagging again per the standing mandate): the approval gate auto-confirms — `contact-form` submitted immediately with a `_hint` claiming the user confirmed, and no confirmation was ever requested.\n\nFAILED: the confirmation/approval gate still auto-confirms instead of blocking (contact-form submitted with a _hint asserting a user confirmation that never happened) — carried over from the earlier step; both T8 tools themselves ran and returned correct shapes.",
+    "encoding_format": "float"
+  }
+}

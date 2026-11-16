@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/tool-catalog-callback-modes-and-image-generation-c-d6b18778-7ca4-4d24-ae5c-b5c6d1956528/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nembedded: true\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"d6b18778-7ca4-4d24-ae5c-b5c6d1956528\"\nthreadTitle: \"Tool catalog, callback modes, and image generation checks\"\nuploadedAt: \"2026-11-16T18:37:52.147Z\"\n---\n\n# test-image.jpeg\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Tool catalog, callback modes, and image generation checks |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

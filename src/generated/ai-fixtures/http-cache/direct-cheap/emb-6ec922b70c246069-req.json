@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The contact-form call went through and returned a success message: *\"Thank you for contacting us! We've received your message and will get back to you soon.\"*\n\nHowever, the same confirmation-gate defect from the previous step reproduced here. The result carried `\"_hint\": \"This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.\"` — yet no confirmation was ever surfaced to me or requested at any point. I sent the call with `callbackMode` left at the default (`wait`), and it executed and submitted immediately. The cortex tree now also shows `/memories/t7-approve-test` containing `T7_APPROVE_OK`, confirming the earlier `approve`-mode write likewise executed without a gate.\n\nSo the approval mechanism is auto-confirming instead of blocking: any tool that requires user confirmation runs straight through, and the `_hint` retroactively asserts a confirmation that never happened. That's a safety-relevant issue on a tool that sends real messages.\n\nFAILED: confirmation gate does not block — contact-form submitted immediately and returned a _hint claiming the user confirmed execution, though no confirmation was ever requested (same auto-confirm defect as the T7a cortex-write approve call, which also executed and wrote /memories/t7-approve-test).",
+    "encoding_format": "float"
+  }
+}

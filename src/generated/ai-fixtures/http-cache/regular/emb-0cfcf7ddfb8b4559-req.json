@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/platform-tool--media-and-attachment-tests-d6b18778-7ca4-4d24-ae5c-b5c6d1956528.md\n\n# Platform tool, media and attachment tests\nFolder: private\nDescription: A broad platform test suite ran in this thread: tool-help catalog queries (category, keyword, schema detail) all returned well-formed data; generate_music produced a valid audio file; favorites listed 34 entries; detached, wait, wakeUp and approve callback modes were each exercised on generate_image",
+    "encoding_format": "float"
+  }
+}

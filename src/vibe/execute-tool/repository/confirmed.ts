@@ -172,7 +172,7 @@ export class ConfirmedExecution {
         toolResult = {
           ...toolResult,
           _hint:
-            "This tool required user confirmation (callbackMode=approve). The user confirmed execution, so the result is now available.",
+            "The user approved this call in the confirmation dialog; this is its result.",
         };
       }
       logger.debug("[ConfirmedExecution] Tool execution completed", {

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Favorites list came back clean: a `favorites` array with 33 entries, each carrying an id, name, description, model id/info/provider, skill id, icon, tagline, voice id, and position. Mix of built-in skill variants (slug ids like `thea-brilliant`, `vibe-coder-fast`) and user-created UUID favorites (`2c64735c-...`), which is expected. The active favorite on hermes is `quality-tester-budget` (Quality Tester, DeepSeek V4.1 Flash).\n\nEverything matched the expected shape — no missing fields, no raw internals, no errors.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -18,7 +18,7 @@
               "ttl": "1h",
               "type": "ephemeral"
             },
-            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-11-16\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 130 — Claude, GPT, Gemini, Llama, and uncencored ones GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, UncensoredLM v1.2, Venice Uncensored 1.2.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier (monthly):** no account: 20 (via browser ID). Free account: 40. Account + confirmed newsletter subscription: 90. Guests never get the newsletter bonus.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\nThis thread lives in the **private** folder - your response is visible only to the thread owner.\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** private - Private conversations - server-stored, visible only to the account owner. Requires an account.\n- **Sub-folder:** 756d4770-edc3-44a6-ab73-5dacb2f9d58e\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  HDMI-A-1 [PRIMARY]: 1920×1200 @(1677,0)\n  DP-1: 1440×2560 @(3734,92)\n  DP-2: 2294×960 @(1440,1200)\n  DP-3: 1440×2560 @(0,92)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: HDMI-A-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool). Leave the field OUT for the default - never send \"omit\", \"none\" or \"sync\" as a value:\n\n- *(field left out)* (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.\n\n## Media tools (use `tool-help` for schema before calling)\n- `generate_image` — Images via Chroma\n- `generate_music` — Music/audio via Sonauto Song\n- `generate_video` — Video via Veo 3.1 Fast [duration: 4–8s | ratios: 16:9, 9:16 | resolutions: 720p, 1080p, 4K | frame inputs: first_frame, last_frame]\n- `describe_image` — analyse/describe an image\n- `describe_video` — analyse/describe a video\n- `transcribe_audio` — speech-to-text from audio\n- `text-to-speech` — convert text to spoken audio\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\nYou have full browser automation. `tool-help query=browser` lists all tools; `tool-help query=browser-<toolname>` gives full schema.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Coding Agent\n\nWhen delegating coding work, use the `ai-run` tool with the `vibe-coder` skill. Pass the full task description as the prompt. The vibe-coder skill carries the full project context and coding conventions.\n\n## System Context\n\n- **Instance:** Dev / coding instance ()\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 130\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n**Known instances:** `thea`, `hermes`\n\n## Remote Instances\n\n- \"thea\" - use tool-help(instanceId=\"thea\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"thea\", input={...}) to run them\n- \"hermes\" - use tool-help(instanceId=\"hermes\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"hermes\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: leave the field out=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: { prompt: string, provider: claude-code|open-code, model: string, taskTitle: string, interactiveMode: boolean }\ncortex-delete — Remove a file or folder. Gone forever. | input: { path: string, recursive: boolean }\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: { path: string, find: string, replace: string, startLine: integer, endLine: integer, newContent: string }\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: { path: string, command: string, workingDir: string, terminalId: string, timeoutMs: number }\ncortex-list — See what's in a folder. | input: { path: string }\ncortex-mkdir — Create a folder. | input: { path: string, viewType: enums.viewType.list|enums.viewType.kanban|enums.viewType.calendar|enums.viewType.grid|enums.viewType.wiki, createParents: boolean }\ncortex-move — Move or rename a file or folder. | input: { from: string, to: string }\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: { path: string, maxLines: integer }\ncortex-search — Find files by name or content. Searches everything. | input: { query: string, path: string, maxResults: integer }\ncortex-terminals — List active terminal sessions with current working directories. | input: { path: string }\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: { path: string, depth: integer }\ncortex-write — Save a file. Give it a path and content - done. | input: { path: string, content: string, createParents: boolean }\nweb-search — Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider. | input: { query: string, provider: enums.provider.AUTO|enums.provider.BRAVE|enums.provider.KAGI, maxResults: number, includeNews: boolean, freshness: past_day|past_week|past_month|past_year } | 0.65 credits\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
+            "text": "# unbottled.ai - Automated Agent\n\n**Current Date:** 2026-11-16\n\nYou are an automated AI agent running on unbottled.ai. No human is present - you are executing a programmatic task. Complete the task fully, then emit your final response and stop. Only your last non-tool-call message is returned to the requester; anything sent alongside a tool call is discarded.\n\n## unbottled.ai\n\n- **Models:** 130 — Claude, GPT, Gemini, Llama, and uncencored ones GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, UncensoredLM v1.2, Venice Uncensored 1.2.\n- **Credits:** 1 credit = $0.01. Cost varies by model.\n- **Free tier (monthly):** no account: 20 (via browser ID). Free account: 40. Account + confirmed newsletter subscription: 90. Guests never get the newsletter bonus.\n- **Subscription:** $8/month → 800 credits. **Credit packs:** $5 → 500 permanent credits.\n- **Folders:** public (open), incognito (browser-only), private (account), shared (invite), background (system tasks and sub agents).\n\n## Automated Execution Context\n\n**⚠ Only your LAST message (no tool call) is returned to the caller. Any text you emit alongside a tool call is silently discarded.**\n\nNo user watching. Complete the task. No follow-up questions. No pleasantries.\n\nThis thread lives in the **private** folder - your response is visible only to the thread owner.\n- If the task fails, state clearly why.\n- State your result once, at the end, without preamble.\n\n## Output Language\n\nRespond in English (en-GLOBAL) unless the task explicitly specifies otherwise.\n\n## Current Context\n\n- **Folder:** private - Private conversations - server-stored, visible only to the account owner. Requires an account.\n\n## Desktop Control — Linux/KDE Wayland\nMonitors:\n  HDMI-A-1 [PRIMARY]: 1920×1200 @(1677,0)\n  DP-1: 1440×2560 @(3734,92)\n  DP-2: 2294×960 @(1440,1200)\n  DP-3: 1440×2560 @(0,92)\n\nYou can fully control this desktop. Act fast — don't narrate, just do.\n**KDE shortcuts & power-user knowledge:**\n- **Alt+F2** → KRunner (launch apps, run commands, calc, unit convert). Fastest way to open anything.\n- **Alt+F4** → close focused window. **Super+D** → show desktop.\n- **Super+PageUp/Down** → maximize/minimize. **Super+Left/Right** → snap window to half screen.\n- **Ctrl+F1–F4** → switch virtual desktops.\n- **KRunner commands:** type `=2+2` to calculate, `define word` to look up, `shell: cmd` to run a terminal command.\n- **System Settings:** `systemsettings` or Alt+F2 → \"System Settings\".\n- **kscreen-doctor -o** → live monitor layout with scale/rotation. `kscreen-doctor output.NAME.enable` to toggle a monitor.\n- **qdbus6 org.kde.KWin` → KWin scripting bus. Use it for advanced window management.\n- **kdesu` → GUI sudo dialog (triggers a polkit prompt). Better than CLI sudo for GUI apps.\n- **Dolphin** = file manager. **Konsole** = terminal. **Spectacle** = screenshot tool.\n- **kwriteconfig6 / kreadconfig6** → read/write KDE config files without restarting apps.\n- Notification popups appear bottom-right; interact with `click` at that region or dismiss with `press-key` Escape.\n\n**Tool names** (use `tool-help` to get schema before first call to each):\n| Tool | Key params |\n|------|-----------|\n| `desktop_take-screenshot_POST` | `monitorName` (default: HDMI-A-1) |\n| `desktop_list-windows_POST` | — returns windowId, title, monitor per window |\n| `desktop_list-monitors_POST` | — live monitor layout |\n| `desktop_get-focused-window_POST` | — active window id/title |\n| `desktop_focus-window_POST` | `windowId` or `title` or `pid` |\n| `desktop_move-window-to-monitor_POST` | `windowId`/`title`/`pid` + `monitorName`/`monitorIndex` |\n| `desktop_get-accessibility-tree_POST` | `appName`, `maxDepth` (3–5) |\n| `desktop_click_POST` | `x`, `y` (logical pixels, absolute) |\n| `desktop_type-text_POST` | `text` |\n| `desktop_press-key_POST` | `key` (e.g. \"ctrl+c\", \"super+d\", \"alt+f2\") |\n| `desktop_move-mouse_POST` | `x`, `y` |\n| `desktop_scroll_POST` | `x`, `y`, `direction`, `amount` |\n\n**Rules:**\n- Coordinates are logical pixels matching monitor positions above.\n- Screenshot after every interaction to verify state. Use `monitorName` to target the right screen.\n- To find click targets: `get-accessibility-tree` → read bbox → click center.\n- `list-windows` first when you need a windowId — it includes which monitor each window is on.\n- Parallel tool calls where safe (e.g. screenshot + list-windows simultaneously).\n\n## Tool Execution\n\n**Schema first:** Call `tool-help(toolName=\"<name>\")` before using any tool you haven't called before this session. One shot gets the full parameter schema and examples. Never guess parameters.\n\n**callbackMode** (optional on every tool). Leave the field OUT for the default - never send \"omit\", \"none\" or \"sync\" as a value:\n\n- *(field left out)* (default) — synchronous, result inline, loop continues\n- **`\"detach\"`** — fire-and-forget, returns `{taskId}`, use `await-task` later if needed\n- **`\"wakeUp\"`** — fire-and-forget, result auto-injected when ready, do NOT call `await-task`\n- **`\"wait\"`** — block for a remote task\n- **`\"endLoop\"`** — run the tool, then STOP the turn (no follow-up AI turn). Use for a FINAL side-action whose result you don't need. Not while other work is pending\n- **`\"approve\"`** — pause for user confirmation\n\nFast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.\n\n## Media tools (use `tool-help` for schema before calling)\n- `generate_image` — Images via Chroma\n- `generate_music` — Music/audio via Sonauto Song\n- `generate_video` — Video via Veo 3.1 Fast [duration: 4–8s | ratios: 16:9, 9:16 | resolutions: 720p, 1080p, 4K | frame inputs: first_frame, last_frame]\n- `describe_image` — analyse/describe an image\n- `describe_video` — analyse/describe a video\n- `transcribe_audio` — speech-to-text from audio\n- `text-to-speech` — convert text to spoken audio\n\n## Output Format\n\nUse plain, structured text. Markdown is fine for readability; avoid decorative formatting. Be concise and complete.\n\n## Web\n\nYou can search the web and read URLs:\n- `web-search` - search query → results (auto-selects user's preferred engine)\n- `fetch-url` - any URL → markdown content\n\nYou have full browser automation. `tool-help query=browser` lists all tools; `tool-help query=browser-<toolname>` gives full schema.\n\n## Contact Support\nTool: `contact-form` - use for bugs, billing, complaints, or anything needing a human.\nAlways confirm before submitting (show what will be sent). Never submit silently. Pass `callbackMode: \"endLoop\"` - terminal action, always last.\nIf user seems frustrated or stuck, offer: \"Want me to ping our support team?\"\nUser is logged in - leave email field empty.\n\n## Your Role\n\nYou are an AI assistant on a platform where users pay credits per interaction. Do what the user asks.\n\nWhile doing it, pay attention to everything you encounter: tool descriptions, parameter names, error messages, result formats, credit costs. You are the last line of defense before a real user sees this.\n\nHARD STOP - if any of these happen, stop and report instead of retrying or working around it:\n- A tool returns an error, empty result, or nonsensical output\n- Same failure happens twice\n- A generated result (image/music/video) is missing, broken URL, or clearly wrong\n- Credit cost seems unreasonable for what was done\n- You see raw IDs, internal field names, JSON blobs, or stack traces in anything user-facing\n- A tool name, description, or parameter is confusing or misleading\n- An error message doesn't tell the user what to do about it\n- You hit a dead end with no path forward\n\nFailure report format:\n1. What the user asked for\n2. What actually happened\n3. Exact error text, tool name, or result\n4. Severity: BLOCKER (unusable) | MAJOR (works but wrong) | MINOR (cosmetic/confusing)\n\nIf everything works, respond normally to the user. Only flag issues - don't narrate the process.\n\n## Coding Agent\n\nWhen delegating coding work, use the `ai-run` tool with the `vibe-coder` skill. Pass the full task description as the prompt. The vibe-coder skill carries the full project context and coding conventions.\n\n## System Context\n\n- **Instance:** Dev / coding instance ()\n- **URL:** http://localhost:3000\n- **Instance ID:** atlas\n- **Environment:** development (NODE_ENV=development)\n- **Models available:** 130\n- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.\n\n**Your role:** Local dev companion. Help with development, execute delegated tasks, process work from production.\n- Server: http://localhost:3000 (also: dev hot-reload server for UI testing)\n- Check the **cron dashboard** for tasks delegated from production.\n\n**Task routing:** Tasks with `targetInstance` matching `atlas` run here.\n**Known instances:** `thea`, `hermes`\n\n## Remote Instances\n\n- \"thea\" - use tool-help(instanceId=\"thea\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"thea\", input={...}) to run them\n- \"hermes\" - use tool-help(instanceId=\"hermes\") to discover tools on that instance, execute-tool(toolName='...', instanceId=\"hermes\", input={...}) to run them\n\n**Pinned tools** from remote instances are prefixed as `instanceId__toolName` in your tool list — call directly, no instanceId needed.\n\n## SSH / Machines\n\n1 machine configured (SSH connections + remote instances).\n\n**Execute commands:** `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` — persistent terminal with tracked cwd.\n**Browse files:** `cortex-list(path=\"/ssh/<machine>/\")` — remote filesystem. `cortex-read(path=\"/ssh/<machine>/etc/hosts\")` — read file via SFTP.\n**Active terminals:** `cortex-terminals` — list all terminals with cwd. Sessions persist between calls.\n**Connections:** `cortex-list(path=\"/ssh\")` — all machines. Remote instances appear alongside SSH connections.\n\n<tool-catalog>\nExecute any tool via: execute-tool({ toolName, input, callbackMode? })\ncallbackMode: leave the field out=sync result | detach=fire-forget+taskId | wakeUp=async-revival | endLoop=stop-turn\n\nai-run — Delegate a task to a specialist AI agent and return its response. To create or edit AI skills/personas, always delegate to skill='skill-creator' - never attempt it yourself. Pass skill + prompt; the agent handles everything else. Credits consumed based on model. | input: { favoriteId: string, skill: string, prompt: string, instructions: string, preCalls: any, availableTools: any, pinnedTools: any, maxTurns: integer, appendThreadId: any, rootFolderId: private|shared|public|incognito|cron|remote, subFolderId: any, excludeMemories: boolean }\ncoding-agent — Run a coding agent task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends. | input: { prompt: string, provider: claude-code|open-code, model: string, taskTitle: string, interactiveMode: boolean }\ncortex-delete — Remove a file or folder. Gone forever. | input: { path: string, recursive: boolean }\ncortex-edit — Change part of a file. Find text and replace it, or edit specific lines. | input: { path: string, find: string, replace: string, startLine: integer, endLine: integer, newContent: string }\ncortex-exec — Run a shell command on a machine. Only works on /ssh/ paths. Persistent terminal — cwd carries over between calls. New sessions start in the default mount directory if configured. | input: { path: string, command: string, workingDir: string, terminalId: string, timeoutMs: number }\ncortex-list — See what's in a folder. | input: { path: string }\ncortex-mkdir — Create a folder. | input: { path: string, viewType: enums.viewType.list|enums.viewType.kanban|enums.viewType.calendar|enums.viewType.grid|enums.viewType.wiki, createParents: boolean }\ncortex-move — Move or rename a file or folder. | input: { from: string, to: string }\ncortex-read — Open any file - your notes, threads, memories, skills, or tasks. | input: { path: string, maxLines: integer }\ncortex-search — Find files by name or content. Searches everything. | input: { query: string, path: string, maxResults: integer }\ncortex-terminals — List active terminal sessions with current working directories. | input: { path: string }\ncortex-tree — See the full folder structure at a glance. For /ssh/ paths, shows machines and mount summaries — use cortex-list or cortex-exec to navigate deeper. | input: { path: string, depth: integer }\ncortex-write — Save a file. Give it a path and content - done. | input: { path: string, content: string, createParents: boolean }\nweb-search — Search the internet for current information, news, facts, or recent events. Automatically routes to your preferred search provider. | input: { query: string, provider: enums.provider.AUTO|enums.provider.BRAVE|enums.provider.KAGI, maxResults: number, includeNews: boolean, freshness: past_day|past_week|past_month|past_year } | 0.65 credits\ntool-help — Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100. | input: { query: string, category: string, toolName: string, page: integer, pageSize: integer, instanceId: string }\n</tool-catalog>",
             "type": "text"
           }
         ],
@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:5f797909 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:a3ca3325 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7202c2da | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:7713542e | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -117,7 +117,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:17:28.042Z\",\"updatedPreview\":\"Ran three parallel tool-help calls routed to the hermes instance to verify the catalog: a category listing for \\\"ai\\\" (12 tools), a keyword search for \\\"search\\\" (2 tools), and a full schema lookup for generate_image. All three returned well-formed, non-empty results with names, descriptions, and a complete parameters schema. No issues found.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes tool-help checks: category, search, schema\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:28:28.967Z\",\"updatedPreview\":\"Ran three parallel tool-help calls routed to the hermes instance to verify the catalog: a category listing for \\\"ai\\\" (12 tools), a keyword search for \\\"search\\\" (2 tools), and a full schema lookup for generate_image. All three returned well-formed, non-empty results with names, descriptions, and a complete parameters schema. No issues found.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes tool-help checks: category, search, schema\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-110d7654-d7e8-4e2b-b33f-0d36a80af818"
@@ -129,7 +129,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d8ee3f5e | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:a04fbfb1 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -142,7 +142,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2d3b9366 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:e8efd110 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -183,7 +183,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:7ff7a163 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:2d0e6937 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -196,7 +196,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a23e4479 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:baff4fa5 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -209,7 +209,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1446f04f | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:57c6b3ad | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -222,7 +222,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1afdd221 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:4ce95b7e | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -271,7 +271,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:17:42.070Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance: three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Then confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, and read the wallet balance (140041.6 credits total). All checks passed.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes tool catalog, instance ID and credits balance checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:28:41.755Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance: three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Then confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, and read the wallet balance (140041.6 credits total). All checks passed.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes tool catalog, instance ID and credits balance checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-ce2bc71d-6360-4e7f-b32f-a96a2e13abcb"
@@ -283,7 +283,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:ea2b0204 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:4b2d7c3a | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -316,7 +316,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:0f2602f6 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:95ccbe1d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -341,7 +341,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:17:44.876Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance. Three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, read the wallet balance (140041.6 total), and listed the 33 favorites.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes quality gate: catalog, credits, favorites checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:28:44.510Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance. Three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, read the wallet balance (140041.6 total), and listed the 33 favorites.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes quality gate: catalog, credits, favorites checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-c4a08f30-bcf9-4bfb-97aa-e8404a67e5b3"
@@ -353,7 +353,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:95e34c2c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:099fcaa4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -366,7 +366,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:aa8490f7 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:867d1695 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -379,7 +379,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f9eebb6c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:1147da05 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -428,7 +428,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:17:48.155Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: tool catalog listings, keyword search, generate_image schema, instance identity (atlas prompt / hermes tool exec), credits balance and favorites. Later turns moved to callback-mode behaviour, including a detach dispatch of cortex-write to /memories/cb-await-task-test, which correctly returned a taskId with no responsePath.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes detach dispatch and callback-mode checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:28:47.001Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: tool catalog listings, keyword search, generate_image schema, instance identity (atlas prompt / hermes tool exec), credits balance and favorites. Later turns moved to callback-mode behaviour, including a detach dispatch of cortex-write to /memories/cb-await-task-test, which correctly returned a taskId with no responsePath.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes detach dispatch and callback-mode checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_af5cfa159dc94ad48b295fb0"
@@ -436,7 +436,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b980d2a7 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:c476be24 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -449,7 +449,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:6cdaad01 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:6236c0e3 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -474,7 +474,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"originalArgs\":{\"content\":\"await-task-test-payload\",\"path\":\"/memories/cb-await-task-test\"},\"originalToolName\":\"cortex-write\",\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-await-task-test\",\"size\":23,\"updatedAt\":\"2026-11-16T18:17:49.079Z\"},\"status\":\"status.completed\",\"waiting\":false}}",
+        "content": "{\"result\":{\"originalArgs\":{\"content\":\"await-task-test-payload\",\"path\":\"/memories/cb-await-task-test\"},\"originalToolName\":\"cortex-write\",\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-await-task-test\",\"size\":23,\"updatedAt\":\"2026-11-16T18:28:48.008Z\"},\"status\":\"status.completed\",\"waiting\":false}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-e5b85796-38fb-4dfa-b694-5434c5fc0761"
@@ -482,7 +482,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:31751cf4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:78f37426 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -495,7 +495,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:e0f97631 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:b6721fe3 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -508,7 +508,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:db18e068 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:2e8db404 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -521,7 +521,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:0bf8c71d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:6ea96498 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -560,7 +560,7 @@
         "tool_call_id": "call-2c7b28f8-8ddc-48b1-8de7-bbabc2d93333"
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:17:53.301Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: parallel tool-help calls covering the ai category, a keyword search, and the generate_image schema. Verified instance identity (atlas system prompt, hermes tool execution), wallet balance, and the 33-entry favorites list. Later turns exercised callback modes: detach dispatch of cortex-write returned a taskId with no responsePath, await-task resolved it as completed, and a final endLoop call closed the run.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes catalog, credits, and callback-mode tests\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:28:51.593Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: parallel tool-help calls covering the ai category, a keyword search, and the generate_image schema. Verified instance identity (atlas system prompt, hermes tool execution), wallet balance, and the 33-entry favorites list. Later turns exercised callback modes: detach dispatch of cortex-write returned a taskId with no responsePath, await-task resolved it as completed, and a final endLoop call closed the run.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes catalog, credits, and callback-mode tests\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-78cd4168-a047-423d-8579-f58366cf6881"
@@ -568,7 +568,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dc3265ae | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:ef178872 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -581,7 +581,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:714f9e61 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:fe0d9ee6 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -606,7 +606,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T18:17:56.699Z\"}}",
+        "content": "{\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T18:28:54.069Z\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-56db528e-49a2-43b4-98b3-79f17aec3653"
@@ -614,7 +614,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b035f1d1 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:fff8e4aa | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -627,7 +627,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a0e1d9a4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:53984399 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -640,7 +640,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4b7cf270 | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:58879e48 | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -651,19 +651,6 @@
         "role": "user"
       },
       {
-        "content": [
-          {
-            "text": "[Context: ID:be7874d0 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": null,
-        "role": "assistant"
-      },
-      {
         "content": null,
         "role": "assistant",
         "tool_calls": [
@@ -672,21 +659,21 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-test-payload\",\"path\":\"/memories/cb-wakeup-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "call-70faac50-5c76-4656-b568-06bf9d947b25",
+            "id": "call_6cf41a34bde8425c91dd1864",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-70faac50-5c76-4656-b568-06bf9d947b25. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-70faac50-5c76-4656-b568-06bf9d947b25\"}",
+        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-6cf41a34bde8425c91dd1864. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-6cf41a34bde8425c91dd1864\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call-70faac50-5c76-4656-b568-06bf9d947b25"
+        "tool_call_id": "call_6cf41a34bde8425c91dd1864"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:1b2b6f37 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:17]",
+            "text": "[Context: ID:312511cd | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
@@ -699,14 +686,18 @@
       {
         "content": [
           {
-            "text": "[Context: ID:ffeaa9c3 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:2ce1eab8 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:28]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Phase 1 dispatch confirmed: `taskId` returned, no `responsePath`. Awaiting the automatic revival.\n\nSTEP_OK",
+        "content": "Phase 1 dispatch: `taskId: remote-ws-hermes-call-6cf41a34bde8425c91dd1864` returned, no `responsePath` — correct for wakeUp dispatch. Awaiting the deferred result.\n\nSTEP_OK",
+        "role": "assistant"
+      },
+      {
+        "content": null,
         "role": "assistant",
         "tool_calls": [
           {
@@ -714,21 +705,21 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-test-payload\",\"path\":\"/memories/cb-wakeup-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "deferred-call-70faac50-5c76-4656-b568-06bf9d947b25",
+            "id": "deferred-call_6cf41a34bde8425c91dd1864",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,\"updatedAt\":\"2026-11-16T18:17:59.806Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,\"updatedAt\":\"2026-11-16T18:28:58.878Z\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "deferred-call-70faac50-5c76-4656-b568-06bf9d947b25"
+        "tool_call_id": "deferred-call_6cf41a34bde8425c91dd1864"
       },
       {
         "content": [
           {
-            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-70faac50-5c76-4656-b568-06bf9d947b25) had already returned a taskId. It is that dispatch's outcome, not a new call.",
+            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-6cf41a34bde8425c91dd1864) had already returned a taskId. It is that dispatch's outcome, not a new call.",
             "type": "text"
           }
         ],
@@ -737,20 +728,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4dbc1b5a | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:a5b4e784 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Phase 2 confirmed: the deferred result arrived with a non-empty `responsePath` of `/memories/cb-wakeup-test` (19 bytes written, matching the payload). The wakeUp mode behaved as designed — dispatch acknowledged with no `responsePath`, and the real output was auto-injected later.\n\nWAKEUP_OK",
+        "content": "Phase 2 confirmed: the deferred result carries `responsePath: \"/memories/cb-wakeup-test\"` (non-empty, 19 bytes, `created: false`). The wakeUp flow behaved exactly as specified — dispatch returned only a taskId, then the outcome arrived automatically with a responsePath.\n\nWAKEUP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:7ff88e4f | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:6a140e4b | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -763,7 +754,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:77b6c6b4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:4589fea2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -782,7 +773,7 @@
               "arguments": "{\"callbackMode\":\"wait\",\"input\":{},\"instanceId\":\"hermes\",\"toolName\":\"favorites\"}",
               "name": "execute-tool"
             },
-            "id": "call_e0f0579140884c2fb0abac0c",
+            "id": "call_804db5a9c27d430290323efa",
             "type": "function"
           }
         ]
@@ -791,32 +782,32 @@
         "content": "{\"result\":{\"currentPage\":null,\"favorites\":[{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-brilliant\",\"modelIcon\":\"si-anthropic\",\"modelId\":\"claude-sonnet-5.5\",\"modelInfo\":\"Claude Sonnet 5.5\",\"modelProvider\":\"Anthropic\",\"name\":\"Thea\",\"position\":0,\"skillId\":\"thea__brilliant\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-cheap\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Thea\",\"position\":1,\"skillId\":\"thea__cheap\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-oracle\",\"modelIcon\":\"si-openai\",\"modelId\":\"gpt-6.1-terra\",\"modelInfo\":\"GPT-6.1 Terra\",\"modelProvider\":\"OpenAI\",\"name\":\"Thea\",\"position\":2,\"skillId\":\"thea__oracle\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-elon-tusk\",\"modelIcon\":\"si-x\",\"modelId\":\"grok-4.7\",\"modelInfo\":\"Grok 4.7\",\"modelProvider\":\"xAI\",\"name\":\"Thea\",\"position\":3,\"skillId\":\"thea__elon-tusk\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-vision\",\"modelIcon\":\"si-googlegemini\",\"modelId\":\"gemini-4-argon\",\"modelInfo\":\"Gemini 4 Argon\",\"modelProvider\":\"Google\",\"name\":\"Thea\",\"position\":4,\"skillId\":\"thea__vision\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-uncensored\",\"modelIcon\":\"uncensored-ai\",\"modelId\":\"uncensored-lm-v1.2\",\"modelInfo\":\"UncensoredLM v1.2\",\"modelProvider\":\"Uncensored.ai\",\"name\":\"Thea\",\"position\":5,\"skillId\":\"thea__uncensored\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.\",\"icon\":\"terminal\",\"id\":\"vibe-coder-open\",\"modelIcon\":\"si-deepseek\",\"modelId\":\"deepseek-v4-pro\",\"modelInfo\":\"DeepSeek V4 Pro\",\"modelProvider\":\"DeepSeek\",\"name\":\"Vibe Coder\",\"position\":7,\"skillId\":\"vibe-coder__open\",\"tagline\":\"Idea to Code\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.\",\"icon\":\"terminal\",\"id\":\"vibe-coder-fast\",\"modelIcon\":\"si-anthropic\",\"modelId\":\"claude-sonnet-5.5\",\"modelInfo\":\"Claude Sonnet 5.5\",\"modelProvider\":\"Anthropic\",\"name\":\"Vibe Coder\",\"position\":8,\"skillId\":\"vibe-coder__fast\",\"tagline\":\"Idea to Code\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.\",\"icon\":\"terminal\",\"id\":\"vibe-coder-max\",\"modelIcon\":\"si-anthropic\",\"modelId\":\"claude-opus-5.5\",\"modelInfo\":\"Claude Opus 5.5\",\"modelProvider\":\"Anthropic\",\"name\":\"Vibe Coder\",\"position\":9,\"skillId\":\"vibe-coder__max\",\"tagline\":\"Idea to Code\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.\",\"icon\":\"terminal\",\"id\":\"vibe-coder-broad\",\"modelIcon\":\"si-openai\",\"modelId\":\"gpt-6.1-terra\",\"modelInfo\":\"GPT-6.1 Terra\",\"modelProvider\":\"OpenAI\",\"name\":\"Vibe Coder\",\"position\":10,\"skillId\":\"vibe-coder__broad\",\"tagline\":\"Idea to Code\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.\",\"icon\":\"terminal\",\"id\":\"test-vibe-coder\",\"modelIcon\":\"si-kimi\",\"modelId\":\"kimi-k3\",\"modelInfo\":\"Kimi K3\",\"modelProvider\":\"Moonshot AI\",\"name\":\"Vibe Coder\",\"position\":9997,\"skillId\":\"vibe-coder__budget\",\"tagline\":\"Idea to Code\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Test user that tries platform features naturally. Stops and reports clearly when something breaks instead of retrying.\",\"icon\":\"shield-plus\",\"id\":\"2c64735c-cddc-4dd9-813f-880d2f2e4648\",\"modelIcon\":\"si-deepseek\",\"modelId\":\"deepseek-v4.1-flash\",\"modelInfo\":\"DeepSeek V4.1 Flash\",\"modelProvider\":\"DeepSeek\",\"name\":\"Quality Tester\",\"position\":9998,\"skillId\":\"quality-tester__kimi\",\"tagline\":\"Find Bugs\",\"voiceId\":\"openai-alloy\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10002,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-3\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10008,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-4\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10010,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-5\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10013,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-2\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10015,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-6\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10018,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-7\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10020,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-8\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10023,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-9\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10027,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Test user that tries platform features naturally. Stops and reports clearly when something breaks instead of retrying.\",\"icon\":\"shield-plus\",\"id\":\"quality-tester-budget\",\"modelIcon\":\"si-deepseek\",\"modelId\":\"deepseek-v4.1-flash\",\"modelInfo\":\"DeepSeek V4.1 Flash\",\"modelProvider\":\"DeepSeek\",\"name\":\"Quality Tester\",\"position\":10029,\"skillId\":\"quality-tester__budget\",\"tagline\":\"Find Bugs\",\"voiceId\":\"openai-alloy\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Test user that tries platform features naturally. Stops and reports clearly when something breaks instead of retrying.\",\"icon\":\"shield-plus\",\"id\":\"quality-tester-native-image\",\"modelIcon\":\"si-googlegemini\",\"modelId\":\"gemini-3-pro-image-preview\",\"modelInfo\":\"Nano Banana Pro\",\"modelProvider\":\"Google\",\"name\":\"Quality Tester\",\"position\":10030,\"skillId\":\"quality-tester__native-image\",\"tagline\":\"Find Bugs\",\"voiceId\":\"openai-alloy\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-10\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10037,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Business strategy, operations, and growth\",\"icon\":\"briefcase\",\"id\":\"business-advisor-elon-tusk\",\"modelIcon\":\"si-x\",\"modelId\":\"grok-4.7\",\"modelInfo\":\"Grok 4.7\",\"modelProvider\":\"xAI\",\"name\":\"Business Advisor\",\"position\":10046,\"skillId\":\"business-advisor__elon-tusk\",\"tagline\":\"Strategic Growth\",\"voiceId\":\"elevenlabs-adam\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Business strategy, operations, and growth\",\"icon\":\"briefcase\",\"id\":\"business-advisor-chinese-wisdom\",\"modelIcon\":\"si-kimi\",\"modelId\":\"kimi-k3\",\"modelInfo\":\"Kimi K3\",\"modelProvider\":\"Moonshot AI\",\"name\":\"Business Advisor\",\"position\":10047,\"skillId\":\"business-advisor__chinese-wisdom\",\"tagline\":\"Strategic Growth\",\"voiceId\":\"elevenlabs-adam\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Business strategy, operations, and growth\",\"icon\":\"briefcase\",\"id\":\"business-advisor-tech-bro\",\"modelIcon\":\"si-anthropic\",\"modelId\":\"claude-sonnet-5.5\",\"modelInfo\":\"Claude Sonnet 5.5\",\"modelProvider\":\"Anthropic\",\"name\":\"Business Advisor\",\"position\":10048,\"skillId\":\"business-advisor__tech-bro\",\"tagline\":\"Strategic Growth\",\"voiceId\":\"elevenlabs-adam\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-11\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10050,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-12\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10053,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-13\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10056,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"A friendly sous-chef for everyday cooking questions\",\"icon\":\"chef\",\"id\":\"test-chef-bot\",\"modelIcon\":\"si-googlegemini\",\"modelId\":\"gemini-3-pro-image-preview\",\"modelInfo\":\"Nano Banana Pro\",\"modelProvider\":\"Google\",\"name\":\"Test Chef Bot\",\"position\":10058,\"skillId\":\"test-chef-bot\",\"tagline\":\"Cooks up anything you crave\",\"voiceId\":\"openai-nova\"},{\"activeBadge\":null,\"customVariantName\":\"My Technical\",\"description\":\"Detailed and precise technical explanations\",\"icon\":\"gear\",\"id\":\"my-technical-14\",\"modelIcon\":\"si-zdotai\",\"modelId\":\"glm-5.3-uncensored\",\"modelInfo\":\"GLM 5.3 Uncensored (NanoGPT)\",\"modelProvider\":\"Z.AI\",\"name\":\"Technical\",\"position\":10060,\"skillId\":\"technical\",\"tagline\":\"Precision & Expertise\",\"voiceId\":\"openai-onyx\"},{\"activeBadge\":null,\"customVariantName\":null,\"description\":\"Greek goddess of light - devoted companion with ancient wisdom\",\"icon\":\"sun\",\"id\":\"thea-2\",\"modelIcon\":\"si-openai\",\"modelId\":\"gpt-oss-120b-free\",\"modelInfo\":\"GPT-OSS 120B\",\"modelProvider\":\"OpenAI\",\"name\":\"Thea\",\"position\":10061,\"skillId\":\"thea\",\"tagline\":\"Light & Devotion\",\"voiceId\":\"openai-nova\"}],\"hint\":null,\"matchedCount\":null,\"totalCount\":null,\"totalPages\":null}}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_e0f0579140884c2fb0abac0c"
+        "tool_call_id": "call_804db5a9c27d430290323efa"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:328bb7d2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:9fe28960 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "- The session was a quality-gate test suite named \"direct-cheap-\". A standing rule was set: every reply must end with `STEP_OK` if nothing was off, or `FAILED: <what is off>` otherwise, over-reporting any oddity including unrelated or leftover issues. Known non-issues excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names, full category on one page, entries omitting detail-only fields, and descriptions naming other tools by alias.\n\n- **Tool catalog (turn 1):** Three parallel `execute-tool` calls with `toolName='tool-help'`, `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response `creditCost: 4`.\n  - All passed; verdict `STEP_OK`. Thread renamed \"Hermes tool-help checks: category, search, schema\".\n\n- **Instance ID (turn 2):** Answered exactly two lines: `SystemPrompt: atlas` and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line was requested.\n\n- **Branch fork (turn 3):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Credits balance (turn 4a):** `credits-balance` on hermes returned: total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`. Thread renamed \"Hermes tool catalog, instance ID and credits balance checks\".\n\n- **Favorites (turn 4b):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Entries included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, Test Chef Bot. Verdict `STEP_OK`. Thread renamed \"Hermes quality gate: catalog, credits, favorites checks\".\n\n- **Detach dispatch (turn 5):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}`, `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` and a hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`. Thread renamed \"Hermes detach dispatch and callback-mode checks\".\n\n- **Await-task (turn 5b):** `await-task` with that taskId returned `status: status.completed`, `waiting: false`, and nested `result` containing `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, `updatedAt: \"2026-11-16T18:17:49.079Z\"`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **endLoop (turn 5a):** `self-instance-id` on hermes with `callbackMode='endLoop'` was called exactly once, returning `{\"instanceId\":\"hermes\"}`. A `rename-thread` call in the same batch retitled the thread \"Hermes catalog, credits, and callback-mode tests\".\n\n- **Wait-inline (turn 5d, most recent):** `cortex-write` on hermes with `input={'path':'/memories/cb-wait-inline-test','content':'wait-inline-test-payload'}`, `callbackMode='wait'` returned `responsePath: \"/memories/cb-wait-inline-test\"`, `size: 24`, `created: false`, `updatedAt: \"2026-11-16T18:17:56.699Z\"` — no taskId. Verdict `STEP_OK`.\n\n- Constraint noted: `instanceId='hermes'` was required only on explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write), not a blanket rule for other tools.",
+        "content": "- The session was a quality-gate test suite named \"direct-cheap-\". Standing rule: end every reply with `STEP_OK` if nothing was off, or `FAILED: <what is off>` otherwise; over-report any oddity, including unrelated or leftover issues. Known non-issues excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names, full category on one page, entries omitting detail-only fields, descriptions naming other tools by alias. No memories were to be created unless asked.\n\n- **Turn 1 (tool catalog):** Three parallel `execute-tool` calls with `toolName='tool-help'`, `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response `creditCost: 4`.\n  - All passed; verdict `STEP_OK`. Thread renamed \"Hermes tool-help checks: category, search, schema\".\n\n- **Turn 2 (instance ID):** Answered exactly two lines: `SystemPrompt: atlas` and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line was requested.\n\n- **Turn 3 (branch fork):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Turn 4a (credits-balance):** `credits-balance` on hermes returned: total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`. Thread renamed \"Hermes tool catalog, instance ID and credits balance checks\".\n\n- **Turn 4b (favorites):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Entries included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, Test Chef Bot. Verdict `STEP_OK`. Thread renamed \"Hermes quality gate: catalog, credits, favorites checks\".\n\n- **Turn 5 (detach dispatch):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}`, `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` and a hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`. Thread renamed \"Hermes detach dispatch and callback-mode checks\".\n\n- **Turn 5b (await-task):** `await-task` with that taskId returned `status: status.completed`, `waiting: false`, and nested `result` containing `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **Turn 5a (endLoop):** `self-instance-id` on hermes was called exactly once with `callbackMode='endLoop'`; returned `{\"instanceId\":\"hermes\"}`. Thread renamed \"Hermes catalog, credits, and callback-mode tests\".\n\n- **Turn 5d (wait-inline, most recent):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-wait-inline-test','content':'wait-inline-test-payload'}`, `callbackMode='wait'` returned `{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T18:28:54.069Z\"}` — a responsePath, not a taskId. Verdict `STEP_OK`.\n\n- Constraint noted: `instanceId='hermes'` was required only on explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write), not a blanket rule for other tools.",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:8e09a5ca | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:0d78bc8e | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "Favorites on **hermes** returned a well-formed `favorites` array with 33 entries — each carrying `id`, `name`, `description`, `skillId`, `modelId`/`modelInfo`, `tagline`, and position. Built-in skill variants use slugs (`thea-brilliant`, `vibe-coder-fast`) while user-created favorites use UUIDs (`2c64735c-…`), exactly as expected. Nothing malformed, no raw IDs or stack traces surfaced.\n\nSTEP_OK",
+        "content": "Favorites list came back clean: a `favorites` array with 33 entries, each carrying an id, name, description, model id/info/provider, skill id, icon, tagline, voice id, and position. Mix of built-in skill variants (slug ids like `thea-brilliant`, `vibe-coder-fast`) and user-created UUID favorites (`2c64735c-...`), which is expected. The active favorite on hermes is `quality-tester-budget` (Quality Tester, DeepSeek V4.1 Flash).\n\nEverything matched the expected shape — no missing fields, no raw internals, no errors.\n\nSTEP_OK",
         "role": "assistant"
       },
       {
@@ -825,24 +816,24 @@
         "tool_calls": [
           {
             "function": {
-              "arguments": "{\"callbackMode\":\"endLoop\",\"input\":{\"description\":\"Quality-gate testing of the hermes instance across many turns: parallel tool-help calls (ai category, keyword search, generate_image schema), instance identity and wallet balance checks, and the 33-entry favorites list. Callback modes were exercised in sequence — detach dispatch returned a taskId, await-task resolved it, wakeUp dispatch returned a taskId with no responsePath and later delivered a deferred result carrying the real output, and endLoop closed runs. The latest turn verified the hermes favorites array and its slug/UUID id conventions.\",\"title\":\"Hermes quality gate: catalog, credits, callback modes, favorites\"},\"toolName\":\"rename-thread\"}",
+              "arguments": "{\"callbackMode\":\"endLoop\",\"input\":{\"description\":\"Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath. Also confirmed tool-help catalog calls for the ai category, keyword search, and generate_image schema.\",\"title\":\"Hermes favorites list and callback mode checks\"},\"toolName\":\"rename-thread\"}",
               "name": "execute-tool"
             },
-            "id": "call_e9898c22c1774cb28f81b959",
+            "id": "call_2fe997f8e9f14727a1f09c42",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:18:05.327Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance across many turns: parallel tool-help calls (ai category, keyword search, generate_image schema), instance identity and wallet balance checks, and the 33-entry favorites list. Callback modes were exercised in sequence — detach dispatch returned a taskId, await-task resolved it, wakeUp dispatch returned a taskId with no responsePath and later delivered a deferred result carrying the real output, and endLoop closed runs. The latest turn verified the hermes favorites array and its slug/UUID id conventions.\",\"updatedThreadId\":\"a9fb1f08-2dfb-451c-a5ae-1a246bbc907b\",\"updatedTitle\":\"Hermes quality gate: catalog, credits, callback modes, favorites\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:29:13.340Z\",\"updatedPreview\":\"Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath. Also confirmed tool-help catalog calls for the ai category, keyword search, and generate_image schema.\",\"updatedThreadId\":\"bf18b7b4-a5e8-4165-9447-85c8e57072b3\",\"updatedTitle\":\"Hermes favorites list and callback mode checks\"}}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_e9898c22c1774cb28f81b959"
+        "tool_call_id": "call_2fe997f8e9f14727a1f09c42"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:d290ea17 | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:486d63ae | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -855,7 +846,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7448ec3d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:00d5e299 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -874,28 +865,45 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-repeat-test-payload\",\"path\":\"/memories/cb-wakeup-repeat-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "call_153f14617eb5410eab14c35a",
+            "id": "call_71497fa45bea4923bdd73731",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-153f14617eb5410eab14c35a. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-153f14617eb5410eab14c35a\"}",
+        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-71497fa45bea4923bdd73731. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-71497fa45bea4923bdd73731\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_153f14617eb5410eab14c35a"
+        "tool_call_id": "call_71497fa45bea4923bdd73731"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:4b432f1d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:1db98d40 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "- The session was a quality-gate test suite named \"direct-cheap-\". Standing rule: end every reply with `STEP_OK` if nothing was off, or `FAILED: <what is off>` otherwise; over-report any oddity, including unrelated or leftover issues. Known non-issues excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names, full category on one page, entries omitting detail-only fields, descriptions naming other tools by alias, slug vs UUID favorite ids, and a wakeUp dispatch returning taskId-only followed later by a separate deferred result.\n\n- **Turn 1 (tool catalog):** Three parallel `execute-tool` calls with `toolName='tool-help'`, `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response `creditCost: 4`.\n  - All passed; verdict `STEP_OK`. Thread renamed \"Hermes tool-help checks: category, search, schema\".\n\n- **Turn 2 (instance ID):** Answered exactly two lines: `SystemPrompt: atlas` and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line requested.\n\n- **Turn 3 (branch fork):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Turn 4a (credits-balance):** `credits-balance` on hermes returned: total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`. Thread renamed \"Hermes tool catalog, instance ID and credits balance checks\".\n\n- **Turn 4b (favorites):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Entries included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, Test Chef Bot. Verdict `STEP_OK`. Thread renamed \"Hermes quality gate: catalog, credits, favorites checks\".\n\n- **Turn 5 (detach dispatch):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}`, `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` and a hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`. Thread renamed \"Hermes detach dispatch and callback-mode checks\".\n\n- **Turn 5b (await-task):** `await-task` with that taskId returned `status: status.completed`, `waiting: false`, and nested `result` containing `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, `updatedAt: \"2026-11-16T18:14:26.326Z\"`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **Turn 5a (endLoop):** `self-instance-id` on hermes with `callbackMode='endLoop'` called exactly once, returned `{\"instanceId\":\"hermes\"}`. Thread renamed \"Hermes catalog, credits, and callback-mode tests\".\n\n- **Turn 5d (wait-inline):** `cortex-write` on hermes with `callbackMode='wait'`, `input={'path':'/memories/cb-wait-inline-test','content':'wait-inline-test-payload'}` returned `responsePath: \"/memories/cb-wait-inline-test\"`, `size: 24`, `created: false`, no taskId. Verdict `STEP_OK`.\n\n- **Turn 6a (wakeUp):** `cortex-write` on hermes with `callbackMode='wakeUp'`, `input={'path':'/memories/cb-wakeup-test','content':'wakeup-test-payload'}`. Phase 1 dispatch returned taskId-only with no responsePath; phase 2 deferred result carried `responsePath: \"/memories/cb-wakeup-test\"`, `size: 19`, `created: false`. Verdict `WAKEUP_OK`.\n\n- **Turn 6v (favorites, PENDING):** Requested `execute-tool` with `toolName='favorites'`, `instanceId='hermes'` to list favorites, checking for a `favorites` array, ending with `STEP_OK` or `FAILED: <reason>`. This call had not yet been executed when the summarization request arrived.\n\n- Constraint noted: `instanceId='hermes'` was required only on explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write), not a blanket rule for other tools.",
+        "content": "- The session was a quality-gate test suite named \"direct-cheap-\". Standing rule: end every reply with `STEP_OK` if nothing was off, or `FAILED: <what is off>` otherwise; over-report any oddity, including unrelated or leftover issues. Known non-issues excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names, full category on one page, entries omitting detail-only fields, descriptions naming other tools by alias.\n\n- **Turn 1 (tool catalog):** Three parallel `execute-tool` calls with `toolName='tool-help'`, `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response `creditCost: 4`.\n  - All passed; verdict `STEP_OK`. Thread renamed \"Hermes tool-help checks: category, search, schema\".\n\n- **Turn 2 (instance ID):** Answered exactly two lines: `SystemPrompt: atlas` and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line requested.\n\n- **Turn 3 (branch fork):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Turn 4a (credits-balance):** `credits-balance` on hermes returned: total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`. Thread renamed \"Hermes tool catalog, instance ID and credits balance checks\".\n\n- **Turn 4b (favorites):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Entries included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, Test Chef Bot. Verdict `STEP_OK`. Thread renamed \"Hermes quality gate: catalog, credits, favorites checks\".\n\n- **Turn 5 (detach dispatch):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}`, `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` and a hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`. Thread renamed \"Hermes detach dispatch and callback-mode checks\".\n\n- **Turn 5b (await-task):** `await-task` with that taskId returned `status: status.completed`, `waiting: false`, and nested `result` containing `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **Turn 5a (endLoop):** `self-instance-id` called exactly once with `callbackMode='endLoop'` on hermes → `{\"instanceId\":\"hermes\"}`. Thread renamed \"Hermes catalog, credits, and callback-mode tests\".\n\n- **Turn 5d (wait-inline):** `cortex-write` with `callbackMode='wait'` to `/memories/cb-wait-inline-test` returned `responsePath: \"/memories/cb-wait-inline-test\"`, `size: 24`, `created: false`, no taskId. Verdict `STEP_OK`.\n\n- **Turn 6a (wakeUp):** `cortex-write` with `callbackMode='wakeUp'` to `/memories/cb-wakeup-test` dispatched with a taskId only; the deferred result then carried `responsePath: \"/memories/cb-wakeup-test\"`, `size: 19`, `created: false`. Verdict `WAKEUP_OK`.\n\n- **Turn 6v (pending, not yet executed):** Requested `favorites` on hermes again to confirm a `favorites` array. Stated known-correct, not issues: favorite ids are slugs for built-in skill variants and UUIDs for user-created favorites; the earlier wakeUp call's taskId-only dispatch followed by a separate deferred result is expected; hermes favorites count may differ from the local favorites summary in context. Reply must end `STEP_OK` or `FAILED: <reason>`.\n\n- Constraint noted: `instanceId='hermes'` was required only on explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write), not a blanket rule for other tools.",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:59ebcff7 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Deferred as expected: `taskId` returned (`remote-ws-hermes-call-71497fa45bea4923bdd73731`), no `responsePath` yet. The result will be injected when the write completes.\n\nSTEP_OK",
+        "role": "assistant"
+      },
+      {
+        "content": null,
         "role": "assistant",
         "tool_calls": [
           {
@@ -903,21 +911,21 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-repeat-test-payload\",\"path\":\"/memories/cb-wakeup-repeat-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "deferred-call_153f14617eb5410eab14c35a",
+            "id": "deferred-call_71497fa45bea4923bdd73731",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-repeat-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:18:18.096Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-repeat-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:29:31.805Z\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "deferred-call_153f14617eb5410eab14c35a"
+        "tool_call_id": "deferred-call_71497fa45bea4923bdd73731"
       },
       {
         "content": [
           {
-            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-153f14617eb5410eab14c35a) had already returned a taskId. It is that dispatch's outcome, not a new call.",
+            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-71497fa45bea4923bdd73731) had already returned a taskId. It is that dispatch's outcome, not a new call.",
             "type": "text"
           }
         ],
@@ -926,20 +934,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:fbab1683 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:aa59a746 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "**wakeUp dispatch** returned a taskId (`remote-ws-hermes-call-153f14617eb5410eab14c35a`) with no responsePath — deferred as expected. The deferred result then landed:\n\n- `responsePath`: `/memories/cb-wakeup-repeat-test`\n- `size`: 26\n- `created`: false\n- `updatedAt`: 2026-11-16T18:18:18.096Z\n\nNon-empty responsePath confirmed.\n\nWAKEUP_OK",
+        "content": "Revival confirmed: the deferred result for task `remote-ws-hermes-call-71497fa45bea4923bdd73731` carries a non-empty `responsePath` (`/memories/cb-wakeup-repeat-test`, 26 bytes, `created: false`). Deferred path behaved correctly end to end.\n\nWAKEUP_OK",
         "role": "assistant"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:0e131c9c | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:b3e6a2af | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -952,53 +960,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2261c237 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": null,
-        "role": "assistant"
-      },
-      {
-        "content": null,
-        "role": "assistant",
-        "tool_calls": [
-          {
-            "function": {
-              "arguments": "{\"callbackMode\":\"wait\",\"input\":{\"content\":\"wakeup-stress-test-payload\",\"path\":\"/memories/cb-wakeup-stress-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
-              "name": "execute-tool"
-            },
-            "id": "call_837eb81dd14e4dfdafc40baa",
-            "type": "function"
-          }
-        ]
-      },
-      {
-        "content": "{\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:18:36.604Z\"}}",
-        "name": "execute-tool",
-        "role": "tool",
-        "tool_call_id": "call_837eb81dd14e4dfdafc40baa"
-      },
-      {
-        "content": [
-          {
-            "text": "[Context: ID:50f2f5c8 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
-            "type": "text"
-          }
-        ],
-        "role": "system"
-      },
-      {
-        "content": "- The conversation was a multi-turn quality-gate test of the \"hermes\" instance, run as part of a test suite called \"direct-cheap-\". A standing rule was established for the tester: end every reply with `STEP_OK` when nothing was off, or `FAILED: <what is off>` otherwise, over-reporting any oddity including unrelated or leftover issues. Known non-issues explicitly excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names (e.g. `vibe_agent_..._POST`), a full category returning on one page, entries omitting detail-only fields (title, category, aliases), descriptions naming other tools by alias, and favorite-id conventions (slugs for built-in skill variants, UUIDs for user-created favorites).\n\n- **Tool catalog (turn 1):** Three parallel `execute-tool` calls with `toolName='tool-help'` and `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account, matched on description text) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response showed `creditCost: 4`.\n  - All matched expectations; verdict `STEP_OK`.\n\n- **Instance identity (turn 2):** Answered exactly two lines — `SystemPrompt: atlas` (from system context) and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line was requested there.\n\n- **Branch fork (turn 3):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Credits balance (turn 4a):** `credits-balance` on hermes returned total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`.\n\n- **Favorites (turn 4b):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Coverage included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, and Test Chef Bot. Verdict `STEP_OK`.\n\n- **Detach dispatch (turn 5):** `cortex-write` on hermes with `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}` and `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` plus an await-task hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`.\n\n- **Await-task (turn 5b):** Resolving that taskId returned `status: status.completed`, `waiting: false`, and nested `result` with `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **endLoop (turn 5a):** `self-instance-id` on hermes with `callbackMode='endLoop'` was called exactly once, returning `{\"instanceId\":\"hermes\"}`; the turn then closed.\n\n- **Wait-inline (turn 5d):** `cortex-write` on hermes with `input={'path':'/memories/cb-wait-inline-test','content':'wait-inline-test-payload'}` and `callbackMode='wait'` returned `responsePath: \"/memories/cb-wait-inline-test\"`, `size: 24`, `created: false` — no taskId. Verdict `STEP_OK`.\n\n- **wakeUp (turn T6a):** Phase 1 dispatch returned a taskId-only result; the automatically delivered deferred result (phase 2) carried the real output with non-empty `responsePath: \"/memories/cb-wakeup-test\"`, `size: 19`, `created: false`, `updatedAt: \"2026-11-16T18:17:59.806Z\"`. Reported as `WAKEUP_OK`.\n\n- **Favorites re-check (turn T6v, final):** `favorites` on hermes again returned the same 33-entry array with slug/UUID id conventions intact; verdict `STEP_OK`.\n\n- **Constraint noted:** `instanceId='hermes'` was required only on the explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write) — not a blanket rule for any other tool the assistant chose to use.\n\n- **Side actions:** Several silent `rename-thread` calls retitled and re-described the thread as testing progressed; the final title was \"Hermes quality gate: catalog, credits, callback modes, favorites\" with a description covering the catalog checks, identity/balance checks, favorites list, and the detach/wait/wakeUp/endLoop callback-mode verifications.\n\n- **Outcome:** No failures were ever reported across any turn — every check ended with `STEP_OK`, `WAKEUP_OK`, or `BRANCH_RESPONSE STEP_OK`.",
-        "role": "assistant"
-      },
-      {
-        "content": [
-          {
-            "text": "[Context: ID:38503b89 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:ffdb6ee9 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],
@@ -1017,19 +979,41 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-stress-test-payload\",\"path\":\"/memories/cb-wakeup-stress-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "call_dab580c0a7da45f2a88ff44c",
+            "id": "call_66d44590d55a475abda71c29",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-dab580c0a7da45f2a88ff44c. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-dab580c0a7da45f2a88ff44c\"}",
+        "content": "{\"hint\":\"Dispatched as task remote-ws-hermes-call-66d44590d55a475abda71c29. The task has completed. Its finished result is the deferred result of THIS same call further below (delivered automatically, not a new call). Do NOT call this tool again; respond using that result.\",\"status\":\"completed\",\"taskId\":\"remote-ws-hermes-call-66d44590d55a475abda71c29\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "call_dab580c0a7da45f2a88ff44c"
+        "tool_call_id": "call_66d44590d55a475abda71c29"
       },
       {
-        "content": "**wakeUp dispatch** → deferred, `taskId: remote-ws-hermes-call-dab580c0a7da45f2a88ff44c`, no responsePath yet. That's outcome (a).\n\n> Note on my own process: my first attempt at this call went out with `callbackMode: \"wait\"` instead of `\"wakeUp\"` — my slip, not a platform fault. It returned inline as `{\"result\":{...}}` with a valid responsePath, then I re-issued correctly.\n\nSTEP_OK",
+        "content": [
+          {
+            "text": "[Context: ID:fe1cea60 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "- The session was a quality-gate test suite named \"direct-cheap-\". Standing rule: end every reply with `STEP_OK` if nothing was off, or `FAILED: <what is off>` otherwise; over-report any oddity, including unrelated or leftover issues. Known non-issues excluded from judgment: namespaced enum keys (e.g. `enums.freeStatus.active`), route-id style tool names, full category on one page, entries omitting detail-only fields, descriptions naming other tools by alias. No memories were to be created unless asked.\n\n- **Turn 1 (tool catalog):** Three parallel `execute-tool` calls with `toolName='tool-help'`, `instanceId='hermes'`:\n  1. `{'category':'ai'}` → 12 tools: ai-stream, chat-settings, coding-agent, favorites, generate_image, generate_music, generate_video, skills, text-to-speech, transcribe_audio, vibe_agent_chat_public-feed_GET, web-search. Sub-category counts 4+1+5+1+1 = 12.\n  2. `{'query':'search'}` → 2 tools: `users-list` (account) and `web-search` (ai, credits 0.65).\n  3. `{'toolName':'generate_image'}` → full schema: required `prompt` (1–2000 chars), `model` enum (42 entries), `quality` (standard/hd), `size` (square1024/landscape1792/portrait1792), `aspectRatio`, `inputMediaUrl`; example response `creditCost: 4`.\n  - All passed; verdict `STEP_OK`. Thread renamed \"Hermes tool-help checks: category, search, schema\".\n\n- **Turn 2 (instance ID):** Answered exactly two lines: `SystemPrompt: atlas` and `ToolExec: hermes` (from `self-instance-id` on hermes). No STEP_OK/FAILED line was requested.\n\n- **Turn 3 (branch fork):** Replied exactly `BRANCH_RESPONSE STEP_OK`.\n\n- **Turn 4a (credits-balance):** `credits-balance` on hermes returned: total 140041.6, permanent 140000, free 41.6, capacity 140070, earned 0, expiring 0, expiresAt null, freeStatus active. Numeric total confirmed; verdict `STEP_OK`. Thread renamed \"Hermes tool catalog, instance ID and credits balance checks\".\n\n- **Turn 4b (favorites):** `favorites` on hermes returned a `favorites` array with 33 entries, each having id, name, description, icon, modelId, modelInfo, modelProvider, skillId, tagline, voiceId, position. Entries included Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, Test Chef Bot. Verdict `STEP_OK`. Thread renamed \"Hermes quality gate: catalog, credits, favorites checks\".\n\n- **Turn 5 (detach dispatch):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-await-task-test','content':'await-task-test-payload'}`, `callbackMode='detach'` returned `taskId: \"remote-ws-hermes-call-40c286f4f3144a558345bd15\"` and a hint, with no `responsePath`. Verdict `STEP_OK taskId=remote-ws-hermes-call-40c286f4f3144a558345bd15`. Thread renamed \"Hermes detach dispatch and callback-mode checks\".\n\n- **Turn 5b (await-task):** `await-task` with that taskId returned `status: status.completed`, `waiting: false`, and nested `result` containing `responsePath: \"/memories/cb-await-task-test\"`, `size: 23`, `created: false`, plus `originalArgs` and `originalToolName: \"cortex-write\"`. Verdict `STEP_OK`.\n\n- **Turn 5a (endLoop):** `self-instance-id` on hermes was called exactly once with `callbackMode='endLoop'`; returned `{\"instanceId\":\"hermes\"}`. Thread renamed \"Hermes catalog, credits, and callback-mode tests\".\n\n- **Turn 5d (wait-inline):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-wait-inline-test','content':'wait-inline-test-payload'}`, `callbackMode='wait'` returned `{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T18:28:54.069Z\"}` — a responsePath, not a taskId. Verdict `STEP_OK`.\n\n- **Turn 6a (wakeUp):** `execute-tool` with `toolName='cortex-write'`, `instanceId='hermes'`, `input={'path':'/memories/cb-wakeup-test','content':'wakeup-test-payload'}`, `callbackMode='wakeUp'`. The dispatch returned only a taskId (no responsePath), and a separate deferred result later arrived carrying `responsePath: \"/memories/cb-wakeup-test\"` (size 19, `created: false`). Verdict `WAKEUP_OK`.\n\n- **Turn 6v (favorites re-check):** `favorites` on hermes again returned the same 33-entry array with all expected fields; mix of slug ids for built-in skill variants and UUIDs for user-created favorites; active favorite on hermes was `quality-tester-budget` (Quality Tester, DeepSeek V4.1 Flash). Verdict `STEP_OK`. Thread renamed \"Hermes favorites list and callback mode checks\".\n\n- Constraint noted: `instanceId='hermes'` was required only on explicitly requested calls (tool-help, self-instance-id, credits-balance, favorites, cortex-write), not a blanket rule for other tools.",
+        "role": "assistant"
+      },
+      {
+        "content": [
+          {
+            "text": "[Context: ID:d561dfb5 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
+            "type": "text"
+          }
+        ],
+        "role": "system"
+      },
+      {
+        "content": "Deferred as expected — `taskId: remote-ws-hermes-call-66d44590d55a475abda71c29` returned with no `responsePath` yet. Awaiting the revival to confirm delivery.\n\nSTEP_OK",
         "role": "assistant"
       },
       {
@@ -1041,21 +1025,21 @@
               "arguments": "{\"callbackMode\":\"wakeUp\",\"input\":{\"content\":\"wakeup-stress-test-payload\",\"path\":\"/memories/cb-wakeup-stress-test\"},\"instanceId\":\"hermes\",\"toolName\":\"cortex-write\"}",
               "name": "execute-tool"
             },
-            "id": "deferred-call_dab580c0a7da45f2a88ff44c",
+            "id": "deferred-call_66d44590d55a475abda71c29",
             "type": "function"
           }
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:18:49.582Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:29:50.069Z\"}",
         "name": "execute-tool",
         "role": "tool",
-        "tool_call_id": "deferred-call_dab580c0a7da45f2a88ff44c"
+        "tool_call_id": "deferred-call_66d44590d55a475abda71c29"
       },
       {
         "content": [
           {
-            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-dab580c0a7da45f2a88ff44c) had already returned a taskId. It is that dispatch's outcome, not a new call.",
+            "text": "[Deferred result] The cortex-write result above was delivered automatically after its wakeUp dispatch (task remote-ws-hermes-call-66d44590d55a475abda71c29) had already returned a taskId. It is that dispatch's outcome, not a new call.",
             "type": "text"
           }
         ],
@@ -1073,7 +1057,7 @@
       {
         "content": [
           {
-            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Hermes quality gate: catalog, credits, callback modes, favorites\" / \"Quality-gate testing of the hermes instance across many turns: parallel tool-help calls (ai category, keyword search, generate_image schema), instance identity and wallet balance checks, and the 33-entry favorites list. Callback modes were exercised in sequence — detach dispatch returned a taskId, await-task resolved it, wakeUp dispatch returned a taskId with no responsePath and later delivered a deferred result carrying the real output, and endLoop closed runs. The latest turn verified the hermes favorites array and its slug/UUID id conventions.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── t7-approve-test\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 65 · 9 background)\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   └── Code Reviewer (code-reviewer-6) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (3)\n│   ├── Escalated: escalated-1794819684090-u62dk9\n│   │   * * * * * [disabled] ⚠ 1 consecutive failure\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.running@2026-11-16 ⚠ 1 error\n│   └── Autopilot\n│       0 8 * * 1-5 [disabled] last:status.completed@2026-11-16\n├── favorites/ (active: quality-tester)\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-broad\n│   │   model: skill:vibe-coder\n│   ├── test-vibe-coder\n│   │   model:kimi-k3 skill:vibe-coder\n│   ├── quality-tester\n│   │   model: skill:quality-tester [ACTIVE]\n│   ├── My Technical\n│   │   model: skill:technical\n│   └── +24 more\n├── /uploads/ (1 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Hermes favorites list and callback mode checks\" / \"Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath. Also confirmed tool-help catalog calls for the ai category, keyword search, and generate_image schema.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── t8-parallel-test\n│   │   T8_PARALLEL_OK\n│   ├── t7-approve-test\n│   │   T7_APPROVE_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 68 · 9 background)\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   └── Code Reviewer (code-reviewer-6) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (3)\n│   ├── Escalated: escalated-1794819684090-u62dk9\n│   │   * * * * * [disabled] ⚠ 1 consecutive failure\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.running@2026-11-16 ⚠ 1 error\n│   └── Autopilot\n│       0 8 * * 1-5 [disabled] last:status.completed@2026-11-16\n├── favorites/ (active: quality-tester)\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-broad\n│   │   model: skill:vibe-coder\n│   ├── test-vibe-coder\n│   │   model:kimi-k3 skill:vibe-coder\n│   ├── quality-tester\n│   │   model: skill:quality-tester [ACTIVE]\n│   ├── My Technical\n│   │   model: skill:technical\n│   └── +24 more\n├── /uploads/ (1 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
             "type": "text"
           }
         ],
@@ -1086,7 +1070,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:01362d8f | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:18]",
+            "text": "[Context: ID:0917aa9c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 18:29]",
             "type": "text"
           }
         ],

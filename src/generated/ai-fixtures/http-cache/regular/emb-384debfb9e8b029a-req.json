@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/platform-tool--media-and-attachment-test-suite-dfd9a53a-8be7-44c3-b28d-23997745a78a.md\n\n# Platform tool, media and attachment test suite\nFolder: private\nDescription: A quality-gate test suite exercised the platform's tool catalog, callback modes, media generation and attachments. Tool-help calls validated category, keyword and detail lookups; generate_music, generate_image and generate_video all returned usable media with reasonable credit costs, including a spi",
+    "encoding_format": "float"
+  }
+}

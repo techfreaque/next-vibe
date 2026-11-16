@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Phase 2 confirmed: the deferred result carries `responsePath: \"/memories/cb-wakeup-test\"` (non-empty, 19 bytes, `created: false`). The wakeUp flow behaved exactly as specified — dispatch returned only a taskId, then the outcome arrived automatically with a responsePath.\n\nWAKEUP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** a solid red circle centered on a plain white background — flat two-color graphic, no text or other elements.\n\n**Audio:** processed successfully — a 26.7-second instrumental electro-funk / chiptune-infused electronic track at ~120 BPM, driven by a syncopated slap-style synth bass, punchy kick and snare/clap on 2 and 4, crisp hi-hats, and bright staccato synth stabs, with a fill/turnaround in the final seconds.\n\nBoth attachments came through — image content visible and audio described.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

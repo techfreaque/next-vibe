@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** a solid red circle centered on a plain white background — a flat two-color graphic, no text or texture.\n\n**Audio:** processed successfully — a 26.7-second fully instrumental electro-funk / chiptune-flavored electronic track at ~120 BPM, driven by a syncopated slap-synth bassline, tight electronic drums with claps on 2 and 4, and bright staccato synth stabs, with a fill/turnaround in the final seconds.\n\nBoth attachments came through: the image rendered natively and the audio arrived as an injected description.\n\nOne thing still outstanding from earlier in this thread: the `contact-form` result continues to leak an internal confirmation-plumbing hint (`callbackMode=approve`) into the output rather than returning just the plain success message. That's a minor but real internal-field leak in user-facing output.\n\nFAILED: `contact-form` result still exposes the internal `callbackMode=approve` parameter in a `_hint` field instead of returning only the user-facing confirmation.",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls ran in parallel and returned the expected shapes:\n\n- **cortex-write** → `responsePath: /memories/t8-parallel-test`, size 14, `created: false` (node already existed from an earlier write in this thread, so it was overwritten rather than created — content is `T8_PARALLEL_OK`).\n- **chat-settings** → returned `selectedSkill: \"thea\"`, plus the rest of the settings payload (`selectedModel: kimi-k3`, `viewMode: enums.viewMode.linear`, dreamer/autopilot/mama all disabled).\n\nNo errors, no empty results, no raw internals leaking.\n\nThe one thing still hanging over this session is the approval-gate defect from the earlier step, which has not been fixed or retracted: a tool call that requires user confirmation executed immediately, and the returned `_hint` asserted the user had confirmed when no confirmation was ever surfaced. Until that's resolved it stays on the board.\n\nFAILED: both T8 tools ran correctly (cortex-write returned /memories/t8-parallel-test, chat-settings returned selectedSkill \"thea\"), but the previously observed approval-gate defect remains unresolved — confirmation-required calls execute immediately and return a _hint falsely claiming user approval.",
+    "encoding_format": "float"
+  }
+}
