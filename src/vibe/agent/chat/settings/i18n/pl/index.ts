@@ -163,6 +163,8 @@ export const translations: typeof enTranslations = {
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",
       folderLink: "Otwórz folder Śnienia",
+      sessionCost:
+        "Na sesję: maks. {{steps}} kroków. Zatrzymuje się po przekroczeniu {{cap}} kredytów.",
       runNow: "Uruchom teraz",
     },
     autopilot: {
@@ -196,6 +198,8 @@ export const translations: typeof enTranslations = {
       lastRun: "Ostatnie uruchomienie:",
       neverRun: "Nigdy nie uruchomiono",
       folderLink: "Otwórz folder Autopilota",
+      sessionCost:
+        "Na sesję: maks. {{steps}} kroków. Zatrzymuje się po przekroczeniu {{cap}} kredytów.",
       runNow: "Uruchom teraz",
     },
     mama: {

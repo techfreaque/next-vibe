@@ -243,11 +243,16 @@ export class TaskExecuteRepository {
             platform: Platform.CRON,
             cronTaskId: task.id,
             // no user context — UTC (dates not user-facing here)
-            toolExecutionContext: makeHeadlessContext(
-              taskAbortController.signal,
-              undefined,
-              "UTC",
-            ),
+            toolExecutionContext: {
+              ...makeHeadlessContext(
+                taskAbortController.signal,
+                undefined,
+                "UTC",
+              ),
+              // Run now is a task run too: its billed steps land in the task
+              // spend ledger and stop at the per-run budget cap.
+              cronTaskId: task.id,
+            },
           }),
           new Promise<never>((...[, reject]) => {
             setTimeout(() => reject(new Error("TASK_TIMEOUT")), timeoutMs);

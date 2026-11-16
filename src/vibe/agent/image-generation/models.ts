@@ -1007,11 +1007,7 @@ export const imageGenModelDefinitions: Record<
     // LEGACY 2026-11-16: superseded by Nano Banana 2.1. ModelsLab v6 dropped Imagen 4 Fast ("Model not found"); no other provider of ours serves Imagen.
     // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
     enabled: false,
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.IMAGE_GEN,
-      ModelUtility.FAST,
-    ],
+    utilities: [ModelUtility.LEGACY, ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.MAINSTREAM,
@@ -1050,11 +1046,7 @@ export const imageGenModelDefinitions: Record<
     // LEGACY 2026-11-16: superseded by Qwen Image 3. ModelsLab v6 dropped qwen-t2i ("Model not found"); Qwen Image 3 runs on OpenRouter.
     // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
     enabled: false,
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.IMAGE_GEN,
-      ModelUtility.FAST,
-    ],
+    utilities: [ModelUtility.LEGACY, ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -1093,11 +1085,7 @@ export const imageGenModelDefinitions: Record<
     // LEGACY 2026-11-16: superseded by Z Image Turbo (same price tier). ModelsLab v6 dropped realtime-t2i ("Model not found").
     // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
     enabled: false,
-    utilities: [
-      ModelUtility.LEGACY,
-      ModelUtility.IMAGE_GEN,
-      ModelUtility.FAST,
-    ],
+    utilities: [ModelUtility.LEGACY, ModelUtility.IMAGE_GEN, ModelUtility.FAST],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,

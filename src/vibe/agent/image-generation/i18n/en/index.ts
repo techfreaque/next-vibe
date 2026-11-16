@@ -12,7 +12,7 @@ export const translations = {
     titleShort: "Generate Image",
     dynamicTitle: "Image: {{prompt}}",
     description:
-      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Pass aspectRatio (e.g. 16:9) for landscape or portrait output. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl plus the real width, height and outputAspectRatio of the file.",
     form: {
       title: "Image Generation",
       description: "Enter a prompt to generate an image",
@@ -43,7 +43,8 @@ export const translations = {
     },
     aspectRatio: {
       label: "Aspect Ratio",
-      description: "Output image aspect ratio",
+      description:
+        "Output aspect ratio: 16:9 or 21:9 landscape, 9:16 portrait, 4:3, 3:4, 3:2, 2:3, 1:1. Leave blank for square. Each model gets the closest ratio it supports; the result reports the real width, height and ratio, so describe the image by those, never by what you asked for.",
     },
     inputMediaUrl: {
       label: "Reference Image URL",
@@ -65,6 +66,9 @@ export const translations = {
       imageUrl: "Generated image URL",
       creditCost: "Credits used",
       jobId: "Async job ID",
+      width: "Width (px)",
+      height: "Height (px)",
+      outputAspectRatio: "Aspect ratio",
     },
     errors: {
       referenceUnavailable:
@@ -124,6 +128,10 @@ export const translations = {
         "The model {{model}} does not accept reference images. Choose an image-to-image model (one whose inputs include image) to use a reference.",
       generationFailed: "Image generation failed",
       generationFailedWithReason: "Image generation failed: {{error}}",
+      contentRejected:
+        "Refused by the image provider's content filter: {{error}}. This is a refusal, not an outage. Rephrase the prompt or pick an uncensored model. You were not charged.",
+      providerOutage:
+        "The image provider is down or overloaded right now: {{error}}. This is an outage, not a refusal. Try again in a minute or pick another model. You were not charged.",
       providerError: "Image provider error: {{error}}",
       noImageUrl: "No image URL returned from provider",
       noImageGenerated:

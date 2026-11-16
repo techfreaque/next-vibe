@@ -26,6 +26,9 @@ import { scopedTranslation } from "../i18n";
  * chat/completions endpoint. Use the /api/v1/images endpoint instead."
  *
  * Image-to-image/edit: a reference image URL is passed in `input_references`.
+ * Aspect ratio: `aspect_ratio` (per-model enum, see
+ * GET /api/v1/images/models/<id>/endpoints). A model that rejects the ratio
+ * is retried once without it; the repository then reports the real size.
  * Response images come back as base64 in `data[i].b64_json` (no hosted URL), so
  * the bytes are wrapped as a `data:` URI for the repository's storage step to
  * fetch and persist (never inlined into model context).
@@ -53,17 +56,31 @@ function safeImageMime(mediaType: string | undefined): string {
   return "image/png";
 }
 
+/** OpenRouter's 4xx for a ratio the model does not offer. */
+function isAspectRatioRejection(status: number, message: string): boolean {
+  return status >= 400 && status < 500 && /aspect[_ ]?ratio/i.test(message);
+}
+
 export async function generateWithOpenRouter(params: {
   providerModel: string;
   prompt: string;
+  /** Requested ratio ("16:9"); omitted = provider default (square). */
+  aspectRatio?: string;
   logger: EndpointLogger;
   locale: CountryLanguage;
   inputMediaUrl?: string | null;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, logger, locale, inputMediaUrl, fetchImpl } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    aspectRatio,
+    logger,
+    locale,
+    inputMediaUrl,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENROUTER_API_KEY) {
@@ -79,8 +96,8 @@ export async function generateWithOpenRouter(params: {
     imageToImage: Boolean(inputMediaUrl),
   });
 
-  try {
-    const response = await fetchImpl(OPENROUTER_IMAGES_URL, {
+  const request = (withAspectRatio: boolean): Promise<Response> =>
+    fetchImpl(OPENROUTER_IMAGES_URL, {
       method: "POST",
       headers: {
         // eslint-disable-next-line i18next/no-literal-string
@@ -94,6 +111,9 @@ export async function generateWithOpenRouter(params: {
       body: JSON.stringify({
         model: providerModel,
         prompt,
+        ...(withAspectRatio && aspectRatio
+          ? { aspect_ratio: aspectRatio }
+          : {}),
         ...(inputMediaUrl
           ? {
               input_references: [
@@ -104,7 +124,20 @@ export async function generateWithOpenRouter(params: {
       }),
     });
 
-    const rawText = await response.text();
+  try {
+    let response = await request(true);
+    let rawText = await response.text();
+
+    if (aspectRatio && isAspectRatioRejection(response.status, rawText)) {
+      logger.warn("[OpenRouter Image] Model rejected the aspect ratio", {
+        model: providerModel,
+        aspectRatio,
+        status: response.status,
+        body: rawText.slice(0, 300),
+      });
+      response = await request(false);
+      rawText = await response.text();
+    }
 
     let data: OpenRouterImagesResponse;
     try {
@@ -125,9 +158,16 @@ export async function generateWithOpenRouter(params: {
 
     if (!response.ok || data.error) {
       const errorMsg = data.error?.message ?? `HTTP ${response.status}`;
-      logger.error("[OpenRouter Image] API error", { error: errorMsg });
+      logger.error("[OpenRouter Image] API error", {
+        error: errorMsg,
+        status: response.status,
+        model: providerModel,
+      });
       return fail({
-        message: t("post.errors.externalServiceError", { message: errorMsg }),
+        // The status tells a refusal (400/403) from an outage (5xx/429).
+        message: t("post.errors.externalServiceError", {
+          message: `${errorMsg} (HTTP ${String(response.status)})`,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

@@ -560,6 +560,8 @@ export async function setupAiStream(params: {
   parentThreadId?: string;
   /** TEST-ONLY E2E fixture scope of the originating request (see CreateAiStreamParams). */
   fixtureScopeId?: string;
+  /** Scheduled task running this stream: keys the spend ledger + budget guard. */
+  cronTaskId?: string;
   resolvedRelayContext?: ResolvedRelayContext;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
@@ -1013,6 +1015,10 @@ export async function setupAiStream(params: {
     // Browser E2E fixture scope (dev/test only) — every tool/provider call of
     // this stream records/replays under it.
     fixtureScopeId: params.fixtureScopeId,
+    // Background task runs: every billed step is recorded against this task
+    // and checked against its per-run budget cap and turn ceilings
+    // (db-writer/credits.ts guardTaskStep). Without it the guard never ran.
+    cronTaskId: params.cronTaskId,
     // Voice mode on/off rides the context so a revival keeps speaking; the
     // voice itself resolves from the favorite/skill, not from here.
     voiceEnabled: data.voiceMode?.enabled ?? false,

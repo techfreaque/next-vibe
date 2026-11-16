@@ -27,6 +27,7 @@ export const translations = {
       label: "Read",
       loadingText: "Reading...",
     },
+    emptyFile: "This file is empty.",
     response: {
       path: { content: "Path" },
       content: { content: "Content" },

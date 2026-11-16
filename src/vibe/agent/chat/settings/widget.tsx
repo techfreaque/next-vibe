@@ -15,6 +15,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { ScheduleAutocomplete } from "next-vibe/tasks/cron/[id]/widget/schedule-autocomplete";
 import taskExecuteEndpoints from "next-vibe/tasks/execute/definition";
+import { TASK_WATCHDOG_CONFIG } from "next-vibe/tasks/watchdog/config";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -98,11 +99,22 @@ import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
+  AUTOPILOT_MAX_TURNS,
   DREAM_DEFAULT_SCHEDULE,
+  DREAM_MAX_TURNS,
   generateRandomAutopilotSchedule,
   generateRandomDreamerSchedule,
   MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/constants";
+
+/**
+ * Per-run credit cap the task guard enforces on every background session
+ * (db-writer/credits.ts -> TaskGuard). A session is many model steps, each
+ * resending the growing context, so the per-message price of the model says
+ * little about what one session costs: show the session limits instead.
+ */
+const PULSE_SESSION_CAP_CREDITS =
+  TASK_WATCHDOG_CONFIG.budgetDefaults.perTaskCredits;
 
 const MIN_VALUE = 1_000;
 const MAX_ABSOLUTE = 200_000;
@@ -598,6 +610,7 @@ function FavSlotCollapsed({
   disabled,
   locale,
   placeholder,
+  costLabel,
 }: {
   fav: FavoriteCard | null;
   open: boolean;
@@ -605,6 +618,8 @@ function FavSlotCollapsed({
   disabled: boolean;
   locale: CountryLanguage;
   placeholder: string;
+  /** Replaces the per-message model price (pulse slots: per-session limits) */
+  costLabel?: string;
 }): JSX.Element {
   const variantLabel = fav ? getVariantLabelForFav(fav, locale) : null;
 
@@ -652,19 +667,26 @@ function FavSlotCollapsed({
                   <Span className="truncate">{fav.modelProvider}</Span>
                 </>
               )}
-              {fav.modelId && (
+              {costLabel ? (
                 <>
                   <Div className="h-1 w-1 rounded-full bg-muted-foreground/40 shrink-0" />
-                  <ModelCreditDisplay
-                    modelId={fav.modelId}
-                    variant="text"
-                    className="text-xs text-muted-foreground"
-                    locale={locale}
-                    // Rendered inside the slot <Button>: the popover trigger
-                    // would be a nested <button> (hydration error).
-                    interactive={false}
-                  />
+                  <Span className="truncate">{costLabel}</Span>
                 </>
+              ) : (
+                fav.modelId && (
+                  <>
+                    <Div className="h-1 w-1 rounded-full bg-muted-foreground/40 shrink-0" />
+                    <ModelCreditDisplay
+                      modelId={fav.modelId}
+                      variant="text"
+                      className="text-xs text-muted-foreground"
+                      locale={locale}
+                      // Rendered inside the slot <Button>: the popover trigger
+                      // would be a nested <button> (hydration error).
+                      interactive={false}
+                    />
+                  </>
+                )
               )}
             </Div>
           </Div>
@@ -696,6 +718,7 @@ function PulseFavSlot({
   label,
   placeholder,
   defaultSkillId,
+  costLabel,
 }: {
   favoriteId: string | null;
   onFavoriteChange: (id: string | null) => void;
@@ -705,6 +728,8 @@ function PulseFavSlot({
   placeholder: string;
   /** Fallback skill to display when no favorite is selected */
   defaultSkillId: string;
+  /** Shown instead of the per-message model price */
+  costLabel?: string;
 }): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -763,6 +788,7 @@ function PulseFavSlot({
         disabled={disabled}
         locale={locale}
         placeholder={placeholder}
+        costLabel={costLabel}
       />
       {open && (
         <Div className="rounded-xl border overflow-hidden">
@@ -900,6 +926,10 @@ function PulseSectionDreaming({
           label={t("post.dreaming.favoriteId.label")}
           placeholder={t("post.dreaming.favoriteId.defaultOption")}
           defaultSkillId="thea-dreamer"
+          costLabel={t("post.dreaming.sessionCost", {
+            steps: DREAM_MAX_TURNS,
+            cap: PULSE_SESSION_CAP_CREDITS,
+          })}
         />
       </Div>
       <SettingsRow label={t("post.dreaming.prompt.label")} stacked>
@@ -1026,6 +1056,10 @@ function PulseSectionAutopilot({
           label={t("post.autopilot.favoriteId.label")}
           placeholder={t("post.autopilot.favoriteId.defaultOption")}
           defaultSkillId="hermes-autopilot"
+          costLabel={t("post.autopilot.sessionCost", {
+            steps: AUTOPILOT_MAX_TURNS,
+            cap: PULSE_SESSION_CAP_CREDITS,
+          })}
         />
       </Div>
       <SettingsRow label={t("post.autopilot.prompt.label")} stacked>

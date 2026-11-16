@@ -20,7 +20,9 @@ import { chatFolders } from "../../db";
 import type { ChatSettings } from "../db";
 import {
   AUTOPILOT_DEFAULT_SCHEDULE,
+  AUTOPILOT_MAX_TURNS,
   DREAM_DEFAULT_SCHEDULE,
+  DREAM_MAX_TURNS,
   MAMA_DEFAULT_SCHEDULE,
 } from "./constants";
 
@@ -91,17 +93,27 @@ function autopilotTaskId(userId: string): string {
   return `${AUTOPILOT_TASK_PREFIX}${userId.slice(0, 8)}`;
 }
 
+/** Existing user-owned pulse task state needed to sync it. */
+interface ExistingPulseTask {
+  id: string;
+  enabled: boolean;
+  schedule: string;
+}
+
 /**
  * Find an existing user-owned pulse task by display name.
- * Returns the task's id if found, null otherwise.
  * Used to reuse the existing task row instead of creating duplicates.
  */
-async function findExistingPulseTaskId(
+async function findExistingPulseTask(
   userId: string,
   displayName: string,
-): Promise<string | null> {
+): Promise<ExistingPulseTask | null> {
   const [existing] = await db
-    .select({ id: cronTasks.id })
+    .select({
+      id: cronTasks.id,
+      enabled: cronTasks.enabled,
+      schedule: cronTasks.schedule,
+    })
     .from(cronTasks)
     .where(
       and(
@@ -110,7 +122,33 @@ async function findExistingPulseTaskId(
       ),
     )
     .limit(1);
-  return existing?.id ?? null;
+  return existing ?? null;
+}
+
+/**
+ * Due-check watermark for a pulse task that is being switched on (or moved
+ * to a new schedule while on).
+ *
+ * The pulse treats a never-run recurring task, or one whose last run is
+ * older than its latest scheduled slot, as overdue and fires it on the next
+ * tick. For Dreaming/Autopilot that meant "enable" = an immediate billed
+ * session at whatever hour the user clicked (prod 2026-11-14: Dreaming
+ * switched on at 00:48 Paris ran at once, ~80 credits, instead of at its
+ * 2 AM slot). Moving lastExecutedAt to now makes the first run the next
+ * scheduled slot. Run now still starts a session on demand.
+ */
+function pulseEnableWatermark(
+  existing: ExistingPulseTask | null,
+  enabled: boolean,
+  schedule: string,
+): Date | undefined {
+  if (!enabled) {
+    return undefined;
+  }
+  if (!existing || !existing.enabled || existing.schedule !== schedule) {
+    return new Date();
+  }
+  return undefined;
 }
 
 /** Default user message to kick off a dreaming session */
@@ -137,10 +175,11 @@ export async function ensureDreamTask(
     >
   >,
 ): Promise<void> {
-  const existingId = await findExistingPulseTaskId(userId, "Dreaming");
-  const id = existingId ?? dreamTaskId(userId);
+  const existing = await findExistingPulseTask(userId, "Dreaming");
+  const id = existing?.id ?? dreamTaskId(userId);
   const enabled = settings.dreamerEnabled ?? false;
   const schedule = settings.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE;
+  const lastExecutedAt = pulseEnableWatermark(existing, enabled, schedule);
   const favoriteId = settings.dreamerFavoriteId ?? undefined;
   const prompt = settings.dreamerPrompt ?? DREAM_DEFAULT_PROMPT;
 
@@ -155,7 +194,7 @@ export async function ensureDreamTask(
     favoriteId: favoriteId ?? undefined,
     skill: "thea-dreamer",
     prompt,
-    maxTurns: 10,
+    maxTurns: DREAM_MAX_TURNS,
     rootFolderId: DefaultFolderId.BACKGROUND,
     subFolderId,
     appendThreadId: undefined,
@@ -179,6 +218,7 @@ export async function ensureDreamTask(
       timeout: TASK_TIMEOUTS.EXTENDED,
       taskInput,
       userId,
+      lastExecutedAt,
     })
     .onConflictDoUpdate({
       target: cronTasks.id,
@@ -187,6 +227,7 @@ export async function ensureDreamTask(
         enabled,
         schedule,
         taskInput,
+        lastExecutedAt,
         updatedAt: new Date(),
       },
     });
@@ -208,10 +249,11 @@ export async function ensureAutopilotTask(
     >
   >,
 ): Promise<void> {
-  const existingId = await findExistingPulseTaskId(userId, "Autopilot");
-  const id = existingId ?? autopilotTaskId(userId);
+  const existing = await findExistingPulseTask(userId, "Autopilot");
+  const id = existing?.id ?? autopilotTaskId(userId);
   const enabled = settings.autopilotEnabled ?? false;
   const schedule = settings.autopilotSchedule ?? AUTOPILOT_DEFAULT_SCHEDULE;
+  const lastExecutedAt = pulseEnableWatermark(existing, enabled, schedule);
   const favoriteId = settings.autopilotFavoriteId ?? undefined;
   const prompt = settings.autopilotPrompt ?? AUTOPILOT_DEFAULT_PROMPT;
 
@@ -226,7 +268,7 @@ export async function ensureAutopilotTask(
     favoriteId: favoriteId ?? undefined,
     skill: "hermes-autopilot",
     prompt,
-    maxTurns: 12,
+    maxTurns: AUTOPILOT_MAX_TURNS,
     rootFolderId: DefaultFolderId.BACKGROUND,
     subFolderId,
     appendThreadId: undefined,
@@ -250,6 +292,7 @@ export async function ensureAutopilotTask(
       timeout: TASK_TIMEOUTS.EXTENDED,
       taskInput,
       userId,
+      lastExecutedAt,
     })
     .onConflictDoUpdate({
       target: cronTasks.id,
@@ -258,6 +301,7 @@ export async function ensureAutopilotTask(
         enabled,
         schedule,
         taskInput,
+        lastExecutedAt,
         updatedAt: new Date(),
       },
     });

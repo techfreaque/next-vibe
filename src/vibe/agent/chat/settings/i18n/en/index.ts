@@ -162,6 +162,8 @@ export const translations = {
       lastRun: "Last run:",
       neverRun: "Never run",
       folderLink: "Open Dreams folder",
+      sessionCost:
+        "Per session: max {{steps}} steps. Stops once it passes {{cap}} credits.",
       runNow: "Run now",
     },
     autopilot: {
@@ -195,6 +197,8 @@ export const translations = {
       lastRun: "Last run:",
       neverRun: "Never run",
       folderLink: "Open Autopilot folder",
+      sessionCost:
+        "Per session: max {{steps}} steps. Stops once it passes {{cap}} credits.",
       runNow: "Run now",
     },
     mama: {

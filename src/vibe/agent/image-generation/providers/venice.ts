@@ -125,7 +125,16 @@ export async function generateWithVenice(params: {
       }),
     });
 
-    const data = (await response.json()) as VeniceImageResponse;
+    // A gateway error page (HTML 502/503) is an outage, not a parse crash.
+    const rawText = await response.text();
+    let data: VeniceImageResponse;
+    try {
+      data = JSON.parse(rawText) as VeniceImageResponse;
+    } catch {
+      data = {
+        error: `HTTP ${String(response.status)}: ${rawText.slice(0, 200)}`,
+      };
+    }
     if (!response.ok || data.error) {
       const errorMsg = errorMessageOf(data, response.status);
       logger.error("[Venice Images] API error", {
@@ -135,7 +144,10 @@ export async function generateWithVenice(params: {
         size: apiSize,
       });
       return fail({
-        message: t("post.errors.externalServiceError", { message: errorMsg }),
+        // The status tells a refusal (400/403) from an outage (5xx/429).
+        message: t("post.errors.externalServiceError", {
+          message: `${errorMsg} (HTTP ${String(response.status)})`,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -264,9 +276,14 @@ async function editWithVenice(params: {
       } catch {
         errorMsg = `HTTP ${response.status}`;
       }
-      logger.error("[Venice Images] Edit API error", { error: errorMsg });
+      logger.error("[Venice Images] Edit API error", {
+        error: errorMsg,
+        status: response.status,
+      });
       return fail({
-        message: t("post.errors.externalServiceError", { message: errorMsg }),
+        message: t("post.errors.externalServiceError", {
+          message: `${errorMsg} (HTTP ${String(response.status)})`,
+        }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

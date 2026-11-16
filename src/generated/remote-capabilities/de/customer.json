@@ -53422,6 +53422,7 @@
             },
             "type": "string"
           },
+          "includeInCacheKey": true,
           "usage": {
             "request": "data"
           },
@@ -55334,18 +55335,47 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Seitenverhältnis",
-          "description": "Seitenverhältnis des Ausgabebildes",
+          "description": "Seitenverhältnis des Bildes: 16:9 oder 21:9 Querformat, 9:16 Hochformat, 4:3, 3:4, 3:2, 2:3, 1:1. Leer lassen für quadratisch. Jedes Modell bekommt das nächstliegende Format, das es kann; das Ergebnis nennt die echte Breite, Höhe und das echte Format.",
           "columns": 6,
           "options": [],
-          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "enum",
+                  "entries": {
+                    "1:1": "1:1",
+                    "16:9": "16:9",
+                    "9:16": "9:16",
+                    "4:3": "4:3",
+                    "3:4": "3:4",
+                    "3:2": "3:2",
+                    "2:3": "2:3",
+                    "21:9": "21:9"
+                  }
                 },
-                "type": "string"
+                "type": "enum",
+                "enum": {
+                  "1:1": "1:1",
+                  "16:9": "16:9",
+                  "9:16": "9:16",
+                  "4:3": "4:3",
+                  "3:4": "3:4",
+                  "3:2": "3:2",
+                  "2:3": "2:3",
+                  "21:9": "21:9"
+                },
+                "options": [
+                  "1:1",
+                  "16:9",
+                  "9:16",
+                  "4:3",
+                  "3:4",
+                  "3:2",
+                  "2:3",
+                  "21:9"
+                ]
               }
             },
             "type": "optional"
@@ -55437,6 +55467,70 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "width": {
+          "type": "text",
+          "label": "Breite (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "height": {
+          "type": "text",
+          "label": "Höhe (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "outputAspectRatio": {
+          "type": "text",
+          "label": "Seitenverhältnis",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true

@@ -43,7 +43,8 @@ export const translations: typeof enTranslations = {
     },
     aspectRatio: {
       label: "Seitenverhältnis",
-      description: "Seitenverhältnis des Ausgabebildes",
+      description:
+        "Seitenverhältnis des Bildes: 16:9 oder 21:9 Querformat, 9:16 Hochformat, 4:3, 3:4, 3:2, 2:3, 1:1. Leer lassen für quadratisch. Jedes Modell bekommt das nächstliegende Format, das es kann; das Ergebnis nennt die echte Breite, Höhe und das echte Format.",
     },
     inputMediaUrl: {
       label: "Referenzbild-URL",
@@ -65,6 +66,9 @@ export const translations: typeof enTranslations = {
       imageUrl: "URL des generierten Bildes",
       creditCost: "Verwendete Credits",
       jobId: "Asynchrone Job-ID",
+      width: "Breite (px)",
+      height: "Höhe (px)",
+      outputAspectRatio: "Seitenverhältnis",
     },
     errors: {
       referenceUnavailable:
@@ -125,6 +129,10 @@ export const translations: typeof enTranslations = {
         "Das Modell {{model}} verarbeitet keine Referenzbilder. Wähle ein Bild-zu-Bild-Modell (dessen Eingaben Bild umfassen), um eine Referenz zu nutzen.",
       generationFailed: "Bildgenerierung fehlgeschlagen",
       generationFailedWithReason: "Bildgenerierung fehlgeschlagen: {{error}}",
+      contentRejected:
+        "Vom Inhaltsfilter des Bildanbieters abgelehnt: {{error}}. Das ist eine Ablehnung, keine Störung. Formuliere den Prompt um oder wähle ein unzensiertes Modell. Es wurden keine Credits berechnet.",
+      providerOutage:
+        "Der Bildanbieter ist gerade gestört oder überlastet: {{error}}. Das ist eine Störung, keine Ablehnung. Versuch es in einer Minute erneut oder wähle ein anderes Modell. Es wurden keine Credits berechnet.",
       providerError: "Anbieter-Fehler: {{error}}",
       noImageUrl: "Kein Bild-URL vom Anbieter zurückgegeben",
       noImageGenerated:

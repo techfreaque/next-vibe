@@ -29008,7 +29008,7 @@
     "toolName": "generate_image",
     "title": "Generate Image",
     "titleShort": "Generate Image",
-    "description": "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+    "description": "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Pass aspectRatio (e.g. 16:9) for landscape or portrait output. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl plus the real width, height and outputAspectRatio of the file.",
     "fields": {
       "usage": {
         "request": "data",
@@ -29419,18 +29419,47 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Aspect Ratio",
-          "description": "Output image aspect ratio",
+          "description": "Output aspect ratio: 16:9 or 21:9 landscape, 9:16 portrait, 4:3, 3:4, 3:2, 2:3, 1:1. Leave blank for square. Each model gets the closest ratio it supports; the result reports the real width, height and ratio, so describe the image by those, never by what you asked for.",
           "columns": 6,
           "options": [],
-          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "enum",
+                  "entries": {
+                    "1:1": "1:1",
+                    "16:9": "16:9",
+                    "9:16": "9:16",
+                    "4:3": "4:3",
+                    "3:4": "3:4",
+                    "3:2": "3:2",
+                    "2:3": "2:3",
+                    "21:9": "21:9"
+                  }
                 },
-                "type": "string"
+                "type": "enum",
+                "enum": {
+                  "1:1": "1:1",
+                  "16:9": "16:9",
+                  "9:16": "9:16",
+                  "4:3": "4:3",
+                  "3:4": "3:4",
+                  "3:2": "3:2",
+                  "2:3": "2:3",
+                  "21:9": "21:9"
+                },
+                "options": [
+                  "1:1",
+                  "16:9",
+                  "9:16",
+                  "4:3",
+                  "3:4",
+                  "3:2",
+                  "2:3",
+                  "21:9"
+                ]
               }
             },
             "type": "optional"
@@ -29522,6 +29551,70 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "width": {
+          "type": "text",
+          "label": "Width (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "height": {
+          "type": "text",
+          "label": "Height (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "outputAspectRatio": {
+          "type": "text",
+          "label": "Aspect ratio",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true

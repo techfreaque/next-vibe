@@ -20,6 +20,15 @@ interface CliWidgetProps {
   fieldName: string;
 }
 
+/** "2048x1152 (16:9)" when the delivered size is known. */
+function sizeLabel(value: ImageGenerationPostResponseOutput): string | null {
+  if (value.width === undefined || value.height === undefined) {
+    return null;
+  }
+  const ratio = value.outputAspectRatio ? ` (${value.outputAspectRatio})` : "";
+  return `${String(value.width)}x${String(value.height)}${ratio}`;
+}
+
 function renderCli(value: ImageGenerationPostResponseOutput): string {
   const lines: string[] = [];
   lines.push(`${chalk.green("✓")} ${chalk.bold("Image generated")}`);
@@ -27,6 +36,10 @@ function renderCli(value: ImageGenerationPostResponseOutput): string {
   lines.push(
     `${chalk.dim("URL")}      ${chalk.cyan(resolveMediaSrc(value.imageUrl, { absolute: true }))}`,
   );
+  const size = sizeLabel(value);
+  if (size) {
+    lines.push(`${chalk.dim("Size")}     ${size}`);
+  }
   lines.push(
     `${chalk.dim("Credits")}  ${chalk.yellow(String(value.creditCost))}`,
   );
@@ -34,9 +47,11 @@ function renderCli(value: ImageGenerationPostResponseOutput): string {
 }
 
 function renderMcp(value: ImageGenerationPostResponseOutput): string {
+  const size = sizeLabel(value);
   return [
     "Image generated successfully.",
     `URL: ${resolveMediaSrc(value.imageUrl, { absolute: true })}`,
+    ...(size ? [`Size: ${size}`] : []),
     `Credits used: ${String(value.creditCost)}`,
   ].join("\n");
 }

@@ -444,13 +444,15 @@ export class ChatSettingsRepository {
           data.dreamerSchedule !== undefined ||
           data.dreamerPrompt !== undefined)
       ) {
-        void ensureDreamTask(userId, {
+        // Awaited so two quick saves (on, then off) sync the task in order;
+        // a failed sync is logged, never fails the settings save.
+        await ensureDreamTask(userId, {
           dreamerEnabled: savedRow.dreamerEnabled ?? false,
           dreamerFavoriteId: savedRow.dreamerFavoriteId ?? null,
           dreamerSchedule: savedRow.dreamerSchedule ?? undefined,
           dreamerPrompt: savedRow.dreamerPrompt ?? null,
-        }).catch(() => {
-          // Best-effort - don't fail settings save if task sync fails
+        }).catch((syncError: Error) => {
+          logger.error("Failed to sync dreaming task", parseError(syncError));
         });
       }
       if (
@@ -460,13 +462,15 @@ export class ChatSettingsRepository {
           data.autopilotSchedule !== undefined ||
           data.autopilotPrompt !== undefined)
       ) {
-        void ensureAutopilotTask(userId, {
+        // Awaited so two quick saves (on, then off) sync the task in order;
+        // a failed sync is logged, never fails the settings save.
+        await ensureAutopilotTask(userId, {
           autopilotEnabled: savedRow.autopilotEnabled ?? false,
           autopilotFavoriteId: savedRow.autopilotFavoriteId ?? null,
           autopilotSchedule: savedRow.autopilotSchedule ?? undefined,
           autopilotPrompt: savedRow.autopilotPrompt ?? null,
-        }).catch(() => {
-          // Best-effort - don't fail settings save if task sync fails
+        }).catch((syncError: Error) => {
+          logger.error("Failed to sync autopilot task", parseError(syncError));
         });
       }
       if (
@@ -475,12 +479,14 @@ export class ChatSettingsRepository {
           data.mamaSchedule !== undefined ||
           data.mamaPrompt !== undefined)
       ) {
-        void ensureMamaTask(userId, {
+        // Awaited so two quick saves (on, then off) sync the task in order;
+        // a failed sync is logged, never fails the settings save.
+        await ensureMamaTask(userId, {
           mamaEnabled: savedRow.mamaEnabled ?? false,
           mamaSchedule: savedRow.mamaSchedule ?? undefined,
           mamaPrompt: savedRow.mamaPrompt ?? null,
-        }).catch(() => {
-          // Best-effort - don't fail settings save if task sync fails
+        }).catch((syncError: Error) => {
+          logger.error("Failed to sync mama task", parseError(syncError));
         });
       }
 

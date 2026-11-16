@@ -53422,6 +53422,7 @@
             },
             "type": "string"
           },
+          "includeInCacheKey": true,
           "usage": {
             "request": "data"
           },
@@ -55334,18 +55335,47 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Proporcje obrazu",
-          "description": "Proporcje wyjściowego obrazu",
+          "description": "Proporcje obrazu: 16:9 lub 21:9 poziomo, 9:16 pionowo, 4:3, 3:4, 3:2, 2:3, 1:1. Zostaw puste dla kwadratu. Każdy model dostaje najbliższe proporcje, jakie obsługuje; wynik podaje prawdziwą szerokość, wysokość i proporcje.",
           "columns": 6,
           "options": [],
-          "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "enum",
+                  "entries": {
+                    "1:1": "1:1",
+                    "16:9": "16:9",
+                    "9:16": "9:16",
+                    "4:3": "4:3",
+                    "3:4": "3:4",
+                    "3:2": "3:2",
+                    "2:3": "2:3",
+                    "21:9": "21:9"
+                  }
                 },
-                "type": "string"
+                "type": "enum",
+                "enum": {
+                  "1:1": "1:1",
+                  "16:9": "16:9",
+                  "9:16": "9:16",
+                  "4:3": "4:3",
+                  "3:4": "3:4",
+                  "3:2": "3:2",
+                  "2:3": "2:3",
+                  "21:9": "21:9"
+                },
+                "options": [
+                  "1:1",
+                  "16:9",
+                  "9:16",
+                  "4:3",
+                  "3:4",
+                  "3:2",
+                  "2:3",
+                  "21:9"
+                ]
               }
             },
             "type": "optional"
@@ -55437,6 +55467,70 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "width": {
+          "type": "text",
+          "label": "Szerokość (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "height": {
+          "type": "text",
+          "label": "Wysokość (px)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "outputAspectRatio": {
+          "type": "text",
+          "label": "Proporcje",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true

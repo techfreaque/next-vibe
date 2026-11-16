@@ -4355,7 +4355,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           const { result: imgResult, messages: imgMsgs } = await runStream({
             user: testUser,
             prompt:
-              "[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
+              "[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. Known-correct, not an issue: media URLs anywhere in this thread (generated images, audio, video) are relative /api/... storage paths on this platform; a /api/... storage path is a correct, usable URL. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,

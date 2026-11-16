@@ -18,7 +18,11 @@ import {
   resolveChatModelForUser,
 } from "../../ai-stream/models";
 import type { AgentEnvAvailability } from "../../env-availability";
+import { getClientAvailability } from "../../env-availability-store";
+import { DEFAULT_SKILLS } from "../../skills/config";
+import { pickSkillVariant } from "../../skills/pick-variant";
 import { ViewMode } from "../enum";
+import { isSkillVariantId, parseSkillId } from "../slugify";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -393,6 +397,42 @@ export class ChatSettingsRepositoryClient {
   }
 
   /**
+   * The chat model a default-skill variant runs for this user, from an id
+   * that names the variant explicitly ("skill__variant", as skillId or as the
+   * favorite id). null when no variant is named (a plain skill id would
+   * silently pick the default variant) or the skill is custom.
+   */
+  static resolveVariantModelId(params: {
+    favoriteId: string;
+    skillId: string | null;
+    user: JwtPayloadType;
+    availability: AgentEnvAvailability;
+  }): ChatModelId | null {
+    const { favoriteId, skillId, user, availability } = params;
+    const composite =
+      skillId && isSkillVariantId(skillId)
+        ? skillId
+        : isSkillVariantId(favoriteId)
+          ? favoriteId
+          : null;
+    if (!composite) {
+      return null;
+    }
+    const { skillId: baseSkillId, variantId } = parseSkillId(composite);
+    const skill = DEFAULT_SKILLS.find((s) => s.id === baseSkillId);
+    if (!skill || !variantId) {
+      return null;
+    }
+    const variant = pickSkillVariant(skill.variants, variantId);
+    if (!variant) {
+      return null;
+    }
+    return (
+      getBestChatModel(variant.modelSelection, user, availability)?.id ?? null
+    );
+  }
+
+  /**
    * Select a favorite and update settings
    * Handles optimistic updates for both settings and favorites list
    */
@@ -404,7 +444,27 @@ export class ChatSettingsRepositoryClient {
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, skillId, logger, locale, user } = params;
+    const { favoriteId, skillId, logger, locale, user } = params;
+    // No model from the caller: take the skill variant's own pick instead of
+    // keeping the previous selectedModel. The stream runs `selectedModel`
+    // (the favorite is only context), so a kept model made the active mode and
+    // the model that answers diverge. Prod 2026-11-14: "Uncensored" was the
+    // active mode, Gemini 4 Argon (the earlier "All-Seeing" pick) answered.
+    const modelId =
+      params.modelId ??
+      ChatSettingsRepositoryClient.resolveVariantModelId({
+        favoriteId,
+        skillId,
+        user,
+        availability: getClientAvailability(),
+      });
+    if (!params.modelId) {
+      logger.debug("selectFavorite: model resolved from the skill variant", {
+        favoriteId,
+        skillId,
+        modelId,
+      });
+    }
 
     const { apiClient } = await import("next-vibe/unified-ui/hooks/store");
     const settingsDefinition = await import("./definition");

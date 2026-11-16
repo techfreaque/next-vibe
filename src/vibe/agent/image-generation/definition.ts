@@ -23,6 +23,7 @@ import {
 import { z } from "zod";
 
 import { mediaUrlSchema } from "../chat/storage/storage-url";
+import { IMAGE_ASPECT_RATIOS } from "./aspect-ratio";
 import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   ImageQuality,
@@ -115,6 +116,9 @@ const { POST } = createEndpoint({
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
         schema: z.enum(ImageQuality).default(ImageQuality.STANDARD),
       }),
+      // Visible to the AI: it is the only way to ask for a landscape or
+      // portrait image (size/quality stay UI-only). Each provider gets the
+      // closest ratio it supports; the result reports the real pixel size.
       aspectRatio: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -122,8 +126,7 @@ const { POST } = createEndpoint({
         description: "post.aspectRatio.description",
         columns: 6,
         options: [],
-        hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        schema: z.string().optional(),
+        schema: z.enum(IMAGE_ASPECT_RATIOS).optional(),
       }),
       inputMediaUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -160,6 +163,23 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.creditCost",
         schema: z.number(),
+      }),
+      /** Real pixel size of the delivered file (read from its header). */
+      width: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.width",
+        schema: z.number().optional(),
+      }),
+      height: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.height",
+        schema: z.number().optional(),
+      }),
+      /** Ratio of the delivered file, e.g. "16:9" (or the reduced W:H). */
+      outputAspectRatio: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.outputAspectRatio",
+        schema: z.string().optional(),
       }),
       /** Async job ID for polling (video generation only) */
       jobId: responseField(scopedTranslation, {
@@ -221,11 +241,25 @@ const { POST } = createEndpoint({
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },
+      landscape: {
+        prompt: "A wide cinematic shot of a bakery counter at dawn",
+        aspectRatio: "16:9",
+      },
     },
     responses: {
       default: {
         imageUrl: "https://example.com/generated-image.png",
         creditCost: 4,
+        width: 1024,
+        height: 1024,
+        outputAspectRatio: "1:1",
+      },
+      landscape: {
+        imageUrl: "https://example.com/generated-image-wide.png",
+        creditCost: 4,
+        width: 2048,
+        height: 1152,
+        outputAspectRatio: "16:9",
       },
     },
   },

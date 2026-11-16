@@ -10,6 +10,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { FileText } from "next-vibe/ui/components/icons/FileText";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Markdown } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -17,6 +18,7 @@ import {
   useWidgetDisabled,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -44,6 +46,10 @@ export function CortexReadWidget({
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const isPushed = navigation.canGoBack;
+  const response = useWidgetResponse();
+  // Opened via navigation.push there is no form: show the fetch state here,
+  // otherwise the viewer is an empty panel until (or if) the read lands.
+  const hasError = response?.success === false;
 
   const handleCopy = (): void => {
     if (value?.content) {
@@ -107,6 +113,22 @@ export function CortexReadWidget({
         </Div>
       )}
 
+      {/* Pushed viewer: loading + error states (the form block above owns them otherwise) */}
+      {isPushed && !value && (
+        <Div className="flex flex-col gap-3 px-4 pb-4">
+          {hasError ? (
+            <FormAlertWidget field={{}} />
+          ) : (
+            <Div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <Span className="text-sm">
+                {t("get.submitButton.loadingText")}
+              </Span>
+            </Div>
+          )}
+        </Div>
+      )}
+
       {/* Response */}
       {value && (
         <Div className="flex flex-col gap-3 px-4 pb-4">
@@ -143,7 +165,13 @@ export function CortexReadWidget({
 
           {/* Content - rendered as Markdown */}
           <Div className="prose prose-sm dark:prose-invert max-w-none rounded-lg border bg-muted/20 p-4 overflow-auto max-h-[600px]">
-            <Markdown content={value.content ?? ""} />
+            {value.content ? (
+              <Markdown content={value.content} />
+            ) : (
+              <Span className="text-sm text-muted-foreground italic">
+                {t("get.emptyFile")}
+              </Span>
+            )}
           </Div>
 
           {/* Footer */}

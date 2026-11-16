@@ -65,10 +65,11 @@ const { GET } = createEndpoint({
     firstCliArgKey: "path",
   },
   defaultExpanded: true,
+  // No `queryOptions.enabled: false` here: the read is opened via
+  // navigation.push({ path }) from the list/search widgets, which never
+  // submits, so a disabled query left the viewer blank. An empty path is
+  // already held back by the query's request-validity gate.
   options: {
-    queryOptions: {
-      enabled: false, // Don't auto-fetch — path is required, wait for user to submit
-    },
     formOptions: {
       autoSubmit: false,
     },
@@ -86,6 +87,10 @@ const { GET } = createEndpoint({
         description: "get.fields.path.description" as const,
         columns: 12,
         schema: z.string().min(1),
+        // One read state per file: without this every pushed viewer shares a
+        // single cache entry and shows the previously opened file until the
+        // new read lands.
+        includeInCacheKey: true,
       }),
       maxLines: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

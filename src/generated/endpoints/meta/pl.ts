@@ -20165,11 +20165,25 @@ export const endpointsMeta: EndpointMeta[] = [
           size: "post.size.square1024",
           quality: "post.quality.standard",
         },
+        landscape: {
+          prompt: "A wide cinematic shot of a bakery counter at dawn",
+          aspectRatio: "16:9",
+        },
       },
       responses: {
         default: {
           imageUrl: "https://example.com/generated-image.png",
           creditCost: 4,
+          width: 1024,
+          height: 1024,
+          outputAspectRatio: "1:1",
+        },
+        landscape: {
+          imageUrl: "https://example.com/generated-image-wide.png",
+          creditCost: 4,
+          width: 2048,
+          height: 1152,
+          outputAspectRatio: "16:9",
         },
       },
     },

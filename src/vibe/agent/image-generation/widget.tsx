@@ -35,6 +35,7 @@ import {
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
 import { ModelSelectionType } from "../skills/enum";
+import { isImageAspectRatio } from "./aspect-ratio";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { ImageSize } from "./enum";
@@ -147,7 +148,7 @@ export function ImageGenerationContainer({
       : undefined;
   const supportedAspectRatios =
     resolvedModel && "supportedAspectRatios" in resolvedModel
-      ? resolvedModel.supportedAspectRatios
+      ? resolvedModel.supportedAspectRatios?.filter(isImageAspectRatio)
       : undefined;
 
   const showSizeOptions =

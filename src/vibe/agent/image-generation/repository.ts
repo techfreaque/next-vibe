@@ -52,6 +52,12 @@ import {
 import { NO_SKILL_ID } from "../skills/constants";
 import { buildFavoriteConfig } from "../skills/favorites/repository";
 import {
+  aspectRatioToImageSize,
+  describeAspectRatio,
+  parseAspectRatio,
+  snapAspectRatio,
+} from "./aspect-ratio";
+import {
   type ImageGenerationPostRequestInput,
   type ImageGenerationPostRequestOutput,
   type ImageGenerationPostResponseOutput,
@@ -63,6 +69,8 @@ import {
   type ImageSizeValue,
 } from "./enum";
 import type { ImageGenerationT } from "./i18n";
+import { type ImageDimensions, readImageDimensions } from "./image-dimensions";
+import { imageGenerationKey, runOncePerKey } from "./in-flight";
 import {
   filterImageGenModels,
   getImageGenModelById,
@@ -70,6 +78,10 @@ import {
   imageGenModelOptions,
   type ImageGenModelSelection,
 } from "./models";
+import {
+  classifyImageProviderError,
+  ImageProviderFailureKind,
+} from "./provider-error";
 import { generateWithFalAi } from "./providers/fal-ai";
 import { generateImageWithModelsLab } from "./providers/modelslab";
 import { generateWithOpenAI } from "./providers/openai";
@@ -121,11 +133,135 @@ const HEADLESS_QUALITY_HINT: Record<typeof ImageQualityValue, string> = {
   [ImageQuality.HD]: "high detail",
 };
 
+/**
+ * The size facts of a delivered file for the tool result. The AI must
+ * describe the image by these, never by the ratio it asked for.
+ */
+function deliveredSize(dimensions: ImageDimensions | null): {
+  width?: number;
+  height?: number;
+  outputAspectRatio?: string;
+} {
+  if (!dimensions) {
+    return {};
+  }
+  return {
+    width: dimensions.width,
+    height: dimensions.height,
+    outputAspectRatio: describeAspectRatio(dimensions.width, dimensions.height),
+  };
+}
+
+/**
+ * Log when a provider delivered a clearly different ratio than requested
+ * (more than ~15 % off): that provider ignores or caps the ratio parameter.
+ */
+function logRatioMismatch(
+  logger: EndpointLogger,
+  model: string,
+  requested: string | undefined,
+  dimensions: ImageDimensions | null,
+): void {
+  if (!requested || !dimensions) {
+    return;
+  }
+  const wanted = parseAspectRatio(requested);
+  if (wanted === null) {
+    return;
+  }
+  const got = dimensions.width / dimensions.height;
+  if (Math.abs(Math.log(got) - Math.log(wanted)) > 0.15) {
+    logger.warn("[ImageGen] Provider delivered a different aspect ratio", {
+      model,
+      requested,
+      width: dimensions.width,
+      height: dimensions.height,
+    });
+  }
+}
+
+/**
+ * A provider failure the user can act on: a content-filter refusal reads
+ * differently from an outage (both used to say "Image generation failed").
+ */
+function providerFailure(
+  message: string,
+  t: ImageGenerationT,
+): ResponseType<never> {
+  const kind = classifyImageProviderError(message);
+  if (kind === ImageProviderFailureKind.CONTENT_POLICY) {
+    return fail({
+      message: t("post.errors.contentRejected", { error: message }),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
+  if (kind === ImageProviderFailureKind.OUTAGE) {
+    return fail({
+      message: t("post.errors.providerOutage", { error: message }),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
+  return fail({
+    // Carry the provider's reason: a bare "failed" left users and the AI
+    // guessing.
+    message: t("post.errors.generationFailedWithReason", { error: message }),
+    errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+  });
+}
+
 export class ImageGenerationRepository {
   /**
-   * Generate an image from a text prompt
+   * Generate an image from a text prompt. An identical request that arrives
+   * while the same one is still generating in this thread joins it instead
+   * of paying for a second copy (see in-flight.ts).
    */
   static async generateImage(
+    data: ImageGenerationPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: ImageGenerationT,
+    toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
+  ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
+    const key = data.model
+      ? imageGenerationKey({
+          threadId: toolExecutionContext.threadId,
+          callerId: user.isPublic ? user.leadId : user.id,
+          model: data.model,
+          prompt: data.prompt,
+          size: data.size,
+          aspectRatio: data.aspectRatio,
+          inputMediaUrl: data.inputMediaUrl ?? undefined,
+        })
+      : null;
+    return runOncePerKey(
+      key,
+      () =>
+        ImageGenerationRepository.generateImageOnce(
+          data,
+          user,
+          locale,
+          logger,
+          t,
+          toolExecutionContext,
+          platform,
+        ),
+      (shared) => {
+        if (!shared.success) {
+          return shared;
+        }
+        logger.info("[ImageGen] Joined an identical in-flight generation", {
+          model: data.model,
+          threadId: toolExecutionContext.threadId,
+        });
+        // Same file, billed once: the joining call costs nothing.
+        return success({ ...shared.data, creditCost: 0 });
+      },
+    );
+  }
+
+  private static async generateImageOnce(
     data: ImageGenerationPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -179,16 +315,31 @@ export class ImageGenerationRepository {
 
     const imageModel = modelConfig;
 
+    // A requested ratio picks the size for size-based providers (the AI
+    // cannot set size; the default square would silently win) and is
+    // snapped to the closest ratio the model supports for ratio-based ones.
+    // size is hidden from AI/MCP callers and arrives UNSET there (the schema
+    // default is not applied to hidden fields), so widen before checking.
+    const requestedSize: typeof ImageSizeValue | undefined = data.size;
+    const size =
+      data.aspectRatio &&
+      (requestedSize === undefined || requestedSize === ImageSize.SQUARE_1024)
+        ? aspectRatioToImageSize(data.aspectRatio, imageModel.supportedSizes)
+        : (requestedSize ?? ImageSize.SQUARE_1024);
+    const aspectRatio = data.aspectRatio
+      ? snapAspectRatio(data.aspectRatio, imageModel.supportedAspectRatios)
+      : undefined;
+
     // Validate size against model capabilities
     if (
       imageModel.supportedSizes &&
       imageModel.supportedSizes.length > 0 &&
-      !imageModel.supportedSizes.includes(data.size)
+      !imageModel.supportedSizes.includes(size)
     ) {
       return fail({
         message: t("post.errors.unsupportedSize", {
           model: data.model,
-          size: data.size,
+          size,
           supported: imageModel.supportedSizes.join(", "),
         }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -211,23 +362,6 @@ export class ImageGenerationRepository {
       });
     }
 
-    // Validate aspect ratio against model capabilities
-    if (
-      data.aspectRatio &&
-      imageModel.supportedAspectRatios &&
-      imageModel.supportedAspectRatios.length > 0 &&
-      !imageModel.supportedAspectRatios.includes(data.aspectRatio)
-    ) {
-      return fail({
-        message: t("post.errors.unsupportedAspectRatio", {
-          model: data.model,
-          aspectRatio: data.aspectRatio,
-          supported: imageModel.supportedAspectRatios.join(", "),
-        }),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
-    }
-
     // Reject a reference image on a model that cannot consume one. Passing it
     // to a text-to-image-only model would have the provider silently drop it
     // and return nothing, surfacing as a blank "generation failed". Fail loud
@@ -241,11 +375,7 @@ export class ImageGenerationRepository {
       });
     }
 
-    const creditCost = calculateImageCreditCost(
-      imageModel,
-      data.size,
-      data.quality,
-    );
+    const creditCost = calculateImageCreditCost(imageModel, size, data.quality);
 
     // Check provider availability before attempting generation
     if (!isModelProviderAvailable(imageModel, await getEnvAvailability())) {
@@ -263,6 +393,10 @@ export class ImageGenerationRepository {
       provider: imageModel.apiProvider,
       creditCost,
       promptLength: data.prompt.length,
+      requestedSize: data.size,
+      size,
+      requestedAspectRatio: data.aspectRatio ?? null,
+      aspectRatio: aspectRatio ?? null,
     });
 
     const balanceCheck = await checkMediaBalance(
@@ -309,7 +443,7 @@ export class ImageGenerationRepository {
         generationResult = await generateImageWithModelsLab({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          aspectRatio: data.aspectRatio,
+          aspectRatio,
           inputMediaUrl,
           logger,
           locale,
@@ -318,10 +452,12 @@ export class ImageGenerationRepository {
         break;
 
       case ApiProvider.OPENROUTER:
-        // OpenRouter image models don't support aspect ratio or quality - silently drop them
+        // /api/v1/images takes aspect_ratio (every listed model supports at
+        // least 1:1/3:2/2:3; most take 16:9 and 9:16). Quality has no knob.
         generationResult = await generateWithOpenRouter({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
+          aspectRatio,
           inputMediaUrl,
           logger,
           locale,
@@ -333,7 +469,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithFalAi({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          size: data.size,
+          size,
           inputMediaUrl,
           logger,
           locale,
@@ -345,7 +481,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithOpenAI({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          size: data.size,
+          size,
           quality: data.quality,
           inputMediaUrl,
           logger,
@@ -358,7 +494,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithReplicate({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          size: data.size,
+          size,
           inputMediaUrl,
           logger,
           locale,
@@ -370,7 +506,7 @@ export class ImageGenerationRepository {
         generationResult = await generateWithVenice({
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
-          size: data.size,
+          size,
           inputMediaUrl,
           logger,
           locale,
@@ -414,14 +550,12 @@ export class ImageGenerationRepository {
     }
 
     if (!generationResult.success) {
-      return fail({
-        // Carry the provider's reason (moderation block, model unavailable,
-        // timeout): a bare "failed" left users and the AI guessing.
-        message: t("post.errors.generationFailedWithReason", {
-          error: generationResult.message,
-        }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
+      // The remote instance runs this same repository: its message is
+      // already classified (refusal vs outage), never wrap it twice.
+      if (imageModel.apiProvider === ApiProvider.UNBOTTLED) {
+        return generationResult;
+      }
+      return providerFailure(generationResult.message, t);
     }
 
     let { imageUrl } = generationResult.data;
@@ -439,6 +573,7 @@ export class ImageGenerationRepository {
     const isLeadOwned = toolExecutionContext.threadId
       ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
       : user.isPublic;
+    let dimensions: ImageDimensions | null = null;
     try {
       const imgRes = await fetchImpl(imageUrl);
       if (!imgRes.ok) {
@@ -447,6 +582,7 @@ export class ImageGenerationRepository {
       }
       const arrayBuf = await imgRes.arrayBuffer();
       const imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
+      dimensions = readImageDimensions(imageBuffer);
       // Detect format from magic bytes (providers often return PNG despite .jpg URL)
       const magic = imageBuffer.subarray(0, 4);
       const ext =
@@ -500,7 +636,10 @@ export class ImageGenerationRepository {
     logger.debug("[ImageGen] Image generated successfully", {
       model: data.model,
       creditCost: finalCreditCost,
+      width: dimensions?.width ?? null,
+      height: dimensions?.height ?? null,
     });
+    logRatioMismatch(logger, data.model, aspectRatio, dimensions);
 
     const toolMessageId = toolExecutionContext.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
@@ -536,6 +675,7 @@ export class ImageGenerationRepository {
     return success({
       imageUrl,
       creditCost: finalCreditCost,
+      ...deliveredSize(dimensions),
     });
   }
 
@@ -562,9 +702,12 @@ export class ImageGenerationRepository {
 
     // data.size / data.quality are i18n enum keys ("post.size.square1024") -
     // never put those in the model prompt; map them to plain-language hints.
-    const sizeHint = data.size
-      ? ` Output size: ${HEADLESS_SIZE_HINT[data.size]}.`
-      : "";
+    // A requested ratio replaces the size hint (the AI cannot set size).
+    const sizeHint = data.aspectRatio
+      ? ` Aspect ratio: ${data.aspectRatio}.`
+      : data.size
+        ? ` Output size: ${HEADLESS_SIZE_HINT[data.size]}.`
+        : "";
     const qualityHint = data.quality
       ? ` Quality: ${HEADLESS_QUALITY_HINT[data.quality]}.`
       : "";
@@ -677,12 +820,7 @@ export class ImageGenerationRepository {
       // retry/fall back, rather than treat it as a permanent dead-end.
       const providerError = result.data.providerErrorText;
       if (providerError) {
-        return fail({
-          message: t("post.errors.generationFailedWithReason", {
-            error: providerError,
-          }),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
+        return providerFailure(providerError, t);
       }
       // No image and no provider error: the model answered with text (a
       // refusal, a description of the image) or nothing. Log what it did say
@@ -716,6 +854,7 @@ export class ImageGenerationRepository {
     const isLeadOwned = toolExecutionContext.threadId
       ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
       : user.isPublic;
+    let dimensions: ImageDimensions | null = null;
     {
       try {
         const storage = getStorageAdapter();
@@ -740,6 +879,7 @@ export class ImageGenerationRepository {
           );
           imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
         }
+        dimensions = readImageDimensions(imageBuffer);
         const ext = imageUrl.includes("webp")
           ? "webp"
           : imageUrl.includes("jpeg") || imageUrl.includes("jpg")
@@ -765,7 +905,8 @@ export class ImageGenerationRepository {
     // Credits already deducted per-token by the headless AI stream - report the
     // actual cost so the UI displays it the same way as fixed-price image gen models.
     const creditCost = result.data.totalCreditsDeducted ?? 0;
-    return success({ imageUrl, creditCost });
+    logRatioMismatch(logger, modelConfig.id, data.aspectRatio, dimensions);
+    return success({ imageUrl, creditCost, ...deliveredSize(dimensions) });
   }
 
   /**

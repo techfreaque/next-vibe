@@ -43,7 +43,8 @@ export const translations: typeof enTranslations = {
     },
     aspectRatio: {
       label: "Proporcje obrazu",
-      description: "Proporcje wyjściowego obrazu",
+      description:
+        "Proporcje obrazu: 16:9 lub 21:9 poziomo, 9:16 pionowo, 4:3, 3:4, 3:2, 2:3, 1:1. Zostaw puste dla kwadratu. Każdy model dostaje najbliższe proporcje, jakie obsługuje; wynik podaje prawdziwą szerokość, wysokość i proporcje.",
     },
     inputMediaUrl: {
       label: "URL obrazu referencyjnego",
@@ -65,6 +66,9 @@ export const translations: typeof enTranslations = {
       imageUrl: "URL wygenerowanego obrazu",
       creditCost: "Użyte kredyty",
       jobId: "ID zadania asynchronicznego",
+      width: "Szerokość (px)",
+      height: "Wysokość (px)",
+      outputAspectRatio: "Proporcje",
     },
     errors: {
       referenceUnavailable:
@@ -123,7 +127,12 @@ export const translations: typeof enTranslations = {
       modelNoReferenceImage:
         "Model {{model}} nie przyjmuje obrazów referencyjnych. Wybierz model typu obraz-do-obrazu (taki, którego wejścia obejmują obraz), aby użyć referencji.",
       generationFailed: "Generowanie obrazu nie powiodło się",
-      generationFailedWithReason: "Generowanie obrazu nie powiodło się: {{error}}",
+      generationFailedWithReason:
+        "Generowanie obrazu nie powiodło się: {{error}}",
+      contentRejected:
+        "Filtr treści dostawcy odrzucił ten prompt: {{error}}. To odmowa, nie awaria. Przeredaguj prompt albo wybierz model bez cenzury. Nie pobrano kredytów.",
+      providerOutage:
+        "Dostawca obrazów ma teraz awarię lub jest przeciążony: {{error}}. To awaria, nie odmowa. Spróbuj ponownie za minutę albo wybierz inny model. Nie pobrano kredytów.",
       providerError: "Błąd dostawcy: {{error}}",
       noImageUrl: "Dostawca nie zwrócił URL obrazu",
       noImageGenerated:

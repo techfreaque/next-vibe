@@ -167,7 +167,11 @@ export interface CreateAiStreamParams {
   toolsContext?: ToolExecutionContext;
   /** Parent stream's abort signal - sub-stream aborts when parent does. */
   parentAbortSignal?: AbortSignal;
-  /** Set when a scheduled task runs this stream (log-level decisions only). */
+  /**
+   * Set when a scheduled task runs this stream. Rides the stream's
+   * toolExecutionContext so every billed step lands in the task spend ledger
+   * and the per-run budget cap / turn ceilings can stop it.
+   */
   cronTaskId?: string;
   /**
    * Per-tool confirmation requirements injected by the relay target
@@ -1063,6 +1067,7 @@ export class AiStreamRepository {
       parentAbortSignal,
       parentThreadId,
       fixtureScopeId,
+      cronTaskId,
       resolvedRelayContext,
     });
 

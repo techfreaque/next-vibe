@@ -164,6 +164,8 @@ export const translations: typeof enTranslations = {
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
       folderLink: "Träume-Ordner öffnen",
+      sessionCost:
+        "Pro Sitzung: höchstens {{steps}} Schritte. Stoppt, sobald {{cap}} Credits überschritten sind.",
       runNow: "Jetzt ausführen",
     },
     autopilot: {
@@ -197,6 +199,8 @@ export const translations: typeof enTranslations = {
       lastRun: "Letzter Lauf:",
       neverRun: "Noch nie ausgeführt",
       folderLink: "Autopilot-Ordner öffnen",
+      sessionCost:
+        "Pro Sitzung: höchstens {{steps}} Schritte. Stoppt, sobald {{cap}} Credits überschritten sind.",
       runNow: "Jetzt ausführen",
     },
     mama: {

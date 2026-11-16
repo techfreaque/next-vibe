@@ -28,6 +28,7 @@ export const translations: typeof enTranslations = {
       label: "Lesen",
       loadingText: "Wird gelesen...",
     },
+    emptyFile: "Diese Datei ist leer.",
     response: {
       path: { content: "Pfad" },
       content: { content: "Inhalt" },

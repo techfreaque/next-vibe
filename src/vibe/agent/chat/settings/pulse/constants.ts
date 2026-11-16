@@ -48,3 +48,9 @@ export function generateRandomAutopilotSchedule(timezone: string): string {
   const utcHour = (((localHour - utcOffset) % 24) + 24) % 24;
   return `${minute} ${utcHour} * * 1-5`;
 }
+
+/** Max model steps per Dreaming session (ai-run maxTurns). */
+export const DREAM_MAX_TURNS = 10;
+
+/** Max model steps per Autopilot session (ai-run maxTurns). */
+export const AUTOPILOT_MAX_TURNS = 12;

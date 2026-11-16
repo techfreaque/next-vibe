@@ -142,8 +142,9 @@ describe("Cortex Read E2E", () => {
     expect(res.data.truncated).toBe(false);
     expect(res.data.size).toBe(Buffer.byteLength(content, "utf8"));
     expect(res.data.size).toBeGreaterThan(0);
-    expect(res.data.updatedAt).toBeInstanceOf(Date);
-    expect(Number.isNaN(res.data.updatedAt.getTime())).toBe(false);
+    // The test transport hands back the JSON wire value (ISO string), so
+    // assert it parses to a real date rather than the in-process Date type.
+    expect(Number.isNaN(new Date(res.data.updatedAt).getTime())).toBe(false);
   });
 
   it("truncates output when maxLines is below the line count", async () => {

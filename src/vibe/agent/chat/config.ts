@@ -51,10 +51,17 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
   Record<DefaultFolderId, readonly string[]>
 > = {
   [DefaultFolderId.INCOGNITO]: [
-    // Task infrastructure - results can't route back to localStorage-only threads
+    // Task infrastructure - results can't route back to localStorage-only threads.
+    // execute-tool itself stays ALLOWED: it is the only way the AI reaches
+    // discoverable tools (generate_image, rename-thread, ...) and is loaded in
+    // the default incognito tool set. Denying it made every such call fail
+    // with "Forbidden" (prod 2026-11-14/16: "incognito refuses image
+    // generation"), while the same tools stayed callable by name through the
+    // fallback path, so the deny protected nothing. The async modes it could
+    // open are blocked by FOLDER_BLOCKED_CALLBACK_MODES, and every denied
+    // TARGET below is still refused by the execute-tool permission guard.
     "coding-agent",
     CORTEX_EXEC_ALIAS,
-    EXECUTE_TOOL_ALIAS,
     "await-task",
     "complete-task",
     "cron-create",

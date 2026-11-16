@@ -20137,7 +20137,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Generate Image",
     titleShort: "Generate Image",
     description:
-      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Pass aspectRatio (e.g. 16:9) for landscape or portrait output. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl plus the real width, height and outputAspectRatio of the file.",
     icon: "image",
     category: "ai",
     subCategory: "Generation",
@@ -20154,11 +20154,25 @@ export const endpointsMeta: EndpointMeta[] = [
           size: "post.size.square1024",
           quality: "post.quality.standard",
         },
+        landscape: {
+          prompt: "A wide cinematic shot of a bakery counter at dawn",
+          aspectRatio: "16:9",
+        },
       },
       responses: {
         default: {
           imageUrl: "https://example.com/generated-image.png",
           creditCost: 4,
+          width: 1024,
+          height: 1024,
+          outputAspectRatio: "1:1",
+        },
+        landscape: {
+          imageUrl: "https://example.com/generated-image-wide.png",
+          creditCost: 4,
+          width: 2048,
+          height: 1152,
+          outputAspectRatio: "16:9",
         },
       },
     },
