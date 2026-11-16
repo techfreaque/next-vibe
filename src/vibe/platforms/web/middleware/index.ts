@@ -12,6 +12,7 @@ import {
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
 
+import { repairMangledStorageUrl } from "../../../agent/chat/storage/storage-url";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { Environment } from "../../../env/env-util";
@@ -107,6 +108,18 @@ export async function middleware(
   const publicOrigin = forwardedHost
     ? `${forwardedProto}://${forwardedHost}`
     : new URL(request.url).origin;
+
+  // Models mangle chat-file links by dropping the /files segment
+  // (/threads/{threadId}/{fileId}.mp3). Send those to the real file route,
+  // which runs the existing/permission checks itself (strict pattern: UUIDs
+  // + media extension, so no real thread route can match).
+  const repairedFilePath = repairMangledStorageUrl(path);
+  if (repairedFilePath) {
+    return NextResponseClass.redirect(
+      new URL(`${repairedFilePath}${request.nextUrl.search}`, publicOrigin),
+      308,
+    );
+  }
 
   // Skip for static files — Next.js serves these directly.
   // For bare-root paths with a file extension (e.g. /favicon.png, /logo.jpg) that

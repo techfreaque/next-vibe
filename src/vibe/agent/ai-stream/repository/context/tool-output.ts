@@ -11,6 +11,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { mediaMarkdownLink } from "../../../chat/storage/storage-url";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
 import type { Modality } from "../../../models/enum";
@@ -355,6 +356,14 @@ export async function buildToolResultOutput(
 
     const modelCanSee = toolResultCarriesMedia(modelConfig, modality);
 
+    // Ready-to-paste link for own storage files (models that rebuild it from
+    // the bare URL drop the /files segment). Undefined for anything else.
+    const markdownLink =
+      fileUrl === undefined || isInlineData
+        ? null
+        : mediaMarkdownLink(fileUrl, modality);
+    const markdownLinkField = markdownLink ? { markdownLink } : {};
+
     if (modelCanSee && fileUrl) {
       // Model supports this modality - fetch + base64 encode the file so the model
       // can actually see the generated media (passing a URL string as JSON doesn't
@@ -385,6 +394,12 @@ export async function buildToolResultOutput(
           const citeUrl = safeUrl(mediaResult.imageUrl ?? mediaResult.file);
           if (citeUrl) {
             contentParts.push({ type: "text", text: `imageUrl: ${citeUrl}` });
+            if (markdownLink) {
+              contentParts.push({
+                type: "text",
+                text: `markdownLink: ${markdownLink}`,
+              });
+            }
           }
           if (mediaResult.text) {
             contentParts.push({ type: "text", text: mediaResult.text });
@@ -403,6 +418,7 @@ export async function buildToolResultOutput(
         value: {
           ...mediaResultExtraFields(effectiveResult),
           file: safeUrl(fileUrl) ?? null,
+          ...markdownLinkField,
           text: mediaResult.text ?? null,
           mediaType: mediaResult.mediaType ?? null,
           creditCost: mediaResult.creditCost ?? null,
@@ -430,6 +446,7 @@ export async function buildToolResultOutput(
           !mediaResult.imageUrl &&
           !mediaResult.videoUrl &&
           !mediaResult.audioUrl && { file: safeUrl(fileUrl) }),
+        ...markdownLinkField,
         text: mediaResult.text ?? null,
         mediaType: mediaResult.mediaType ?? null,
         creditCost: mediaResult.creditCost ?? null,

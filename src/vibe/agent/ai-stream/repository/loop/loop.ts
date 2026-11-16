@@ -45,6 +45,7 @@ import {
   MAX_TOOL_CALLS,
   StreamAbortError,
 } from "../core/constants";
+import type { InlineThinkEvent } from "../core/inline-think-splitter";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { isTransientErrorText } from "../errors/transient";
 import {
@@ -415,6 +416,15 @@ export class StreamLoop implements StreamLoopState {
       toolExecutionContext,
     } = this.p;
 
+    // A text block ended: release a held-back partial "<think" as content.
+    // Any other non-text part ends the text run: also close an inline block
+    // that the model never closed, before the part is handled.
+    if (part.type === "text-end") {
+      await this.applyInlineThinkEvents(ctx.inlineThink.flushBuffer());
+    } else if (part.type !== "text-delta" && part.type !== "text-start") {
+      await this.applyInlineThinkEvents(ctx.inlineThink.flush());
+    }
+
     if (part.type === "file") {
       await this.onFilePart(part.file);
       return { shouldAbort: false };
@@ -444,69 +454,13 @@ export class StreamLoop implements StreamLoopState {
       if (ctx.stepHasToolsAwaitingConfirmation) {
         return { shouldAbort: false };
       }
-      const textContent = part.text;
-      const result = await this.onTextDelta(textContent);
-      ctx.currentAssistantMessageId = result.currentAssistantMessageId;
-      ctx.currentAssistantContent = result.currentAssistantContent;
-      if (result.currentAssistantMessageId) {
-        ctx.lastAssistantMessageId = result.currentAssistantMessageId;
-      }
-
-      if (result.wasCreated) {
-        // If pendingQueueParentId was the parent for this new message, the chain
-        // has advanced past the compacting point - advanceTip clears it so
-        // finish-step and onToolCall don't re-apply the compacting ID as parent.
-        this.advanceTip(result.currentAssistantMessageId, {
-          clearPendingQueueParent: true,
-        });
-        // Record time-to-first-token on first message creation
-        if (ctx.streamStartTime === null) {
-          ctx.streamStartTime = Date.now();
-        }
-        // Reset estimated token counter for the new message
-        ctx.lastEstimatedTokenEmitLength = 0;
-      }
-
-      // Emit estimated token count every ~200 chars of accumulated content.
-      // SSE-only, no DB write. Corrected by real counts from onStepFinish.
-      if (ctx.currentAssistantMessageId) {
-        const contentLength = ctx.currentAssistantContent.length;
-        if (contentLength - ctx.lastEstimatedTokenEmitLength >= 200) {
-          ctx.lastEstimatedTokenEmitLength = contentLength;
-          ctx.dbWriter.emitEstimatedTokens(
-            ctx.currentAssistantMessageId,
-            contentLength,
-            ctx.estimatedInputTokens || undefined,
-          );
-        }
-      }
-
+      // Inline <think>…</think> in answer text becomes reasoning, for any model.
+      await this.applyInlineThinkEvents(ctx.inlineThink.push(part.text));
       return { shouldAbort: false };
     }
 
     if (part.type === "reasoning-start") {
-      ctx.isInReasoningBlock = true;
-      const result = await this.onReasoningStart();
-      ctx.currentAssistantMessageId = result.currentAssistantMessageId;
-      ctx.currentAssistantContent = result.currentAssistantContent;
-      if (result.currentAssistantMessageId) {
-        ctx.lastAssistantMessageId = result.currentAssistantMessageId;
-      }
-
-      if (result.wasCreated) {
-        // Chain advanced past the compacting point — clear deferred override.
-        this.advanceTip(result.currentAssistantMessageId, {
-          clearPendingQueueParent: true,
-        });
-        // Notify TTS handler of the new message ID so subsequent text-deltas
-        // can be processed. Reasoning content is inside <think> tags and will
-        // be automatically skipped by ttsHandler.addDelta(), but the messageId
-        // must be set so text-deltas that follow reasoning are not silently dropped.
-        if (ttsHandler) {
-          ttsHandler.setMessageId(result.currentAssistantMessageId);
-        }
-      }
-
+      await this.handleReasoningStart();
       return { shouldAbort: false };
     }
 
@@ -521,11 +475,7 @@ export class StreamLoop implements StreamLoopState {
     }
 
     if (part.type === "reasoning-end") {
-      if (ctx.isInReasoningBlock) {
-        ctx.currentAssistantContent = this.onReasoningEnd();
-        ctx.isInReasoningBlock = false;
-      }
-
+      this.handleReasoningEnd();
       return { shouldAbort: false };
     }
 
@@ -896,6 +846,103 @@ export class StreamLoop implements StreamLoopState {
     opts: { clearPendingQueueParent: boolean },
   ): void {
     return advanceTip(this, messageId, opts);
+  }
+
+  /** Dispatch the events the inline <think> splitter resolved. */
+  private async applyInlineThinkEvents(
+    events: InlineThinkEvent[],
+  ): Promise<void> {
+    for (const event of events) {
+      if (event.type === "text") {
+        await this.handleTextDelta(event.text);
+      } else if (event.type === "reasoning-start") {
+        await this.handleReasoningStart();
+      } else if (event.type === "reasoning-delta") {
+        this.p.ctx.currentAssistantContent = this.onReasoningDelta(event.text);
+      } else {
+        this.handleReasoningEnd();
+      }
+    }
+  }
+
+  /** Answer text: create/extend the assistant message, track TTFT and the
+   *  estimated token counter. */
+  private async handleTextDelta(textContent: string): Promise<void> {
+    const { ctx } = this.p;
+    const result = await this.onTextDelta(textContent);
+    ctx.currentAssistantMessageId = result.currentAssistantMessageId;
+    ctx.currentAssistantContent = result.currentAssistantContent;
+    if (result.currentAssistantMessageId) {
+      ctx.lastAssistantMessageId = result.currentAssistantMessageId;
+    }
+
+    if (result.wasCreated) {
+      // If pendingQueueParentId was the parent for this new message, the chain
+      // has advanced past the compacting point - advanceTip clears it so
+      // finish-step and onToolCall don't re-apply the compacting ID as parent.
+      this.advanceTip(result.currentAssistantMessageId, {
+        clearPendingQueueParent: true,
+      });
+      // Record time-to-first-token on first message creation
+      if (ctx.streamStartTime === null) {
+        ctx.streamStartTime = Date.now();
+      }
+      // Reset estimated token counter for the new message
+      ctx.lastEstimatedTokenEmitLength = 0;
+    }
+
+    // Emit estimated token count every ~200 chars of accumulated content.
+    // SSE-only, no DB write. Corrected by real counts from onStepFinish.
+    if (ctx.currentAssistantMessageId) {
+      const contentLength = ctx.currentAssistantContent.length;
+      if (contentLength - ctx.lastEstimatedTokenEmitLength >= 200) {
+        ctx.lastEstimatedTokenEmitLength = contentLength;
+        ctx.dbWriter.emitEstimatedTokens(
+          ctx.currentAssistantMessageId,
+          contentLength,
+          ctx.estimatedInputTokens || undefined,
+        );
+      }
+    }
+  }
+
+  /** Open a reasoning block (provider reasoning-start or inline <think>). */
+  private async handleReasoningStart(): Promise<void> {
+    const { ctx, ttsHandler } = this.p;
+    if (ctx.isInReasoningBlock) {
+      // Already open (e.g. inline <think> inside provider reasoning): one block.
+      return;
+    }
+    ctx.isInReasoningBlock = true;
+    const result = await this.onReasoningStart();
+    ctx.currentAssistantMessageId = result.currentAssistantMessageId;
+    ctx.currentAssistantContent = result.currentAssistantContent;
+    if (result.currentAssistantMessageId) {
+      ctx.lastAssistantMessageId = result.currentAssistantMessageId;
+    }
+
+    if (result.wasCreated) {
+      // Chain advanced past the compacting point — clear deferred override.
+      this.advanceTip(result.currentAssistantMessageId, {
+        clearPendingQueueParent: true,
+      });
+      // Notify TTS handler of the new message ID so subsequent text-deltas
+      // can be processed. Reasoning content is inside <think> tags and will
+      // be automatically skipped by ttsHandler.addDelta(), but the messageId
+      // must be set so text-deltas that follow reasoning are not silently dropped.
+      if (ttsHandler) {
+        ttsHandler.setMessageId(result.currentAssistantMessageId);
+      }
+    }
+  }
+
+  /** Close the open reasoning block, if any. */
+  private handleReasoningEnd(): void {
+    const { ctx } = this.p;
+    if (ctx.isInReasoningBlock) {
+      ctx.currentAssistantContent = this.onReasoningEnd();
+      ctx.isInReasoningBlock = false;
+    }
   }
 
   /** Handle a text-delta part: create the assistant message on first delta,

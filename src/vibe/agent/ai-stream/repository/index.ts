@@ -338,10 +338,6 @@ export class AiStreamRepository {
   }
 
   /**
-   * Strip <think>...</think> reasoning tags from AI message content.
-   * Handles both complete tags and incomplete (streaming-cut) trailing tags.
-   */
-  /**
    * Execute a single pre-call and return its result.
    * Args are passed as flat merged data — execute-tool auto-splits
    * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.

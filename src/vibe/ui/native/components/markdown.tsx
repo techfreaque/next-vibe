@@ -62,6 +62,15 @@ export const CodeSnippet = memo(function CodeSnippet({
   );
 });
 
+/** Reasoning (<think> blocks, unclosed or orphaned tags) is not answer text. */
+function stripThinking(content: string): string {
+  return content
+    .replaceAll(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/<think>[\s\S]*$/i, "")
+    .replaceAll(/<\/think>/gi, "")
+    .trim();
+}
+
 export const Markdown = memo(function Markdown({
   className,
   style,
@@ -76,7 +85,9 @@ export const Markdown = memo(function Markdown({
         className: cn("flex flex-col gap-2", className),
       })}
     >
-      <RNText className="text-sm text-foreground">{content}</RNText>
+      <RNText className="text-sm text-foreground">
+        {stripThinking(content)}
+      </RNText>
     </View>
   );
 });

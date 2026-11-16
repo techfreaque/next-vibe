@@ -30,6 +30,7 @@ import { ThreadStreamingState } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { WakeUpPayload } from "../revival/revival";
 import { AbortReason, StreamAbortError } from "./constants";
+import { InlineThinkSplitter } from "./inline-think-splitter";
 import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
 import { registerOwnedRun, releaseOwnedRun } from "./run-heartbeat";
 import {
@@ -77,6 +78,9 @@ export class ToolExecutionContextImpl {
 
   // Reasoning state
   isInReasoningBlock = false;
+  /** Splits inline `<think>…</think>` markup in text deltas into reasoning
+   *  events (models that stream reasoning inside the answer text). */
+  readonly inlineThink = new InlineThinkSplitter();
   /** Provider-issued reasoning replay data for the CURRENT reasoning block
    *  (e.g. Anthropic's signature_delta / redacted_thinking, carried on a
    *  reasoning-delta part's providerMetadata, not on reasoning-end). Reset

@@ -13,6 +13,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatMessage } from "../../../chat/db";
 import { type ChatModelId, getChatModelById } from "../../models";
+import {
+  type InlineThinkEvent,
+  InlineThinkSplitter,
+} from "../core/inline-think-splitter";
 import type { ToolExecutionContextImpl } from "../core/stream";
 import { TokenAccumulator } from "../loop/token-accumulator";
 
@@ -128,10 +132,21 @@ export async function runCompactingLLM(params: {
       ]),
     });
 
+    // Inline <think>…</think> reasoning never belongs in the summary.
+    const inlineThink = new InlineThinkSplitter();
+    const appendSummary = (events: InlineThinkEvent[]): void => {
+      for (const event of events) {
+        if (event.type === "text") {
+          compactedSummary += event.text;
+          ctx.dbWriter.emitCompactingDelta(compactingMessageId, event.text);
+        }
+      }
+    };
     for await (const part of streamResult.fullStream) {
       if (part.type === "text-delta") {
-        compactedSummary += part.text;
-        ctx.dbWriter.emitCompactingDelta(compactingMessageId, part.text);
+        appendSummary(inlineThink.push(part.text));
+      } else if (part.type !== "text-start") {
+        appendSummary(inlineThink.flush());
       }
 
       if (part.type === "finish") {

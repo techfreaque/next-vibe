@@ -17,6 +17,7 @@ import {
   FOLDER_ALLOWS_REMOTE_TOOLS,
   FOLDER_BLOCKED_CALLBACK_MODES,
 } from "../../agent/chat/config";
+import { withMediaMarkdownLink } from "../../agent/chat/storage/storage-url";
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -462,7 +463,9 @@ function createToolFromEndpoint(
           return result;
         }
 
-        return result.data as WidgetData;
+        // Media results get a ready-to-paste markdown link: models rebuilding
+        // the link from the bare URL drop the /files segment.
+        return withMediaMarkdownLink(result.data as WidgetData);
       };
 
       // If no abort signal, just run inline

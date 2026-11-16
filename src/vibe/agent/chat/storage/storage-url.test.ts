@@ -13,10 +13,15 @@ import { describe, expect, it } from "bun:test";
 import {
   buildStorageFilePath,
   isStorageUrl,
+  mediaMarkdownLink,
   mediaUrlSchema,
+  parseStorageFileRef,
+  repairMangledStorageUrl,
+  repairMangledStorageUrlsInText,
   rewriteStorageUrlsInText,
   STORAGE_FILES_ROUTE,
   toPortableStorageUrl,
+  withMediaMarkdownLink,
 } from "./storage-url";
 
 const THREAD = "b992b758-ab44-4a39-9ae1-f81d4f6a69fb";
@@ -157,5 +162,76 @@ describe("mediaUrlSchema", () => {
 
   it("rejects garbage", () => {
     expect(mediaUrlSchema.safeParse("not a url").success).toBe(false);
+  });
+});
+
+/**
+ * Models mangled media links by dropping `/files`
+ * (`/threads/{threadId}/{fileId}.mp3`): users got broken links.
+ */
+describe("mangled storage URLs (/files dropped)", () => {
+  const AUDIO = "5f0c2a8e-1b7d-4c3e-9a6f-2d8b1e4c7a90.mp3";
+  const MANGLED = `/api/de-DE/vibe/agent/chat/threads/${THREAD}/${AUDIO}`;
+  const CANONICAL = `/api/en-GLOBAL/vibe/agent/chat/threads/files/${THREAD}/${AUDIO}`;
+
+  it("maps the mangled path to the canonical file route", () => {
+    expect(repairMangledStorageUrl(MANGLED)).toBe(CANONICAL);
+    expect(repairMangledStorageUrl(`https://unbottled.ai${MANGLED}?x=1`)).toBe(
+      `${CANONICAL}?x=1`,
+    );
+    expect(toPortableStorageUrl(MANGLED)).toBe(CANONICAL);
+    expect(isStorageUrl(MANGLED)).toBe(true);
+    expect(parseStorageFileRef(MANGLED)).toEqual({
+      threadId: THREAD,
+      filename: AUDIO,
+    });
+  });
+
+  it("never matches real thread routes or non-media files", () => {
+    for (const path of [
+      CANONICAL,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/messages`,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/permissions`,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/notes.txt`,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/not-a-uuid.mp3`,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/${AUDIO}x`,
+      `/api/en-US/vibe/agent/chat/threads/${THREAD}/${AUDIO}/more`,
+    ]) {
+      expect(repairMangledStorageUrl(path)).toBeNull();
+    }
+  });
+
+  it("repairs only mangled links inside answer text", () => {
+    const text = `Listen: [song](${MANGLED}) or ${CANONICAL} and /api/en-US/vibe/agent/chat/threads/${THREAD}/messages`;
+    expect(repairMangledStorageUrlsInText(text)).toBe(
+      `Listen: [song](${CANONICAL}) or ${CANONICAL} and /api/en-US/vibe/agent/chat/threads/${THREAD}/messages`,
+    );
+  });
+});
+
+describe("withMediaMarkdownLink", () => {
+  it("adds a paste-ready link next to an own media URL", () => {
+    const direct: Record<string, string | number> = withMediaMarkdownLink({
+      audioUrl: PORTABLE,
+      creditCost: 1,
+    });
+    expect(direct).toEqual({
+      audioUrl: PORTABLE,
+      creditCost: 1,
+      markdownLink: `[audio](${PORTABLE})`,
+    });
+    const wrapped: { result: Record<string, string> } = withMediaMarkdownLink({
+      result: { imageUrl: PORTABLE },
+    });
+    expect(wrapped).toEqual({
+      result: { imageUrl: PORTABLE, markdownLink: `[image](${PORTABLE})` },
+    });
+  });
+
+  it("leaves third-party URLs and other results alone", () => {
+    const external = { imageUrl: "https://example.com/a.png" };
+    expect(withMediaMarkdownLink(external)).toBe(external);
+    expect(withMediaMarkdownLink("text")).toBe("text");
+    expect(mediaMarkdownLink("data:image/png;base64,xx", "image")).toBeNull();
   });
 });

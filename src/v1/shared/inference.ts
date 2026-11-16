@@ -24,6 +24,11 @@ import {
 } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { ProviderFactory } from "next-vibe/agent/ai-stream/repository/core/infra";
+import {
+  type InlineThinkEvent,
+  InlineThinkSplitter,
+  splitInlineThink,
+} from "next-vibe/agent/ai-stream/repository/core/inline-think-splitter";
 import { readImageOutputTokens } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { createFixtureDownload } from "next-vibe/agent/shared/fixture-download";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
@@ -257,13 +262,39 @@ function buildCall(request: InferenceRequest): {
   };
 }
 
+/** Inline-<think> splitter events as /v1 stream events (start is implicit). */
+function* inlineEvents(
+  events: InlineThinkEvent[],
+): Generator<InferenceStreamEvent> {
+  for (const event of events) {
+    if (event.type === "text") {
+      yield { type: "text", text: event.text };
+    } else if (event.type === "reasoning-delta") {
+      yield { type: "reasoning", text: event.text };
+    } else if (event.type === "reasoning-end") {
+      yield { type: "reasoning-end", replay: undefined };
+    }
+  }
+}
+
 export const aiSdkRunner: InferenceRunner = {
   async generate(request) {
     const result = await generateText(buildCall(request));
     const parts: InferenceOutputPart[] = [];
     for (const part of result.content) {
       if (part.type === "text" && part.text !== "") {
-        parts.push({ type: "text", text: part.text });
+        // Inline <think>…</think> in the text is reasoning, not answer text.
+        const split = splitInlineThink(part.text);
+        if (split.reasoning !== "") {
+          parts.push({
+            type: "reasoning",
+            text: split.reasoning,
+            replay: undefined,
+          });
+        }
+        if (split.text !== "") {
+          parts.push({ type: "text", text: split.text });
+        }
       } else if (part.type === "reasoning") {
         parts.push({
           type: "reasoning",
@@ -280,7 +311,9 @@ export const aiSdkRunner: InferenceRunner = {
       }
     }
     return {
-      text: result.text,
+      text: parts
+        .map((part) => (part.type === "text" ? part.text : ""))
+        .join(""),
       toolCalls: result.toolCalls.map((call) => ({
         id: call.toolCallId,
         name: call.toolName,
@@ -302,9 +335,16 @@ export const aiSdkRunner: InferenceRunner = {
     // Client tools have no execute, so a call is one step: its finish-step
     // metadata holds the real upstream cost billed for the call.
     let stepMetadata: ProviderMetadata | undefined;
+    // Inline <think>…</think> in text deltas is reasoning, not answer text.
+    const inlineThink = new InlineThinkSplitter();
     for await (const part of result.fullStream) {
+      if (part.type === "text-end") {
+        yield* inlineEvents(inlineThink.flushBuffer());
+      } else if (part.type !== "text-delta" && part.type !== "text-start") {
+        yield* inlineEvents(inlineThink.flush());
+      }
       if (part.type === "text-delta") {
-        yield { type: "text", text: part.text };
+        yield* inlineEvents(inlineThink.push(part.text));
       } else if (part.type === "reasoning-start") {
         inReasoning = true;
         replay = mergeReplay(undefined, part.providerMetadata);

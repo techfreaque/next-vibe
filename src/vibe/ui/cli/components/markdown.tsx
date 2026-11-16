@@ -11,8 +11,11 @@ export type { MarkdownProps } from "../../web/components/markdown";
 function stripMarkdown(content: string): string {
   return (
     content
-      // Remove think blocks (tags + content)
+      // Remove think blocks (tags + content), an unclosed trailing block
+      // (still streaming / interrupted) and orphaned closing tags
       .replaceAll(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/<think>[\s\S]*$/i, "")
+      .replaceAll(/<\/think>/gi, "")
       // Remove Chat tags but keep content
       .replaceAll(/<Chat>([\s\S]*?)<\/Chat>/gi, "$1")
       // Remove headings markers

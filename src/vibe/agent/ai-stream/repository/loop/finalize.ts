@@ -8,6 +8,7 @@ import "server-only";
 import type { JSONValue, streamText as aiStreamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
+import { repairMangledStorageUrlsInText } from "../../../chat/storage/storage-url";
 import { creditsWithoutPlatformMarkup } from "../../../models/models";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
@@ -51,7 +52,12 @@ export async function finalizeAssistant(
     completionTokens,
   } = params;
 
-  let { currentAssistantContent } = params;
+  // Models rebuilding a media link from a tool result's bare URL drop the
+  // /files segment: repair exactly that pattern before it is persisted
+  // (CONTENT_DONE carries the repaired content to the client too).
+  let currentAssistantContent = repairMangledStorageUrlsInText(
+    params.currentAssistantContent,
+  );
 
   // If reasoning block is still open, close it
   if (isInReasoningBlock) {
