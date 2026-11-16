@@ -3433,7 +3433,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             // The approve tool requires confirmation → placeholder only, stream aborts before AI response.
             const { result, messages } = await runStream({
               user: testUser,
-              prompt: `[T7a approve-phase1] In a single response, call BOTH at the same time: (1) ${toolInstr(cfg, "tool-help")} to list available tools, and (2) ${toolInstrWithArgs(cfg, approveTool.name, approveTool.argsInstr)}. The ${approveTool.name} tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.`,
+              prompt: `[T7a approve-phase1] In a single response, call BOTH at the same time: (1) ${toolInstr(cfg, "tool-help")} to list available tools, and (2) ${toolInstrWithArgs(cfg, approveTool.name, approveTool.argsInstr)}. The ${approveTool.name} tool requires user confirmation - it should NOT execute yet. The user approves it in the confirmation dialog right after your reply; it runs then and its result notes that approval: that is correct. End your reply with STEP_OK after the tool calls.`,
               threadId,
               favoriteId: mainFavoriteId,
               explicitParentMessageId: lastMainAiMsgId,
@@ -4072,8 +4072,8 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           const { result, messages } = await runStream({
             user: testUser,
             prompt: cfg.cheapMode
-              ? `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "cortex-write", `path='${t8CheapPath}' and content='T8_PARALLEL_OK'`)} to write a memory node, and (2) ${toolInstr(cfg, "chat-settings")} to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. Enum-valued fields come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design, the UI translates them: that is not an issue. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`
-              : `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "tool-help", `query='image'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)} to look up tools matching 'image' (this returns a tools array, NOT categories), and (2) ${toolInstrWithArgs(cfg, "generate_image", `prompt='green square'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)}. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. tool-help WITH a query returns a tools array; an empty array only means no match, not a failure. Check that tool-help returned a tools array (any length) and generate_image returned an imageUrl (not a taskId). End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`,
+              ? `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "cortex-write", `path='${t8CheapPath}' and content='T8_PARALLEL_OK'`)} to write a memory node, and (2) ${toolInstr(cfg, "chat-settings")} to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. Enum-valued fields come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design, the UI translates them: that is not an issue. Known-correct, not an issue: an earlier confirmation-required call ran only after the user approved it in the confirmation dialog, and its result notes that approval. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`
+              : `[T8 parallel-tools] In a single response, call BOTH at the same time: (1) ${toolInstrWithArgs(cfg, "tool-help", `query='image'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)} to look up tools matching 'image' (this returns a tools array, NOT categories), and (2) ${toolInstrWithArgs(cfg, "generate_image", `prompt='green square'${cfg.remoteInstanceId ? " and callbackMode='wait'" : ""}`)}. IMPORTANT: You MUST use callbackMode='wait' for both tools - do NOT use wakeUp or detach. tool-help WITH a query returns a tools array; an empty array only means no match, not a failure. Check that tool-help returned a tools array (any length) and generate_image returned an imageUrl (not a taskId). Known-correct, not an issue: an earlier confirmation-required call ran only after the user approved it in the confirmation dialog, and its result notes that approval. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.`,
             threadId,
             favoriteId: mainFavoriteId,
             explicitParentMessageId: lastMainAiMsgId,
@@ -5870,7 +5870,6 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
               sql`UPDATE credit_wallets SET balance = 0, free_credits_remaining = 0 WHERE id = ${w.id}`,
             );
           }
-
           try {
             const { result } = await runStream({
               user: testUser,

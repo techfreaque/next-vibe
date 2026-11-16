@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Video description:**\n\nThe clip opens on a close-up of a person's hands holding and turning a Rubik's cube. The background is a dense, chaotic pile of dozens of other Rubik's cubes scattered across an indoor surface, blurred out by a shallow depth of field.\n\nThe hands gently rotate the faces of the central cube, revealing scrambled stickers in white, red, blue, green, orange and yellow. Lighting is bright and even, picking out the glossy plastic texture of the puzzle cubes. The camera stays straight-on, tightly framed on the hands and the cube, with no on-screen text and no audio — it reads like a polished macro demonstration or tutorial clip.\n\nThe video processed fine.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

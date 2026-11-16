@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** A solid red circle centered on a plain white background — flat, minimal graphic with no text or texture.\n\n**Audio:** Received and processed — a 26-second instrumental R&B/neo-soul style cue, ~95–98 BPM, built on syncopated electric piano stabs, finger snaps on the backbeat, soft shaker, punchy kick and warm sub bass, with a filtered riser transition around 0:21 before the groove drops out and cuts cleanly at 0:26. No vocals.\n\nBoth attachments came through: the image is visible as content, and the audio produced a full description.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

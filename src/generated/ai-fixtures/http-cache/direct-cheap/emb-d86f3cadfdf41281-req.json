@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "`payment-invoice-list` on hermes returned:\n\n- `invoices`: `[]` (empty array — present as expected)\n- `total`: `0`\n\nThe response shape is correct: an `invoices` array is present. It's empty, which is consistent with an account that has no billing history — no error, no malformed output.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

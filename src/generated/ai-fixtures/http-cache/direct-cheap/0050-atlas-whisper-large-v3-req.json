@@ -1,0 +1,13 @@
+{
+  "url": "https://api.nano-gpt.com/api/v1/audio/transcriptions",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "file": {},
+    "model": "Whisper-Large-V3",
+    "language": "en",
+    "response_format": "json"
+  }
+}

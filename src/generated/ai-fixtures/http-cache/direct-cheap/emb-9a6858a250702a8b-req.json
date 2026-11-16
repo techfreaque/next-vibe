@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/video/hermes-catalog-callback-modes-and-attachment-tests-8e0812b7-9e1c-4cdd-a462-f692e431b571/test-video.mp4.md\n\n---\nfilename: \"test-video.mp4\"\nurl: \"/api/en-GLOBAL/vibe/agent/chat/threads/files/8e0812b7-9e1c-4cdd-a462-f692e431b571/0f41867d-307a-4323-952b-271857a43133.mp4\"\nmimeType: \"video/mp4\"\nsize: \"1.1 MB\"\nthreadId: \"8e0812b7-9e1c-4cdd-a462-f692e431b571\"\nthreadTitle: \"Hermes catalog, callback modes and attachment tests\"\nuploadedAt: \"2026-11-16T19:19:10.504Z\"\n---\n\n# test-video.mp4\n\n**Download:** [test-video.mp4](/api/en-GLOBAL/vibe/agent/chat/threads/files/8e0812b7-9e1c-4cdd-a462-f692e431b571/0f41867d-307a-4323-952b-271857a43133.mp4)\n\n| Field | Value |\n| --- | --- |\n| Type | `video/mp4` |\n| Size | 1.1 MB |\n| Thread | Hermes catalog, callback modes and attachment tests |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

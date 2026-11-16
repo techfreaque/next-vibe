@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Product categories on hermes — `categories` array present with 3 entries:\n\n| Name | Active | Parent | Sort |\n|---|---|---|---|\n| Services | yes | — (root) | 0 |\n| Physical Goods | yes | — (root) | 0 |\n| Digital Products | yes | — (root) | 0 |\n\nEach entry carries `id`, `name`, `parentId`, `isActive`, `sortOrder`, `createdAt`, and the payload reports `total: 3` — all three are top-level categories with no children.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

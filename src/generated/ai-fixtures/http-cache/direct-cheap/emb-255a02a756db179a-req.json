@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Image:** a solid red circle centered on a plain white background — flat vector-style, no texture, text, or shading.\n\n**Audio:** processed successfully — an upbeat, jazzy game-show style clip (~47s): swinging drums with prominent hi-hat/ride, walking electric bass, clean twangy guitar, bright bell-like synth melody, and staccato brass stabs. Cheerful, retro 1960s feel at roughly 120–130 BPM, polished studio mix, no non-musical events.\n\nBoth attachments came through — the image content was visible and the audio produced a full description.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

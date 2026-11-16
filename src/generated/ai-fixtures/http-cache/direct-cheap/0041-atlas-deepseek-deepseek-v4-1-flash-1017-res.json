@@ -1,0 +1,41 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a5b8ca42195c4ffe-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Mon, 16 Nov 2026 19:09:27 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794856166-mlhfAVxUJNc9KTyBdGpC",
+    "x-openrouter-release": "api;2889a2d5-51ab-4f97-a68f-bc0bc0c58f9f",
+    "set-cookie": "__cf_bm=z5z1mqrmvKwo4tiGLi_KvWEMVjgOfBNlTuSifOpl58s-1794856166.7415535-1.0.1.1-LeN0zswgnWX1rPruM6omkNZawO0jR2I69NF0ZxOvSx6nID4MXTMDjg8NRbmMagKM7Hvq9S1dak.7iQOqsQcnR0O0AovjRtJhiXoIoV8L1jYmhUrWRxJV5V9CUERdhaxn; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 19:39:27 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"Call\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"Call\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\" products-category-list on her\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\" products-category-list on her\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":\"mes.\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"mes.\",\"format\":\"unknown\",\"index\":0}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call-197d8318-8593-44ad-9318-9aa9c503dfd9\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"wait\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"input\\\":{}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"instanceId\\\":\\\"hermes\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"toolName\\\":\\\"products\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"-category-list\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\",\"reasoning\":null},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794856166-mlhfAVxUJNc9KTyBdGpC\",\"object\":\"chat.completion.chunk\",\"created\":1794856166,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":63583,\"completion_tokens\":103,\"total_tokens\":63686,\"cost\":0.000943164,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":55808,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.000943164,\"upstream_inference_prompt_cost\":0.000879098,\"upstream_inference_completions_cost\":0.000064066},\"completion_tokens_details\":{\"reasoning_tokens\":23,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

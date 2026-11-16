@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Audio description:** an instrumental hip-hop / boom-bap beat loop, roughly 25 seconds long at about 92–94 BPM in a jazzy F minor / A♭ major feel.\n\n- **Drums:** punchy sampled acoustic kit — snare snapping on 2 and 4 with ghost notes, bouncy syncopated kick, swung hi-hats, and a light shaker/tambourine layer up top.\n- **Bass:** warm, rounded fingerstyle electric bass bouncing in syncopation against the chords.\n- **Keys:** staccato Rhodes/Wurlitzer-style electric piano playing light, soulful jazz chords with a touch of stereo movement and saturation.\n- **Accents:** brief high synth blips and vocal-like harmonic chops on the off-beats.\n- **Structure:** full groove from the start, a short filter/tape-stop turnaround around 0:11–0:13, the pattern repeats, then the keys and bass drop out for a drum fill and a crisp cutoff at the end.\n- **Vocals:** none — fully instrumental.\n\nThe audio came through and was processed fine.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

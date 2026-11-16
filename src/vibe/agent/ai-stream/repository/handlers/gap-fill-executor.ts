@@ -35,6 +35,7 @@ import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { ChatModelOption } from "../../models";
 import { reserveFixtureOrdinals } from "../../testing/fetch-cache";
+import { formatBridgedAttachmentText } from "../context/bridged-attachment";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { BridgeContext } from "../core/modality-resolver";
 import { BridgeCall, getBridgeFailReason, isBridgeFail } from "./bridge-call";
@@ -435,7 +436,11 @@ export class GapFillExecutor {
     } else {
       return {
         type: "text" as const,
-        text: `[${args.label} attachment - system-injected ${args.descriptor} description (you cannot see the raw file)]:\n${bridgeResult}`,
+        text: formatBridgedAttachmentText(
+          args.label,
+          args.descriptor,
+          bridgeResult,
+        ),
       };
     }
     return {

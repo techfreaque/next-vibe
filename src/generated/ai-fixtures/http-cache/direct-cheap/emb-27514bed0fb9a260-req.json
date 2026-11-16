@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I could not hear the word 'banana' — the audio that arrived is not a voice recording at all.\n\nWhat came through instead is a ~16-second **instrumental music clip**: a light, upbeat funk/soul jingle with clean electric guitar riff, walking bass, steady drums, and a sustained organ chord. The only non-musical event is a single \"boing\" spring/cartoon sound effect at 0:01. There is **no speech, no voice, and no transcription** of any kind.\n\nSo the expected spoken word is entirely absent. Two possibilities: the wrong file was attached, or the audio pipeline delivered the wrong asset (the description reads like a generic outro jingle rather than a voice clip). Either way the WAV → transcription path did not produce the expected content.\n\nFAILED: The attached WAV contained no speech — it arrived as a music-only clip (funk/soul instrumental with a \"boing\" sound effect at 0:01), so the word 'banana' was never heard. Either the wrong file was attached or the audio attachment was delivered as the wrong asset.",
+    "encoding_format": "float"
+  }
+}

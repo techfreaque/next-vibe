@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Audio processed** — a ~28-second high-energy pop/dance-pop instrumental cue at roughly 112–114 BPM in 4/4, sitting in an A minor / C major modal pop space.\n\n- **00:00–00:21 (intro groove):** sparse syncopated rhythm — finger snaps and layered claps on 2 and 4, ticking hi-hat/shaker, plus a quirky bell-like synth pluck carrying a repeating syncopated hook. Warm bouncy electric bass walks underneath, with muted guitar or electric-piano stabs on the off-beats. Minimalist funk feel.\n- **00:21–00:23 (build):** percussion strips back, a white-noise riser and reversed cymbal swell create tension, with a snare roll into the downbeat.\n- **00:24–00:28 (drop):** punchy four-on-the-floor kick, full dance beat, a brief pitched vocal chop on the downbeat, thick synth pads and chord stabs, driving electronic bass locking with the kick. Cuts off cleanly at 00:28.\n\n**Production:** fully digital modern studio multitrack — crisp bright top end, tight plate reverbs on the snaps, warm punchy low end, wide stereo. No lyrics beyond the processed vocal exclamation at the drop.",
+    "encoding_format": "float"
+  }
+}

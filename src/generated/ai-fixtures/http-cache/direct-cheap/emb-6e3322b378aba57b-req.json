@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/hermes-catalog-callback-modes-and-attachment-check-306387f6-5143-486a-b94b-7dfb07cc4bd8/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nurl: \"/api/en-GLOBAL/vibe/agent/chat/threads/files/306387f6-5143-486a-b94b-7dfb07cc4bd8/8a80faf7-df94-4586-b528-7bdbbd67ddfc.jpeg\"\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"306387f6-5143-486a-b94b-7dfb07cc4bd8\"\nthreadTitle: \"Hermes catalog, callback modes and attachment checks\"\nuploadedAt: \"2026-11-16T19:10:00.222Z\"\n---\n\n# test-image.jpeg\n\n**Download:** [test-image.jpeg](/api/en-GLOBAL/vibe/agent/chat/threads/files/306387f6-5143-486a-b94b-7dfb07cc4bd8/8a80faf7-df94-4586-b528-7bdbbd67ddfc.jpeg)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Hermes catalog, callback modes and attachment checks |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

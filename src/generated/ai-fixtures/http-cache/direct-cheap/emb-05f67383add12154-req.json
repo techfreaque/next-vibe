@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-catalog--callback-modes-and-attachment-test-306387f6-5143-486a-b94b-7dfb07cc4bd8.md\n\n# Hermes catalog, callback modes and attachment tests\nFolder: private\nDescription: Quality-gate testing against the hermes instance: tool-help category and keyword searches, the generate_image schema, instance identity (atlas system prompt, hermes tool execution), a 140041.6 credit balance, and a 33-entry favorites list. Exercised every callback mode - detach plus await-task, inli",
+    "encoding_format": "float"
+  }
+}

@@ -106,6 +106,7 @@ const messageVariantSchema: z.ZodType<MessageVariant> = z.object({
   creditCost: z.number().optional(),
   createdAt: z.string(),
   bridgeType: bridgeTypeSchema.optional(),
+  attachmentId: z.string().optional(),
 });
 
 const pipelineStepSchema = z.object({

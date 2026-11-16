@@ -1,0 +1,36 @@
+{
+  "type": "json",
+  "url": "https://modelslab.com/api/v7/voice/fetch/5016927",
+  "status": 200,
+  "headers": {
+    "access-control-allow-methods": "GET, POST",
+    "access-control-allow-origin": "*",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, private",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a5b8e17f5c86dccd-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Mon, 16 Nov 2026 19:25:18 GMT",
+    "link": "<https://modelslab.com/api-deprecation-policy>; rel=\"deprecation\"; type=\"text/html\"",
+    "modelslab-api-lifecycle": "supported",
+    "modelslab-api-version": "v7",
+    "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=JNxnNiP4GuT1D8Q14do2uUr%2B6kC%2BkFZ1P%2B7qAY%2F1x2PAZjUr6h5kwODBI42PL8jkjI%2FZkv7JCINDWK4IKNcdRchV6EDUtqdSkp4afwOpUYmFdXflDzsgzL%2Fpb%2BqZdYU%3D\"}]}",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-cloud-trace-context": "cf7031efec3964bbe3bd2781a8b52f8a",
+    "x-request-time": "0.025",
+    "x-served-by": "octane-api",
+    "x-upstream-connect": "0.000",
+    "x-upstream-time": "-"
+  },
+  "body": {
+    "status": "processing",
+    "id": 5016927,
+    "message": "audio is processing",
+    "output": [],
+    "tip": "Get 20x faster audio generation using enterprise plan. Click here https://modelslab.com/enterprise"
+  }
+}

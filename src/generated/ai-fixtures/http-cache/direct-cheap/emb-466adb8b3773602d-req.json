@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "No audio file came through with this message — it arrived as text only (\"outro music\"), so there's nothing for me to listen to or transcribe this turn.\n\nIf you meant to attach a clip, it didn't make it into the message; send it again and I'll describe it.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

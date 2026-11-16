@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Here's your outro — a short cinematic piece, 8 seconds, 10.4 credits:\n\n`/api/en-GLOBAL/vibe/agent/chat/threads/a8a8b238-853d-4e0c-9bbf-6449a34c630c/031c883c-3f10-4b12-8bc8-61593575c670.mp3`\n\nWarm resolving progression, gentle fade — should sit nicely under credits.\n\nIf you want it longer (say 20–30s) or in a different mood, say the word and I'll regenerate.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

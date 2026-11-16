@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/audio/tool-catalog-callback-modes-and-image-generation-c-a8a8b238-853d-4e0c-9bbf-6449a34c630c/test-music.mp3.md\n\n---\nfilename: \"test-music.mp3\"\nurl: \"/api/en-GLOBAL/vibe/agent/chat/threads/files/a8a8b238-853d-4e0c-9bbf-6449a34c630c/efded98e-9799-483e-8cb5-0645a51038e4.mp3\"\nmimeType: \"audio/mpeg\"\nsize: \"1.1 MB\"\nthreadId: \"a8a8b238-853d-4e0c-9bbf-6449a34c630c\"\nthreadTitle: \"Tool catalog, callback modes, and image generation checks\"\nuploadedAt: \"2026-11-16T19:23:58.486Z\"\n---\n\n# test-music.mp3\n\n**Download:** [test-music.mp3](/api/en-GLOBAL/vibe/agent/chat/threads/files/a8a8b238-853d-4e0c-9bbf-6449a34c630c/efded98e-9799-483e-8cb5-0645a51038e4.mp3)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/mpeg` |\n| Size | 1.1 MB |\n| Thread | Tool catalog, callback modes, and image generation checks |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

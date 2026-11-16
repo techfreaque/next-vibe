@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "*outro music* — and that's a wrap.\n\nEverything in this run checked out on the second pass: the catalog listings, instance identity, wallet balance, favorites, all the callback modes, and the attachment handling.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

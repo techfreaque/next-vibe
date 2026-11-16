@@ -91,11 +91,13 @@ export function stripAttachmentsFromMessages(
           return true;
         }
 
-        const isImage = mimeType.startsWith("image/");
         const isFile =
           mimeType.startsWith("application/") || mimeType.startsWith("text/");
 
-        if (!isImage && !isFile) {
+        // Image/audio/video stay: the converter swaps in their cached
+        // per-attachment bridge description, or gap-fill bridges them once
+        // (see bridged-attachment.ts).
+        if (!isFile) {
           return true;
         }
 
@@ -106,7 +108,7 @@ export function stripAttachmentsFromMessages(
             ? `${message.content}\n\n[Attachment description: ${description}]`
             : `[Attachment description: ${description}]`;
           totalRemoved++;
-          formatSet.add(isImage ? "image" : "file");
+          formatSet.add("file");
           return false;
         }
 

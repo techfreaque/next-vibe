@@ -126,6 +126,8 @@ export type MessageVariant = {
   creditCost?: number;
   createdAt: string; // ISO timestamp
   bridgeType?: BridgeType; // set for gap-fill variants so the UI can pick the right label/icon
+  /** Attachment this text variant describes (bridged attachments only). */
+  attachmentId?: string;
 };
 
 export type BridgeType = "stt" | "vision" | "translation" | "tts";

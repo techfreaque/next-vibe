@@ -4,27 +4,30 @@
   "status": 200,
   "headers": {
     "access-control-allow-origin": "*",
-    "access-control-expose-headers": "X-Generation-Id,cf-ray",
-    "cf-ray": "a18c2ea6ec4bd349-FRA",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a5b8ec066bf95d8b-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Fri, 10 Jul 2026 02:36:43 GMT",
+    "date": "Mon, 16 Nov 2026 19:32:33 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1783651002-q7i6Jaw5Q6gGA5otk1YW"
+    "x-generation-id": "gen-1794857550-cknxULnb27QAxweBXQTZ",
+    "x-openrouter-release": "api;4d94f9f5-4934-4340-811b-d18f936200f4",
+    "set-cookie": "__cf_bm=DGpJLbMr4B4Ko9qFksZHcI4YfBQKK.KG9gp6wHf_OFM-1794857549.8378146-1.0.1.1-Ofg.rKYfiHoBYxgT4Ghg1SMipVJ8r5HsJlmT0TrhUM4H1D_6HNqsUCu2p7ANjSUE_VUkVpLKkGXLR2q71uwc7y.v4loWdIPSTYRxpXZeoGeEl8NH7hqR.lpF0a.KxYTt; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 20:02:33 GMT"
   },
   "body": {
-    "id": "gen-1783651002-q7i6Jaw5Q6gGA5otk1YW",
+    "id": "gen-1794857550-cknxULnb27QAxweBXQTZ",
     "object": "chat.completion",
-    "created": 1783651002,
+    "created": 1794857550,
     "model": "google/gemini-3.8-flash",
     "provider": "Google",
     "system_fingerprint": null,
-    "service_tier": "default",
+    "service_tier": "provisioned",
     "choices": [
       {
         "index": 0,
@@ -33,17 +36,31 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "This audio segment features upbeat, jazzy background music with a vintage feel, ideal for a game show or a lighthearted scene. The duration is a short clip, lasting approximately 47 seconds. The sound quality is clear and polished, suggesting a studio recording environment.\n\nHere's a breakdown of the musical elements:\n\n**Genre/Subgenre:** Jazz, specifically a subgenre that blends elements of big band, swing, and game show music. It has a slightly retro, 1960s feel.\n\n**Tempo:** Approximately 120-130 BPM, giving it a moderate to upbeat pace.\n\n**Instruments and Interaction:**\n\n*   **Drums:** The primary rhythmic drive comes from a drum kit playing a steady, swinging beat. The hi-hat and ride cymbal are prominent, providing a light, crisp foundation. There are occasional classic-sounding drum fills that add to the game show aesthetic.\n*   **Bass Guitar:** A smooth, walking bass line underpins the harmony, played on an electric bass. It provides a solid, groovy foundation.\n*   **Electric Guitar:** A clean, slightly twangy electric guitar plays short, catchy melodic phrases and rhythmic chords, often in unison with other instruments, contributing to the bright, cheerful feel.\n*   **Keyboard/Synth:** A bright, bell-like or chime-like synth sound is used to play the main melody line. It has a distinctive, almost 'video game' quality, further reinforcing the game show vibe.\n*   **Trumpet/Brass Section:** There are bright, staccato trumpet or brass section stabs that punctuate the melody and add a classic big-band flavor. These are not continuously playing but rather provide accentuation.\n\n**Song Structure:**\nThe clip is too short to discern a full song structure, but it seems to be a repeating loop of a melodic phrase with variations. There's an introductory feel, followed by the main theme.\n\n**Production Style:**\nThe production is polished and clean, with a bright mix. There's a subtle use of reverb that gives the instruments a cohesive, slightly spacious feel. The overall sound is designed to be engaging and attention-grabbing without being overly complex.\n\n**Mood and Emotional Arc:**\nThe music consistently evokes a mood of excitement, anticipation, and lighthearted fun. It's cheerful, optimistic, and slightly comedic, perfectly suited for a segment that needs to convey energy or a sense of beginning.\n\n**Non-musical audio events:** None. The entire clip is music.",
+          "content": "### Overview and Structure\nThis is a 26-second studio-produced, mid-tempo instrumental music cue in 4/4 time signature, with an estimated tempo of approximately 95–98 BPM. The style blends elements of modern R&B, neo-soul, and polished pop/hip-hop beat production. There are no vocals or spoken words present throughout the clip.\n\n### Instrumentation and Arrangement\n- **Keys/Synths:** The core harmonic foundation consists of a syncopated, staccato electric piano/synth chime motif playing rhythmic, jazzy minor-key chord stabs. The chords have a bright, percussive attack followed by a quick decay, imparting a bouncy, head-nodding groove.\n- **Percussion:** \n  - Crisp, prominent layered finger snaps/rim clicks hit consistently on beats 2 and 4, treated with subtle stereo reverb.\n  - A subtle, soft electronic shaker/closed hi-hat pattern maintains subdivision energy in the background.\n- **Drums & Bass:** \n  - A rounded, punchy electronic kick drum plays a syncopated rhythmic pattern under the snaps.\n  - A warm, smooth sub/synth bassline locks closely with the kick drum, outlining the chord root movement with subtle groove slides.\n\n### Chronological Progression\n- **0:00 – 0:21:** The main groove establishes immediately and loops steadily. The syncopated electric keyboard stabs, finger snaps on the backbeat, bouncy bassline, and punchy kick create a clean, minimalist, laid-back R&B rhythm section.\n- **0:21 – 0:23:** A transitional section begins. A filtered synth riser / reverse cymbal whoosh sweeps upward in pitch and volume, creating anticipation.\n- **0:23 – 0:26:** The full groove drops out briefly for a rhythmic transition or breakdown marker. A low-frequency kick impact thuds on the downbeat alongside a muted, filtered synth texture and decaying percussion tail before the audio cuts off cleanly at 0:26.\n\n### Production and Sound Quality\n- **Audio Quality:** High-fidelity, pristine digital studio production with a wide stereo image and balanced dynamic range.\n- **Mixing & Effects:** Dry and punchy low end; clean high-end transients on the snaps and shakers; spatial stereo widening applied to the synth stabs; dynamic filtering and sweep automation during the final transition.\n- **Mood:** Smooth, relaxed, confident, stylish, and modern.",
           "refusal": null,
-          "reasoning": null
+          "reasoning": "**Analyzing Audio Elements**\n\nI'm currently focused on dissecting the provided audio segment. My analysis is revealing a roughly 26-second duration, driven by an instrumental track with electronic, R&B, or hip-hop influences, featuring a tempo in the 95-100 BPM range.\n\n**Refining Musical Details**\n\nI'm honing in on the harmonic and rhythmic intricacies. The 4/4 time signature and a tempo around 100 BPM are confirmed. I'm investigating the minor key, suspecting D minor or G minor, and noting the distinctive syncopated chord stabs and rhythmic bassline.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Audio Elements**\n\nI'm currently focused on dissecting the provided audio segment. My analysis is revealing a roughly 26-second duration, driven by an instrumental track with electronic, R&B, or hip-hop influences, featuring a tempo in the 95-100 BPM range.\n\n**Refining Musical Details**\n\nI'm honing in on the harmonic and rhythmic intricacies. The 4/4 time signature and a tempo around 100 BPM are confirmed. I'm investigating the minor key, suspecting D minor or G minor, and noting the distinctive syncopated chord stabs and rhythmic bassline.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS0zLjgtZmxhc2gtMjAyNjA5MDJ8Z29vZ2xlLXZlcnRleC9nbG9iYWwifQ",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
         }
       }
     ],
     "usage": {
       "prompt_tokens": 1072,
-      "completion_tokens": 528,
-      "total_tokens": 1600,
-      "cost": 0.0021666,
+      "completion_tokens": 1054,
+      "total_tokens": 2126,
+      "cost": 0.0047565,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
@@ -52,12 +69,12 @@
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.0021666,
-        "upstream_inference_prompt_cost": 0.0008466,
-        "upstream_inference_completions_cost": 0.00132
+        "upstream_inference_cost": 0.0047565,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.0039525
       },
       "completion_tokens_details": {
-        "reasoning_tokens": 0,
+        "reasoning_tokens": 523,
         "image_tokens": 0,
         "audio_tokens": 0
       }

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { ToolResultOutput } from "@ai-sdk/provider-utils";
+import type { ProviderOptions, ToolResultOutput } from "@ai-sdk/provider-utils";
 import type {
   AssistantContent,
   JSONValue,
@@ -32,6 +32,13 @@ import {
   extractDocumentText,
   isDocumentMimeType,
 } from "../handlers/attachments";
+import { supportsAttachmentNatively } from "./attachments";
+import {
+  attachmentPartOptions,
+  bridgeLabelsFor,
+  cachedAttachmentDescription,
+  formatBridgedAttachmentText,
+} from "./bridged-attachment";
 import { resolveImageMediaType } from "./image-media-type";
 import { buildToolResultOutput } from "./tool-output";
 
@@ -229,8 +236,17 @@ export async function toAiSdkMessage(
       // is identical between first request and history.
       const contentParts: Array<
         | { type: "text"; text: string }
-        | { type: "image"; image: string | URL }
-        | { type: "file"; data: string; mediaType: string }
+        | {
+            type: "image";
+            image: string | URL;
+            providerOptions?: ProviderOptions;
+          }
+        | {
+            type: "file";
+            data: string;
+            mediaType: string;
+            providerOptions?: ProviderOptions;
+          }
       > = [];
 
       // Add text content if present
@@ -244,8 +260,45 @@ export async function toAiSdkMessage(
         message.metadata?.attachments &&
         message.metadata.attachments.length > 0
       ) {
+        // Bridgeable = image/audio/video the active model cannot take
+        // natively: those reach it as a cached bridge description when one
+        // exists (no download, no new bridge call), otherwise as a part
+        // tagged with the attachment id so gap-fill caches its description.
+        const metadata = message.metadata;
+        const attachments = metadata.attachments ?? [];
+        const needsBridge = (attachment: { mimeType: string }): boolean =>
+          modelConfig !== undefined &&
+          bridgeLabelsFor(attachment.mimeType) !== null &&
+          !supportsAttachmentNatively(attachment, modelConfig);
+        const bridgeableCount = attachments.filter(needsBridge).length;
+
         // Add attachments
-        for (const attachment of message.metadata.attachments) {
+        for (const attachment of attachments) {
+          const bridgeLabels = needsBridge(attachment)
+            ? bridgeLabelsFor(attachment.mimeType)
+            : null;
+          const cachedDescription = bridgeLabels
+            ? cachedAttachmentDescription(
+                metadata.variants,
+                attachment.id,
+                bridgeableCount,
+              )
+            : null;
+          if (bridgeLabels && cachedDescription) {
+            contentParts.push({
+              type: "text",
+              text: formatBridgedAttachmentText(
+                bridgeLabels.label,
+                bridgeLabels.descriptor,
+                cachedDescription,
+              ),
+            });
+            continue;
+          }
+          const partOptions = bridgeLabels
+            ? { providerOptions: attachmentPartOptions(attachment.id) }
+            : {};
+
           // Get base64 data - either from attachment.data or from URL
           let base64Data: string | null = null;
 
@@ -285,6 +338,7 @@ export async function toAiSdkMessage(
               contentParts.push({
                 type: "image",
                 image: `data:${resolveImageMediaType(base64Data, attachment.mimeType)};base64,${base64Data}`,
+                ...partOptions,
               });
             } else if (
               attachment.mimeType.startsWith("text/") ||
@@ -326,6 +380,7 @@ export async function toAiSdkMessage(
                 type: "file",
                 data: base64Data,
                 mediaType: attachment.mimeType,
+                ...partOptions,
               });
             } else if (isDocumentMimeType(attachment.mimeType)) {
               // Documents (PDF, DOCX, XLSX): Extract text content

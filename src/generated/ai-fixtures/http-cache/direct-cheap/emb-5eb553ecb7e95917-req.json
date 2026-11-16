@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The call succeeded. `companies-list` on hermes returned a `companies` array with 1 entry:\n\n| Field | Value |\n|---|---|\n| name | Demo Company |\n| country | DE |\n| currency | EUR |\n| role | owner |\n| type | b2c |\n| active | true |\n| created | 2026-11-07 |\n\nTotal: 1 company.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

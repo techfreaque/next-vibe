@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/hermes-catalog-callback-modes-and-product-categori-8e0812b7-9e1c-4cdd-a462-f692e431b571/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nurl: \"/api/en-GLOBAL/vibe/agent/chat/threads/files/8e0812b7-9e1c-4cdd-a462-f692e431b571/12a84420-9932-45eb-9d1a-20bcfc15202c.jpeg\"\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"8e0812b7-9e1c-4cdd-a462-f692e431b571\"\nthreadTitle: \"Hermes catalog, callback modes and product categories\"\nuploadedAt: \"2026-11-16T19:18:36.126Z\"\n---\n\n# test-image.jpeg\n\n**Download:** [test-image.jpeg](/api/en-GLOBAL/vibe/agent/chat/threads/files/8e0812b7-9e1c-4cdd-a462-f692e431b571/12a84420-9932-45eb-9d1a-20bcfc15202c.jpeg)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Hermes catalog, callback modes and product categories |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10a image-attach] Describe the attached image briefly. NOTE: on models without native vision, the attachment reaches you as an injected vision DESCRIPTION inside the message - that injected description IS the image content and counts as seeing it. Known-correct, not an issue: media URLs anywhere in this thread (generated images, audio, video) are relative /api/... storage paths on this platform; a /api/... storage path is a correct, usable URL. End your reply with STEP_OK if image content (native or injected description) is present and you described it, or FAILED: <reason> only if NO image content of either form is present.",
+    "encoding_format": "float"
+  }
+}

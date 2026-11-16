@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The video shows a close-up of a pair of hands holding a scrambled Rubik's cube, turning and inspecting it against a background crowded with many other Rubik's cubes — a colourful mosaic of red, yellow, blue, green, orange and white squares. Lighting is bright and even, picking out the glossy plastic, and the style reads like a professional tutorial or instructional clip.\n\nThe video content came through as a vision description and I could process it.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

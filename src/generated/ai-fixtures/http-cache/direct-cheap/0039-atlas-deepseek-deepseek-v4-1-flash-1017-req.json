@@ -27,7 +27,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:394dfb70 | Posted:Nov 16, 19:42]",
+            "text": "[Context: ID:f7df2eef | Posted:Nov 16, 20:07]",
             "type": "text"
           }
         ],
@@ -40,7 +40,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:f60430fb | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:42]",
+            "text": "[Context: ID:90694943 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:07]",
             "type": "text"
           }
         ],
@@ -117,7 +117,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:42:50.209Z\",\"updatedPreview\":\"Ran three parallel tool-help calls routed to the hermes instance to verify the catalog: a category listing for \\\"ai\\\" (12 tools), a keyword search for \\\"search\\\" (2 tools), and a full schema lookup for generate_image. All three returned well-formed, non-empty results with names, descriptions, and a complete parameters schema. No issues found.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes tool-help checks: category, search, schema\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:07:54.026Z\",\"updatedPreview\":\"Ran three parallel tool-help calls routed to the hermes instance to verify the catalog: a category listing for \\\"ai\\\" (12 tools), a keyword search for \\\"search\\\" (2 tools), and a full schema lookup for generate_image. All three returned well-formed, non-empty results with names, descriptions, and a complete parameters schema. No issues found.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes tool-help checks: category, search, schema\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-110d7654-d7e8-4e2b-b33f-0d36a80af818"
@@ -129,7 +129,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:9e4d019d | Posted:Nov 16, 19:42]",
+            "text": "[Context: ID:916a716c | Posted:Nov 16, 20:07]",
             "type": "text"
           }
         ],
@@ -142,7 +142,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:a494727a | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:42]",
+            "text": "[Context: ID:4ec38fc5 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:07]",
             "type": "text"
           }
         ],
@@ -183,7 +183,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:a4d207ad | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:bf54de31 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -196,7 +196,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d7f61b34 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:c393dc7c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -209,7 +209,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1981326d | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:32a8940e | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -222,7 +222,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:aba53e14 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:9dbddcb2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -271,7 +271,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:03.138Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance: three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Then confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, and read the wallet balance (140041.6 credits total). All checks passed.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes tool catalog, instance ID and credits balance checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:07.528Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance: three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Then confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, and read the wallet balance (140041.6 credits total). All checks passed.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes tool catalog, instance ID and credits balance checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-ce2bc71d-6360-4e7f-b32f-a96a2e13abcb"
@@ -283,7 +283,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:e450a02c | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:98df32ec | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -316,7 +316,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:78d502b8 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:ca9ac6a4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -341,7 +341,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:06.005Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance. Three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, read the wallet balance (140041.6 total), and listed the 33 favorites.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes quality gate: catalog, credits, favorites checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:10.327Z\",\"updatedPreview\":\"Quality-gate test thread on the hermes instance. Three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, read the wallet balance (140041.6 total), and listed the 33 favorites.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes quality gate: catalog, credits, favorites checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-c4a08f30-bcf9-4bfb-97aa-e8404a67e5b3"
@@ -353,7 +353,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:2f3c9685 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:6383628d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -366,7 +366,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:9a1c3e95 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:a43fd7c7 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -379,7 +379,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:b33e4389 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:99788bb9 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -428,7 +428,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:08.604Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: tool catalog listings, keyword search, generate_image schema, instance identity (atlas prompt / hermes tool exec), credits balance and favorites. Later turns moved to callback-mode behaviour, including a detach dispatch of cortex-write to /memories/cb-await-task-test, which correctly returned a taskId with no responsePath.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes detach dispatch and callback-mode checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:13.032Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: tool catalog listings, keyword search, generate_image schema, instance identity (atlas prompt / hermes tool exec), credits balance and favorites. Later turns moved to callback-mode behaviour, including a detach dispatch of cortex-write to /memories/cb-await-task-test, which correctly returned a taskId with no responsePath.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes detach dispatch and callback-mode checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_af5cfa159dc94ad48b295fb0"
@@ -436,7 +436,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4cde5893 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:c6153c22 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -449,7 +449,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:238b6055 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:76bf7bc5 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -474,7 +474,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"originalArgs\":{\"content\":\"await-task-test-payload\",\"path\":\"/memories/cb-await-task-test\"},\"originalToolName\":\"cortex-write\",\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-await-task-test\",\"size\":23,\"updatedAt\":\"2026-11-16T18:43:09.716Z\"},\"status\":\"status.completed\",\"waiting\":false}}",
+        "content": "{\"result\":{\"originalArgs\":{\"content\":\"await-task-test-payload\",\"path\":\"/memories/cb-await-task-test\"},\"originalToolName\":\"cortex-write\",\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-await-task-test\",\"size\":23,\"updatedAt\":\"2026-11-16T19:08:14.023Z\"},\"status\":\"status.completed\",\"waiting\":false}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-e5b85796-38fb-4dfa-b694-5434c5fc0761"
@@ -482,7 +482,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:fb748005 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:b4b21330 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -495,7 +495,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:92afeecc | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:c9502ea0 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -508,7 +508,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7f19c76f | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:0e26304c | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -521,7 +521,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dc5951b0 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:55e9f7d1 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -560,7 +560,7 @@
         "tool_call_id": "call-2c7b28f8-8ddc-48b1-8de7-bbabc2d93333"
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:13.948Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: parallel tool-help calls covering the ai category, a keyword search, and the generate_image schema. Verified instance identity (atlas system prompt, hermes tool execution), wallet balance, and the 33-entry favorites list. Later turns exercised callback modes: detach dispatch of cortex-write returned a taskId with no responsePath, await-task resolved it as completed, and a final endLoop call closed the run.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes catalog, credits, and callback-mode tests\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:18.218Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance: parallel tool-help calls covering the ai category, a keyword search, and the generate_image schema. Verified instance identity (atlas system prompt, hermes tool execution), wallet balance, and the 33-entry favorites list. Later turns exercised callback modes: detach dispatch of cortex-write returned a taskId with no responsePath, await-task resolved it as completed, and a final endLoop call closed the run.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes catalog, credits, and callback-mode tests\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-78cd4168-a047-423d-8579-f58366cf6881"
@@ -568,7 +568,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:66e3d25e | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:bcf72563 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -581,7 +581,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:672be709 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:edf7f6fa | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -606,7 +606,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T18:43:16.672Z\"}}",
+        "content": "{\"result\":{\"created\":false,\"responsePath\":\"/memories/cb-wait-inline-test\",\"size\":24,\"updatedAt\":\"2026-11-16T19:08:20.735Z\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call-56db528e-49a2-43b4-98b3-79f17aec3653"
@@ -614,7 +614,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:0842303b | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:3be8b2c7 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -627,7 +627,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:41fd0ee6 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:525b3664 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -640,7 +640,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:3c7de991 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:4928dde4 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -665,7 +665,7 @@
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,\"updatedAt\":\"2026-11-16T18:43:19.907Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,\"updatedAt\":\"2026-11-16T19:08:23.704Z\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_6cf41a34bde8425c91dd1864"
@@ -682,7 +682,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:9466830c | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:7e369684 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -695,7 +695,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:dd855f35 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:e19650db | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -708,7 +708,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:ebe0a521 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:71316c44 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -741,7 +741,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:4a3b9ec3 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:41e2eb25 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -754,7 +754,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:47e15e66 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:7ca05901 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -779,7 +779,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:25.474Z\",\"updatedPreview\":\"Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath. Also confirmed tool-help catalog calls for the ai category, keyword search, and generate_image schema.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes favorites list and callback mode checks\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:29.229Z\",\"updatedPreview\":\"Quality-gate testing on the hermes instance: verified the favorites tool returns a populated favorites array (33 entries, mixed slug and UUID ids), and exercised wakeUp callback mode where cortex-write dispatched with a taskId and later delivered a deferred result containing a non-empty responsePath. Also confirmed tool-help catalog calls for the ai category, keyword search, and generate_image schema.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes favorites list and callback mode checks\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_2fe997f8e9f14727a1f09c42"
@@ -787,7 +787,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:c6775df1 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:654f468f | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -800,7 +800,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:7d817f64 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:f79ce265 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -825,7 +825,7 @@
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-repeat-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:43:30.657Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-repeat-test\",\"size\":26,\"updatedAt\":\"2026-11-16T19:08:34.535Z\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_71497fa45bea4923bdd73731"
@@ -842,7 +842,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:012f26b7 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:d9d00529 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -855,7 +855,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:d4a20973 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:f194ead9 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -868,7 +868,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:379a56ca | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:ef05720d | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -893,7 +893,7 @@
         ]
       },
       {
-        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-16T18:43:35.680Z\"}",
+        "content": "{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-stress-test\",\"size\":26,\"updatedAt\":\"2026-11-16T19:08:40.045Z\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_66d44590d55a475abda71c29"
@@ -910,7 +910,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:1bb990dc | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:bfe9230a | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -935,7 +935,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:36.795Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance across the tool catalog, wallet, favorites, and all callback modes. Verified tool-help category, keyword search, and generate_image schema; confirmed instance identity (atlas system prompt, hermes tool execution), credits balance 140041.6, and a 33-entry favorites array. Exercised detach plus await-task, inline wait, and three wakeUp dispatches, each returning a taskId followed by a deferred result with a non-empty responsePath.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes catalog, credits and callback mode validation\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:08:41.302Z\",\"updatedPreview\":\"Quality-gate testing of the hermes instance across the tool catalog, wallet, favorites, and all callback modes. Verified tool-help category, keyword search, and generate_image schema; confirmed instance identity (atlas system prompt, hermes tool execution), credits balance 140041.6, and a 33-entry favorites array. Exercised detach plus await-task, inline wait, and three wakeUp dispatches, each returning a taskId followed by a deferred result with a non-empty responsePath.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes catalog, credits and callback mode validation\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_8bf4d9e598f54f3dbb4474cc"
@@ -943,20 +943,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:9c048a06 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:8e4ede90 | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T7a approve-phase1] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list available tools, and (2) execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/t7-approve-test', 'content':'T7_APPROVE_OK'}. The cortex-write tool requires user confirmation - it should NOT execute yet. End your reply with STEP_OK after the tool calls.",
+        "content": "[T7a approve-phase1] In a single response, call BOTH at the same time: (1) execute-tool with toolName='tool-help' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to list available tools, and (2) execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/t7-approve-test', 'content':'T7_APPROVE_OK'}. The cortex-write tool requires user confirmation - it should NOT execute yet. The user approves it in the confirmation dialog right after your reply; it runs then and its result notes that approval: that is correct. End your reply with STEP_OK after the tool calls.",
         "role": "user"
       },
       {
         "content": [
           {
-            "text": "[Context: ID:dc84f9c2 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:aa93cca4 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -995,7 +995,7 @@
         "tool_call_id": "call_a3c5a467e3ca4b8bb106ef30"
       },
       {
-        "content": "{\"_hint\":\"The user approved this call in the confirmation dialog; this is its result.\",\"created\":false,\"responsePath\":\"/memories/t7-approve-test\",\"size\":13,\"updatedAt\":\"2026-11-16T18:43:45.367Z\"}",
+        "content": "{\"_hint\":\"The user approved this call in the confirmation dialog; this is its result.\",\"created\":false,\"responsePath\":\"/memories/t7-approve-test\",\"size\":13,\"updatedAt\":\"2026-11-16T19:08:50.804Z\"}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_065c5227d67f49b3bc60c21e"
@@ -1007,7 +1007,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:29224376 | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:39f9f67e | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -1020,7 +1020,7 @@
       {
         "content": [
           {
-            "text": "[Context: ID:21259e50 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:26638ebb | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:08]",
             "type": "text"
           }
         ],
@@ -1069,7 +1069,7 @@
         ]
       },
       {
-        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T18:43:55.066Z\",\"updatedPreview\":\"Quality-gate testing on the hermes instance covering the tool catalog (ai category, keyword search, generate_image schema), instance identity, credits balance, and the favorites list. Exercised every callback mode: detach plus await-task, inline wait, and repeated wakeUp dispatches that each returned a taskId followed by a deferred result with a non-empty responsePath. The approval gate was the failing area - cortex-write with callbackMode=approve executed immediately and wrote /memories/t7-approve-test, and a later contact-form submission likewise ran without any confirmation being requested while returning a hint claiming the user had confirmed.\",\"updatedThreadId\":\"186b7f3e-f893-4151-a437-edfa33f0c3e2\",\"updatedTitle\":\"Hermes catalog, callback modes and approval gate tests\"}}",
+        "content": "{\"result\":{\"updatedAt\":\"2026-11-16T19:09:00.939Z\",\"updatedPreview\":\"Quality-gate testing on the hermes instance covering the tool catalog (ai category, keyword search, generate_image schema), instance identity, credits balance, and the favorites list. Exercised every callback mode: detach plus await-task, inline wait, and repeated wakeUp dispatches that each returned a taskId followed by a deferred result with a non-empty responsePath. The approval gate was the failing area - cortex-write with callbackMode=approve executed immediately and wrote /memories/t7-approve-test, and a later contact-form submission likewise ran without any confirmation being requested while returning a hint claiming the user had confirmed.\",\"updatedThreadId\":\"306387f6-5143-486a-b94b-7dfb07cc4bd8\",\"updatedTitle\":\"Hermes catalog, callback modes and approval gate tests\"}}",
         "name": "execute-tool",
         "role": "tool",
         "tool_call_id": "call_108bee28dafd401e976f706d"
@@ -1077,20 +1077,20 @@
       {
         "content": [
           {
-            "text": "[Context: ID:cc22c10d | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:59912ad1 | Posted:Nov 16, 20:09]",
             "type": "text"
           }
         ],
         "role": "system"
       },
       {
-        "content": "[T8 parallel-tools] In a single response, call BOTH at the same time: (1) execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/t8-parallel-test', 'content':'T8_PARALLEL_OK'} to write a memory node, and (2) execute-tool with toolName='chat-settings' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. Enum-valued fields come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design, the UI translates them: that is not an issue. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.",
+        "content": "[T8 parallel-tools] In a single response, call BOTH at the same time: (1) execute-tool with toolName='cortex-write', instanceId='hermes', input={'path':'/memories/t8-parallel-test', 'content':'T8_PARALLEL_OK'} to write a memory node, and (2) execute-tool with toolName='chat-settings' and instanceId='hermes' (instanceId='hermes' is REQUIRED on this call - never omit it) to read the chat settings. Check that cortex-write returned a responsePath and chat-settings returned a selectedSkill. Enum-valued fields come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design, the UI translates them: that is not an issue. Known-correct, not an issue: an earlier confirmation-required call ran only after the user approved it in the confirmation dialog, and its result notes that approval. End your reply with STEP_OK if both tools ran and returned their result shape, or FAILED: <reason> only if a tool errored or did not run.",
         "role": "user"
       },
       {
         "content": [
           {
-            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Hermes catalog, callback modes and approval gate tests\" / \"Quality-gate testing on the hermes instance covering the tool catalog (ai category, keyword search, generate_image schema), instance identity, credits balance, and the favorites list. Exercised every callback mode: detach plus await-task, inline wait, and repeated wakeUp dispatches that each returned a taskId followed by a deferred result with a non-empty responsePath. The approval gate was the failing area - cortex-write with callbackMode=approve executed immediately and wrote /memories/t7-approve-test, and a later contact-form submission likewise ran without any confirmation being requested while returning a hint claiming the user had confirmed.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [90%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test [86%]\n│   │   T8_PARALLEL_OK\n│   ├── name.md [80%]\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 71 · 9 background)\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-5cd99d86-08cf-4ac5-a6cf-f8077c7dbee1 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-7a4182d1-94c4-4127-9012-23e420b3bddf [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-a9fb1f08-2dfb-451c-a5ae-1a246bbc907b [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-60d47bdc-be24-435e-afc9-08c7bc2afa67 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-23cd530e-83a2-475c-bf9f-be11859500a9 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-b3bf384e-f346-46f7-bf7a-132c6da9103c [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-01034a7a-c6f8-4ab7-ae18-1e3adca733f4 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-e2c9d264-94f0-4e16-ac22-61f01225a449 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-f4102ac5-3b77-4526-87f1-09ba3c1e9b74 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-74a9c343-ff67-49fb-ac06-a2b3fbfdd93a [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-978a9c46-a57a-4188-a7d2-67cba65d3463 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-1be127da-54f8-4e36-ab81-4c0403833282 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-f7c4c671-a22e-43ed-bb55-d34a1be8d1ba [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-a25df74a-4a52-42ec-8d25-ef340a77393d [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-faa07509-beb7-42e9-903d-7e7a9536a9e4 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-1ff44d20-0d7c-4159-8ca2-f61dfb36b909 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-eb90cbd4-78ec-46b6-aaed-fbc45f62e566 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-63a63294-2641-4559-aca4-35cd33f42c6d [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-bf18b7b4-a5e8-4165-9447-85c8e57072b3 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-7220a39e-8690-4643-96d1-82d17f250a0c [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-186b7f3e-f893-4151-a437-edfa33f0c3e2 [79%]\n│   ├── tool-catalog--callback-modes--media-and-contact-fo-32765211-cf2e-4d4e-a4cf-67c062409f70 [71%]\n│   ├── tool-catalog--callback-modes--media-and-contact-fo-d6b18778-7ca4-4d24-ae5c-b5c6d1956528 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-5cd99d86-08cf-4ac5-a6cf-f8077c7dbee1 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-7a4182d1-94c4-4127-9012-23e420b3bddf [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-a9fb1f08-2dfb-451c-a5ae-1a246bbc907b [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-60d47bdc-be24-435e-afc9-08c7bc2afa67 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-23cd530e-83a2-475c-bf9f-be11859500a9 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-b3bf384e-f346-46f7-bf7a-132c6da9103c [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-01034a7a-c6f8-4ab7-ae18-1e3adca733f4 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-e2c9d264-94f0-4e16-ac22-61f01225a449 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-f4102ac5-3b77-4526-87f1-09ba3c1e9b74 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-74a9c343-ff67-49fb-ac06-a2b3fbfdd93a [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-978a9c46-a57a-4188-a7d2-67cba65d3463 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-1be127da-54f8-4e36-ab81-4c0403833282 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-f7c4c671-a22e-43ed-bb55-d34a1be8d1ba [71%]\n│   └── hermes-tool-help-checks--category--search--schema-a25df74a-4a52-42ec-8d25-ef340a77393d [71%]\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   └── Code Reviewer (code-reviewer-6) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (3)\n│   ├── Escalated: escalated-1794819684090-u62dk9\n│   │   * * * * * [disabled] ⚠ 1 consecutive failure\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.running@2026-11-16 ⚠ 1 error\n│   └── Autopilot\n│       0 8 * * 1-5 [disabled] last:status.completed@2026-11-16\n├── favorites/ (active: quality-tester)\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-broad\n│   │   model: skill:vibe-coder\n│   ├── test-vibe-coder\n│   │   model:kimi-k3 skill:vibe-coder\n│   ├── quality-tester\n│   │   model: skill:quality-tester [ACTIVE]\n│   ├── My Technical\n│   │   model: skill:technical\n│   └── +24 more\n├── /uploads/ (4 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
+            "text": "[Current context and required actions for THIS turn — reflects live state right now]\n\n[RENAME IF STALE] Current title \"Hermes catalog, callback modes and approval gate tests\" / \"Quality-gate testing on the hermes instance covering the tool catalog (ai category, keyword search, generate_image schema), instance identity, credits balance, and the favorites list. Exercised every callback mode: detach plus await-task, inline wait, and repeated wakeUp dispatches that each returned a taskId followed by a deferred result with a non-empty responsePath. The approval gate was the failing area - cortex-write with callbackMode=approve executed immediately and wrote /memories/t7-approve-test, and a later contact-form submission likewise ran without any confirmation being requested while returning a hint claiming the user had confirmed.\". If the topic has shifted or the description no longer fits, silently call execute-tool(toolName=\"rename-thread\", input={ title: \"≤8 words covering the whole conversation, no quotes\", description: \"2-6 sentences summarizing the full thread — what was discussed, decided, or built\" }, callbackMode: \"endLoop\") this response (never announce it) — as a side-action, not instead of the user's request. Otherwise leave it. Do the user's actual request FIRST and in FULL; the rename is a silent side-action fired in the SAME batch as your real tool calls (or right after, once your answer is complete). NEVER skip, delay, or replace the user's work with it, never make it your only action, and never fire it while other work is still pending — only fire it once the user's request is fully done, then let endLoop close the turn. endLoop means nothing runs after it: your visible answer text must be in the SAME response as the rename call (thinking alone is not an answer), or the user gets no reply.\n\n## Cortex (Your Persistent Brain)\nShared memory between you and the user. Persists across conversations. You read and write files directly.\n**Language:** Write all content in English - the user's language.\n\n/ (cortex)\n├── memories/ (24)\n│   ├── t7-approve-test [89%]\n│   │   T7_APPROVE_OK\n│   ├── t8-parallel-test [86%]\n│   │   T8_PARALLEL_OK\n│   ├── name.md\n│   │   Test User - integration test identity. · Prefers concise responses. Works with TypeScript.\n│   ├── skills.md\n│   │   Expert in: TypeScript, React, Node.js. · Strong in: testing, API design.\n│   ├── background.md\n│   │   Built production systems at scale. · Deep understanding of SaaS architecture and AI pipelines.\n│   ├── t2-cheap-test\n│   │   T2_CHEAP_OK\n│   ├── cb-wakeup-stress-test\n│   │   wakeup-stress-test-payload\n│   ├── cb-wakeup-repeat-test\n│   │   wakeup-repeat-test-payload\n│   ├── cb-wakeup-test\n│   │   wakeup-test-payload\n│   ├── cb-wait-inline-test\n│   │   wait-inline-test-payload\n│   ├── cb-await-task-test\n│   │   await-task-test-payload\n│   ├── role.md\n│   │   <!-- Your professional role, what you do, and the context you operate in. -->\n│   ├── goals.md\n│   │   <!-- Your primary goals - what you're trying to build, achieve, or improve. Short-term and long-term. -->\n│   ├── communication.md\n│   │   <!-- How you prefer to communicate: tone, depth, format, what annoys you, what you value. -->\n│   ├── tools.md\n│   │   <!-- Tools, languages, frameworks, and platforms you use regularly. Preferred stack. -->\n│   ├── projects.md\n│   │   <!-- Active projects: what you're working on, what matters most right now. -->\n│   ├── preferences.md\n│   │   <!-- Working preferences: how you like to work, what slows you down, what helps you focus. -->\n│   ├── constraints.md\n│   │   <!-- Constraints, hard rules, and non-negotiables for how the AI should behave with you. -->\n│   ├── career.md\n│   │   · <!-- What are you actually doing for work right now? Role, company/project, income level, satisfaction 1-10. --> · ## Goals · <!-- Short-term (this month): --> · <!-- Medium-term (this year): --> · <!-- Long-term (3-5 years): --> · ## Active Projects · <!-- Which projects in /documents/projects/ serve your career right now? What's the connection? --> · ## Blockers · <!-- What would change everyt\n│   ├── health.md\n│   │   · <!-- Honest snapshot: physical fitness, mental state, sleep quality, any conditions or concerns. --> · ## Routines · <!-- What you actually do (not what you plan to do). Exercise, sleep schedule, nutrition habits. --> · ## Energy · <!-- What charges you? What drains you? When in the day/week are you sharpest? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · \n│   ├── relationships.md\n│   │   · <!-- The 3-5 people who matter most. Partner, family, closest friends. How are things with each? --> · ## Current State · <!-- Overall relationship health. Who are you close to? Who have you drifted from? --> · ## Investment · <!-- Who needs more from you right now? Where are you over-investing vs under-investing? --> · ## Goals · <!-- What do you want to build or repair in your relationships th\n│   ├── finances.md\n│   │   · <!-- Monthly income vs spending. Savings. Debt. Stability rating 1-10. --> · ## Safety Net · <!-- How many months could you survive without income? What's your runway? --> · ## Goals · <!-- Short-term (this month): --> · <!-- Long-term (this year): --> · ## Growth · <!-- How are you building wealth or financial security? Investments, side income, skills that pay. --> · ## Blockers · <!-- What's \n│   ├── growth.md\n│   │   · <!-- What are you actively learning or developing right now? What's clicking? --> · ## Skills Gap · <!-- What skill or knowledge, if acquired, would unlock the next level for you? --> · ## Goals · <!-- What do you want to learn or master this year? Be specific. --> · ## Resources · <!-- Books, courses, mentors, communities that are helping. What's working? --> · ## Blockers · <!-- What's slowing\n│   └── purpose.md\n│       · <!-- One or two sentences: what is your life fundamentally about? What are you here to do or build? --> · ## Core Values · <!-- 3-5 values that guide your decisions. Not aspirations - things you actually live by. --> · ## What Success Looks Like · <!-- In 5 years, what does a life well-lived look like for you specifically? -->\n├── documents/ (5)\n│   ├── delete-test/ (2 files)\n│   │   ├── observe.md\n│   │   └── single.md\n│   └── templates/ (5 files)\n│       ├── meeting-notes.md\n│       ├── project-brief.md\n│       ├── weekly-review.md\n│       ├── decision-log.md\n│       └── knowledge-article.md\n├── threads/ (private: 75 · 9 background)\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-5cd99d86-08cf-4ac5-a6cf-f8077c7dbee1 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-7a4182d1-94c4-4127-9012-23e420b3bddf [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-a9fb1f08-2dfb-451c-a5ae-1a246bbc907b [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-60d47bdc-be24-435e-afc9-08c7bc2afa67 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-23cd530e-83a2-475c-bf9f-be11859500a9 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-63a63294-2641-4559-aca4-35cd33f42c6d [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-bf18b7b4-a5e8-4165-9447-85c8e57072b3 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-7220a39e-8690-4643-96d1-82d17f250a0c [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-186b7f3e-f893-4151-a437-edfa33f0c3e2 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-60ff0a37-ac96-4e83-b9e6-e9b6663be6ba [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-306387f6-5143-486a-b94b-7dfb07cc4bd8 [80%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-b3bf384e-f346-46f7-bf7a-132c6da9103c [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-01034a7a-c6f8-4ab7-ae18-1e3adca733f4 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-e2c9d264-94f0-4e16-ac22-61f01225a449 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-f4102ac5-3b77-4526-87f1-09ba3c1e9b74 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-74a9c343-ff67-49fb-ac06-a2b3fbfdd93a [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-978a9c46-a57a-4188-a7d2-67cba65d3463 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-1be127da-54f8-4e36-ab81-4c0403833282 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-f7c4c671-a22e-43ed-bb55-d34a1be8d1ba [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-a25df74a-4a52-42ec-8d25-ef340a77393d [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-faa07509-beb7-42e9-903d-7e7a9536a9e4 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-1ff44d20-0d7c-4159-8ca2-f61dfb36b909 [79%]\n│   ├── hermes-catalog-checks-and-cortex-write-read-test-eb90cbd4-78ec-46b6-aaed-fbc45f62e566 [79%]\n│   ├── hermes-tool-help-checks--category--search--schema-5cd99d86-08cf-4ac5-a6cf-f8077c7dbee1 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-7a4182d1-94c4-4127-9012-23e420b3bddf [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-a9fb1f08-2dfb-451c-a5ae-1a246bbc907b [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-60d47bdc-be24-435e-afc9-08c7bc2afa67 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-23cd530e-83a2-475c-bf9f-be11859500a9 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-b3bf384e-f346-46f7-bf7a-132c6da9103c [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-01034a7a-c6f8-4ab7-ae18-1e3adca733f4 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-e2c9d264-94f0-4e16-ac22-61f01225a449 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-f4102ac5-3b77-4526-87f1-09ba3c1e9b74 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-74a9c343-ff67-49fb-ac06-a2b3fbfdd93a [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-978a9c46-a57a-4188-a7d2-67cba65d3463 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-1be127da-54f8-4e36-ab81-4c0403833282 [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-f7c4c671-a22e-43ed-bb55-d34a1be8d1ba [71%]\n│   ├── hermes-tool-help-checks--category--search--schema-a25df74a-4a52-42ec-8d25-ef340a77393d [71%]\n│   └── hermes-tool-help-checks--category--search--schema-faa07509-beb7-42e9-903d-7e7a9536a9e4 [71%]\n├── skills/ (10 created)\n│   ├── Test Chef Bot (test-chef-bot) (created)\n│   │   a friendly cooking assistant. Answer cooking questions concisely and confidently.\n│   ├── Code Reviewer (code-reviewer-10) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-9) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-9) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-8) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-8) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-7) (created)\n│   │   Help users craft compelling stories and narratives.\n│   ├── Code Reviewer (code-reviewer-7) (created)\n│   │   Analyze code for bugs, performance issues, and best practices.\n│   ├── Creative Writer (creative-writer-6) (created)\n│   │   Help users craft compelling stories and narratives.\n│   └── Code Reviewer (code-reviewer-6) (created)\n│       Analyze code for bugs, performance issues, and best practices.\n├── tasks/ (3)\n│   ├── Escalated: escalated-1794819684090-u62dk9\n│   │   * * * * * [disabled] ⚠ 1 consecutive failure\n│   ├── Dreaming\n│   │   0 2 * * * [disabled] last:status.running@2026-11-16 ⚠ 1 error\n│   └── Autopilot\n│       0 8 * * 1-5 [disabled] last:status.completed@2026-11-16\n├── favorites/ (active: quality-tester)\n│   ├── thea-elon-tusk\n│   │   model: skill:thea\n│   ├── thea-vision\n│   │   model: skill:thea\n│   ├── thea-uncensored\n│   │   model: skill:thea\n│   ├── vibe-coder-open\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-fast\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-max\n│   │   model: skill:vibe-coder\n│   ├── vibe-coder-broad\n│   │   model: skill:vibe-coder\n│   ├── test-vibe-coder\n│   │   model:kimi-k3 skill:vibe-coder\n│   ├── quality-tester\n│   │   model: skill:quality-tester [ACTIVE]\n│   ├── My Technical\n│   │   model: skill:technical\n│   └── +24 more\n├── /uploads/ (8 - images, documents, audio, video)\n└── /gens/ (1 - images, audio, video)\n\n**Tools:** `cortex-write` (create/overwrite) · `cortex-edit` (targeted edits — prefer over write) · `cortex-read` · `cortex-search` · `cortex-list` (+ move/delete/mkdir/tree - `tool-help query=\"cortex\"`)\n**Write proactively:** After learning something new about the user, write it. After completing a task, document it. After spotting a stale memory, update it. Use `cortex-edit` to update existing files, `cortex-write` only for new files or full rewrites.\n**Rules:** One idea per file. <200 words. Names: `specific-kebab-case.md`. Consolidate duplicates. Archive (`archived: true` frontmatter) over deleting. Pin critical files (`pinned: true`) - always shown.\n**Writable:** /memories/ (knowledge) · /documents/ (working files) · /skills/ (custom skills)\n**Read-only:** /threads/ · /uploads/ · /searches/ · /gens/ · /favorites/ · /tasks/ · /ssh/ - use `cortex-read` or `cortex-list` only\n**SSH/Machines:** `cortex-list(path=\"/ssh\")` → machines + their mounts. `cortex-exec(path=\"/ssh/<machine>\", command=\"...\")` → run commands (only /ssh/ paths). `cortex-terminals` → active terminals with cwd. Mounts at `/ssh/<machine>/<mount>/` → shortcuts to configured dirs (terminal retains full machine access). Default mount sets initial cwd for new sessions. `cortex-list(path=\"/ssh/<machine>/<mount>/\")` → browse mount. `cortex-read(path=\"/ssh/<machine>/path\")` → read file.\n\n## Favorites (34) - active: \"Quality Tester - Budget\" ()\n- [quality-tester] Quality Tester - Budget [ACTIVE] | char:Quality Tester - Budget (quality-tester) | model:\n- [thea-elon-tusk] Thea - Elon Tusk | char:Thea - Elon Tusk (thea) | model:\n- [thea-vision] Thea - All-Seeing | char:Thea - All-Seeing (thea) | model:\n- [thea-uncensored] Thea - Uncensored | char:Thea - Uncensored (thea) | model:\n- [vibe-coder-open] Vibe Coder - Open Frontier | char:Vibe Coder - Open Frontier (vibe-coder) | model:\n- [vibe-coder-fast] Vibe Coder - Sharp | char:Vibe Coder - Sharp (vibe-coder) | model:\n- [vibe-coder-max] Vibe Coder - Max | char:Vibe Coder - Max (vibe-coder) | model:\n- [vibe-coder-broad] Vibe Coder - Broad | char:Vibe Coder - Broad (vibe-coder) | model:\n- [test-vibe-coder] Vibe Coder - Cheap & Smart | char:Vibe Coder - Cheap & Smart (vibe-coder) | model:kimi-k3\n- [my-technical] My Technical | char:Technical (technical) | model:\n- [my-technical-3] My Technical | char:Technical (technical) | model:\n- [my-technical-4] My Technical | char:Technical (technical) | model:\n- [my-technical-5] My Technical | char:Technical (technical) | model:\n- [my-technical-2] My Technical | char:Technical (technical) | model:\n- [my-technical-6] My Technical\n[... 19 more favorites not shown - use `favorites` for the full list]\n\nTools: `favorites` (list) · `favorite-create` (create) · `favorite-update` (edit) · `favorite-delete` (delete) · `skill-create` (new character)\n\n**Proactive optimization:** Continuously improve the user's character + favorites setup:\n- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite\n- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one\n- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups\n- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config",
             "type": "text"
           }
         ],
@@ -1103,7 +1103,7 @@
         },
         "content": [
           {
-            "text": "[Context: ID:03b6a616 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 19:43]",
+            "text": "[Context: ID:46c092a3 | Model:deepseek-v4.1-flash | Skill:quality-tester__budget | Posted:Nov 16, 20:09]",
             "type": "text"
           }
         ],

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog--callback-modes-and-media-attachment--a8a8b238-853d-4e0c-9bbf-6449a34c630c.md\n\n# Tool catalog, callback modes and media attachment tests\nFolder: private\nDescription: A QA session exercising the platform tool catalog, callback modes and media handling. Parallel tool-help calls validated category, keyword and detail lookups; generate_music, favorites, self-instance-id and generate_video all returned well-formed results, as did detach/await-task, wait and repeated",
+    "encoding_format": "float"
+  }
+}

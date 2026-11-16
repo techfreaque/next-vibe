@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The audio came through as a ~28-second pop / dance-pop instrumental, roughly 112–114 BPM in 4/4.\n\n- **0:00–0:21:** Sparse syncopated groove — finger snaps and claps on beats 2 and 4, soft shaker/hi-hat ticking, a bell-like synth pluck carrying a repeating hook, and a warm bouncy bassline underneath.\n- **0:21–0:24:** Build-up — percussion strips back, a white-noise riser and reversed cymbal swell create tension.\n- **0:24–0:28:** The drop — four-on-the-floor kick, a brief processed vocal chop, thick synth pads, and a driving bassline before cutting off cleanly at 0:28.\n\nNo lyrics beyond that one vocal stab. Clean, bright modern production with a wide stereo image.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

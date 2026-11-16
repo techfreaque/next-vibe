@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/audio/hermes-catalog-callback-modes-and-attachment-tests-5503a4b0-9031-41ad-8a52-31a724f9fc47/test-voice.wav.md\n\n---\nfilename: \"test-voice.wav\"\nembedded: true\nmimeType: \"audio/wav\"\nsize: \"625.0 KB\"\nthreadId: \"5503a4b0-9031-41ad-8a52-31a724f9fc47\"\nthreadTitle: \"Hermes catalog, callback modes and attachment tests\"\nuploadedAt: \"2026-11-16T19:33:05.402Z\"\n---\n\n# test-voice.wav\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/wav` |\n| Size | 625.0 KB |\n| Thread | Hermes catalog, callback modes and attachment tests |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10e voice-wav-attach] A WAV audio recording is attached. Repeat back the exact word(s) you heard in the audio. End your reply with STEP_OK if the transcription contained the word 'banana', or FAILED: <reason> if you could not hear it or got something else.",
+    "encoding_format": "float"
+  }
+}

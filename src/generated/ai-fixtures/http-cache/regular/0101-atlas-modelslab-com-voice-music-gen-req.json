@@ -1,0 +1,13 @@
+{
+  "url": "https://modelslab.com/api/v7/voice/music-gen",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "key": "t20x6N3haz5IAxDzfP0MBUSzQ5IpjZ5nMkd5AY9nKDuGR7svtN53lD31jsMa",
+    "model_id": "sonauto_song",
+    "prompt": "short cinematic outro music, warm resolving chord progression, gentle fade out, podcast credits feel",
+    "duration": 8
+  }
+}

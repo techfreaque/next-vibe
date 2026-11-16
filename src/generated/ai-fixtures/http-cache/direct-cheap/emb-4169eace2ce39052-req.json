@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Both calls ran in parallel and returned the expected shapes.\n\n- `cortex-write` → `responsePath: /memories/t8-parallel-test`, size 14, `created: false` (node already existed from an earlier run, so it was updated rather than created — content written successfully).\n- `chat-settings` → returned the full settings object with `selectedSkill: \"thea\"` and `selectedModel: \"kimi-k3\"`.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

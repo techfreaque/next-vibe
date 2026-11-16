@@ -21,6 +21,7 @@ import type {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../../vision-models";
+import { attachmentIdOfPart } from "../context/bridged-attachment";
 import { ProviderFactory } from "../core/infra";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import {
@@ -169,6 +170,8 @@ async function runBridgeCall(params: {
   promptText: string;
   abortSignal: AbortSignal;
   chatMessageId: string | null;
+  /** Attachment being described (tags the cached variant). */
+  attachmentId: string | undefined;
   bridgeType: "stt" | "vision" | "translation" | "tts";
   modality: Modality;
   creditFeature: string;
@@ -185,6 +188,7 @@ async function runBridgeCall(params: {
     promptText,
     abortSignal,
     chatMessageId,
+    attachmentId,
     bridgeType,
     modality,
     creditFeature,
@@ -293,6 +297,7 @@ async function runBridgeCall(params: {
         creditCost,
         createdAt: new Date().toISOString(),
         bridgeType,
+        ...(attachmentId ? { attachmentId } : {}),
       };
 
       await dbWriter.emitGapFillCompleted({
@@ -491,6 +496,7 @@ export class BridgeCall {
       promptText: BRIDGE_PROMPTS.image,
       abortSignal: params.abortSignal,
       chatMessageId,
+      attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
       creditFeature: `vision-bridge:${visionModel.id}`,
@@ -565,6 +571,7 @@ export class BridgeCall {
       promptText: BRIDGE_PROMPTS.audio,
       abortSignal: params.abortSignal,
       chatMessageId,
+      attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
       creditFeature: `audio-vision-bridge:${audioVisionModel.id}`,
@@ -639,6 +646,7 @@ export class BridgeCall {
       promptText: BRIDGE_PROMPTS.video,
       abortSignal: params.abortSignal,
       chatMessageId,
+      attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
       creditFeature: `video-vision-bridge:${videoVisionModel.id}`,

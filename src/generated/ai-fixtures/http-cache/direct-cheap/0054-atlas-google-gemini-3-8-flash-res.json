@@ -4,23 +4,26 @@
   "status": 200,
   "headers": {
     "access-control-allow-origin": "*",
-    "access-control-expose-headers": "X-Generation-Id,cf-ray",
-    "cf-ray": "a18c2f7bdccbdcae-FRA",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a5b8ece84f375d8b-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Fri, 10 Jul 2026 02:37:17 GMT",
+    "date": "Mon, 16 Nov 2026 19:33:09 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1783651036-juW1HzH80u7Hi6p4lJQO"
+    "x-generation-id": "gen-1794857586-Q9BHIWRC9VdXKx3AaMEB",
+    "x-openrouter-release": "api;4d94f9f5-4934-4340-811b-d18f936200f4",
+    "set-cookie": "__cf_bm=GAhqwsWgWZ_DO9Y5jzSL7V.m3JKKgwRVr3maHu6SMgM-1794857585.9736934-1.0.1.1-ZpWKosTmKhjjO_AfaPMbQRp2nxABPAQ7a9lKJFun.FjWHQ1_B9f0iBVGxo0q4u6IK1U0DUezzL4Ria0Fy0PZDudEStHSIOOYWAWQ1ekJpzW_RZEQTQ5aW0PJUjeTIlgH; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 20:03:09 GMT"
   },
   "body": {
-    "id": "gen-1783651036-juW1HzH80u7Hi6p4lJQO",
+    "id": "gen-1794857586-Q9BHIWRC9VdXKx3AaMEB",
     "object": "chat.completion",
-    "created": 1783651036,
+    "created": 1794857586,
     "model": "google/gemini-3.8-flash",
     "provider": "Google",
     "system_fingerprint": null,
@@ -33,31 +36,45 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "The audio is a short clip, 16 seconds in duration, exhibiting a polished production style and good sound quality. It features several musical elements and one distinct sound effect.\n\n**Musical Elements:**\n- **Genre:** This appears to be a light, upbeat instrumental piece, possibly an outro or a short jingle, with strong elements of funk and soul.\n- **Tempo:** The tempo is moderately fast, estimated around 120-130 BPM.\n- **Instruments:**\n    - **Electric Guitar:** Plays a clean, rhythmic riff with a distinct funk/soul feel. It's prominent throughout the clip.\n    - **Bass Guitar:** Provides a groovy, walking bassline, complementing the guitar and driving the rhythm.\n    - **Drums:** A standard drum kit provides a steady, upbeat rhythm with a clear snare hit, hi-hats, and kick drum.\n    - **Organ/Keyboard:** Plays a sustained chord, adding a warm, harmonic layer to the background, particularly noticeable in the second half of the clip.\n- **Interaction:** The guitar, bass, and drums form a cohesive, bouncy rhythm section. The organ adds harmonic richness without dominating.\n- **Mood:** The music is cheerful, light, and somewhat nostalgic, evoking a retro vibe.\n\n**Non-Musical Audio Events:**\n- **Sound Effect:** At 0:01, there is a distinct \"boing\" sound, similar to that of a spring or an eccentric cartoon sound effect. It stands out against the musical background.\n\n**Structure:**\nThe clip is too short to discern a full song structure, but it feels like a self-contained musical snippet, potentially an outro theme given its conclusive feel towards the end.\n\n**Overall:**\nThe audio combines a playful sound effect with a well-produced, upbeat funk/soul instrumental, creating an engaging and lighthearted atmosphere.",
+          "content": "### Audio Overview & Environment\n- **Duration:** Approximately 21 seconds.\n- **Recording Environment / Quality:** Clear indoor recording using a close-range microphone (likely a phone or desktop mic in a quiet room). Slight room resonance and occasional low-level breath sounds are audible.\n- **Music:** None present.\n\n---\n\n### Speech Analysis & Transcription\n\n- **Speaker Characteristics:**\n  - **Gender / Age:** Adult male, estimated in his 20s to 30s.\n  - **Accent:** Non-native English speaker with a distinct Central European / Germanic accent.\n  - **Tone & Delivery:** Calm, deliberate, neutral, and instructional. The pacing is relatively slow with marked pauses between clauses, noticeably stretching out time toward the end.\n\n- **Verbatim Transcription:**\n  > \"If you hear this, exactly transcribe the whole message exactly as I say it, including [pause] the magic [pause] keyword [pause] banana banana, [pause] and I need to fill up the last [short pause] few seconds, and it will be...\"\n\n---\n\n### Timeline & Non-Verbal Audio Details\n- **00:00 – 00:06:** The speaker begins speaking clearly: *\"If you hear this, exactly transcribe the whole message exactly as I say it...\"*\n- **00:06 – 00:11:** Noticeable brief pauses between words: *\"including... the magic... keyword...\"*\n- **00:11 – 00:14:** Pronounces the phrase: *\"banana banana,\"* followed by a brief hesitation/breath.\n- **00:14 – 00:18:** The speaker deliberately fills time: *\"and I need to fill up the last few seconds, and it will be...\"*\n- **00:18 – 00:21:** The speaker stops mid-sentence on the word \"be\", followed by near-silence, faint ambient room tone, and subtle mic noise until the end of the recording.",
           "refusal": null,
-          "reasoning": null
+          "reasoning": "**Analyzing Speech**\n\nI'm currently dissecting the provided audio, focusing on accurately transcribing the adult male speaker's speech. My initial analysis points to a European, likely Germanic, accent, which is a key element for the description.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Speech**\n\nI'm currently dissecting the provided audio, focusing on accurately transcribing the adult male speaker's speech. My initial analysis points to a European, likely Germanic, accent, which is a key element for the description.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "AY89a19WX0eMjBjjhuJTuQfvAqBGzGp6di7kyCZiW6k7x36l055w2HGIcvIANR1/GY7fng16fD3Jq95dMNbyuJ5uB0cjgDlTrt05GYhTE4mtvOTMgWMCuHcoD/xFzFjite1/XOWzhKA4lQd22q/0rsGEb6Wv8QKyvLz+Ryp811VIgWV8uSqIhSsZ1AS0vA/rI68t/v7VWxk/eNa81T8LtDAygEZog4+CEoFY3bHvZjVQJaqO3As8VJa+uHNiCAzlzo0EPOJjvK1um3koqgpJXcGRGc3HS5PPF4cio78lGCZXO5R0LKJthNkkgSVCAaONyuybyZi6oHP15Y/qRT+wofQOU6oNOI4kBxOOyn1ykkkldXNEG0vC4LuNZ/ATwv3sZw5G9FXh6/KTydmOjUfUtA+RYr7MYwnSZQvP/Y91PuiP1vus4vmRl3Ucjk+yvk4iDybg4Ftob2NoT8zatvzQ0USGTvh/Tesu5/anNIZHftpQg1vot+Izz6+C4QA5u8Jy/qDKtwVc3ShkT2hxCnWzztR/+t5P3+TTiYpVb39Gc92lovceHBUBLTYUDuPNR+r0IDp5PuHjvFhWUc5+XIHnaNWy8E4YfB0s7e7NgQSI/cC/mxQ9MG4OPoGyNIRper6kp63+k0O1ollVhoy2kgd8elL/GidNpI1EEUtac0MaFSv39YgwgJ2JTjRmJkTK/MJCaH+FmeUtaj76+KXixAgMt6Ridns6GbTsiI7UyASgPHeU6YgSSR9EXofWSzkFmR+t8gDtqvzRfP8UeNp5rwh/7u2JKtO0LC22Q0cYN9gW7V8qpjVf3Iql+EgEW2dI1icOOQQBNcy3wlisM4p16lWdtllw4ehZR7Px2vTiQKbGM73cDT+s7nmnjzcMy51euh3WEf9txvj4ZB3tRjuIgynKyjgGwN6Amyvrk1Rxf1DiXWZeKfF4k+9p85f42SM/p4pnhXAM+v3NuntdC3zpcZp01/QlNmfB4ITD9yArKUhEXBB18qPgbg5pjAqVZTB/RMZIeB3+fvI+9WoVzth53XEOYpLZaZUsfigmF5GiCzS5nNu4Gsme4mAChi48ToEbbV+2XVGazxI9iTobRtKffS4kT+++VmqvBCsCCp+phbLZRbQzhRsRoOOKiTSo4Yeb6AmYVHilmyfj9hv0oXw5exRJKartUvjGJpr0IsBTnTxbqGOGU6cYKKwWlhckLJJxOqZmZueoimHi2RjL+bEf9g3doGzRGd5kcC+52xHzE0IGBYNU+CvTKVOFqCwh84ANL/dqVHTGXb/QSRY+vhHIw+TmjpIFoC/cKqHkoVDsXurE0ZFH2plzlwT4ngvdbDjktBobaaVuV/yDGKc2Hd6a7NJiB/LTgN08KQ5p2982Xz2yIZWkhXjAqFNQ/0vms5BFDjOrmUhhA8GNOg7aszhUO/0UJgNxI/GPyf33SN0Q47EJPX/lu1geOo58tfxJl39vWgbA3ynKwLgud+AA885QqG0yC62cfZGgv52T1AfshTvhnrzv2sWPoLIr7r72b5AP127k2IBHMOyNp2EJcMlLcKIe53lbnVqno6ugv/iqWIXbuJ2zHRemIW9hQwArCL2uc176v+WU/WNCeyzL4BmAyzWiNAyJelKm2l+KyfUZUpZl4b4C4vjxPe9nk1ZbdIjeC0K/NBgB5J4tKvgASnQL/Qp1+rFERAUF7Fct+cfWDg==.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS0zLjgtZmxhc2gtMjAyNjA5MDJ8Z29vZ2xlLXZlcnRleC9nbG9iYWwifQ",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
         }
       }
     ],
     "usage": {
-      "prompt_tokens": 1072,
-      "completion_tokens": 391,
-      "total_tokens": 1463,
-      "cost": 0.0018241,
+      "prompt_tokens": 822,
+      "completion_tokens": 658,
+      "total_tokens": 1480,
+      "cost": 0.003084,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
         "cache_write_tokens": 0,
-        "audio_tokens": 750,
+        "audio_tokens": 500,
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.0018241,
-        "upstream_inference_prompt_cost": 0.0008466,
-        "upstream_inference_completions_cost": 0.0009775
+        "upstream_inference_cost": 0.003084,
+        "upstream_inference_prompt_cost": 0.0006165,
+        "upstream_inference_completions_cost": 0.0024675
       },
       "completion_tokens_details": {
-        "reasoning_tokens": 0,
+        "reasoning_tokens": 223,
         "image_tokens": 0,
         "audio_tokens": 0
       }

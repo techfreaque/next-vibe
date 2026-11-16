@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/images/tool-catalog-callback-modes-and-image-generation-c-a8a8b238-853d-4e0c-9bbf-6449a34c630c/test-image.jpeg.md\n\n---\nfilename: \"test-image.jpeg\"\nurl: \"/api/en-GLOBAL/vibe/agent/chat/threads/files/a8a8b238-853d-4e0c-9bbf-6449a34c630c/6478e807-b002-42d1-a27c-20d3ed588ec0.jpeg\"\nmimeType: \"image/jpeg\"\nsize: \"233.1 KB\"\nthreadId: \"a8a8b238-853d-4e0c-9bbf-6449a34c630c\"\nthreadTitle: \"Tool catalog, callback modes, and image generation checks\"\nuploadedAt: \"2026-11-16T19:23:58.486Z\"\n---\n\n# test-image.jpeg\n\n**Download:** [test-image.jpeg](/api/en-GLOBAL/vibe/agent/chat/threads/files/a8a8b238-853d-4e0c-9bbf-6449a34c630c/6478e807-b002-42d1-a27c-20d3ed588ec0.jpeg)\n\n| Field | Value |\n| --- | --- |\n| Type | `image/jpeg` |\n| Size | 233.1 KB |\n| Thread | Tool catalog, callback modes, and image generation checks |\n| Uploaded | 2026-11-16 |\n\n## Message Context\n\n[T10b multi-attach] Two files are attached: an image and an audio file. Describe the image. For the audio, any description including '[Music]' or similar counts as successfully processed. IMPORTANT: If you received a text description of the image contents (e.g. from a vision model gap-fill), that counts as the image being 'visible' - you do not need to process the raw file yourself. End your reply with STEP_OK if you received any image content or description AND the audio produced any response at all (even just '[Music]'), or FAILED: <reason> only if both the image AND its description were completely absent.",
+    "encoding_format": "float"
+  }
+}

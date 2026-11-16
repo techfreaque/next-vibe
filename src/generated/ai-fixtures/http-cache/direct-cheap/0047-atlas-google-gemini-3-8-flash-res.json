@@ -1,0 +1,83 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a5b8cb4ddb4b4ffe-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Mon, 16 Nov 2026 19:10:13 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794856209-Gds7eZsKr90WZKDPF2YU",
+    "x-openrouter-release": "api;2889a2d5-51ab-4f97-a68f-bc0bc0c58f9f",
+    "set-cookie": "__cf_bm=sqP.GYzxNqrPrNGfftKJxLiDQYmmuwdF71973JfhyYE-1794856209.589718-1.0.1.1-Q5YeDR1du1RzAEN8HpyNwhr_y6..8NGcA8A9l5MLdAw1NfpFACSLDaZS3b1oZCO8z84eRNrzNVYh9hHXqBR4XZzybvJeTmh8qGWCQvDcrmPPyZUurhX19eVZ7DatVYY2; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 19:40:13 GMT"
+  },
+  "body": {
+    "id": "gen-1794856209-Gds7eZsKr90WZKDPF2YU",
+    "object": "chat.completion",
+    "created": 1794856209,
+    "model": "google/gemini-3.8-flash",
+    "provider": "Google",
+    "system_fingerprint": null,
+    "service_tier": "default",
+    "choices": [
+      {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "STOP",
+        "message": {
+          "role": "assistant",
+          "content": "### Overview & Genre\nThis is a high-energy, commercially polished pop / dance-pop instrumental cue (approximately 28 seconds long) that functions as an intro leading into a dynamic chorus/hook drop. The track blends elements of contemporary electro-pop, funk-pop, and modern R&B.\n\n### Tempo, Meter & Harmony\n- **Tempo:** Approximately 112–114 BPM\n- **Time Signature:** 4/4\n- **Feel:** Bouncy, syncopated, rhythmic, and danceable\n- **Key/Tonality:** Minor/modal pop progression with a bright, upbeat inflection (A minor / C major area).\n\n### Chronological Structure & Arrangement\n\n- **00:00 – 00:21 (Intro / Verse Groove):**\n  - The track opens immediately with a sparse, syncopated rhythm section driven by crisp finger snaps / layered claps on beats 2 and 4, accompanied by subtle hi-hat/shaker ticking and soft percussion taps.\n  - A quirky, resonant, bell-like electronic mallet/synth pluck plays a catchy, repeating syncopated melodic hook across the stereo field.\n  - A warm, rounded, bouncy bassline (electric bass tone with synth reinforcement) enters, providing a walking, groovy counterpoint underneath the pluck motif.\n  - Light, muted rhythmic guitar or clean electric piano stabs accent the off-beats, creating an infectious, minimalist funk groove.\n\n- **00:21 – 00:23 (Transition / Build-Up):**\n  - A brief transitional sweep occurs: the percussion strips back slightly as a smooth white-noise riser and reversed cymbal swell create tension leading into the drop.\n  - A subtle drum fill or snare roll rolls toward the downbeat.\n\n- **00:24 – 00:28 (The Drop / Full Groove):**\n  - Impact at 00:24 with a punchy, rounded four-on-the-floor kick drum and a full, driving pop dance beat.\n  - A heavily processed, pitched, bright vocal sample/ad-lib hits briefly on the downbeat, initiating the energetic hook section.\n  - Thick, pulsating synth pads and energetic chord stabs expand the stereo spectrum.\n  - A fuller, driving electronic bassline locks with the kick drum.\n  - The energy peaks into a vibrant, radio-ready dance-pop chorus groove before cutting off cleanly at 00:28.\n\n### Production, Sound Quality & Mix\n- **Acoustic Environment:** Fully digital, modern studio multi-track production.\n- **Mix Characteristics:** Very crisp, bright high-end (snaps and percussion have tight, short plate reverbs), warm and punchy low-end without muddiness, and wide stereo separation.\n- **Speech/Lyrics:** No lyrical speech; only a brief, heavily processed melodic vocal chop/exclamation at the 00:24 drop.",
+          "refusal": null,
+          "reasoning": "**Analyzing Music Genre**\n\nI'm currently zeroing in on the pop genre. The track feels contemporary, with a rhythmic pulse that suggests modern production techniques are at play. I'm listening for specific elements that define its pop classification, like vocal melodies and instrumentation.\n\n**Identifying Genre Elements**\n\nI'm now deeply engrossed in the instrumental intro, identifying a moderate dance tempo around 110-115 BPM in 4/4. The core is a rhythmic electronic percussion groove with finger snaps and a funky bassline, leading into a transition and drop around 00:23 with a full, driving beat.\n\n",
+          "reasoning_details": [
+            {
+              "type": "reasoning.text",
+              "text": "**Analyzing Music Genre**\n\nI'm currently zeroing in on the pop genre. The track feels contemporary, with a rhythmic pulse that suggests modern production techniques are at play. I'm listening for specific elements that define its pop classification, like vocal melodies and instrumentation.\n\n**Identifying Genre Elements**\n\nI'm now deeply engrossed in the instrumental intro, identifying a moderate dance tempo around 110-115 BPM in 4/4. The core is a rhythmic electronic percussion groove with finger snaps and a funky bassline, leading into a transition and drop around 00:23 with a full, driving beat.\n\n",
+              "format": "google-gemini-v1",
+              "index": 0
+            },
+            {
+              "type": "reasoning.encrypted",
+              "data": "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.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS0zLjgtZmxhc2gtMjAyNjA5MDJ8Z29vZ2xlLXZlcnRleC9nbG9iYWwifQ",
+              "format": "google-gemini-v1",
+              "index": 1
+            }
+          ]
+        }
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1072,
+      "completion_tokens": 1174,
+      "total_tokens": 2246,
+      "cost": 0.0052065,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 750,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0052065,
+        "upstream_inference_prompt_cost": 0.000804,
+        "upstream_inference_completions_cost": 0.0044025
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 542,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  }
+}

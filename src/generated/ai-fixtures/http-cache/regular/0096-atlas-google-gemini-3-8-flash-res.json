@@ -6,24 +6,24 @@
     "access-control-allow-origin": "*",
     "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
     "alt-svc": "h3=\":443\"; ma=86400",
-    "cf-ray": "a5b8b43b6c9c4dbf-FRA",
+    "cf-ray": "a5b8dfae9d447ed8-FRA",
     "connection": "keep-alive",
     "content-encoding": "gzip",
     "content-type": "application/json",
-    "date": "Mon, 16 Nov 2026 18:54:28 GMT",
+    "date": "Mon, 16 Nov 2026 19:24:07 GMT",
     "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
     "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
     "server": "cloudflare",
     "transfer-encoding": "chunked",
     "x-content-type-options": "nosniff",
-    "x-generation-id": "gen-1794855264-EOj1Q97jsjYpvAyQ6519",
-    "x-openrouter-release": "api;2889a2d5-51ab-4f97-a68f-bc0bc0c58f9f",
-    "set-cookie": "__cf_bm=yOG9MVFTBVBrqyntnPZOYWG_ol5uqCcvrmYj7aLDt_Q-1794855264.5470648-1.0.1.1-m7EmuidcnBy2s1J7yf9dIo2VN806Yy83BmvIxI_JU5fMs.EcFNVwZfQKA.U2OsdcEF.m7GVg.qwrQnPq1T_DFLFHqdZ3376XkkL1z8k8wmpQsC6axFgvKXZMQI640fqh; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 19:24:28 GMT"
+    "x-generation-id": "gen-1794857044-xMDgVUkFi7MG3q6Ks8oE",
+    "x-openrouter-release": "api;4d94f9f5-4934-4340-811b-d18f936200f4",
+    "set-cookie": "__cf_bm=FhsMbkLnNfQx8F1KmUiEHHgkxSqOMc3hJeo8utOiWiE-1794857044.2574217-1.0.1.1-Fux3k8txwIEzgiyhSWtX77ZvcCitnlCo5Odis5YjCeO0vk1bkWSG.mylq1euPKd_JcowYcbIp257BsLglh48_TyQ2bpwaNmIJMRfWBsJI2mfgfRmZxxCJPmKmy0AJw04; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 19:54:07 GMT"
   },
   "body": {
-    "id": "gen-1794855264-EOj1Q97jsjYpvAyQ6519",
+    "id": "gen-1794857044-xMDgVUkFi7MG3q6Ks8oE",
     "object": "chat.completion",
-    "created": 1794855264,
+    "created": 1794857044,
     "model": "google/gemini-3.8-flash",
     "provider": "Google",
     "system_fingerprint": null,
@@ -36,19 +36,19 @@
         "native_finish_reason": "STOP",
         "message": {
           "role": "assistant",
-          "content": "### Audio Overview\nThis audio clip (approximately 27 seconds long) consists entirely of an instrumental hip-hop / boom-bap / jazz-hop beat. There are no vocals, spoken words, or ambient environmental sounds present.\n\n---\n\n### Musical Analysis\n\n- **Genre / Style:** Instrumental Hip-Hop, Lo-Fi / Jazz-Hop, Boom-Bap.\n- **Tempo & Time Signature:** Steady mid-tempo groove at approximately 88–90 BPM in standard 4/4 time with a slight swing / laid-back pocket.\n- **Key / Tonality:** Minor tonality (warm, introspective, neo-soul/jazz-influenced minor progression).\n- **Mood / Vibe:** Chill, head-nodding, smooth, and relaxed.\n\n---\n\n### Instrumentation & Sonic Elements\n\n1. **Bass:**\n   - **0:00 – 0:19:** A warm, round, and bouncy electric bass guitar line playing a melodic, syncopated groove that anchors the progression.\n   - **0:22 – 0:27:** Following a brief transition, the low end switches to a heavier, deeper 808-style sub-bass foundation with strong low-frequency impact.\n\n2. **Drums & Percussion:**\n   - Crisp, punchy acoustic/sampled boom-bap drum pattern.\n   - Tight kick drum locked with the syncopated bass groove.\n   - Crisp acoustic snare / cross-stick rimshot striking on beats 2 and 4 with subtle reverb.\n   - Steady, swung closed hi-hats ticking through eighth/sixteenth-note rhythms with occasional open accents.\n\n3. **Keys & Melodic Layer:**\n   - Soft, Rhodes-style electric piano or warm analog synth keys playing sparse, syncopated chord stabs and delicate upper-register melodic accents.\n   - Modulated with light stereo chorus/vibrato, giving it a vintage, floating character.\n\n---\n\n### Structure & Timeline\n\n- **0:00 – 0:19 (Main Groove Loop):** \n  The track establishes a continuous, looping 4-bar groove featuring the electric bassline, crisp boom-bap drum break, and sparse electric piano stabs.\n- **0:19 – 0:21 (Transition / Fill):** \n  The primary rhythm cuts out momentarily for a brief transitional bridge/fill featuring a descending pitch-shifted texture and a quick percussive roll.\n- **0:22 – 0:27 (B-Section / Beat Drop):** \n  The beat drops back in with increased low-end weight, introducing a sustained deep sub-bass line under the drum pattern and keys before cutting off cleanly at the end of the clip.\n\n---\n\n### Production & Sound Quality\n- **Quality:** Clean, studio-produced digital audio with warm saturation and analog-style processing.\n- **Mix Balance:** Drum transients (snare and kick) are prominent in the center, bass sits warmly below 150 Hz, and keyboard elements are gently spread across the stereo field with tasteful, subtle room reverb.",
+          "content": "An instrumental hip-hop and boom-bap style musical beat loop with a groovy, playful, and head-nodding aesthetic.\n\n### Musical Overview\n- **Genre:** Hip-Hop / Instrumental Boom Bap / Jazz-Hop / Lo-Fi Beats\n- **Tempo:** Approximately 92–94 BPM\n- **Time Signature:** 4/4\n- **Key:** F minor / A♭ major (modal jazzy harmony)\n- **Duration:** Approximately 25 seconds (a looping 8-to-12-bar phrase with a concluding fill/breakdown)\n\n### Instrumentation & Arrangement\n- **Drums & Percussion:** \n  - A tight, punchy acoustic-style sampled drum kit.\n  - A crisp, snappy acoustic snare landing firmly on beats 2 and 4, accompanied by subtle ghost notes.\n  - A bouncy, syncopated kick drum pattern anchoring the downbeats and pocket.\n  - Swung eighth-note/sixteenth-note hi-hats (alternating tight closed ticks and quick open accents).\n  - Shaker/tambourine rhythm layered subtly into the upper frequencies, enhancing the swing.\n- **Bass:**\n  - A warm, rounded, deep electric fingerstyle bassline that bounces with playful syncopation, providing rhythmic counterpoint to the chord stabs.\n- **Keys / Chords:**\n  - Staccato, syncopated electric piano (Rhodes/Wurlitzer style) playing light, jazzy, soulful chords with slight stereo modulation and warm saturation.\n- **Synthesizers / Melodic Stabs:**\n  - Brief, high-register melodic synth blips and subtle vocal-like harmonic chops that accent specific off-beats.\n\n### Structural Progression\n- **0:00 – 0:11:** The full rhythm section enters immediately with the main thematic groove running over an initial 4-bar progression.\n- **0:11 – 0:13:** A brief rhythmic inflection/turnaround with a subtle tape-stop or filter dip before restarting the groove pattern.\n- **0:13 – 0:21:** The core groove repeats for another 4 bars, maintaining consistent energy and groove pocket.\n- **0:22 – 0:25:** The harmonic elements (keys and bass) drop out for a brief drum fill/breakdown consisting of muted kick and tom/snare hits, ending on a crisp cutoff.\n\n### Production Style & Quality\n- Clean, modern, polished studio production with analog-style warmth and saturation.\n- Drums are compressed for a classic hip-hop \"smack\" and forward presence.\n- Stereo field features centered kick, snare, and bass, with electric piano chords and percussion panned gently across the stereo spectrum.\n- **Speech/Vocals:** None present.",
           "refusal": null,
-          "reasoning": "**Analyzing Audio Bridge**\n\nI'm currently listening to the audio bridge. It's about 27-28 seconds long and features a hip-hop/boom bap/lo-fi/jazz-hop beat with a clean electric sound.\n\n**Detecting Musical Elements**\n\nI've identified a bouncy bassline and a crisp hip-hop drum beat. A Rhodes or electric piano provides sparse chords. There's subtle background texture and a transition around 0:19, with a heavier 808 kick entering at 0:22. The tempo is around 85-90 BPM in a minor key.\n\n",
+          "reasoning": "**Analyzing Audio Content**\n\nI'm currently dissecting an instrumental audio clip, approximately 25 seconds long. My focus is on characterizing it as an audio bridge, noting its upbeat, bouncy rhythm within a Hip-hop/Lo-Fi/Boom Bap/Jazz-hop genre.\n\n**Profiling Track Elements**\n\nI'm refining my analysis, focusing on the detailed sonic components. The rhythmic backbone is a crisp boom-bap drum break and a warm, walking bassline. Jazzy, syncopated chords from a Rhodes-like keyboard interplay with percussive tambourine accents and sharp synth stabs.\n\n",
           "reasoning_details": [
             {
               "type": "reasoning.text",
-              "text": "**Analyzing Audio Bridge**\n\nI'm currently listening to the audio bridge. It's about 27-28 seconds long and features a hip-hop/boom bap/lo-fi/jazz-hop beat with a clean electric sound.\n\n**Detecting Musical Elements**\n\nI've identified a bouncy bassline and a crisp hip-hop drum beat. A Rhodes or electric piano provides sparse chords. There's subtle background texture and a transition around 0:19, with a heavier 808 kick entering at 0:22. The tempo is around 85-90 BPM in a minor key.\n\n",
+              "text": "**Analyzing Audio Content**\n\nI'm currently dissecting an instrumental audio clip, approximately 25 seconds long. My focus is on characterizing it as an audio bridge, noting its upbeat, bouncy rhythm within a Hip-hop/Lo-Fi/Boom Bap/Jazz-hop genre.\n\n**Profiling Track Elements**\n\nI'm refining my analysis, focusing on the detailed sonic components. The rhythmic backbone is a crisp boom-bap drum break and a warm, walking bassline. Jazzy, syncopated chords from a Rhodes-like keyboard interplay with percussive tambourine accents and sharp synth stabs.\n\n",
               "format": "google-gemini-v1",
               "index": 0
             },
             {
               "type": "reasoning.encrypted",
-              "data": "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.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS0zLjgtZmxhc2gtMjAyNjA5MDJ8Z29vZ2xlLXZlcnRleC9nbG9iYWwifQ",
+              "data": "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.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS0zLjgtZmxhc2gtMjAyNjA5MDJ8Z29vZ2xlLXZlcnRleC9nbG9iYWwifQ",
               "format": "google-gemini-v1",
               "index": 1
             }
@@ -58,9 +58,9 @@
     ],
     "usage": {
       "prompt_tokens": 1072,
-      "completion_tokens": 1135,
-      "total_tokens": 2207,
-      "cost": 0.00506025,
+      "completion_tokens": 1138,
+      "total_tokens": 2210,
+      "cost": 0.0050715,
       "is_byok": false,
       "prompt_tokens_details": {
         "cached_tokens": 0,
@@ -69,12 +69,12 @@
         "video_tokens": 0
       },
       "cost_details": {
-        "upstream_inference_cost": 0.00506025,
+        "upstream_inference_cost": 0.0050715,
         "upstream_inference_prompt_cost": 0.000804,
-        "upstream_inference_completions_cost": 0.00425625
+        "upstream_inference_completions_cost": 0.0042675
       },
       "completion_tokens_details": {
-        "reasoning_tokens": 466,
+        "reasoning_tokens": 536,
         "image_tokens": 0,
         "audio_tokens": 0
       }
