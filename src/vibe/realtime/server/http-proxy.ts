@@ -105,10 +105,15 @@ export async function handleHttpProxy(
   });
   outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
   outHeaders["x-forwarded-for"] = clientIp;
-  outHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
+  // Keep what an upstream TLS edge (Caddy) already set: this proxy only sees
+  // plain http, so overwriting the proto made every middleware redirect on a
+  // same-port node (HA S2) point to http:// instead of https://.
+  outHeaders["x-forwarded-proto"] =
+    req.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "");
   // Forward the original public host so Nitro builds redirect URLs using the
   // proxy port (e.g. 3000) rather than the internal Vite port (3100).
-  outHeaders["x-forwarded-host"] = req.headers.get("host") ?? url.host;
+  outHeaders["x-forwarded-host"] =
+    req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? url.host;
 
   // Only idempotent methods get retry logic. Non-idempotent methods are proxied
   // fire-and-forget (no body buffering, no retry on ECONNREFUSED).
