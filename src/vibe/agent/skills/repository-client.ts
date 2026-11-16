@@ -43,6 +43,7 @@ import type { ImageGenModelSelection } from "../image-generation/models";
 import {
   type ImageGenModelOption,
   imageGenModelOptions,
+  resolveImageGenSelection,
 } from "../image-generation/models";
 import { getModelDisplayName } from "../models/all-models";
 import type { ModelOptionBase, ModelOptionTokenBased } from "../models/models";
@@ -419,7 +420,7 @@ export class SkillsRepositoryClient {
   ): ImageGenModelOption[] {
     return this.filterRoleModels(
       imageGenModelOptions,
-      selection,
+      resolveImageGenSelection(selection),
       user,
       availability,
     );

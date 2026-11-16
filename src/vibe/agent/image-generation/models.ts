@@ -616,7 +616,14 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-16: superseded by Gen4 Image. ModelsLab gen4_image_turbo fails text-only requests ("expected array": Runway Turbo needs reference images); no other provider serves it.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -748,7 +755,14 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    // LEGACY 2026-11-16: superseded by Grok Imagine Image 2.0. ModelsLab v6 dropped grok-t2i ("Model not found"); 2.0 runs on OpenRouter.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -898,7 +912,11 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
+    // LEGACY 2026-11-16: superseded by Nano Banana Pro. ModelsLab v6 dropped Imagen 4 ("Model not found"); no other provider of ours serves Imagen.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -940,7 +958,11 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
+    // LEGACY 2026-11-16: superseded by Nano Banana 2.1. ModelsLab v6 dropped Imagen 4 ("Model not found"); no other provider of ours serves Imagen.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.IMAGE_GEN,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
@@ -982,7 +1004,14 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    // LEGACY 2026-11-16: superseded by Nano Banana 2.1. ModelsLab v6 dropped Imagen 4 Fast ("Model not found"); no other provider of ours serves Imagen.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.FAST,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.MAINSTREAM,
@@ -1018,7 +1047,14 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    // LEGACY 2026-11-16: superseded by Qwen Image 3. ModelsLab v6 dropped qwen-t2i ("Model not found"); Qwen Image 3 runs on OpenRouter.
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.FAST,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -1054,7 +1090,14 @@ export const imageGenModelDefinitions: Record<
         supportedQualities: [],
       },
     ],
-    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    // LEGACY 2026-11-16: superseded by Z Image Turbo (same price tier). ModelsLab v6 dropped realtime-t2i ("Model not found").
+    // Disabled (out of the picker); stored picks resolve via imageGenModelSuccessors.
+    enabled: false,
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.FAST,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.OPEN,
@@ -1839,6 +1882,10 @@ function buildImageGenModelOptionsPool(): ImageGenModelOption[] {
       !(llmImageGenModelIds as readonly string[]).includes(id),
   )) {
     const def = imageGenModelDefinitions[modelId];
+    // Disabled definitions stay resolvable by id through their successor.
+    if (def.enabled === false && def.enabledWithoutPrice !== true) {
+      continue;
+    }
     const sortedProviders = [...def.providers].toSorted(
       (a, b) => getProviderPrice(a) - getProviderPrice(b),
     );
@@ -1886,7 +1933,67 @@ export const ImageGenModelIdOptions = (
 export function getImageGenModelById(
   modelId: ImageGenModelId,
 ): ImageGenModelOption | undefined {
-  return imageGenModelOptionsIndex[modelId];
+  return (
+    imageGenModelOptionsIndex[modelId] ??
+    imageGenModelOptionsIndex[resolveImageGenModelSuccessor(modelId)]
+  );
+}
+
+// ============================================================
+// LEGACY → SUCCESSOR
+// ============================================================
+
+/**
+ * Retired image models → closest working successor. Stored picks (skills,
+ * favorites, old threads, tool calls) that name a retired id generate with the
+ * successor instead of failing.
+ */
+export const imageGenModelSuccessors: Partial<
+  Record<ImageGenModelId, ImageGenModelId>
+> = {
+  // 2026-11-16: ModelsLab v6 dropped these ids ("Model not found" / "expected array")
+  [ImageGenModelId.IMAGEN_4_ULTRA]: ImageGenModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+  [ImageGenModelId.IMAGEN_4]: ImageGenModelId.GEMINI_NANO_BANANA_2_1,
+  [ImageGenModelId.IMAGEN_4_FAST]: ImageGenModelId.GEMINI_NANO_BANANA_2_1,
+  [ImageGenModelId.GROK_T2I]: ImageGenModelId.GROK_IMAGINE_IMAGE_2,
+  [ImageGenModelId.QWEN_T2I]: ImageGenModelId.QWEN_IMAGE_3,
+  [ImageGenModelId.REALTIME_T2I]: ImageGenModelId.Z_IMAGE_TURBO,
+  [ImageGenModelId.GEN4_T2I_TURBO]: ImageGenModelId.GEN4_IMAGE,
+};
+
+/** Follow the legacy → successor chain; current ids are returned unchanged. */
+export function resolveImageGenModelSuccessor(
+  modelId: ImageGenModelId,
+): ImageGenModelId {
+  let current = modelId;
+  const seen = new Set<ImageGenModelId>([current]);
+  let next = imageGenModelSuccessors[current];
+  while (next !== undefined && !seen.has(next)) {
+    seen.add(next);
+    current = next;
+    next = imageGenModelSuccessors[current];
+  }
+  return current;
+}
+
+/**
+ * A MANUAL pick of a retired model becomes a pick of its successor; every other
+ * selection passes through unchanged.
+ */
+export function resolveImageGenSelection(
+  selection: ImageGenModelSelection | null | undefined,
+): ImageGenModelSelection | null | undefined {
+  if (
+    !selection ||
+    selection.selectionType !== ModelSelectionType.MANUAL ||
+    !selection.manualModelId
+  ) {
+    return selection;
+  }
+  const successorId = resolveImageGenModelSuccessor(selection.manualModelId);
+  return successorId === selection.manualModelId
+    ? selection
+    : { ...selection, manualModelId: successorId };
 }
 
 // ============================================================
@@ -1930,7 +2037,12 @@ export function filterImageGenModels(
         (m) => m.apiProvider === ApiProvider.UNBOTTLED,
       )
     : imageGenModelOptionsPool;
-  return filterRoleModels(pool, selection, user, availability);
+  return filterRoleModels(
+    pool,
+    resolveImageGenSelection(selection),
+    user,
+    availability,
+  );
 }
 
 export function getBestImageGenModel(
