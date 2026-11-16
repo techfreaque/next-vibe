@@ -3,7 +3,9 @@
  * Refactored to separate template from business logic
  */
 
-import { Button, Hr, Section } from "@react-email/components";
+import { Button } from "@react-email/button";
+import { Hr } from "@react-email/hr";
+import { Section } from "@react-email/section";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {

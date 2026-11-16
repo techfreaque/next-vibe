@@ -2,7 +2,9 @@
  * Password Reset Request Email Template
  */
 
-import { Button, Section, Text } from "@react-email/components";
+import { Button } from "@react-email/button";
+import { Section } from "@react-email/section";
+import { Text } from "@react-email/text";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreEnv } from "next-vibe/core/env";

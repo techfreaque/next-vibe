@@ -3,7 +3,9 @@
  * User confirmation + admin notification
  */
 
-import { Button, Section, Text as Span } from "@react-email/components";
+import { Button } from "@react-email/button";
+import { Section } from "@react-email/section";
+import { Text as Span } from "@react-email/text";
 import { eq } from "drizzle-orm";
 import type { UndefinedType } from "next-vibe/core/definition/common.schema";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";

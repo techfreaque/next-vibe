@@ -7,7 +7,6 @@
 import "server-only";
 
 import Imap from "imap";
-import { simpleParser } from "mailparser";
 
 import type { SystemMailboxConfig } from "./config";
 
@@ -169,6 +168,10 @@ function fetchRaw(imap: Imap, uids: number[]): Promise<FetchedRaw[]> {
 }
 
 async function parseFull(item: FetchedRaw): Promise<InboxMessageFull> {
+  // Lazy: mailparser's module graph (libmime charsets, encoding tables,
+  // linkify TLD regex) costs ~80 ms of sync evaluation; loading it statically
+  // put that on the event loop of every process importing this module.
+  const { simpleParser } = await import("mailparser");
   const parsed = await simpleParser(item.raw);
   const text = parsed.text ?? "";
   return {

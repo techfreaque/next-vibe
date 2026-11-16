@@ -53,6 +53,7 @@ import {
 } from "../../../logger/formatters";
 import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
+import { takeWsActivitySummary } from "../../../realtime/server/activity";
 import { summarizeRecentRequests } from "../../../realtime/server/http-proxy";
 import { ServerFramework } from "../enum";
 import {
@@ -659,6 +660,8 @@ export class ServerStartRepository {
           lastHeapMb = heapMb;
           const stall = worstStall;
           worstStall = null;
+          // Taken every window (it resets), logged only with a lag row
+          const wsActivity = takeWsActivitySummary();
           // Shared context for every lag level: when, how big the heap was
           // (a full GC on a large heap is one candidate), what ran.
           const lagContext = {
@@ -674,6 +677,9 @@ export class ServerStartRepository {
             // Per run: start/end wall clock, to place it against stallStartedAt
             taskTimings: stall?.taskTimings || undefined,
             recentRequests: stall?.recentRequests,
+            // Prod hub serves only WS (Next.js has its own port), so this is
+            // the in-process traffic a no-task stall can come from
+            wsActivity,
             cpuUserMs: Math.round(cpuDelta.user / 1000),
             cpuSystemMs: Math.round(cpuDelta.system / 1000),
             loadAvg1m: Math.round(loadavg()[0] * 100) / 100,

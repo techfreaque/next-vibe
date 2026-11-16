@@ -64,6 +64,11 @@ import type { PulseStatusResponseOutput } from "./status/definition";
 /**
  * Implementation of Pulse Health Repository
  */
+/** Placeholder for "no lag-probe phase open". */
+function noPhase(): void {
+  // nothing open
+}
+
 export class PulseHealthRepository {
   private static async getCurrentHealth(
     locale: CountryLanguage,
@@ -192,6 +197,10 @@ export class PulseHealthRepository {
       isDryRun: boolean;
     }>
   > {
+    // Lag-probe phases: the whole pulse (task-list load, admin auth, history
+    // write) and the open per-task phase (prep or post), ended on every path.
+    const endPulsePhase = RunningTaskRegistry.beginPhase("pulse");
+    let endTaskPhase: () => void = noPhase;
     try {
       locale = options.systemLocale;
       const startTime = Date.now();
@@ -390,6 +399,13 @@ export class PulseHealthRepository {
           logger.debug(
             `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
           );
+          // Owner lookup, route import and arg split run before the attempt
+          // registers. A cold route import is sync module evaluation, so
+          // name this stretch for the lag probe or its stall is anonymous.
+          endTaskPhase();
+          endTaskPhase = RunningTaskRegistry.beginPhase(
+            `cron-prep:${dbTask.routeId}`,
+          );
 
           // Resolve user context with real roles from DB
           const cachedAdmin = adminAuthResult?.success
@@ -403,6 +419,7 @@ export class PulseHealthRepository {
           );
 
           if (!taskUserContext) {
+            endTaskPhase();
             tasksFailed.push(dbTask.displayName);
             const failedOwner = dbUserIdToOwner(dbTask.userId);
             logger.error(
@@ -452,6 +469,7 @@ export class PulseHealthRepository {
           let taskSucceeded = false;
 
           if (!path || !handler) {
+            endTaskPhase();
             tasksFailed.push(dbTask.displayName);
             logger.error(
               `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
@@ -517,6 +535,9 @@ export class PulseHealthRepository {
                 dbTask.lastExecutionStatus === CronTaskStatus.SKIPPED;
 
               for (let attempt = 0; ; attempt++) {
+                // Ends the prep phase (first attempt) or the previous
+                // attempt's post phase (retry): the run itself is registered.
+                endTaskPhase();
                 const attemptStart = Date.now();
                 const taskAbortController = new AbortController();
                 // The watchdog / an admin cancels a run through this entry.
@@ -618,6 +639,12 @@ export class PulseHealthRepository {
                 const cancelReason = RunningTaskRegistry.unregister(
                   dbTask.id,
                   taskAbortController,
+                );
+                // History row, retry decision, stats update and emits after
+                // the run: named for the lag probe like the prep phase.
+                endTaskPhase();
+                endTaskPhase = RunningTaskRegistry.beginPhase(
+                  `cron-post:${dbTask.routeId}`,
                 );
                 if (cancelReason !== null) {
                   typedResult = failInline({
@@ -888,6 +915,7 @@ export class PulseHealthRepository {
           }
         } // end for dbTask
       } // end for pass
+      endTaskPhase();
 
       const summary = {
         pulseId,
@@ -923,6 +951,9 @@ export class PulseHealthRepository {
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    } finally {
+      endTaskPhase();
+      endPulsePhase();
     }
   }
 

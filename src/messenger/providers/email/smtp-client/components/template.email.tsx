@@ -1,10 +1,8 @@
-import {
-  Body,
-  Container,
-  Html,
-  Preview,
-  Section,
-} from "@react-email/components";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Html } from "@react-email/html";
+import { Preview } from "@react-email/preview";
+import { Section } from "@react-email/section";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";

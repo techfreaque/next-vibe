@@ -3,7 +3,9 @@
  * User confirmation + admin notification
  */
 
-import { Hr, Section, Text as Span } from "@react-email/components";
+import { Hr } from "@react-email/hr";
+import { Section } from "@react-email/section";
+import { Text as Span } from "@react-email/text";
 import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {

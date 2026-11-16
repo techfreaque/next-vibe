@@ -30,4 +30,25 @@ describe("RunningTaskRegistry.activeSince", () => {
 
     RunningTaskRegistry.unregister("reg-test-live", live);
   });
+
+  it("reports phases without counting them as runs", () => {
+    const sizeBefore = RunningTaskRegistry.size();
+    const before = Date.now();
+    const end = RunningTaskRegistry.beginPhase("cron-prep:phase-test");
+
+    const open = RunningTaskRegistry.activeSince(before - 1);
+    expect(
+      open.find((run) => run.label === "cron-prep:phase-test")?.endedAt,
+    ).toBeNull();
+    // Phases are not cancellable runs: drain status ignores them
+    expect(RunningTaskRegistry.size()).toBe(sizeBefore);
+
+    end();
+    end(); // idempotent: one ring entry, no throw
+    const closed = RunningTaskRegistry.activeSince(before - 1).filter(
+      (run) => run.label === "cron-prep:phase-test",
+    );
+    expect(closed).toHaveLength(1);
+    expect(closed[0]?.endedAt).toBeNumber();
+  });
 });

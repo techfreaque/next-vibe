@@ -3,7 +3,9 @@
  * One component, two entry points: right after signup, and on resend.
  */
 
-import { Button, Section, Text } from "@react-email/components";
+import { Button } from "@react-email/button";
+import { Section } from "@react-email/section";
+import { Text } from "@react-email/text";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type {

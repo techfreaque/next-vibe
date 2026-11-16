@@ -3,7 +3,7 @@
  * Automatically wraps links with tracking URLs when tracking context is provided
  */
 
-import { Link } from "@react-email/components";
+import { Link } from "@react-email/link";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CSSProperties, JSX, ReactNode } from "react";
 

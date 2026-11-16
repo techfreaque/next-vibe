@@ -5,7 +5,8 @@
 
 import "server-only";
 
-import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { statfs } from "node:fs/promises";
 import { freemem, totalmem } from "node:os";
 
 import type { ResponseType } from "../../core/route/response.schema";
@@ -19,16 +20,18 @@ import type { TasksT } from "../../tasks/i18n";
 import { rawPool } from "..";
 import { DB_HEALTH_THRESHOLDS as THRESHOLDS } from "./constants";
 
-/** Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms. */
+/**
+ * Read /proc/meminfo - works on Linux (Docker). Returns null on other platforms.
+ * A direct procfs read (kernel-generated, microseconds), never a child process:
+ * the health snapshot calls this every minute on the event loop, and a sync
+ * spawn there blocks every WS stream of the process for the spawn's duration.
+ */
 export function readProcMeminfo(): {
   totalKb: number;
   availableKb: number;
 } | null {
   try {
-    const raw = execSync("cat /proc/meminfo", {
-      encoding: "utf-8",
-      stdio: "pipe",
-    });
+    const raw = readFileSync("/proc/meminfo", "utf-8");
     const total = parseInt(/MemTotal:\s+(\d+)/.exec(raw)?.[1] ?? "", 10);
     const available = parseInt(
       /MemAvailable:\s+(\d+)/.exec(raw)?.[1] ?? "",
@@ -43,19 +46,17 @@ export function readProcMeminfo(): {
   }
 }
 
-/** Read disk usage for /app (or /). Returns null if df unavailable. */
-function readDiskUsedPct(): number | null {
+/**
+ * Disk usage of /app (or /) in percent, same formula as `df -P`
+ * (used / (used + available to non-root), rounded up). Async statfs, no
+ * `df` child process blocking the event loop. Null if statfs is unavailable.
+ */
+async function readDiskUsedPct(): Promise<number | null> {
   try {
-    const raw = execSync(
-      process.platform === "win32"
-        ? "df -P /"
-        : "df -P /app 2>/dev/null || df -P /",
-      { encoding: "utf-8", stdio: "pipe" },
-    );
-    const lines = raw.trim().split("\n");
-    const dataLine = lines[lines.length - 1];
-    const match = /\s(\d+)%\s/.exec(dataLine ?? "");
-    return match ? parseInt(match[1], 10) : null;
+    const stats = await statfs(existsSync("/app") ? "/app" : "/");
+    const used = stats.blocks - stats.bfree;
+    const total = used + stats.bavail;
+    return total > 0 ? Math.ceil((used / total) * 100) : null;
   } catch {
     return null;
   }
@@ -135,7 +136,7 @@ export class DbHealthRepository {
     }
 
     // --- Disk check ---
-    const diskUsedPct = readDiskUsedPct();
+    const diskUsedPct = await readDiskUsedPct();
 
     if (diskUsedPct !== null) {
       if (diskUsedPct >= THRESHOLDS.diskCriticalPct) {

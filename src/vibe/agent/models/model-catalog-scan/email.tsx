@@ -4,14 +4,12 @@
  * block so it pastes cleanly into a coding brief.
  */
 
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Preview,
-  Text,
-} from "@react-email/components";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Head } from "@react-email/head";
+import { Html } from "@react-email/html";
+import { Preview } from "@react-email/preview";
+import { Text } from "@react-email/text";
 import type { CSSProperties, JSX } from "react";
 
 export interface ModelCatalogScanEmailProps {

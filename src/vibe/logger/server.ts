@@ -43,6 +43,7 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "rssMb",
   "recentRequests",
   "taskTimings",
+  "wsActivity",
   "recent",
   "elapsedMs",
   "durationMs",

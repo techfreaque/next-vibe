@@ -44,6 +44,12 @@ import type {
   WsWireMessage,
 } from "../core/types";
 import { parseWsClientMessage } from "../core/types";
+import {
+  recordWsBroadcast,
+  recordWsBroadcastPost,
+  recordWsOpen,
+  recordWsSubscribe,
+} from "./activity";
 import { handleHttpProxy } from "./http-proxy";
 import { getPubSubAdapter } from "./pubsub/index";
 import {
@@ -149,6 +155,7 @@ export function broadcastLocalToAll(
     seq: globalSeq,
   };
 
+  const sendStart = performance.now();
   const payload = JSON.stringify(message);
   for (const ws of subscribers) {
     try {
@@ -157,6 +164,7 @@ export function broadcastLocalToAll(
       // Socket may be closing - silently skip
     }
   }
+  recordWsBroadcast(channel, payload.length, performance.now() - sendStart);
 }
 
 /**
@@ -193,6 +201,7 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
     globalSeq++;
     return { ...e, seq: globalSeq };
   });
+  const sendStart = performance.now();
   const payload = JSON.stringify({ type: "batch", events: eventsWithSeq });
 
   for (const ws of socketsToSend) {
@@ -202,6 +211,11 @@ export function broadcastLocalBatch(events: WsBatchEvent[]): void {
       // Socket may be closing - silently skip
     }
   }
+  recordWsBroadcast(
+    `batch:${channelNames[0] ?? ""}`,
+    payload.length,
+    performance.now() - sendStart,
+  );
 }
 
 /**
@@ -362,6 +376,7 @@ export function startWebSocketServer(
         if (!isLoopbackAddress(remoteIp)) {
           return new Response("Forbidden", { status: 403 });
         }
+        recordWsBroadcastPost();
         try {
           const body = await req.json();
           if (
@@ -554,6 +569,7 @@ export function startWebSocketServer(
           return;
         }
         // Normal /ws connection - register initial channels from query param
+        recordWsOpen();
         wsClients.add(ws as ServerWebSocket<WsConnectionData>);
         const initialChannels = [...ws.data.channels];
         // Clear first since subscribeToChannel() re-adds them
@@ -595,6 +611,7 @@ export function startWebSocketServer(
           }
 
           if (msg.type === "subscribe") {
+            recordWsSubscribe();
             if (
               !(await authorizeWsChannel(
                 ws.data.user,

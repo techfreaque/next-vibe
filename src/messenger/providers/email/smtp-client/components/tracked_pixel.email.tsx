@@ -3,7 +3,7 @@
  * Invisible tracking pixel for email open tracking
  */
 
-import { Img } from "@react-email/components";
+import { Img } from "@react-email/img";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { JSX } from "react";
 

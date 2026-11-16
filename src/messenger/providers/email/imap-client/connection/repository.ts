@@ -6,7 +6,6 @@
 import "server-only";
 
 import Imap from "imap";
-import { simpleParser } from "mailparser";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -486,6 +485,9 @@ export class ImapConnectionRepository {
                     const rawEmail = Buffer.concat(chunks);
                     void (async (): Promise<void> => {
                       try {
+                        // Lazy: mailparser's module graph costs ~80 ms of
+                        // sync evaluation; only IMAP sync needs it.
+                        const { simpleParser } = await import("mailparser");
                         const parsed = await simpleParser(rawEmail);
                         const rawMessageId = parsed.messageId || "";
                         const messageId =

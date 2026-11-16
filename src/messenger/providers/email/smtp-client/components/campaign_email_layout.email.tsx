@@ -7,14 +7,12 @@
  * marketing mail. Identity comes from the same config the imprint page renders.
  */
 
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Preview,
-  Section,
-} from "@react-email/components";
+import { Body } from "@react-email/body";
+import { Container } from "@react-email/container";
+import { Head } from "@react-email/head";
+import { Html } from "@react-email/html";
+import { Preview } from "@react-email/preview";
+import { Section } from "@react-email/section";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JSX, ReactNode } from "react";
 

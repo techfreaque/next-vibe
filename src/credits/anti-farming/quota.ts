@@ -11,7 +11,17 @@
 
 import "server-only";
 
-import { and, eq, gte, inArray, isNotNull, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  lte,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { ipPoolKey, ipSubnetKey } from "next-vibe/identity/lead/ip-key";
@@ -345,25 +355,23 @@ export async function signupGuestCarryover({
   const from = new Date(
     user.createdAt.getTime() - SIGNUP_GUEST_SPEND_LOOKBACK_HOURS * 3_600_000,
   );
-  const guestLeads = await db
-    .select({ id: leads.id })
-    .from(leads)
-    .where(or(sql`${leads.metadata}->>'ipKey' = ${key}`, eq(leadIp, ip)));
-  const guestLeadIds = guestLeads
-    .map((l) => l.id)
-    .filter((id) => !poolLeadIds.includes(id));
-  if (guestLeadIds.length === 0) {
-    return 0;
-  }
+  // One query: the guest leads of that IP are a join, not a materialised id
+  // list. A shared IP (CGNAT, VPN exit, localhost in dev) has thousands of
+  // guest leads; loading them and binding each as an IN parameter cost
+  // ~30 ms of sync drizzle query building per credit check.
   const [row] = await db
     .select({
       spent: sql<string>`COALESCE(sum((${creditTransactions.metadata}->>'freeCreditsUsed')::numeric), 0)`,
     })
     .from(creditTransactions)
     .innerJoin(creditWallets, eq(creditWallets.id, creditTransactions.walletId))
+    .innerJoin(leads, eq(leads.id, creditWallets.leadId))
     .where(
       and(
-        inArray(creditWallets.leadId, guestLeadIds),
+        or(sql`${leads.metadata}->>'ipKey' = ${key}`, eq(leadIp, ip)),
+        poolLeadIds.length > 0
+          ? notInArray(creditWallets.leadId, poolLeadIds)
+          : undefined,
         eq(creditTransactions.type, CreditTransactionType.USAGE),
         gte(creditTransactions.createdAt, from),
         lte(creditTransactions.createdAt, user.createdAt),

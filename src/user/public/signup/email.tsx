@@ -3,7 +3,11 @@
  * Refactored to separate template from business logic
  */
 
-import { Button, Column, Row, Section, Text } from "@react-email/components";
+import { Button } from "@react-email/button";
+import { Column } from "@react-email/column";
+import { Row } from "@react-email/row";
+import { Section } from "@react-email/section";
+import { Text } from "@react-email/text";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreEnv } from "next-vibe/core/env";

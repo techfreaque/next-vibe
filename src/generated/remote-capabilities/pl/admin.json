@@ -344171,7 +344171,8 @@
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -344273,7 +344274,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gpt-55",
@@ -344373,7 +344375,8 @@
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
                                                 "meta-muse-ember",
-                                                "drummer-artemis-31b"
+                                                "drummer-artemis-31b",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -345133,7 +345136,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -345235,7 +345239,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -345335,7 +345340,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -346045,7 +346051,8 @@
                                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -346079,7 +346086,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gemini-3.1-pro-preview-customtools",
@@ -346111,7 +346119,8 @@
                                                 "gemini-4-hydrogen",
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
-                                                "meta-muse-ember"
+                                                "meta-muse-ember",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -346803,7 +346812,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -346837,7 +346847,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -346869,7 +346880,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -362309,7 +362321,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -362411,7 +362424,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -362511,7 +362525,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -363271,7 +363286,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -363373,7 +363389,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -363473,7 +363490,8 @@
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
-                                            "drummer-artemis-31b"
+                                            "drummer-artemis-31b",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -364183,7 +364201,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -364217,7 +364236,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -364249,7 +364269,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -364941,7 +364962,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -364975,7 +364997,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gemini-3.1-pro-preview-customtools",
@@ -365007,7 +365030,8 @@
                                             "gemini-4-hydrogen",
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
-                                            "meta-muse-ember"
+                                            "meta-muse-ember",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -377514,7 +377538,8 @@
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -377616,7 +377641,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gpt-55",
@@ -377716,7 +377742,8 @@
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
                                                 "meta-muse-ember",
-                                                "drummer-artemis-31b"
+                                                "drummer-artemis-31b",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -378476,7 +378503,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -378578,7 +378606,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -378678,7 +378707,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -379382,7 +379412,8 @@
                                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -379416,7 +379447,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gemini-3.1-pro-preview-customtools",
@@ -379448,7 +379480,8 @@
                                                 "gemini-4-hydrogen",
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
-                                                "meta-muse-ember"
+                                                "meta-muse-ember",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -380140,7 +380173,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -380174,7 +380208,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -380206,7 +380241,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -392113,7 +392149,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -392215,7 +392252,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -392315,7 +392353,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -393075,7 +393114,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -393177,7 +393217,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -393277,7 +393318,8 @@
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
-                                            "drummer-artemis-31b"
+                                            "drummer-artemis-31b",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -393981,7 +394023,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -394015,7 +394058,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -394047,7 +394091,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -394739,7 +394784,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -394773,7 +394819,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gemini-3.1-pro-preview-customtools",
@@ -394805,7 +394852,8 @@
                                             "gemini-4-hydrogen",
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
-                                            "meta-muse-ember"
+                                            "meta-muse-ember",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -401489,7 +401537,8 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -401591,7 +401640,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -401691,7 +401741,8 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -402447,7 +402498,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -402549,7 +402601,8 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gpt-55",
@@ -402649,7 +402702,8 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -403364,7 +403418,8 @@
                                     "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                    "META_MUSE_EMBER": "meta-muse-ember"
+                                    "META_MUSE_EMBER": "meta-muse-ember",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -403398,7 +403453,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gemini-3.1-pro-preview-customtools",
@@ -403430,7 +403486,8 @@
                                   "gemini-4-hydrogen",
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
-                                  "meta-muse-ember"
+                                  "meta-muse-ember",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -404118,7 +404175,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -404152,7 +404210,8 @@
                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                "META_MUSE_EMBER": "meta-muse-ember"
+                                "META_MUSE_EMBER": "meta-muse-ember",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gemini-3.1-pro-preview-customtools",
@@ -404184,7 +404243,8 @@
                                 "gemini-4-hydrogen",
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
-                                "meta-muse-ember"
+                                "meta-muse-ember",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -420751,7 +420811,8 @@
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -420853,7 +420914,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gpt-55",
@@ -420953,7 +421015,8 @@
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
                                                 "meta-muse-ember",
-                                                "drummer-artemis-31b"
+                                                "drummer-artemis-31b",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -421713,7 +421776,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -421815,7 +421879,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -421915,7 +421980,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -422619,7 +422685,8 @@
                                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                                  "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
                                               "type": "enum",
@@ -422653,7 +422720,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
                                                 "gemini-3.1-pro-preview-customtools",
@@ -422685,7 +422753,8 @@
                                                 "gemini-4-hydrogen",
                                                 "gemini-4-carbon",
                                                 "minimax-m3.1-flash",
-                                                "meta-muse-ember"
+                                                "meta-muse-ember",
+                                                "qwen-4-max"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -423377,7 +423446,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -423411,7 +423481,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -423443,7 +423514,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -435350,7 +435422,8 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -435452,7 +435525,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -435552,7 +435626,8 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -436312,7 +436387,8 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -436414,7 +436490,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -436514,7 +436591,8 @@
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
-                                            "drummer-artemis-31b"
+                                            "drummer-artemis-31b",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -437218,7 +437296,8 @@
                                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                                "META_MUSE_EMBER": "meta-muse-ember"
+                                                "META_MUSE_EMBER": "meta-muse-ember",
+                                                "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
                                             "type": "enum",
@@ -437252,7 +437331,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
                                               "gemini-3.1-pro-preview-customtools",
@@ -437284,7 +437364,8 @@
                                               "gemini-4-hydrogen",
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
-                                              "meta-muse-ember"
+                                              "meta-muse-ember",
+                                              "qwen-4-max"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -437976,7 +438057,8 @@
                                               "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                              "META_MUSE_EMBER": "meta-muse-ember"
+                                              "META_MUSE_EMBER": "meta-muse-ember",
+                                              "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
                                           "type": "enum",
@@ -438010,7 +438092,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
                                             "gemini-3.1-pro-preview-customtools",
@@ -438042,7 +438125,8 @@
                                             "gemini-4-hydrogen",
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
-                                            "meta-muse-ember"
+                                            "meta-muse-ember",
+                                            "qwen-4-max"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -450105,7 +450189,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -450207,7 +450292,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -450307,7 +450393,8 @@
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
                                           "meta-muse-ember",
-                                          "drummer-artemis-31b"
+                                          "drummer-artemis-31b",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -451065,7 +451152,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -451167,7 +451255,8 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -451267,7 +451356,8 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -451982,7 +452072,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -452016,7 +452107,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gemini-3.1-pro-preview-customtools",
@@ -452048,7 +452140,8 @@
                                           "gemini-4-hydrogen",
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
-                                          "meta-muse-ember"
+                                          "meta-muse-ember",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -452738,7 +452831,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -452772,7 +452866,8 @@
                                         "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                        "META_MUSE_EMBER": "meta-muse-ember"
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gemini-3.1-pro-preview-customtools",
@@ -452804,7 +452899,8 @@
                                         "gemini-4-hydrogen",
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
-                                        "meta-muse-ember"
+                                        "meta-muse-ember",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -465254,7 +465350,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -465356,7 +465453,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -465456,7 +465554,8 @@
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
                                           "meta-muse-ember",
-                                          "drummer-artemis-31b"
+                                          "drummer-artemis-31b",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -466214,7 +466313,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -466316,7 +466416,8 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -466416,7 +466517,8 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -467120,7 +467222,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -467154,7 +467257,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gemini-3.1-pro-preview-customtools",
@@ -467186,7 +467290,8 @@
                                           "gemini-4-hydrogen",
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
-                                          "meta-muse-ember"
+                                          "meta-muse-ember",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -467876,7 +467981,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -467910,7 +468016,8 @@
                                         "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                        "META_MUSE_EMBER": "meta-muse-ember"
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gemini-3.1-pro-preview-customtools",
@@ -467942,7 +468049,8 @@
                                         "gemini-4-hydrogen",
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
-                                        "meta-muse-ember"
+                                        "meta-muse-ember",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -480140,7 +480248,8 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -480242,7 +480351,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -480342,7 +480452,8 @@
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
                                           "meta-muse-ember",
-                                          "drummer-artemis-31b"
+                                          "drummer-artemis-31b",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -481100,7 +481211,8 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -481202,7 +481314,8 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -481302,7 +481415,8 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -482006,7 +482120,8 @@
                                             "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                            "META_MUSE_EMBER": "meta-muse-ember"
+                                            "META_MUSE_EMBER": "meta-muse-ember",
+                                            "QWEN_4_MAX": "qwen-4-max"
                                           }
                                         },
                                         "type": "enum",
@@ -482040,7 +482155,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         },
                                         "options": [
                                           "gemini-3.1-pro-preview-customtools",
@@ -482072,7 +482188,8 @@
                                           "gemini-4-hydrogen",
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
-                                          "meta-muse-ember"
+                                          "meta-muse-ember",
+                                          "qwen-4-max"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -482762,7 +482879,8 @@
                                           "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                          "META_MUSE_EMBER": "meta-muse-ember"
+                                          "META_MUSE_EMBER": "meta-muse-ember",
+                                          "QWEN_4_MAX": "qwen-4-max"
                                         }
                                       },
                                       "type": "enum",
@@ -482796,7 +482914,8 @@
                                         "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                        "META_MUSE_EMBER": "meta-muse-ember"
+                                        "META_MUSE_EMBER": "meta-muse-ember",
+                                        "QWEN_4_MAX": "qwen-4-max"
                                       },
                                       "options": [
                                         "gemini-3.1-pro-preview-customtools",
@@ -482828,7 +482947,8 @@
                                         "gemini-4-hydrogen",
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
-                                        "meta-muse-ember"
+                                        "meta-muse-ember",
+                                        "qwen-4-max"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -500097,7 +500217,8 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -500199,7 +500320,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -500299,7 +500421,8 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -501055,7 +501178,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -501157,7 +501281,8 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gpt-55",
@@ -501257,7 +501382,8 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -501965,7 +502091,8 @@
                                     "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                    "META_MUSE_EMBER": "meta-muse-ember"
+                                    "META_MUSE_EMBER": "meta-muse-ember",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -501999,7 +502126,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gemini-3.1-pro-preview-customtools",
@@ -502031,7 +502159,8 @@
                                   "gemini-4-hydrogen",
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
-                                  "meta-muse-ember"
+                                  "meta-muse-ember",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -502719,7 +502848,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -502753,7 +502883,8 @@
                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                "META_MUSE_EMBER": "meta-muse-ember"
+                                "META_MUSE_EMBER": "meta-muse-ember",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gemini-3.1-pro-preview-customtools",
@@ -502785,7 +502916,8 @@
                                 "gemini-4-hydrogen",
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
-                                "meta-muse-ember"
+                                "meta-muse-ember",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -522255,7 +522387,8 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -522357,7 +522490,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -522457,7 +522591,8 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -523213,7 +523348,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -523315,7 +523451,8 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gpt-55",
@@ -523415,7 +523552,8 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -524126,7 +524264,8 @@
                                     "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                    "META_MUSE_EMBER": "meta-muse-ember"
+                                    "META_MUSE_EMBER": "meta-muse-ember",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -524160,7 +524299,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gemini-3.1-pro-preview-customtools",
@@ -524192,7 +524332,8 @@
                                   "gemini-4-hydrogen",
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
-                                  "meta-muse-ember"
+                                  "meta-muse-ember",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -524880,7 +525021,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -524914,7 +525056,8 @@
                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                "META_MUSE_EMBER": "meta-muse-ember"
+                                "META_MUSE_EMBER": "meta-muse-ember",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gemini-3.1-pro-preview-customtools",
@@ -524946,7 +525089,8 @@
                                 "gemini-4-hydrogen",
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
-                                "meta-muse-ember"
+                                "meta-muse-ember",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -539813,7 +539957,8 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -539915,7 +540060,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -540015,7 +540161,8 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -540771,7 +540918,8 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -540873,7 +541021,8 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gpt-55",
@@ -540973,7 +541122,8 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
@@ -541684,7 +541834,8 @@
                                     "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                    "META_MUSE_EMBER": "meta-muse-ember"
+                                    "META_MUSE_EMBER": "meta-muse-ember",
+                                    "QWEN_4_MAX": "qwen-4-max"
                                   }
                                 },
                                 "type": "enum",
@@ -541718,7 +541869,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 },
                                 "options": [
                                   "gemini-3.1-pro-preview-customtools",
@@ -541750,7 +541902,8 @@
                                   "gemini-4-hydrogen",
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
-                                  "meta-muse-ember"
+                                  "meta-muse-ember",
+                                  "qwen-4-max"
                                 ]
                               },
                               "intelligenceRange": {
@@ -542438,7 +542591,8 @@
                                   "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                  "META_MUSE_EMBER": "meta-muse-ember"
+                                  "META_MUSE_EMBER": "meta-muse-ember",
+                                  "QWEN_4_MAX": "qwen-4-max"
                                 }
                               },
                               "type": "enum",
@@ -542472,7 +542626,8 @@
                                 "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                                "META_MUSE_EMBER": "meta-muse-ember"
+                                "META_MUSE_EMBER": "meta-muse-ember",
+                                "QWEN_4_MAX": "qwen-4-max"
                               },
                               "options": [
                                 "gemini-3.1-pro-preview-customtools",
@@ -542504,7 +542659,8 @@
                                 "gemini-4-hydrogen",
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
-                                "meta-muse-ember"
+                                "meta-muse-ember",
+                                "qwen-4-max"
                               ]
                             },
                             "intelligenceRange": {
