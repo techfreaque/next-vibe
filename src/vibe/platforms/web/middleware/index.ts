@@ -29,7 +29,7 @@ import {
 import { createEndpointLogger } from "../../../logger/server";
 import { VIBE_FRAME_MOUNT_API_PATH } from "../../vibe-frame/mount/constants";
 import type { LanguageMiddlewareOptions } from "./language/index";
-import { detectLocale } from "./language/index";
+import { buildLocaleRedirectPath, detectLocale } from "./language/index";
 import {
   extractLocaleFromPath,
   shouldSkipPath,
@@ -143,50 +143,15 @@ export async function middleware(
     });
   }
 
-  // Step 1: Strip bare "/en/" prefix hallucinated by AI tools in local testing.
-  // Redirect to the path without it so normal locale detection takes over.
-  // Skipped in production - this only happens during local dev/testing.
-  if (coreEnv.NODE_ENV !== Environment.PRODUCTION) {
-    const pathParts = path.split("/").filter(Boolean);
-    const isApiRoute = pathParts[0] === "api";
-    const bareSegment = isApiRoute ? pathParts[1] : pathParts[0];
-    if (bareSegment === "en") {
-      let stripped: string;
-      if (isApiRoute) {
-        // /api/en/foo -> /api/foo
-        stripped = `/api/${pathParts.slice(2).join("/")}`;
-      } else {
-        // /en/foo -> /foo
-        stripped = `/${pathParts.slice(1).join("/")}`;
-      }
-      const redirectUrl = new URL(stripped || "/", publicOrigin);
-      redirectUrl.search = request.nextUrl.search;
-      return NextResponseClass.redirect(redirectUrl);
-    }
-  }
-
-  // Step 2: Handle language detection and redirection
-  const detectedLocale = detectLocale(request, options);
-
-  // If we need to redirect for locale, do it now
-  if (detectedLocale) {
-    let newPath: string;
-
-    // Handle API routes: /api/... -> /api/[locale]/...
-    if (path.startsWith("/api/") || path === "/api") {
-      const apiPath = path === "/api" ? "" : path.slice(4); // Remove "/api"
-      newPath = `/api/${detectedLocale}${apiPath}`;
-    }
-    // Handle root path: / -> /[locale]
-    else if (path === "/") {
-      newPath = `/${detectedLocale}`;
-    }
-    // Handle regular paths: /... -> /[locale]/...
-    else {
-      newPath = `/${detectedLocale}${path}`;
-    }
-
-    const redirectUrl = new URL(newPath, publicOrigin);
+  // Step 1: Locale redirect. A locale-shaped first segment (/en/, /fr-FR/,
+  // /en-us/) is REPLACED by the negotiated locale, any other path is prefixed.
+  // One redirect, query string kept (?ref= track links survive).
+  const localeRedirect = detectLocale(request, options);
+  if (localeRedirect) {
+    const redirectUrl = new URL(
+      buildLocaleRedirectPath(path, localeRedirect),
+      publicOrigin,
+    );
     redirectUrl.search = request.nextUrl.search;
     return NextResponseClass.redirect(redirectUrl);
   }

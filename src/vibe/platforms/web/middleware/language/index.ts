@@ -54,79 +54,77 @@ function normalizeLocaleFormat(locale: string): string {
 }
 
 /**
- * Detect locale from request
- * Returns null if path already has valid locale or should be skipped
- * Returns locale string if redirect is needed
+ * A locale redirect the middleware must issue.
+ * `replaceSegment` = the path's first segment (after /api) is a locale-shaped
+ * token that must be swapped for `locale` instead of prefixed. Without it a
+ * bad segment survives: /fr-FR/user -> /en-GLOBAL/fr-FR/user (404).
  */
-export function detectLocale(
-  request: NextRequest,
-  options: LanguageMiddlewareOptions,
-): CountryLanguage | null {
-  const {
-    supportedLocales: baseLocales,
-    defaultLocale,
-    cookieName = LOCALE_COOKIE_NAME,
-    allowMixedLocales = false,
-  } = options;
+export interface LocaleRedirect {
+  locale: CountryLanguage;
+  replaceSegment: boolean;
+}
 
-  // Generate all possible locale combinations if mixed locales are allowed
-  const supportedLocales = allowMixedLocales
-    ? ((): CountryLanguage[] => {
-        const languages = [
-          ...new Set(baseLocales.map((locale) => locale.split("-")[0])),
-        ];
-        const countries = [
-          ...new Set(baseLocales.map((locale) => locale.split("-")[1])),
-        ];
-        return languages.flatMap((lang) =>
-          countries.map((country) => `${lang}-${country}` as CountryLanguage),
-        );
-      })()
-    : baseLocales;
+/** Locale-shaped segment: xx-YY / xx_YY / xx-GLOBAL (any casing). */
+const LOCALE_SHAPED_SEGMENT_REGEX = /^[a-z]{2}[-_](?:[a-z]{2}|global)$/i;
 
-  const path = request.nextUrl.pathname;
-
-  // Check if the path already has a locale prefix
-  const pathParts = path.split("/").filter(Boolean);
-  const pathFirstPart = pathParts[0] || "";
-
-  // For API routes, check the second path segment (/api/[locale]/...)
-  // For regular routes, check the first path segment (/[locale]/...)
-  const isApiRoute = pathFirstPart === "api";
-  const localeSegment = isApiRoute ? pathParts[1] : pathFirstPart;
-
-  // Check if the path starts with a valid locale (case-insensitive)
-  const matchedLocale =
-    localeSegment &&
-    supportedLocales.find((locale) => {
-      return localeSegment.toLowerCase() === locale.toLowerCase();
-    });
-
-  if (matchedLocale) {
-    // If casing is already correct, no redirect needed
-    if (localeSegment === matchedLocale) {
-      return null;
-    }
-    // Casing is wrong (e.g. "en-us" instead of "en-US") - redirect to fix it
-    return matchedLocale;
+/**
+ * Expand the base locales into every language x country combination when
+ * mixed locales are allowed (de-PL, en-DE, ...).
+ */
+function expandLocales(
+  baseLocales: CountryLanguage[],
+  allowMixedLocales: boolean,
+): CountryLanguage[] {
+  if (!allowMixedLocales) {
+    return baseLocales;
   }
+  const languages = [
+    ...new Set(baseLocales.map((locale) => locale.split("-")[0])),
+  ];
+  const countries = [
+    ...new Set(baseLocales.map((locale) => locale.split("-")[1])),
+  ];
+  return languages.flatMap((lang) =>
+    countries.map((country) => `${lang}-${country}` as CountryLanguage),
+  );
+}
 
-  // Check for user's preferred locale from cookie
+function findLocale(
+  supportedLocales: CountryLanguage[],
+  candidate: string,
+): CountryLanguage | undefined {
+  const lower = candidate.toLowerCase();
+  return supportedLocales.find((locale) => locale.toLowerCase() === lower);
+}
+
+function languageOf(locale: string): string {
+  return (locale.split(/[-_]/)[0] ?? "").toLowerCase();
+}
+
+/**
+ * Negotiate the best supported locale: cookie, then Accept-Language, then the
+ * default. With `language` set, only locales of that language qualify, and the
+ * GLOBAL variant of that language is the fallback.
+ */
+function negotiateLocale(
+  request: NextRequest,
+  supportedLocales: CountryLanguage[],
+  defaultLocale: CountryLanguage,
+  cookieName: string,
+  language?: string,
+): CountryLanguage {
+  const fitsLanguage = (locale: CountryLanguage): boolean =>
+    language === undefined || languageOf(locale) === language;
+
   const rawCookieLocale = request.cookies.get(cookieName)?.value;
-  const cookieLocale =
-    rawCookieLocale &&
-    supportedLocales.find(
-      (locale) => rawCookieLocale.toLowerCase() === locale.toLowerCase(),
-    );
-
-  if (cookieLocale) {
+  const cookieLocale = rawCookieLocale
+    ? findLocale(supportedLocales, rawCookieLocale)
+    : undefined;
+  if (cookieLocale && fitsLanguage(cookieLocale)) {
     return cookieLocale;
   }
 
-  // Fallback to Accept-Language header
   const acceptLanguage = request.headers.get("accept-language") || "";
-
-  // Parse Accept-Language header and try to match supported locales
   for (const lang of acceptLanguage.split(",")) {
     const headerLocale = lang.split(";")[0]?.trim();
     if (!headerLocale) {
@@ -138,30 +136,136 @@ export function detectLocale(
     if (!normalized) {
       continue;
     }
-
-    // Try exact match first
-    if (supportedLocales.includes(normalized as CountryLanguage)) {
-      return normalized as CountryLanguage;
+    const langCode = languageOf(normalized);
+    if (language !== undefined && langCode !== language) {
+      continue;
     }
 
-    // Try language-only match
-    const langCode = normalized.split("-")[0];
+    // Try exact match first
+    const exact = supportedLocales.find((locale) => locale === normalized);
+    if (exact) {
+      return exact;
+    }
 
     // Prefer GLOBAL variant for the language if available
-    const globalLocale = `${langCode}-GLOBAL` as CountryLanguage;
-    if (supportedLocales.includes(globalLocale)) {
+    const globalLocale = supportedLocales.find(
+      (locale) => locale === `${langCode}-GLOBAL`,
+    );
+    if (globalLocale) {
       return globalLocale;
     }
 
     // Find any locale with matching language
-    const matchingLocale = supportedLocales.find((locale) => {
-      const [localeLang] = locale.split("-");
-      return localeLang.toLowerCase() === langCode;
-    });
+    const matchingLocale = supportedLocales.find(
+      (locale) => languageOf(locale) === langCode,
+    );
     if (matchingLocale) {
       return matchingLocale;
     }
   }
 
+  if (language !== undefined) {
+    const languageLocale =
+      supportedLocales.find((locale) => locale === `${language}-GLOBAL`) ??
+      supportedLocales.find((locale) => languageOf(locale) === language);
+    if (languageLocale) {
+      return languageLocale;
+    }
+  }
+
   return defaultLocale;
+}
+
+/**
+ * Detect locale from request.
+ * Returns null if the path already carries a valid, correctly cased locale.
+ * Otherwise returns the locale to redirect to, and whether the path's first
+ * segment (after /api) must be replaced rather than prefixed:
+ * - wrong casing (/en-us/...) -> replace with the canonical casing
+ * - supported language only (/en/..., /de/...) -> replace with the best
+ *   locale of that language
+ * - locale-shaped but unsupported (/fr-FR/..., /en-GB/...) -> replace with
+ *   the best locale of that language if supported, else the negotiated one
+ * - anything else (/user/referral) -> prefix the negotiated locale
+ */
+export function detectLocale(
+  request: NextRequest,
+  options: LanguageMiddlewareOptions,
+): LocaleRedirect | null {
+  const {
+    supportedLocales: baseLocales,
+    defaultLocale,
+    cookieName = LOCALE_COOKIE_NAME,
+    allowMixedLocales = false,
+  } = options;
+
+  const supportedLocales = expandLocales(baseLocales, allowMixedLocales);
+  const supportedLanguages = new Set(supportedLocales.map(languageOf));
+
+  const path = request.nextUrl.pathname;
+
+  // For API routes, check the second path segment (/api/[locale]/...)
+  // For regular routes, check the first path segment (/[locale]/...)
+  const pathParts = path.split("/").filter(Boolean);
+  const isApiRoute = pathParts[0] === "api";
+  const localeSegment = (isApiRoute ? pathParts[1] : pathParts[0]) ?? "";
+
+  if (localeSegment) {
+    const matchedLocale = findLocale(supportedLocales, localeSegment);
+    if (matchedLocale) {
+      // Correct casing -> no redirect; wrong casing (en-us) -> fix it
+      return localeSegment === matchedLocale
+        ? null
+        : { locale: matchedLocale, replaceSegment: true };
+    }
+
+    const isLanguageOnly =
+      /^[a-z]{2}$/i.test(localeSegment) &&
+      supportedLanguages.has(localeSegment.toLowerCase());
+    if (isLanguageOnly || LOCALE_SHAPED_SEGMENT_REGEX.test(localeSegment)) {
+      const language = languageOf(localeSegment);
+      return {
+        locale: negotiateLocale(
+          request,
+          supportedLocales,
+          defaultLocale,
+          cookieName,
+          supportedLanguages.has(language) ? language : undefined,
+        ),
+        replaceSegment: true,
+      };
+    }
+  }
+
+  return {
+    locale: negotiateLocale(
+      request,
+      supportedLocales,
+      defaultLocale,
+      cookieName,
+    ),
+    replaceSegment: false,
+  };
+}
+
+/**
+ * Build the redirect target path for a locale redirect.
+ * /api paths keep /api in front: /api/fr-FR/x -> /api/en-GLOBAL/x.
+ */
+export function buildLocaleRedirectPath(
+  path: string,
+  redirect: LocaleRedirect,
+): string {
+  const pathParts = path.split("/").filter(Boolean);
+  const isApiRoute = pathParts[0] === "api";
+  const rest = pathParts.slice(
+    (isApiRoute ? 1 : 0) + (redirect.replaceSegment ? 1 : 0),
+  );
+  const trailingSlash = path.length > 1 && path.endsWith("/") && rest.length > 0;
+  const parts = [
+    ...(isApiRoute ? ["api"] : []),
+    redirect.locale,
+    ...rest,
+  ];
+  return `/${parts.join("/")}${trailingSlash ? "/" : ""}`;
 }
