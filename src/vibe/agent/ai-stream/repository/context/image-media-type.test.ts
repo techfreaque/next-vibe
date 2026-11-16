@@ -5,6 +5,8 @@
 
 import { describe, expect, it } from "bun:test";
 
+import { ChatModelId } from "../../models-definitions";
+
 import {
   resolveImageMediaType,
   sniffImageMediaType,
@@ -51,8 +53,8 @@ describe("buildToolResultOutput: generated image media type", () => {
     const { buildToolResultOutput } = await import("./tool-output");
     const { getChatModelById } = await import("../../models");
     const { createEndpointLogger } = await import("next-vibe/logger/server");
-    const visionModel = getChatModelById("claude-sonnet-4.6");
-    expect(visionModel?.inputs).toContain("image");
+    const visionModel = getChatModelById(ChatModelId.CLAUDE_SONNET_4_6);
+    expect(visionModel?.inputs.some((input) => input === "image")).toBe(true);
 
     const output = await buildToolResultOutput(
       createEndpointLogger(false, "en-GLOBAL"),
@@ -70,5 +72,85 @@ describe("buildToolResultOutput: generated image media type", () => {
     expect(imagePart?.type === "image-data" && imagePart.mediaType).toBe(
       "image/jpeg",
     );
+  });
+});
+
+// Prod 2026-11-16: venice-uncensored (vision, Venice provider) received two
+// generated PNGs from history as base64 TEXT (the OpenAI-compatible converter
+// stringifies `content` tool outputs): a 14.6M-character prompt.
+describe("buildToolResultOutput: providers that stringify tool results", () => {
+  it("gives a Venice vision model the URL, never image-data", async () => {
+    const { buildToolResultOutput } = await import("./tool-output");
+    const { getChatModelById } = await import("../../models");
+    const { createEndpointLogger } = await import("next-vibe/logger/server");
+    const veniceModel = getChatModelById(ChatModelId.VENICE_UNCENSORED);
+    expect(String(veniceModel?.apiProvider)).toBe("venice-ai");
+    expect(veniceModel?.inputs.some((input) => input === "image")).toBe(true);
+
+    for (const isCurrentTurn of [true, false]) {
+      const output = await buildToolResultOutput(
+        createEndpointLogger(false, "en-GLOBAL"),
+        {
+          result: { imageUrl: `data:image/png;base64,${JPEG}`, creditCost: 1 },
+        },
+        "execute-tool",
+        veniceModel,
+        isCurrentTurn,
+      );
+      expect(output.type).toBe("json");
+      expect(JSON.stringify(output)).not.toContain(JPEG);
+    }
+
+    const contentOutput = await buildToolResultOutput(
+      createEndpointLogger(false, "en-GLOBAL"),
+      {
+        type: "content",
+        value: [
+          { type: "image-data", data: JPEG, mediaType: "image/jpeg" },
+          { type: "text", text: "screenshot" },
+        ],
+      },
+      "browser-take-screenshot",
+      veniceModel,
+      true,
+    );
+    expect(JSON.stringify(contentOutput)).not.toContain(JPEG);
+  });
+});
+
+describe("summarizePromptSize", () => {
+  it("names the part that blows the context", async () => {
+    const { summarizePromptSize, isContextOverflowText } =
+      await import("../loop/prompt-size");
+    expect(
+      isContextOverflowText(
+        "This model's maximum context length is 131072 tokens.",
+      ),
+    ).toBe(true);
+    expect(isContextOverflowText("rate limit exceeded")).toBe(false);
+
+    const huge = "A".repeat(50_000);
+    const summary = summarizePromptSize("system prompt", [
+      { role: "user", content: [{ type: "text", text: "hi" }] },
+      {
+        role: "tool",
+        content: [
+          {
+            type: "tool-result",
+            toolCallId: "c1",
+            toolName: "generate_image",
+            output: {
+              type: "content",
+              value: [{ type: "text", text: huge }],
+            },
+          },
+        ],
+      },
+    ]);
+    expect(summary.systemPromptChars).toBe(13);
+    expect(summary.messageCount).toBe(2);
+    expect(summary.largestParts[0]?.toolName).toBe("generate_image");
+    expect(summary.largestParts[0]?.partType).toBe("tool-result:content");
+    expect(summary.charsByRole["tool"]).toBeGreaterThan(50_000);
   });
 });

@@ -193,6 +193,22 @@ function summarizeIssueForLog(issue: ZodIssue): string {
   } else if (typeof input === "object") {
     const keys = Object.keys(input);
     received = `object{${keys.slice(0, 8).join(",")}${keys.length > 8 ? ",..." : ""}}`;
+    // A discriminated-union miss reports the whole object as input; without
+    // the discriminator's own value the log can't say WHICH variant was sent.
+    const lastSegment = issue.path.at(-1);
+    const lastKey = typeof lastSegment === "string" ? lastSegment : null;
+    const keyValue =
+      lastKey !== null && keys.includes(lastKey)
+        ? Reflect.get(input, lastKey)
+        : undefined;
+    if (
+      typeof keyValue === "string" ||
+      typeof keyValue === "number" ||
+      typeof keyValue === "boolean" ||
+      keyValue === null
+    ) {
+      received += ` ${lastKey}=${JSON.stringify(keyValue)}`;
+    }
   } else {
     received = typeof input;
   }

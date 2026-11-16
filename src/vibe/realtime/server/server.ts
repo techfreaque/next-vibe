@@ -58,6 +58,7 @@ import {
   describeSubscribeIdentity,
   isRequestedUidLinkedLead,
 } from "./ws-channel-auth";
+import { diagnoseWsClose, WS_IDLE_TIMEOUT_SECONDS } from "./ws-keepalive";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -441,6 +442,8 @@ export function startWebSocketServer(
             } satisfies JwtPayloadType,
             channels: new Set<string>(),
             connectedAt: Date.now(),
+            lastInboundAt: Date.now(),
+            pongCount: 0,
             proxyWs: upstream,
           } satisfies WsConnectionDataWithProxy,
         });
@@ -523,6 +526,8 @@ export function startWebSocketServer(
             user,
             channels: new Set(channel ? [channel] : []),
             connectedAt: Date.now(),
+            lastInboundAt: Date.now(),
+            pongCount: 0,
             connectorInstanceId,
           } satisfies WsConnectionData,
         });
@@ -545,6 +550,17 @@ export function startWebSocketServer(
     },
 
     websocket: {
+      // Explicit keepalive (see ws-keepalive.ts): Bun's default 120 s left an
+      // idle socket silent for ~104 s, so 60 s middlebox idle limits on the
+      // client's network cut it with 1006 in a reconnect loop.
+      idleTimeout: WS_IDLE_TIMEOUT_SECONDS,
+      sendPings: true,
+
+      pong(ws): void {
+        ws.data.lastInboundAt = Date.now();
+        ws.data.pongCount++;
+      },
+
       open(ws): void {
         // Proxy connection - wire up upstream → browser bridging
         if (ws.data.proxyWs) {
@@ -599,6 +615,7 @@ export function startWebSocketServer(
           return;
         }
         // Normal /ws connection
+        ws.data.lastInboundAt = Date.now();
         try {
           const rawStr =
             typeof raw === "string" ? raw : new TextDecoder().decode(raw);
@@ -659,7 +676,7 @@ export function startWebSocketServer(
         }
       },
 
-      close(ws): void {
+      close(ws, code, reason): void {
         // Proxy connection - close upstream
         if (ws.data.proxyWs) {
           ws.data.proxyWs.close();
@@ -669,8 +686,30 @@ export function startWebSocketServer(
         if (ws.data.connectorInstanceId) {
           connectorSockets.delete(ws.data.connectorInstanceId);
         }
+        // Diagnose before unsubscribing (channelCount is part of the report).
+        const diagnosis = shuttingDown
+          ? null
+          : diagnoseWsClose(ws.data, code, reason, Date.now());
         unsubscribeFromAll(ws as ServerWebSocket<WsConnectionData>);
-        logger.debug("[WS] Connection closed");
+        if (diagnosis?.kind === "idle-timeout") {
+          // The server cut it: the client answered no keepalive ping within
+          // the idle window. Pairs with the browser's "[WS Client] Connection
+          // lost" 1006 row; pongCount 0 = pings never got through at all.
+          logger.warn(
+            "[WS] Closed idle socket - client stopped answering pings",
+            diagnosis.meta,
+          );
+        } else if (diagnosis?.kind === "dropped") {
+          // Ended without a close frame (network cut, middlebox, sleep, tab
+          // killed). The browser reports it when it can; this side records
+          // how long the socket had been silent when it went.
+          logger.info(
+            "[WS] Socket dropped without close frame",
+            diagnosis.meta,
+          );
+        } else {
+          logger.debug("[WS] Connection closed", { code });
+        }
       },
     },
   });

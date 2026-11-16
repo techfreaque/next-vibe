@@ -48,6 +48,11 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "elapsedMs",
   "durationMs",
   "lastUpstreamOkMsAgo",
+  // "[WS] Closed idle socket" / "Socket dropped": per-socket measurements.
+  "connectedForMs",
+  "sinceLastInboundMs",
+  "pongCount",
+  "channelCount",
   "cpuUserMs",
   "cpuSystemMs",
   "loadAvg1m",

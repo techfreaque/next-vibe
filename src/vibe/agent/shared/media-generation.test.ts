@@ -1,49 +1,71 @@
-import { describe, expect, test } from "bun:test";
-import { Platform } from "next-vibe/platforms/platforms";
+/**
+ * Reference media for third-party generation providers: own storage files go
+ * out as data URIs (providers have no session), browser data URIs pass
+ * through, and nothing is ever rebased onto our origin (prod 2026-11-16:
+ * "https://unbottled.aidata:image/jpeg;base64,...").
+ */
 
-import { keepsExplicitMediaModel } from "./media-generation";
+import { describe, expect, it } from "bun:test";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-describe("keepsExplicitMediaModel", () => {
-  const isKnownModel = (model: string): boolean =>
-    model === "real-model-id" || model === "another-real-id";
+const JPEG_DATA_URI = "data:image/jpeg;base64,/9j/4AAQSkZJRg==";
 
-  test("AI caller keeps a known, deliberate model id", () => {
+describe("parseBase64DataUri", () => {
+  it("splits mime type and payload", async () => {
+    const { parseBase64DataUri } = await import("./media-generation");
+    expect(parseBase64DataUri(JPEG_DATA_URI)).toEqual({
+      mimeType: "image/jpeg",
+      base64: "/9j/4AAQSkZJRg==",
+    });
     expect(
-      keepsExplicitMediaModel(Platform.AI, "real-model-id", isKnownModel),
-    ).toBe(true);
+      parseBase64DataUri("data:image/png;name=a.png;base64,iVBORw0KGgo="),
+    ).toEqual({ mimeType: "image/png", base64: "iVBORw0KGgo=" });
   });
 
-  test("MCP caller keeps a known, deliberate model id", () => {
+  it("rejects non-base64 data URIs and URLs", async () => {
+    const { parseBase64DataUri } = await import("./media-generation");
+    expect(parseBase64DataUri("data:text/plain,hello")).toBeNull();
+    expect(parseBase64DataUri("https://example.com/a.png")).toBeNull();
     expect(
-      keepsExplicitMediaModel(Platform.MCP, "another-real-id", isKnownModel),
-    ).toBe(true);
+      parseBase64DataUri(
+        "/api/en-GLOBAL/vibe/agent/chat/threads/files/t1/f1.png",
+      ),
+    ).toBeNull();
   });
+});
 
-  test("AI caller with no model falls through to defaults", () => {
+describe("resolveMediaReference (no storage access)", () => {
+  it("passes data URIs and public URLs through, drops the rest", async () => {
+    const { resolveMediaReference } = await import("./media-generation");
+    const { createEndpointLogger } = await import("next-vibe/logger/server");
+    const logger = createEndpointLogger(false, "en-GLOBAL");
+    const user = {
+      isPublic: true as const,
+      leadId: "11111111-1111-4111-8111-111111111111",
+      roles: [UserPermissionRole.PUBLIC],
+    };
+
     expect(
-      keepsExplicitMediaModel(Platform.AI, undefined, isKnownModel),
-    ).toBe(false);
-  });
-
-  test("AI caller with a blank model falls through to defaults", () => {
-    expect(keepsExplicitMediaModel(Platform.AI, "", isKnownModel)).toBe(false);
-  });
-
-  test("AI caller with an unknown placeholder id falls through to defaults", () => {
+      await resolveMediaReference(JPEG_DATA_URI, user, logger, "en-GLOBAL"),
+    ).toBe(JPEG_DATA_URI);
     expect(
-      keepsExplicitMediaModel(Platform.AI, "stale-example-id", isKnownModel),
-    ).toBe(false);
-  });
-
-  test("human CLI caller keeps any explicit id without model validation", () => {
+      await resolveMediaReference(
+        "https://cdn.example.com/a.png",
+        user,
+        logger,
+        "en-GLOBAL",
+      ),
+    ).toBe("https://cdn.example.com/a.png");
     expect(
-      keepsExplicitMediaModel(Platform.CLI, "anything-at-all", isKnownModel),
-    ).toBe(true);
-  });
-
-  test("human CLI caller with no model falls through to defaults", () => {
+      await resolveMediaReference(
+        "data:text/plain,hello",
+        user,
+        logger,
+        "en-GLOBAL",
+      ),
+    ).toBeNull();
     expect(
-      keepsExplicitMediaModel(Platform.CLI, undefined, isKnownModel),
-    ).toBe(false);
+      await resolveMediaReference("/not/storage.png", user, logger, "en-GLOBAL"),
+    ).toBeNull();
   });
 });

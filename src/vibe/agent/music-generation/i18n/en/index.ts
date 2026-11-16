@@ -54,6 +54,8 @@ export const translations = {
       jobId: "Async job ID",
     },
     errors: {
+      referenceUnavailable:
+        "The reference audio is not available. It was deleted, or it belongs to a chat you cannot open. Use audio from this chat or upload it again.",
       validation_failed: {
         title: "Validation Error",
         description: "Please check your prompt and settings",

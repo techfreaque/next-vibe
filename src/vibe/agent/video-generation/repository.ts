@@ -17,7 +17,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 
@@ -25,17 +24,12 @@ import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
-import {
-  isStorageFileOwner,
-  mimeFromUrl,
-  parseStorageUrl,
-  resolveStorageUrl,
-} from "../chat/storage/url-utils";
 import { ApiProvider, roundMediaCost } from "../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
+  resolveMediaReference,
 } from "../shared/media-generation";
 import {
   type VideoGenerationPostRequestInput,
@@ -73,40 +67,6 @@ function resolveSeedImageUrl(
     return first.url;
   }
   return frameReferences?.find((f) => f.role !== "last")?.url;
-}
-
-/**
- * External providers cannot fetch OUR generated-media URLs — they point at our
- * own storage (a localhost dev server, or an access-controlled endpoint). So
- * for any URL that is one of OUR storage files, read the bytes DIRECTLY from the
- * storage adapter (ownership verified via the requesting user) and inline them
- * as a base64 data URI. NO HTTP fetch — the server reads its own storage. URLs
- * that aren't ours (already-public third-party links) pass through unchanged.
- */
-async function inlineOwnStorageUrl(
-  url: string,
-  user: JwtPayloadType,
-): Promise<string> {
-  const parsed = parseStorageUrl(url);
-  if (!parsed) {
-    return url; // not our storage → already provider-fetchable
-  }
-  const storage = getStorageAdapter();
-  // Ownership: non-admins may only inline their own files.
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  if (!isAdmin) {
-    const meta = await storage.getFileMetadata(parsed.fileId, parsed.threadId);
-    if (!meta || !isStorageFileOwner(meta, user)) {
-      // not owned — hand the provider a fully-qualified URL; it will reject if unreachable
-      return resolveStorageUrl(url);
-    }
-  }
-  const base64 = await storage.readFileAsBase64(parsed.fileId, parsed.threadId);
-  if (!base64) {
-    return resolveStorageUrl(url);
-  }
-  return `data:${mimeFromUrl(url)};base64,${base64}`;
 }
 
 export class VideoGenerationRepository {
@@ -262,20 +222,45 @@ export class VideoGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
-    // Inline any of OUR storage URLs (localhost/access-controlled) to base64 data
-    // URIs before handing them to an external provider, which cannot fetch them.
-    // Read straight from storage with the user (ownership-checked) — no HTTP.
-    const resolvedFrameReferences = data.frameReferences
-      ? await Promise.all(
-          data.frameReferences.map(async (f) => ({
-            ...f,
-            url: await inlineOwnStorageUrl(f.url, user),
-          })),
-        )
-      : undefined;
-    const resolvedSeedImageUrl = seedImageUrl
-      ? await inlineOwnStorageUrl(seedImageUrl, user)
-      : seedImageUrl;
+    // Own storage URLs sit behind the auth-gated files route: read them here
+    // with the caller's permissions and hand providers a data URI (they have
+    // no session, so a private-thread URL 404s for them). See
+    // resolveMediaReference.
+    let resolvedFrameReferences: typeof data.frameReferences;
+    if (data.frameReferences) {
+      resolvedFrameReferences = [];
+      for (const frame of data.frameReferences) {
+        const url = await resolveMediaReference(
+          frame.url,
+          user,
+          logger,
+          locale,
+        );
+        if (!url) {
+          return fail({
+            message: t("post.errors.referenceUnavailable"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        resolvedFrameReferences.push({ ...frame, url });
+      }
+    }
+    let resolvedSeedImageUrl: string | undefined;
+    if (seedImageUrl) {
+      const url = await resolveMediaReference(
+        seedImageUrl,
+        user,
+        logger,
+        locale,
+      );
+      if (!url) {
+        return fail({
+          message: t("post.errors.referenceUnavailable"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      resolvedSeedImageUrl = url;
+    }
 
     let generationResult: ResponseType<{
       videoUrl: string;
@@ -301,7 +286,11 @@ export class VideoGenerationRepository {
 
       case ApiProvider.UNBOTTLED:
         generationResult = await generateVideoWithUnbottled({
-          input: data,
+          // The remote instance cannot read our storage: send the resolved
+          // references (data URIs for own files), never our portable paths.
+          input: resolvedFrameReferences
+            ? { ...data, frameReferences: resolvedFrameReferences }
+            : data,
           user,
           locale,
           logger,

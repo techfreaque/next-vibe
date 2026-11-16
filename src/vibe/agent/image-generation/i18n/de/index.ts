@@ -67,6 +67,8 @@ export const translations: typeof enTranslations = {
       jobId: "Asynchrone Job-ID",
     },
     errors: {
+      referenceUnavailable:
+        "Das Referenzbild ist nicht verfügbar. Es wurde gelöscht oder gehört zu einem Chat, auf den du keinen Zugriff hast. Nimm ein Bild aus diesem Chat oder lade es neu hoch.",
       validation_failed: {
         title: "Validierungsfehler",
         description: "Bitte überprüfe deine Beschreibung und Einstellungen",

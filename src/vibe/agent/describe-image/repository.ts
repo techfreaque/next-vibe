@@ -30,11 +30,15 @@ import {
   ModalityResolver,
 } from "../ai-stream/repository/core/modality-resolver";
 import { chatSettings } from "../chat/settings/db";
-import { mimeFromUrl, resolveStorageUrl } from "../chat/storage/url-utils";
+import { mimeFromUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
 import { calculateCreditCost } from "../models/models";
 import { VISION_MINIMUM_BALANCE } from "../shared/constants";
 import { createFixtureDownload } from "../shared/fixture-download";
+import {
+  parseBase64DataUri,
+  resolveMediaReference,
+} from "../shared/media-generation";
 import { chatFavorites, FAVORITE_CONFIG_COLUMNS } from "../skills/favorites/db";
 import { resolveFavoriteConfig } from "../skills/favorites/repository";
 import type {
@@ -81,6 +85,23 @@ export class DescribeImageRepository {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+
+    // Own storage files sit behind the auth-gated files route: read them with
+    // the caller's permissions and send the bytes. The provider fetching our
+    // URL has no session, so a private-thread file 404s for it.
+    const fileReference = await resolveMediaReference(
+      data.fileUrl,
+      user,
+      logger,
+      locale,
+    );
+    if (!fileReference) {
+      return fail({
+        message: t("post.errors.not_found.description"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+    const inlineFile = parseBase64DataUri(fileReference);
 
     // Check balance
     const balanceResult = await CreditRepository.getBalance(
@@ -130,9 +151,8 @@ export class DescribeImageRepository {
               // OpenRouter as a generic "file" the model can't see.
               {
                 type: "file" as const,
-                // Portable storage paths are host-free; the SDK needs a full URL.
-                data: new URL(resolveStorageUrl(data.fileUrl)),
-                mediaType: mimeFromUrl(data.fileUrl),
+                data: inlineFile ? inlineFile.base64 : new URL(fileReference),
+                mediaType: inlineFile?.mimeType ?? mimeFromUrl(data.fileUrl),
               },
               {
                 type: "text" as const,

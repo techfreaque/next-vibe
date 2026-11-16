@@ -22,12 +22,12 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
-import { resolveStorageUrl } from "../chat/storage/url-utils";
 import { ApiProvider, calculateCreditCost } from "../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
+  resolveMediaReference,
 } from "../shared/media-generation";
 import {
   type MusicGenerationPostRequestInput,
@@ -132,11 +132,25 @@ export class MusicGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
-    // Tool results carry portable (host-free) storage paths; providers fetch
-    // the reference themselves, so it must be fully qualified on THIS instance.
-    const inputMediaUrl = data.inputMediaUrl
-      ? resolveStorageUrl(data.inputMediaUrl)
-      : undefined;
+    // Reference audio: own storage files are read here with the caller's
+    // permissions and handed over as a data URI (providers have no session,
+    // so a private-thread URL 404s for them).
+    let inputMediaUrl: string | undefined;
+    if (data.inputMediaUrl) {
+      const resolvedReference = await resolveMediaReference(
+        data.inputMediaUrl,
+        user,
+        logger,
+        locale,
+      );
+      if (!resolvedReference) {
+        return fail({
+          message: t("post.errors.referenceUnavailable"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      inputMediaUrl = resolvedReference;
+    }
 
     let generationResult: ResponseType<{
       audioUrl: string;
@@ -193,7 +207,7 @@ export class MusicGenerationRepository {
 
       case ApiProvider.UNBOTTLED:
         generationResult = await generateMusicWithUnbottled({
-          input: data,
+          input: inputMediaUrl ? { ...data, inputMediaUrl } : data,
           user,
           locale,
           logger,

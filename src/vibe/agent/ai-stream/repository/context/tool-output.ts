@@ -14,6 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
 import type { Modality } from "../../../models/enum";
+import { ApiProvider } from "../../../models/models";
 import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
 import type { ChatModelOption } from "../../models";
@@ -65,6 +66,28 @@ function safeUrl(url: string | undefined): string | undefined {
   return url?.startsWith("data:") ? "[inline media omitted]" : url;
 }
 
+/**
+ * Can this model actually SEE an image placed inside a tool result?
+ *
+ * Needs both: a model that takes the modality, and a provider transport that
+ * maps tool-result media parts to real media. Only the OpenRouter provider
+ * does (`mapToolResultContentParts`). The OpenAI-compatible chat converter
+ * behind the prompt-engineered providers (Venice, NanoGPT, Uncensored.ai,
+ * FreedomGPT, Gab) and the Claude Code bridge JSON.stringify a `content`
+ * tool output, so every image-data part became base64 TEXT in the prompt:
+ * two generated PNGs in history sent Venice a 14.6M-character prompt
+ * (context_length_exceeded). Those providers get the URL + text instead.
+ */
+export function toolResultCarriesMedia(
+  modelConfig: ChatModelOption | undefined,
+  modality: Modality,
+): boolean {
+  return (
+    modelConfig?.apiProvider === ApiProvider.OPENROUTER &&
+    (modelConfig.inputs?.includes(modality) ?? false)
+  );
+}
+
 type ShapedToolResultOutput =
   | {
       type: "json";
@@ -108,7 +131,7 @@ export async function buildToolResultOutput(
     Array.isArray(result.content)
   ) {
     const blocks = result.content as ContentBlock[];
-    const modelSupportsImages = modelConfig?.inputs?.includes("image") ?? false;
+    const modelSupportsImages = toolResultCarriesMedia(modelConfig, "image");
     const contentParts: Array<
       | { type: "text"; text: string }
       | { type: "image-data"; data: string; mediaType: string }
@@ -124,7 +147,7 @@ export async function buildToolResultOutput(
           mediaType: resolveImageMediaType(block.data, block.mimeType),
         });
       } else if (block.type === "image_url") {
-        if (isCurrentTurn) {
+        if (isCurrentTurn && modelSupportsImages) {
           // Current turn: fetch base64 on-demand so the model can see the image
           const base64 = await fetchStorageFileAsBase64(
             block.url,
@@ -146,12 +169,14 @@ export async function buildToolResultOutput(
               text: `[image: ${block.url}]`,
             });
           }
-        } else {
+        } else if (modelSupportsImages) {
           // History turn: stub with URL + hint — model can re-examine via view_image
           contentParts.push({
             type: "text",
             text: `[image: ${block.url}] — use view_image tool to re-examine`,
           });
+        } else {
+          contentParts.push({ type: "text", text: `[image: ${block.url}]` });
         }
       }
     }
@@ -178,7 +203,7 @@ export async function buildToolResultOutput(
     "value" in result &&
     Array.isArray(result.value)
   ) {
-    const modelSupportsImages = modelConfig?.inputs?.includes("image") ?? false;
+    const modelSupportsImages = toolResultCarriesMedia(modelConfig, "image");
     const parts = result.value as Array<
       | { type: "text"; text: string }
       | { type: "image-data"; data: string; mediaType: string }
@@ -285,7 +310,7 @@ export async function buildToolResultOutput(
           ? "video"
           : "audio";
 
-    const modelCanSee = modelConfig?.inputs?.includes(modality) ?? false;
+    const modelCanSee = toolResultCarriesMedia(modelConfig, modality);
 
     if (modelCanSee && fileUrl) {
       // Model supports this modality - fetch + base64 encode the file so the model

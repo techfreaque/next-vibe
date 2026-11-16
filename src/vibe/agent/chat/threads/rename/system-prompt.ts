@@ -29,11 +29,23 @@ export const threadRenameFragment: SystemPromptFragment = {
   build: async (params) => {
     const { threadId } = params;
     if (!threadId) {
+      // Caller frames name WHICH prompt build ran without a thread (prod row
+      // 11-16 07:44, incognito guest, said nothing about the path).
       params.logger.error(
         "Missing threadid in system prompt, wont show rename prompt fragment",
-        params.user,
-        params.subFolderId,
-        params.rootFolderId,
+        {
+          userId: params.user.isPublic ? null : params.user.id,
+          leadId: params.user.leadId,
+          isPublic: params.user.isPublic,
+          isIncognito: params.isIncognito,
+          rootFolderId: params.rootFolderId,
+          subFolderId: params.subFolderId,
+          callerStack: new Error("trace").stack
+            ?.split("\n")
+            .slice(2, 9)
+            .map((line) => line.trim())
+            .join(" | "),
+        },
       );
       return null;
     }

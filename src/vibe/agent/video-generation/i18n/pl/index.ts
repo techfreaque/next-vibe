@@ -69,6 +69,8 @@ export const translations: typeof enTranslations = {
       jobId: "ID zadania asynchronicznego",
     },
     errors: {
+      referenceUnavailable:
+        "Obraz wejściowy jest niedostępny. Został usunięty albo należy do czatu, do którego nie masz dostępu. Użyj obrazu z tego czatu albo wgraj go ponownie.",
       validation_failed: {
         title: "Błąd walidacji",
         description: "Sprawdź swój opis i ustawienia",

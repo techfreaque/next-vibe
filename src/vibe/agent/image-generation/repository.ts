@@ -31,7 +31,7 @@ import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/str
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { ChatMessageRole } from "../chat/enum";
 import { getStorageAdapter } from "../chat/storage/index";
-import { parseStorageUrl, resolveStorageUrl } from "../chat/storage/url-utils";
+import { parseStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
 import {
   ApiProvider,
@@ -46,6 +46,8 @@ import {
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
+  parseBase64DataUri,
+  resolveMediaReference,
 } from "../shared/media-generation";
 import { NO_SKILL_ID } from "../skills/constants";
 import { buildFavoriteConfig } from "../skills/favorites/repository";
@@ -278,11 +280,25 @@ export class ImageGenerationRepository {
     // poll loops, so it must not be recreated per call.
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
-    // Tool results carry portable (host-free) storage paths; providers fetch
-    // the reference themselves, so it must be fully qualified on THIS instance.
-    const inputMediaUrl = data.inputMediaUrl
-      ? resolveStorageUrl(data.inputMediaUrl)
-      : undefined;
+    // Reference image: own storage files are read here with the caller's
+    // permissions and handed over as a data URI (providers have no session,
+    // so a private-thread URL 404s for them); browser uploads already are one.
+    let inputMediaUrl: string | undefined;
+    if (data.inputMediaUrl) {
+      const resolvedReference = await resolveMediaReference(
+        data.inputMediaUrl,
+        user,
+        logger,
+        locale,
+      );
+      if (!resolvedReference) {
+        return fail({
+          message: t("post.errors.referenceUnavailable"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      inputMediaUrl = resolvedReference;
+    }
 
     let generationResult: ResponseType<{
       imageUrl: string;
@@ -364,7 +380,9 @@ export class ImageGenerationRepository {
 
       case ApiProvider.UNBOTTLED:
         generationResult = await generateImageWithUnbottled({
-          input: data,
+          // The remote instance cannot read our storage: send the resolved
+          // reference (data URI for own files), never our portable path.
+          input: inputMediaUrl ? { ...data, inputMediaUrl } : data,
           user,
           locale,
           logger,
@@ -536,9 +554,41 @@ export class ImageGenerationRepository {
     const qualityHint = data.quality
       ? ` Quality: ${HEADLESS_QUALITY_HINT[data.quality]}.`
       : "";
-    const refHint = data.inputMediaUrl
-      ? ` Use this image as reference: ${data.inputMediaUrl}`
-      : "";
+    // Reference image: attach the bytes so the model actually sees them. A
+    // URL in the prompt text is invisible to the model, and a data URI there
+    // would be megabytes of base64 prompt text.
+    let refHint = "";
+    let referenceAttachments: File[] | null = null;
+    if (data.inputMediaUrl) {
+      const resolvedReference = await resolveMediaReference(
+        data.inputMediaUrl,
+        user,
+        logger,
+        locale,
+      );
+      const inline = resolvedReference
+        ? parseBase64DataUri(resolvedReference)
+        : null;
+      if (!resolvedReference) {
+        return fail({
+          message: t("post.errors.referenceUnavailable"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      if (inline) {
+        const extension = inline.mimeType.split("/")[1] ?? "png";
+        referenceAttachments = [
+          new File(
+            [Buffer.from(inline.base64, "base64")],
+            `reference.${extension}`,
+            { type: inline.mimeType },
+          ),
+        ];
+        refHint = " Use the attached image as reference.";
+      } else {
+        refHint = ` Use this image as reference: ${resolvedReference}`;
+      }
+    }
 
     const chatModel = chatModelOptionsIndex[modelConfig.id];
     // Synthetic request data — the headless intake phase inside createAiStream
@@ -572,7 +622,7 @@ export class ImageGenerationRepository {
       audioInput: { file: null },
       resumeToken: null,
       timezone: "UTC",
-      attachments: null,
+      attachments: referenceAttachments,
       executionContext: { mode: "local" as const },
     };
     const result = await AiStreamRepository.createAiStream({

@@ -75,6 +75,19 @@ describe("makeAbsoluteStorageUrl", () => {
       "https://cdn.example.com/x.png",
     );
   });
+
+  // Prod 2026-11-16: a browser upload reached Venice as
+  // "https://unbottled.aidata:image/jpeg;base64,...".
+  it("never rebases data:, blob: or protocol-relative URLs", () => {
+    setAppUrl("https://unbottled.ai");
+    const dataUri = "data:image/jpeg;base64,/9j/4AAQ";
+    expect(makeAbsoluteStorageUrl(dataUri)).toBe(dataUri);
+    expect(resolveStorageUrl(dataUri)).toBe(dataUri);
+    expect(makeAbsoluteStorageUrl("blob:https://x/1")).toBe("blob:https://x/1");
+    expect(makeAbsoluteStorageUrl("//cdn.example.com/x.png")).toBe(
+      "//cdn.example.com/x.png",
+    );
+  });
 });
 
 const FILE_PATH =

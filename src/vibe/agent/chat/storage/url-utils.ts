@@ -9,7 +9,10 @@ import { buildStorageFilePath, toPortableStorageUrl } from "./storage-url";
  * Only for consumers that genuinely need a fully-qualified URL at call time
  * (third-party providers, external links). Never persist the result: stored
  * references stay portable (see ./storage-url.ts).
- * If the URL is already absolute (starts with http:// or https://) it is returned as-is.
+ * Only root-relative paths (`/api/...`) are rebased. Anything else (absolute
+ * http(s) URLs, `data:` / `blob:` URIs, other schemes) is returned as-is:
+ * prefixing the origin to a data: URI produced
+ * `https://unbottled.aidata:image/jpeg;base64,...`.
  *
  * Uses the SERVER env (`coreEnv`, server-only), NOT the client env: this module
  * runs server-side only (storage adapters), and NEXT_PUBLIC_* values on the
@@ -22,7 +25,7 @@ import { buildStorageFilePath, toPortableStorageUrl } from "./storage-url";
  * Hermes preview-port rewrite, which `coreEnv` applies identically).
  */
 export function makeAbsoluteStorageUrl(relativeUrl: string): string {
-  if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
+  if (!relativeUrl.startsWith("/") || relativeUrl.startsWith("//")) {
     return relativeUrl;
   }
 

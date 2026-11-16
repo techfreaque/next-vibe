@@ -55,6 +55,7 @@ import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
 import { takeWsActivitySummary } from "../../../realtime/server/activity";
 import { summarizeRecentRequests } from "../../../realtime/server/http-proxy";
+import { PhaseProfiler } from "../../../tasks/watchdog/phase-profiler";
 import { ServerFramework } from "../enum";
 import {
   addPidToFile,
@@ -644,6 +645,11 @@ export class ServerStartRepository {
       // Heap of the previous 5 s window: a large drop next to a stall with
       // high own CPU points at a major GC rather than application code.
       let lastHeapMb: number | undefined;
+      // Kernel-side counters of the window. Prod stalls carry ~0.9 s of SYSTEM
+      // CPU next to a ~40 MB heap jump: minor faults = fresh memory being
+      // committed (heap growth / GC), major faults = pages read back from
+      // disk, fs ops = sync file IO, involuntary switches = CPU contention.
+      let lastRusage = process.resourceUsage();
       const lagInterval = setInterval(() => {
         try {
           // histogram.mean is in nanoseconds
@@ -652,6 +658,17 @@ export class ServerStartRepository {
           histogram.reset();
           const cpuDelta = process.cpuUsage(lastCpu);
           lastCpu = process.cpuUsage();
+          const rusage = process.resourceUsage();
+          const rusageDelta = {
+            minorFaults: rusage.minorPageFault - lastRusage.minorPageFault,
+            majorFaults: rusage.majorPageFault - lastRusage.majorPageFault,
+            fsReads: rusage.fsRead - lastRusage.fsRead,
+            fsWrites: rusage.fsWrite - lastRusage.fsWrite,
+            involuntarySwitches:
+              rusage.involuntaryContextSwitches -
+              lastRusage.involuntaryContextSwitches,
+          };
+          lastRusage = rusage;
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -683,6 +700,12 @@ export class ServerStartRepository {
             cpuUserMs: Math.round(cpuDelta.user / 1000),
             cpuSystemMs: Math.round(cpuDelta.system / 1000),
             loadAvg1m: Math.round(loadavg()[0] * 100) / 100,
+            ...rusageDelta,
+            // Sampled stack of the stall when a profiled cron phase covered
+            // it (see PhaseProfiler); the profiler also logs its own row.
+            profiledHotFrames: stall
+              ? PhaseProfiler.profileCovering(stall.startedAt)?.hotFrames
+              : undefined,
           };
           // Dynamic values go in metadata, not the message text - see the
           // [Memory] logging above for why (fingerprint groups on message).

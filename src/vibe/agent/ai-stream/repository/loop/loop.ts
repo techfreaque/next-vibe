@@ -59,6 +59,7 @@ import {
 } from "./finalize";
 import { DEFAULT_TEMPERATURE } from "./helpers";
 import { extractMediaPrompt, onFilePart } from "./media-parts";
+import { isContextOverflowText, summarizePromptSize } from "./prompt-size";
 import type {
   AssistantPrepResult,
   StreamLoopParams,
@@ -84,6 +85,10 @@ import { FirstPartWatchdog } from "./watchdog";
 
 export class StreamLoop implements StreamLoopState {
   constructor(readonly p: StreamLoopParams) {}
+
+  /** Messages of the most recent model request (initial, then each
+   *  prepareStep result) - sized in the log on a context-length overflow. */
+  private lastPromptMessages: readonly ModelMessage[] = [];
 
   /** First-part watchdog timeout: a dead provider connection sent no output
    *  within the window — log and abort the stream. Shared by every arm site. */
@@ -213,6 +218,7 @@ export class StreamLoop implements StreamLoopState {
     const messagesClean = JSON.parse(
       JSON.stringify(messages),
     ) as typeof messages;
+    this.lastPromptMessages = messagesClean;
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages: messagesClean,
@@ -257,7 +263,11 @@ export class StreamLoop implements StreamLoopState {
             }): Promise<{
               messages?: ModelMessage[];
               toolChoice?: "none";
-            }> => this.prepareStep(stepMessages, stepNumber),
+            }> => {
+              const prepared = await this.prepareStep(stepMessages, stepNumber);
+              this.lastPromptMessages = prepared.messages ?? stepMessages;
+              return prepared;
+            },
             onStepFinish: (stepResult): void => {
               this.onStepFinish(stepResult);
             },
@@ -823,6 +833,19 @@ export class StreamLoop implements StreamLoopState {
         );
       } else {
         logger.error("[AI Stream] Provider emitted error part", errorMeta);
+      }
+      // A context-length overflow names only the total: log where the
+      // characters are (per role / part type, largest parts) so an inlined
+      // payload (e.g. media as base64 text) is identifiable from the log.
+      if (isContextOverflowText(errorText)) {
+        logger.error("[AI Stream] Context overflow: prompt size breakdown", {
+          model,
+          apiProvider: this.p.modelConfig.apiProvider,
+          providerModel: this.p.modelConfig.providerModel,
+          contextWindow: this.p.modelConfig.contextWindow,
+          threadId,
+          ...summarizePromptSize(this.p.systemPrompt, this.lastPromptMessages),
+        });
       }
     }
 

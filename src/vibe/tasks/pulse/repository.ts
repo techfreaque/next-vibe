@@ -45,6 +45,7 @@ import {
 } from "../i18n";
 import { TaskIncidentType } from "../watchdog/enum";
 import { TaskGuard } from "../watchdog/guard";
+import { PhaseProfiler } from "../watchdog/phase-profiler";
 import {
   decideRetry,
   isInsufficientCreditsFailure,
@@ -67,6 +68,23 @@ import type { PulseStatusResponseOutput } from "./status/definition";
 /** Placeholder for "no lag-probe phase open". */
 function noPhase(): void {
   // nothing open
+}
+
+/**
+ * A per-task bookkeeping phase (prep / post) for the lag probe, sampled by the
+ * phase profiler so a stall in or right after it is named by function, not
+ * only by phase. The run itself is not profiled (it can last 30 minutes).
+ */
+function beginProfiledTaskPhase(
+  label: string,
+  logger: EndpointLogger,
+): () => void {
+  const endPhase = RunningTaskRegistry.beginPhase(label);
+  const endProfile = PhaseProfiler.hold(label, logger);
+  return (): void => {
+    endPhase();
+    endProfile();
+  };
 }
 
 export class PulseHealthRepository {
@@ -403,8 +421,9 @@ export class PulseHealthRepository {
           // registers. A cold route import is sync module evaluation, so
           // name this stretch for the lag probe or its stall is anonymous.
           endTaskPhase();
-          endTaskPhase = RunningTaskRegistry.beginPhase(
+          endTaskPhase = beginProfiledTaskPhase(
             `cron-prep:${dbTask.routeId}`,
+            logger,
           );
 
           // Resolve user context with real roles from DB
@@ -643,8 +662,9 @@ export class PulseHealthRepository {
                 // History row, retry decision, stats update and emits after
                 // the run: named for the lag probe like the prep phase.
                 endTaskPhase();
-                endTaskPhase = RunningTaskRegistry.beginPhase(
+                endTaskPhase = beginProfiledTaskPhase(
                   `cron-post:${dbTask.routeId}`,
+                  logger,
                 );
                 if (cancelReason !== null) {
                   typedResult = failInline({
@@ -735,7 +755,11 @@ export class PulseHealthRepository {
                   skippedForCredits = true;
                   (wasSkippedBefore ? logger.debug : logger.info).bind(logger)(
                     `Pulse: task "${resolvedTaskName}" skipped - insufficient credits or budget cap reached`,
-                    { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
+                    {
+                      message: logMessage,
+                      taskId: dbTask.id,
+                      routeId: dbTask.routeId,
+                    },
                   );
                   break;
                 }
@@ -761,7 +785,11 @@ export class PulseHealthRepository {
                 if (decision.retry) {
                   logger.warn(
                     `Pulse: task "${resolvedTaskName}" failed transiently (attempt ${attempt + 1}), retrying in ${decision.delayMs}ms`,
-                    { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
+                    {
+                      message: logMessage,
+                      taskId: dbTask.id,
+                      routeId: dbTask.routeId,
+                    },
                   );
                   await new Promise<void>((resolve) => {
                     setTimeout(resolve, decision.delayMs);
@@ -771,7 +799,11 @@ export class PulseHealthRepository {
 
                 logger.error(
                   `Pulse: task "${resolvedTaskName}" failed after ${attempt + 1} attempt(s)`,
-                  { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
+                  {
+                    message: logMessage,
+                    taskId: dbTask.id,
+                    routeId: dbTask.routeId,
+                  },
                 );
                 if (
                   cancelReason === null &&

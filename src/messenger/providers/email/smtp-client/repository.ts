@@ -218,6 +218,18 @@ export class SmtpRepository {
         return primaryResult;
       }
 
+      // 5.1.x = the destination mailbox does not exist (RFC 3463). Another
+      // account would get the same answer from the same receiving server, so
+      // the fallback only doubled every bounce into a second error chain.
+      if (SmtpRepository.isBadRecipientError(primaryResult.message)) {
+        logger.error("Email recipient rejected as nonexistent - not retrying", {
+          to: data.to,
+          primaryAccountId: primaryAccount.id,
+          primaryError: primaryResult.message,
+        });
+        return primaryResult;
+      }
+
       logger.info(
         "Primary SMTP account failed after retries, trying fallback",
         {
@@ -745,6 +757,11 @@ export class SmtpRepository {
     const retryablePatterns =
       /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
     return retryablePatterns.test(errorMessage);
+  }
+
+  /** Permanent "no such mailbox" rejections (enhanced status 5.1.x). */
+  static isBadRecipientError(errorMessage: string): boolean {
+    return /\b5\.1\.\d{1,2}\b/.test(errorMessage);
   }
 
   /**

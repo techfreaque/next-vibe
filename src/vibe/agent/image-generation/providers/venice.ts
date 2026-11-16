@@ -8,9 +8,11 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { fetchPublicUrl } from "next-vibe/core/utils/ssrf-guard";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import { parseBase64DataUri } from "../../shared/media-generation";
 import { ImageSize } from "../enum";
 import { scopedTranslation } from "../i18n";
 
@@ -57,9 +59,10 @@ export async function generateWithVenice(params: {
   prompt: string;
   size: string;
   /**
-   * Reference image URL. When set, the Venice image EDIT endpoint is used
-   * (image-to-image) instead of text-to-image. The bytes are fetched via the
-   * same fixture-aware fetchImpl and passed to Venice as a base64 string.
+   * Reference image: a base64 data URI (own storage files, browser uploads;
+   * see resolveMediaReference) or a public URL. When set, the Venice image
+   * EDIT endpoint is used (image-to-image) and the bytes go to Venice as a
+   * base64 string.
    */
   inputMediaUrl?: string | null;
   logger: EndpointLogger;
@@ -184,9 +187,9 @@ function editErrorMessageOf(
 /**
  * Venice.ai image EDIT (image-to-image) via POST /image/edit.
  *
- * The reference image arrives as a URL; its bytes are fetched with the
- * fixture-aware fetchImpl and sent to Venice as a base64 string in the JSON
- * body. Venice returns the edited image as RAW BYTES (not JSON) on success,
+ * The reference image arrives as a base64 data URI (decoded) or a public URL
+ * (fetched SSRF-guarded via the fixture-aware fetchImpl) and is sent to Venice
+ * as a base64 string in the JSON body. Venice returns the edited image as RAW BYTES (not JSON) on success,
  * so the result is wrapped as a data: URI for the repository to fetch and
  * upload to storage. `safe_mode: false` disables Venice's adult-content blur —
  * the model's UNCENSORED content tier already gates who can pick it.
@@ -209,23 +212,33 @@ async function editWithVenice(params: {
   });
 
   try {
-    // Fetch the reference image bytes (fixture-aware) and base64-encode them.
-    const refRes = await fetchImpl(inputMediaUrl);
-    if (!refRes.ok) {
-      logger.error("[Venice Images] Reference image fetch failed", {
-        status: refRes.status,
-      });
-      return fail({
-        message: t("post.errors.externalServiceError", {
-          message: `reference image fetch HTTP ${refRes.status}`,
-        }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
+    // The repository hands over own storage files (and browser uploads) as
+    // a base64 data URI: decode it, never fetch it. Only a public third-party
+    // URL is fetched, SSRF-guarded and fixture-aware.
+    let refBase64: string;
+    const inline = parseBase64DataUri(inputMediaUrl);
+    if (inline) {
+      refBase64 = inline.base64;
+    } else {
+      const refRes = await fetchPublicUrl(inputMediaUrl, fetchImpl);
+      if (!refRes?.ok) {
+        logger.error("[Venice Images] Reference image fetch failed", {
+          status: refRes?.status ?? null,
+          blocked: refRes === null,
+          host: URL.canParse(inputMediaUrl)
+            ? new URL(inputMediaUrl).host
+            : null,
+        });
+        return fail({
+          message: t("post.errors.externalServiceError", {
+            message: `reference image fetch HTTP ${refRes?.status ?? "blocked"}`,
+          }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      const refArrayBuf = await refRes.arrayBuffer();
+      refBase64 = Buffer.from(new Uint8Array(refArrayBuf)).toString("base64");
     }
-    const refArrayBuf = await refRes.arrayBuffer();
-    const refBase64 = Buffer.from(new Uint8Array(refArrayBuf)).toString(
-      "base64",
-    );
 
     const response = await fetchImpl(VENICE_IMAGE_EDIT_URL, {
       method: "POST",

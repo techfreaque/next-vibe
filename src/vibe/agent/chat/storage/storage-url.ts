@@ -45,6 +45,20 @@ export function isStorageUrl(url: string): boolean {
 }
 
 /**
+ * `{ threadId, filename }` of a storage-file URL in any form (relative, any
+ * host, legacy route), or null for anything else (data: URIs, third-party).
+ */
+export function parseStorageFileRef(
+  url: string,
+): { threadId: string; filename: string } | null {
+  const match = STORAGE_URL_EXACT.exec(url);
+  if (!match?.[1] || !match[2]) {
+    return null;
+  }
+  return { threadId: match[1], filename: match[2] };
+}
+
+/**
  * Normalize a storage-file URL to its portable root-relative form on the
  * canonical route. Non-storage URLs (third-party, data URIs) return unchanged.
  */

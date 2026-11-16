@@ -207,6 +207,14 @@ export interface WsConnectionData {
   /** Connection timestamp */
   connectedAt: number;
   /**
+   * Last time the client proved it was alive: a message or a pong to the
+   * server's keepalive ping. The close log reports the silence before a drop,
+   * which separates "client stopped answering pings" from a cut mid-traffic.
+   */
+  lastInboundAt: number;
+  /** Pongs received on this socket (0 = no ping was ever answered). */
+  pongCount: number;
+  /**
    * Set only for reverse-ws connector sockets (local → cloud outbound WS).
    * Identifies which remoteConnections row opened this socket so the server
    * can forcibly close it on disconnect without waiting for the client side.
