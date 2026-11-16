@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Your outro track is ready — a short, warm instrumental piece that resolves and fades, built for a credits/podcast-signoff feel.\n\n**File:** [outro.mp3](/api/en-GLOBAL/vibe/agent/chat/threads/8056ec77-f2c1-40fd-9887-b3ec7453a720/7cb21a70-8f6a-4d00-8117-514841f524dd.mp3)\n\n- **Length:** 8 seconds\n- **Cost:** 10.4 credits\n\nIf you want it longer or a different mood (darker, more upbeat, with a drum finish), say the word and I'll regenerate.\n\nFAILED: two unresolved defects from earlier in this session — (1) the `generate_image` tool with `callbackMode: \"approve\"` executed immediately without ever pausing for user confirmation, so the approval gate does not work; (2) the `contact-form` tool result contained an internal `hint` field that should not be surfaced to the user.",
+    "encoding_format": "float"
+  }
+}

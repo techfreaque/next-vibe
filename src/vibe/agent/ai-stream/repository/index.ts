@@ -1559,12 +1559,14 @@ export class AiStreamRepository {
             {
               try {
                 const { toAiSdkMessages } = await import("./context/convert");
+                // modelConfig: cached attachment descriptions replace the
+                // files here too, so gap-fill only bridges new attachments.
                 const preConvertedHistory = await toAiSdkMessages(
                   compactingCheck.branchMessages,
                   logger,
                   data.timezone,
                   data.rootFolderId,
-                  undefined,
+                  modelConfig,
                   undefined,
                   toolExecutionContext,
                 );

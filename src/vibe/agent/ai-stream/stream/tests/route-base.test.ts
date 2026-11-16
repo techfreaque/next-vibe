@@ -86,11 +86,17 @@ import {
 import type { ChatModelId } from "../../models";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
+  createE2ECreditUser,
+  drainCredits,
+} from "../../testing/e2e-credit-user";
+import {
+  fetchFavoriteConfigAndModel,
   fetchThreadMessages,
   fetchThreadMeta,
   fetchThreadTitle,
   getOrCreateFolder,
   resolveUser,
+  runTestStream,
   type SlimMessage,
   toolResultRecord,
 } from "../../testing/headless-test-runner";
@@ -5849,34 +5855,33 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
       fit(
         "C3: insufficient credits - returns 402 when balance is zero",
         async () => {
-          const wallets = await db.execute<{
-            id: string;
-            balance: number;
-            free_credits_remaining: number;
-          }>(
-            sql`SELECT cw.id, cw.balance, cw.free_credits_remaining
-              FROM credit_wallets cw
-              LEFT JOIN user_lead_links ull ON ull.lead_id = cw.lead_id
-              WHERE cw.user_id = ${testUser.id} OR ull.user_id = ${testUser.id}`,
-          );
-          const saved = wallets.rows.map((w) => ({
-            id: w.id,
-            balance: w.balance,
-            freeCreditsRemaining: w.free_credits_remaining,
-          }));
-
-          for (const w of saved) {
-            await db.execute(
-              sql`UPDATE credit_wallets SET balance = 0, free_credits_remaining = 0 WHERE id = ${w.id}`,
-            );
-          }
+          // A dedicated customer with no credits at all: credits live in
+          // packs (wallet balance columns are derived), so a real zero state
+          // comes from a fresh account drained through the deduction path,
+          // never from editing the shared test account's wallet rows.
+          const broke = await createE2ECreditUser("stream-c3-broke", 0);
           try {
-            const { result } = await runStream({
-              user: testUser,
+            await drainCredits(broke.user);
+            // The main favorite's config, pinned to the model it resolves to
+            // (the broke account has no favorites of its own).
+            const { favoriteConfig, model } = await fetchFavoriteConfigAndModel(
+              mainFavoriteId,
+              testUser,
+            );
+            const { result } = await runTestStream({
+              user: broke.user,
               prompt: "[C3 insufficient-credits] Say: SHOULD_FAIL",
-              threadId,
-              favoriteId: mainFavoriteId,
-              explicitParentMessageId: lastMainAiMsgId,
+              favoriteConfig: {
+                ...favoriteConfig,
+                modelSelection: {
+                  selectionType: ModelSelectionType.MANUAL,
+                  manualModelId: model,
+                },
+              },
+              rootFolderId: DefaultFolderId.PRIVATE,
+              // No fixture chain: the credit check refuses before any model
+              // call, so nothing is recorded or replayed.
+              toolExecutionContext: rootlessToolExecutionContext(),
             });
 
             expect(result.success).toBe(false);
@@ -5889,11 +5894,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             expect(result.errorType?.errorCode).toBe(402);
             expect(result.message).toContain("nsufficient");
           } finally {
-            for (const w of saved) {
-              await db.execute(
-                sql`UPDATE credit_wallets SET balance = ${w.balance}, free_credits_remaining = ${w.freeCreditsRemaining} WHERE id = ${w.id}`,
-              );
-            }
+            await broke.remove();
           }
         },
         effectiveTestTimeout,
