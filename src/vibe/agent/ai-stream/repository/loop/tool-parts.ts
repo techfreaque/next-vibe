@@ -883,7 +883,7 @@ async function executeFallbackTool(
   toolName: string,
   args: WidgetData | undefined,
 ): Promise<{ data: WidgetData } | { error: string } | null> {
-  const { user, locale, logger, toolExecutionContext } = state.p;
+  const { user, locale, logger, toolExecutionContext, model, skill } = state.p;
 
   try {
     logger.debug(
@@ -932,6 +932,11 @@ async function executeFallbackTool(
           error: result.message,
           errorKey: result.errorType.errorKey,
           args: JSON.stringify(args ?? {}).slice(0, 500),
+          // Which model keeps sending malformed calls (tool-description fix
+          // vs model quirk); `repaired` = normalizeExecuteToolArgs changed them.
+          model,
+          skill: skill ?? null,
+          repaired: inputArgs !== rawArgs,
         },
       );
       // Detail that used to arrive via messageParams is now interpolated into

@@ -23,16 +23,18 @@ export async function getCookie(
       return null;
     }
 
-    const value = `; ${document.cookie}`;
+    // First match wins, like the server's cookie parser: the browser lists
+    // the most specific (longest path, then oldest) duplicate first. A second
+    // copy (other path/domain) used to make this return null, so the CSRF
+    // header was dropped and every POST of that browser got a 403.
     // eslint-disable-next-line i18next/no-literal-string
-    const parts = value.split(`; ${name}=`);
-
-    if (parts.length === 2) {
-      const cookieValue = parts.pop()?.split(";").shift();
-      return cookieValue ? decodeURIComponent(cookieValue) : null;
-    }
-
-    return null;
+    const prefix = `${name}=`;
+    const entry = document.cookie
+      .split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(prefix));
+    const cookieValue = entry?.slice(prefix.length);
+    return cookieValue ? decodeURIComponent(cookieValue) : null;
   } catch (error) {
     // decodeURIComponent URIError on a malformed value, or a SecurityError
     reportStorageFailure(logger, {

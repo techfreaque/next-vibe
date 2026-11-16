@@ -307,6 +307,19 @@ export async function resolveModelSkill(params: {
   // setup gets the skill's identity for its tool/model cascades.
   if (skill) {
     const skillVariant = await resolveSkillVariant(skill, null);
+    if (!skillVariant) {
+      // Unknown skill id (AI callers invent ones like "chatgpt"): say so, so
+      // the caller can pick a real one instead of reading "model or skill
+      // required" although it passed a skill.
+      logger.warn("[resolveModelSkill] Skill not found", {
+        skill,
+        isPublic: user.isPublic,
+      });
+      return fail({
+        message: t("run.post.skillNotFound", { skill }),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
     const resolvedModel = resolveChatModelId(
       undefined,
       skillVariant?.modelSelection ?? undefined,

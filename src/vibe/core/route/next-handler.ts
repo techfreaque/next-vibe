@@ -16,6 +16,7 @@ import { NextResponse } from "next-vibe/ui/lib/request";
 import {
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
+  LEAD_ID_COOKIE_NAME,
   REQUEST_ID_HEADER_NAME,
 } from "@/env/constants";
 
@@ -79,6 +80,16 @@ function validateCsrf(
     return { valid: false, reason: "csrf_token_mismatch" };
   }
   return { valid: true };
+}
+
+/** How many cookies named `name` the raw Cookie header carries. */
+function countCookies(cookieHeader: string | null, name: string): number {
+  if (!cookieHeader) {
+    return 0;
+  }
+  return cookieHeader
+    .split(";")
+    .filter((part) => part.trim().startsWith(`${name}=`)).length;
 }
 
 /** Client-minted ids are uuids; accept any short token, never arbitrary text. */
@@ -151,6 +162,21 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       // CSRF double-submit validation for mutating browser requests
       const csrfCheck = validateCsrf(request, endpoint.method as Methods);
       if (!csrfCheck.valid) {
+        // Our own client always echoes the cookie, so a rejection means the
+        // page could not read it (duplicate cookie, foreign frame/webview)
+        // or the request was not ours: say which from the wire.
+        logger.warn("[CSRF] Mutating request rejected", {
+          reason: csrfCheck.reason,
+          csrfCookieCount: countCookies(
+            request.headers.get("cookie"),
+            CSRF_TOKEN_COOKIE_NAME,
+          ),
+          secFetchSite: request.headers.get("sec-fetch-site"),
+          secFetchMode: request.headers.get("sec-fetch-mode"),
+          hasOrigin: request.headers.get("origin") !== null,
+          hasRequestId: request.headers.get(REQUEST_ID_HEADER_NAME) !== null,
+          hasLeadCookie: request.cookies.has(LEAD_ID_COOKIE_NAME),
+        });
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
         return wrapErrorResponse(
           // `errorTypes.forbidden` is the generic ErrorResponseTypes label and

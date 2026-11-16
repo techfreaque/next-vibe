@@ -523,7 +523,11 @@ export class PulseHealthRepository {
                 RunningTaskRegistry.register(
                   dbTask.id,
                   taskAbortController,
-                  `cron:${resolvedTaskName}`,
+                  // routeId, not the display name: display names are i18n
+                  // keys of the task's own module and resolve to bare keys
+                  // here ("ingest.title", "cleanup.name"), so lag rows
+                  // could not tell which cron run stalled the loop.
+                  `cron:${dbTask.routeId}`,
                 );
                 let timedOut = false;
                 let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
@@ -704,7 +708,7 @@ export class PulseHealthRepository {
                   skippedForCredits = true;
                   (wasSkippedBefore ? logger.debug : logger.info).bind(logger)(
                     `Pulse: task "${resolvedTaskName}" skipped - insufficient credits or budget cap reached`,
-                    { message: logMessage, taskId: dbTask.id },
+                    { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
                   );
                   break;
                 }
@@ -730,7 +734,7 @@ export class PulseHealthRepository {
                 if (decision.retry) {
                   logger.warn(
                     `Pulse: task "${resolvedTaskName}" failed transiently (attempt ${attempt + 1}), retrying in ${decision.delayMs}ms`,
-                    { message: logMessage, taskId: dbTask.id },
+                    { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
                   );
                   await new Promise<void>((resolve) => {
                     setTimeout(resolve, decision.delayMs);
@@ -740,7 +744,7 @@ export class PulseHealthRepository {
 
                 logger.error(
                   `Pulse: task "${resolvedTaskName}" failed after ${attempt + 1} attempt(s)`,
-                  { message: logMessage, taskId: dbTask.id },
+                  { message: logMessage, taskId: dbTask.id, routeId: dbTask.routeId },
                 );
                 if (
                   cancelReason === null &&

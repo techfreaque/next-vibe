@@ -32,8 +32,13 @@ import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";
 const TTS_MAX_ATTEMPTS = 2;
 const TTS_RETRY_DELAY_MS = 1500;
 
+/** 10 ms of silence, played inside the click to unlock the shared player. */
+const SILENT_WAV_DATA_URI =
+  "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+
 interface ChunkFetchResult {
-  audio: HTMLAudioElement | null;
+  /** Audio data URL for the chunk; null on failure or cancel. */
+  audio: string | null;
   /** Display message when the fetch failed; null on success or cancel. */
   error: string | null;
 }
@@ -122,15 +127,11 @@ export function useTTSAudio({
       refs.prefetchTimer = null;
     }
 
-    // Stop all audio playback
-    const audioCount = refs.audioQueue.filter((a) => a !== null).length;
-    logger.debug(`TTS: Stopping ${audioCount} audio elements`);
-    refs.audioQueue.forEach((audio) => {
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-    });
+    // Stop playback
+    if (refs.player) {
+      refs.player.pause();
+      refs.player.currentTime = 0;
+    }
 
     resetTtsRefs(messageId);
     resetStore(messageId);
@@ -143,7 +144,7 @@ export function useTTSAudio({
     logger.debug("TTS: Stopping audio");
 
     const refs = getTtsRefs(messageId);
-    const currentAudio = refs.audioQueue[refs.currentPlayingIndex];
+    const currentAudio = refs.player;
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
@@ -195,8 +196,7 @@ export function useTTSAudio({
               attempt,
             });
 
-            const audio = new Audio(audioDataUrl);
-            resolve({ audio, error: null });
+            resolve({ audio: audioDataUrl, error: null });
           },
           onError: ({ error: endpointError }) => {
             const refs2 = getTtsRefs(messageId);
@@ -262,18 +262,26 @@ export function useTTSAudio({
     function playQueuedChunk(): void {
       const refs = getTtsRefs(messageId);
       const nextIndex = refs.currentPlayingIndex;
-      const audio = refs.audioQueue[nextIndex];
+      const audioUrl = refs.audioQueue[nextIndex];
 
       logger.debug(`TTS: playNextChunk called`, {
         nextIndex,
         totalChunks: refs.chunks.length,
-        hasAudio: !!audio,
+        hasAudio: !!audioUrl,
       });
 
-      if (!audio) {
+      if (!audioUrl) {
         logger.debug(`TTS: No audio available for chunk ${nextIndex + 1}`);
         return;
       }
+
+      // Every chunk plays through the element playAudio unlocked in the
+      // click; only a (never expected) missing one gets a fresh element.
+      const audio = refs.player ?? new Audio();
+      refs.player = audio;
+      audio.src = audioUrl;
+      // The data URL is no longer needed once handed to the element.
+      refs.audioQueue[nextIndex] = null;
 
       logger.debug(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
       setStore(messageId, { currentChunk: nextIndex + 1, isPlaying: true });
@@ -358,7 +366,7 @@ export function useTTSAudio({
 
         if (refs2.currentPlayingIndex < refs2.chunks.length) {
           const nextAudio = refs2.audioQueue[refs2.currentPlayingIndex];
-          if (nextAudio) {
+          if (nextAudio !== null && nextAudio !== undefined) {
             playQueuedChunk();
           } else {
             setStore(messageId, { isPlaying: false });
@@ -483,6 +491,21 @@ export function useTTSAudio({
 
     refs.isProcessing = true;
     setStore(messageId, { error: null, isLoading: true });
+
+    // Unlock the shared player while still inside the click (before any
+    // await): iOS Safari then lets it play every later chunk without a new
+    // gesture. A rejected prime is not a failure by itself; the real play()
+    // below logs it if the browser still blocks playback.
+    if (typeof Audio !== "undefined") {
+      const player = refs.player ?? new Audio();
+      refs.player = player;
+      player.src = SILENT_WAV_DATA_URI;
+      void player.play().catch((primeError: Error | null) => {
+        logger.debug("TTS: Player prime rejected", {
+          errorName: primeError instanceof Error ? primeError.name : null,
+        });
+      });
+    }
 
     try {
       logger.debug("TTS: Starting playAudio", {

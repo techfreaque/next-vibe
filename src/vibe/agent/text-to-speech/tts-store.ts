@@ -64,7 +64,15 @@ export const useTtsStore = create<TtsStoreState>((setState, getState) => ({
 // ── Per-message mutable refs (survive unmounts, never trigger re-renders) ─────
 
 export interface TtsRefs {
-  audioQueue: (HTMLAudioElement | null)[];
+  /** Fetched audio (data URL) per chunk; null until that chunk arrives. */
+  audioQueue: (string | null)[];
+  /**
+   * The one element every chunk plays through. It is created and primed
+   * inside the click that starts read-aloud: iOS Safari only lets an element
+   * play without a gesture once a gesture has played it, so a fresh element
+   * per chunk was rejected (NotAllowedError) from chunk 2 on.
+   */
+  player: HTMLAudioElement | null;
   chunks: string[];
   currentPlayingIndex: number;
   currentFetchingIndex: number;
@@ -79,6 +87,7 @@ export function getTtsRefs(messageId: string): TtsRefs {
   if (!refsMap.has(messageId)) {
     refsMap.set(messageId, {
       audioQueue: [],
+      player: null,
       chunks: [],
       currentPlayingIndex: 0,
       currentFetchingIndex: 0,
