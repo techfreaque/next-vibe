@@ -1,7 +1,9 @@
 # syntax=docker/dockerfile:1
 
-# Base stage with Bun
-FROM oven/bun:1.3.3-alpine AS base
+# Base stage with Bun. Keep in step with the local dev Bun: 1.3.3 could not
+# load any react-dom/server build of React 19.3 ("Expected CommonJS module to
+# have a function wrapper"), which broke every email rendered by the task runner.
+FROM oven/bun:1.3.14-alpine AS base
 WORKDIR /app
 
 # Install Node.js for Next.js build compatibility. `apk upgrade` pulls the latest

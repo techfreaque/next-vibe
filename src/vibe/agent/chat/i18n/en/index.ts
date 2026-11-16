@@ -892,6 +892,10 @@ export const translations = {
         "Grok 4.7 - xAI's latest Grok. Sharper reasoning and code, open content policy, vision. 500K-token context.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Moonshot AI's strongest model. Multimodal reasoning and long agent runs. 1M-token context.",
+      qwen4Max:
+        "Qwen 4 Max - Alibaba's new flagship. Frontier reasoning, code and analysis, reads images and video. 1M-token context.",
+      kimiK31ProUncensored:
+        "Kimi K3.1 Pro Uncensored - Moonshot AI's strongest Kimi with the refusals removed (abliterated). Flagship reasoning, no lectures, tools included. 1M-token context.",
       deepseekV41Flash:
         "DeepSeek V4.1 Flash - DeepSeek's fast open model, now with vision. Serious coding for almost nothing. 1M-token context.",
       qwen38Flash:
@@ -924,6 +928,12 @@ export const translations = {
         "Artemis 31B - TheDrummer's Gemma 4 roleplay finetune. Dark scenes, explicit fiction, characters that stay in voice. Cheap, 262K context, reads images, calls tools.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - xAI's latest image generation model with improved prompt adherence and visual quality.",
+      recraftV41:
+        "Recraft V4.1 - Recraft's design-first image model with precise text in images, built for logos, posters and brand graphics.",
+      recraftV41Pro:
+        "Recraft V4.1 Pro - Recraft's 2K premium tier for print-ready brand and product visuals with fine detail.",
+      recraftV41Flash:
+        "Recraft V4.1 Flash - Recraft's fast, low-cost tier for drafts and bulk runs, under 1 credit per image.",
       qwenImage3:
         "Qwen Image 3 - Alibaba's fast image generation model at ultra-low cost.",
       qwenImage3Pro:

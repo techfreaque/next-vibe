@@ -208,7 +208,7 @@ export function getChatModelById(
   }
   return (
     chatModelOptionsIndex[modelId] ??
-    chatModelOptionsIndex[ChatModelId.KIMI_K2]!
+    chatModelOptionsIndex[ChatModelId.KIMI_K3_1_PRO]!
   );
 }
 

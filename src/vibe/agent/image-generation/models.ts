@@ -62,6 +62,10 @@ export enum ImageGenModelId {
   FLUX_3_KLEIN = "flux-3-klein",
   GPT_IMAGE_2_6_FLARE = "gpt-image-2.6-flare",
   GPT_IMAGE_2_6_SUNBURST = "gpt-image-2.6-sunburst",
+  // Media refresh 2026-11-16
+  RECRAFT_V4_1 = "recraft-v4.1",
+  RECRAFT_V4_1_PRO = "recraft-v4.1-pro",
+  RECRAFT_V4_1_FLASH = "recraft-v4.1-flash",
   // Uncensored image models via Venice.ai (added 2026-11-07)
   LUSTIFY_V8 = "lustify-v8",
   CHROMA = "chroma",
@@ -1333,6 +1337,100 @@ export const imageGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  // ── Media refresh 2026-11-16 ──────────────────────────────────────────────
+
+  [ImageGenModelId.RECRAFT_V4_1]: {
+    name: "Recraft V4.1",
+    by: "recraft",
+    description: "chat.models.descriptions.recraftV41",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "pen-tool",
+    inputs: ["text", "image"], // updated: 2026-11-16 from openrouter-api (input_references 0-1)
+    outputs: ["image"], // updated: 2026-11-16 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.RECRAFT_V4_1,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "recraft/recraft-v4.1",
+        creditCostPerImage: 3.5, // updated: 2026-11-16 from openrouter-api ($0.035/image, ~1K)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.RECRAFT_V4_1_PRO]: {
+    name: "Recraft V4.1 Pro",
+    by: "recraft",
+    description: "chat.models.descriptions.recraftV41Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "pen-tool",
+    inputs: ["text", "image"], // updated: 2026-11-16 from openrouter-api (input_references 0-1)
+    outputs: ["image"], // updated: 2026-11-16 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.RECRAFT_V4_1_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "recraft/recraft-v4.1-pro",
+        creditCostPerImage: 21, // updated: 2026-11-16 from openrouter-api ($0.21/image, ~2K)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+    },
+  },
+
+  [ImageGenModelId.RECRAFT_V4_1_FLASH]: {
+    name: "Recraft V4.1 Flash",
+    by: "recraft",
+    description: "chat.models.descriptions.recraftV41Flash",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "pen-tool",
+    inputs: ["text"], // updated: 2026-11-16 from openrouter-api
+    outputs: ["image"], // updated: 2026-11-16 from openrouter-api
+    providers: [
+      {
+        id: ImageGenModelId.RECRAFT_V4_1_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        // Flash V2 (2026-11-13) replaces V4.1 Flash upstream at the same price.
+        providerModel: "recraft/recraft-v4.1-flash-v2",
+        creditCostPerImage: 0.7, // updated: 2026-11-16 from openrouter-api ($0.007/image, ~1K)
+        supportedSizes: [],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,

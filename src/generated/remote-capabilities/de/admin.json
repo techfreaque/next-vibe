@@ -46086,18 +46086,351 @@
           },
           "schemaType": "primitive"
         },
-        "filePath": {
+        "filePaths": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Dateipfad",
-          "description": "Der lokale Pfad der hochzuladenden Datei",
-          "placeholder": "Dateipfad eingeben",
+          "label": "Dateipfade",
+          "description": "Absoluter Pfad der hochzuladenden Datei, bei Mehrfachauswahl auch mehrere. Erlaubt sind Projektverzeichnis und System-Temp-Verzeichnis.",
+          "placeholder": "/tmp/foto.png",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "string"
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              },
+              "out": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  },
+                  "checks": [{}]
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string",
+                    "checks": [{}]
+                  },
+                  "type": "string"
+                }
+              }
             },
-            "type": "string"
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "pipe",
+                "in": {
+                  "def": {
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "out": {
+                  "def": {
+                    "type": "transform"
+                  },
+                  "type": "transform"
+                }
+              },
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "array",
+                    "element": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "out": {
+                "def": {
+                  "type": "transform"
+                },
+                "type": "transform"
+              }
+            },
+            "out": {
+              "def": {
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string",
+                    "checks": [{}]
+                  },
+                  "type": "string"
+                },
+                "checks": [{}]
+              },
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            }
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "includeSnapshot": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Snapshot anhängen",
+          "description": "Nach dem Upload einen Seiten-Snapshot zurückgeben",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -258111,7 +258444,9 @@
                           "GEMINI_4_CARBON": "gemini-4-carbon",
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
-                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "QWEN_4_MAX": "qwen-4-max",
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
                       },
                       "type": "enum",
@@ -258247,7 +258582,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
                       "options": [
                         "gpt-55",
@@ -258381,7 +258718,9 @@
                         "gemini-4-carbon",
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
-                        "drummer-artemis-31b"
+                        "drummer-artemis-31b",
+                        "qwen-4-max",
+                        "kimi-k3.1-pro-uncensored"
                       ]
                     }
                   },
@@ -261228,7 +261567,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
                           },
                           "type": "enum",
@@ -261364,7 +261705,9 @@
                             "GEMINI_4_CARBON": "gemini-4-carbon",
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
-                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "QWEN_4_MAX": "qwen-4-max",
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
                           "options": [
                             "gpt-55",
@@ -261498,7 +261841,9 @@
                             "gemini-4-carbon",
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
-                            "drummer-artemis-31b"
+                            "drummer-artemis-31b",
+                            "qwen-4-max",
+                            "kimi-k3.1-pro-uncensored"
                           ]
                         }
                       },
@@ -271178,6 +271523,14 @@
             {
               "value": "drummer-artemis-31b",
               "label": "models.names.DRUMMER_ARTEMIS_31B"
+            },
+            {
+              "value": "qwen-4-max",
+              "label": "models.names.QWEN_4_MAX"
+            },
+            {
+              "value": "kimi-k3.1-pro-uncensored",
+              "label": "models.names.KIMI_K3_1_PRO_UNCENSORED"
             }
           ],
           "columns": 6,
@@ -271320,7 +271673,9 @@
                     "GEMINI_4_CARBON": "gemini-4-carbon",
                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                     "META_MUSE_EMBER": "meta-muse-ember",
-                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                    "QWEN_4_MAX": "qwen-4-max",
+                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                   }
                 },
                 "type": "enum",
@@ -271456,7 +271811,9 @@
                   "GEMINI_4_CARBON": "gemini-4-carbon",
                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                   "META_MUSE_EMBER": "meta-muse-ember",
-                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                  "QWEN_4_MAX": "qwen-4-max",
+                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                 },
                 "options": [
                   "gpt-55",
@@ -271590,7 +271947,9 @@
                   "gemini-4-carbon",
                   "minimax-m3.1-flash",
                   "meta-muse-ember",
-                  "drummer-artemis-31b"
+                  "drummer-artemis-31b",
+                  "qwen-4-max",
+                  "kimi-k3.1-pro-uncensored"
                 ]
               }
             },
@@ -272945,6 +273304,9 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "RECRAFT_V4_1": "recraft-v4.1",
+                                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -272990,6 +273352,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -273033,6 +273398,9 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "recraft-v4.1",
+                                  "recraft-v4.1-pro",
+                                  "recraft-v4.1-flash",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -273732,6 +274100,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -273777,6 +274148,9 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "RECRAFT_V4_1": "recraft-v4.1",
+                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -273820,6 +274194,9 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "recraft-v4.1",
+                                "recraft-v4.1-pro",
+                                "recraft-v4.1-flash",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -301140,7 +301517,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       }
                     },
                     "type": "enum",
@@ -301276,7 +301655,9 @@
                       "GEMINI_4_CARBON": "gemini-4-carbon",
                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                       "META_MUSE_EMBER": "meta-muse-ember",
-                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                      "QWEN_4_MAX": "qwen-4-max",
+                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                     },
                     "options": [
                       "gpt-55",
@@ -301410,7 +301791,9 @@
                       "gemini-4-carbon",
                       "minimax-m3.1-flash",
                       "meta-muse-ember",
-                      "drummer-artemis-31b"
+                      "drummer-artemis-31b",
+                      "qwen-4-max",
+                      "kimi-k3.1-pro-uncensored"
                     ]
                   }
                 },
@@ -302510,6 +302893,14 @@
             {
               "value": "drummer-artemis-31b",
               "label": "models.names.DRUMMER_ARTEMIS_31B"
+            },
+            {
+              "value": "qwen-4-max",
+              "label": "models.names.QWEN_4_MAX"
+            },
+            {
+              "value": "kimi-k3.1-pro-uncensored",
+              "label": "models.names.KIMI_K3_1_PRO_UNCENSORED"
             }
           ],
           "columns": 6,
@@ -302651,7 +303042,9 @@
                     "GEMINI_4_CARBON": "gemini-4-carbon",
                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                     "META_MUSE_EMBER": "meta-muse-ember",
-                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                    "QWEN_4_MAX": "qwen-4-max",
+                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                   }
                 },
                 "type": "enum",
@@ -302787,7 +303180,9 @@
                   "GEMINI_4_CARBON": "gemini-4-carbon",
                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                   "META_MUSE_EMBER": "meta-muse-ember",
-                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                  "QWEN_4_MAX": "qwen-4-max",
+                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                 },
                 "options": [
                   "gpt-55",
@@ -302921,7 +303316,9 @@
                   "gemini-4-carbon",
                   "minimax-m3.1-flash",
                   "meta-muse-ember",
-                  "drummer-artemis-31b"
+                  "drummer-artemis-31b",
+                  "qwen-4-max",
+                  "kimi-k3.1-pro-uncensored"
                 ]
               }
             },
@@ -304810,7 +305207,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       }
                     },
                     "type": "enum",
@@ -304946,7 +305345,9 @@
                       "GEMINI_4_CARBON": "gemini-4-carbon",
                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                       "META_MUSE_EMBER": "meta-muse-ember",
-                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                      "QWEN_4_MAX": "qwen-4-max",
+                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                     },
                     "options": [
                       "gpt-55",
@@ -305080,7 +305481,9 @@
                       "gemini-4-carbon",
                       "minimax-m3.1-flash",
                       "meta-muse-ember",
-                      "drummer-artemis-31b"
+                      "drummer-artemis-31b",
+                      "qwen-4-max",
+                      "kimi-k3.1-pro-uncensored"
                     ]
                   }
                 },
@@ -308046,7 +308449,9 @@
                           "GEMINI_4_CARBON": "gemini-4-carbon",
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
-                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "QWEN_4_MAX": "qwen-4-max",
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
                       },
                       "type": "enum",
@@ -308182,7 +308587,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
                       "options": [
                         "gpt-55",
@@ -308316,7 +308723,9 @@
                         "gemini-4-carbon",
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
-                        "drummer-artemis-31b"
+                        "drummer-artemis-31b",
+                        "qwen-4-max",
+                        "kimi-k3.1-pro-uncensored"
                       ]
                     }
                   },
@@ -309249,7 +309658,9 @@
                     "GEMINI_4_CARBON": "gemini-4-carbon",
                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                     "META_MUSE_EMBER": "meta-muse-ember",
-                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                    "QWEN_4_MAX": "qwen-4-max",
+                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                   }
                 },
                 "type": "enum",
@@ -309385,7 +309796,9 @@
                   "GEMINI_4_CARBON": "gemini-4-carbon",
                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                   "META_MUSE_EMBER": "meta-muse-ember",
-                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                  "QWEN_4_MAX": "qwen-4-max",
+                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                 },
                 "options": [
                   "gpt-55",
@@ -309519,7 +309932,9 @@
                   "gemini-4-carbon",
                   "minimax-m3.1-flash",
                   "meta-muse-ember",
-                  "drummer-artemis-31b"
+                  "drummer-artemis-31b",
+                  "qwen-4-max",
+                  "kimi-k3.1-pro-uncensored"
                 ]
               }
             },
@@ -310252,7 +310667,9 @@
                           "GEMINI_4_CARBON": "gemini-4-carbon",
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
-                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "QWEN_4_MAX": "qwen-4-max",
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
                       },
                       "type": "enum",
@@ -310388,7 +310805,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
                       "options": [
                         "gpt-55",
@@ -310522,7 +310941,9 @@
                         "gemini-4-carbon",
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
-                        "drummer-artemis-31b"
+                        "drummer-artemis-31b",
+                        "qwen-4-max",
+                        "kimi-k3.1-pro-uncensored"
                       ]
                     }
                   },
@@ -316315,7 +316736,9 @@
                 "GEMINI_4_CARBON": "gemini-4-carbon",
                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                 "META_MUSE_EMBER": "meta-muse-ember",
-                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                "QWEN_4_MAX": "qwen-4-max",
+                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
               }
             },
             "type": "enum",
@@ -316451,7 +316874,9 @@
               "GEMINI_4_CARBON": "gemini-4-carbon",
               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
               "META_MUSE_EMBER": "meta-muse-ember",
-              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+              "QWEN_4_MAX": "qwen-4-max",
+              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
             },
             "options": [
               "gpt-55",
@@ -316585,7 +317010,9 @@
               "gemini-4-carbon",
               "minimax-m3.1-flash",
               "meta-muse-ember",
-              "drummer-artemis-31b"
+              "drummer-artemis-31b",
+              "qwen-4-max",
+              "kimi-k3.1-pro-uncensored"
             ]
           },
           "usage": {
@@ -321985,6 +322412,18 @@
               "label": "models.names.GPT_IMAGE_2_6_SUNBURST"
             },
             {
+              "value": "recraft-v4.1",
+              "label": "models.names.RECRAFT_V4_1"
+            },
+            {
+              "value": "recraft-v4.1-pro",
+              "label": "models.names.RECRAFT_V4_1_PRO"
+            },
+            {
+              "value": "recraft-v4.1-flash",
+              "label": "models.names.RECRAFT_V4_1_FLASH"
+            },
+            {
               "value": "lustify-v8",
               "label": "models.names.LUSTIFY_V8"
             },
@@ -322063,6 +322502,9 @@
                     "FLUX_3_KLEIN": "flux-3-klein",
                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                    "RECRAFT_V4_1": "recraft-v4.1",
+                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                     "LUSTIFY_V8": "lustify-v8",
                     "CHROMA": "chroma",
                     "QWEN_EDIT": "qwen-edit",
@@ -322108,6 +322550,9 @@
                   "FLUX_3_KLEIN": "flux-3-klein",
                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                  "RECRAFT_V4_1": "recraft-v4.1",
+                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                   "LUSTIFY_V8": "lustify-v8",
                   "CHROMA": "chroma",
                   "QWEN_EDIT": "qwen-edit",
@@ -322151,6 +322596,9 @@
                   "flux-3-klein",
                   "gpt-image-2.6-flare",
                   "gpt-image-2.6-sunburst",
+                  "recraft-v4.1",
+                  "recraft-v4.1-pro",
+                  "recraft-v4.1-flash",
                   "lustify-v8",
                   "chroma",
                   "qwen-edit",
@@ -330628,7 +331076,9 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max",
+                                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                           }
                                         },
                                         "type": "enum",
@@ -330764,7 +331214,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -330898,7 +331350,9 @@
                                           "gemini-4-carbon",
                                           "minimax-m3.1-flash",
                                           "meta-muse-ember",
-                                          "drummer-artemis-31b"
+                                          "drummer-artemis-31b",
+                                          "qwen-4-max",
+                                          "kimi-k3.1-pro-uncensored"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -331690,7 +332144,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
                                       },
                                       "type": "enum",
@@ -331826,7 +332282,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -331960,7 +332418,9 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max",
+                                        "kimi-k3.1-pro-uncensored"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -333432,7 +333892,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
                                       },
                                       "type": "enum",
@@ -333568,7 +334030,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -333702,7 +334166,9 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max",
+                                        "kimi-k3.1-pro-uncensored"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -334494,7 +334960,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -334630,7 +335098,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -334764,7 +335234,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -336143,6 +336615,9 @@
                                                   "FLUX_3_KLEIN": "flux-3-klein",
                                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                   "LUSTIFY_V8": "lustify-v8",
                                                   "CHROMA": "chroma",
                                                   "QWEN_EDIT": "qwen-edit",
@@ -336188,6 +336663,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -336231,6 +336709,9 @@
                                                 "flux-3-klein",
                                                 "gpt-image-2.6-flare",
                                                 "gpt-image-2.6-sunburst",
+                                                "recraft-v4.1",
+                                                "recraft-v4.1-pro",
+                                                "recraft-v4.1-flash",
                                                 "lustify-v8",
                                                 "chroma",
                                                 "qwen-edit",
@@ -336934,6 +337415,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -336979,6 +337463,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -337022,6 +337509,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -348728,7 +349218,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
                                       },
                                       "type": "enum",
@@ -348864,7 +349356,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -348998,7 +349492,9 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max",
+                                        "kimi-k3.1-pro-uncensored"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -349790,7 +350286,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -349926,7 +350424,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -350060,7 +350560,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -351530,7 +352032,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -351666,7 +352170,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -351800,7 +352306,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -352590,7 +353098,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -352726,7 +353236,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -352860,7 +353372,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -354239,6 +354753,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -354284,6 +354801,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -354327,6 +354847,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -355030,6 +355553,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -355075,6 +355601,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -355118,6 +355647,9 @@
                                             "flux-3-klein",
                                             "gpt-image-2.6-flare",
                                             "gpt-image-2.6-sunburst",
+                                            "recraft-v4.1",
+                                            "recraft-v4.1-pro",
+                                            "recraft-v4.1-flash",
                                             "lustify-v8",
                                             "chroma",
                                             "qwen-edit",
@@ -367414,7 +367946,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
                                       },
                                       "type": "enum",
@@ -367550,7 +368084,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -367684,7 +368220,9 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max",
+                                        "kimi-k3.1-pro-uncensored"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -368476,7 +369014,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -368612,7 +369152,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -368746,7 +369288,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -369444,6 +369988,9 @@
                                                   "FLUX_3_KLEIN": "flux-3-klein",
                                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                   "LUSTIFY_V8": "lustify-v8",
                                                   "CHROMA": "chroma",
                                                   "QWEN_EDIT": "qwen-edit",
@@ -369489,6 +370036,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -369532,6 +370082,9 @@
                                                 "flux-3-klein",
                                                 "gpt-image-2.6-flare",
                                                 "gpt-image-2.6-sunburst",
+                                                "recraft-v4.1",
+                                                "recraft-v4.1-pro",
+                                                "recraft-v4.1-flash",
                                                 "lustify-v8",
                                                 "chroma",
                                                 "qwen-edit",
@@ -370235,6 +370788,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -370280,6 +370836,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -370323,6 +370882,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -381985,7 +382547,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -382121,7 +382685,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -382255,7 +382821,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -383045,7 +383613,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -383181,7 +383751,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -383315,7 +383887,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -384013,6 +384587,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -384058,6 +384635,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -384101,6 +384681,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -384804,6 +385387,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -384849,6 +385435,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -384892,6 +385481,9 @@
                                             "flux-3-klein",
                                             "gpt-image-2.6-flare",
                                             "gpt-image-2.6-sunburst",
+                                            "recraft-v4.1",
+                                            "recraft-v4.1-pro",
+                                            "recraft-v4.1-flash",
                                             "lustify-v8",
                                             "chroma",
                                             "qwen-edit",
@@ -405778,6 +406370,9 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "RECRAFT_V4_1": "recraft-v4.1",
+                                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -405823,6 +406418,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -405866,6 +406464,9 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "recraft-v4.1",
+                                  "recraft-v4.1-pro",
+                                  "recraft-v4.1-flash",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -406565,6 +407166,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -406610,6 +407214,9 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "RECRAFT_V4_1": "recraft-v4.1",
+                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -406653,6 +407260,9 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "recraft-v4.1",
+                                "recraft-v4.1-pro",
+                                "recraft-v4.1-flash",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -410573,7 +411183,9 @@
                                           "GEMINI_4_CARBON": "gemini-4-carbon",
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
-                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "QWEN_4_MAX": "qwen-4-max",
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
                                       },
                                       "type": "enum",
@@ -410709,7 +411321,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -410843,7 +411457,9 @@
                                         "gemini-4-carbon",
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
-                                        "drummer-artemis-31b"
+                                        "drummer-artemis-31b",
+                                        "qwen-4-max",
+                                        "kimi-k3.1-pro-uncensored"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -411635,7 +412251,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -411771,7 +412389,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -411905,7 +412525,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -412603,6 +413225,9 @@
                                                   "FLUX_3_KLEIN": "flux-3-klein",
                                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                   "LUSTIFY_V8": "lustify-v8",
                                                   "CHROMA": "chroma",
                                                   "QWEN_EDIT": "qwen-edit",
@@ -412648,6 +413273,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -412691,6 +413319,9 @@
                                                 "flux-3-klein",
                                                 "gpt-image-2.6-flare",
                                                 "gpt-image-2.6-sunburst",
+                                                "recraft-v4.1",
+                                                "recraft-v4.1-pro",
+                                                "recraft-v4.1-flash",
                                                 "lustify-v8",
                                                 "chroma",
                                                 "qwen-edit",
@@ -413394,6 +414025,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -413439,6 +414073,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -413482,6 +414119,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -425144,7 +425784,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -425280,7 +425922,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -425414,7 +426058,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -426204,7 +426850,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -426340,7 +426988,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -426474,7 +427124,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -427172,6 +427824,9 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "RECRAFT_V4_1": "recraft-v4.1",
+                                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                                 "LUSTIFY_V8": "lustify-v8",
                                                 "CHROMA": "chroma",
                                                 "QWEN_EDIT": "qwen-edit",
@@ -427217,6 +427872,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -427260,6 +427918,9 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "recraft-v4.1",
+                                              "recraft-v4.1-pro",
+                                              "recraft-v4.1-flash",
                                               "lustify-v8",
                                               "chroma",
                                               "qwen-edit",
@@ -427963,6 +428624,9 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "RECRAFT_V4_1": "recraft-v4.1",
+                                              "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                              "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                               "LUSTIFY_V8": "lustify-v8",
                                               "CHROMA": "chroma",
                                               "QWEN_EDIT": "qwen-edit",
@@ -428008,6 +428672,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -428051,6 +428718,9 @@
                                             "flux-3-klein",
                                             "gpt-image-2.6-flare",
                                             "gpt-image-2.6-sunburst",
+                                            "recraft-v4.1",
+                                            "recraft-v4.1-pro",
+                                            "recraft-v4.1-flash",
                                             "lustify-v8",
                                             "chroma",
                                             "qwen-edit",
@@ -440127,7 +440797,7 @@
           "variant": "muted",
           "label": "Wähle aus {{count}} Modellen mit präziser Steuerung von Intelligenz, Geschwindigkeit und Kosten",
           "contentParams": {
-            "count": 243
+            "count": 248
           },
           "usage": {
             "response": true
@@ -440649,7 +441319,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               }
                             },
                             "type": "enum",
@@ -440785,7 +441457,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             },
                             "options": [
                               "gpt-55",
@@ -440919,7 +441593,9 @@
                               "gemini-4-carbon",
                               "minimax-m3.1-flash",
                               "meta-muse-ember",
-                              "drummer-artemis-31b"
+                              "drummer-artemis-31b",
+                              "qwen-4-max",
+                              "kimi-k3.1-pro-uncensored"
                             ]
                           }
                         },
@@ -441544,7 +442220,9 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max",
+                                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                               }
                                             },
                                             "type": "enum",
@@ -441680,7 +442358,9 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -441814,7 +442494,9 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max",
+                                              "kimi-k3.1-pro-uncensored"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -442608,7 +443290,9 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                             }
                                           },
                                           "type": "enum",
@@ -442744,7 +443428,9 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max",
+                                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -442878,7 +443564,9 @@
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
-                                            "drummer-artemis-31b"
+                                            "drummer-artemis-31b",
+                                            "qwen-4-max",
+                                            "kimi-k3.1-pro-uncensored"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -444043,7 +444731,9 @@
                                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "QWEN_4_MAX": "qwen-4-max",
+                                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                               }
                                             },
                                             "type": "enum",
@@ -444179,7 +444869,9 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -444313,7 +445005,9 @@
                                               "gemini-4-carbon",
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
-                                              "drummer-artemis-31b"
+                                              "drummer-artemis-31b",
+                                              "qwen-4-max",
+                                              "kimi-k3.1-pro-uncensored"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -445107,7 +445801,9 @@
                                               "GEMINI_4_CARBON": "gemini-4-carbon",
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
-                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                             }
                                           },
                                           "type": "enum",
@@ -445243,7 +445939,9 @@
                                             "GEMINI_4_CARBON": "gemini-4-carbon",
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
-                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "QWEN_4_MAX": "qwen-4-max",
+                                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -445377,7 +446075,9 @@
                                             "gemini-4-carbon",
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
-                                            "drummer-artemis-31b"
+                                            "drummer-artemis-31b",
+                                            "qwen-4-max",
+                                            "kimi-k3.1-pro-uncensored"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -454292,6 +454992,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -454337,6 +455040,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -454380,6 +455086,9 @@
                                           "flux-3-klein",
                                           "gpt-image-2.6-flare",
                                           "gpt-image-2.6-sunburst",
+                                          "recraft-v4.1",
+                                          "recraft-v4.1-pro",
+                                          "recraft-v4.1-flash",
                                           "lustify-v8",
                                           "chroma",
                                           "qwen-edit",
@@ -455081,6 +455790,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -455126,6 +455838,9 @@
                                         "FLUX_3_KLEIN": "flux-3-klein",
                                         "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                         "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                        "RECRAFT_V4_1": "recraft-v4.1",
+                                        "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                        "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                         "LUSTIFY_V8": "lustify-v8",
                                         "CHROMA": "chroma",
                                         "QWEN_EDIT": "qwen-edit",
@@ -455169,6 +455884,9 @@
                                         "flux-3-klein",
                                         "gpt-image-2.6-flare",
                                         "gpt-image-2.6-sunburst",
+                                        "recraft-v4.1",
+                                        "recraft-v4.1-pro",
+                                        "recraft-v4.1-flash",
                                         "lustify-v8",
                                         "chroma",
                                         "qwen-edit",
@@ -458991,7 +459709,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -459127,7 +459847,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -459261,7 +459983,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -460051,7 +460775,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -460187,7 +460913,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -460321,7 +461049,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -469378,6 +470108,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -469423,6 +470156,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -469466,6 +470202,9 @@
                                           "flux-3-klein",
                                           "gpt-image-2.6-flare",
                                           "gpt-image-2.6-sunburst",
+                                          "recraft-v4.1",
+                                          "recraft-v4.1-pro",
+                                          "recraft-v4.1-flash",
                                           "lustify-v8",
                                           "chroma",
                                           "qwen-edit",
@@ -470167,6 +470906,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -470212,6 +470954,9 @@
                                         "FLUX_3_KLEIN": "flux-3-klein",
                                         "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                         "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                        "RECRAFT_V4_1": "recraft-v4.1",
+                                        "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                        "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                         "LUSTIFY_V8": "lustify-v8",
                                         "CHROMA": "chroma",
                                         "QWEN_EDIT": "qwen-edit",
@@ -470255,6 +471000,9 @@
                                         "flux-3-klein",
                                         "gpt-image-2.6-flare",
                                         "gpt-image-2.6-sunburst",
+                                        "recraft-v4.1",
+                                        "recraft-v4.1-pro",
+                                        "recraft-v4.1-flash",
                                         "lustify-v8",
                                         "chroma",
                                         "qwen-edit",
@@ -474045,7 +474793,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -474181,7 +474931,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -474315,7 +475067,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -475105,7 +475859,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -475241,7 +475997,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -475375,7 +476133,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -484234,6 +484994,9 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "RECRAFT_V4_1": "recraft-v4.1",
+                                            "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                            "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                             "LUSTIFY_V8": "lustify-v8",
                                             "CHROMA": "chroma",
                                             "QWEN_EDIT": "qwen-edit",
@@ -484279,6 +485042,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -484322,6 +485088,9 @@
                                           "flux-3-klein",
                                           "gpt-image-2.6-flare",
                                           "gpt-image-2.6-sunburst",
+                                          "recraft-v4.1",
+                                          "recraft-v4.1-pro",
+                                          "recraft-v4.1-flash",
                                           "lustify-v8",
                                           "chroma",
                                           "qwen-edit",
@@ -485023,6 +485792,9 @@
                                           "FLUX_3_KLEIN": "flux-3-klein",
                                           "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                           "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                          "RECRAFT_V4_1": "recraft-v4.1",
+                                          "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                          "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                           "LUSTIFY_V8": "lustify-v8",
                                           "CHROMA": "chroma",
                                           "QWEN_EDIT": "qwen-edit",
@@ -485068,6 +485840,9 @@
                                         "FLUX_3_KLEIN": "flux-3-klein",
                                         "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                         "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                        "RECRAFT_V4_1": "recraft-v4.1",
+                                        "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                        "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                         "LUSTIFY_V8": "lustify-v8",
                                         "CHROMA": "chroma",
                                         "QWEN_EDIT": "qwen-edit",
@@ -485111,6 +485886,9 @@
                                         "flux-3-klein",
                                         "gpt-image-2.6-flare",
                                         "gpt-image-2.6-sunburst",
+                                        "recraft-v4.1",
+                                        "recraft-v4.1-pro",
+                                        "recraft-v4.1-flash",
                                         "lustify-v8",
                                         "chroma",
                                         "qwen-edit",
@@ -488901,7 +489679,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -489037,7 +489817,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -489171,7 +489953,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -489961,7 +490745,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -490097,7 +490883,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -490231,7 +491019,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -491448,7 +492238,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -491584,7 +492376,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -491718,7 +492512,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -492508,7 +493304,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -492644,7 +493442,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -492778,7 +493578,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -493936,7 +494738,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -494072,7 +494876,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -494206,7 +495012,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -494996,7 +495804,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -495132,7 +495942,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -495266,7 +496078,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -504143,6 +504957,9 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "RECRAFT_V4_1": "recraft-v4.1",
+                                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -504188,6 +505005,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -504231,6 +505051,9 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "recraft-v4.1",
+                                  "recraft-v4.1-pro",
+                                  "recraft-v4.1-flash",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -504930,6 +505753,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -504975,6 +505801,9 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "RECRAFT_V4_1": "recraft-v4.1",
+                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -505018,6 +505847,9 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "recraft-v4.1",
+                                "recraft-v4.1-pro",
+                                "recraft-v4.1-flash",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -508818,7 +509650,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               }
                             },
                             "type": "enum",
@@ -508954,7 +509788,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             },
                             "options": [
                               "gpt-55",
@@ -509088,7 +509924,9 @@
                               "gemini-4-carbon",
                               "minimax-m3.1-flash",
                               "meta-muse-ember",
-                              "drummer-artemis-31b"
+                              "drummer-artemis-31b",
+                              "qwen-4-max",
+                              "kimi-k3.1-pro-uncensored"
                             ]
                           },
                           "intelligenceRange": {
@@ -509878,7 +510716,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
                           },
                           "type": "enum",
@@ -510014,7 +510854,9 @@
                             "GEMINI_4_CARBON": "gemini-4-carbon",
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
-                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "QWEN_4_MAX": "qwen-4-max",
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
                           "options": [
                             "gpt-55",
@@ -510148,7 +510990,9 @@
                             "gemini-4-carbon",
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
-                            "drummer-artemis-31b"
+                            "drummer-artemis-31b",
+                            "qwen-4-max",
+                            "kimi-k3.1-pro-uncensored"
                           ]
                         },
                         "intelligenceRange": {
@@ -510955,7 +511799,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   }
                                 },
                                 "type": "enum",
@@ -511091,7 +511937,9 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max",
+                                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -511225,7 +512073,9 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max",
+                                  "kimi-k3.1-pro-uncensored"
                                 ]
                               },
                               "intelligenceRange": {
@@ -512015,7 +512865,9 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max",
+                                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                 }
                               },
                               "type": "enum",
@@ -512151,7 +513003,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               },
                               "options": [
                                 "gpt-55",
@@ -512285,7 +513139,9 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max",
+                                "kimi-k3.1-pro-uncensored"
                               ]
                             },
                             "intelligenceRange": {
@@ -513545,7 +514401,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -513681,7 +514539,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -513815,7 +514675,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -514605,7 +515467,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -514741,7 +515605,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -514875,7 +515741,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -516033,7 +516901,9 @@
                                         "GEMINI_4_CARBON": "gemini-4-carbon",
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
-                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "QWEN_4_MAX": "qwen-4-max",
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
                                     },
                                     "type": "enum",
@@ -516169,7 +517039,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -516303,7 +517175,9 @@
                                       "gemini-4-carbon",
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
-                                      "drummer-artemis-31b"
+                                      "drummer-artemis-31b",
+                                      "qwen-4-max",
+                                      "kimi-k3.1-pro-uncensored"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -517093,7 +517967,9 @@
                                       "GEMINI_4_CARBON": "gemini-4-carbon",
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
-                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                      "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "QWEN_4_MAX": "qwen-4-max",
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
                                   },
                                   "type": "enum",
@@ -517229,7 +518105,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -517363,7 +518241,9 @@
                                     "gemini-4-carbon",
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
-                                    "drummer-artemis-31b"
+                                    "drummer-artemis-31b",
+                                    "qwen-4-max",
+                                    "kimi-k3.1-pro-uncensored"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -526244,6 +527124,9 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "RECRAFT_V4_1": "recraft-v4.1",
+                                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -526289,6 +527172,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -526332,6 +527218,9 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "recraft-v4.1",
+                                  "recraft-v4.1-pro",
+                                  "recraft-v4.1-flash",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -527031,6 +527920,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -527076,6 +527968,9 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "RECRAFT_V4_1": "recraft-v4.1",
+                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -527119,6 +528014,9 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "recraft-v4.1",
+                                "recraft-v4.1-pro",
+                                "recraft-v4.1-flash",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -530927,7 +531825,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               }
                             },
                             "type": "enum",
@@ -531063,7 +531963,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             },
                             "options": [
                               "gpt-55",
@@ -531197,7 +532099,9 @@
                               "gemini-4-carbon",
                               "minimax-m3.1-flash",
                               "meta-muse-ember",
-                              "drummer-artemis-31b"
+                              "drummer-artemis-31b",
+                              "qwen-4-max",
+                              "kimi-k3.1-pro-uncensored"
                             ]
                           },
                           "intelligenceRange": {
@@ -531987,7 +532891,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
                           },
                           "type": "enum",
@@ -532123,7 +533029,9 @@
                             "GEMINI_4_CARBON": "gemini-4-carbon",
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
-                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "QWEN_4_MAX": "qwen-4-max",
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
                           "options": [
                             "gpt-55",
@@ -532257,7 +533165,9 @@
                             "gemini-4-carbon",
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
-                            "drummer-artemis-31b"
+                            "drummer-artemis-31b",
+                            "qwen-4-max",
+                            "kimi-k3.1-pro-uncensored"
                           ]
                         },
                         "intelligenceRange": {
@@ -533551,7 +534461,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               }
                             },
                             "type": "enum",
@@ -533687,7 +534599,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             },
                             "options": [
                               "gpt-55",
@@ -533821,7 +534735,9 @@
                               "gemini-4-carbon",
                               "minimax-m3.1-flash",
                               "meta-muse-ember",
-                              "drummer-artemis-31b"
+                              "drummer-artemis-31b",
+                              "qwen-4-max",
+                              "kimi-k3.1-pro-uncensored"
                             ]
                           },
                           "intelligenceRange": {
@@ -534611,7 +535527,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
                           },
                           "type": "enum",
@@ -534747,7 +535665,9 @@
                             "GEMINI_4_CARBON": "gemini-4-carbon",
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
-                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "QWEN_4_MAX": "qwen-4-max",
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
                           "options": [
                             "gpt-55",
@@ -534881,7 +535801,9 @@
                             "gemini-4-carbon",
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
-                            "drummer-artemis-31b"
+                            "drummer-artemis-31b",
+                            "qwen-4-max",
+                            "kimi-k3.1-pro-uncensored"
                           ]
                         },
                         "intelligenceRange": {
@@ -543760,6 +544682,9 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "RECRAFT_V4_1": "recraft-v4.1",
+                                    "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                    "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                     "LUSTIFY_V8": "lustify-v8",
                                     "CHROMA": "chroma",
                                     "QWEN_EDIT": "qwen-edit",
@@ -543805,6 +544730,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -543848,6 +544776,9 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "recraft-v4.1",
+                                  "recraft-v4.1-pro",
+                                  "recraft-v4.1-flash",
                                   "lustify-v8",
                                   "chroma",
                                   "qwen-edit",
@@ -544547,6 +545478,9 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "RECRAFT_V4_1": "recraft-v4.1",
+                                  "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                  "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                   "LUSTIFY_V8": "lustify-v8",
                                   "CHROMA": "chroma",
                                   "QWEN_EDIT": "qwen-edit",
@@ -544592,6 +545526,9 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "RECRAFT_V4_1": "recraft-v4.1",
+                                "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
+                                "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
                                 "LUSTIFY_V8": "lustify-v8",
                                 "CHROMA": "chroma",
                                 "QWEN_EDIT": "qwen-edit",
@@ -544635,6 +545572,9 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "recraft-v4.1",
+                                "recraft-v4.1-pro",
+                                "recraft-v4.1-flash",
                                 "lustify-v8",
                                 "chroma",
                                 "qwen-edit",
@@ -548446,7 +549386,9 @@
                                     "GEMINI_4_CARBON": "gemini-4-carbon",
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
-                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                    "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "QWEN_4_MAX": "qwen-4-max",
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   }
                                 },
                                 "type": "enum",
@@ -548582,7 +549524,9 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max",
+                                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                 },
                                 "options": [
                                   "gpt-55",
@@ -548716,7 +549660,9 @@
                                   "gemini-4-carbon",
                                   "minimax-m3.1-flash",
                                   "meta-muse-ember",
-                                  "drummer-artemis-31b"
+                                  "drummer-artemis-31b",
+                                  "qwen-4-max",
+                                  "kimi-k3.1-pro-uncensored"
                                 ]
                               },
                               "intelligenceRange": {
@@ -549506,7 +550452,9 @@
                                   "GEMINI_4_CARBON": "gemini-4-carbon",
                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                   "META_MUSE_EMBER": "meta-muse-ember",
-                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                  "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                  "QWEN_4_MAX": "qwen-4-max",
+                                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                 }
                               },
                               "type": "enum",
@@ -549642,7 +550590,9 @@
                                 "GEMINI_4_CARBON": "gemini-4-carbon",
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
-                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                                "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "QWEN_4_MAX": "qwen-4-max",
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               },
                               "options": [
                                 "gpt-55",
@@ -549776,7 +550726,9 @@
                                 "gemini-4-carbon",
                                 "minimax-m3.1-flash",
                                 "meta-muse-ember",
-                                "drummer-artemis-31b"
+                                "drummer-artemis-31b",
+                                "qwen-4-max",
+                                "kimi-k3.1-pro-uncensored"
                               ]
                             },
                             "intelligenceRange": {
@@ -551213,7 +552165,9 @@
                           "GEMINI_4_CARBON": "gemini-4-carbon",
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
-                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "QWEN_4_MAX": "qwen-4-max",
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
                       },
                       "type": "enum",
@@ -551349,7 +552303,9 @@
                         "GEMINI_4_CARBON": "gemini-4-carbon",
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "QWEN_4_MAX": "qwen-4-max",
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
                       "options": [
                         "gpt-55",
@@ -551483,7 +552439,9 @@
                         "gemini-4-carbon",
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
-                        "drummer-artemis-31b"
+                        "drummer-artemis-31b",
+                        "qwen-4-max",
+                        "kimi-k3.1-pro-uncensored"
                       ]
                     }
                   },
@@ -567934,7 +568892,9 @@
                               "GEMINI_4_CARBON": "gemini-4-carbon",
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
-                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                              "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "QWEN_4_MAX": "qwen-4-max",
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
                           },
                           "type": "enum",
@@ -568070,7 +569030,9 @@
                             "GEMINI_4_CARBON": "gemini-4-carbon",
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
-                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b"
+                            "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "QWEN_4_MAX": "qwen-4-max",
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
                           "options": [
                             "gpt-55",
@@ -568204,7 +569166,9 @@
                             "gemini-4-carbon",
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
-                            "drummer-artemis-31b"
+                            "drummer-artemis-31b",
+                            "qwen-4-max",
+                            "kimi-k3.1-pro-uncensored"
                           ]
                         }
                       },

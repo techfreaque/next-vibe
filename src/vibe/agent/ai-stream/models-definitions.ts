@@ -152,6 +152,9 @@ export enum ChatModelId {
   META_MUSE_EMBER = "meta-muse-ember",
   // Uncensored models added 2026-11-13
   DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
+  // Added 2026-11-16
+  QWEN_4_MAX = "qwen-4-max",
+  KIMI_K3_1_PRO_UNCENSORED = "kimi-k3.1-pro-uncensored",
 }
 
 export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
@@ -4532,6 +4535,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -5315,12 +5319,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         id: ChatModelId.DEEPSEEK_V4_1_FLASH,
         apiProvider: ApiProvider.OPENROUTER,
         // The 2026-10-17 snapshot is what DeepSeek serves as deepseek-flash
-        // (also behind ~deepseek/deepseek-flash-latest). The undated alias is
-        // now listed at 0.30 / 1.20, so pin the snapshot.
+        // (also behind ~deepseek/deepseek-flash-latest), so pin the snapshot.
+        // 2026-11-16: OpenRouter raised the snapshot to 0.30 / 1.20 while the
+        // older undated alias dropped to 0.14 / 0.42 (the two prices swapped).
         providerModel: "deepseek/deepseek-v4.1-flash-1017",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.04, // updated: 2026-11-13 from openrouter-api
-        outputTokenCost: 0.5, // updated: 2026-11-13 from openrouter-api
+        inputTokenCost: 0.3, // updated: 2026-11-16 from openrouter-api
+        outputTokenCost: 1.2, // updated: 2026-11-16 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-11-13 from openrouter-api
       },
       {
@@ -5926,6 +5931,76 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
+
+  [ChatModelId.QWEN_4_MAX]: {
+    name: "Qwen 4 Max",
+    by: "alibaba",
+    description: "chat.models.descriptions.qwen4Max",
+    parameterCount: undefined,
+    contextWindow: 1000000, // updated: 2026-11-16 from openrouter-api
+    icon: "si-qwen",
+    inputs: ["text", "image", "video"], // updated: 2026-11-16 from openrouter-api
+    outputs: ["text"], // updated: 2026-11-16 from openrouter-api
+    providers: [
+      {
+        id: ChatModelId.QWEN_4_MAX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen4-max",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-11-16 from openrouter-api
+        outputTokenCost: 4.5, // updated: 2026-11-16 from openrouter-api
+        cacheReadTokenCost: 0.075, // updated: 2026-11-16 from openrouter-api
+        cacheWriteTokenCost: 1.875, // updated: 2026-11-16 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.VISION,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+
+  [ChatModelId.KIMI_K3_1_PRO_UNCENSORED]: {
+    // Abliterated Kimi K3.1 Pro served by Lyber through NanoGPT (2026-11-16):
+    // text only, reasoning on, native tool calls per NanoGPT capabilities.
+    name: "Kimi K3.1 Pro Uncensored",
+    by: "moonshotAI",
+    description: "chat.models.descriptions.kimiK31ProUncensored",
+    parameterCount: undefined,
+    contextWindow: 1048576, // updated: 2026-11-16 from nano-gpt-api
+    icon: "si-kimi",
+    inputs: ["text"], // updated: 2026-11-16 from nano-gpt-api
+    outputs: ["text"], // updated: 2026-11-16 from nano-gpt-api
+    providers: [
+      {
+        id: ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "lyber/kimi-k3.1-pro-abliterated",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 4, // updated: 2026-11-16 from nano-gpt-api
+        outputTokenCost: 15, // updated: 2026-11-16 from nano-gpt-api
+        cacheReadTokenCost: 0.4, // updated: 2026-11-16 from nano-gpt-api
+      },
+    ],
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.SMART,
+      ModelUtility.REASONING,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+      ModelUtility.ANALYSIS,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.UNCENSORED,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
 };
 
 /**
@@ -6017,6 +6092,8 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.MIMO_V2_5_PRO]: ChatModelId.MIMO_V2_6_PRO,
   [ChatModelId.MIMO_V2_5]: ChatModelId.MIMO_V2_6_FLASH,
   [ChatModelId.META_MUSE_SPARK_1_2]: ChatModelId.META_MUSE_SPARK_1_3,
+  // Qwen 4 Max (2026-11-16): newer flagship, cheaper than 3.8 Max.
+  [ChatModelId.QWEN_3_8_MAX]: ChatModelId.QWEN_4_MAX,
   // Redundant entries: cheapest / newest kept (2026-11-07)
   [ChatModelId.CLAUDE_CODE_HAIKU]: ChatModelId.CLAUDE_HAIKU_5_5,
   [ChatModelId.CLAUDE_CODE_SONNET]: ChatModelId.CLAUDE_SONNET_5_5,

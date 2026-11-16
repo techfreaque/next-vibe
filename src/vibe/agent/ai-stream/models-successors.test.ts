@@ -318,6 +318,8 @@ describe("model browser", () => {
       ChatModelId.GROK_4_7,
       ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
       ChatModelId.GLM_5_3_UNCENSORED,
+      ChatModelId.QWEN_4_MAX,
+      ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(true);
     }
@@ -327,6 +329,7 @@ describe("model browser", () => {
       ChatModelId.GROK_4_6,
       ChatModelId.GROK_4_FAST,
       ChatModelId.MINIMAX_M3,
+      ChatModelId.QWEN_3_8_MAX,
     ]) {
       expect(names.has(chatModelDefinitions[id].name), id).toBe(false);
     }

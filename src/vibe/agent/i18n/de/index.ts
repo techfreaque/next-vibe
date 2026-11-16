@@ -1852,10 +1852,14 @@ export const translations: typeof enTranslations = {
           "Das neueste Grok von xAI. Scharfes Reasoning und starker Code, liest Bilder, ruft Tools auf, 500K Kontext, halb so viel wie bei den meisten Flaggschiffen hier. Offene Inhaltsrichtlinie: beantwortet mehr als die Mainstream-Anbieter, ist aber nicht vollständig unzensiert. Preislich auf dem Niveau von Qwen 3.8 Max. Eine günstige Fast-Stufe bietet xAI nicht mehr: Für schnellen, billigen Chat mit offenen Filtern MiniMax M3.1 Flash oder Meta Muse Ember testen.",
         kimiK31Pro:
           "Das stärkste Kimi von Moonshot AI. Reasoning, Code, kreatives Schreiben und lange Agentenläufe auf Spitzenniveau, liest Bilder und Videos, ruft Tools auf, 1M Kontext. Lockerere Filter als die US-Anbieter. Preisgleich mit Claude Sonnet 5.5. Kimi K3 kommt für gut die Hälfte des Preises nah heran.",
+        qwen4Max:
+          "Alibabas neues Flaggschiff und das erste Qwen 4. Reasoning, Code und Analyse auf Spitzenniveau, liest Bilder und Videos, ruft Tools auf, 1M Kontext. Lockerere Filter als die US-Anbieter. Denkt vor jeder Antwort nach, das kostet einen Moment. Ein Viertel günstiger als Qwen 3.8 Max, das es ablöst.",
+        kimiK31ProUncensored:
+          "Das stärkste Kimi von Moonshot AI, Verweigerungen entfernt (abliterated), bereitgestellt von Lyber. Die neue Spitze unter den unzensierten Modellen: Reasoning, Code, lange Texte und Tools, 1M Kontext. Verweigerungen entfernt, Weltbild unangetastet: Bei Politik antwortet es mit der Einordnung des Basis-Kimi. Für politische Positionen gegen den Mainstream: UncensoredLM. Nur Text. Premium-Preis, ein Mehrfaches von GLM 5.3 Uncensored, dem günstigeren Schwergewicht.",
         deepseekV41Flash:
           "Das schnelle Modell von DeepSeek, jetzt mit Bildverständnis. Ernsthaftes Programmieren und Analysieren für fast nichts: das günstigste Modell im Katalog. Ruft Tools auf, 1M Kontext, lockerere Filter. Kein tiefer Denker. Für harte Probleme DeepSeek V4 Pro, ohne Verweigerungen DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:
-          "Das schnelle Qwen von Alibaba. Text, Bilder und Video rein, flotte Antworten raus, ordentlich beim Programmieren, ruft Tools auf, 1M Kontext. Budgetpreis, lockerere Filter. Ein Alltagsmodell, kein tiefer Denker. Die harten Probleme übernimmt Qwen 3.8 Max.",
+          "Das schnelle Qwen von Alibaba. Text, Bilder und Video rein, flotte Antworten raus, ordentlich beim Programmieren, ruft Tools auf, 1M Kontext. Budgetpreis, lockerere Filter. Ein Alltagsmodell, kein tiefer Denker. Die harten Probleme übernimmt Qwen 4 Max.",
         glm53:
           "Das Basismodell GLM-5.3 von Z.AI. Starkes Reasoning und Code für Centbeträge, ruft Tools auf, 1M Kontext. Nur Text, lockerere Filter. Eines der günstigsten klugen Modelle im Katalog. Gar keine Verweigerungen gewünscht? GLM 5.3 Uncensored ist die ungefilterte Variante.",
         glm53Flash:
@@ -1884,6 +1888,12 @@ export const translations: typeof enTranslations = {
           "Das Gemma-4-31B-Finetune von TheDrummer für Rollenspiel und Fiktion. Bleibt in der Rolle, schreibt Grimdark und explizite Szenen für Erwachsene ohne Verweigerung und hält die Sprache lebendig statt glattgebügelt. Liest Bilder, ruft Tools auf, 262K Kontext. Schwach bei Code und harter Analyse: ein Erzähler, kein Denker. Ein Community-Finetune auf einem einzigen NanoGPT-Host, fällt also gelegentlich kurz aus. Kostet rund ein Fünftel von Venice Role Play Uncensored. Braucht die Geschichte echte Logik, ist DeepSeek V4.1 Flash Uncensored die klügere Wahl.",
         grokImagineImage2:
           "Die zweite Generation des Grok-Imagine-Bildmodells von xAI. Nimmt Text oder ein Referenzbild und beherrscht damit Bearbeitungen ebenso wie neue Bilder. Mittleres Preisniveau. Open-Stufe: lockerere Filter als Mainstream-Modelle, nicht explizit. Das Upgrade gegenüber Grok Imagine T2I, wenn Bearbeitung oder genauere Prompt-Treue gefragt ist.",
+        recraftV41:
+          "Recraft V4.1. Gebaut für Designarbeit: Logos, Poster, Verpackungen, Anzeigen und alles, worin Text steht. Saubere Typografie, starke Bildaufteilung, nimmt ein Referenzbild. Rund 3,5 Credits pro Bild bei etwa 1K. Mainstream: Filter greifen. Pro liefert druckfähiges 2K, Flash günstige Entwürfe.",
+        recraftV41Pro:
+          "Das Premium-Recraft V4.1. Dasselbe Designgespür und dieselbe scharfe Typografie, dazu etwa 2K und feineres Detail. Gemacht für Druck, Produktbilder und Markenassets, die ohne Nacharbeit rausgehen. Rund 21 Credits pro Bild, also erst mit V4.1 oder Flash entwerfen. Mainstream: Filter greifen.",
+        recraftV41Flash:
+          "Die Tempostufe von Recraft. Rund 1,5 Sekunden pro Bild, unter 1 Credit, nur Textprompts. Ideal für Moodboards, Vorschaubilder und das schnelle Durchspielen vieler Ideen. Weniger Detail als Recraft V4.1. Mainstream: Filter greifen.",
         qwenImage3:
           "Die schnelle Stufe von Alibabas Qwen Image 3. Erzeugt Bilder aus Text und bearbeitet Referenzbilder, zum niedrigen Preis. Gut für schnelle Bearbeitungen, textlastige Grafiken und Iterationen. Qwen Image 3 Pro bringt für etwas mehr Geld mehr Detail; für unzensierte Bearbeitungen gibt es Qwen Edit Uncensored.",
         qwenImage3Pro:

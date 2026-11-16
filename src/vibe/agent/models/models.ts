@@ -655,6 +655,11 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "ByteDance",
     icon: "si-bytedance",
   },
+  recraft: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Recraft",
+    icon: "pen-tool",
+  },
   elevenlabs: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "ElevenLabs",

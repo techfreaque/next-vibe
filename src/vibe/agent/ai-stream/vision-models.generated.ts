@@ -103,6 +103,7 @@ export enum ImageVisionModelId {
   MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
   META_MUSE_EMBER = "meta-muse-ember",
   DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
+  QWEN_4_MAX = "qwen-4-max",
 }
 
 export enum VideoVisionModelId {
@@ -136,6 +137,7 @@ export enum VideoVisionModelId {
   GEMINI_4_CARBON = "gemini-4-carbon",
   MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
   META_MUSE_EMBER = "meta-muse-ember",
+  QWEN_4_MAX = "qwen-4-max",
 }
 
 export enum AudioVisionModelId {

@@ -1836,10 +1836,14 @@ export const translations: typeof enTranslations = {
           "Najnowszy Grok od xAI. Ostre rozumowanie i mocny kod, czyta obrazy, wywołuje narzędzia, 500K kontekstu, czyli połowa tego, co oferuje większość flagowców tutaj. Otwarta polityka treści: odpowiada na więcej niż modele głównych laboratoriów, choć nie jest całkiem bez cenzury. Cenowo jak Qwen 3.8 Max. Taniego poziomu Fast xAI już nie ma: na szybki, tani czat z otwartymi filtrami sprawdź MiniMax M3.1 Flash albo Meta Muse Ember.",
         kimiK31Pro:
           "Najmocniejsze Kimi od Moonshot AI. Rozumowanie, kod, pisanie kreatywne i długie zadania agentowe na najwyższym poziomie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Kosztuje tyle co Claude Sonnet 5.5. Kimi K3 jest blisko za nieco ponad połowę ceny.",
+        qwen4Max:
+          "Nowy flagowiec Alibaby i pierwszy Qwen 4. Rozumowanie, kod i analiza na najwyższym poziomie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Myśli przed każdą odpowiedzią, więc chwilę to trwa. O jedną czwartą tańszy od Qwen 3.8 Max, który zastępuje.",
+        kimiK31ProUncensored:
+          "Najmocniejsze Kimi od Moonshot AI z usuniętymi odmowami (abliterated), dostarczane przez Lyber. Nowy szczyt wśród modeli bez cenzury: rozumowanie, kod, długie teksty i narzędzia, 1M kontekstu. Odmowy usunięte, światopogląd nietknięty: w polityce odpowiada tak, jak ujmuje to bazowe Kimi. Po poglądy polityczne pod prąd mainstreamu weź UncensoredLM. Tylko tekst. Cena premium, kilka razy więcej niż GLM 5.3 Uncensored, tańszy ciężki zawodnik.",
         deepseekV41Flash:
           "Szybki model DeepSeek, teraz także z rozumieniem obrazów. Poważne kodowanie i analiza prawie za darmo: najtańszy model w katalogu. Wywołuje narzędzia, 1M kontekstu, luźniejsze filtry. Nie myśli głęboko. Do trudnych problemów weź DeepSeek V4 Pro, a bez odmów DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:
-          "Szybki Qwen od Alibaby. Na wejściu tekst, obrazy i wideo, na wyjściu szybkie odpowiedzi, przyzwoity w kodzie, wywołuje narzędzia, 1M kontekstu. Budżetowa cena, luźniejsze filtry. Model na co dzień, nie do głębokiego myślenia. Trudne problemy zostaw dla Qwen 3.8 Max.",
+          "Szybki Qwen od Alibaby. Na wejściu tekst, obrazy i wideo, na wyjściu szybkie odpowiedzi, przyzwoity w kodzie, wywołuje narzędzia, 1M kontekstu. Budżetowa cena, luźniejsze filtry. Model na co dzień, nie do głębokiego myślenia. Trudne problemy zostaw dla Qwen 4 Max.",
         glm53:
           "Model bazowy GLM-5.3 od Z.AI. Mocne rozumowanie i kod za grosze, wywołuje narzędzia, 1M kontekstu. Tylko tekst, luźniejsze filtry. Jeden z najtańszych bystrych modeli w katalogu. Chcesz zero odmów? GLM 5.3 Uncensored to wersja bez filtra.",
         glm53Flash:
@@ -1868,6 +1872,12 @@ export const translations: typeof enTranslations = {
           "Fine-tune Gemmy 4 31B od TheDrummera do roleplayu i fikcji. Trzyma się postaci, pisze grimdark i dosadne sceny dla dorosłych bez odmów, a styl zostaje żywy, nie wygładzony. Czyta obrazy, wywołuje narzędzia, kontekst 262K. Słaby w kodowaniu i twardej analizie: to narrator, nie myśliciel. Fine-tune społeczności na jednym hoście NanoGPT, więc bywa chwilowo niedostępny. Kosztuje mniej więcej jedną piątą ceny Venice Role Play Uncensored. Gdy historia potrzebuje prawdziwej logiki, lepiej sięgnąć po DeepSeek V4.1 Flash Uncensored.",
         grokImagineImage2:
           "Druga generacja modelu obrazów Grok Imagine od xAI. Przyjmuje tekst albo obraz referencyjny, więc ogarnia edycje i nowe obrazy. Średnia półka cenowa. Poziom open: łagodniejsze filtry niż mainstream, bez treści dosadnych. Krok wyżej od Grok Imagine T2I, gdy potrzebujesz edycji albo wierniejszego trzymania się promptu.",
+        recraftV41:
+          "Recraft V4.1. Zrobiony do pracy projektowej: logo, plakaty, opakowania, reklamy i wszystko, na czym jest tekst. Czysta typografia, dobra kompozycja, przyjmuje jeden obraz referencyjny. Około 3,5 kredytu za obraz w rozdzielczości ok. 1K. Mainstream: obowiązują filtry. Pro daje 2K do druku, Flash tanie szkice.",
+        recraftV41Pro:
+          "Recraft V4.1 w wersji premium. To samo wyczucie designu i ostra typografia, do tego ok. 2K i więcej detali. Do druku, zdjęć produktów i materiałów marki, które idą prosto do użytku. Około 21 kredytów za obraz, więc szkicuj najpierw w V4.1 albo Flash. Mainstream: obowiązują filtry.",
+        recraftV41Flash:
+          "Szybka wersja Recraft. Około 1,5 sekundy na obraz, poniżej 1 kredytu, tylko prompty tekstowe. Świetna do moodboardów, miniatur i testowania wielu pomysłów naraz. Mniej detali niż Recraft V4.1. Mainstream: obowiązują filtry.",
         qwenImage3:
           "Szybka wersja Qwen Image 3 od Alibaby. Generuje z tekstu i edytuje obraz referencyjny, a przy tym jest tania. Dobra do szybkich poprawek, grafik z dużą ilością tekstu i iteracji. Qwen Image 3 Pro daje więcej detali za niewiele wyższą cenę; do edycji bez cenzury jest Qwen Edit Uncensored.",
         qwenImage3Pro:

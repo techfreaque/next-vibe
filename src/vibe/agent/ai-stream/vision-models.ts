@@ -302,6 +302,9 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.QWEN_3_8_MAX]: makeImageVisionOption(
     ImageVisionModelId.QWEN_3_8_MAX,
   ),
+  [ImageVisionModelId.QWEN_4_MAX]: makeImageVisionOption(
+    ImageVisionModelId.QWEN_4_MAX,
+  ),
   [ImageVisionModelId.MIMO_V2_5]: makeImageVisionOption(
     ImageVisionModelId.MIMO_V2_5,
   ),
@@ -444,6 +447,9 @@ const videoVisionModelOptionsIndex: Record<
   ),
   [VideoVisionModelId.QWEN_3_8_MAX]: makeVideoVisionOption(
     VideoVisionModelId.QWEN_3_8_MAX,
+  ),
+  [VideoVisionModelId.QWEN_4_MAX]: makeVideoVisionOption(
+    VideoVisionModelId.QWEN_4_MAX,
   ),
   [VideoVisionModelId.MIMO_V2_5]: makeVideoVisionOption(
     VideoVisionModelId.MIMO_V2_5,

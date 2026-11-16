@@ -124,7 +124,7 @@ export const dataAnalystSkill: Skill = {
       weakness: "skills.dataAnalyst.variantInfo.budget.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.QWEN_3_8_MAX,
+        manualModelId: ChatModelId.QWEN_4_MAX,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

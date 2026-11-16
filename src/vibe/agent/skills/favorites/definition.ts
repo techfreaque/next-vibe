@@ -521,7 +521,7 @@ const { GET } = createEndpoint({
             id: "thea",
             skillId: "default",
             customVariantName: null,
-            modelId: ChatModelId.CLAUDE_SONNET_4_5,
+            modelId: ChatModelId.CLAUDE_SONNET_5_5,
             voiceId: DEFAULT_TTS_VOICE_ID,
             position: 0,
             icon: "sparkles",

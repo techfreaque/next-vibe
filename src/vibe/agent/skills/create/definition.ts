@@ -659,7 +659,7 @@ const { POST } = createEndpoint({
             isDefault: true,
             modelSelection: {
               selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ChatModelId.GPT_5,
+              manualModelId: ChatModelId.GPT_6_1_SOL,
             },
           },
         ],

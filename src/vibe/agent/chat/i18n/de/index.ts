@@ -899,6 +899,10 @@ export const translations: typeof enTranslations = {
         "Grok 4.7 - xAIs neuester Grok. Schärfere Logik und Code, offene Inhaltsrichtlinie, Bildverständnis. 500K-Token-Kontext.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Moonshot AIs stärkstes Modell. Multimodale Logik und lange Agentenläufe. 1M-Token-Kontext.",
+      qwen4Max:
+        "Qwen 4 Max - Alibabas neues Flaggschiff. Reasoning, Code und Analyse auf Spitzenniveau, liest Bilder und Videos. 1M-Token-Kontext.",
+      kimiK31ProUncensored:
+        "Kimi K3.1 Pro Uncensored - Moonshot AIs stärkstes Kimi ohne Verweigerungen (abliterated). Spitzen-Reasoning ohne Belehrungen, mit Tools. 1M-Token-Kontext.",
       deepseekV41Flash:
         "DeepSeek V4.1 Flash - DeepSeeks schnelles offenes Modell, jetzt mit Bildverständnis. Ernsthafter Code fast umsonst. 1M-Token-Kontext.",
       qwen38Flash:
@@ -931,6 +935,12 @@ export const translations: typeof enTranslations = {
         "Artemis 31B - Das Rollenspiel-Finetune von TheDrummer auf Gemma-4-Basis. Düstere Szenen, explizite Fiktion, Figuren, die ihre Stimme halten. Günstig, 262K Kontext, liest Bilder, ruft Tools auf.",
       grokImagineImage2:
         "Grok Imagine Image 2.0 - xAIs neuestes Bildgenerierungsmodell mit verbesserter Prompt-Treue und Bildqualität.",
+      recraftV41:
+        "Recraft V4.1 - Das Designmodell von Recraft mit präziser Schrift im Bild, gemacht für Logos, Poster und Markengrafiken.",
+      recraftV41Pro:
+        "Recraft V4.1 Pro - Die 2K-Premiumstufe von Recraft für druckreife Marken- und Produktbilder mit feinem Detail.",
+      recraftV41Flash:
+        "Recraft V4.1 Flash - Die schnelle, günstige Stufe von Recraft für Entwürfe und Serien, unter 1 Credit pro Bild.",
       qwenImage3:
         "Qwen Image 3 - Alibabas schnelles Bildgenerierungsmodell zu Niedrigstkosten.",
       qwenImage3Pro:
