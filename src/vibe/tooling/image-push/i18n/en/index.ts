@@ -68,7 +68,12 @@ export const translations = {
       cleanup: {
         title: "Clean up locally",
         description:
-          "Default on. After a successful run, keep THIS build machine bounded: untag local builds of ghcr.io/techfreaque/next-vibe-app older than the newest 3 (never :latest, :rollback, :prod-current-good, the build just deployed, or an image a container uses), prune Docker build cache older than 48h, and move old .tmp/image-build exports to .tmp/todelete/image-build/. Below 40 GB free on the Docker root it also prunes before the build. Remote servers are never touched. Off = warn only.",
+          "Default on. After a successful run, keep THIS build machine bounded: untag local builds of ghcr.io/techfreaque/next-vibe-app older than the newest 3 (never :latest, :rollback, :prod-current-good, the build just deployed, or an image a container uses), prune Docker build cache older than 48h, and move old .tmp/image-build exports to .tmp/todelete/image-build/. Below 40 GB free on the Docker root it also prunes before the build. Prod servers have their own switch (remoteCleanup). Off = warn only.",
+      },
+      remoteCleanup: {
+        title: "Clean up prod servers",
+        description:
+          "Default on. After a node deployed and passed its health check, keep on that server only: the image any container runs, its rollback tags (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev and the co-hosted site's :latest) and the newest 3 builds of ghcr.io/techfreaque/next-vibe-app. Older tags go with plain docker rmi (never -f, docker refuses images in use), then dangling images are pruned. Before each load, under 30 GB free runs the same retention. Only the configured HA servers, never an explicit --sshTarget. Off = warn only.",
       },
       success: {
         title: "Success",
@@ -204,6 +209,17 @@ export const translations = {
           "⚠️ Only {{free}} GB free on {{path}} (minimum {{min}} GB). Cleanup is off, nothing pruned. The build may fill the disk.",
         diskAfterPrune: "💽 {{free}} GB free on {{path}} after pruning",
         diskCheckFailed: "Could not read free space on {{path}}: {{error}}",
+        remoteDiskOk: "💽 {{target}}: {{free}} GB free before the load",
+        remoteDiskLow:
+          "⚠️ {{target}}: only {{free}} GB free (minimum {{min}} GB). Dropping old images before the load ...",
+        remoteDiskLowNoCleanup:
+          "⚠️ {{target}}: only {{free}} GB free (minimum {{min}} GB). remoteCleanup is off, nothing removed. The load may fill the disk.",
+        remoteDiskAfter: "💽 {{target}}: {{free}} GB free after retention",
+        remoteListFailed:
+          "Image retention on {{target}} skipped, nothing removed: {{error}}",
+        remoteTagFailed: "{{target}}: could not remove {{ref}}: {{error}}",
+        remoteRetained:
+          "🧹 {{target}}: removed {{count}} old image ref(s), kept the newest {{keep}} builds plus rollback tags and images in use: {{tags}}. Dangling prune: {{pruned}}",
       },
     },
   },

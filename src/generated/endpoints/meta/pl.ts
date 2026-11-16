@@ -26254,7 +26254,7 @@ export const endpointsMeta: EndpointMeta[] = [
         },
         viaSsh: { sshTarget: "root@203.0.113.5" },
         noDrain: { drain: false },
-        noCleanup: { cleanup: false },
+        noCleanup: { cleanup: false, remoteCleanup: false },
         specificCommit: { commit: "a1b2c3d", push: false },
       },
       responses: {

@@ -10,8 +10,13 @@ import {
   CLEANUP_IMAGE_REPO,
   type ExportDirEntry,
   type LocalImageEntry,
+  KEEP_BUILDS,
   parseDockerCreatedAt,
+  parseRemoteInventory,
   PINNED_TAGS,
+  remoteInventoryScript,
+  remotePinnedTags,
+  remoteRetentionScript,
   selectExportDirsToPark,
   selectImageRefsToRemove,
 } from "./cleanup-selection";
@@ -212,5 +217,208 @@ describe("selectExportDirsToPark", () => {
     expect(
       selectExportDirsToPark({ entries, keep: 3, currentSha: sha("e") }),
     ).toEqual([sha("b")]);
+  });
+});
+
+describe("remotePinnedTags", () => {
+  it("pins latest, rollback and prod-current-good on Server 1", () => {
+    expect(remotePinnedTags("s1", "unbottled")).toEqual([
+      "latest",
+      "rollback",
+      "prod-current-good",
+    ]);
+  });
+
+  it("pins the node tag family on Server 2", () => {
+    expect(remotePinnedTags("s2", "unbottled").toSorted()).toEqual(
+      ["latest", "unbottled", "unbottled-prev", "unbottled-rollback"].toSorted(),
+    );
+  });
+
+  it("always pins heilpraktiker's :latest on Server 2, whatever the node tag", () => {
+    for (const tag of ["", "  ", "latest", "other"]) {
+      expect(remotePinnedTags("s2", tag)).toContain("latest");
+    }
+  });
+});
+
+/** One inventory line per image, as remoteInventoryScript prints it. */
+function img(tag: string, n: number, created: string): string {
+  return `VIBE_IMG|${REPO}|${tag}|sha256:${String(n).padStart(64, "0")}|${created} +0000 UTC`;
+}
+function id(n: number): string {
+  return `sha256:${String(n).padStart(64, "0")}`;
+}
+
+describe("parseRemoteInventory", () => {
+  it("parses free space, images and container image ids", () => {
+    const stdout = [
+      "VIBE_FREE_KB 97517568",
+      img("unbottled", 1, "2026-11-16 12:23:14"),
+      "VIBE_CTR|sha256:abc",
+      "VIBE_INVENTORY_END",
+    ].join("\n");
+    expect(parseRemoteInventory(stdout)).toEqual({
+      freeGb: 93,
+      entries: [
+        {
+          repository: REPO,
+          tag: "unbottled",
+          id: id(1),
+          createdAt: "2026-11-16 12:23:14 +0000 UTC",
+        },
+      ],
+      containerImageIds: ["sha256:abc"],
+    });
+  });
+
+  it("returns undefined without the end marker (failed or cut-off listing)", () => {
+    expect(
+      parseRemoteInventory(
+        ["VIBE_FREE_KB 1", img("a", 1, "2026-11-16 12:23:14")].join("\n"),
+      ),
+    ).toBeUndefined();
+  });
+
+  it("leaves freeGb undefined when df printed nothing", () => {
+    expect(
+      parseRemoteInventory("VIBE_FREE_KB \nVIBE_INVENTORY_END")?.freeGb,
+    ).toBeUndefined();
+  });
+
+  it("only lists the app repository", () => {
+    expect(remoteInventoryScript(REPO)).toContain(
+      `--format 'VIBE_IMG|{{.Repository}}|{{.Tag}}|{{.ID}}|{{.CreatedAt}}' ${REPO}`,
+    );
+    expect(remoteInventoryScript("ghcr.io/x/y; rm -rf /")).toBe("exit 2");
+  });
+});
+
+describe("remoteRetentionScript", () => {
+  it("uses plain docker rmi (never -f) and prunes dangling only", () => {
+    const script = remoteRetentionScript([`${REPO}:old`, id(7)]);
+    expect(script).toContain(`docker rmi '${REPO}:old'`);
+    expect(script).toContain(`docker rmi '${id(7)}'`);
+    expect(script).toContain("docker image prune -f");
+    expect(script).not.toMatch(/rmi -f|rmi --force|prune -a|prune --all|system prune/);
+  });
+
+  it("drops refs outside the app repository or with shell metacharacters", () => {
+    const script = remoteRetentionScript([
+      "postgres:16",
+      `${REPO}:x'; rm -rf / #`,
+      "heilpraktiker-brandstaetter-postgres:latest",
+      "sha256:short",
+    ]);
+    expect(script).not.toContain("docker rmi");
+  });
+});
+
+/** Mirrors ImagePushRemoteRetention.afterDeploy's selection. */
+function selectRemote(
+  node: "s1" | "s2",
+  stdout: string,
+  currentTags: string[],
+): string[] {
+  const inventory = parseRemoteInventory(stdout);
+  if (!inventory) {
+    throw new Error("inventory");
+  }
+  return selectImageRefsToRemove({
+    repository: REPO,
+    entries: inventory.entries,
+    keepBuilds: KEEP_BUILDS,
+    keepTags: [...remotePinnedTags(node, "unbottled"), ...currentTags],
+    containerImageIds: inventory.containerImageIds,
+  });
+}
+
+describe("prod retention scenarios (inventories of 2026-11-16)", () => {
+  it("Server 2: keeps heilpraktiker's old :latest, the node tags and the newest 3", () => {
+    // After a deploy of build 20: :unbottled moved to 20, :unbottled-rollback
+    // to 19 (funnel-1116). Build 1 is heilpraktiker's :latest from October,
+    // run by its next-vibe-app container.
+    const stdout = [
+      "VIBE_FREE_KB 50000000",
+      img("new-1116", 20, "2026-11-16 15:00:00"),
+      img("unbottled", 20, "2026-11-16 15:00:00"),
+      img("funnel-1116", 19, "2026-11-16 12:23:14"),
+      img("unbottled-rollback", 19, "2026-11-16 12:23:14"),
+      img("proxyhdr-1116", 18, "2026-11-16 11:41:38"),
+      img("auth-locale-1116", 17, "2026-11-16 10:45:37"),
+      img("seo-lag-1116", 16, "2026-11-16 10:08:38"),
+      img("suite-fix-1113", 15, "2026-11-13 21:59:21"),
+      img("1f4b1ceb47", 14, "2026-11-13 13:02:26"),
+      img("ca158da240", 13, "2026-11-12 21:53:12"),
+      img("envfix-variants", 13, "2026-11-12 21:53:12"),
+      img("unbottled-prev", 12, "2026-11-09 18:08:53"),
+      img("latest", 1, "2026-10-05 18:26:23"),
+      `VIBE_CTR|${id(20)}`,
+      `VIBE_CTR|${id(1)}`,
+      "VIBE_CTR|sha256:postgres",
+      "VIBE_INVENTORY_END",
+    ].join("\n");
+    const removed = selectRemote("s2", stdout, ["new-1116"]);
+    expect(removed.toSorted()).toEqual(
+      [
+        `${REPO}:auth-locale-1116`,
+        `${REPO}:seo-lag-1116`,
+        `${REPO}:suite-fix-1113`,
+        `${REPO}:1f4b1ceb47`,
+        `${REPO}:ca158da240`,
+        `${REPO}:envfix-variants`,
+      ].toSorted(),
+    );
+    expect(removed).not.toContain(`${REPO}:latest`);
+    expect(removed).not.toContain(`${REPO}:unbottled-prev`);
+  });
+
+  it("Server 2: heilpraktiker's :latest survives even when no container runs it", () => {
+    const stdout = [
+      img("unbottled", 5, "2026-11-16 15:00:00"),
+      img("a", 4, "2026-11-16 14:00:00"),
+      img("b", 3, "2026-11-16 13:00:00"),
+      img("latest", 1, "2026-10-05 18:26:23"),
+      "VIBE_INVENTORY_END",
+    ].join("\n");
+    expect(selectRemote("s2", stdout, [])).toEqual([]);
+  });
+
+  it("Server 1: keeps :latest/:rollback/:prod-current-good, the new build and the newest 3", () => {
+    const stdout = [
+      img("abc1234567", 30, "2026-11-16 15:00:00"),
+      img("latest", 30, "2026-11-16 15:00:00"),
+      img("216df376ac", 29, "2026-11-16 12:23:14"),
+      img("rollback", 29, "2026-11-16 12:23:14"),
+      img("prod-current-good", 29, "2026-11-16 12:23:14"),
+      img("bf746e1185", 28, "2026-11-16 11:41:38"),
+      img("proxyhdr-1116", 28, "2026-11-16 11:41:38"),
+      img("1d134bed45", 27, "2026-11-16 11:14:11"),
+      img("rollback-pre-ha", 10, "2026-11-12 20:24:40"),
+      img("940e3325-good", 2, "2026-11-10 12:03:50"),
+      `VIBE_CTR|${id(30)}`,
+      "VIBE_INVENTORY_END",
+    ].join("\n");
+    expect(
+      selectRemote("s1", stdout, ["abc1234567", "latest"]).toSorted(),
+    ).toEqual(
+      [
+        `${REPO}:1d134bed45`,
+        `${REPO}:rollback-pre-ha`,
+        `${REPO}:940e3325-good`,
+      ].toSorted(),
+    );
+  });
+
+  it("Server 1: a stopped container's image is never selected", () => {
+    const stdout = [
+      img("n4", 4, "2026-11-16 15:00:00"),
+      img("n3", 3, "2026-11-16 14:00:00"),
+      img("n2", 2, "2026-11-16 13:00:00"),
+      img("old", 1, "2026-11-01 13:00:00"),
+      `VIBE_CTR|${id(1)}`,
+      "VIBE_INVENTORY_END",
+    ].join("\n");
+    expect(selectRemote("s1", stdout, [])).toEqual([]);
   });
 });

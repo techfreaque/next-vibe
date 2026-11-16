@@ -70,7 +70,12 @@ export const translations: typeof enTranslations = {
       cleanup: {
         title: "Sprzątanie lokalne",
         description:
-          "Domyślnie włączone. Po udanym przebiegu TA maszyna budująca nie puchnie: lokalne buildy ghcr.io/techfreaque/next-vibe-app starsze niż 3 najnowsze tracą tagi (nigdy :latest, :rollback, :prod-current-good, właśnie wdrożony build ani obraz używany przez kontener), cache buildów Dockera starszy niż 48h jest usuwany, a stare eksporty z .tmp/image-build trafiają do .tmp/todelete/image-build/. Poniżej 40 GB wolnego miejsca w katalogu Dockera sprząta też przed buildem. Serwery zdalne pozostają nietknięte. Wyłączone = tylko ostrzeżenie.",
+          "Domyślnie włączone. Po udanym przebiegu TA maszyna budująca nie puchnie: lokalne buildy ghcr.io/techfreaque/next-vibe-app starsze niż 3 najnowsze tracą tagi (nigdy :latest, :rollback, :prod-current-good, właśnie wdrożony build ani obraz używany przez kontener), cache buildów Dockera starszy niż 48h jest usuwany, a stare eksporty z .tmp/image-build trafiają do .tmp/todelete/image-build/. Poniżej 40 GB wolnego miejsca w katalogu Dockera sprząta też przed buildem. Serwery produkcyjne mają osobny przełącznik (remoteCleanup). Wyłączone = tylko ostrzeżenie.",
+      },
+      remoteCleanup: {
+        title: "Sprzątanie serwerów produkcyjnych",
+        description:
+          "Domyślnie włączone. Gdy node się wdroży i przejdzie health check, na tym serwerze zostaje tylko: obraz używany przez dowolny kontener, jego tagi rollback (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev oraz :latest współhostowanej strony) i 3 najnowsze buildy ghcr.io/techfreaque/next-vibe-app. Starsze tagi usuwa zwykłe docker rmi (nigdy -f, Docker odmawia dla używanych obrazów), potem znikają osierocone obrazy. Przed każdym ładowaniem ta sama retencja rusza poniżej 30 GB wolnego miejsca. Tylko skonfigurowane serwery HA, nigdy jawny --sshTarget. Wyłączone = tylko ostrzeżenie.",
       },
       success: {
         title: "Sukces",
@@ -213,6 +218,17 @@ export const translations: typeof enTranslations = {
         diskAfterPrune: "💽 {{free}} GB wolne na {{path}} po sprzątaniu",
         diskCheckFailed:
           "Nie można odczytać wolnego miejsca na {{path}}: {{error}}",
+        remoteDiskOk: "💽 {{target}}: {{free}} GB wolnego przed ładowaniem",
+        remoteDiskLow:
+          "⚠️ {{target}}: tylko {{free}} GB wolnego (minimum {{min}} GB). Usuwam stare obrazy przed ładowaniem ...",
+        remoteDiskLowNoCleanup:
+          "⚠️ {{target}}: tylko {{free}} GB wolnego (minimum {{min}} GB). remoteCleanup wyłączone, nic nie usunięto. Ładowanie może zapełnić dysk.",
+        remoteDiskAfter: "💽 {{target}}: {{free}} GB wolnego po retencji",
+        remoteListFailed:
+          "Retencja obrazów na {{target}} pominięta, nic nie usunięto: {{error}}",
+        remoteTagFailed: "{{target}}: nie udało się usunąć {{ref}}: {{error}}",
+        remoteRetained:
+          "🧹 {{target}}: usunięto {{count}} starych refów, zostaje {{keep}} najnowszych buildów, tagi rollback i używane obrazy: {{tags}}. Osierocone: {{pruned}}",
       },
     },
   },

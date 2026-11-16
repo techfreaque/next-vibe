@@ -70,7 +70,12 @@ export const translations: typeof enTranslations = {
       cleanup: {
         title: "Lokal aufräumen",
         description:
-          "Standardmäßig an. Nach einem erfolgreichen Lauf bleibt DIESE Build-Maschine schlank: lokale Builds von ghcr.io/techfreaque/next-vibe-app älter als die neuesten 3 verlieren ihre Tags (nie :latest, :rollback, :prod-current-good, der gerade deployte Build oder ein von einem Container genutztes Image), Docker-Build-Cache älter als 48h wird gelöscht, alte .tmp/image-build-Exporte wandern nach .tmp/todelete/image-build/. Unter 40 GB frei im Docker-Root wird schon vor dem Build aufgeräumt. Remote-Server bleiben unberührt. Aus = nur warnen.",
+          "Standardmäßig an. Nach einem erfolgreichen Lauf bleibt DIESE Build-Maschine schlank: lokale Builds von ghcr.io/techfreaque/next-vibe-app älter als die neuesten 3 verlieren ihre Tags (nie :latest, :rollback, :prod-current-good, der gerade deployte Build oder ein von einem Container genutztes Image), Docker-Build-Cache älter als 48h wird gelöscht, alte .tmp/image-build-Exporte wandern nach .tmp/todelete/image-build/. Unter 40 GB frei im Docker-Root wird schon vor dem Build aufgeräumt. Prod-Server haben einen eigenen Schalter (remoteCleanup). Aus = nur warnen.",
+      },
+      remoteCleanup: {
+        title: "Prod-Server aufräumen",
+        description:
+          "Standardmäßig an. Nachdem ein Node deployt und den Health-Check bestanden hat, bleibt auf diesem Server nur: das Image, das ein Container nutzt, seine Rollback-Tags (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev und :latest der mitgehosteten Seite) und die neuesten 3 Builds von ghcr.io/techfreaque/next-vibe-app. Ältere Tags entfernt ein einfaches docker rmi (nie -f, Docker verweigert genutzte Images), danach werden verwaiste Images gelöscht. Vor jedem Laden greift dieselbe Bereinigung unter 30 GB frei. Nur die konfigurierten HA-Server, nie ein explizites --sshTarget. Aus = nur warnen.",
       },
       success: {
         title: "Erfolg",
@@ -213,6 +218,18 @@ export const translations: typeof enTranslations = {
           "⚠️ Nur {{free}} GB frei auf {{path}} (Minimum {{min}} GB). Aufräumen ist aus, nichts gelöscht. Der Build kann die Platte füllen.",
         diskAfterPrune: "💽 {{free}} GB frei auf {{path}} nach dem Aufräumen",
         diskCheckFailed: "Freier Speicher auf {{path}} nicht lesbar: {{error}}",
+        remoteDiskOk: "💽 {{target}}: {{free}} GB frei vor dem Laden",
+        remoteDiskLow:
+          "⚠️ {{target}}: nur {{free}} GB frei (Minimum {{min}} GB). Alte Images werden vor dem Laden entfernt ...",
+        remoteDiskLowNoCleanup:
+          "⚠️ {{target}}: nur {{free}} GB frei (Minimum {{min}} GB). remoteCleanup ist aus, nichts entfernt. Das Laden kann die Platte füllen.",
+        remoteDiskAfter: "💽 {{target}}: {{free}} GB frei nach der Bereinigung",
+        remoteListFailed:
+          "Image-Bereinigung auf {{target}} übersprungen, nichts entfernt: {{error}}",
+        remoteTagFailed:
+          "{{target}}: {{ref}} konnte nicht entfernt werden: {{error}}",
+        remoteRetained:
+          "🧹 {{target}}: {{count}} alte Image-Refs entfernt, behalten: die neuesten {{keep}} Builds, Rollback-Tags und genutzte Images: {{tags}}. Verwaiste gelöscht: {{pruned}}",
       },
     },
   },

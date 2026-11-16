@@ -33,12 +33,17 @@ import {
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import { ImagePushCleanup } from "./cleanup";
+import type { RemoteNode } from "./cleanup-selection";
 import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
 } from "./definition";
 import { imagePushEnv } from "./env";
 import type { ImagePushT } from "./i18n";
+import {
+  ImagePushRemoteRetention,
+  type RetentionBox,
+} from "./remote-retention";
 
 /** Node-local drain helper, shipped from the commit to both HA boxes. */
 const DRAIN_SCRIPT = "scripts/ha-node-drain.sh";
@@ -68,7 +73,8 @@ export class ImagePushRepository {
   ): Promise<ResponseType<ImagePushResponseOutput>> {
     const result = await ImagePushRepository.buildAndDeploy(data, logger, t);
     // Keep the LOCAL build machine bounded once the run succeeded: old local
-    // tags, stale build cache, old export dirs. Remote boxes are never touched.
+    // tags, stale build cache, old export dirs. The prod servers get their own
+    // retention inside the deploy (--remoteCleanup, remote-retention.ts).
     if (result.success && data.cleanup) {
       const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
       const sha = ImagePushRepository.git([
@@ -206,13 +212,39 @@ export class ImagePushRepository {
     // image straight from this machine to Server 2 and rolls only that node.
     if (data.push && !data.primary) {
       return ImagePushRepository.deploySecondaryOnly(
-        { refs, image, tags, sha, shortSha, contextDir, startTime },
+        {
+          refs,
+          image,
+          tags,
+          sha,
+          shortSha,
+          contextDir,
+          startTime,
+          remoteCleanup: data.remoteCleanup,
+        },
         logger,
         t,
       );
     }
 
     if (transferTarget) {
+      // Prod retention only on the configured HA boxes: an explicit
+      // --sshTarget is a one-off box whose images are not ours to manage.
+      const s1Box = data.sshTarget
+        ? undefined
+        : ImagePushRepository.retentionBox(
+            "s1",
+            transferTarget,
+            imagePushEnv.SSH_SERVER_PWD,
+          );
+      if (s1Box) {
+        await ImagePushRemoteRetention.beforeLoad(
+          s1Box,
+          ImagePushRepository.retentionParams(image, data.remoteCleanup),
+          logger,
+          t,
+        );
+      }
       const transferResult = await ImagePushRepository.transferViaSsh(
         refs,
         transferTarget,
@@ -232,6 +264,21 @@ export class ImagePushRepository {
         data.secondary && !data.sshTarget
           ? imagePushEnv.SSH_SERVER2
           : undefined;
+      const s2Box = secondaryTarget
+        ? ImagePushRepository.retentionBox(
+            "s2",
+            secondaryTarget,
+            imagePushEnv.SSH_SERVER2_PWD,
+          )
+        : undefined;
+      if (s2Box) {
+        await ImagePushRemoteRetention.beforeLoad(
+          s2Box,
+          ImagePushRepository.retentionParams(image, data.remoteCleanup),
+          logger,
+          t,
+        );
+      }
       const secondaryTransfer = secondaryTarget
         ? imagePushEnv.SSH_SERVER2_RELAY_ADDR
           ? await ImagePushRepository.relayToSecondary(
@@ -302,6 +349,22 @@ export class ImagePushRepository {
       if (imagePushEnv.SSH_DEPLOY_SCRIPT) {
         ImagePushRepository.recordDeployedSha(sha, shortSha, logger, t);
       }
+      // Server 1 is healthy on the new image (install-docker.sh health-checked
+      // it). Its retention runs after the whole roll, so it never lengthens
+      // the window in which one node carries all traffic.
+      const retainS1 = async (): Promise<void> => {
+        if (s1Box && imagePushEnv.SSH_DEPLOY_SCRIPT && data.remoteCleanup) {
+          await ImagePushRemoteRetention.afterDeploy(
+            s1Box,
+            {
+              ...ImagePushRepository.retentionParams(image, true),
+              currentTags: tags,
+            },
+            logger,
+            t,
+          );
+        }
+      };
 
       if (secondaryTarget && secondaryTransfer) {
         const secondaryResult = await ImagePushRepository.rollSecondary(
@@ -315,8 +378,25 @@ export class ImagePushRepository {
           t,
           drainPlan,
         );
+        await retainS1();
         if (!secondaryResult.success) {
           return secondaryResult;
+        }
+        // Server 2 deployed + health-checked (deploy-ha-node.sh exit 0).
+        if (
+          s2Box &&
+          imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT &&
+          data.remoteCleanup
+        ) {
+          await ImagePushRemoteRetention.afterDeploy(
+            s2Box,
+            {
+              ...ImagePushRepository.retentionParams(image, true),
+              currentTags: tags.slice(0, 1),
+            },
+            logger,
+            t,
+          );
         }
         return success({
           success: true,
@@ -331,6 +411,7 @@ export class ImagePushRepository {
         });
       }
 
+      await retainS1();
       return success({
         success: true,
         output: t("post.repository.messages.sshTransferSuccess", {
@@ -652,6 +733,7 @@ export class ImagePushRepository {
       shortSha: string;
       contextDir: string;
       startTime: number;
+      remoteCleanup: boolean;
     },
     logger: EndpointLogger,
     t: ImagePushT,
@@ -664,6 +746,17 @@ export class ImagePushRepository {
       });
     }
     const shaRef = build.refs[0] ?? "";
+    const s2Box = ImagePushRepository.retentionBox(
+      "s2",
+      secondaryTarget,
+      imagePushEnv.SSH_SERVER2_PWD,
+    );
+    await ImagePushRemoteRetention.beforeLoad(
+      s2Box,
+      ImagePushRepository.retentionParams(build.image, build.remoteCleanup),
+      logger,
+      t,
+    );
     const transfer = await ImagePushRepository.transferViaSsh(
       build.refs,
       secondaryTarget,
@@ -686,6 +779,17 @@ export class ImagePushRepository {
       return rolled;
     }
     ImagePushRepository.recordDeployedSha(build.sha, build.shortSha, logger, t);
+    if (imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT && build.remoteCleanup) {
+      await ImagePushRemoteRetention.afterDeploy(
+        s2Box,
+        {
+          ...ImagePushRepository.retentionParams(build.image, true),
+          currentTags: build.tags.slice(0, 1),
+        },
+        logger,
+        t,
+      );
+    }
     return success({
       success: true,
       output: t("post.repository.messages.secondaryOnlySuccess", {
@@ -1170,6 +1274,40 @@ export class ImagePushRepository {
     return success(undefined);
   }
 
+  /**
+   * A prod HA box for image retention (remote-retention.ts). Its commands
+   * run with stdout captured: listings are parsed, never printed.
+   */
+  private static retentionBox(
+    node: RemoteNode,
+    target: string,
+    password: string | undefined,
+  ): RetentionBox {
+    return {
+      node,
+      target,
+      run: async (cmd) =>
+        await ImagePushRepository.runRemote(
+          target,
+          cmd,
+          undefined,
+          password,
+          true,
+        ),
+    };
+  }
+
+  private static retentionParams(
+    image: string,
+    cleanup: boolean,
+  ): { image: string; secondaryTag: string; cleanup: boolean } {
+    return {
+      image,
+      secondaryTag: imagePushEnv.SSH_SERVER2_IMAGE_TAG,
+      cleanup,
+    };
+  }
+
   /** Parses `user@host` or `user@host:port` into its parts (defaults: root, port 22) */
   private static parseSshTarget(sshTarget: string): {
     username: string;
@@ -1187,13 +1325,15 @@ export class ImagePushRepository {
    * Runs a command on the SSH target, streaming its output to this terminal
    * and optionally piping `stdin` into it. Authenticates with SSH_SERVER_PWD
    * via ssh2 when set, otherwise uses the system `ssh` client (key/agent auth).
+   * `captureStdout` collects stdout into the result instead of printing it.
    */
   private static async runRemote(
     sshTarget: string,
     remoteCmd: string,
     stdin?: Readable,
     password: string | undefined = imagePushEnv.SSH_SERVER_PWD,
-  ): Promise<{ exitCode: number; error?: string }> {
+    captureStdout = false,
+  ): Promise<{ exitCode: number; error?: string; stdout: string }> {
     const { username, host, port } =
       ImagePushRepository.parseSshTarget(sshTarget);
 
@@ -1219,23 +1359,29 @@ export class ImagePushRepository {
         remoteCmd,
       ];
       return new Promise((resolve) => {
+        const stdio: ["pipe" | "inherit", "pipe" | "inherit", "inherit"] = [
+          stdin ? "pipe" : "inherit",
+          captureStdout ? "pipe" : "inherit",
+          "inherit",
+        ];
         const child = password
           ? spawn("sshpass", ["-e", "ssh", ...sshArgs], {
-              stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
+              stdio,
               cwd: process.cwd(),
               env: { ...process.env, SSHPASS: password },
             })
-          : spawn("ssh", sshArgs, {
-              stdio: [stdin ? "pipe" : "inherit", "inherit", "inherit"],
-              cwd: process.cwd(),
-            });
+          : spawn("ssh", sshArgs, { stdio, cwd: process.cwd() });
         if (stdin && child.stdin) {
           stdin.pipe(child.stdin);
         }
+        let stdout = "";
+        child.stdout?.on("data", (chunk: Buffer) => {
+          stdout += chunk.toString("utf-8");
+        });
         child.on("error", (err) =>
-          resolve({ exitCode: -1, error: err.message }),
+          resolve({ exitCode: -1, error: err.message, stdout }),
         );
-        child.on("close", (code) => resolve({ exitCode: code ?? -1 }));
+        child.on("close", (code) => resolve({ exitCode: code ?? -1, stdout }));
       });
     }
 
@@ -1244,13 +1390,14 @@ export class ImagePushRepository {
     return new Promise((resolve) => {
       const client = new Client();
       let settled = false;
+      let stdout = "";
       const settle = (result: { exitCode: number; error?: string }): void => {
         if (settled) {
           return;
         }
         settled = true;
         client.end();
-        resolve(result);
+        resolve({ ...result, stdout });
       };
 
       client.on("error", (err) => settle({ exitCode: -1, error: err.message }));
@@ -1260,7 +1407,13 @@ export class ImagePushRepository {
             settle({ exitCode: -1, error: err.message });
             return;
           }
-          channel.pipe(process.stdout, { end: false });
+          if (captureStdout) {
+            channel.on("data", (chunk: Buffer) => {
+              stdout += chunk.toString("utf-8");
+            });
+          } else {
+            channel.pipe(process.stdout, { end: false });
+          }
           channel.stderr.pipe(process.stderr, { end: false });
           channel.on("exit", (code: number | null) => {
             settle({ exitCode: code ?? -1 });

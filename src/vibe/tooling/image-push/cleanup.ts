@@ -4,7 +4,7 @@
  * plus an ever-growing BuildKit cache filled the dev box's root partition
  * (266 GB of cache, ~40 old tags) and took Hermes' Postgres down with it.
  * Only this machine's docker and `.tmp/image-build/` are touched. Remote
- * servers keep their own rollback rules (install-docker.sh, deploy-ha-node.sh).
+ * servers get their own retention (remote-retention.ts, --remoteCleanup).
  * Best effort throughout: a failed cleanup step only warns, never fails the
  * deploy that already succeeded. Nothing is ever `rm`ed: export dirs move to
  * `.tmp/todelete/image-build/`.
