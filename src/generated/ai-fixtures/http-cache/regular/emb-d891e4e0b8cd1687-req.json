@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks--category--search--schema-716822ca-c458-4648-8092-120fe452ee6f.md\n\n# Tool-help catalog checks: category, search, schema\nFolder: private\nDescription: Ran three parallel tool-help calls as a catalog quality check: category='ai' (92 tools), query='search' (11 matches), and toolName='generate_image' (full parameter schema). Verified every entry carries a name and description, and that the detail call returns a complete schema with required prompt fi",
+    "encoding_format": "float"
+  }
+}

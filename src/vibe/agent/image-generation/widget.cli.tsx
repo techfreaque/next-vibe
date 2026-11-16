@@ -65,3 +65,7 @@ export function ImageGenerationWidget({ field }: CliWidgetProps): JSX.Element {
 }
 
 ImageGenerationWidget.cliWidget = true as const;
+
+// The definition lazy-loads "./widget" by this name; on CLI/MCP that resolves
+// to this file, so without the alias the renderer got undefined and crashed.
+export { ImageGenerationWidget as ImageGenerationContainer };

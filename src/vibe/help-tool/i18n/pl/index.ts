@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
       pageSize: {
         label: "Rozmiar strony",
         description:
-          "Liczba wyników na stronie. AI/MCP domyślnie: 25. Web/CLI: 200.",
+          "Liczba wyników na stronie. AI/MCP domyślnie: 100. Web/CLI: 800.",
         title: "Efektywny rozmiar strony",
       },
       tools: {

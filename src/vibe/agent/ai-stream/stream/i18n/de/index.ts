@@ -556,6 +556,8 @@ export const translations: typeof enTranslations = {
       "Die KI brauchte zu lange für eine Antwort (Zeitüberschreitung nach {{maxDuration}} Sekunden). Bitte versuchen Sie es mit einer kürzeren Nachricht erneut.",
     noResponse:
       "Die KI hat keine Antwort generiert. Bitte versuchen Sie es erneut.",
+    emptyAnswer:
+      "Das Modell hat ohne Antwort beendet. Berechnet wurden nur die Kosten des Anbieters, keine Plattformgebühr. Versuchen Sie es erneut oder wählen Sie ein anderes Modell.",
     contentFiltered:
       "Diese Antwort wurde vom Inhaltsfilter des Anbieters blockiert. Versuche ein anderes Modell.",
     modelUnavailable:

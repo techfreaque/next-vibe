@@ -24,7 +24,12 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
 import { normalizeExecuteToolArgs } from "./execute-tool-args";
-import { isValidToolResult, sortObjectKeys } from "./helpers";
+import {
+  endLoopNeedsAnswerStep,
+  isThreadRenameCall,
+  isValidToolResult,
+  sortObjectKeys,
+} from "./helpers";
 import type { StreamLoopState } from "./state";
 
 function isPlainRecord(
@@ -158,15 +163,39 @@ export async function onToolCall(
   // and continues its turn (generates acknowledgement text), then ends naturally.
   // The revival happens later when the background task completes.
   if (callbackModeArg === CallbackMode.END_LOOP) {
-    ctx.shouldStopLoop = true;
-    logger.debug(
-      "[AI Stream] Model requested loop stop via callbackMode endLoop",
-      {
-        toolName: part.toolName,
-        toolCallId: part.toolCallId,
-        callbackMode: callbackModeArg,
-      },
-    );
+    const wrappedToolName =
+      typeof toolCallArgs === "object" &&
+      toolCallArgs !== null &&
+      !Array.isArray(toolCallArgs) &&
+      !(toolCallArgs instanceof Date) &&
+      typeof toolCallArgs["toolName"] === "string"
+        ? toolCallArgs["toolName"]
+        : undefined;
+    if (
+      !ctx.stepHasAnswerText &&
+      isThreadRenameCall(part.toolName, wrappedToolName) &&
+      endLoopNeedsAnswerStep(state.p.toolExecutionContext)
+    ) {
+      // The silent rename fired with endLoop in a step with no visible answer
+      // (only thinking or tool calls; any earlier text preceded the latest
+      // tool results): stopping here ends the turn on a blank, billed bubble. Keep the loop alive; the SDK side (onStepFinish ->
+      // prepareStep) runs ONE text-only answer step.
+      ctx.endLoopAwaitingAnswer = true;
+      logger.info(
+        "[AI Stream] endLoop before any answer text - deferring stop to a forced answer step",
+        { toolName: part.toolName, toolCallId: part.toolCallId },
+      );
+    } else {
+      ctx.shouldStopLoop = true;
+      logger.debug(
+        "[AI Stream] Model requested loop stop via callbackMode endLoop",
+        {
+          toolName: part.toolName,
+          toolCallId: part.toolCallId,
+          callbackMode: callbackModeArg,
+        },
+      );
+    }
   }
 
   // All tool metadata comes from toolsConfig built during setup

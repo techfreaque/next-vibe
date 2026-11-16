@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks-and-image-generation-test-aef10079-99e1-4ad5-a981-0f9592acbe9b.md\n\n# Tool-help catalog checks and image generation test\nFolder: private\nDescription: Ran three parallel tool-help calls (category='ai', query='search', toolName='generate_image') which all returned valid results. Then attempted to generate an image with prompt='red circle', but the call failed with a 403 consent_required error because the default Chroma model is uncensored and requi",
+    "encoding_format": "float"
+  }
+}

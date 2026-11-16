@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The detached task resolved cleanly.\n\n- **status:** completed\n- **originalToolName:** `cortex-write` → `/memories/cb-await-task-test`\n- **responsePath:** `/memories/cb-await-task-test` (present, nested in `result`)\n- **size:** 23 bytes, `created: false` (existing file overwritten, as expected)\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

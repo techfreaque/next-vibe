@@ -8,8 +8,10 @@ import "server-only";
 import type { JSONValue, streamText as aiStreamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
+import { creditsWithoutPlatformMarkup } from "../../../models/models";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
+import { endLoopNeedsAnswerStep } from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
   producedImageFile,
@@ -230,7 +232,7 @@ export async function complete(
   // hits were billed below zero and long cached tool loops went negative
   // (deductAndEmitCredits skips amount <= 0, so the whole turn was free).
   // Actual-cost models (OpenRouter) bill the summed real per-step cost.
-  const { credits: actualCreditCost, upstreamCost } =
+  const { credits: fullCreditCost, upstreamCost } =
     TokenAccumulator.resolveCharge(state.p.ctx, modelConfig, {
       inputTokens: finalUncachedInputTokens + finalCachedInputTokens,
       outputTokens: finalOutputTokens,
@@ -238,11 +240,29 @@ export async function complete(
       cacheWriteTokens: finalCacheWriteTokens,
       imageOutputTokens: finalImageOutputTokens,
     });
+  // Empty answer: the turn streamed no visible text (provider returned
+  // nothing, reasoning-only output, tool-only turn that never answered) and
+  // produced no media. The provider still charged for the tokens, so the user
+  // pays that real cost; the platform waives its markup. Background task
+  // turns may legitimately end without prose and keep the normal charge.
+  const producedMedia =
+    generatedFiles.length > 0 ||
+    Boolean(state.p.ctx.dbWriter.lastGeneratedMediaUrl);
+  const isEmptyAnswer =
+    !state.p.ctx.turnHasAnswerText &&
+    !producedMedia &&
+    endLoopNeedsAnswerStep(state.p.toolExecutionContext);
+  const actualCreditCost = isEmptyAnswer
+    ? creditsWithoutPlatformMarkup(fullCreditCost)
+    : fullCreditCost;
   state.p.ctx.tokensBilled = true;
   logger.info("[AI Stream] Turn charge", {
     model,
     threadId,
     creditCost: actualCreditCost,
+    ...(isEmptyAnswer
+      ? { emptyAnswer: true, creditCostBeforeMarkupWaiver: fullCreditCost }
+      : {}),
     upstreamCostUsd: upstreamCost?.upstreamCostUsd ?? null,
     fallbackCostUsd: upstreamCost?.fallbackCostUsd ?? null,
     upstreamProvider: upstreamCost?.upstreamProvider ?? null,
@@ -401,6 +421,35 @@ export async function complete(
       finishReason: finishReason ?? null,
       creditCost: actualCreditCost,
     });
+
+    // The turn created a message but never answered (reasoning-only, or tool
+    // calls with no reply): without this the user sees a blank/thinking-only
+    // bubble with a charge. content-filter already showed its own message.
+    if (isEmptyAnswer && finishReason !== "content-filter") {
+      logger.warn("[AI Stream] Turn ended without answer text", {
+        threadId,
+        model,
+        apiProvider: modelConfig.apiProvider,
+        providerModel: modelConfig.providerModel,
+        finishReason: finishReason ?? null,
+        steps: ctx.tokenStepCount,
+        outputTokens: usage.outputTokens,
+        creditCost: actualCreditCost,
+        creditCostBeforeMarkupWaiver: fullCreditCost,
+      });
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        errorType: StreamErrorType.STREAM_ERROR,
+        error: fail({
+          message: t("errors.emptyAnswer"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        }),
+        content: t("errors.emptyAnswer"),
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+        user,
+      });
+    }
   } else {
     // Provider returned an empty stream - no text was generated.
     // Emit CONTENT_DONE on the pre-generated ID so the frontend closes the pending slot,
@@ -438,14 +487,18 @@ export async function complete(
       totalTokens: null,
       finishReason: finishReason ?? null,
     });
+    // Tokens were charged (prompt read, maybe hidden output): say so, and
+    // that only the provider's cost was billed.
+    const emptyKey =
+      actualCreditCost > 0 ? "errors.emptyAnswer" : "errors.noResponse";
     await ctx.dbWriter.emitErrorMessage({
       threadId,
       errorType: StreamErrorType.STREAM_ERROR,
       error: fail({
-        message: t("errors.noResponse"),
+        message: t(emptyKey),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       }),
-      content: t("errors.noResponse"),
+      content: t(emptyKey),
       parentId: ctx.lastParentId,
       sequenceId: ctx.lastSequenceId,
       user,

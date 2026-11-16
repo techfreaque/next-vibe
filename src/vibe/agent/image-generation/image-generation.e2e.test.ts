@@ -23,6 +23,7 @@ import { until } from "../ai-stream/testing/e2e-chat";
 import { createE2ECreditUser } from "../ai-stream/testing/e2e-credit-user";
 import { submitAndAwaitResponse } from "../ai-stream/testing/e2e-slow-submit";
 import { cacheDir } from "../ai-stream/testing/fetch-cache";
+import { STORAGE_FILES_ROUTE } from "../chat/storage/storage-url";
 import { roundMediaCost } from "../models/models";
 import { scopedTranslation as consentScopedTranslation } from "../models/uncensored-consent/i18n";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
@@ -96,22 +97,22 @@ const REFERENCE_IMAGE_URL =
   "https://dummyimage.com/320x320/4287f5/ffffff.png";
 
 /**
- * A generated media URL must never be a bare relative "/path": storage URLs are
- * built from runtime NEXT_PUBLIC_APP_URL and must come back absolute (http...),
- * which guards the localhost/relative-URL regression. Standalone tool runs that
- * are not inside a chat thread skip the storage re-upload and return the
- * provider URL directly, which may be an inline data: URI — that is not the
- * regression, so it is allowed. Only a leading "/" (lost app-URL prefix) fails.
+ * A generated image is always re-hosted in our storage, also for standalone
+ * runs outside a chat thread: the result is the portable storage path
+ * (resolved per instance at render time, see chat/storage/storage-url.ts) or,
+ * for remote-routed models, an absolute URL. Never an inline data: URI (it
+ * floods the model context on every later turn) and never another relative
+ * path.
  */
 function expectAbsoluteUrl(url: string): void {
   expect(
-    url.startsWith("http") || url.startsWith("data:"),
-    `expected an absolute http(s) url or data: uri, got ${url.slice(0, 80)}`,
-  ).toBe(true);
-  expect(
-    url.startsWith("/"),
-    `generated media url is relative (lost NEXT_PUBLIC_APP_URL prefix): ${url.slice(0, 80)}`,
+    url.startsWith("data:"),
+    `generated media url must not be an inline data: uri, got ${url.slice(0, 80)}`,
   ).toBe(false);
+  expect(
+    url.startsWith("http") || url.startsWith(STORAGE_FILES_ROUTE),
+    `expected an absolute url or a storage path, got ${url.slice(0, 80)}`,
+  ).toBe(true);
 }
 
 describe("E2E: image generation", () => {

@@ -1,0 +1,38 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a5b80d9a9fa49f11-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Mon, 16 Nov 2026 17:00:40 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794848439-OHJ7hM1lgUHxDWeoqVTX",
+    "x-openrouter-release": "api;efcfad22-1eb0-45a4-8cc9-7e4a381d9ff0",
+    "set-cookie": "__cf_bm=2wibguUUGx23GRRpqMN9l7fR_bQbubYxFne3cdKshTo-1794848439.4630775-1.0.1.1-6Z3OpjI7vldxFdg8tNlSGa98SJLf3YDn8xePyUqqB2_QzPdsyoGk9hud6VXxZBi.Vyu_MQZheWM_0423j3_YOJRvZncN.ZD_hgJrHrGC1TOBif217QntWUuH5IDlfb7r; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 17:30:40 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call-1dad3a0f-4de2-4768-b4fe-914f00761ac9\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"wait\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"input\\\":{}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"instanceId\\\":\\\"hermes\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"toolName\\\":\\\"f\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"avorites\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794848439-OHJ7hM1lgUHxDWeoqVTX\",\"object\":\"chat.completion.chunk\",\"created\":1794848439,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":26216,\"completion_tokens\":92,\"total_tokens\":26308,\"cost\":0.00189216,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00189216,\"upstream_inference_prompt_cost\":0.00183512,\"upstream_inference_completions_cost\":0.00005704},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

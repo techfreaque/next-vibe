@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks--category--search--schema-0a42be0a-0ec0-48cc-bb25-cbf15f5d13b5.md\n\n# Tool-help catalog checks: category, search, schema\nFolder: private\nDescription: Ran three parallel tool-help calls to validate the tool catalog. The category='ai' call returned 92 tools, each with a name and description. The query='search' call returned 11 matching tools with names and descriptions, with a consistent per-category breakdown. The toolName='generate_image' detail",
+    "encoding_format": "float"
+  }
+}

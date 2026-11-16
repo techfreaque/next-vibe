@@ -20137,7 +20137,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Generate Image",
     titleShort: "Generate Image",
     description:
-      "Generate an image from a text prompt. Use list-models with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
     icon: "image",
     category: "ai",
     subCategory: "Generation",
@@ -20587,7 +20587,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Generate Music",
     titleShort: "Generate Music",
     description:
-      "Generate music from a text prompt. Use list-models with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
+      "Generate music from a text prompt. Use the models tool with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
     icon: "music",
     category: "ai",
     subCategory: "Generation",
@@ -21689,7 +21689,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Speech to Text",
     titleShort: "Speech to Text",
     description:
-      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: per second of audio at the chosen model's own rate (see list-models). Returns the transcribed text, provider used, and confidence score.",
+      "Transcribe audio to text. Upload an audio file (MP3, WAV, WebM, max 25MB). Cost: per second of audio at the chosen model's own rate (see the models tool). Returns the transcribed text, provider used, and confidence score.",
     icon: "mic",
     category: "ai",
     subCategory: "Generation",
@@ -21765,7 +21765,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Text to Speech",
     titleShort: "Text to Speech",
     description:
-      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: per character at the chosen voice's own rate (see list-models). Returns audioUrl.",
+      "Convert text to speech. Pass text and a voice id. Use the models tool (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: per character at the chosen voice's own rate (see the models tool). Returns audioUrl.",
     icon: "volume-2",
     category: "ai",
     subCategory: "Generation",
@@ -21799,7 +21799,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Generate Video",
     titleShort: "Generate Video",
     description:
-      "Generate a video from a text prompt. Use list-models (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
+      "Generate a video from a text prompt. Use the models tool (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
     icon: "video",
     category: "ai",
     subCategory: "Generation",
@@ -23360,7 +23360,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Tool Help - Discover Available Tools",
     titleShort: "Tool Help",
     description:
-      "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+      "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100.",
     icon: "help-circle",
     category: "ai",
     subCategory: "Tools",

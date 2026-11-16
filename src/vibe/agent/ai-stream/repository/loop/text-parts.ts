@@ -60,6 +60,11 @@ export async function onTextDelta(
     };
   }
 
+  if (textDelta.trim().length > 0) {
+    ctx.turnHasAnswerText = true;
+    ctx.stepHasAnswerText = true;
+  }
+
   // First delta: create the message
   if (!currentAssistantMessageId) {
     const messageId = ctx.getNextAssistantMessageId();

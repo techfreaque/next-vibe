@@ -58,7 +58,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
+import { db, trackPendingDbWork } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
   leadLeadLinks,
@@ -4963,19 +4963,12 @@ export class CreditRepository {
     t: CreditsT,
     locale: CountryLanguage,
   ): void {
-    void CreditRepository.getBalance(user, logger, t, locale).then((result) => {
-      if (!result.success) {
-        return undefined;
-      }
-      const { total, expiring, permanent, earned, free, expiresAt, capacity } =
-        result.data;
-      const emitCredits = createEndpointEmitter(
-        creditsDefinitions.GET,
-        logger,
-        user,
-      );
-      emitCredits("credits-balance-updated", {
-        responseData: {
+    const work = CreditRepository.getBalance(user, logger, t, locale).then(
+      (result) => {
+        if (!result.success) {
+          return undefined;
+        }
+        const {
           total,
           expiring,
           permanent,
@@ -4983,10 +4976,28 @@ export class CreditRepository {
           free,
           expiresAt,
           capacity,
-        },
-      });
-      return undefined;
-    });
+        } = result.data;
+        const emitCredits = createEndpointEmitter(
+          creditsDefinitions.GET,
+          logger,
+          user,
+        );
+        emitCredits("credits-balance-updated", {
+          responseData: {
+            total,
+            expiring,
+            permanent,
+            earned,
+            free,
+            expiresAt,
+            capacity,
+          },
+        });
+        return undefined;
+      },
+    );
+    // Short-lived processes (CLI) must not close the pool under this lookup.
+    trackPendingDbWork(work);
   }
 }
 

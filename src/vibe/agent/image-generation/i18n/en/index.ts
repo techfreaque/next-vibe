@@ -12,7 +12,7 @@ export const translations = {
     titleShort: "Generate Image",
     dynamicTitle: "Image: {{prompt}}",
     description:
-      "Generate an image from a text prompt. Use list-models with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+      "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
     form: {
       title: "Image Generation",
       description: "Enter a prompt to generate an image",
@@ -25,7 +25,7 @@ export const translations = {
     model: {
       label: "Model",
       description:
-        "Image generation model id. Leave blank for user default. Use list-models (modelType=image) to browse available models.",
+        "Image generation model id. Leave blank for user default. Use the models tool (modelType=image) to browse available models.",
     },
     approxCost: "~credits",
     size: {
@@ -48,7 +48,7 @@ export const translations = {
     inputMediaUrl: {
       label: "Reference Image URL",
       description:
-        "Image URL for image-to-image generation. The model animates or transforms from this image. Only works with models that support image input.",
+        "Image URL for image-to-image generation. The model edits or restyles this image. Only works with models that support image input.",
       placeholder: "https://example.com/image.jpg",
     },
     download: "Download",
@@ -123,6 +123,7 @@ export const translations = {
       modelNoReferenceImage:
         "The model {{model}} does not accept reference images. Choose an image-to-image model (one whose inputs include image) to use a reference.",
       generationFailed: "Image generation failed",
+      generationFailedWithReason: "Image generation failed: {{error}}",
       providerError: "Image provider error: {{error}}",
       noImageUrl: "No image URL returned from provider",
       noImageGenerated:

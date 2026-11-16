@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-quality-gate--tool-help--wakeup--favorites-e2c9d264-94f0-4e16-ac22-61f01225a449.md\n\n# Hermes quality gate: tool-help, wakeUp, favorites\nFolder: private\nDescription: Quality-gate run against the hermes instance covering parallel tool-help calls (ai category, search keyword, generate_image schema), a wakeUp-mode cortex-write, and a favorites listing. The favorites call returned a populated favorites array (34 entries). The wakeUp call did not behave as a detached",
+    "encoding_format": "float"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Detach dispatch worked as expected.\n\n- **taskId:** `remote-ws-hermes-call-00-5arsh4vyrj75tn2q93jy9x1e` (string, present)\n- **responsePath:** absent — correct, the write is running in the background\n- Returned payload was just `{hint, taskId}`, so nothing inline was attempted\n\nSTEP_OK taskId=remote-ws-hermes-call-00-5arsh4vyrj75tn2q93jy9x1e",
+    "encoding_format": "float"
+  }
+}

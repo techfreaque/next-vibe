@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "## Tool catalog check — all three calls returned data\n\nI ran the three `tool-help` calls in parallel. Every one came back non-empty and well-formed.\n\n### 1. `category='ai'` → 92 tools\n\nEvery entry has a `name` and a `description`. As expected, the category is broad — it holds threads, folders, favorites, skills, moderation and refusal-index tools alongside the AI ones.\n\n### 2. `query='search'` → 11 tools\n\nEvery entry has a `name` and a `description`. The 11 matches are: `users-list`, `agent-search-messages`, `agent-search-threads`, `brave-search`, `kagi-search`, `tool-help`, `vibe_agent_chat_threads_threadId_messages_search_GET`, `web-search`, `cortex-search`, `leads-search`, `pos-product-lookup`.\n\n### 3. `toolName='generate_image'` → full schema\n\nReturned with `name`, `description`, a `parameters` JSON schema (`prompt` required, `model` an enum of 44 image model ids, `inputMediaUrl` optional), and example input/response payloads.\n\n---\n\n## What's off\n\n- **Raw internal API route names are exposed as user-facing tool names.** The `ai` category contains entries like `vibe_agent_chat_threads_threadId_messages_messageId_vote_POST` and `vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET` — route paths with camelCase path parameters and HTTP verbs baked in, sitting right next to clean names like `rename-thread` and `favorites`.\n\n- **`tool-help`'s description contradicts its behaviour.** It documents \"Default page size for AI/MCP is 25\" and \"Supports pagination via page/pageSize\", but `category='ai'` returned all 92 tools in a single unpaginated response.\n\n- **`generate_image`'s description names a tool that doesn't exist.** It says \"Use list-models with modelType=image\" — the tool is `models`; `list-models` is only an alias. The same mistake is repeated in the `model` parameter's description.\n\n- **`generate_image.inputMediaUrl` uses video wording.** It reads \"The model animates or transforms from this image\" — \"animates\" is copied from the video tool. An image",
+    "encoding_format": "float"
+  }
+}

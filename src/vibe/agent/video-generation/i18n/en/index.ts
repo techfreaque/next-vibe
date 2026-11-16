@@ -9,7 +9,7 @@ export const translations = {
     titleShort: "Generate Video",
     dynamicTitle: "Video: {{prompt}}",
     description:
-      "Generate a video from a text prompt. Use list-models (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
+      "Generate a video from a text prompt. Use the models tool (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
     form: {
       title: "Video Generation",
       description: "Enter a prompt to generate a video",
@@ -22,7 +22,7 @@ export const translations = {
     model: {
       label: "Model",
       description:
-        "Video model id. Leave blank for user default. Use list-models (modelType=video) to browse models and their capabilities.",
+        "Video model id. Leave blank for user default. Use the models tool (modelType=video) to browse models and their capabilities.",
     },
     duration: {
       label: "Duration",

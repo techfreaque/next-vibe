@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
       pageSize: {
         label: "Seitengröße",
         description:
-          "Anzahl der Ergebnisse pro Seite. KI/MCP Standard: 25. Web/CLI Standard: 200.",
+          "Anzahl der Ergebnisse pro Seite. KI/MCP Standard: 100. Web/CLI Standard: 800.",
         title: "Effektive Seitengröße",
       },
       tools: {

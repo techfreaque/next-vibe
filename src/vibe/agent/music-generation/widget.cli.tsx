@@ -69,3 +69,7 @@ export function MusicGenerationWidget({ field }: CliWidgetProps): JSX.Element {
 }
 
 MusicGenerationWidget.cliWidget = true as const;
+
+// The definition lazy-loads "./widget" by this name; on CLI/MCP that resolves
+// to this file, so without the alias the renderer got undefined and crashed.
+export { MusicGenerationWidget as MusicGenerationContainer };

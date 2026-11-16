@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-tool-help-checks--category--search--schema-b3bf384e-f346-46f7-bf7a-132c6da9103c.md\n\n# Hermes tool-help checks: category, search, schema\nFolder: private\nDescription: Ran three parallel tool-help calls routed to the hermes instance to verify the catalog: a category listing for \"ai\" (12 tools), a keyword search for \"search\" (2 tools), and a full schema lookup for generate_image. All three returned well-formed, non-empty results with names, descriptions, and a comp",
+    "encoding_format": "float"
+  }
+}

@@ -195,12 +195,16 @@ export function ImageGenerationContainer({
           modelSelection={workingSelection ?? modelSelection}
           onChange={(sel) => setWorkingSelection(sel ?? undefined)}
           onSelect={(sel) => {
-            if (
-              sel !== null &&
-              sel.selectionType === ModelSelectionType.MANUAL
-            ) {
+            if (sel !== null) {
+              // A filter pick ("cheapest uncensored", ...) used to be dropped
+              // silently, so the default model generated instead of the one
+              // the selector showed. Resolve it to the concrete model now.
+              const pickedId =
+                sel.selectionType === ModelSelectionType.MANUAL
+                  ? sel.manualModelId
+                  : getBestImageGenModel(sel, user, availability)?.id;
               const selectedId = Object.values(ImageGenModelId).find(
-                (id) => id === sel.manualModelId,
+                (id) => id === pickedId,
               );
               if (selectedId !== undefined) {
                 form?.setValue("model", selectedId);

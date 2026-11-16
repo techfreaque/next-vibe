@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Balance read successfully — `total: 20041.6` (numeric), composed of `permanent: 20000` + `free: 41.6`, which sums correctly. `freeStatus` came back as `enums.freeStatus.active`, which is the expected namespaced enum key.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

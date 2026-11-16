@@ -780,7 +780,7 @@ export function describeStreamSuite(cfg: ModeConfig): void {
             user: testUser,
             prompt: `[T1 thread-create+tool-help-all-modes] You are the quality gate for this entire session. From now on, across EVERY turn, if ANYTHING is off — a tool error, an empty or nonsensical result, a broken/missing URL, a wrong or unreasonable credit cost, a raw ID / internal field name / JSON blob / stack trace in anything user-facing, a confusing tool name/description/parameter, a result that contradicts what was asked, or ANY oddity you notice even if it is UNRELATED to the current instruction or is left over from a PREVIOUS turn — you MUST end your reply with FAILED: <what is off>. Do not work around it, do not stay silent, do not give it the benefit of the doubt. Over-report rather than ignore: everything off is a FAIL. Only end with STEP_OK when you have checked and NOTHING at all is off. Enum-valued fields in tool results come back as namespaced enum keys (e.g. 'enums.viewMode.linear') by platform design and the UI translates them: that alone is never an issue. You dont need to create any memories unless asked, other than that treat it like any other chat. This test suite is called ${cfg.cachePrefix}
 
-Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THREE calls. Issue ALL THREE IN PARALLEL in this ONE turn — emit them together in a single response (do NOT wait for one result before making the next), each NOW (do not reuse earlier results): (1) ${toolInstrWithArgs(cfg, "tool-help", "category='ai'")} to list the "ai" category's tools; (2) ${toolInstrWithArgs(cfg, "tool-help", "query='search'")} to keyword-search for search tools; (3) ${toolInstrWithArgs(cfg, "tool-help", "toolName='generate_image'")} to get one tool's full schema.${cfg.remoteInstanceId ? ` The instanceId='${cfg.remoteInstanceId}' routing above applies ONLY to these three tool-help calls that I explicitly asked you to run there — it is NOT a blanket rule. Any OTHER tool you decide to use on your own is a separate decision: route each one wherever is correct for what it does, and never carry '${cfg.remoteInstanceId}' onto a call I didn't ask to run there.` : ""} Check: the category-narrow and keyword-query calls each return a non-empty tools array whose entries have a name + description; the detail call returns generate_image with a name, a description, and a parameters schema. Counts are not comparable across the calls: a category spans many feature areas (the "ai" category also holds threads, folders, favorites and skills tools), and the per-category counts inside a keyword search count only that search's matches. End your reply with STEP_OK if all looked right AND nothing else is off, or FAILED: <what was wrong> otherwise.`,
+Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THREE calls. Issue ALL THREE IN PARALLEL in this ONE turn — emit them together in a single response (do NOT wait for one result before making the next), each NOW (do not reuse earlier results): (1) ${toolInstrWithArgs(cfg, "tool-help", "category='ai'")} to list the "ai" category's tools; (2) ${toolInstrWithArgs(cfg, "tool-help", "query='search'")} to keyword-search for search tools; (3) ${toolInstrWithArgs(cfg, "tool-help", "toolName='generate_image'")} to get one tool's full schema.${cfg.remoteInstanceId ? ` The instanceId='${cfg.remoteInstanceId}' routing above applies ONLY to these three tool-help calls that I explicitly asked you to run there — it is NOT a blanket rule. Any OTHER tool you decide to use on your own is a separate decision: route each one wherever is correct for what it does, and never carry '${cfg.remoteInstanceId}' onto a call I didn't ask to run there.` : ""} Check: the category-narrow and keyword-query calls each return a non-empty tools array whose entries have a name + description; the detail call returns generate_image with a name, a description, and a parameters schema. Counts are not comparable across the calls: a category spans many feature areas (the "ai" category also holds threads, folders, favorites and skills tools), and the per-category counts inside a keyword search count only that search's matches. Scope of THIS step: judge the three calls' results against that check. The catalog's own naming and paging are known and tracked separately, so these are NOT issues here: route-id style names (e.g. vibe_agent_..._POST) for tools without a short alias, the full category coming back on one page, entries omitting fields that the detail call carries (title, category, aliases), and descriptions naming another tool by its alias. The LAST line of your reply must be exactly STEP_OK if all looked right AND nothing else is off, or FAILED: <what was wrong> otherwise.`,
             favoriteId: mainFavoriteId,
           });
 
@@ -1930,13 +1930,16 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
 
         const videoAdded = newMessages(videoMsgs, prevIdsVideo);
 
-        // T4b: favorites user must be a direct child of T4a's music leaf (chains
-        // AFTER T4a, not a sibling fork off 3b).
+        // T4b: favorites user must continue from T4a's chain tip (chains AFTER
+        // T4a, not a sibling fork off 3b). Like the UI, the tip is the
+        // rename/endLoop tool row when T4a's answer step fired one, else the
+        // answer itself (runStream applies tipAfterAnswer to the parent).
+        const t4aTipId = tipAfterAnswer(t4aMusicAiMsgId, videoMsgs);
         const videoUser = videoAdded.find((m) => m.role === "user");
         expect(
           chainParentOf(videoUser, videoMsgs),
-          `T4b: favorites user parentId must be t4aMusicAiMsgId=${t4aMusicAiMsgId} (chains after T4a, not a fork off branchForkAiMsgId=${branchForkAiMsgId})`,
-        ).toBe(t4aMusicAiMsgId);
+          `T4b: favorites user parentId must be T4a's tip ${t4aTipId} (answer ${t4aMusicAiMsgId}; chains after T4a, not a fork off branchForkAiMsgId=${branchForkAiMsgId})`,
+        ).toBe(t4aTipId);
 
         // Tool message
         const videoToolMsg = findToolMsg(videoAdded, t4bTool, cfg);
@@ -1976,16 +1979,22 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           videoChain.includes(branchForkAiMsgId),
           `T4b: branchForkAiMsgId (3b) must be an ancestor in the video chain`,
         ).toBe(true);
-        // T4a's music leaf must be in the chain AND videoUser immediately after
-        // it — proving T4b continues T4a linearly, not as a sibling fork.
+        // T4a's answer must be in the chain (so T4b's AI has it in context)
+        // AND videoUser immediately after T4a's tip — proving T4b continues
+        // T4a linearly, not as a sibling fork.
         const t4aLeafIdx = videoChain.indexOf(t4aMusicAiMsgId);
         expect(
           t4aLeafIdx,
           `T4b: t4aMusicAiMsgId must be in the video chain (T4b chains after T4a)`,
         ).toBeGreaterThanOrEqual(0);
+        const t4aTipIdx = videoChain.indexOf(t4aTipId);
         expect(
-          videoChain[t4aLeafIdx + 1],
-          `T4b: videoUser must be immediately after t4aMusicAiMsgId (T4b chains after T4a, not a sibling of it)`,
+          t4aTipIdx,
+          `T4b: T4a's tip must be at or after T4a's answer in the chain`,
+        ).toBeGreaterThanOrEqual(t4aLeafIdx);
+        expect(
+          videoChain[t4aTipIdx + 1],
+          `T4b: videoUser must be immediately after T4a's tip (T4b chains after T4a, not a sibling of it)`,
         ).toBe(videoUser!.id);
         // fork tip must come BEFORE T4a's leaf (3b → T4a → T4b ordering).
         expect(

@@ -151,8 +151,17 @@ export async function generateImageWithModelsLab(params: {
         }
 
         if (pollResult.status === "error") {
+          logger.warn("[ModelsLab Image] Generation failed while polling", {
+            providerModel,
+            message: pollResult.message ?? null,
+            attempt: attempt + 1,
+          });
           return fail({
-            message: t("post.errors.generationFailed"),
+            message: pollResult.message
+              ? t("post.errors.externalServiceError", {
+                  message: pollResult.message,
+                })
+              : t("post.errors.generationFailed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -170,6 +179,11 @@ export async function generateImageWithModelsLab(params: {
     }
 
     // Error response
+    logger.warn("[ModelsLab Image] Provider rejected the request", {
+      providerModel,
+      status: result.status ?? null,
+      message: result.message ?? null,
+    });
     return fail({
       message: t("post.errors.externalServiceError", {
         message: result.message ?? "Unknown error",

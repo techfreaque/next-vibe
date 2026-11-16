@@ -415,7 +415,9 @@ export class ImageGenerationRepository {
 
     if (!generationResult.success) {
       return fail({
-        message: t("post.errors.generationFailed", {
+        // Carry the provider's reason (moderation block, model unavailable,
+        // timeout): a bare "failed" left users and the AI guessing.
+        message: t("post.errors.generationFailedWithReason", {
           error: generationResult.message,
         }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -428,43 +430,55 @@ export class ImageGenerationRepository {
     // server-side thread row — the file is owned by the caller's leadId and
     // served only to that lead (browser); inlining as a base64 data URI is
     // forbidden (it blows up the model context on subsequent turns).
-    const scThreadId = toolExecutionContext.threadId;
-    const isIncognito =
-      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
-    if (scThreadId) {
-      try {
-        const imgRes = await fetchImpl(imageUrl);
-        if (!imgRes.ok) {
-          // eslint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
-          throw new Error(`Image fetch failed: ${String(imgRes.status)}`);
-        }
-        const arrayBuf = await imgRes.arrayBuffer();
-        const imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
-        // Detect format from magic bytes (providers often return PNG despite .jpg URL)
-        const magic = imageBuffer.subarray(0, 4);
-        const ext =
-          magic[0] === 0x89 && magic[1] === 0x50
-            ? "png"
-            : magic[0] === 0xff && magic[1] === 0xd8
-              ? "jpeg"
-              : magic[0] === 0x52 && magic[1] === 0x49
-                ? "webp"
-                : "png";
-        const storage = getStorageAdapter();
-        const uploadResult = await storage.uploadFile(imageBuffer, {
-          filename: `generated-image-${Date.now()}.${ext}`,
-          mimeType: `image/${ext}`,
-          threadId: scThreadId,
-          userId: isIncognito ? undefined : user.id,
-          leadId: isIncognito ? user.leadId : undefined,
-        });
-        imageUrl = uploadResult.url;
-      } catch (uploadErr) {
-        logger.error("[ImageGen] Failed to process image, using provider URL", {
-          error:
-            uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
-        });
+    // Standalone calls (CLI, MCP, tool page: no thread) are re-hosted too:
+    // providers like OpenRouter return the image as a base64 data URI, and a
+    // data: URI must never reach a tool result. They get a fresh thread-less
+    // namespace, owned by the account when logged in, by the lead for guests
+    // (same rule as video generation).
+    const scThreadId = toolExecutionContext.threadId ?? crypto.randomUUID();
+    const isLeadOwned = toolExecutionContext.threadId
+      ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
+      : user.isPublic;
+    try {
+      const imgRes = await fetchImpl(imageUrl);
+      if (!imgRes.ok) {
+        // eslint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
+        throw new Error(`Image fetch failed: ${String(imgRes.status)}`);
       }
+      const arrayBuf = await imgRes.arrayBuffer();
+      const imageBuffer = Buffer.from(new Uint8Array(arrayBuf));
+      // Detect format from magic bytes (providers often return PNG despite .jpg URL)
+      const magic = imageBuffer.subarray(0, 4);
+      const ext =
+        magic[0] === 0x89 && magic[1] === 0x50
+          ? "png"
+          : magic[0] === 0xff && magic[1] === 0xd8
+            ? "jpeg"
+            : magic[0] === 0x52 && magic[1] === 0x49
+              ? "webp"
+              : "png";
+      const storage = getStorageAdapter();
+      const uploadResult = await storage.uploadFile(imageBuffer, {
+        filename: `generated-image-${Date.now()}.${ext}`,
+        mimeType: `image/${ext}`,
+        threadId: scThreadId,
+        userId: isLeadOwned ? undefined : user.id,
+        leadId: isLeadOwned ? user.leadId : undefined,
+      });
+      imageUrl = uploadResult.url;
+    } catch (uploadErr) {
+      logger.error("[ImageGen] Failed to process image, using provider URL", {
+        error:
+          uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
+      });
+    }
+    // An inline data URI must never reach a tool result (it floods the model
+    // context on every later turn): no stored file, no result.
+    if (imageUrl.startsWith("data:")) {
+      return fail({
+        message: t("post.errors.generationFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
     }
 
     const finalCreditCost = generationResult.data.creditCost ?? creditCost;
@@ -664,7 +678,9 @@ export class ImageGenerationRepository {
       const providerError = result.data.providerErrorText;
       if (providerError) {
         return fail({
-          message: t("post.errors.generationFailed", { error: providerError }),
+          message: t("post.errors.generationFailedWithReason", {
+            error: providerError,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -691,10 +707,16 @@ export class ImageGenerationRepository {
     // Re-upload from ephemeral storage to the real thread's storage so the
     // file-serving route can find it. Incognito threads have no server-side
     // thread row — the file is owned by the caller's leadId instead.
-    const scThreadId = toolExecutionContext.threadId;
-    const isIncognito =
-      toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
-    if (scThreadId) {
+    // Standalone calls (CLI, MCP, tool page: no thread) are re-hosted too:
+    // providers like OpenRouter return the image as a base64 data URI, and a
+    // data: URI must never reach a tool result. They get a fresh thread-less
+    // namespace, owned by the account when logged in, by the lead for guests
+    // (same rule as video generation).
+    const scThreadId = toolExecutionContext.threadId ?? crypto.randomUUID();
+    const isLeadOwned = toolExecutionContext.threadId
+      ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
+      : user.isPublic;
+    {
       try {
         const storage = getStorageAdapter();
         // The ephemeral URL points to our file-serving API which requires DB thread lookup.
@@ -727,8 +749,8 @@ export class ImageGenerationRepository {
           filename: `generated-image-${Date.now()}.${ext}`,
           mimeType: `image/${ext}`,
           threadId: scThreadId,
-          userId: isIncognito ? undefined : user.id,
-          leadId: isIncognito ? user.leadId : undefined,
+          userId: isLeadOwned ? undefined : user.id,
+          leadId: isLeadOwned ? user.leadId : undefined,
         });
         imageUrl = uploadResult.url;
       } catch (uploadErr) {
@@ -770,8 +792,14 @@ export class ImageGenerationRepository {
       ctx.user && !ctx.user.isPublic && "id" in ctx.user
         ? ctx.user.id
         : undefined;
-    let sel: ImageGenModelSelection | undefined;
-    if (userId) {
+    // The stream already resolved this (client favorite config -> favorite
+    // -> skill -> default) in setup and advertised it in the system prompt.
+    // Re-querying the favorite from the DB diverged whenever the client's
+    // favorite was not a saved row: a different model generated than the
+    // one the user picked. Only stream-less callers re-run the cascade.
+    let sel: ImageGenModelSelection | undefined =
+      ctx.toolExecutionContext.resolvedMediaSelections?.imageGenModelSelection;
+    if (!sel && userId) {
       const { resolveSkillFavoriteContext } =
         await import("../skills/resolver");
       const { ModalityResolver } =
@@ -783,8 +811,6 @@ export class ImageGenerationRepository {
       });
       sel = ModalityResolver.resolveImageGenSelection({ favorite, skill });
     }
-    sel ??=
-      ctx.toolExecutionContext.resolvedMediaSelections?.imageGenModelSelection;
     const model = filterImageGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

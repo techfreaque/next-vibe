@@ -355,8 +355,14 @@ export class MusicGenerationRepository {
       ctx.user && !ctx.user.isPublic && "id" in ctx.user
         ? ctx.user.id
         : undefined;
-    let sel: MusicGenModelSelection | undefined;
-    if (userId) {
+    // The stream already resolved this (client favorite config -> favorite
+    // -> skill -> default) in setup and advertised it in the system prompt.
+    // Re-querying the favorite from the DB diverged whenever the client's
+    // favorite was not a saved row: a different model generated than the
+    // one the user picked. Only stream-less callers re-run the cascade.
+    let sel: MusicGenModelSelection | undefined =
+      ctx.toolExecutionContext.resolvedMediaSelections?.musicGenModelSelection;
+    if (!sel && userId) {
       const { resolveSkillFavoriteContext } =
         await import("../skills/resolver");
       const { ModalityResolver } =
@@ -368,8 +374,6 @@ export class MusicGenerationRepository {
       });
       sel = ModalityResolver.resolveMusicGenSelection({ favorite, skill });
     }
-    sel ??=
-      ctx.toolExecutionContext.resolvedMediaSelections?.musicGenModelSelection;
     const model = filterMusicGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

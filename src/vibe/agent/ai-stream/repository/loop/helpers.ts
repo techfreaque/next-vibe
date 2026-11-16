@@ -6,8 +6,10 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 import type { WidgetData } from "next-vibe/core/utils/json";
+import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 
 import type { ToolCall } from "../../../chat/db";
+import { THREAD_RENAME_ALIAS } from "../../../chat/threads/rename/constants";
 import { IMAGE_GEN_ALIAS } from "../../../image-generation/constants";
 import { AUDIO_GEN_TOOL_NAME } from "../../../music-generation/constants";
 import { VIDEO_GEN_TOOL_NAME } from "../../../video-generation/constants";
@@ -26,6 +28,47 @@ export const FINAL_STEP_INSTRUCTIONS =
   "Provide your final answer now in plain text, based on the results gathered " +
   "so far. If the task could not be completed, state what you found and what " +
   "remains to be done.";
+
+/**
+ * Injected on the forced answer step that follows an endLoop tool call made
+ * before any visible answer (paired with toolChoice:"none"). The model's
+ * tools already ran; without this step the turn ended blank but billed.
+ */
+export const ANSWER_STEP_INSTRUCTIONS =
+  "Your tool calls ran, but you have not written a " +
+  "reply yet (thinking is not visible to the user). Tools are disabled now. " +
+  "Write your reply to the user's last message in plain text, using the tool " +
+  "results above. If a tool failed, say so plainly. Do not mention renaming " +
+  "the thread.";
+
+/**
+ * Whether this stream must end on visible answer text: interactive turns do.
+ * Background task turns (cronTaskId) may legitimately end on a tool call with
+ * no prose, so they keep the plain endLoop stop and the normal charge.
+ */
+export function endLoopNeedsAnswerStep(toolExecutionContext: {
+  cronTaskId?: string;
+}): boolean {
+  return !toolExecutionContext.cronTaskId;
+}
+
+/**
+ * The silent per-turn rename (direct, via execute-tool, or relayed as
+ * `<caller>__rename-thread`). It is housekeeping that rides the answer with
+ * endLoop; when a model fires it BEFORE writing the answer, that endLoop must
+ * not end the turn (prod 11-14..16: blank, billed turns on haiku, gpt, venice,
+ * glm, minimax). Any other endLoop tool keeps its contract: the loop stops.
+ */
+export function isThreadRenameCall(
+  toolName: string,
+  wrappedToolName: string | undefined,
+): boolean {
+  const name = toolName === EXECUTE_TOOL_ALIAS ? wrappedToolName : toolName;
+  return (
+    name !== undefined &&
+    (name === THREAD_RENAME_ALIAS || name.endsWith(`__${THREAD_RENAME_ALIAS}`))
+  );
+}
 
 // AI SDK arrays are readonly - Array.isArray alone does not narrow them out.
 function isJSONArray(value: JSONValue): value is readonly JSONValue[] {

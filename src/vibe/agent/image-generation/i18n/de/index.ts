@@ -124,6 +124,7 @@ export const translations: typeof enTranslations = {
       modelNoReferenceImage:
         "Das Modell {{model}} verarbeitet keine Referenzbilder. Wähle ein Bild-zu-Bild-Modell (dessen Eingaben Bild umfassen), um eine Referenz zu nutzen.",
       generationFailed: "Bildgenerierung fehlgeschlagen",
+      generationFailedWithReason: "Bildgenerierung fehlgeschlagen: {{error}}",
       providerError: "Anbieter-Fehler: {{error}}",
       noImageUrl: "Kein Bild-URL vom Anbieter zurückgegeben",
       noImageGenerated:

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "C1_FAIL:skipped the 'list' query — only 4 of 5 sequential calls were made ('search', 'chat', 'image', 'audio'); all four returned valid results, but the requested sequence wasn't followed and tools are now disabled so it can't be retried.",
+    "encoding_format": "float"
+  }
+}

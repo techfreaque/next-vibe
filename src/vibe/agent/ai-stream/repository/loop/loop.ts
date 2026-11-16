@@ -37,6 +37,7 @@ import {
 } from "ai";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
+import { CallbackMode } from "next-vibe/execute-tool/constants";
 
 import { calculateCreditCost } from "../../../models/models";
 import {
@@ -57,7 +58,7 @@ import {
   finalizeAssistant,
   runAbortHandler,
 } from "./finalize";
-import { DEFAULT_TEMPERATURE } from "./helpers";
+import { DEFAULT_TEMPERATURE, isThreadRenameCall } from "./helpers";
 import { extractMediaPrompt, onFilePart } from "./media-parts";
 import { isContextOverflowText, summarizePromptSize } from "./prompt-size";
 import type {
@@ -241,6 +242,9 @@ export class StreamLoop implements StreamLoopState {
               (
                 (): StopCondition<ToolSet> => () =>
                   ctx.shouldStopLoop ||
+                  // endLoop with the answer already written (SDK-side view,
+                  // set in onStepFinish which the SDK awaits before this).
+                  ctx.sdkEndLoopStop ||
                   ctx.stepHasToolsAwaitingConfirmation ||
                   // execute-tool's confirmation gate sets the flag on the tool
                   // execution context synchronously inside execute() - read it
@@ -269,7 +273,39 @@ export class StreamLoop implements StreamLoopState {
               return prepared;
             },
             onStepFinish: (stepResult): void => {
-              this.onStepFinish(stepResult);
+              // Read here (SDK-typed) so steps.ts stays free of the SDK's
+              // untyped tool input: which calls of this step asked endLoop,
+              // and were they all the silent rename?
+              const endLoopCalls = stepResult.toolCalls.filter(
+                (call) =>
+                  typeof call.input === "object" &&
+                  call.input !== null &&
+                  "callbackMode" in call.input &&
+                  call.input.callbackMode === CallbackMode.END_LOOP,
+              );
+              // Explicit fields, never a spread: the SDK's step result is a
+              // class whose usage/text/files are prototype getters.
+              this.onStepFinish({
+                usage: stepResult.usage,
+                finishReason: stepResult.finishReason,
+                providerMetadata: stepResult.providerMetadata,
+                files: stepResult.files,
+                text: stepResult.text,
+                requestedEndLoop: endLoopCalls.length > 0,
+                endLoopOnlyRename:
+                  endLoopCalls.length > 0 &&
+                  endLoopCalls.every((call) =>
+                    isThreadRenameCall(
+                      call.toolName,
+                      typeof call.input === "object" &&
+                        call.input !== null &&
+                        "toolName" in call.input &&
+                        typeof call.input.toolName === "string"
+                        ? call.input.toolName
+                        : undefined,
+                    ),
+                  ),
+              });
             },
           }
         : {}),
@@ -1042,6 +1078,9 @@ export class StreamLoop implements StreamLoopState {
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
     files?: ReadonlyArray<{ mediaType: string }>;
+    text: string;
+    requestedEndLoop: boolean;
+    endLoopOnlyRename: boolean;
   }): void {
     return onStepFinish(this, stepResult);
   }

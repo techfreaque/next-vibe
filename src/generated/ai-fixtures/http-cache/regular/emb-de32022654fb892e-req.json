@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls came back clean.\n\n## Results\n\n**(1) `category='ai'`** — returned a non-empty tools array of 92 entries, every one carrying a `name` and `description` (threads, folders, favorites, skills, models, refusal-index, moderation, media tools). Paging hint and `totalCount: 591` present.\n\n**(2) `query='search'`** — returned 11 matching tools, each with `name` + `description`: `agent-search-messages`, `agent-search-threads`, `brave-search`, `kagi-search`, `tool-help`, `vibe_agent_chat_threads_threadId_messages_search_GET`, `web-search`, `cortex-search`, `leads-search`, `pos-product-lookup`, `users-list`. Category breakdown (account 1, ai 7, cortex 1, leads 1, pos 1) sums to 11 — internally consistent.\n\n**(3) `toolName='generate_image'`** — detail call returned the tool with `name`, a full `description` (prompt-based generation, optional `inputMediaUrl` for image-to-image, returns `imageUrl`), plus a complete JSON Schema `parameters` object: required `prompt` (1–2000 chars), optional `model` (43-entry enum), optional `inputMediaUrl`. Examples included input and response shapes.\n\nEverything matched the check: both list-style calls returned non-empty arrays with name+description on every entry, and the detail call returned name, description, and a parameters schema. No empty results, errors, or malformed output.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

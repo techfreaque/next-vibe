@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-catalog-checks-and-cortex-write-read-test-b3bf384e-f346-46f7-bf7a-132c6da9103c.md\n\n# Hermes catalog checks and cortex write/read test\nFolder: private\nDescription: Verified the hermes instance tool catalog with three parallel tool-help calls (ai category, search keyword, generate_image schema), confirmed the system prompt runs on atlas while hermes executes tools, then wrote and read back a memory node at /memories/t2-cheap-test containing T2_CHEAP_OK. All che",
+    "encoding_format": "float"
+  }
+}

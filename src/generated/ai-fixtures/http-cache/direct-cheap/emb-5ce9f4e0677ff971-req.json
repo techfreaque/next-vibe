@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Wait-mode call returned inline as expected.\n\n- **responsePath:** `/memories/cb-wait-inline-test` — present and non-empty\n- **no taskId** in the result\n- `created: false` (file already existed from a prior run), `size: 24`\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

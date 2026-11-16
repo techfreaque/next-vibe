@@ -322254,7 +322254,7 @@
     "toolName": "generate_image",
     "title": "Generate Image",
     "titleShort": "Generate Image",
-    "description": "Generate an image from a text prompt. Use list-models with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
+    "description": "Generate an image from a text prompt. Use the models tool with modelType=image to see available models and their capabilities. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for image-to-image generation (uses the URL as a reference/starting point). Returns imageUrl.",
     "fields": {
       "usage": {
         "request": "data",
@@ -322284,7 +322284,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Image generation model id. Leave blank for user default. Use list-models (modelType=image) to browse available models.",
+          "description": "Image generation model id. Leave blank for user default. Use the models tool (modelType=image) to browse available models.",
           "columns": 6,
           "options": [
             {
@@ -322296,34 +322296,6 @@
               "label": "models.names.FLUX_2_MAX"
             },
             {
-              "value": "flux-2-klein-4b",
-              "label": "models.names.FLUX_2_KLEIN_4B"
-            },
-            {
-              "value": "riverflow-v2-pro",
-              "label": "models.names.RIVERFLOW_V2_PRO"
-            },
-            {
-              "value": "riverflow-v2-fast",
-              "label": "models.names.RIVERFLOW_V2_FAST"
-            },
-            {
-              "value": "riverflow-v2-max-preview",
-              "label": "models.names.RIVERFLOW_V2_MAX_PREVIEW"
-            },
-            {
-              "value": "riverflow-v2-standard-preview",
-              "label": "models.names.RIVERFLOW_V2_STANDARD_PREVIEW"
-            },
-            {
-              "value": "riverflow-v2-fast-preview",
-              "label": "models.names.RIVERFLOW_V2_FAST_PREVIEW"
-            },
-            {
-              "value": "flux-2-flex",
-              "label": "models.names.FLUX_2_FLEX"
-            },
-            {
               "value": "flux-2-pro",
               "label": "models.names.FLUX_2_PRO"
             },
@@ -322332,20 +322304,12 @@
               "label": "models.names.SEEDREAM_4_5"
             },
             {
-              "value": "gen4-t2i-turbo",
-              "label": "models.names.GEN4_T2I_TURBO"
-            },
-            {
               "value": "gen4-image",
               "label": "models.names.GEN4_IMAGE"
             },
             {
               "value": "wan-2.7-t2i",
               "label": "models.names.WAN_2_7_T2I"
-            },
-            {
-              "value": "grok-t2i",
-              "label": "models.names.GROK_T2I"
             },
             {
               "value": "z-image-base",
@@ -322358,26 +322322,6 @@
             {
               "value": "flux-pro-1.1-ultra",
               "label": "models.names.FLUX_PRO_1_1_ULTRA"
-            },
-            {
-              "value": "imagen-4-ultra",
-              "label": "models.names.IMAGEN_4_ULTRA"
-            },
-            {
-              "value": "imagen-4",
-              "label": "models.names.IMAGEN_4"
-            },
-            {
-              "value": "imagen-4-fast",
-              "label": "models.names.IMAGEN_4_FAST"
-            },
-            {
-              "value": "qwen-t2i",
-              "label": "models.names.QWEN_T2I"
-            },
-            {
-              "value": "realtime-t2i",
-              "label": "models.names.REALTIME_T2I"
             },
             {
               "value": "grok-imagine-image-2",
@@ -322746,7 +322690,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Reference Image URL",
-          "description": "Image URL for image-to-image generation. The model animates or transforms from this image. Only works with models that support image input.",
+          "description": "Image URL for image-to-image generation. The model edits or restyles this image. Only works with models that support image input.",
           "columns": 12,
           "placeholder": "https://example.com/image.jpg",
           "schema": {
@@ -325649,7 +325593,7 @@
     "toolName": "generate_music",
     "title": "Generate Music",
     "titleShort": "Generate Music",
-    "description": "Generate music from a text prompt. Use list-models with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
+    "description": "Generate music from a text prompt. Use the models tool with modelType=audio to see available music models. Pass model id to select a specific model, or leave blank for the user's default. Optionally pass inputMediaUrl for audio-to-audio style transfer. Returns audioUrl and durationSeconds.",
     "fields": {
       "usage": {
         "request": "data",
@@ -325679,7 +325623,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Music generation model id. Leave blank for user default. Use list-models (modelType=audio) to browse available models.",
+          "description": "Music generation model id. Leave blank for user default. Use the models tool (modelType=audio) to browse available models.",
           "columns": 6,
           "options": [
             {
@@ -553696,7 +553640,7 @@
     "toolName": "generate_video",
     "title": "Generate Video",
     "titleShort": "Generate Video",
-    "description": "Generate a video from a text prompt. Use list-models (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
+    "description": "Generate a video from a text prompt. Use the models tool (modelType=video) to see all video models with their capabilities: supportedDurations (valid clip lengths in seconds), supportedAspectRatios, supportedFrameImages (first_frame/last_frame = image-to-video support). Pass frameReferences to steer the video: role 'first' pins the opening frame and role 'last' pins the closing frame — both MUST be image URLs (only on models with last_frame support); role 'reference' (or no role) feeds a guiding image, audio, or video asset. Pass negativePrompt on models that support it. Returns videoUrl.",
     "fields": {
       "usage": {
         "request": "data",
@@ -553726,7 +553670,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Model",
-          "description": "Video model id. Leave blank for user default. Use list-models (modelType=video) to browse models and their capabilities.",
+          "description": "Video model id. Leave blank for user default. Use the models tool (modelType=video) to browse models and their capabilities.",
           "columns": 12,
           "options": [],
           "schema": {
@@ -569677,7 +569621,7 @@
     "toolName": "tool-help",
     "title": "Tool Help - Discover Available Tools",
     "titleShort": "Tool Help",
-    "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+    "description": "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100.",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -569871,7 +569815,7 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Page Size",
-          "description": "Number of results per page. AI/MCP default: 25. Web/CLI default: 200. Max: 500.",
+          "description": "Number of results per page. AI/MCP default: 100. Web/CLI default: 800. Max: 1000.",
           "columns": 3,
           "schema": {
             "def": {

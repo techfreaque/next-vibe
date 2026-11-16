@@ -946,6 +946,21 @@ export function upstreamCostToCredits(costUsd: number): number {
   return Math.round(rounded * 10) / 10;
 }
 
+/**
+ * Strip the platform markup from a turn charge: what is left is the provider's
+ * real cost in credits. Used for a turn that delivered no answer (empty or
+ * reasoning-only output): the provider still charged for the tokens, the
+ * platform waives its own share. Rounded UP to 0.01 credit, zero stays zero.
+ */
+export function creditsWithoutPlatformMarkup(credits: number): number {
+  if (!(credits > 0)) {
+    return 0;
+  }
+  const providerCredits = credits / (1 + STANDARD_MARKUP_PERCENTAGE);
+  const rounded = Math.ceil(providerCredits * 100 - 1e-9) / 100;
+  return Math.round(rounded * 100) / 100;
+}
+
 export function calculateCreditCost(
   modelOption: CreditCostInput,
   actualInputTokens: number,

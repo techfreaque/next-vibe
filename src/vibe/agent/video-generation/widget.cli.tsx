@@ -72,3 +72,7 @@ export function VideoGenerationWidget({ field }: CliWidgetProps): JSX.Element {
 }
 
 VideoGenerationWidget.cliWidget = true as const;
+
+// The definition lazy-loads "./widget" by this name; on CLI/MCP that resolves
+// to this file, so without the alias the renderer got undefined and crashed.
+export { VideoGenerationWidget as VideoGenerationContainer };

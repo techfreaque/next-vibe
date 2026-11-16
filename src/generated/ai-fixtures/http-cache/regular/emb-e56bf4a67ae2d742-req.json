@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-help-catalog-checks--category--search--schema-558b5733-9249-4aab-a9a5-2dfcfbdddc5c.md\n\n# Tool-help catalog checks: category, search, schema\nFolder: private\nDescription: Ran three parallel tool-help calls to audit the tool catalog: category='ai', query='search', and toolName='generate_image'. All three returned non-empty results with name and description on every entry, and the generate_image detail call returned a full parameters schema. Flagged several user-facing",
+    "encoding_format": "float"
+  }
+}

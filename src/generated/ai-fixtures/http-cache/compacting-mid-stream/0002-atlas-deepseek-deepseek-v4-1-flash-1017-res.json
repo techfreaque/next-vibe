@@ -1,0 +1,35 @@
+{
+  "type": "sse",
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache",
+    "cf-ray": "a5b80eac0d569f11-FRA",
+    "connection": "keep-alive",
+    "content-type": "text/event-stream",
+    "date": "Mon, 16 Nov 2026 17:01:23 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "x-generation-id": "gen-1794848483-UOaihk3lmmGOYEkfqTog",
+    "x-openrouter-release": "api;efcfad22-1eb0-45a4-8cc9-7e4a381d9ff0",
+    "set-cookie": "__cf_bm=gwAzCwAAr6ZolrYLQTJfqDS2ZOTBpBMG3hMSOBVy3Zs-1794848483.2057266-1.0.1.1-1lARybcxe4FfIN7eK4E3p.aGmFTzuNAeLIPssNHsYjKFQ3AWy9WclPNEsGVPONTmyxeNKiZM.I8BnUcZELgXUTyh8NIlYq78Uk2TovzWIENwv0lzna1dLoNYhEd5vEFh; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Mon, 16 Nov 2026 17:31:23 GMT"
+  },
+  "events": [
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call-e76363b0-8d50-4f5c-b380-cd49a25d73bb\",\"type\":\"function\",\"function\":{\"name\":\"execute-tool\",\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\\\"callbackMode\\\":\\\"wait\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"input\\\":{\\\"query\\\":\\\"search\\\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\\\"toolName\\\":\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"tool-help\\\"\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":null,\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null,\"native_finish_reason\":null}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}]}",
+    "data: {\"id\":\"gen-1794848483-UOaihk3lmmGOYEkfqTog\",\"object\":\"chat.completion.chunk\",\"created\":1794848483,\"model\":\"deepseek/deepseek-v4.1-flash-1017\",\"provider\":\"Morph\",\"service_tier\":null,\"choices\":[{\"index\":0,\"delta\":{\"content\":\"\",\"role\":\"assistant\"},\"finish_reason\":\"tool_calls\",\"native_finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":9025,\"completion_tokens\":80,\"total_tokens\":9105,\"cost\":0.00068135,\"is_byok\":false,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0,\"audio_tokens\":0,\"video_tokens\":0},\"cost_details\":{\"upstream_inference_cost\":0.00068135,\"upstream_inference_prompt_cost\":0.00063175,\"upstream_inference_completions_cost\":0.0000496},\"completion_tokens_details\":{\"reasoning_tokens\":0,\"image_tokens\":0,\"audio_tokens\":0}}}",
+    "data: [DONE]"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I invoked `generate_image` with prompt='red circle', but the call did not produce an image.\n\n**What happened:**\n\nThe tool returned a 403 `consent_required` error:\n\n> Chroma is uncensored. One-time confirmation needed: you are 18+ and accept that uncensored models can produce offensive, false, dangerous, illegal or malicious content, unfiltered. A human confirms this in the chat, or runs: `vibe uncensored-consent-agree --confirm=true`\n\n**Result:** No `imageUrl`, no `creditCost` — the generation never ran. The default model (Chroma) is an uncensored model that requires a one-time 18+ consent confirmation before it will execute.\n\nThis is a real blocker for the requested check: the tool could not be evaluated for a non-empty `imageUrl` and positive `creditCost` because it refused to run pending consent.\n\nFAILED: generate_image returned a 403 consent_required error (Chroma uncensored model needs one-time 18+ confirmation) — no imageUrl and no creditCost produced, so the result could not be validated.",
+    "encoding_format": "float"
+  }
+}

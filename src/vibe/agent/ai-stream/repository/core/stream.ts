@@ -115,6 +115,28 @@ export class ToolExecutionContextImpl {
   // Loop control - set to true when model requests to stop the tool loop
   shouldStopLoop = false;
 
+  /** Consumer side: true once this turn streamed visible answer text
+   *  (non-whitespace text-delta; reasoning does not count). A turn that ends
+   *  without it is an empty answer: see finalize.complete(). */
+  turnHasAnswerText = false;
+  /** Consumer side: the CURRENT step streamed visible answer text. Reset at
+   *  every finish-step. A step that fires the rename+endLoop without it has
+   *  no answer after the last tool results (text of an earlier step came
+   *  BEFORE those results), so the turn would end on a blank bubble. */
+  stepHasAnswerText = false;
+  /** Consumer side: an endLoop tool call arrived before any answer text, so
+   *  the loop was NOT stopped - the SDK side forces one text-only answer step
+   *  instead (see onStepFinish / prepareStep). Cleared at that step's finish. */
+  endLoopAwaitingAnswer = false;
+  /** SDK side: endLoop was requested and the turn already has its answer, so
+   *  stopWhen ends the loop. */
+  sdkEndLoopStop = false;
+  /** SDK side: the next step is a forced text-only answer step (endLoop came
+   *  before any answer). Consumed by prepareStep. */
+  forceAnswerNextStep = false;
+  /** SDK side: the forced answer step was already granted once this turn. */
+  forcedAnswerStepUsed = false;
+
   /** Text of the last provider `error` stream part (already logged, classified
    *  transient/real, where it arrived). finalize uses it to avoid re-logging a
    *  finishReason=error that carries no detail of its own. */

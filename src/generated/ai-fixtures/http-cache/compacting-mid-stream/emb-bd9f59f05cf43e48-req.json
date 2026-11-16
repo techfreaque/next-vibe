@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "I made 4 of the 5 calls — `search`, `chat`, `image`, `audio` — and skipped the first one, `list`. So I can't honestly give you the required `COMPACT_DONE`.\n\n**What happened:** The first `tool-help` call in the sequence never ran. Calls 2–5 all returned normally (11, 43, 6, and 3 matches respectively), so the tool itself is fine — the miss was mine, on the ordering.\n\n**Severity:** MINOR for the platform, but it invalidates the test result — the compacting run didn't complete the specified sequence.\n\nSay the word and I'll rerun all five in order, starting with `list`.",
+    "encoding_format": "float"
+  }
+}

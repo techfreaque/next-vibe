@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls ran in parallel against **hermes** and came back clean.\n\n## 1. `category: 'ai'` — 12 tools\n\n`matchedCount: 12`, non-empty `tools` array, every entry has a `name` + `description`:\n\n| Tool | Sub-category |\n|---|---|\n| `ai-stream` | — |\n| `chat-settings` | chatSettings |\n| `coding-agent` | Tools |\n| `favorites` | — |\n| `generate_image` | Generation |\n| `generate_music` | Generation |\n| `generate_video` | Generation |\n| `skills` | — |\n| `text-to-speech` | Generation |\n| `transcribe_audio` | Generation |\n| `vibe_agent_chat_public-feed_GET` | — |\n| `web-search` | Search |\n\nThe `subCategories` breakdown (4 + 1 + 5 + 1 + 1) sums to 12, so the category is internally consistent.\n\n## 2. `query: 'search'` — 2 tools\n\n`matchedCount: 2`:\n\n- **`users-list`** (account) — matched on its description (\"Search, filter by revenue, activity, signup date or source…\")\n- **`web-search`** (ai) — the actual search tool, `credits: 0.65`\n\nThe per-category counts in this response (`account: 1`, `ai: 1`) reflect only this search's matches, as expected.\n\n## 3. `toolName: 'generate_image'` — full schema\n\nReturned a single tool with everything required:\n\n- **name:** `generate_image`\n- **description:** text-to-image generation, optional `inputMediaUrl` for image-to-image, returns `imageUrl`\n- **parameters schema:** `prompt` (required, 1–2000 chars), `model` (42-entry enum), `quality` (standard/hd), `size` (square1024 / landscape1792 / portrait1792), `aspectRatio`, `inputMediaUrl`\n- **examples:** default input + a sample response with `creditCost: 4` and an `imageUrl`\n\nAll three results were well-formed, non-empty, and matched the shapes you described. Nothing broken, nothing missing.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

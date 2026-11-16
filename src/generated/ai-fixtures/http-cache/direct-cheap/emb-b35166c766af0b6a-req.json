@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Write and read-back both succeeded on **hermes**.\n\n- `cortex-write` → `/memories/t2-cheap-test`, size 11 bytes, `created: false` (node already existed and was overwritten with the new content)\n- `cortex-read` → content is exactly `T2_CHEAP_OK`, `truncated: false`, `readonly: false`\n\nContent verified byte-for-byte.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

@@ -6,7 +6,7 @@ export const translations = {
     title: "Tool Help - Discover Available Tools",
     titleShort: "Tool Help",
     description:
-      "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
+      "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 100.",
     tags: {
       tools: "tools",
     },
@@ -39,7 +39,7 @@ export const translations = {
       pageSize: {
         label: "Page Size",
         description:
-          "Number of results per page. AI/MCP default: 25. Web/CLI default: 200. Max: 500.",
+          "Number of results per page. AI/MCP default: 100. Web/CLI default: 800. Max: 1000.",
         title: "Effective page size",
       },
       tools: {

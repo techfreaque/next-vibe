@@ -99,9 +99,34 @@ async function closeLongRunningPool(logger: EndpointLogger): Promise<void> {
 
 let databaseClosed = false;
 
+/**
+ * Fire-and-forget DB work (e.g. the balance broadcast after a credit charge)
+ * that must finish before the pool closes. A short-lived process (CLI, MCP
+ * call) otherwise ends the pool under it: "Cannot use a pool after calling
+ * end on the pool".
+ */
+const pendingDbWork = new Set<Promise<void>>();
+const PENDING_DB_WORK_DRAIN_MS = 3000;
+
+export function trackPendingDbWork(work: Promise<void>): void {
+  pendingDbWork.add(work);
+  void (async (): Promise<void> => {
+    await Promise.allSettled([work]);
+    pendingDbWork.delete(work);
+  })();
+}
+
 export async function closeDatabase(logger: EndpointLogger): Promise<void> {
   if (databaseClosed) {
     return;
+  }
+  if (pendingDbWork.size > 0) {
+    await Promise.race([
+      Promise.allSettled([...pendingDbWork]),
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, PENDING_DB_WORK_DRAIN_MS);
+      }),
+    ]);
   }
   await closeLongRunningPool(logger);
   if (rawPool.ending || rawPool.ended) {

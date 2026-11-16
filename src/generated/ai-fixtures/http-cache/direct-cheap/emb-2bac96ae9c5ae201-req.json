@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `favorites` call on hermes succeeded and returned a non-empty `favorites` array — 33 entries, matching the expected count.\n\nEach entry has the expected shape: `id`, `name`, `description`, `skillId`, `modelId`, `modelInfo`, `modelProvider`, `icon`, `tagline`, `position`, `voiceId`. The list includes the Thea variants, Vibe Coder variants, Quality Tester favorites, the Technical favorites, Business Advisor variants, and Test Chef Bot.\n\nOne minor note: the pagination fields (`currentPage`, `matchedCount`, `totalCount`, `totalPages`) all came back `null`. That's harmless here since the full list was returned in one shot, but it means the endpoint doesn't expose a total count.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

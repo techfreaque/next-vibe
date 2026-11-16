@@ -154,12 +154,15 @@ export function MusicGenerationContainer({
           modelSelection={workingSelection ?? modelSelection}
           onChange={(sel) => setWorkingSelection(sel ?? undefined)}
           onSelect={(sel) => {
-            if (
-              sel !== null &&
-              sel.selectionType === ModelSelectionType.MANUAL
-            ) {
+            if (sel !== null) {
+              // A filter pick used to be dropped silently, so the default
+              // model generated instead of the one the selector showed.
+              const pickedId =
+                sel.selectionType === ModelSelectionType.MANUAL
+                  ? sel.manualModelId
+                  : getBestMusicGenModel(sel, user, availability)?.id;
               const modelId = Object.values(MusicGenModelId).find(
-                (id) => id === sel.manualModelId,
+                (id) => id === pickedId,
               );
               if (modelId !== undefined) {
                 form?.setValue("model", modelId);

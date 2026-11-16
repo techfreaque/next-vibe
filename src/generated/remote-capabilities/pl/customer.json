@@ -54965,34 +54965,6 @@
               "label": "models.names.FLUX_2_MAX"
             },
             {
-              "value": "flux-2-klein-4b",
-              "label": "models.names.FLUX_2_KLEIN_4B"
-            },
-            {
-              "value": "riverflow-v2-pro",
-              "label": "models.names.RIVERFLOW_V2_PRO"
-            },
-            {
-              "value": "riverflow-v2-fast",
-              "label": "models.names.RIVERFLOW_V2_FAST"
-            },
-            {
-              "value": "riverflow-v2-max-preview",
-              "label": "models.names.RIVERFLOW_V2_MAX_PREVIEW"
-            },
-            {
-              "value": "riverflow-v2-standard-preview",
-              "label": "models.names.RIVERFLOW_V2_STANDARD_PREVIEW"
-            },
-            {
-              "value": "riverflow-v2-fast-preview",
-              "label": "models.names.RIVERFLOW_V2_FAST_PREVIEW"
-            },
-            {
-              "value": "flux-2-flex",
-              "label": "models.names.FLUX_2_FLEX"
-            },
-            {
               "value": "flux-2-pro",
               "label": "models.names.FLUX_2_PRO"
             },
@@ -55001,20 +54973,12 @@
               "label": "models.names.SEEDREAM_4_5"
             },
             {
-              "value": "gen4-t2i-turbo",
-              "label": "models.names.GEN4_T2I_TURBO"
-            },
-            {
               "value": "gen4-image",
               "label": "models.names.GEN4_IMAGE"
             },
             {
               "value": "wan-2.7-t2i",
               "label": "models.names.WAN_2_7_T2I"
-            },
-            {
-              "value": "grok-t2i",
-              "label": "models.names.GROK_T2I"
             },
             {
               "value": "z-image-base",
@@ -55027,26 +54991,6 @@
             {
               "value": "flux-pro-1.1-ultra",
               "label": "models.names.FLUX_PRO_1_1_ULTRA"
-            },
-            {
-              "value": "imagen-4-ultra",
-              "label": "models.names.IMAGEN_4_ULTRA"
-            },
-            {
-              "value": "imagen-4",
-              "label": "models.names.IMAGEN_4"
-            },
-            {
-              "value": "imagen-4-fast",
-              "label": "models.names.IMAGEN_4_FAST"
-            },
-            {
-              "value": "qwen-t2i",
-              "label": "models.names.QWEN_T2I"
-            },
-            {
-              "value": "realtime-t2i",
-              "label": "models.names.REALTIME_T2I"
             },
             {
               "value": "grok-imagine-image-2",
@@ -283061,7 +283005,7 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Rozmiar strony",
-          "description": "Liczba wyników na stronie. AI/MCP domyślnie: 25. Web/CLI: 200.",
+          "description": "Liczba wyników na stronie. AI/MCP domyślnie: 100. Web/CLI: 800.",
           "columns": 3,
           "schema": {
             "def": {

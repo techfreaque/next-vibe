@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/compacting-test--five-sequential-tool-help-calls-3244f58a-7a60-439a-bfb2-e83ef815e1b4.md\n\n# Compacting Test: Five Sequential Tool-Help Calls\nFolder: private\nDescription: User ran a mid-stream context compacting test with padding text and asked for five sequential tool-help calls using the queries list, search, chat, image, and audio. All five completed successfully, and the final response was required to be exactly COMPACT_DONE.",
+    "encoding_format": "float"
+  }
+}

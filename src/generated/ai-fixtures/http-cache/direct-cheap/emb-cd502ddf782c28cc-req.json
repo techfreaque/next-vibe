@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Favorites listed fine — the `favorites` array came back populated with 34 entries, each carrying name, description, tagline, model info, and skillId.\n\nBut two things are off:\n\n**1. Raw UUID as a favorite ID.** Most favorites use readable slugs (`thea-elon-tusk`, `vibe-coder-fast`, `my-technical`), but one — the \"Quality Tester\" with `skillId: quality-tester__kimi` — has `id: \"2c64735c-cddc-4dd9-813f-880d2f2e4648\"`. That's an internal identifier leaking into user-facing data where every sibling entry has a human-readable slug.\n\n**2. Earlier wakeUp call didn't actually detach.** In the previous turn the `cortex-write` with `callbackMode: \"wakeUp\"` returned its full result inline (`{\"created\":false,\"responsePath\":\"/memories/cb-wakeup-test\",\"size\":19,...}`) with no `taskId`. Per the test's own phase-1 definition that's a failure — I should have flagged it then instead of saying WAKEUP_OK. A wakeUp call is supposed to dispatch and hand back a taskId, not run synchronously.\n\nFAILED: wakeUp-mode cortex-write returned a full inline result with responsePath instead of a taskId-only dispatch (phase 1 violated); and the favorites list contains a raw UUID id (\"2c64735c-cddc-4dd9-813f-880d2f2e4648\") among otherwise slug-based favorite ids.",
+    "encoding_format": "float"
+  }
+}

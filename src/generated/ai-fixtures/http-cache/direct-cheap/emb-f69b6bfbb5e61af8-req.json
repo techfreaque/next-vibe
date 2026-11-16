@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-tool--credits--and-favorites-verification-b3bf384e-f346-46f7-bf7a-132c6da9103c.md\n\n# Hermes tool, credits, and favorites verification\nFolder: private\nDescription: Quality-gate run across the hermes instance: verified the tool catalog with parallel tool-help calls (ai category, search keyword, generate_image schema), confirmed the system prompt runs on atlas while tools execute on hermes, exercised a fork branch, read the wallet balance (20041.6 total), and li",
+    "encoding_format": "float"
+  }
+}

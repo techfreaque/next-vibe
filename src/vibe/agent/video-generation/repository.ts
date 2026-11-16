@@ -477,8 +477,14 @@ export class VideoGenerationRepository {
       ctx.user && !ctx.user.isPublic && "id" in ctx.user
         ? ctx.user.id
         : undefined;
-    let sel: VideoGenModelSelection | undefined;
-    if (userId) {
+    // The stream already resolved this (client favorite config -> favorite
+    // -> skill -> default) in setup and advertised it in the system prompt.
+    // Re-querying the favorite from the DB diverged whenever the client's
+    // favorite was not a saved row: a different model generated than the
+    // one the user picked. Only stream-less callers re-run the cascade.
+    let sel: VideoGenModelSelection | undefined =
+      ctx.toolExecutionContext.resolvedMediaSelections?.videoGenModelSelection;
+    if (!sel && userId) {
       const { resolveSkillFavoriteContext } =
         await import("../skills/resolver");
       const { ModalityResolver } =
@@ -490,8 +496,6 @@ export class VideoGenerationRepository {
       });
       sel = ModalityResolver.resolveVideoGenSelection({ favorite, skill });
     }
-    sel ??=
-      ctx.toolExecutionContext.resolvedMediaSelections?.videoGenModelSelection;
     const model = filterVideoGenModels(sel, ctx.user, availability)[0]?.id;
     if (!model) {
       return {};

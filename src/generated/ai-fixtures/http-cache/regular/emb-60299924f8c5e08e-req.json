@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls returned clean, non-empty payloads — but the catalog has some user-facing problems.\n\n## Results\n\n**(1) `category='ai'`** → 92 tools, every entry has a `name` + `description`.\n\n**(2) `query='search'`** → 11 tools, every entry has a `name` + `description` (plus `category`, which call 1's entries omit).\n\n**(3) `toolName='generate_image'`** → returned with `name`, `description`, and a full `parameters` JSON schema (`prompt` required, optional `model` enum of 44 ids, optional `inputMediaUrl`), plus example input/response.\n\n## What's off\n\n- **Internal API route names are exposed as user-facing tool names.** The `ai` category contains entries like `vibe_agent_chat_threads_threadId_messages_messageId_vote_POST` and `vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET` — raw route paths with camelCase path parameters (`threadId`, `messageId`, `subFolderId`) and HTTP verbs baked into the tool name. These are raw internal identifiers surfaced directly to users and the model, and they're indistinguishable from the clean names (`rename-thread`, `favorites`) sitting right beside them.\n- **`tool-help`'s own description contradicts its behaviour.** It states \"Default page size for AI/MCP is 25\" and \"Supports pagination via page/pageSize\", yet `category='ai'` returned all 92 tools in one unpaginated response. The documented contract and the actual response don't match.\n- **`generate_image`'s description points at a tool name that doesn't exist.** It says \"Use list-models with modelType=image\" — the tool is named `models`; `list-models` is only an alias. Same phrasing is repeated in the `model` parameter description.\n- **`generate_image`'s `inputMediaUrl` uses video terminology.** It reads \"The model animates or transforms from this image\" — \"animates\" is copied from the video tool; an image tool transforms, it doesn't animate.\n- **Inconsistent entry shape within a single result array.** In call 1, most entries carry a `title`, but `describe_image`, `descri",
+    "encoding_format": "float"
+  }
+}

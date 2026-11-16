@@ -22,7 +22,11 @@ import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import { QueueRegistry } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
 import { injectPendingWakeUpResults } from "../revival/revival";
-import { FINAL_STEP_INSTRUCTIONS } from "./helpers";
+import {
+  ANSWER_STEP_INSTRUCTIONS,
+  endLoopNeedsAnswerStep,
+  FINAL_STEP_INSTRUCTIONS,
+} from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
   billsUpstreamCost,
@@ -74,6 +78,18 @@ export async function onFinishStep(
     );
     return { shouldAbort: true };
   }
+
+  // A rename+endLoop in a step without answer text (see onToolCall): the stop
+  // was deferred so the SDK runs a forced answer step. If answer text streamed
+  // AFTER the tool call within the same step, the step is answered after all:
+  // stop now, exactly like a normal endLoop.
+  if (ctx.endLoopAwaitingAnswer && ctx.pendingToolMessages.size === 0) {
+    ctx.endLoopAwaitingAnswer = false;
+    if (ctx.stepHasAnswerText) {
+      ctx.shouldStopLoop = true;
+    }
+  }
+  ctx.stepHasAnswerText = false;
 
   // endLoop: abort only when no more tool-calls are pending (supports sequential tool calls).
   // shouldStopLoop persists across steps - once set it stays true until abort.
@@ -226,6 +242,25 @@ export async function prepareStep(
   // Step 0 = initial request, already has fresh context from stream-setup
   if (stepNumber === 0) {
     return finalStepGuard.toolChoice ? finalStepGuard : {};
+  }
+
+  // endLoop fired before any answer text (decided in onStepFinish, which the
+  // SDK awaits before calling prepareStep): run ONE text-only answer step so
+  // the user gets a reply instead of a blank, billed turn.
+  if (state.p.ctx.forceAnswerNextStep) {
+    state.p.ctx.forceAnswerNextStep = false;
+    state.p.ctx.forcedAnswerStepUsed = true;
+    state.p.logger.info(
+      "[prepareStep] Forcing a text-only answer step after an unanswered endLoop",
+      { stepNumber, threadId: state.p.threadId, model: state.p.model },
+    );
+    const answerMessages = JSON.parse(
+      JSON.stringify([
+        ...stepMessages,
+        { role: "system", content: ANSWER_STEP_INSTRUCTIONS },
+      ]),
+    ) as ModelMessage[];
+    return { messages: answerMessages, toolChoice: "none" };
   }
 
   // Runs before cortex refresh so the refreshed context is applied
@@ -584,9 +619,32 @@ export function onStepFinish(
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
     files?: ReadonlyArray<{ mediaType: string }>;
+    /** Visible text of this step (reasoning excluded). */
+    text: string;
+    /** This step called a tool with callbackMode endLoop. */
+    requestedEndLoop: boolean;
+    /** Every endLoop call of this step was the silent rename-thread. */
+    endLoopOnlyRename: boolean;
   },
 ): void {
   const { ctx, modelConfig } = state.p;
+
+  // SDK-ordered endLoop decision (onStepFinish -> stopWhen -> prepareStep).
+  // Judged per STEP: text of an earlier step came before this step's tool
+  // results, so it is not the answer the turn ends on (prod + route T1:
+  // answer, then a lone rename step -> blank final bubble).
+  if (stepResult.requestedEndLoop) {
+    if (
+      stepResult.endLoopOnlyRename &&
+      stepResult.text.trim().length === 0 &&
+      !ctx.forcedAnswerStepUsed &&
+      endLoopNeedsAnswerStep(state.p.toolExecutionContext)
+    ) {
+      ctx.forceAnswerNextStep = true;
+    } else {
+      ctx.sdkEndLoopStop = true;
+    }
+  }
   const inputTokens = stepResult.usage.inputTokens ?? 0;
   const outputTokens = stepResult.usage.outputTokens ?? 0;
   const cachedInputTokens =

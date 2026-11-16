@@ -14,7 +14,7 @@ export const translations = {
     titleShort: "Text to Speech",
     dynamicTitle: "Speech: {{text}}",
     description:
-      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: per character at the chosen voice's own rate (see list-models). Returns audioUrl.",
+      "Convert text to speech. Pass text and a voice id. Use the models tool (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: per character at the chosen voice's own rate (see the models tool). Returns audioUrl.",
     form: {
       title: "Text to Speech Conversion",
       description: "Enter text to convert to speech",
@@ -27,7 +27,7 @@ export const translations = {
     voice: {
       label: "Voice",
       description:
-        "Voice model id. Use list-models (modelType=audio) to browse available voices and their ids.",
+        "Voice model id. Use the models tool (modelType=audio) to browse available voices and their ids.",
     },
     download: "Download",
     response: {

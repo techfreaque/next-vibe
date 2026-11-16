@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "All three calls completed and returned usable data.\n\n## What came back\n\n**(1) `category='ai'`** — 92 tools, every entry with a `name` and `description`.\n\n**(2) `query='search'`** — 11 tools, every entry with a `name` and `description`.\n\n**(3) `toolName='generate_image'`** — full detail: name, description, complete `parameters` schema (`prompt` required; optional `model` enum with 44 ids; optional `inputMediaUrl`), plus example input and response.\n\n## What's off\n\n- **Raw internal API routes are exposed as tool names.** The `ai` category contains entries like `vibe_agent_chat_threads_threadId_messages_messageId_vote_POST` and `vibe_agent_chat_folders_subfolders_subFolderId_permissions_GET` — HTTP verbs and camelCase path parameters baked straight into names the user sees, sitting right next to clean ones like `rename-thread`.\n\n- **`tool-help` contradicts its own description.** It advertises \"Default page size for AI/MCP is 25\" and pagination via `page`/`pageSize`, but `category='ai'` returned all 92 tools in one unpaginated response.\n\n- **`generate_image` points at a tool name that doesn't exist.** Its description says \"Use list-models with modelType=image\" — the tool is `models`; `list-models` is only an alias. The same wrong name is repeated in the `model` parameter description.\n\n- **`generate_image.inputMediaUrl` uses video wording.** \"The model animates or transforms from this image\" — \"animates\" was copied over from the video tool.\n\n- **Inconsistent entry shapes.** Several entries (`describe_image`, `describe_video`, `generate_image`, `generate_music`, `generate_video`, `models`) have no `title`, while their neighbours do. Call 2's entries carry a `category` field that call 1's entries lack.\n\nNone of these blocked the calls — all three returned correct, complete data — but the raw route names shouldn't be reaching a user at all.\n\nFAILED: `ai` category exposes raw internal API route names with path parameters as user-facing tool names (e.g. `vibe_agent_chat_thread",
+    "encoding_format": "float"
+  }
+}

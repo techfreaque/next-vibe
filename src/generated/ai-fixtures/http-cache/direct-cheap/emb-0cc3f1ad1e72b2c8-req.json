@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-quality-gate--tools--credits--favorites--de-e2c9d264-94f0-4e16-ac22-61f01225a449.md\n\n# Hermes quality-gate: tools, credits, favorites, detach\nFolder: private\nDescription: Quality-gate run against the hermes instance: parallel tool-help calls (ai category, search keyword, generate_image schema), confirmation that the loop runs on atlas while tools execute on hermes, a fork branch, the wallet balance (60041.6 total = 60000 permanent + 41.6 free), the favorites list (33",
+    "encoding_format": "float"
+  }
+}
