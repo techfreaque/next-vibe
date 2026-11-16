@@ -16,6 +16,14 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    musicVoice: {
+      title:
+        "Muzyka AI, głosy AI i transkrypcja. Który model do jakiej roboty.",
+      category: "Poradnik",
+      excerpt:
+        "Piosenki, bity, lektor i transkrypcje na jednym saldzie. Każdy model muzyczny, każdy głos i każdy model transkrypcji obok siebie, z prawdziwą ceną za klip, za minutę i za godzinę. Do tego szczera odpowiedź, czy jest tu alternatywa dla Suno.",
+      readTime: "11 min czytania",
+    },
     videoGenerators: {
       title:
         "Generatory wideo AI w porównaniu. Kling, Seedance, Veo, Wan i inne.",

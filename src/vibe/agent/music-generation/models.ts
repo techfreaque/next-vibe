@@ -173,7 +173,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.ELEVENLABS_MUSIC]: {
     name: "ElevenLabs Music",
-    by: "elevenLabs",
+    by: "elevenlabs",
     description: "chat.models.descriptions.modelsLabElevenlabsMusic",
     parameterCount: undefined,
     contextWindow: 0,

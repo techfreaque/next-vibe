@@ -84,7 +84,7 @@ export const translations: typeof enTranslations = {
         description: "Ein Konflikt ist aufgetreten",
       },
       noTtsProviderConfigured:
-        "Kein Sprachausgabe-Anbieter konfiguriert. Hinterlege OPENAI_API_KEY, EDEN_AI_API_KEY oder ELEVENLABS_API_KEY – oder verbinde einen System-Inferenzanbieter.",
+        "Kein Sprachausgabe-Anbieter konfiguriert. Hinterlege OPENAI_API_KEY, EDEN_AI_API_KEY oder ELEVENLABS_API_KEY oder verbinde einen System-Inferenzanbieter.",
       notConfigured:
         "{{label}} API-Schlüssel nicht konfiguriert. Fügen Sie {{envKey}}=<ihr-schlüssel> zu Ihrer .env-Datei hinzu. Holen Sie sich Ihren Schlüssel auf {{url}}",
       conversionFailed: "Sprachsynthese fehlgeschlagen: {{error}}",
@@ -117,16 +117,24 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
-      openaiAlloy: "OpenAI Alloy",
-      openaiNova: "OpenAI Nova",
-      openaiOnyx: "OpenAI Onyx",
-      openaiEcho: "OpenAI Echo",
-      openaiShimmer: "OpenAI Shimmer",
-      openaiFable: "OpenAI Fable",
-      elevenlabsRachel: "ElevenLabs Rachel",
-      elevenlabsJosh: "ElevenLabs Josh",
-      elevenlabsBella: "ElevenLabs Bella",
-      elevenlabsAdam: "ElevenLabs Adam",
+      openaiAlloy:
+        "OpenAI Alloy - Ausgewogene, neutrale Stimme für professionelle Inhalte",
+      openaiNova:
+        "OpenAI Nova - Warme, freundliche Stimme, ideal für Gespräche",
+      openaiOnyx: "OpenAI Onyx - Tiefe, souveräne Stimme für formelle Inhalte",
+      openaiEcho:
+        "OpenAI Echo - Klare, deutliche Stimme mit natürlichem Rhythmus",
+      openaiShimmer:
+        "OpenAI Shimmer - Ausdrucksstarke, dynamische Stimme für packende Inhalte",
+      openaiFable: "OpenAI Fable - Ausdrucksstarke Erzählstimme",
+      elevenlabsRachel:
+        "ElevenLabs Rachel - Natürliche Frauenstimme mit emotionaler Bandbreite",
+      elevenlabsJosh:
+        "ElevenLabs Josh - Natürliche Männerstimme im Gesprächston",
+      elevenlabsBella:
+        "ElevenLabs Bella - Warme Frauenstimme mit sanftem Vortrag",
+      elevenlabsAdam:
+        "ElevenLabs Adam - Professionelle Männerstimme für Content-Produktion",
       kokoroBella:
         "Kokoro Bella - Open-Weight-Modell, warme amerikanische Frauenstimme. Kein Inhaltsfilter.",
       kokoroSarah:

@@ -16,6 +16,14 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    musicVoice: {
+      title:
+        "KI-Musik, KI-Stimmen und Transkription. Welches Modell für welchen Job.",
+      category: "Ratgeber",
+      excerpt:
+        "Songs, Beats, Sprecherstimmen und Transkripte auf einem Guthaben. Jedes Musikmodell, jede Stimme und jedes Transkriptionsmodell im direkten Vergleich, mit dem echten Preis pro Clip, pro Minute und pro Stunde. Dazu die ehrliche Antwort auf die Frage nach der Suno-Alternative.",
+      readTime: "11 Min. Lesezeit",
+    },
     videoGenerators: {
       title:
         "KI-Videogeneratoren im Vergleich. Kling, Seedance, Veo, Wan und mehr.",

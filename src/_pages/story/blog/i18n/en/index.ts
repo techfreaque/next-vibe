@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    musicVoice: {
+      title: "AI music, voices and transcription. Which model for which job.",
+      category: "Guide",
+      excerpt:
+        "Songs, beats, voiceovers and transcripts on one balance. Every music model, voice and speech to text model side by side, with the real price per clip, per minute and per hour. Plus the honest Suno alternative answer.",
+      readTime: "11 min read",
+    },
     videoGenerators: {
       title:
         "AI video generators compared. Kling, Seedance, Veo, Wan and more.",

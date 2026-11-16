@@ -80,7 +80,7 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt",
       },
       noTtsProviderConfigured:
-        "Nie skonfigurowano żadnego dostawcy syntezy mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo ELEVENLABS_API_KEY – lub podłącz systemowego dostawcę inferencji.",
+        "Nie skonfigurowano żadnego dostawcy syntezy mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo ELEVENLABS_API_KEY. Możesz też podłączyć systemowego dostawcę inferencji.",
       notConfigured:
         "Klucz API {{label}} nie jest skonfigurowany. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Pobierz klucz na {{url}}",
       conversionFailed: "Synteza mowy nie powiodła się: {{error}}",
@@ -112,16 +112,21 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
-      openaiAlloy: "OpenAI Alloy",
-      openaiNova: "OpenAI Nova",
-      openaiOnyx: "OpenAI Onyx",
-      openaiEcho: "OpenAI Echo",
-      openaiShimmer: "OpenAI Shimmer",
-      openaiFable: "OpenAI Fable",
-      elevenlabsRachel: "ElevenLabs Rachel",
-      elevenlabsJosh: "ElevenLabs Josh",
-      elevenlabsBella: "ElevenLabs Bella",
-      elevenlabsAdam: "ElevenLabs Adam",
+      openaiAlloy:
+        "OpenAI Alloy - Zrównoważony, neutralny głos do profesjonalnych treści",
+      openaiNova: "OpenAI Nova - Ciepły, przyjazny głos, idealny do rozmów",
+      openaiOnyx: "OpenAI Onyx - Głęboki, stanowczy głos do formalnych treści",
+      openaiEcho: "OpenAI Echo - Wyraźny głos o naturalnym rytmie",
+      openaiShimmer:
+        "OpenAI Shimmer - Ekspresyjny, dynamiczny głos do angażujących treści",
+      openaiFable: "OpenAI Fable - Ekspresyjny głos do opowiadania historii",
+      elevenlabsRachel:
+        "ElevenLabs Rachel - Naturalny głos kobiecy z szeroką skalą emocji",
+      elevenlabsJosh: "ElevenLabs Josh - Naturalny głos męski w tonie rozmowy",
+      elevenlabsBella:
+        "ElevenLabs Bella - Ciepły głos kobiecy o łagodnym brzmieniu",
+      elevenlabsAdam:
+        "ElevenLabs Adam - Profesjonalny głos męski do tworzenia treści",
       kokoroBella:
         "Kokoro Bella - Otwarty model 82M, ciepły amerykański głos kobiecy. Bez filtra treści.",
       kokoroSarah:

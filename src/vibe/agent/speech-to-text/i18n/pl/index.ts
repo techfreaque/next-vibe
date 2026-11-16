@@ -204,7 +204,7 @@ export const translations: typeof enTranslations = {
       noSttProvider: "Brak dostępnego dostawcy transkrypcji mowy",
       unsupportedProvider: "Nieobsługiwany dostawca transkrypcji: {{provider}}",
       noSttProviderConfigured:
-        "Nie skonfigurowano żadnego dostawcy transkrypcji mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo DEEPGRAM_API_KEY – lub podłącz systemowego dostawcę inferencji.",
+        "Nie skonfigurowano żadnego dostawcy transkrypcji mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo DEEPGRAM_API_KEY. Możesz też podłączyć systemowego dostawcę inferencji.",
       notConfigured:
         "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
       providerResultMissing: "Dostawca {{provider}} nie zwrócił żadnego wyniku",
@@ -251,8 +251,10 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
-      openaiWhisper: "OpenAI Whisper",
-      deepgramNova2: "Deepgram Nova-2",
+      openaiWhisper:
+        "OpenAI Whisper - Najwyższej klasy rozpoznawanie mowy w 99 językach",
+      deepgramNova2:
+        "Deepgram Nova-2 - Szybka i dokładna transkrypcja, odporna na hałas",
       whisperLargeV3:
         "Whisper Large V3 - Otwarty model OpenAI, 99 języków, znacznie tańszy niż whisper-1.",
       voxtralMini:

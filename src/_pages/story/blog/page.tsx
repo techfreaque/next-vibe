@@ -180,6 +180,12 @@ export function TanstackPage({
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
+    post("ai-music-and-voice-generators", {
+      title: t("posts.musicVoice.title"),
+      category: t("posts.musicVoice.category"),
+      excerpt: t("posts.musicVoice.excerpt"),
+      readTime: t("posts.musicVoice.readTime"),
+    }),
     post("ai-video-generators-compared", {
       title: t("posts.videoGenerators.title"),
       category: t("posts.videoGenerators.category"),

@@ -14,7 +14,7 @@ export const translations = {
     titleShort: "Text to Speech",
     dynamicTitle: "Speech: {{text}}",
     description:
-      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models — each has a unique id to pass as the voice parameter. Cost: ~0.00052 credits per character. Returns audioUrl.",
+      "Convert text to speech. Pass text and a voice id. Use list-models (modelType=audio) to see available voice models. Each has a unique id to pass as the voice parameter. Cost: ~0.00052 credits per character. Returns audioUrl.",
     form: {
       title: "Text to Speech Conversion",
       description: "Enter text to convert to speech",

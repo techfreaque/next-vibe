@@ -141,7 +141,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.VOXTRAL_MINI_TRANSCRIBE]: {
     name: "Voxtral Mini Transcribe",
-    by: "mistral",
+    by: "mistralAI",
     description: "speechToText.models.descriptions.voxtralMini",
     contextWindow: 0,
     parameterCount: undefined,

@@ -665,6 +665,26 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Deepgram",
     icon: "mic",
   },
+  hexgrad: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Hexgrad",
+    icon: "volume-2",
+  },
+  inworld: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Inworld",
+    icon: "volume-2",
+  },
+  nvidia: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "NVIDIA",
+    icon: "mic",
+  },
+  sonauto: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Sonauto",
+    icon: "music",
+  },
   sourceful: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Sourceful",
