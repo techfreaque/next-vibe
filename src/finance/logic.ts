@@ -330,11 +330,120 @@ export interface AlertCandidate {
 const money = (value: number): string => `$${value.toFixed(2)}`;
 
 /**
- * Stolen-key detector. Two independent tripwires on the spend since the last
+ * Where a provider's spend figure comes from:
+ *  - provider-api: the provider's own balance / usage API. A spike there is money
+ *    leaving OUR account at the provider, so it can mean a stolen key.
+ *  - usage-ledger: no spend API (uncensored.ai, FreedomGPT). Spend is ESTIMATED
+ *    from our own credit_transactions (billed calls x creditCost), so it only ever
+ *    sees calls our users made and paid for through us. Key theft is invisible to
+ *    it; a spike is a usage spike, and the real question is whether billing covered it.
+ */
+export type SpendBasis = "provider-api" | "usage-ledger";
+
+export interface LedgerWalletShare {
+  /** Operator-facing wallet owner, e.g. "user <uuid>" / "lead <uuid>". */
+  wallet: string;
+  /** Credits this wallet was billed on the provider's models in the window. */
+  credits: number;
+}
+
+/** Who / what drove the ledger-estimated spend in the alert window. */
+export interface LedgerUsageBreakdown {
+  /** Distinct billed calls (assistant turns) in the window. */
+  calls: number;
+  /** All credits billed on the provider's models in the window. */
+  billedCredits: number;
+  /** Part of billedCredits paid from packs (purchased, subscription, earned, bonus). */
+  packCredits: number;
+  /** Part of billedCredits paid from the free allowance. */
+  freeCredits: number;
+  walletCount: number;
+  /** Biggest wallets first (at most a handful). */
+  topWallets: LedgerWalletShare[];
+}
+
+const KEY_THEFT_NOTE = (label: string): string =>
+  `Key theft on ${label} is only visible in its own dashboard: this monitor cannot see calls made outside unbottled.ai.`;
+
+const pct = (part: number, whole: number): number =>
+  whole > 0 ? round2((part / whole) * 100) : 0;
+
+interface LedgerAssessment {
+  severity: typeof AlertSeverityValue;
+  /** Who / what + billed vs estimated cost + margin verdict + key-theft note. */
+  detail: string;
+  metadata: Record<string, string | number | null>;
+}
+
+/**
+ * Severity + explanation for a ledger-estimated spike. The spend was billed to
+ * our own users, so it is a usage spike, not a key compromise: WARNING while the
+ * credits billed cover the estimated upstream cost, CRITICAL (a margin problem)
+ * when they do not. Without a breakdown the margin is unknown: WARNING.
+ */
+function assessLedgerSpike(input: {
+  providerLabel: string;
+  spendUsd: number;
+  ledger: LedgerUsageBreakdown | null;
+}): LedgerAssessment {
+  const note = KEY_THEFT_NOTE(input.providerLabel);
+  const { ledger } = input;
+  if (ledger === null) {
+    return {
+      severity: AlertSeverity.WARNING,
+      detail: `Ledger breakdown unavailable, margin unknown. ${note}`,
+      metadata: { spendBasis: "usage-ledger" },
+    };
+  }
+  const creditUsd = FINANCE_CONFIG.creditValueUsd;
+  const billedUsd = round2(ledger.billedCredits * creditUsd);
+  const packUsd = round2(ledger.packCredits * creditUsd);
+  const freeUsd = round2(ledger.freeCredits * creditUsd);
+  const covered = billedUsd >= input.spendUsd;
+  const marginPct =
+    billedUsd > 0
+      ? round2(((billedUsd - input.spendUsd) / billedUsd) * 100)
+      : null;
+  const top = ledger.topWallets
+    .map(
+      (w) => `${w.wallet} ${pct(w.credits, ledger.billedCredits).toFixed(0)}%`,
+    )
+    .join(", ");
+  const who = `${ledger.calls} calls from ${ledger.walletCount} wallet${ledger.walletCount === 1 ? "" : "s"}${top ? ` (top: ${top})` : ""}.`;
+  const billed = `Billed ${money(billedUsd)} in credits (pack ${money(packUsd)}, free ${money(freeUsd)}) vs ${money(input.spendUsd)} estimated upstream cost`;
+  const verdict = covered
+    ? `${billed}, margin ${(marginPct ?? 0).toFixed(1)}%: covered, no loss.`
+    : `${billed}: billing does NOT cover the estimated cost (shortfall ${money(round2(input.spendUsd - billedUsd))}). Margin problem: check this provider's model pricing.`;
+  return {
+    severity: covered ? AlertSeverity.WARNING : AlertSeverity.CRITICAL,
+    detail: `${who} ${verdict} ${note}`,
+    metadata: {
+      spendBasis: "usage-ledger",
+      ledgerCalls: ledger.calls,
+      ledgerWallets: ledger.walletCount,
+      topWallet: ledger.topWallets[0]?.wallet ?? null,
+      topWalletSharePct:
+        ledger.topWallets[0] === undefined
+          ? null
+          : pct(ledger.topWallets[0].credits, ledger.billedCredits),
+      billedUsd,
+      packCreditsUsd: packUsd,
+      freeCreditsUsd: freeUsd,
+      ledgerMarginPct: marginPct,
+    },
+  };
+}
+
+/**
+ * Spend-spike detector. Two independent tripwires on the spend since the last
  * reading, scaled to dollars per hour:
  *  - hard cap: more than hourlySpendCapUsd per hour
  *  - drain: more than drainMultiplier x the trailing hourly average
  * Both ignore spends below minSpikeUsd (noise on a quiet account).
+ *
+ * provider-api spend: a stolen-key detector, CRITICAL "possible key compromise".
+ * usage-ledger spend: worded as a usage spike from our own ledger (see
+ * assessLedgerSpike); never "key compromise", since it cannot see key theft.
  */
 export function detectProviderAnomalies(input: {
   provider: string;
@@ -344,6 +453,9 @@ export function detectProviderAnomalies(input: {
   trailing: TrailingRate;
   balanceUsd: number | null;
   thresholds: Thresholds;
+  spendBasis: SpendBasis;
+  /** Who / what in the window; only for usage-ledger spend (null = unavailable). */
+  ledgerUsage?: LedgerUsageBreakdown | null;
 }): AlertCandidate[] {
   const { thresholds: th } = input;
   if (input.elapsedHours <= 0 || input.spendUsd < th.minSpikeUsd) {
@@ -352,6 +464,14 @@ export function detectProviderAnomalies(input: {
   const perHour = input.spendUsd / input.elapsedHours;
   const trailingPerHour = input.trailing.perHourUsd;
   const out: AlertCandidate[] = [];
+  const ledger =
+    input.spendBasis === "usage-ledger"
+      ? assessLedgerSpike({
+          providerLabel: input.providerLabel,
+          spendUsd: input.spendUsd,
+          ledger: input.ledgerUsage ?? null,
+        })
+      : null;
   const metadata = {
     provider: input.provider,
     spendUsd: round2(input.spendUsd),
@@ -362,14 +482,21 @@ export function detectProviderAnomalies(input: {
     trailingCoveredHours: input.trailing.coveredHours,
     trailingCoverage: input.trailing.coverage,
     balanceUsd: input.balanceUsd === null ? null : round2(input.balanceUsd),
+    ...(ledger ? ledger.metadata : { spendBasis: "provider-api" }),
   };
+  const severity = ledger ? ledger.severity : AlertSeverity.CRITICAL;
+  const lead = ledger
+    ? `Usage spike on ${input.providerLabel} (estimated from our own credit ledger, the provider has no spend API).`
+    : `Possible key compromise: ${input.providerLabel}.`;
+  const tail = ledger ? ` ${ledger.detail}` : "";
+  const costWord = ledger ? "estimated upstream cost" : "spent";
   if (perHour > th.hourlySpendCapUsd) {
     out.push({
       type: FinanceAlertType.SPEND_SPIKE,
-      severity: AlertSeverity.CRITICAL,
+      severity,
       subject: input.provider,
       dedupKey: `${FinanceAlertType.SPEND_SPIKE}:${input.provider}`,
-      message: `Possible key compromise: ${input.providerLabel}. ${money(input.spendUsd)} spent in ${input.elapsedHours.toFixed(1)}h (${money(perHour)}/h, cap ${money(th.hourlySpendCapUsd)}/h).`,
+      message: `${lead} ${money(input.spendUsd)} ${costWord} in ${input.elapsedHours.toFixed(1)}h (${money(perHour)}/h, cap ${money(th.hourlySpendCapUsd)}/h).${tail}`,
       metadata,
     });
   }
@@ -380,10 +507,10 @@ export function detectProviderAnomalies(input: {
   ) {
     out.push({
       type: FinanceAlertType.BALANCE_DRAIN,
-      severity: AlertSeverity.CRITICAL,
+      severity,
       subject: input.provider,
       dedupKey: `${FinanceAlertType.BALANCE_DRAIN}:${input.provider}`,
-      message: `Possible key compromise: ${input.providerLabel}. Spending ${money(perHour)}/h is ${(perHour / trailingPerHour).toFixed(1)}x the trailing average of ${money(trailingPerHour)}/h over ${input.trailing.coveredHours.toFixed(1)}h of covered data (limit ${th.drainMultiplier}x).`,
+      message: `${lead} ${ledger ? "Estimated spend" : "Spending"} ${money(perHour)}/h is ${(perHour / trailingPerHour).toFixed(1)}x the trailing average of ${money(trailingPerHour)}/h over ${input.trailing.coveredHours.toFixed(1)}h of covered data (limit ${th.drainMultiplier}x).${tail}`,
       metadata,
     });
   }

@@ -24,6 +24,7 @@ import {
   type PaymentStatusValue,
   RefundStatus,
 } from "@/payment/enum";
+import { ApiProvider } from "@/vibe/agent/models/models";
 
 type TestCurrency = "USD" | "EUR" | "PLN";
 
@@ -37,6 +38,7 @@ import {
   financeThresholds,
 } from "./db";
 import {
+  AlertSeverity,
   CostCoverage,
   FinanceAlertType,
   FinanceSource,
@@ -54,6 +56,7 @@ import {
   detectDayAnomalies,
   detectProviderAnomalies,
   isDuplicateAlert,
+  type LedgerUsageBreakdown,
   minorToUsd,
   resolveThresholds,
   spendBetween,
@@ -61,6 +64,7 @@ import {
 } from "./logic";
 import { defaultFinanceDeps,type FinanceDeps, FinanceRepository } from "./repository";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
+import { usagePricing } from "./sources/providers";
 import type { StripeLedgerPort } from "./sources/revenue";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -263,6 +267,7 @@ describe("detectProviderAnomalies", () => {
     providerLabel: "OpenRouter",
     balanceUsd: 100,
     thresholds: DEFAULT_THRESHOLDS,
+    spendBasis: "provider-api" as const,
   };
   /** A fully-covered trailing baseline at the given $/h. */
   const baselineAt = (perHourUsd: number): ReturnType<typeof trailingSpendRate> =>
@@ -278,6 +283,94 @@ describe("detectProviderAnomalies", () => {
     });
     expect(out.map((a) => a.type)).toContain(FinanceAlertType.SPEND_SPIKE);
     expect(out[0]?.message).toContain("Possible key compromise: OpenRouter");
+    expect(out[0]?.severity).toBe(AlertSeverity.CRITICAL);
+    expect(out[0]?.metadata.spendBasis).toBe("provider-api");
+  });
+
+  describe("ledger-estimated providers (no spend API)", () => {
+    const ledgerBase = {
+      ...base,
+      provider: FinanceSource.UNCENSORED_AI,
+      providerLabel: "uncensored.ai",
+      balanceUsd: null,
+      spendBasis: "usage-ledger" as const,
+    };
+    /** One new payer burning a $5 pack: $6.50 billed vs ~$5 upstream (~30% margin). */
+    const onePayer = {
+      calls: 100,
+      billedCredits: 650,
+      packCredits: 600,
+      freeCredits: 50,
+      walletCount: 2,
+      topWallets: [
+        { wallet: "user u-1", credits: 600 },
+        { wallet: "lead l-1", credits: 50 },
+      ],
+    };
+
+    it("words a covered spike as a usage spike, WARNING, never key compromise", () => {
+      const out = detectProviderAnomalies({
+        ...ledgerBase,
+        thresholds: { ...DEFAULT_THRESHOLDS, hourlySpendCapUsd: 2 },
+        spendUsd: 5,
+        elapsedHours: 1,
+        trailing: baselineAt(0.5),
+        ledgerUsage: onePayer,
+      });
+      expect(out.map((a) => a.type)).toEqual([
+        FinanceAlertType.SPEND_SPIKE,
+        FinanceAlertType.BALANCE_DRAIN,
+      ]);
+      for (const alert of out) {
+        expect(alert.severity).toBe(AlertSeverity.WARNING);
+        expect(alert.message).not.toMatch(/compromise/i);
+        expect(alert.message).toContain("Usage spike on uncensored.ai");
+        expect(alert.message).toContain("estimated from our own credit ledger");
+        expect(alert.message).toContain("100 calls from 2 wallets");
+        expect(alert.message).toContain("user u-1 92%");
+        expect(alert.message).toContain(
+          "Billed $6.50 in credits (pack $6.00, free $0.50) vs $5.00 estimated upstream cost",
+        );
+        expect(alert.message).toContain("margin 23.1%: covered");
+        expect(alert.message).toContain(
+          "Key theft on uncensored.ai is only visible in its own dashboard",
+        );
+        expect(alert.metadata.spendBasis).toBe("usage-ledger");
+        expect(alert.metadata.topWalletSharePct).toBe(92.31);
+        expect(alert.metadata.billedUsd).toBe(6.5);
+      }
+    });
+
+    it("keeps CRITICAL as a margin problem when billing does not cover the cost", () => {
+      const out = detectProviderAnomalies({
+        ...ledgerBase,
+        spendUsd: 30,
+        elapsedHours: 1,
+        trailing: noBaseline,
+        ledgerUsage: { ...onePayer, billedCredits: 2000, packCredits: 1950 },
+      });
+      expect(out.map((a) => a.type)).toEqual([FinanceAlertType.SPEND_SPIKE]);
+      expect(out[0]?.severity).toBe(AlertSeverity.CRITICAL);
+      expect(out[0]?.message).not.toMatch(/compromise/i);
+      expect(out[0]?.message).toContain("does NOT cover the estimated cost");
+      expect(out[0]?.message).toContain("shortfall $10.00");
+      expect(out[0]?.message).toContain("Margin problem");
+      expect(out[0]?.message).toContain("only visible in its own dashboard");
+    });
+
+    it("still alerts (WARNING) without a ledger breakdown", () => {
+      const out = detectProviderAnomalies({
+        ...ledgerBase,
+        spendUsd: 30,
+        elapsedHours: 1,
+        trailing: noBaseline,
+        ledgerUsage: null,
+      });
+      expect(out.map((a) => a.type)).toEqual([FinanceAlertType.SPEND_SPIKE]);
+      expect(out[0]?.severity).toBe(AlertSeverity.WARNING);
+      expect(out[0]?.message).toContain("margin unknown");
+      expect(out[0]?.message).not.toMatch(/compromise/i);
+    });
   });
   it("flags a drain over N x the trailing average even below the cap", () => {
     const out = detectProviderAnomalies({
@@ -496,6 +589,16 @@ const FUTURE = new Date(Date.UTC(2031, 0, 1));
 let openRouterUsage = 100;
 /** Billed calls the mocked usage log reports for uncensored.ai / FreedomGPT. */
 let billedCalls = 10;
+/** Who / what the mocked usage log reports for a ledger spike window. */
+let ledgerBreakdown: LedgerUsageBreakdown = {
+  calls: 0,
+  billedCredits: 0,
+  packCredits: 0,
+  freeCredits: 0,
+  walletCount: 0,
+  topWallets: [],
+};
+const ledgerWindows: { from: Date; to: Date }[] = [];
 const httpCalls: string[] = [];
 const mails: { to: string; subject: string }[] = [];
 
@@ -556,6 +659,10 @@ const testDeps: FinanceDeps = {
   nowPaymentsPort: () => null,
   usageLedger: {
     billedCalls: async () => billedCalls,
+    async usageBreakdown(_modelIds, from, to) {
+      ledgerWindows.push({ from, to });
+      return ledgerBreakdown;
+    },
   },
   recipients: () => ["ops@example.com"],
   async sendMail(input) {
@@ -657,6 +764,7 @@ describe("finance ingest (mocked externals)", () => {
     mails.length = 0;
     openRouterUsage = 100;
     billedCalls = 10;
+    ledgerWindows.length = 0;
   });
 
   afterAll(async () => {
@@ -759,6 +867,72 @@ describe("finance ingest (mocked externals)", () => {
       );
     expect(stored?.balanceNative).toBe(30);
     expect(stored?.cumulativeUsageUsd).toBe(1.5);
+  });
+
+  it("raises a ledger spike as a WARNING usage spike with who / what", async () => {
+    // 10 -> 1010 calls at $0.05 in 1h = $50 estimated, over the $25/h cap.
+    await db.insert(financeProviderSnapshots).values({
+      provider: FinanceSource.UNCENSORED_AI,
+      bucketAt: new Date(Date.UTC(2031, 2, 4, 11)),
+      capturedAt: new Date(Date.UTC(2031, 2, 4, 11, 30)),
+      balanceUsd: null,
+      balanceNative: 10,
+      unit: "calls",
+      cumulativeUsageUsd: 0.5,
+      spendUsd: null,
+      elapsedHours: null,
+    });
+    billedCalls = 1010;
+    ledgerBreakdown = {
+      calls: 1000,
+      billedCredits: 6500,
+      packCredits: 6500,
+      freeCredits: 0,
+      walletCount: 1,
+      topWallets: [{ wallet: "user u-payer", credits: 6500 }],
+    };
+    const data = await ingest(IngestScope.BALANCES, true);
+    // Breakdown window = previous reading -> now (FreedomGPT shares the mock)
+    expect(ledgerWindows).toContainEqual({
+      from: new Date(Date.UTC(2031, 2, 4, 11, 30)),
+      to: NOW,
+    });
+    const spike = data.alerts.find(
+      (a) =>
+        a.type === FinanceAlertType.SPEND_SPIKE &&
+        a.subject === FinanceSource.UNCENSORED_AI,
+    );
+    expect(spike?.severity).toBe(AlertSeverity.WARNING);
+    expect(spike?.message).toContain("Usage spike on uncensored.ai");
+    expect(spike?.message).toContain("user u-payer 100%");
+    expect(spike?.message).not.toMatch(/compromise/i);
+  });
+
+  it("the live usage ledger breakdown query runs and adds up", async () => {
+    const { modelIds } = usagePricing(ApiProvider.UNCENSORED_AI);
+    const all = await defaultFinanceDeps.usageLedger.usageBreakdown(
+      modelIds,
+      new Date(Date.UTC(2020, 0, 1)),
+      new Date(Date.UTC(2100, 0, 1)),
+    );
+    expect(all.calls).toBeGreaterThanOrEqual(0);
+    expect(all.packCredits + all.freeCredits).toBeCloseTo(all.billedCredits, 1);
+    expect(all.topWallets.length).toBeLessThanOrEqual(
+      Math.min(all.walletCount, 3),
+    );
+    const none = await defaultFinanceDeps.usageLedger.usageBreakdown(
+      modelIds,
+      FUTURE,
+      new Date(FUTURE.getTime() + 1000),
+    );
+    expect(none).toEqual({
+      calls: 0,
+      billedCredits: 0,
+      packCredits: 0,
+      freeCredits: 0,
+      walletCount: 0,
+      topWallets: [],
+    });
   });
 
   it("is idempotent: a re-run in the same hour keeps one snapshot", async () => {

@@ -17,7 +17,9 @@
  * The two API-less providers are priced from OUR usage log instead: billed calls
  * in credit_transactions x the per-call raw price from the model definitions,
  * reported as a cumulative usage counter so the same snapshot / delta / anomaly
- * machinery as OpenRouter applies.
+ * machinery as OpenRouter applies. Their spend basis is "usage-ledger": a spike
+ * there is our own users' billed usage, never evidence of a stolen key, so the
+ * anomaly alert is worded and graded differently (see detectProviderAnomalies).
  */
 
 /* eslint-disable i18next/no-literal-string */
@@ -34,6 +36,7 @@ import { ApiProvider } from "@/vibe/agent/models/models";
 
 import { FINANCE_CONFIG } from "../config";
 import { FinanceSource, type FinanceSourceValue } from "../enum";
+import type { LedgerUsageBreakdown, SpendBasis } from "../logic";
 import type { FinanceHttp } from "./http";
 import type { ProviderResult } from "./types";
 
@@ -41,6 +44,12 @@ import type { ProviderResult } from "./types";
 export interface UsageLedgerPort {
   /** Distinct billed calls (all time) on these model ids. */
   billedCalls(modelIds: readonly ChatModelId[]): Promise<number>;
+  /** Who / what was billed on these model ids in [from, to): alert context. */
+  usageBreakdown(
+    modelIds: readonly ChatModelId[],
+    from: Date,
+    to: Date,
+  ): Promise<LedgerUsageBreakdown>;
 }
 
 export interface ProviderAdapter {
@@ -50,6 +59,19 @@ export interface ProviderAdapter {
   endpoint: string | null;
   /** Why there is no endpoint (recorded as the skip reason). */
   noEndpointReason: string | null;
+  /** provider-api = the provider's own figures; usage-ledger = estimated from ours. */
+  spendBasis: SpendBasis;
+  /**
+   * Usage-ledger providers only: the billed usage behind a spend window, so a
+   * spike alert can say who / what drove it. null for provider-api adapters.
+   */
+  ledgerBreakdown:
+    | ((
+        ledger: UsageLedgerPort,
+        from: Date,
+        to: Date,
+      ) => Promise<LedgerUsageBreakdown | null>)
+    | null;
   fetchBalance(
     http: FinanceHttp,
     apiKey: string,
@@ -84,6 +106,8 @@ const openRouter: ProviderAdapter = {
   label: "OpenRouter",
   endpoint: "https://openrouter.ai/api/v1/credits",
   noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://openrouter.ai/api/v1/credits",
@@ -138,6 +162,8 @@ const nanoGpt: ProviderAdapter = {
   label: "NanoGPT",
   endpoint: "https://nano-gpt.com/api/check-balance",
   noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://nano-gpt.com/api/check-balance",
@@ -171,6 +197,8 @@ const venice: ProviderAdapter = {
   label: "Venice",
   endpoint: "https://api.venice.ai/api/v1/api_keys/rate_limits",
   noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://api.venice.ai/api/v1/api_keys/rate_limits",
@@ -208,6 +236,8 @@ const gab: ProviderAdapter = {
   label: "Gab AI",
   endpoint: "https://gab.ai/v1/credits",
   noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://gab.ai/v1/credits",
@@ -290,6 +320,14 @@ function usageLedgerAdapter(input: {
     label: input.label,
     endpoint: "usage-ledger:credit_transactions",
     noEndpointReason: null,
+    spendBasis: "usage-ledger",
+    async ledgerBreakdown(ledger, from, to) {
+      const pricing = usagePricing(input.apiProvider);
+      if (pricing.modelIds.length === 0) {
+        return null;
+      }
+      return await ledger.usageBreakdown(pricing.modelIds, from, to);
+    },
     // oxlint-disable-next-line no-unused-vars
     async fetchBalance(_http, _apiKey, ledger) {
       const pricing = usagePricing(input.apiProvider);

@@ -24,7 +24,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { creditTransactions } from "@/credits/db";
+import { creditTransactions, creditWallets } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
 import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
 import { scopedTranslation as mailScopedTranslation } from "@/messenger/system-mailbox/i18n";
@@ -177,6 +177,76 @@ export const defaultFinanceDeps: FinanceDeps = {
           ),
         );
       return Number(row?.calls ?? 0);
+    },
+    async usageBreakdown(modelIds, from, to) {
+      const empty = {
+        calls: 0,
+        billedCredits: 0,
+        packCredits: 0,
+        freeCredits: 0,
+        walletCount: 0,
+        topWallets: [],
+      };
+      if (modelIds.length === 0) {
+        return empty;
+      }
+      const where = and(
+        eq(creditTransactions.type, CreditTransactionType.USAGE),
+        inArray(creditTransactions.modelId, [...modelIds]),
+        gte(creditTransactions.createdAt, from),
+        lt(creditTransactions.createdAt, to),
+      );
+      const [totals] = await db
+        .select({
+          calls: sql<number>`count(distinct coalesce(${creditTransactions.messageId}::text, ${creditTransactions.metadata}->>'messageId', ${creditTransactions.id}::text))`,
+        })
+        .from(creditTransactions)
+        .where(where);
+      // Free-allowance rows carry metadata.freeCreditsUsed > 0; everything else
+      // was paid from a pack (packId is not reliable: it is nulled once a pack
+      // is used up and deleted).
+      const wallets = await db
+        .select({
+          walletId: creditTransactions.walletId,
+          userId: creditWallets.userId,
+          leadId: creditWallets.leadId,
+          credits: sql<number>`coalesce(-sum(${creditTransactions.amount}), 0)`,
+          freeCredits: sql<number>`coalesce(-sum(case when coalesce((${creditTransactions.metadata}->>'freeCreditsUsed')::numeric, 0) > 0 then ${creditTransactions.amount} else 0 end), 0)`,
+        })
+        .from(creditTransactions)
+        .innerJoin(
+          creditWallets,
+          eq(creditWallets.id, creditTransactions.walletId),
+        )
+        .where(where)
+        .groupBy(
+          creditTransactions.walletId,
+          creditWallets.userId,
+          creditWallets.leadId,
+        )
+        .orderBy(desc(sql`coalesce(-sum(${creditTransactions.amount}), 0)`));
+      const billedCredits = wallets.reduce((t, w) => t + Number(w.credits), 0);
+      const freeCredits = wallets.reduce(
+        (t, w) => t + Number(w.freeCredits),
+        0,
+      );
+      return {
+        calls: Number(totals?.calls ?? 0),
+        billedCredits: round2(billedCredits),
+        packCredits: round2(billedCredits - freeCredits),
+        freeCredits: round2(freeCredits),
+        walletCount: wallets.length,
+        topWallets: wallets
+          .slice(0, FINANCE_CONFIG.ledgerTopWallets)
+          .map((w) => ({
+            wallet: w.userId
+              ? `user ${w.userId}`
+              : w.leadId
+                ? `lead ${w.leadId}`
+                : `wallet ${w.walletId}`,
+            credits: round2(Number(w.credits)),
+          })),
+      };
     },
   },
   recipients() {
@@ -531,6 +601,18 @@ export class FinanceRepository {
           provider,
           bucketAt,
         );
+        // Ledger-estimated providers: who / what drove the window, so the
+        // alert reads as a usage spike with its margin, not a key compromise.
+        const ledgerUsage =
+          adapter.ledgerBreakdown !== null &&
+          previous &&
+          delta.spendUsd >= thresholds.minSpikeUsd
+            ? await adapter.ledgerBreakdown(
+                deps.usageLedger,
+                previous.capturedAt,
+                now,
+              )
+            : null;
         candidates.push(
           ...detectProviderAnomalies({
             provider,
@@ -540,6 +622,8 @@ export class FinanceRepository {
             trailing,
             balanceUsd: result.balanceUsd,
             thresholds,
+            spendBasis: adapter.spendBasis,
+            ledgerUsage,
           }),
         );
       }

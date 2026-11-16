@@ -87,6 +87,9 @@ export const FINANCE_CONFIG = {
   usageLedgerNote:
     "estimated from our own usage log (billed calls x per-call price), no provider API",
 
+  /** Wallets named in a ledger-estimated spike alert (biggest spenders first). */
+  ledgerTopWallets: 3,
+
   /** Default thresholds. Keyed by ThresholdKey value suffix (see enum.ts). */
   thresholdDefaults: {
     marginFloorPct: 20,
