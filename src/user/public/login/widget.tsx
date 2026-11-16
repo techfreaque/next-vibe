@@ -24,18 +24,20 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "next-vibe/ui/components/input-otp";
+import { Link } from "next-vibe/ui/components/link";
 import { P } from "next-vibe/ui/components/typography";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
+  useWidgetLocale,
   useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import AlertWidget from "next-vibe/unified-ui/widgets/display-only/alert/widget";
-import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
@@ -43,6 +45,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useEffect, useRef, useState } from "react";
 
+import { authPageHref, CALLBACK_URL_PARAM } from "./callback-url";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -60,6 +63,13 @@ export function LoginFormContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const response = useWidgetResponse();
   const isSubmitting = useWidgetIsSubmitting();
+  const locale = useWidgetLocale();
+  // Footer links keep locale + return path: "Sign up" from a login opened by
+  // the referral page must still end on the referral dashboard.
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get(CALLBACK_URL_PARAM);
+  const footerLinkClass =
+    "inline-flex items-center rounded-sm text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
 
   const [phase, setPhase] = useState<Phase>("credentials");
   const [recovery, setRecovery] = useState(false);
@@ -285,14 +295,18 @@ export function LoginFormContainer({
         />
 
         <Div className="flex flex-col items-center gap-1 border-t pt-4 text-sm">
-          <LinkWidget
-            field={children.forgotPassword}
-            fieldName="forgotPassword"
-          />
-          <LinkWidget
-            field={children.createAccount}
-            fieldName="createAccount"
-          />
+          <Link
+            href={authPageHref(locale, "reset-password", null)}
+            className={footerLinkClass}
+          >
+            {t("footer.forgotPassword")}
+          </Link>
+          <Link
+            href={authPageHref(locale, "signup", callbackUrl)}
+            className={footerLinkClass}
+          >
+            {t("footer.createAccount")}
+          </Link>
         </Div>
       </CardContent>
     </Card>

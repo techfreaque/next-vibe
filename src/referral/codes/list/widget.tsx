@@ -16,6 +16,7 @@ import { Link2 } from "next-vibe/ui/components/icons/Link2";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
@@ -147,8 +148,10 @@ function LinkGenerator({
  * Custom container widget for referral codes list
  */
 export function ReferralCodesListContainer(): React.JSX.Element {
+  // undefined = not loaded yet. Showing "no codes yet" while loading told a
+  // partner whose code was just moved to them that it was missing.
   const codes = useWidgetSelector<typeof definition.GET>()(
-    (data) => data?.codes ?? [],
+    (data) => data?.codes,
   );
   const t = useWidgetTranslation<typeof definition.GET>();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -161,6 +164,10 @@ export function ReferralCodesListContainer(): React.JSX.Element {
       setCopiedIndex(null);
     }, 2000);
   };
+
+  if (!codes) {
+    return <LoadingBlock message={t("codes.list.widget.loading")} />;
+  }
 
   if (codes.length === 0) {
     return (

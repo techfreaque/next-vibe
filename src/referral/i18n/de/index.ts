@@ -130,6 +130,7 @@ export const translations: typeof enTranslations = {
         description: "Ihre Empfehlungscodes erfolgreich abgerufen",
       },
       widget: {
+        loading: "Deine Codes werden geladen...",
         empty: "Du hast noch keinen Code",
         emptyHint:
           "Erstelle unten deinen ersten Code. Der Link ist sofort bereit.",

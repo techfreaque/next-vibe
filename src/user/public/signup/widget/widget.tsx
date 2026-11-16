@@ -41,6 +41,7 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
 import { P } from "next-vibe/ui/components/typography";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -53,7 +54,6 @@ import {
 import { executeQuery } from "next-vibe/unified-ui/hooks/query-executor";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { AlertWidget } from "next-vibe/unified-ui/widgets/display-only/alert/widget";
-import { LinkWidget } from "next-vibe/unified-ui/widgets/display-only/link/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -69,6 +69,10 @@ import {
 import leadCurrentReferralDefinition, {
   type LeadCurrentReferralGetResponseOutput,
 } from "@/referral/lead/current/definition";
+import {
+  authPageHref,
+  CALLBACK_URL_PARAM,
+} from "@/user/public/login/callback-url";
 
 import type definition from "../definition";
 import { PasswordMatchIndicator } from "./password-match-indicator";
@@ -106,6 +110,14 @@ export function SignupFormContainer({
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const data = useWidgetValue<typeof definition.POST>();
+  // Keep the return path: a partner sent here from "Get your partner link"
+  // who already has an account must still land on the referral dashboard.
+  const searchParams = useSearchParams();
+  const loginHref = authPageHref(
+    locale,
+    "login",
+    searchParams.get(CALLBACK_URL_PARAM),
+  );
 
   const referralEndpoint = useEndpoint(
     leadCurrentReferralDefinition,
@@ -485,10 +497,12 @@ export function SignupFormContainer({
 
         {/* Footer Link */}
         <Div className="flex justify-center border-t pt-4 text-sm">
-          <LinkWidget
-            field={children.alreadyHaveAccount}
-            fieldName="alreadyHaveAccount"
-          />
+          <Link
+            href={loginHref}
+            className="inline-flex items-center rounded-sm text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            {t("footer.alreadyHaveAccount")}
+          </Link>
         </Div>
       </CardContent>
     </Card>

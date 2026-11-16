@@ -128,6 +128,7 @@ export const translations = {
         description: "Successfully retrieved your referral codes",
       },
       widget: {
+        loading: "Loading your codes...",
         empty: "You don't have any referral codes yet",
         emptyHint:
           "Create your first code below. Your link is ready instantly.",

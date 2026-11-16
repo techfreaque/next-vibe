@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata, Route } from "next";
+import type { Metadata } from "next";
 import { coreEnv } from "next-vibe/core/env";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -16,6 +16,7 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 import { DEV_SEED_PASSWORD, DEV_SEED_USERS } from "@/user/dev-seed-users";
+import { safeCallbackPath } from "@/user/public/login/callback-url";
 import { scopedTranslation as loginScopedTranslation } from "@/user/public/login/i18n";
 import type { LoginOptions } from "@/user/public/login/repository";
 import { LoginRepository } from "@/user/public/login/repository";
@@ -25,12 +26,13 @@ import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
-  searchParams: Promise<{ callbackUrl?: Route }>;
+  searchParams: Promise<{ callbackUrl?: string }>;
 }
 
 export interface LoginPageData {
   locale: CountryLanguage;
-  callbackUrl: Route | undefined;
+  /** Same-site path to land on after login (e.g. the referral page). */
+  callbackUrl: string | undefined;
   user: JwtPayloadType | null;
   loginOptions: LoginOptions | null;
   errorMessage: string | null;
@@ -88,7 +90,9 @@ export async function tanstackLoader({
   searchParams,
 }: Props): Promise<LoginPageData> {
   const { locale } = await params;
-  const { callbackUrl } = await searchParams;
+  const { callbackUrl: rawCallbackUrl } = await searchParams;
+  // Same-site paths only: a raw value was an open redirect after login.
+  const callbackUrl = safeCallbackPath(rawCallbackUrl) ?? undefined;
   const { t } = pageT.scopedT(locale);
   const { t: loginT } = loginScopedTranslation.scopedT(locale);
   const logger = createEndpointLogger(false, locale);

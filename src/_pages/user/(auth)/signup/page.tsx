@@ -14,6 +14,7 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 import { ReferralRepository } from "@/referral/repository";
+import { safeCallbackPath } from "@/user/public/login/callback-url";
 
 import SignUpForm from "./_components/sign-up-form";
 import { scopedTranslation as pageT } from "./i18n";
@@ -30,20 +31,6 @@ export interface SignUpPageData {
   /** Same-site path to land on after signup (e.g. the referral page). */
   callbackUrl: string | null;
   platform: Platform;
-}
-
-/** Only same-site absolute paths: "/x" yes, "//host", "https:", "\\" no. */
-function safeCallbackPath(value: string | undefined): string | null {
-  if (
-    !value ||
-    !value.startsWith("/") ||
-    value.startsWith("//") ||
-    value.includes("\\") ||
-    value.includes("://")
-  ) {
-    return null;
-  }
-  return value;
 }
 
 /**
