@@ -57,15 +57,16 @@ export const translations = {
   expectations: {
     title: "Realistic expectations - no hype",
     p1: "Here's the honest math:",
-    scenario1Label: "Casual user",
-    scenario1Spend: "~$8/mo average spend",
-    scenario1Earn: "= $0.80/mo per referral (or $1.20/mo via skill link)",
-    scenario2Label: "Developer / heavy AI user",
-    scenario2Spend: "$200+/mo",
-    scenario2Earn: "= $20+/mo per referral (or $30+/mo via skill link)",
-    note: "One developer referral via a skill link earns you $30/mo. That's more than 37 casual users. Developers are the high-value target - they already spend $100–200/mo on AI tools and rarely cancel.",
+    scenario1Label: "Plan subscriber",
+    scenario1Spend: "{{planPrice}}/mo plan",
+    scenario1Earn: "= {{planEarn}}/mo per referral",
+    scenario2Label: "Power user (agents, API, image and video)",
+    scenario2Spend:
+      "{{planPrice}} plan + {{powerPacks}} credit packs at {{packPrice}} = {{powerSpend}}/mo",
+    scenario2Earn: "= {{powerEarn}}/mo per referral",
+    note: "One power user pays you as much as {{powerVsPlan}} plan subscribers. Developers running agents and the API burn through credits and rarely cancel. They're the high-value target.",
     example:
-      "Refer 10 average users via referral link: $8/mo for you. Same 10 via a skill link: $12/mo. Not life-changing - but it's money you earned by saying something you'd say anyway.",
+      "Refer 10 plan subscribers: {{tenPlanEarn}}/mo for you. Not life-changing. But it's money you earned by saying something you'd say anyway.",
   },
   firststeps: {
     title: "Your first steps (5 minutes)",

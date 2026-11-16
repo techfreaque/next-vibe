@@ -134,8 +134,6 @@ export const translations: typeof enTranslations = {
         nowpayments: {
           description: "Kryptowährung",
         },
-        cryptoMonthlyDisabled:
-          "Kryptowährungszahlungen sind nur für Jahresabonnements verfügbar, aufgrund von Mindesttransaktionswertanforderungen (mindestens 20€).",
         cryptoMinimumPacks:
           "Kryptowährungszahlungen erfordern mindestens {{minPacks}} Credit-Pakete ({{minValue}}) aufgrund von Mindesttransaktionswertanforderungen.",
       },

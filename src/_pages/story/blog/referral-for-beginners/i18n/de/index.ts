@@ -59,17 +59,16 @@ export const translations: typeof enTranslations = {
   expectations: {
     title: "Realistische Erwartungen - kein Hype",
     p1: "Hier die ehrliche Rechnung:",
-    scenario1Label: "Gelegenheitsnutzer",
-    scenario1Spend: "~8 $/Monat Durchschnitt",
-    scenario1Earn:
-      "= 0,80 $/Monat pro Empfehlung (oder 1,20 $/Monat via Skill-Link)",
-    scenario2Label: "Entwickler / Power User",
-    scenario2Spend: "200 $+/Monat",
-    scenario2Earn:
-      "= 20 $+/Monat pro Empfehlung (oder 30 $+/Monat via Skill-Link)",
-    note: "Eine Entwickler-Empfehlung über einen Skill-Link bringt 30 $/Monat. Das ist mehr als 37 Gelegenheitsnutzer. Entwickler sind das hochwertige Ziel - sie geben bereits 100–200 $/Monat für KI-Tools aus und kündigen selten.",
+    scenario1Label: "Abonnent im Plan",
+    scenario1Spend: "{{planPrice}}/Monat Plan",
+    scenario1Earn: "= {{planEarn}}/Monat pro Empfehlung",
+    scenario2Label: "Power User (Agenten, API, Bild und Video)",
+    scenario2Spend:
+      "{{planPrice}} Plan + {{powerPacks}} Credit-Pakete à {{packPrice}} = {{powerSpend}}/Monat",
+    scenario2Earn: "= {{powerEarn}}/Monat pro Empfehlung",
+    note: "Ein Power User bringt dir so viel wie {{powerVsPlan}} Plan-Abonnenten. Entwickler mit Agenten und API verbrauchen Credits schnell und kündigen selten. Genau diese Zielgruppe zählt.",
     example:
-      "10 Durchschnittsnutzer via Empfehlungslink: 8 $/Monat für dich. Dieselben 10 via Skill-Link: 12 $/Monat. Nicht weltbewegend - aber Geld, das du verdient hast, indem du etwas gesagt hast, was du ohnehin gesagt hättest.",
+      "10 Plan-Abonnenten geworben: {{tenPlanEarn}}/Monat für dich. Kein Vermögen. Aber Geld für etwas, das du sowieso erzählt hättest.",
   },
   firststeps: {
     title: "Deine ersten Schritte (5 Minuten)",

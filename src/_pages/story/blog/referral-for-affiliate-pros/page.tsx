@@ -17,6 +17,7 @@ import {
 } from "next-vibe/ui/components/table";
 import type { JSX } from "react";
 
+import { getReferralExampleParams } from "@/_pages/user/(account)/referral/i18n/utils";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -81,31 +82,32 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const ex = getReferralExampleParams(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
 
   const commissionRows = [
     {
-      profile: t("recurringMath.row1Profile"),
-      spend: t("recurringMath.row1Spend"),
-      earn: t("recurringMath.row1Earn"),
+      profile: t("recurringMath.row1Profile", ex),
+      spend: t("recurringMath.row1Spend", ex),
+      earn: t("recurringMath.row1Earn", ex),
       highlight: false,
     },
     {
-      profile: t("recurringMath.row2Profile"),
-      spend: t("recurringMath.row2Spend"),
-      earn: t("recurringMath.row2Earn"),
+      profile: t("recurringMath.row2Profile", ex),
+      spend: t("recurringMath.row2Spend", ex),
+      earn: t("recurringMath.row2Earn", ex),
       highlight: false,
     },
     {
-      profile: t("recurringMath.row3Profile"),
-      spend: t("recurringMath.row3Spend"),
-      earn: t("recurringMath.row3Earn"),
+      profile: t("recurringMath.row3Profile", ex),
+      spend: t("recurringMath.row3Spend", ex),
+      earn: t("recurringMath.row3Earn", ex),
       highlight: true,
     },
     {
-      profile: t("recurringMath.row4Profile"),
-      spend: t("recurringMath.row4Spend"),
-      earn: t("recurringMath.row4Earn"),
+      profile: t("recurringMath.row4Profile", ex),
+      spend: t("recurringMath.row4Spend", ex),
+      earn: t("recurringMath.row4Earn", ex),
       highlight: true,
     },
   ];
@@ -162,10 +164,10 @@ export function TanstackPage({
       <ArticleBody>
         <ArticleSection title={t("recurringMath.title")}>
           <ArticleLead>{t("recurringMath.p1", { appName })}</ArticleLead>
-          <ArticleP>{t("recurringMath.p2", { appName })}</ArticleP>
+          <ArticleP>{t("recurringMath.p2", { ...ex, appName })}</ArticleP>
           <FeatureGrid columns={2}>
             <FeatureCard title={t("recurringMath.powerUserTitle")}>
-              {t("recurringMath.powerUserBody")}
+              {t("recurringMath.powerUserBody", ex)}
             </FeatureCard>
             <FeatureCard title={t("recurringMath.floorTitle")}>
               {t("recurringMath.floorBody", { appName })}
@@ -250,7 +252,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection title={t("payouts.title")}>
-          <ArticleP>{t("payouts.p1")}</ArticleP>
+          <ArticleP>{t("payouts.p1", ex)}</ArticleP>
           <ArticleP>{t("payouts.p2")}</ArticleP>
           <ArticleP>{t("payouts.p3")}</ArticleP>
         </ArticleSection>

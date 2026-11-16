@@ -59,17 +59,16 @@ export const translations: typeof enTranslations = {
   expectations: {
     title: "Realistyczne oczekiwania - bez hype'u",
     p1: "Oto uczciwa matematyka:",
-    scenario1Label: "Zwykły użytkownik",
-    scenario1Spend: "~8$/mies. średnich wydatków",
-    scenario1Earn:
-      "= 0,80$/mies. za polecenie (lub 1,20$/mies. przez link do skilla)",
-    scenario2Label: "Deweloper / heavy AI user",
-    scenario2Spend: "200$+/mies.",
-    scenario2Earn:
-      "= 20$+/mies. za polecenie (lub 30$+/mies. przez link do skilla)",
-    note: "Jedno polecenie dewelopera przez link do skilla przynosi 30$/mies. To więcej niż 37 zwykłych użytkowników. Deweloperzy to cel wysokiej wartości - już wydają 100–200$/mies. na narzędzia AI i rzadko rezygnują.",
+    scenario1Label: "Subskrybent planu",
+    scenario1Spend: "Plan za {{planPrice}}/mies.",
+    scenario1Earn: "= {{planEarn}}/mies. za polecenie",
+    scenario2Label: "Power user (agenci, API, obrazy i wideo)",
+    scenario2Spend:
+      "Plan {{planPrice}} + {{powerPacks}} pakietów kredytów po {{packPrice}} = {{powerSpend}}/mies.",
+    scenario2Earn: "= {{powerEarn}}/mies. za polecenie",
+    note: "Jeden power user daje Ci tyle, co {{powerVsPlan}} subskrybentów planu. Deweloperzy z agentami i API szybko zużywają kredyty i rzadko rezygnują. To najcenniejsza grupa.",
     example:
-      "Poleć 10 zwykłych użytkowników przez link polecający: 8$/mies. dla Ciebie. Te same 10 przez link do skilla: 12$/mies. Nie zmienia życia - ale to pieniądze, które zarobiłeś/aś mówiąc to, co i tak byś powiedział/a.",
+      "Poleć 10 subskrybentów planu: {{tenPlanEarn}}/mies. dla Ciebie. Fortuny na tym nie zbijesz. Ale to pieniądze za coś, co i tak byś powiedział(a).",
   },
   firststeps: {
     title: "Pierwsze kroki (5 minut)",

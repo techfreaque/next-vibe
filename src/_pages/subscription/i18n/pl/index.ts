@@ -135,8 +135,6 @@ export const translations: typeof enTranslations = {
         nowpayments: {
           description: "Kryptowaluta",
         },
-        cryptoMonthlyDisabled:
-          "Płatności kryptowalutą są dostępne tylko dla subskrypcji rocznych ze względu na wymagania minimalnej wartości transakcji (minimum 80 PLN).",
         cryptoMinimumPacks:
           "Płatności kryptowalutą wymagają minimum {{minPacks}} pakietów kredytów ({{minValue}}) ze względu na wymagania minimalnej wartości transakcji.",
       },

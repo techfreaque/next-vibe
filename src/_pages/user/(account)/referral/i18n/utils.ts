@@ -1,5 +1,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
+import { getUsdPriceCents } from "@/products/repository-client";
 import { computeLevelPercentages, REFERRAL_CONFIG } from "@/referral/config";
 
 import type { ReferralPageT } from ".";
@@ -54,7 +55,7 @@ function fmtPct(value: number): string {
 
 /**
  * Format cents as a locale-aware USD amount.
- * e.g. en-US: $20.00, de-DE: 20,00 $, pl-PL: 20,00 USD
+ * e.g. en-US: $8.80, de-DE: 8,80 $, pl-PL: 8,80 USD
  * Omits decimal places when the amount is a whole dollar.
  */
 function fmtUSD(cents: number, locale: CountryLanguage): string {
@@ -203,4 +204,56 @@ export function getChainScenarios(locale: CountryLanguage): ChainScenario[] {
     });
   }
   return result;
+}
+
+/** Extra credit packs per month in the "heavy" and "power" spend examples. */
+const HEAVY_EXTRA_PACKS = 4;
+const POWER_EXTRA_PACKS = 20;
+
+/**
+ * Example spend profiles for referral articles, built only from real products:
+ * the monthly plan, plus N one-time credit packs on top. Every amount is
+ * derived from product prices and REFERRAL_CONFIG, so copy never quotes a
+ * plan we don't sell.
+ */
+export function getReferralExampleParams(
+  locale: CountryLanguage,
+): Record<string, string> {
+  const prices = getUsdPriceCents();
+  const percentages = computeLevelPercentages();
+  const direct = REFERRAL_CONFIG.DIRECT_PERCENTAGE;
+  const skill = percentages[1] ?? 0;
+  const fmt = (cents: number): string => fmtUSD(Math.round(cents), locale);
+
+  const plan = prices.subscriptionMonthly;
+  const plusPack = plan + prices.creditPack;
+  const heavy = plan + HEAVY_EXTRA_PACKS * prices.creditPack;
+  const power = plan + POWER_EXTRA_PACKS * prices.creditPack;
+  const min = REFERRAL_CONFIG.MIN_PAYOUT_CENTS;
+
+  return {
+    directPct: fmtPct(direct),
+    skillBonusPct: fmtPct(skill),
+    planPrice: fmt(plan),
+    packPrice: fmt(prices.creditPack),
+    planEarn: fmt(plan * direct),
+    planSkillEarn: fmt(plan * skill),
+    plusPackSpend: fmt(plusPack),
+    plusPackEarn: fmt(plusPack * direct),
+    plusPackSkillEarn: fmt(plusPack * skill),
+    heavyPacks: String(HEAVY_EXTRA_PACKS),
+    heavySpend: fmt(heavy),
+    heavyEarn: fmt(heavy * direct),
+    heavySkillEarn: fmt(heavy * skill),
+    powerPacks: String(POWER_EXTRA_PACKS),
+    powerSpend: fmt(power),
+    powerEarn: fmt(power * direct),
+    powerSkillEarn: fmt(power * skill),
+    /** How many plan subscribers one power user is worth. */
+    powerVsPlan: String(Math.floor(power / plan)),
+    tenPlanEarn: fmt(10 * plan * direct),
+    minPayout: fmt(min),
+    payoutPlanMonths: String(Math.ceil(min / (plan * direct))),
+    payoutPowerMonths: String(Math.ceil(min / (power * direct))),
+  };
 }

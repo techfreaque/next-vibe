@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "You built something with AI. Now earn from sharing it.",
     description:
-      "For developers: your GitHub READMEs, blog posts, and tutorials already have referral potential. Here's the math - including the skill bonus that doubles your income per user.",
+      "For developers: your GitHub READMEs, blog posts, and tutorials already have referral potential. Here's the math, including the skill bonus you earn when others share your skill.",
     category: "Affiliate Program",
     imageAlt: "A developer's terminal with earnings stats alongside code",
     keywords:
@@ -42,31 +42,31 @@ export const translations = {
     tableHeaderSkill: "Others share your skill (5%)",
     rows: [
       {
-        profile: "Casual user",
-        spend: "$8/mo",
-        direct: "$0.80/mo",
-        skill: "$0.40/mo",
+        profile: "Plan subscriber",
+        spend: "{{planPrice}}/mo",
+        direct: "{{planEarn}}/mo",
+        skill: "{{planSkillEarn}}/mo",
       },
       {
-        profile: "Regular subscriber",
-        spend: "$20/mo",
-        direct: "$2.00/mo",
-        skill: "$1.00/mo",
+        profile: "Plan + 1 credit pack",
+        spend: "{{plusPackSpend}}/mo",
+        direct: "{{plusPackEarn}}/mo",
+        skill: "{{plusPackSkillEarn}}/mo",
       },
       {
-        profile: "Heavy AI user",
-        spend: "$100/mo",
-        direct: "$10.00/mo",
-        skill: "$5.00/mo",
+        profile: "Heavy user: plan + {{heavyPacks}} packs",
+        spend: "{{heavySpend}}/mo",
+        direct: "{{heavyEarn}}/mo",
+        skill: "{{heavySkillEarn}}/mo",
       },
       {
-        profile: "Developer / power user",
-        spend: "$200+/mo",
-        direct: "$20.00+/mo",
-        skill: "$10.00+/mo",
+        profile: "Power user: plan + {{powerPacks}} packs",
+        spend: "{{powerSpend}}/mo",
+        direct: "{{powerEarn}}/mo",
+        skill: "{{powerSkillEarn}}/mo",
       },
     ],
-    note: "One developer referral via your skill link earns you $30/mo. That's more than 37 casual users combined. Developers are already spending $100–200/mo on AI tools - they convert fast and rarely churn.",
+    note: "One power user through your link earns you {{powerEarn}}/mo. That's {{powerVsPlan}} plan subscribers in one. Developers already pay for AI tools. They convert fast and rarely churn.",
     growthNote:
       "As {{appName}} adds models and capabilities, ARPU trends up. Referrals you make today earn you more next year without any extra work.",
   },
@@ -85,12 +85,12 @@ export const translations = {
   },
   crypto: {
     title: "Payout in crypto - no bank account needed",
-    p1: "Earnings pay out in BTC or USDC. Processed within 48 hours after approval. Minimum payout is $40 - roughly 2 months from a single developer subscriber via a skill link.",
+    p1: "Earnings pay out in BTC or USDC. Processed within 48 hours after approval. Minimum payout is {{minPayout}}: about {{payoutPowerMonths}} months from one power user, or {{payoutPlanMonths}} subscriber-months on the plan.",
     p2: "Or convert earnings instantly to platform credits. If you're using {{appName}} yourself, your referral income offsets your own usage costs.",
   },
   close: {
     title: "Turn on the stream",
-    p1: "You're already building, writing, and talking about AI tools. Adding a referral link costs nothing and takes five minutes. Adding a skill link to the same place doubles your per-user earnings.",
+    p1: "You're already building, writing, and talking about AI tools. Adding a referral link costs nothing and takes five minutes. Publish a skill too, and you also earn when other people share it.",
     p2: "The compounding math - recurring commissions, rising ARPU, developer-to-developer chain - works in your favor the more you build in public.",
     createCode: "Create your referral code",
     joinDiscord: "Join the Discord",

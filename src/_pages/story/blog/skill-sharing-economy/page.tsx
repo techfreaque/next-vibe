@@ -20,6 +20,7 @@ import {
 } from "next-vibe/ui/components/table";
 import type { JSX } from "react";
 
+import { getReferralExampleParams } from "@/_pages/user/(account)/referral/i18n/utils";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -130,10 +131,11 @@ export function TanstackPage({
     },
   ];
 
+  const ex = getReferralExampleParams(locale);
   const mathRows = (["row1", "row2", "row3", "row4"] as const).map((row) => ({
-    profile: t(`theMath.${row}Profile`),
-    spend: t(`theMath.${row}Spend`),
-    earn: t(`theMath.${row}Earn`),
+    profile: t(`theMath.${row}Profile`, ex),
+    spend: t(`theMath.${row}Spend`, ex),
+    earn: t(`theMath.${row}Earn`, ex),
   }));
 
   const howToSteps = [

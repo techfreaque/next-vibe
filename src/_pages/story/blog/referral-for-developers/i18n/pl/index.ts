@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Zbudowałeś/aś coś z AI. Teraz zarabiaj na tym, że to udostępniasz.",
     description:
-      "Dla deweloperów: Twoje README na GitHubie, posty na blogu i tutoriale mają już potencjał polecający. Oto matematyka - w tym bonus za skill, który podwaja zarobki na użytkownika.",
+      "Dla deweloperów: Twoje README na GitHubie, posty na blogu i tutoriale mają już potencjał polecający. Oto matematyka, łącznie z bonusem za skill, gdy inni go udostępniają.",
     category: "Program polecający",
     imageAlt: "Terminal dewelopera ze statystykami zarobków obok kodu",
     keywords:
@@ -44,31 +44,31 @@ export const translations: typeof enTranslations = {
     tableHeaderSkill: "Inni udostępniają Twój skill (5%)",
     rows: [
       {
-        profile: "Okazjonalny użytkownik",
-        spend: "8$/mies.",
-        direct: "0,80$/mies.",
-        skill: "0,40$/mies.",
+        profile: "Subskrybent planu",
+        spend: "{{planPrice}}/mies.",
+        direct: "{{planEarn}}/mies.",
+        skill: "{{planSkillEarn}}/mies.",
       },
       {
-        profile: "Regularny subskrybent",
-        spend: "20$/mies.",
-        direct: "2,00$/mies.",
-        skill: "1,00$/mies.",
+        profile: "Plan + 1 pakiet kredytów",
+        spend: "{{plusPackSpend}}/mies.",
+        direct: "{{plusPackEarn}}/mies.",
+        skill: "{{plusPackSkillEarn}}/mies.",
       },
       {
-        profile: "Heavy AI user",
-        spend: "100$/mies.",
-        direct: "10,00$/mies.",
-        skill: "5,00$/mies.",
+        profile: "Intensywny użytkownik: plan + {{heavyPacks}} pakiety",
+        spend: "{{heavySpend}}/mies.",
+        direct: "{{heavyEarn}}/mies.",
+        skill: "{{heavySkillEarn}}/mies.",
       },
       {
-        profile: "Deweloper / power user",
-        spend: "200$+/mies.",
-        direct: "20,00$+/mies.",
-        skill: "10,00$+/mies.",
+        profile: "Power user: plan + {{powerPacks}} pakietów",
+        spend: "{{powerSpend}}/mies.",
+        direct: "{{powerEarn}}/mies.",
+        skill: "{{powerSkillEarn}}/mies.",
       },
     ],
-    note: "Jedno polecenie dewelopera przez link do skilla przynosi Ci 30$/mies. To więcej niż 37 okazjonalnych użytkowników razem. Deweloperzy już wydają 100–200$/mies. na narzędzia AI - konwertują szybko i rzadko rezygnują.",
+    note: "Jeden power user z Twojego linku daje Ci {{powerEarn}}/mies. Tyle, co {{powerVsPlan}} subskrybentów planu razem. Deweloperzy już płacą za narzędzia AI. Konwertują szybko i rzadko rezygnują.",
     growthNote:
       "Gdy {{appName}} dodaje modele i funkcje, ARPU rośnie. Polecenia, które robisz dziś, przynoszą Ci więcej w przyszłym roku - bez dodatkowej pracy.",
   },
@@ -86,12 +86,12 @@ export const translations: typeof enTranslations = {
   },
   crypto: {
     title: "Wypłata w krypto - nie potrzeba konta bankowego",
-    p1: "Wypłata w BTC lub USDC. Przetwarzanie w ciągu 48 godzin po zatwierdzeniu. Minimalna wypłata: 40$ - to mniej więcej 2 miesiące od jednego subskrybenta-dewelopera przez link do skilla.",
+    p1: "Wypłata w BTC lub USDC. Przetwarzanie w ciągu 48 godzin po zatwierdzeniu. Minimalna wypłata: {{minPayout}}. To około {{payoutPowerMonths}} miesiące z jednym power userem albo {{payoutPlanMonths}} miesięcy subskrypcji planu.",
     p2: "Albo natychmiast zamień zarobki na kredyty platformy. Jeśli sam/a używasz {{appName}}, zarobki z poleceń kompensują Twoje własne koszty.",
   },
   close: {
     title: "Włącz strumień",
-    p1: "Już budujesz, piszesz i mówisz o narzędziach AI. Dodanie linku polecającego nic Cię nie kosztuje i zajmuje pięć minut. Umieszczenie linku do skilla w tym samym miejscu podwaja zarobki na użytkownika.",
+    p1: "Już budujesz, piszesz i mówisz o narzędziach AI. Dodanie linku polecającego nic Cię nie kosztuje i zajmuje pięć minut. Opublikuj też skill, a zarobisz także wtedy, gdy udostępnią go inni.",
     p2: "Matematyka procentu składanego - cykliczne prowizje, rosnący ARPU, łańcuch deweloper-do-dewelopera - działa tym bardziej na Twoją korzyść, im więcej budujesz publicznie.",
     createCode: "Utwórz kod polecający",
     joinDiscord: "Dołącz do Discorda",

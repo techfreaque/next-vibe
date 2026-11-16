@@ -17,6 +17,7 @@ import {
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { getReferralExampleParams } from "@/_pages/user/(account)/referral/i18n/utils";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -93,6 +94,7 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const ex = getReferralExampleParams(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
 
   const examples = [
@@ -103,10 +105,10 @@ export function TanstackPage({
   ];
 
   const mathRows = ([0, 1, 2, 3] as const).map((i) => ({
-    profile: t(`math.rows.${i}.profile`),
-    spend: t(`math.rows.${i}.spend`),
-    direct: t(`math.rows.${i}.direct`),
-    skill: t(`math.rows.${i}.skill`),
+    profile: t(`math.rows.${i}.profile`, ex),
+    spend: t(`math.rows.${i}.spend`, ex),
+    direct: t(`math.rows.${i}.direct`, ex),
+    skill: t(`math.rows.${i}.skill`, ex),
   }));
 
   const chainKeys = [
@@ -194,7 +196,7 @@ export function TanstackPage({
             </Table>
           </Div>
           <Callout tone="neutral" icon={Info}>
-            {t("math.note", { appName })}
+            {t("math.note", { ...ex, appName })}
           </Callout>
           <Callout tone="success" icon={TrendingUp}>
             {t("math.growthNote", { appName })}
@@ -214,7 +216,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection title={t("crypto.title")}>
-          <ArticleP>{t("crypto.p1")}</ArticleP>
+          <ArticleP>{t("crypto.p1", ex)}</ArticleP>
           <ArticleP>{t("crypto.p2", { appName })}</ArticleP>
         </ArticleSection>
 

@@ -131,8 +131,6 @@ export const translations = {
         nowpayments: {
           description: "Cryptocurrency",
         },
-        cryptoMonthlyDisabled:
-          "Cryptocurrency payments are only available for yearly subscriptions due to minimum transaction value requirements (minimum $20).",
         cryptoMinimumPacks:
           "Cryptocurrency payments require a minimum of {{minPacks}} credit packs ({{minValue}}) due to minimum transaction value requirements.",
       },

@@ -1,3 +1,5 @@
+import { getUsdPriceCents } from "@/products/repository-client";
+
 /**
  * Referral program configuration - single source of truth.
  * Both the payout algorithm (repository.ts) and the UI (page-client.tsx)
@@ -14,8 +16,11 @@ export const REFERRAL_CONFIG = {
   MAX_UPLINE_LEVELS: 5,
   /** Minimum payout threshold in cents ($40) */
   MIN_PAYOUT_CENTS: 4000,
-  /** Example subscription price in cents used in UI illustrations */
-  EXAMPLE_PRICE_CENTS: 2000,
+  /**
+   * Example spend in UI illustrations: the real monthly subscription price
+   * (USD cents), so "every X/mo subscriber earns you Y" always matches pricing.
+   */
+  EXAMPLE_PRICE_CENTS: getUsdPriceCents().subscriptionMonthly,
   /** Crypto payout processing time in hours (used in UI and emails) */
   CRYPTO_PAYOUT_HOURS: 48,
   /**

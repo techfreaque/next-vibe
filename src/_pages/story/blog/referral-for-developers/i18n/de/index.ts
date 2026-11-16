@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Du hast was mit KI gebaut. Jetzt verdien damit, es zu teilen.",
     description:
-      "Für Entwickler: Deine GitHub READMEs, Blog-Posts und Tutorials haben bereits Empfehlungspotenzial. Hier die Rechnung - einschließlich des Skill-Bonus, der dein Einkommen pro Nutzer verdoppelt.",
+      "Für Entwickler: Deine GitHub READMEs, Blog-Posts und Tutorials haben bereits Empfehlungspotenzial. Hier die Rechnung, inklusive Skill-Bonus, wenn andere deinen Skill teilen.",
     category: "Empfehlungsprogramm",
     imageAlt:
       "Das Terminal eines Entwicklers mit Einnahmenstatistiken neben Code",
@@ -45,31 +45,31 @@ export const translations: typeof enTranslations = {
     tableHeaderSkill: "Andere teilen deinen Skill (5 %)",
     rows: [
       {
-        profile: "Gelegenheitsnutzer",
-        spend: "8 $/Monat",
-        direct: "0,80 $/Monat",
-        skill: "0,40 $/Monat",
+        profile: "Abonnent im Plan",
+        spend: "{{planPrice}}/Monat",
+        direct: "{{planEarn}}/Monat",
+        skill: "{{planSkillEarn}}/Monat",
       },
       {
-        profile: "Regulärer Abonnent",
-        spend: "20 $/Monat",
-        direct: "2,00 $/Monat",
-        skill: "1,00 $/Monat",
+        profile: "Plan + 1 Credit-Paket",
+        spend: "{{plusPackSpend}}/Monat",
+        direct: "{{plusPackEarn}}/Monat",
+        skill: "{{plusPackSkillEarn}}/Monat",
       },
       {
-        profile: "Heavy AI User",
-        spend: "100 $/Monat",
-        direct: "10,00 $/Monat",
-        skill: "5,00 $/Monat",
+        profile: "Vielnutzer: Plan + {{heavyPacks}} Pakete",
+        spend: "{{heavySpend}}/Monat",
+        direct: "{{heavyEarn}}/Monat",
+        skill: "{{heavySkillEarn}}/Monat",
       },
       {
-        profile: "Entwickler / Power User",
-        spend: "200 $+/Monat",
-        direct: "20,00 $+/Monat",
-        skill: "10,00 $+/Monat",
+        profile: "Power User: Plan + {{powerPacks}} Pakete",
+        spend: "{{powerSpend}}/Monat",
+        direct: "{{powerEarn}}/Monat",
+        skill: "{{powerSkillEarn}}/Monat",
       },
     ],
-    note: "Eine Entwickler-Empfehlung über deinen Skill-Link bringt dir 30 $/Monat. Das ist mehr als 37 Gelegenheitsnutzer zusammen. Entwickler geben bereits 100–200 $/Monat für KI-Tools aus - sie konvertieren schnell und kündigen selten.",
+    note: "Ein Power User über deinen Link bringt dir {{powerEarn}}/Monat. So viel wie {{powerVsPlan}} Plan-Abonnenten zusammen. Entwickler zahlen längst für KI-Tools. Sie konvertieren schnell und kündigen selten.",
     growthNote:
       "Da {{appName}} Modelle und Features hinzufügt, steigt der ARPU. Empfehlungen, die du heute machst, bringen dir nächstes Jahr mehr - ohne zusätzliche Arbeit.",
   },
@@ -88,12 +88,12 @@ export const translations: typeof enTranslations = {
   },
   crypto: {
     title: "Auszahlung in Krypto - kein Bankkonto nötig",
-    p1: "Auszahlung in BTC oder USDC. Verarbeitung innerhalb von 48 Stunden nach Genehmigung. Mindestbetrag: 40 $ - das entspricht etwa 2 Monaten von einem einzigen Entwickler-Abonnenten via Skill-Link.",
+    p1: "Auszahlung in BTC oder USDC. Verarbeitung innerhalb von 48 Stunden nach Genehmigung. Mindestbetrag: {{minPayout}}. Das sind etwa {{payoutPowerMonths}} Monate mit einem Power User oder {{payoutPlanMonths}} Abo-Monate im Plan.",
     p2: "Alternativ sofort in Plattform-Credits umwandeln. Wenn du {{appName}} selbst nutzt, gleichen deine Empfehlungseinnahmen deine eigenen Nutzungskosten aus.",
   },
   close: {
     title: "Zapf den Strom an",
-    p1: "Du baust, schreibst und redest bereits über KI-Tools. Einen Empfehlungslink hinzuzufügen kostet nichts und dauert fünf Minuten. Einen Skill-Link an derselben Stelle zu platzieren verdoppelt dein Einkommen pro Nutzer.",
+    p1: "Du baust, schreibst und redest bereits über KI-Tools. Einen Empfehlungslink hinzuzufügen kostet nichts und dauert fünf Minuten. Veröffentlichst du dazu einen Skill, verdienst du auch dann, wenn andere ihn teilen.",
     p2: "Der Zinseszinseffekt - wiederkehrende Provisionen, steigender ARPU, Entwickler-zu-Entwickler-Kette - arbeitet umso mehr für dich, je öffentlicher du baust.",
     createCode: "Empfehlungscode erstellen",
     joinDiscord: "Discord beitreten",

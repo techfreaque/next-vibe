@@ -509,6 +509,23 @@ export function getPricingParams(
 }
 
 /**
+ * USD list prices in cents, for USD-denominated illustrations (referral
+ * earnings examples are paid and shown in USD).
+ */
+export function getUsdPriceCents(): {
+  subscriptionMonthly: number;
+  creditPack: number;
+} {
+  const sub = productDefinitions[ProductIds.SUBSCRIPTION];
+  const pack = productDefinitions[ProductIds.CREDIT_PACK];
+  const packPrices = pack.oneTimePriceByCountry ?? pack.priceByCountry;
+  return {
+    subscriptionMonthly: Math.round(sub.priceByCountry.US.price * 100),
+    creditPack: Math.round(packPrices.US.price * 100),
+  };
+}
+
+/**
  * ============================================================================
  * PRICING PLAN INTERFACES AND HELPERS
  * Replaces story/pricing/_components/pricing.tsx

@@ -18,6 +18,7 @@ import {
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { getReferralExampleParams } from "@/_pages/user/(account)/referral/i18n/utils";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -130,6 +131,7 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const ex = getReferralExampleParams(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
   const referralHref = `/${locale}/user/referral`;
 
@@ -202,14 +204,14 @@ export function TanstackPage({
           <Div className="grid gap-3 sm:grid-cols-2">
             {[
               {
-                label: t("expectations.scenario1Label"),
-                spend: t("expectations.scenario1Spend"),
-                earn: t("expectations.scenario1Earn"),
+                label: t("expectations.scenario1Label", ex),
+                spend: t("expectations.scenario1Spend", ex),
+                earn: t("expectations.scenario1Earn", ex),
               },
               {
-                label: t("expectations.scenario2Label"),
-                spend: t("expectations.scenario2Spend"),
-                earn: t("expectations.scenario2Earn"),
+                label: t("expectations.scenario2Label", ex),
+                spend: t("expectations.scenario2Spend", ex),
+                earn: t("expectations.scenario2Earn", ex),
               },
             ].map((scenario) => (
               <Div
@@ -227,9 +229,9 @@ export function TanstackPage({
             ))}
           </Div>
           <Callout tone="warning" icon={Lightbulb}>
-            {t("expectations.note")}
+            {t("expectations.note", ex)}
           </Callout>
-          <ArticleP>{t("expectations.example")}</ArticleP>
+          <ArticleP>{t("expectations.example", ex)}</ArticleP>
         </ArticleSection>
 
         <ArticleSection title={t("firststeps.title")}>
