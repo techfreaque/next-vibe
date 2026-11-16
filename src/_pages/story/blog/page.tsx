@@ -17,13 +17,12 @@ import { Span } from "next-vibe/ui/components/span";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
-import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
 import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 
 import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { scopedTranslation } from "./i18n";
-import { type BlogPostSlug, formatPostDate } from "./posts-meta";
+import { listBlogPostCards } from "./posts-cards";
 
 // Per-visitor newsletter CTA (the story layout is force-dynamic anyway)
 export const dynamic = "force-dynamic";
@@ -167,145 +166,17 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const credits = FEEDBACK_REWARD_CREDITS;
-
-  const post = (
-    slug: BlogPostSlug,
-    content: Omit<BlogCardData, "href" | "date">,
-  ): BlogCardData => ({
-    href: `/${locale}/story/blog/${slug}`,
-    date: formatPostDate(slug, locale),
-    ...content,
-  });
 
   // Newest first; product updates lead, deep dives and referral guides follow.
   const posts: BlogCardData[] = [
-    post("ai-music-and-voice-generators", {
-      title: t("posts.musicVoice.title"),
-      category: t("posts.musicVoice.category"),
-      excerpt: t("posts.musicVoice.excerpt"),
-      readTime: t("posts.musicVoice.readTime"),
-    }),
-    post("ai-video-generators-compared", {
-      title: t("posts.videoGenerators.title"),
-      category: t("posts.videoGenerators.category"),
-      excerpt: t("posts.videoGenerators.excerpt"),
-      readTime: t("posts.videoGenerators.readTime"),
-    }),
-    post("openai-anthropic-compatible-api", {
-      title: t("posts.compatibleApi.title"),
-      category: t("posts.compatibleApi.category"),
-      excerpt: t("posts.compatibleApi.excerpt"),
-      readTime: t("posts.compatibleApi.readTime"),
-    }),
-    post("chatgpt-alternative-without-filters", {
-      title: t("posts.chatgptAlternative.title"),
-      category: t("posts.chatgptAlternative.category"),
-      excerpt: t("posts.chatgptAlternative.excerpt"),
-      readTime: t("posts.chatgptAlternative.readTime"),
-    }),
-    post("unbottled-api-in-coding-tools", {
-      title: t("posts.codingTools.title"),
-      category: t("posts.codingTools.category"),
-      excerpt: t("posts.codingTools.excerpt"),
-      readTime: t("posts.codingTools.readTime"),
-    }),
-    post("uncensored-models-what-each-is-good-at", {
-      title: t("posts.uncensoredGuide.title"),
-      category: t("posts.uncensoredGuide.category"),
-      excerpt: t("posts.uncensoredGuide.excerpt"),
-      readTime: t("posts.uncensoredGuide.readTime"),
-    }),
-    post("model-refresh-uncensored-providers", {
-      title: t("posts.modelRefresh.title"),
-      category: t("posts.modelRefresh.category"),
-      excerpt: t("posts.modelRefresh.excerpt"),
-      readTime: t("posts.modelRefresh.readTime"),
-    }),
-    post("whats-new-november-2026", {
-      title: t("posts.whatsNewNovember2026.title"),
-      category: t("posts.whatsNewNovember2026.category"),
-      excerpt: t("posts.whatsNewNovember2026.excerpt"),
-      readTime: t("posts.whatsNewNovember2026.readTime"),
-    }),
-    post("hermes-thea-two-way-remote", {
-      title: t("posts.hermesThea.title"),
-      category: t("posts.hermesThea.category"),
-      excerpt: t("posts.hermesThea.excerpt"),
-      readTime: t("posts.hermesThea.readTime"),
-    }),
-    post("interactive-coding-agent", {
-      title: t("posts.codingAgent.title"),
-      category: t("posts.codingAgent.category"),
-      excerpt: t("posts.codingAgent.excerpt"),
-      readTime: t("posts.codingAgent.readTime"),
-    }),
-    post("e2e-tests-found-real-bugs", {
-      title: t("posts.e2eTests.title"),
-      category: t("posts.e2eTests.category"),
-      excerpt: t("posts.e2eTests.excerpt"),
-      readTime: t("posts.e2eTests.readTime"),
-    }),
-    post("whats-new-may-2026", {
-      title: t("posts.whatsNewMay2026.title"),
-      category: t("posts.whatsNewMay2026.category"),
-      excerpt: t("posts.whatsNewMay2026.excerpt", { credits }),
-      readTime: t("posts.whatsNewMay2026.readTime"),
-    }),
-    post("whats-new-april-2026", {
-      title: t("posts.whatsNewApril2026.title"),
-      category: t("posts.whatsNewApril2026.category"),
-      excerpt: t("posts.whatsNewApril2026.excerpt"),
-      readTime: t("posts.whatsNewApril2026.readTime"),
-    }),
-    post("one-endpoint-every-surface", {
-      title: t("posts.oneEndpoint.title"),
-      category: t("posts.oneEndpoint.category"),
-      excerpt: t("posts.oneEndpoint.excerpt"),
-      readTime: t("posts.oneEndpoint.readTime"),
-    }),
-    post("skill-sharing-economy", {
-      title: t("posts.skillSharingEconomy.title"),
-      category: t("posts.skillSharingEconomy.category"),
-      excerpt: t("posts.skillSharingEconomy.excerpt"),
-      readTime: t("posts.skillSharingEconomy.readTime"),
-    }),
-    post("one-codebase-13-platforms", {
-      title: t("posts.oneCodebase.title"),
-      category: t("posts.oneCodebase.category"),
-      excerpt: t("posts.oneCodebase.excerpt"),
-      readTime: t("posts.oneCodebase.readTime"),
-    }),
-    post("type-checker-made-ai-stop-lying", {
-      title: t("posts.typeChecker.title"),
-      category: t("posts.typeChecker.category"),
-      excerpt: t("posts.typeChecker.excerpt"),
-      readTime: t("posts.typeChecker.readTime"),
-    }),
-    post("dead-trading-bot-to-monitoring-engine", {
-      title: t("posts.tradingBot.title"),
-      category: t("posts.tradingBot.category"),
-      excerpt: t("posts.tradingBot.excerpt"),
-      readTime: t("posts.tradingBot.readTime"),
-    }),
-    post("referral-for-beginners", {
-      title: t("posts.referralBeginners.title"),
-      category: t("posts.referralBeginners.category"),
-      excerpt: t("posts.referralBeginners.excerpt"),
-      readTime: t("posts.referralBeginners.readTime"),
-    }),
-    post("referral-for-developers", {
-      title: t("posts.referralDevelopers.title"),
-      category: t("posts.referralDevelopers.category"),
-      excerpt: t("posts.referralDevelopers.excerpt"),
-      readTime: t("posts.referralDevelopers.readTime"),
-    }),
-    post("referral-for-affiliate-pros", {
-      title: t("posts.referralAffiliatePros.title"),
-      category: t("posts.referralAffiliatePros.category"),
-      excerpt: t("posts.referralAffiliatePros.excerpt"),
-      readTime: t("posts.referralAffiliatePros.readTime"),
-    }),
+    ...listBlogPostCards(locale).map((card) => ({
+      href: `/${locale}${card.path}`,
+      date: card.date,
+      title: card.title,
+      category: card.category,
+      excerpt: card.excerpt,
+      readTime: card.readTime,
+    })),
     {
       href: `/${locale}/story/earn`,
       date: undefined,

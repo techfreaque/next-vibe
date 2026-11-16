@@ -33,7 +33,6 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -119,7 +118,7 @@ export function TanstackPage({ locale }: HermesTheaPageData): JSX.Element {
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("hermes-thea-two-way-remote", locale)}
+        post={{ slug: "hermes-thea-two-way-remote", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

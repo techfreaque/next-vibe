@@ -26,7 +26,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, Cta, FeatureCard } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -114,7 +113,7 @@ export function TanstackPage({ locale }: WhatsNewMay2026PageData): JSX.Element {
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("whats-new-may-2026", locale)}
+        post={{ slug: "whats-new-may-2026", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

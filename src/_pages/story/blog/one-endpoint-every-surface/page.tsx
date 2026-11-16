@@ -23,7 +23,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -106,7 +105,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("one-endpoint-every-surface", locale)}
+        post={{ slug: "one-endpoint-every-surface", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

@@ -13,11 +13,13 @@ import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Video } from "next-vibe/ui/components/icons/Video";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Span } from "next-vibe/ui/components/span";
 import { Summary } from "next-vibe/ui/components/summary";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { getReferralParams } from "@/_pages/user/(account)/referral/i18n/utils";
 import { getApiAccessPrices } from "@/api-keys/access";
 import { configScopedTranslation } from "@/env/i18n";
@@ -232,6 +234,15 @@ export function TanstackPage({ locale }: PartnersPageData): JSX.Element {
       </PageSection>
 
       <PageSection label={t("faq.label")} title={t("faq.title")}>
+        <JsonLd
+          id="faq-structured-data"
+          data={buildFaqStructuredData(
+            FAQ_IDS.map((id) => ({
+              question: t(`faq.items.${id}.q`),
+              answer: t(`faq.items.${id}.a`, referral),
+            })),
+          )}
+        />
         <Div className="flex max-w-3xl flex-col divide-y divide-border rounded-2xl border border-border bg-card">
           {FAQ_IDS.map((id) => (
             <Details

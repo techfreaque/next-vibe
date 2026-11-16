@@ -76,6 +76,6 @@ export const config = {
     // unlisted public file (was: logo.png, og-image.jpg — the OG image and
     // structured-data logo) is unreachable.
     "/",
-    "/((?!_next/static|_next/image|image|images|favicon\\.ico|favicon\\.png|favicon\\.svg|logo\\.png|og-image\\.jpg|robots\\.txt|sitemap\\.xml|vibe-frame|api/[^/]+/manifest|_serverFn).*)",
+    "/((?!_next/static|_next/image|image|images|favicon\\.ico|favicon\\.png|favicon\\.svg|logo\\.png|og-image\\.jpg|robots\\.txt|sitemap\\.xml|llms\\.txt|llms-full\\.txt|vibe-frame|api/[^/]+/manifest|_serverFn).*)",
   ],
 };

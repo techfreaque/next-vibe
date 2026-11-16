@@ -31,7 +31,6 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -142,7 +141,7 @@ export function TanstackPage({ locale }: E2ETestsPageData): JSX.Element {
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("e2e-tests-found-real-bugs", locale)}
+        post={{ slug: "e2e-tests-found-real-bugs", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

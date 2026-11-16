@@ -7,6 +7,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
@@ -14,6 +15,7 @@ import { openUrl } from "next-vibe/ui/lib/location";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
+import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import contactDefinitions from "@/contact/definition";
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
@@ -122,6 +124,43 @@ export default function HelpPageClient({
         <H2 className="text-2xl font-bold mb-6 text-center">
           {t("pages.help.faq.title")}
         </H2>
+        <JsonLd
+          id="faq-structured-data"
+          data={buildFaqStructuredData([
+            {
+              question: t("pages.help.faq.questions.q1.question", {
+                appName: configT("appName"),
+              }),
+              answer: t("pages.help.faq.questions.q1.answer", {
+                appName: configT("appName"),
+                modelCount,
+              }),
+            },
+            {
+              question: t("pages.help.faq.questions.q2.question"),
+              answer: t("pages.help.faq.questions.q2.answer", {
+                subPrice,
+                subCredits,
+                packPrice,
+                packCredits,
+              }),
+            },
+            {
+              question: t("pages.help.faq.questions.q3.question"),
+              answer: t("pages.help.faq.questions.q3.answer", {
+                subPrice,
+                subCredits,
+                packPrice,
+                packCredits,
+                modelCount,
+              }),
+            },
+            {
+              question: t("pages.help.faq.questions.q4.question"),
+              answer: t("pages.help.faq.questions.q4.answer"),
+            },
+          ])}
+        />
         <Div className="grid md:grid-cols-2 gap-8">
           <Div>
             <H3 className="text-lg font-semibold mb-2">

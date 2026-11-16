@@ -6,10 +6,12 @@
  * end-of-article CTA. Semantic tokens only - identical in light and dark.
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Li } from "next-vibe/ui/components/li";
 import { Link } from "next-vibe/ui/components/link";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
@@ -20,6 +22,8 @@ import { Ul } from "next-vibe/ui/components/ul";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
+import { buildBlogPostStructuredData } from "../../_components/structured-data";
+import { type BlogPostSlug, formatPostDate } from "../blog/posts-meta";
 import { CtaRow } from "./marketing";
 
 /** Reading column: 16px gutters on phones, 3xl measure on desktop. */
@@ -31,8 +35,13 @@ export interface ArticleHeaderProps {
   back: { href: string; label: string };
   category?: ReactNode;
   readTime?: ReactNode;
-  /** Pre-formatted publication date. */
+  /** Pre-formatted publication date (use `post` for blog posts). */
   date?: ReactNode;
+  /**
+   * Blog post this header belongs to: shows its publication date and emits
+   * its BlogPosting + BreadcrumbList structured data.
+   */
+  post?: { slug: BlogPostSlug; locale: CountryLanguage };
   title: ReactNode;
   subtitle?: ReactNode;
 }
@@ -42,11 +51,17 @@ export function ArticleHeader({
   category,
   readTime,
   date,
+  post,
   title,
   subtitle,
 }: ArticleHeaderProps): JSX.Element {
+  const structuredData =
+    post === undefined ? null : buildBlogPostStructuredData(post);
   return (
     <Div className="border-b border-border bg-linear-to-b from-primary/[0.05] to-background">
+      {structuredData !== null && (
+        <JsonLd id="article-structured-data" data={structuredData} />
+      )}
       <Div className={cn(READING_COLUMN, "pt-8 pb-12 md:pt-14 md:pb-16")}>
         <Link
           href={back.href}
@@ -55,7 +70,13 @@ export function ArticleHeader({
           <ArrowLeft className="h-4 w-4" />
           {back.label}
         </Link>
-        <ArticleMeta category={category} readTime={readTime} date={date} />
+        <ArticleMeta
+          category={category}
+          readTime={readTime}
+          date={
+            post === undefined ? date : formatPostDate(post.slug, post.locale)
+          }
+        />
         <H1 className="mt-5 text-4xl font-semibold tracking-tight text-balance break-words hyphens-auto text-foreground md:text-5xl md:leading-[1.1]">
           {title}
         </H1>

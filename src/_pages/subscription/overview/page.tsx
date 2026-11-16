@@ -1,8 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
+
+import { buildPricingStructuredData } from "@/_pages/_components/structured-data";
 
 import { generateSubscriptionMetadata } from "../metadata";
 import { subscriptionLoader } from "../shared-loader";
@@ -27,6 +32,8 @@ export interface OverviewPageData {
     ReturnType<typeof subscriptionLoader>
   >["initialCredits"];
   platform: Awaited<ReturnType<typeof subscriptionLoader>>["platform"];
+  /** Product + Offer JSON-LD for the public pricing page. */
+  structuredData: JsonLdNode;
 }
 
 export async function tanstackLoader({
@@ -35,8 +42,17 @@ export async function tanstackLoader({
 }: PageProps): Promise<OverviewPageData> {
   const { locale } = await params;
   const query = await searchParams;
-  const data = await subscriptionLoader({ locale, searchParams: query });
-  return data;
+  const [data, availability] = await Promise.all([
+    subscriptionLoader({ locale, searchParams: query }),
+    getEnvAvailability(),
+  ]);
+  return {
+    ...data,
+    structuredData: buildPricingStructuredData({
+      locale,
+      modelCount: getAvailableChatModelCount(false, availability),
+    }),
+  };
 }
 
 export function TanstackPage({
@@ -44,14 +60,18 @@ export function TanstackPage({
   user,
   initialCredits,
   platform,
+  structuredData,
 }: OverviewPageData): JSX.Element {
   return (
-    <OverviewPageClient
-      locale={locale}
-      user={user}
-      initialCredits={initialCredits}
-      platform={platform}
-    />
+    <>
+      <JsonLd id="pricing-structured-data" data={structuredData} />
+      <OverviewPageClient
+        locale={locale}
+        user={user}
+        initialCredits={initialCredits}
+        platform={platform}
+      />
+    </>
   );
 }
 

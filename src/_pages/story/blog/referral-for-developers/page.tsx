@@ -28,7 +28,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -125,7 +124,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("referral-for-developers", locale)}
+        post={{ slug: "referral-for-developers", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

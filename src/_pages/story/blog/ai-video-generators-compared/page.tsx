@@ -43,6 +43,7 @@ import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Video } from "next-vibe/ui/components/icons/Video";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import {
@@ -55,6 +56,7 @@ import {
 } from "next-vibe/ui/components/table";
 import type { JSX } from "react";
 
+import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import {
   creditValueText,
   formatNumber,
@@ -86,7 +88,6 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -531,7 +532,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate(SLUG, locale)}
+        post={{ slug: SLUG, locale }}
         title={t("hero.title", stats)}
         subtitle={t("hero.subtitle", stats)}
       />
@@ -798,6 +799,15 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection id="faq" title={t("faq.title")}>
+          <JsonLd
+            id="faq-structured-data"
+            data={buildFaqStructuredData(
+              FAQ_KEYS.map((key) => ({
+                question: t(`faq.${key}.q`, stats),
+                answer: t(`faq.${key}.a`, stats),
+              })),
+            )}
+          />
           {FAQ_KEYS.map((key) => (
             <Div key={key} className="flex flex-col gap-2">
               <ArticleH3>{t(`faq.${key}.q`, stats)}</ArticleH3>

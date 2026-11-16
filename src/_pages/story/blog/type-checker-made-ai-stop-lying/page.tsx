@@ -26,7 +26,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -196,7 +195,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
         back={back}
         category={t("hero.label")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("type-checker-made-ai-stop-lying", locale)}
+        post={{ slug: "type-checker-made-ai-stop-lying", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

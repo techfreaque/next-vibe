@@ -27,10 +27,12 @@ import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
+import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
 import { configScopedTranslation } from "@/env/i18n";
 import {
@@ -52,7 +54,6 @@ import {
   InlineCode,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -244,7 +245,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate(SLUG, locale)}
+        post={{ slug: SLUG, locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle", { appName })}
       />
@@ -370,6 +371,15 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection title={t("faq.title")}>
+          <JsonLd
+            id="faq-structured-data"
+            data={buildFaqStructuredData(
+              FAQ_KEYS.map((key) => ({
+                question: t(`faq.${key}.q`, { appName }),
+                answer: t(`faq.${key}.a`, { ...prices, appName }),
+              })),
+            )}
+          />
           {FAQ_KEYS.map((key) => (
             <Div key={key} className="flex flex-col gap-2">
               <ArticleH3>{t(`faq.${key}.q`, { appName })}</ArticleH3>

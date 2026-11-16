@@ -28,7 +28,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -262,7 +261,7 @@ export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {
         back={back}
         category={t("category")}
         readTime={t("readingTime")}
-        date={formatPostDate("one-codebase-13-platforms", locale)}
+        post={{ slug: "one-codebase-13-platforms", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

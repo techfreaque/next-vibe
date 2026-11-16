@@ -48,7 +48,6 @@ import {
   FeatureCard,
   FeatureGrid,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -251,7 +250,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("model-refresh-uncensored-providers", locale)}
+        post={{ slug: "model-refresh-uncensored-providers", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

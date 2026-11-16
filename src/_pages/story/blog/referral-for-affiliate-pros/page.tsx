@@ -34,7 +34,6 @@ import {
   FeatureCard,
   FeatureGrid,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -155,7 +154,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("referral-for-affiliate-pros", locale)}
+        post={{ slug: "referral-for-affiliate-pros", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

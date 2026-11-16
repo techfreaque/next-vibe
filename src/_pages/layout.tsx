@@ -5,7 +5,10 @@ import "next-vibe/ui/global-css";
 import type { Metadata, Viewport } from "next";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
+import {
+  getAvailableChatModelCount,
+  getAvailableChatProviderCount,
+} from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -13,6 +16,7 @@ import { Body } from "next-vibe/ui/components/body";
 import { inter } from "next-vibe/ui/components/font";
 import { Head } from "next-vibe/ui/components/head";
 import { Html } from "next-vibe/ui/components/html";
+import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { LinkTag } from "next-vibe/ui/components/link-tag";
 import { Meta } from "next-vibe/ui/components/meta";
 import { Outlet } from "next-vibe/ui/components/outlet";
@@ -23,8 +27,7 @@ import { cookies } from "next-vibe/ui/lib/headers";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX, ReactNode } from "react";
 
-import { configScopedTranslation } from "@/env/i18n";
-
+import { buildSiteStructuredData } from "./_components/structured-data";
 import { scopedTranslation } from "./layout-i18n";
 import { RootProviders } from "./layout-shared";
 
@@ -64,24 +67,9 @@ interface RootLayoutProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-interface StructuredDataOrganization {
-  "@context": string;
-  "@type": string;
-  name: string;
-  url: string;
-  logo: string;
-  sameAs: string[];
-  contactPoint: {
-    "@type": string;
-    email: string;
-    contactType: string;
-    availableLanguage: string[];
-  };
-}
-
 interface RootLayoutData {
   locale: CountryLanguage;
-  structuredData: StructuredDataOrganization;
+  structuredData: JsonLdNode;
   theme: ThemePreference;
   availability: AgentEnvAvailability;
   children?: ReactNode;
@@ -98,30 +86,15 @@ export async function tanstackLoader({
   if (!/^[a-z]{2}-[A-Z]+$/.test(locale)) {
     notFound();
   }
-  const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: configT("group.name"),
-    url: envClient.NEXT_PUBLIC_APP_URL,
-    logo: new URL("/logo.png", envClient.NEXT_PUBLIC_APP_URL).toString(),
-    sameAs: [configT("social.twitterUrl")],
-    contactPoint: {
-      "@type": "ContactPoint",
-      email: configT("emails.support"),
-      contactType: t("structuredData.organization.contactPoint.contactType"),
-      availableLanguage: [
-        t("constants.languages.en"),
-        t("constants.languages.de"),
-        t("constants.languages.pl"),
-      ],
-    },
-  };
   const themeCookie = (await cookies()).get("theme_v2")?.value;
   const theme: ThemePreference =
     themeCookie === "light" || themeCookie === "system" ? themeCookie : "dark";
   const availability = await getEnvAvailability();
+  const structuredData = buildSiteStructuredData({
+    locale,
+    modelCount: getAvailableChatModelCount(false, availability),
+    providerCount: getAvailableChatProviderCount(false, availability),
+  });
 
   return { locale, structuredData, theme, availability };
 }
@@ -161,13 +134,7 @@ export function TanstackPage({
           <Outlet>{children}</Outlet>
         </RootProviders>
         <Scripts />
-        <Script
-          id="structured-data"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        />
+        <JsonLd id="structured-data" data={structuredData} />
       </Body>
     </Html>
   );

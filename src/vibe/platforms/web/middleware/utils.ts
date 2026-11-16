@@ -19,6 +19,8 @@ export function shouldSkipPath(path: string): boolean {
       null ||
     path === "/favicon.ico" ||
     path === "/robots.txt" ||
+    path === "/llms.txt" ||
+    path === "/llms-full.txt" ||
     path === "/sitemap.xml" ||
     path.endsWith("/sitemap.xml") ||
     path.endsWith("/sitemap.xml.gz") ||

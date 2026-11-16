@@ -8,3 +8,5 @@ Disallow: /*/tools/
 Disallow: /*/user/
 
 Sitemap: https://unbottled.ai/sitemap.xml
+
+# Site map for AI assistants (llmstxt.org): https://unbottled.ai/llms.txt

@@ -30,7 +30,6 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -92,7 +91,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("interactive-coding-agent", locale)}
+        post={{ slug: "interactive-coding-agent", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

@@ -38,7 +38,6 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, Cta } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 // Revalidate every hour (ISR)
@@ -325,7 +324,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
         back={back}
         category={t("hero.eyebrow")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("dead-trading-bot-to-monitoring-engine", locale)}
+        post={{ slug: "dead-trading-bot-to-monitoring-engine", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />

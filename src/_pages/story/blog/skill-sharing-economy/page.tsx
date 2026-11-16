@@ -41,7 +41,6 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { formatPostDate } from "../posts-meta";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -151,7 +150,7 @@ export function TanstackPage({
         back={back}
         category={t("hero.category")}
         readTime={t("hero.readTime")}
-        date={formatPostDate("skill-sharing-economy", locale)}
+        post={{ slug: "skill-sharing-economy", locale }}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
       />
