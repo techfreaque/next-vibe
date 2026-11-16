@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**favorites result:** the call succeeded and returned a `favorites` array — 26 entries on page 1, with `matchedCount: 34`, `totalCount: 34`, and `totalPages: 2`. Each entry carries a full record (id, name, description, model info, position, skill id, tagline, voice). The active favorite is correctly flagged with `activeBadge: \"active\"` (Quality Tester - Budget).\n\nThe required `favorites` array is present and populated, so the check passes.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

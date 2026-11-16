@@ -66,6 +66,49 @@ function safeUrl(url: string | undefined): string | undefined {
   return url?.startsWith("data:") ? "[inline media omitted]" : url;
 }
 
+/** Fields the media branch rebuilds itself (URL fields, text, type, cost). */
+const MEDIA_RESULT_REBUILT_KEYS = new Set([
+  "file",
+  "imageUrl",
+  "videoUrl",
+  "audioUrl",
+  "text",
+  "mediaType",
+  "creditCost",
+]);
+
+/**
+ * Every other field of a media tool result (durationSeconds, dimensions,
+ * model, ...), kept so the model reads in later turns what it read live.
+ * Rebuilding only URL/text/type/cost made a music result lose its
+ * durationSeconds in history, and the model then flagged its own earlier
+ * (correct) report as fabricated. Inline data URIs stay out.
+ */
+function mediaResultExtraFields(
+  mediaResult: WidgetData | undefined,
+): Record<string, JSONValue> {
+  const extras: Record<string, JSONValue> = {};
+  if (
+    mediaResult === null ||
+    mediaResult === undefined ||
+    typeof mediaResult !== "object" ||
+    Array.isArray(mediaResult) ||
+    mediaResult instanceof Date
+  ) {
+    return extras;
+  }
+  for (const [key, value] of Object.entries(mediaResult)) {
+    if (MEDIA_RESULT_REBUILT_KEYS.has(key) || value === undefined) {
+      continue;
+    }
+    extras[key] =
+      typeof value === "string"
+        ? (safeUrl(value) ?? value)
+        : sanitizeToolResult(value as JSONValue);
+  }
+  return extras;
+}
+
 /**
  * Can this model actually SEE an image placed inside a tool result?
  *
@@ -358,6 +401,7 @@ export async function buildToolResultOutput(
       return {
         type: "json" as const,
         value: {
+          ...mediaResultExtraFields(effectiveResult),
           file: safeUrl(fileUrl) ?? null,
           text: mediaResult.text ?? null,
           mediaType: mediaResult.mediaType ?? null,
@@ -372,6 +416,7 @@ export async function buildToolResultOutput(
     return {
       type: "json" as const,
       value: {
+        ...mediaResultExtraFields(effectiveResult),
         ...(mediaResult.imageUrl !== undefined && {
           imageUrl: safeUrl(mediaResult.imageUrl),
         }),

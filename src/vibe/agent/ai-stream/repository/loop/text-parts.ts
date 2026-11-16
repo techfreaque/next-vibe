@@ -4,17 +4,12 @@
 
 import "server-only";
 
+import { advanceChainTip, chainPlaceholderAssistant } from "./chain-tip";
 import type { AssistantPrepResult, StreamLoopState } from "./state";
 
 /**
  * Advance the chain tip (currentParentId + lastParentId) to a newly written
- * message so the next message becomes its child.
- *
- * clearPendingQueueParent: pass true when the new message was just created
- * as a child of the current tip (first text/reasoning content of a step).
- * If pendingQueueParentId was the parent for this new message, the chain has
- * advanced past the compacting point - it is cleared so finish-step and
- * onToolCall don't re-apply the compacting ID as parent.
+ * message. See chain-tip.ts (advanceChainTip) for the contract.
  *
  * Callers with rewind guards (tool-result/tool-error: only advance when no
  * pending entry matched) keep those guards at the call site - whether to
@@ -25,15 +20,7 @@ export function advanceTip(
   messageId: string | null,
   opts: { clearPendingQueueParent: boolean },
 ): void {
-  const { ctx } = state.p;
-  if (
-    opts.clearPendingQueueParent &&
-    ctx.pendingQueueParentId === ctx.currentParentId
-  ) {
-    ctx.pendingQueueParentId = null;
-  }
-  ctx.currentParentId = messageId;
-  ctx.lastParentId = messageId;
+  advanceChainTip(state.p.ctx, messageId, opts);
 }
 
 /** Handle a text-delta part: create the assistant message on first delta,
@@ -278,6 +265,10 @@ export async function ensureAssistantMessage(
       skill,
       sequenceId,
     });
+    // The placeholder is this step's assistant message: it becomes the tip
+    // (and consumes a compacting/queued-message override it hangs off), so
+    // the tool row chains under it instead of beside it.
+    chainPlaceholderAssistant(ctx, currentAssistantMessageId, initialParentId);
 
     logger.debug("[AI Stream] Created placeholder ASSISTANT message", {
       messageId: currentAssistantMessageId,

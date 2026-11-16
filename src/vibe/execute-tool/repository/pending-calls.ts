@@ -253,6 +253,25 @@ export class PendingCalls {
   }
 
   /**
+   * The tool output inside a relayed remote result. The receiver relays its
+   * execute() data ({ result: <tool output> }) as the wire output, so a
+   * completed entry nests the tool output one level too deep for consumers
+   * that hand it on as the tool's own result (await-task, parked revivals).
+   */
+  static peelReceiverEnvelope(
+    output: Record<string, WidgetData> | null | undefined,
+  ): Record<string, WidgetData> | null {
+    if (!output) {
+      return null;
+    }
+    const keys = Object.keys(output);
+    if (keys.length !== 1 || keys[0] !== "result") {
+      return output;
+    }
+    return PendingCalls.toOutputObject(output["result"]) ?? output;
+  }
+
+  /**
    * Narrow an arbitrary WidgetData value to a plain output object, or null.
    * Shared by every consumer of a wire/DB tool result (results are either a
    * plain object or absent — arrays/scalars/Dates are not valid tool outputs).

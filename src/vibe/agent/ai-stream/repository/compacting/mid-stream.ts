@@ -205,8 +205,12 @@ export class MidStreamCompactingHandler {
       containsMediaReferences: false,
     });
 
+    // The summarizer sees the original task prompt too (it stays verbatim in
+    // the compacted context): without it the middle turns open on a bare
+    // assistant tool call and the summary claimed "no user request was made".
     const compactingMessages: ModelMessage[] = [
       ...systemMessages,
+      ...(firstUserMessage ? [firstUserMessage] : []),
       ...middleTurns,
       {
         role: "user" as const,

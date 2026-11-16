@@ -138,6 +138,8 @@ export class ChatFavoritesRepository {
     query?: string,
     page?: number,
     pageSize?: number,
+    /** The calling stream's own favorite (id or slug); wins over chat_settings. */
+    streamFavoriteId?: string,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
     const userId = targetUserId && isAdmin ? targetUserId : user.id;
@@ -180,9 +182,12 @@ export class ChatFavoritesRepository {
         logger,
         settingsT,
       );
-      const activeFavoriteId = settingsResult.success
-        ? settingsResult.data.activeFavoriteId
-        : null;
+      // A stream reports the favorite it actually runs on as active (a
+      // headless/override run can differ from the user's selected one).
+      const targetsOwnFavorites = userId === user.id;
+      const activeFavoriteId =
+        (targetsOwnFavorites ? streamFavoriteId : undefined) ??
+        (settingsResult.success ? settingsResult.data.activeFavoriteId : null);
 
       const favorites = await db
         .select()
@@ -327,8 +332,15 @@ export class ChatFavoritesRepository {
       characterName,
       characterTagline,
       characterDescription,
-      // Match activeFavoriteId against both slug and UUID
-      favorite.slug === activeFavoriteId || favorite.id === activeFavoriteId
+      // Match activeFavoriteId against slug, UUID and "skill__variant"
+      // (the id form a stream can carry for a skill-variant favorite)
+      favorite.slug === activeFavoriteId ||
+        favorite.id === activeFavoriteId ||
+        (activeFavoriteId !== null &&
+          isSkillVariantId(activeFavoriteId) &&
+          parseSkillId(activeFavoriteId).skillId === favorite.skillId &&
+          (parseSkillId(activeFavoriteId).variantId ?? null) ===
+            (favorite.variantId ?? null))
         ? favorite.slug || favorite.id
         : null,
       characterVoice,

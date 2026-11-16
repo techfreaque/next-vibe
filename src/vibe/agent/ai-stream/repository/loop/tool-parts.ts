@@ -23,6 +23,7 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
+import { resolveToolParentId } from "./chain-tip";
 import { normalizeExecuteToolArgs } from "./execute-tool-args";
 import {
   endLoopNeedsAnswerStep,
@@ -208,31 +209,9 @@ export async function onToolCall(
 
   const prep = await state.ensureAssistantMessage(ctx.currentParentId);
 
-  // Mid-stream compacting race: prepareStep can fire and complete its compacting
-  // DB write DURING the flushContent() await inside ensureAssistantMessage.
-  // When that happens ctx.currentParentId AND pendingQueueParentId are both set
-  // to the compacting message ID (the direct sets in performMidStreamCompacting).
-  // prep.currentParentId is the stale pre-compacting value captured before the yield.
-  //
-  // Use the compacting message as tool parent ONLY when currentParentId still points
-  // to it — meaning no subsequent message (e.g. a reasoning block) has been created
-  // as a child of compact yet. If currentParentId has already advanced past compact
-  // (a text-delta created an assistant message that correctly chains off compact),
-  // use prep.currentParentId instead — the assistant is the correct parent.
-  const compactingId = ctx.pendingQueueParentId;
-  const toolParentId =
-    compactingId !== null &&
-    compactingId !== undefined &&
-    ctx.currentParentId === compactingId
-      ? compactingId
-      : prep.currentParentId;
-  if (
-    compactingId !== null &&
-    compactingId !== undefined &&
-    ctx.currentParentId === compactingId
-  ) {
-    ctx.pendingQueueParentId = null;
-  }
+  // Normally the step's assistant; the summary only in the compacting race
+  // (see chain-tip.ts resolveToolParentId).
+  const toolParentId = resolveToolParentId(ctx, prep.currentParentId);
 
   logger.debug("[AI Stream] Tool confirmation check", {
     toolName: part.toolName,
@@ -432,10 +411,13 @@ export async function onToolResult(
   // (the task was detached successfully). Do NOT treat detach as isWaitingForRemote - its result
   // must be written to DB so handleTaskCompletion can attach the deferred result later.
   const isDetach = toolCallData.toolCall.callbackMode === "detach";
+  // Prefer this call's own recorded outcome; the shared flag may have been
+  // raised by a parallel sibling still waiting on its remote task.
   let isWaitingForRemote =
     !effectiveIsError &&
     !isDetach &&
-    toolExecutionContext.waitingForRemoteResult === true;
+    (pendingToolMessage.remoteWait ??
+      toolExecutionContext.waitingForRemoteResult === true);
   if (
     !isWaitingForRemote &&
     !effectiveIsError &&

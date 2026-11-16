@@ -13,7 +13,15 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger, t, locale, data, platform }) =>
+    handler: ({
+      user,
+      logger,
+      t,
+      locale,
+      data,
+      platform,
+      toolExecutionContext,
+    }) =>
       ChatFavoritesRepository.getFavorites(
         user,
         logger,
@@ -24,6 +32,9 @@ export const { GET, tools } = endpointsHandler({
         data.query,
         data.page,
         data.pageSize,
+        // Inside a stream the active favorite is the one the AI runs on; only
+        // stream-less calls (web page, CLI) fall back to chat_settings.
+        toolExecutionContext.favoriteId,
       ),
   },
 });

@@ -299,6 +299,19 @@ export async function resolveProdUserId(): Promise<string> {
   return rows.rows[0]!.id;
 }
 
+/** Spendable pack balance of a user in the Hermes DB (sum of unexpired
+ *  remaining pack amounts). */
+async function readProdPackBalance(prodUserId: string): Promise<number> {
+  const packRows = await getProdDb().execute<{ total: string }>(
+    sql`SELECT COALESCE(SUM(cp.remaining), 0) AS total
+        FROM credit_packs cp
+        JOIN credit_wallets cw ON cw.id = cp.wallet_id
+        WHERE cw.user_id = ${prodUserId}
+          AND (cp.expires_at IS NULL OR cp.expires_at > NOW())`,
+  );
+  return parseFloat(packRows.rows[0]?.total ?? "0");
+}
+
 /**
  * Ensure the hermes-dev admin user has at least `minCredits` permanent credits.
  * Used by direct-mode tests that send tool calls to hermes-dev (3002) directly — hermes
@@ -313,15 +326,7 @@ export async function ensureProdUserCredits(
 ): Promise<void> {
   const pdb = getProdDb();
 
-  // Read current packable balance (sum of remaining pack amounts)
-  const packRows = await pdb.execute<{ total: string }>(
-    sql`SELECT COALESCE(SUM(cp.remaining), 0) AS total
-        FROM credit_packs cp
-        JOIN credit_wallets cw ON cw.id = cp.wallet_id
-        WHERE cw.user_id = ${prodUserId}
-          AND (cp.expires_at IS NULL OR cp.expires_at > NOW())`,
-  );
-  const current = parseFloat(packRows.rows[0]?.total ?? "0");
+  const current = await readProdPackBalance(prodUserId);
   if (current >= minCredits) {
     return;
   }
@@ -390,10 +395,18 @@ export async function ensureRemoteUserCredits(
       `[ensureRemoteUserCredits] Admin user ${identityEnv.VIBE_ADMIN_USER_EMAIL} not found in atlas DB`,
     );
   }
+  // A floor, not a grant: topping up by the full amount every run grew the
+  // remote wallet without bound (20k per suite run), so replayed answers that
+  // quote the balance stopped matching the live credits-balance result and
+  // live verdict steps flagged the mismatch.
+  const current = await readProdPackBalance(userId);
+  if (current >= minCredits) {
+    return;
+  }
   const result = await sendTestRequest({
     toolExecutionContext: rootlessToolExecutionContext(),
     endpoint: adminAddDefinitions.POST,
-    data: { targetUserId: userId, amount: minCredits },
+    data: { targetUserId: userId, amount: Math.ceil(minCredits - current) },
     user: adminUser,
     instanceId: HERMES_INSTANCE_ID,
   });

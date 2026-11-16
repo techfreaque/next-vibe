@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The detached task resolved cleanly. `await-task` returned `status: status.completed` with `waiting: false`, and the nested `result` carries `responsePath: \"/memories/cb-await-task-test\"` along with `size: 23` and an `updatedAt` timestamp — matching the 23-byte `await-task-test-payload` content written.\n\nNothing off in this step.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

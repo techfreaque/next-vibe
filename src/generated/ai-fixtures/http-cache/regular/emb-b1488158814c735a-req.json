@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/tool-catalog-checks-and-music-generation-test-497052ba-5779-4cbd-8fa6-fe4c90d4ddf9.md\n\n# Tool catalog checks and music generation test\nFolder: private\nDescription: The thread validated the tool catalog with three parallel tool-help calls: the ai category returned 92 tools each with a name and description, the search query returned 11 matches with a consistent per-category breakdown, and the generate_image detail call returned a full parameters schema. A retry-",
+    "encoding_format": "float"
+  }
+}

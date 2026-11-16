@@ -330,6 +330,7 @@ function createToolFromEndpoint(
         let perCallToolMessageId: string | undefined;
         let perCallLeafMessageId: string | null = null;
         let effectiveToolCallId = options?.toolCallId;
+        let perCallPending: PendingToolEntry | undefined;
 
         if (options?.toolCallId && context.toolExecutionContext) {
           effectiveToolCallId = claimExecuteToolCallId(
@@ -354,6 +355,7 @@ function createToolFromEndpoint(
             }
           }
           if (pending) {
+            perCallPending = pending;
             perCallToolMessageId = pending.messageId;
             perCallLeafMessageId =
               pending.toolCallData?.parentId ??
@@ -438,6 +440,14 @@ function createToolFromEndpoint(
           context.toolExecutionContext.stepHasToolsAwaitingConfirmation = true;
         }
 
+        // Record THIS call's own outcome on its pending entry: the result
+        // handler must not read a parallel sibling's remote wait as its own
+        // (a rename-thread next to a remote endLoop call lost its result and
+        // stayed pending forever).
+        if (perCallPending) {
+          perCallPending.remoteWait =
+            perCalltoolExecutionContext?.waitingForRemoteResult === true;
+        }
         if (perCalltoolExecutionContext?.waitingForRemoteResult) {
           // Confirm: a real WAIT task was created - keep the shared flag true
           if (context.toolExecutionContext) {
@@ -484,6 +494,15 @@ function createToolFromEndpoint(
     },
   });
 }
+
+/** One entry of the stream's pendingToolMessages map. */
+type PendingToolEntry =
+  NonNullable<ToolExecutionContext["pendingToolMessages"]> extends Map<
+    string,
+    infer Entry
+  >
+    ? Entry
+    : never;
 
 const allCallbackModes = ["detach", "wakeUp", "endLoop", "approve"];
 

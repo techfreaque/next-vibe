@@ -329,6 +329,15 @@ export function assertToolMessageComplete(
   }
 }
 
+/** An endLoop tool row hanging directly off `parentId`. */
+function isEndLoopChildOf(m: SlimMessage, parentId: string): boolean {
+  return (
+    m.role === "tool" &&
+    m.parentId === parentId &&
+    m.toolCall?.callbackMode === "endLoop"
+  );
+}
+
 /**
  * The real chain tip after an answer: when the answer's step fired an endLoop
  * side-action (rename-thread on an untitled/stale thread), that tool row is
@@ -337,19 +346,37 @@ export function assertToolMessageComplete(
  * whether or not the row already has children, so a later send that names
  * the same assistant (retry/branch from a recorded parent) lands on the same
  * parent as the original.
+ *
+ * Also accepts an endLoop TOOL row as the start: parallel endLoop calls of
+ * one step chain linearly (tool -> tool), so a step that fired the asked
+ * endLoop tool plus the mandated rename-thread ends on the rename row. Hops
+ * past the first stay inside the start's step (same sequenceId).
  */
 export function tipAfterAnswer(aiId: string, messages: SlimMessage[]): string {
-  const ai = messages.find((m) => m.id === aiId);
-  if (ai?.role !== "assistant") {
+  const start = messages.find((m) => m.id === aiId);
+  if (start?.role !== "assistant" && start?.role !== "tool") {
     return aiId;
   }
-  const endLoopChild = messages.findLast(
-    (m) =>
-      m.role === "tool" &&
-      m.parentId === aiId &&
-      m.toolCall?.callbackMode === "endLoop",
-  );
-  return endLoopChild?.id ?? aiId;
+  let tip = start;
+  // An assistant's first hop keeps the original rule (any endLoop child).
+  if (start.role === "assistant") {
+    const first = messages.findLast((m) => isEndLoopChildOf(m, start.id));
+    if (!first) {
+      return aiId;
+    }
+    tip = first;
+  }
+  for (;;) {
+    const current = tip;
+    const next = messages.findLast(
+      (m) =>
+        isEndLoopChildOf(m, current.id) && m.sequenceId === current.sequenceId,
+    );
+    if (!next) {
+      return current.id;
+    }
+    tip = next;
+  }
 }
 
 /**

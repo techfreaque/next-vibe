@@ -145,6 +145,11 @@ export interface ToolExecutionContext {
         string,
         {
           messageId: string;
+          /** This call's own outcome, recorded by tools-loader once its
+           *  execute() returned: true when it parked a remote WAIT/END_LOOP
+           *  task. The shared waitingForRemoteResult flag can belong to a
+           *  parallel sibling. */
+          remoteWait?: boolean;
           toolCallData?: {
             parentId: string | null;
             toolCall?: {

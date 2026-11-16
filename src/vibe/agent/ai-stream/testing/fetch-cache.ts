@@ -16,7 +16,7 @@
  * content-hashed: the Nth external call replays file N. One folder per test
  * file; {instance} (atlas/hermes) disambiguates cross-instance calls.
  *
- * EXCEPTION — embeddings are CONTENT-ADDRESSED (`emb-{sha256(body)}-res.json`)
+ * EXCEPTION — embeddings (`emb-{hash}`) and compacting/summarizer calls (`cmp-{hash}`) are CONTENT-ADDRESSED
  * and do NOT consume the shared ordinal: they fire both on-path and
  * fire-and-forget, so their count/order varies per run. Ordinal-keying made
  * them miss → go live → burn the idle watchdog AND drift the counter for the
@@ -59,6 +59,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { Environment } from "next-vibe/env/env-util";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import type { ToolExecutionContext } from "../../../core/execution-context";
 
@@ -175,6 +176,36 @@ export function normalizeEmbeddingBodyForHash(bodyStr: string): string {
         /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/g,
         "TIMESTAMP",
       )
+  );
+}
+
+const compactingBodySchema = z
+  .object({ messages: z.array(z.looseObject({ role: z.string() })) })
+  .loose();
+
+/**
+ * Hash key for a summarizer (compacting) call. Its system messages carry the
+ * live per-turn context (cortex tree with thread counts and every earlier test
+ * thread, wall-clock times), which grows run to run, so a raw-body hash
+ * missed on every run and went live. The conversation being summarized plus
+ * the summarizer instructions identify the call; system messages are dropped.
+ */
+export function normalizeCompactingBodyForHash(bodyStr: string): string {
+  let parsedJson: WidgetData;
+  try {
+    parsedJson = JSON.parse(bodyStr);
+  } catch {
+    return normalizeEmbeddingBodyForHash(bodyStr);
+  }
+  const parsed = compactingBodySchema.safeParse(parsedJson);
+  if (!parsed.success) {
+    return normalizeEmbeddingBodyForHash(bodyStr);
+  }
+  return normalizeEmbeddingBodyForHash(
+    JSON.stringify({
+      ...parsed.data,
+      messages: parsed.data.messages.filter((m) => m.role !== "system"),
+    }),
   );
 }
 
@@ -736,7 +767,17 @@ async function engineFetch(
   // they can't desync the conversational chain. Detected from the request
   // alone (no markers): Embeddings (URL).
   const isEmbeddingCall = /\/embeddings\b/.test(url);
-  const isContentAddressed = isEmbeddingCall;
+  // Compacting (conversation summarizer) calls fire whenever the context
+  // crosses the trigger, so how often they run varies run to run. On the
+  // shared ordinal they shifted every later turn onto the wrong recording
+  // (route.direct.cheap T6b drift). Their body is the history being
+  // summarized, a function of its own input like an embedding, so they are
+  // content-addressed too. Marker = the instructions' opening sentence
+  // (compacting/core.ts buildCompactingInstructions).
+  const isCompactingCall = bodyStr.includes(
+    "You are a conversation summarizer.",
+  );
+  const isContentAddressed = isEmbeddingCall || isCompactingCall;
 
   // Resolve the run's fixture folder + stem:
   //   - Content-addressed (embeddings): body hash, no ordinal bump.
@@ -779,10 +820,14 @@ async function engineFetch(
     // run on the fetch watchdog. Strip those volatile tokens before hashing so
     // identical content always resolves to the same fixture.
     const bodyHash = createHash("sha256")
-      .update(normalizeEmbeddingBodyForHash(bodyStr))
+      .update(
+        isCompactingCall
+          ? normalizeCompactingBodyForHash(bodyStr)
+          : normalizeEmbeddingBodyForHash(bodyStr),
+      )
       .digest("hex")
       .slice(0, 16);
-    ordinalStem = `emb-${bodyHash}`;
+    ordinalStem = `${isCompactingCall ? "cmp" : "emb"}-${bodyHash}`;
   } else if (pinnedOrdinal !== undefined) {
     const p = await readFixturePrefix(threadId);
     if (!p) {

@@ -145,12 +145,8 @@ export async function handleToolResult(
   // WAIT path peels that wrapper in remote.ts. Parked/revived tool messages
   // store the output verbatim, so peel it for them here — otherwise the
   // stored result nests one level too deep ({ result: { result: ... } }).
-  const peeledOutput =
-    status === "completed" && output && Object.keys(output).length === 1
-      ? PendingCalls.toOutputObject(output["result"])
-      : null;
   const storedOutput: Record<string, WidgetData> | null =
-    peeledOutput ?? output;
+    status === "completed" ? PendingCalls.peelReceiverEnvelope(output) : output;
 
   if (outcome.kind === "completed") {
     // WAIT/END_LOOP callers are already unblocked by PendingCalls.complete's

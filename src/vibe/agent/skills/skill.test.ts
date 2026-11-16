@@ -585,12 +585,18 @@ When BOTH are done, end with [TEST:PASS] on success or [TEST:FAIL: <reason>] on 
       const { t } = favoritesScopedTranslation.scopedT(defaultLocale);
 
       // ── Verify favorite appears in getFavorites list ──
+      // AI callers get 25 per page; the shared test admin accumulates more
+      // favorites than that, so ask for one page that holds them all.
       const listResult = await ChatFavoritesRepository.getFavorites(
         testUser,
         logger,
         t,
         defaultLocale,
         Platform.AI,
+        undefined,
+        undefined,
+        1,
+        1000,
       );
 
       expect(

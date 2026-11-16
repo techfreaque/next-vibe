@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-callback-modes-and-detach-test-74a9c343-ff67-49fb-ac06-a2b3fbfdd93a.md\n\n# Hermes callback modes and detach test\nFolder: private\nDescription: Quality-gate run against the hermes instance covering the tool catalog (ai category, search keyword, generate_image schema), instance identity (system prompt on atlas, tools on hermes), a fork branch, the credits balance, the favorites list, and the full detach-to-await-task round trip on a cortex-w",
+    "encoding_format": "float"
+  }
+}

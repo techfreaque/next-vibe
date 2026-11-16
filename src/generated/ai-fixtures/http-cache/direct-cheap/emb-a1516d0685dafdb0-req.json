@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**await-task** resolved the detached write.\n\n- **Status:** `status.completed`, `waiting: false` — returned immediately as the task had finished\n- **responsePath:** `/memories/cb-await-task-test` — present, nested inside `result`\n- **Payload:** `created: false`, `size: 23`, `updatedAt: 2026-11-16T17:30:09.300Z` — consistent with overwriting the existing memory file\n- **Wrapper:** `originalToolName` and `originalArgs` echo the dispatched call correctly\n\nEverything matches the expected shape.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

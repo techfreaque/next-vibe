@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "Detach dispatch behaved as expected.\n\n- **taskId:** `remote-ws-hermes-call-0-2fd754a3c4c2f7b9` (non-empty string)\n- **responsePath:** absent — correct, since the write runs in the background\n- **Hint text:** returns a usable follow-up instruction (`await-task` with the returned taskId)\n\nNo inline payload came back, which is the intended contract for `callbackMode: \"detach\"`.\n\nSTEP_OK taskId=remote-ws-hermes-call-0-2fd754a3c4c2f7b9",
+    "encoding_format": "float"
+  }
+}

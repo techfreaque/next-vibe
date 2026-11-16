@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**generate_music result:**\n\n| Field | Value | Check |\n|---|---|---|\n| `audioUrl` | `/api/en-GLOBAL/vibe/agent/chat/threads/.../1ff81837-....mp3` | non-empty ✓ |\n| `creditCost` | 10.4 | positive ✓ |\n| `durationSeconds` | 8 | within 8–120 ✓ |\n\nAll three conditions met: a non-empty audio URL was returned, credit cost is positive (10.4), and duration is 8 seconds — at the lower bound of the accepted range.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

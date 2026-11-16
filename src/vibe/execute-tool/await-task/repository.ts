@@ -77,7 +77,12 @@ export class AwaitTaskRepository {
               pendingCall.result.status === "completed"
                 ? CronTaskStatus.COMPLETED
                 : CronTaskStatus.FAILED,
-            result: pendingCall.result.output ?? undefined,
+            result:
+              pendingCall.result.status === "completed"
+                ? (PendingCalls.peelReceiverEnvelope(
+                    pendingCall.result.output,
+                  ) ?? undefined)
+                : (pendingCall.result.output ?? undefined),
             waiting: false,
             originalToolName: pendingCall.toolName,
             originalArgs: pendingCall.input ?? undefined,
@@ -182,7 +187,12 @@ export class AwaitTaskRepository {
                 settledLate.result.status === "completed"
                   ? CronTaskStatus.COMPLETED
                   : CronTaskStatus.FAILED,
-              result: settledLate.result.output ?? undefined,
+              result:
+                settledLate.result.status === "completed"
+                  ? (PendingCalls.peelReceiverEnvelope(
+                      settledLate.result.output,
+                    ) ?? undefined)
+                  : (settledLate.result.output ?? undefined),
               waiting: false,
               originalToolName: pendingCall.toolName,
               originalArgs: pendingCall.input ?? undefined,

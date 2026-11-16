@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**await-task result:**\n\n| Field | Value | Check |\n|---|---|---|\n| `status` | completed | ✓ |\n| `result.imageUrl` | `/api/en-GLOBAL/vibe/agent/chat/threads/.../f418b4d0-....webp` | present, string ✓ |\n| `result.creditCost` | 1.3 | plausible |\n\nThe background task completed and its result carries a non-empty `imageUrl` string nested under `result`, exactly as expected.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

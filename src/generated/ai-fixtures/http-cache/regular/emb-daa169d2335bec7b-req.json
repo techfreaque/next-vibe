@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `generate_image` call succeeded with prompt `red circle`.\n\n- **imageUrl:** non-empty — `/api/en-GLOBAL/vibe/agent/chat/threads/files/497052ba-.../71027f45-....webp`\n- **creditCost:** `1.3` — positive\n\nBoth required conditions are met.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

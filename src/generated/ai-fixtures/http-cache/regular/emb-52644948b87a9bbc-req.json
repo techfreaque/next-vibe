@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**Phase 2 (deferred result):** the background result arrived with a non-empty image URL — `/api/en-GLOBAL/vibe/agent/chat/threads/files/e835429d-.../964c12e8-664e-49c9-b4d8-7f90316d3b01.webp` — and the image rendered inline. So the wakeUp delivery itself did produce an image.\n\n**However, the Phase 1 dispatch was not as specified.** The `wakeUp` call did not return a `taskId` at all. It returned:\n\n```\n{\"hint\":\"Task completed. Its result has been delivered below in this conversation — do NOT call this tool again; respond using that result.\",\"status\":\"completed\"}\n```\n\nNo `taskId` field, no image, and no deferred result was actually present in that turn — only a hint claiming a result had been delivered below it. That contradicts the documented Phase 1 contract (a `taskId` plus no image). I had to issue a second `generate_image` call to obtain the image, which the hint explicitly told me not to do.\n\nFAILED: wakeUp dispatch returned no taskId — only `{\"hint\":\"Task completed...\",\"status\":\"completed\"}` — and the promised deferred result was not delivered in that turn, forcing a duplicate generation call.",
+    "encoding_format": "float"
+  }
+}

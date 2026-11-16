@@ -154,3 +154,31 @@ describe("summarizePromptSize", () => {
     expect(summary.charsByRole["tool"]).toBeGreaterThan(50_000);
   });
 });
+
+describe("buildToolResultOutput: media results keep their other fields", () => {
+  it("keeps a music result's durationSeconds in history", async () => {
+    const { buildToolResultOutput } = await import("./tool-output");
+    const { getChatModelById } = await import("../../models");
+    const { createEndpointLogger } = await import("next-vibe/logger/server");
+    const output = await buildToolResultOutput(
+      createEndpointLogger(false, "en-GLOBAL"),
+      {
+        result: {
+          audioUrl: "/api/en-GLOBAL/vibe/agent/chat/threads/files/t/a.mp3",
+          creditCost: 10.4,
+          durationSeconds: 8,
+          coverUrl: `data:image/png;base64,${PNG}`,
+        },
+      },
+      "execute-tool",
+      getChatModelById(ChatModelId.VENICE_UNCENSORED),
+      false,
+    );
+    expect(output.type).toBe("json");
+    const serialized = JSON.stringify(output);
+    expect(serialized).toContain('"durationSeconds":8');
+    expect(serialized).toContain('"creditCost":10.4');
+    expect(serialized).toContain("/threads/files/t/a.mp3");
+    expect(serialized).not.toContain(PNG);
+  });
+});

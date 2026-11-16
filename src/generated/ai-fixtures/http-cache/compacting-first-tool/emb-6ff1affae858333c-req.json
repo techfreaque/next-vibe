@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/c1-compacting-test--five-sequential-tool-help-call-130fe71a-9b97-4a29-bec6-32743ec24e7a.md\n\n# C1 compacting test: five sequential tool-help calls\nFolder: private\nDescription: Ran the C1 mid-stream compacting test: five sequential tool-help queries for 'list', 'search', 'chat', 'image', and 'audio', each waiting for the prior result. All five returned valid tool catalogs, so the run was reported as C1_PASS.",
+    "encoding_format": "float"
+  }
+}

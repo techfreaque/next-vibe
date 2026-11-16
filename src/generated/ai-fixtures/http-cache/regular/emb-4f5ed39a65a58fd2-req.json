@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "**generate_image (detached) result:**\n\n| Field | Value | Check |\n|---|---|---|\n| `taskId` | `local-bg-call-100f9bf5-6e53-48d4-aafb-8f6b97e8aebd` | string ✓ |\n| `imageUrl` | — (absent) | correct — task runs in background ✓ |\n\nThe detached call returned immediately with a valid `taskId` string and no `imageUrl`, exactly as expected for background dispatch.\n\nSTEP_OK taskId=local-bg-call-100f9bf5-6e53-48d4-aafb-8f6b97e8aebd",
+    "encoding_format": "float"
+  }
+}

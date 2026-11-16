@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-tool-catalog--instance-id-and-credits-balan-a25df74a-4a52-42ec-8d25-ef340a77393d.md\n\n# Hermes tool catalog, instance ID and credits balance checks\nFolder: private\nDescription: Quality-gate test thread on the hermes instance: three parallel tool-help calls verified the ai category listing, a keyword search, and the generate_image schema. Then confirmed the system prompt runs on atlas while hermes executes tools, answered a branch-fork echo test, and read the wallet balance",
+    "encoding_format": "float"
+  }
+}

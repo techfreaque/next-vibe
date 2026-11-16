@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "`cortex-write` on hermes with `callbackMode: 'wait'` returned inline, no taskId:\n\n- `responsePath`: `/memories/cb-wait-inline-test` — present and non-empty ✅\n- `created`: false, `size`: 24, `updatedAt`: 2026-11-16T17:49:39Z (expected — this memory already existed from an earlier run, so it was an update)\n\nThe wait-mode check itself passes.\n\nOne leftover from the previous turn is off: the `rename-thread` call I fired alongside the `self-instance-id` endLoop returned `{\"hint\":\"Result not yet available.\",\"status\":\"pending\"}` — no confirmation that the title/description actually applied, and nothing ever awaited it.\n\nFAILED: rename-thread returned status \"pending\" with no confirmation the rename applied",
+    "encoding_format": "float"
+  }
+}

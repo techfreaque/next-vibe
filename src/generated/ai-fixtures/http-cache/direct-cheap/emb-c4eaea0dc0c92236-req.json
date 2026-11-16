@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/threads/private/hermes-catalog--credits--and-callback-mode-tests-faa07509-beb7-42e9-903d-7e7a9536a9e4.md\n\n# Hermes catalog, credits, and callback-mode tests\nFolder: private\nDescription: Quality-gate testing of the hermes instance: parallel tool-help calls covering the ai category, a keyword search, and the generate_image schema. Verified instance identity (atlas system prompt, hermes tool execution), wallet balance, and the 33-entry favorites list. Later turns exercised callback mo",
+    "encoding_format": "float"
+  }
+}

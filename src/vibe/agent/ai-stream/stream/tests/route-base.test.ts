@@ -73,6 +73,8 @@ import {
 } from "../../../../core/execution-context";
 import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
 import type { ImageGenModelId } from "../../../image-generation/models";
+import { scopedTranslation as consentScopedTranslation } from "../../../models/uncensored-consent/i18n";
+import { UncensoredConsentRepository } from "../../../models/uncensored-consent/repository";
 import type { MusicGenModelId } from "../../../music-generation/models";
 import {
   ContentLevel,
@@ -419,6 +421,18 @@ export function describeStreamSuite(cfg: ModeConfig): void {
         sql`DELETE FROM user_lead_links
             WHERE user_id = ${testUser.id} AND lead_id != ${testUser.leadId}`,
       );
+
+      // The quality-tester favorites resolve uncensored media models (Chroma
+      // image gen); those refuse until the one-time 18+ consent is on record.
+      // The suite exercises generation itself, so its test user consents up
+      // front (same as image-generation.e2e.test.ts; the consent gate has its
+      // own tests in models/uncensored-consent).
+      const consent = await UncensoredConsentRepository.agree(
+        testUser,
+        createEndpointLogger(false, defaultLocale),
+        consentScopedTranslation.scopedT(defaultLocale).t,
+      );
+      expect(consent.success, JSON.stringify(consent)).toBe(true);
 
       // Safety floor: 500cr before any test
       await pinBalance(testUser, 500);
@@ -2938,7 +2952,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           // cross-instance handoff. Replays finish in seconds.
           settleTimeoutMs: 900_000,
           prompt: cfg.cheapMode
-            ? `[T6v favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
+            ? `[T6v favorites] Call ${toolInstr(cfg, "favorites")} to list the user's favorites. Check that the result has a favorites array. Known-correct, not issues: favorite ids are slugs for built-in skill variants and UUIDs for favorites the user created; an earlier wakeUp call shows a taskId-only dispatch result followed later by a SEPARATE deferred result carrying the real output. End your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong.`
             : `[T6v video-gen] Generate a 'spinning cube' video that morphs from this photo ${wojakUrl} (the FIRST frame) into the image YOU generated earlier in this conversation (that earlier generated image is the LAST frame — find its URL in your own prior tool results / conversation history; do NOT reuse the first-frame photo for it). ${cfg.remoteInstanceId ? `Call execute-tool with toolName='generate_video', instanceId='${cfg.remoteInstanceId}', input containing prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].` : `Call the generate_video tool with prompt='spinning cube' and frameReferences=[{url:'${wojakUrl}',role:'first'},{url:<your earlier generated image URL>,role:'last'}].`} Check that the result has a non-empty videoUrl, a positive creditCost, and a positive durationSeconds. You must end your reply with STEP_OK if everything was correct, or FAILED: <reason> if anything was wrong as the very last step.`,
           threadId,
           favoriteId: mainFavoriteId,

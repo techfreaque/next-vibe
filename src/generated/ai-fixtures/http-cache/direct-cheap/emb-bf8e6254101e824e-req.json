@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `credits-balance` call on **hermes** returned a clean wallet object with a numeric total.\n\n| Field | Value |\n|---|---|\n| **total** | 140041.6 |\n| permanent | 140000 |\n| free | 41.6 |\n| capacity | 140070 |\n| earned | 0 |\n| expiring / expiresAt | 0 / null |\n| freeStatus | active |\n\n`total` is a proper number (140041.6), and the component parts add up sensibly (140000 permanent + 41.6 free). Nothing missing or malformed.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}

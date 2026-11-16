@@ -44,6 +44,9 @@ import {
 
 export interface PendingToolData {
   messageId: string;
+  /** Set by tools-loader after this call's execute() returned: true when it
+   *  parked a remote WAIT/END_LOOP task (see onToolResult). */
+  remoteWait?: boolean;
   toolCallData: {
     toolCall: ToolCall;
     parentId: string | null;

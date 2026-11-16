@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "The `favorites` call on **hermes** returned a proper `favorites` array with **33 entries**.\n\nEach entry is well-formed with `id`, `name`, `description`, `icon`, `modelId`, `modelInfo`, `modelProvider`, `skillId`, `tagline`, `voiceId`, and `position`. The list spans Thea variants, Vibe Coder variants, Quality Tester favorites, Business Advisor, Technical, and Test Chef Bot.\n\nNothing missing or malformed in the favorites data itself.\n\nSTEP_OK",
+    "encoding_format": "float"
+  }
+}
