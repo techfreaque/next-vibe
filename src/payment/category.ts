@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Payments",
     "de-DE": "Zahlungen",
     "pl-PL": "Płatności",
+    "fr-FR": "Paiements",
   },
   group: "business",
   icon: "credit-card",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Transactions",
         "de-DE": "Transaktionen",
         "pl-PL": "Transakcje",
+        "fr-FR": "Transactions",
       },
     },
     Providers: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Providers",
         "de-DE": "Anbieter",
         "pl-PL": "Dostawcy",
+        "fr-FR": "Fournisseurs",
       },
     },
   },

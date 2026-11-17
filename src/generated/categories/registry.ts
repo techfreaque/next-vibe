@@ -155,6 +155,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "AI Agent",
       "de-DE": "KI-Agent",
       "pl-PL": "Agent AI",
+      "fr-FR": "Agent IA",
     },
     group: "ai",
     icon: "bot",
@@ -170,6 +171,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Inference",
           "de-DE": "Inferenz",
           "pl-PL": "Wnioskowanie",
+          "fr-FR": "Inférence",
         },
       },
       Generation: {
@@ -181,6 +183,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Generation",
           "de-DE": "Generierung",
           "pl-PL": "Generowanie",
+          "fr-FR": "Génération",
         },
       },
       Tools: {
@@ -192,6 +195,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Tools",
           "de-DE": "Werkzeuge",
           "pl-PL": "Narzędzia",
+          "fr-FR": "Outils",
         },
       },
       Search: {
@@ -203,6 +207,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Search",
           "de-DE": "Suche",
           "pl-PL": "Wyszukiwanie",
+          "fr-FR": "Recherche",
         },
       },
       chat: {
@@ -214,6 +219,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Chat",
           "de-DE": "Chat",
           "pl-PL": "Chat",
+          "fr-FR": "Chat",
         },
       },
       chatFavorites: {
@@ -225,6 +231,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Favorites",
           "de-DE": "Favoriten",
           "pl-PL": "Ulubione",
+          "fr-FR": "Favoris",
         },
       },
       chatOrganization: {
@@ -236,6 +243,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Organization",
           "de-DE": "Organisation",
           "pl-PL": "Organizacja",
+          "fr-FR": "Organisation",
         },
       },
       chatSettings: {
@@ -247,6 +255,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Chat Settings",
           "de-DE": "Chat-Einstellungen",
           "pl-PL": "Ustawienia czatu",
+          "fr-FR": "Paramètres du chat",
         },
       },
       skillsManagement: {
@@ -258,6 +267,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Skills",
           "de-DE": "Skills",
           "pl-PL": "Umiejętności",
+          "fr-FR": "Compétences",
         },
       },
       skillsCommunity: {
@@ -269,6 +279,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Community Skills",
           "de-DE": "Community-Skills",
           "pl-PL": "Umiejętności społeczności",
+          "fr-FR": "Compétences de la communauté",
         },
       },
       skillsModeration: {
@@ -280,6 +291,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Skills Moderation",
           "de-DE": "Skills-Moderation",
           "pl-PL": "Moderacja umiejętności",
+          "fr-FR": "Modération des compétences",
         },
       },
       threadsManagement: {
@@ -291,6 +303,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Threads",
           "de-DE": "Threads",
           "pl-PL": "Wątki",
+          "fr-FR": "Fils de discussion",
         },
       },
       threadsSharing: {
@@ -302,6 +315,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Thread Sharing",
           "de-DE": "Thread-Freigabe",
           "pl-PL": "Udostępnianie wątków",
+          "fr-FR": "Partage de fils",
         },
       },
       threadsSearch: {
@@ -313,6 +327,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Thread Search",
           "de-DE": "Thread-Suche",
           "pl-PL": "Wyszukiwanie wątków",
+          "fr-FR": "Recherche de fils",
         },
       },
       messagesModerating: {
@@ -324,6 +339,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Messages",
           "de-DE": "Nachrichten",
           "pl-PL": "Wiadomości",
+          "fr-FR": "Messages",
         },
       },
       messagesSearch: {
@@ -335,6 +351,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Message Search",
           "de-DE": "Nachrichtensuche",
           "pl-PL": "Wyszukiwanie wiadomości",
+          "fr-FR": "Recherche de messages",
         },
       },
       messagesFiles: {
@@ -346,6 +363,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Message Files",
           "de-DE": "Nachrichtendateien",
           "pl-PL": "Pliki wiadomości",
+          "fr-FR": "Fichiers des messages",
         },
       },
       tasksCron: {
@@ -357,6 +375,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Scheduled Tasks",
           "de-DE": "Geplante Aufgaben",
           "pl-PL": "Zadania cykliczne",
+          "fr-FR": "Tâches planifiées",
         },
       },
     },
@@ -369,6 +388,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Cortex",
       "de-DE": "Cortex",
       "pl-PL": "Cortex",
+      "fr-FR": "Cortex",
     },
     group: "ai",
     icon: "brain",
@@ -383,6 +403,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Analytics",
       "de-DE": "Analytik",
       "pl-PL": "Analityka",
+      "fr-FR": "Analytique",
     },
     group: "analytics",
     icon: "bar-chart-2",
@@ -398,6 +419,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Vibe Sense",
           "de-DE": "Vibe Sense",
           "pl-PL": "Vibe Sense",
+          "fr-FR": "Vibe Sense",
         },
       },
       Indicators: {
@@ -409,6 +431,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Indicators",
           "de-DE": "Indikatoren",
           "pl-PL": "Wskaźniki",
+          "fr-FR": "Indicateurs",
         },
       },
       Evaluators: {
@@ -420,6 +443,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Evaluators",
           "de-DE": "Auswertungen",
           "pl-PL": "Ewaluatory",
+          "fr-FR": "Évaluateurs",
         },
       },
       Transformers: {
@@ -431,6 +455,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Transformers",
           "de-DE": "Transformatoren",
           "pl-PL": "Transformatory",
+          "fr-FR": "Transformateurs",
         },
       },
       leadsData: {
@@ -442,6 +467,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Leads Data",
           "de-DE": "Lead-Daten",
           "pl-PL": "Dane leadów",
+          "fr-FR": "Données des leads",
         },
       },
       usersData: {
@@ -453,6 +479,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Users Data",
           "de-DE": "Nutzerdaten",
           "pl-PL": "Dane użytkowników",
+          "fr-FR": "Données des utilisateurs",
         },
       },
       messengerData: {
@@ -464,6 +491,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Messenger Data",
           "de-DE": "Messenger-Daten",
           "pl-PL": "Dane komunikatora",
+          "fr-FR": "Données de la messagerie",
         },
       },
       paymentsData: {
@@ -475,6 +503,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Payments Data",
           "de-DE": "Zahlungsdaten",
           "pl-PL": "Dane płatności",
+          "fr-FR": "Données des paiements",
         },
       },
       creditsData: {
@@ -486,6 +515,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Credits Data",
           "de-DE": "Guthaben-Daten",
           "pl-PL": "Dane kredytów",
+          "fr-FR": "Données des crédits",
         },
       },
       subscriptionsData: {
@@ -497,6 +527,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Subscriptions Data",
           "de-DE": "Abonnement-Daten",
           "pl-PL": "Dane subskrypcji",
+          "fr-FR": "Données des abonnements",
         },
       },
       referralData: {
@@ -508,6 +539,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Referral Data",
           "de-DE": "Empfehlungsdaten",
           "pl-PL": "Dane poleceń",
+          "fr-FR": "Données du parrainage",
         },
       },
       newsletterData: {
@@ -519,6 +551,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Newsletter Data",
           "de-DE": "Newsletter-Daten",
           "pl-PL": "Dane newslettera",
+          "fr-FR": "Données de la newsletter",
         },
       },
       chatData: {
@@ -530,6 +563,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Chat Data",
           "de-DE": "Chat-Daten",
           "pl-PL": "Dane czatu",
+          "fr-FR": "Données du chat",
         },
       },
       systemData: {
@@ -541,6 +575,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "System Data",
           "de-DE": "Systemdaten",
           "pl-PL": "Dane systemowe",
+          "fr-FR": "Données système",
         },
       },
       financeData: {
@@ -552,6 +587,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Finance Data",
           "de-DE": "Finanzdaten",
           "pl-PL": "Dane finansowe",
+          "fr-FR": "Données financières",
         },
       },
     },
@@ -564,6 +600,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Payments",
       "de-DE": "Zahlungen",
       "pl-PL": "Płatności",
+      "fr-FR": "Paiements",
     },
     group: "business",
     icon: "credit-card",
@@ -579,6 +616,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Transactions",
           "de-DE": "Transaktionen",
           "pl-PL": "Transakcje",
+          "fr-FR": "Transactions",
         },
       },
       Providers: {
@@ -590,6 +628,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Providers",
           "de-DE": "Anbieter",
           "pl-PL": "Dostawcy",
+          "fr-FR": "Fournisseurs",
         },
       },
     },
@@ -602,6 +641,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Subscriptions",
       "de-DE": "Abonnements",
       "pl-PL": "Subskrypcje",
+      "fr-FR": "Abonnements",
     },
     group: "business",
     icon: "refresh-cw",
@@ -617,6 +657,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Subscriptions",
           "de-DE": "Abonnements",
           "pl-PL": "Subskrypcje",
+          "fr-FR": "Abonnements",
         },
       },
       Management: {
@@ -628,6 +669,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Management",
           "de-DE": "Verwaltung",
           "pl-PL": "Zarządzanie",
+          "fr-FR": "Gestion",
         },
       },
       subscriptionAnalytics: {
@@ -639,6 +681,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Analytics",
           "de-DE": "Analytik",
           "pl-PL": "Analityka",
+          "fr-FR": "Analytique",
         },
       },
     },
@@ -651,6 +694,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Credits",
       "de-DE": "Guthaben",
       "pl-PL": "Środki",
+      "fr-FR": "Crédits",
     },
     group: "business",
     icon: "coins",
@@ -666,6 +710,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Credits",
           "de-DE": "Guthaben",
           "pl-PL": "Środki",
+          "fr-FR": "Crédits",
         },
       },
       Management: {
@@ -677,6 +722,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Management",
           "de-DE": "Verwaltung",
           "pl-PL": "Zarządzanie",
+          "fr-FR": "Gestion",
         },
       },
     },
@@ -689,6 +735,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Leads",
       "de-DE": "Leads",
       "pl-PL": "Leady",
+      "fr-FR": "Leads",
     },
     group: "business",
     icon: "target",
@@ -704,6 +751,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Management",
           "de-DE": "Verwaltung",
           "pl-PL": "Zarządzanie",
+          "fr-FR": "Gestion",
         },
       },
       Import: {
@@ -715,6 +763,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Import",
           "de-DE": "Import",
           "pl-PL": "Import",
+          "fr-FR": "Import",
         },
       },
       Leads: {
@@ -726,6 +775,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Leads",
           "de-DE": "Leads",
           "pl-PL": "Leady",
+          "fr-FR": "Leads",
         },
       },
       emailCampaignsProcessing: {
@@ -737,6 +787,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Campaigns",
           "de-DE": "Kampagnen",
           "pl-PL": "Kampanie",
+          "fr-FR": "Campagnes",
         },
       },
       emailCampaignsJourneys: {
@@ -748,6 +799,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Journeys",
           "de-DE": "Journeys",
           "pl-PL": "Ścieżki",
+          "fr-FR": "Parcours",
         },
       },
       emailCampaignsQueue: {
@@ -759,6 +811,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Queue",
           "de-DE": "Warteschlange",
           "pl-PL": "Kolejka",
+          "fr-FR": "File d'attente",
         },
       },
       emailCampaignsStats: {
@@ -770,6 +823,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Campaign Stats",
           "de-DE": "Kampagnenstatistiken",
           "pl-PL": "Statystyki kampanii",
+          "fr-FR": "Stats des campagnes",
         },
       },
       leadMagnetIntegrations: {
@@ -781,6 +835,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Integrations",
           "de-DE": "Integrationen",
           "pl-PL": "Integracje",
+          "fr-FR": "Intégrations",
         },
       },
       growth: {
@@ -792,6 +847,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Growth",
           "de-DE": "Wachstum",
           "pl-PL": "Wzrost",
+          "fr-FR": "Croissance",
         },
       },
       outreach: {
@@ -803,6 +859,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Outreach",
           "de-DE": "Outreach",
           "pl-PL": "Outreach",
+          "fr-FR": "Prospection",
         },
       },
     },
@@ -815,6 +872,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Accounting",
       "de-DE": "Buchhaltung",
       "pl-PL": "Księgowość",
+      "fr-FR": "Comptabilité",
     },
     group: "business",
     icon: "receipt",
@@ -830,6 +888,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Accounts",
           "de-DE": "Konten",
           "pl-PL": "Konta",
+          "fr-FR": "Comptes",
         },
       },
       Journal: {
@@ -841,6 +900,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Journal",
           "de-DE": "Journal",
           "pl-PL": "Dziennik",
+          "fr-FR": "Journal",
         },
       },
       Ledger: {
@@ -852,6 +912,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Ledger",
           "de-DE": "Hauptbuch",
           "pl-PL": "Księga główna",
+          "fr-FR": "Grand livre",
         },
       },
       Periods: {
@@ -863,6 +924,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Periods",
           "de-DE": "Perioden",
           "pl-PL": "Okresy",
+          "fr-FR": "Périodes",
         },
       },
       Accounting: {
@@ -874,6 +936,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Setup",
           "de-DE": "Einrichtung",
           "pl-PL": "Konfiguracja",
+          "fr-FR": "Configuration",
         },
       },
     },
@@ -886,6 +949,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Companies",
       "de-DE": "Unternehmen",
       "pl-PL": "Firmy",
+      "fr-FR": "Entreprises",
     },
     group: "business",
     icon: "building",
@@ -901,6 +965,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Companies",
           "de-DE": "Unternehmen",
           "pl-PL": "Firmy",
+          "fr-FR": "Entreprises",
         },
       },
       "Company Members": {
@@ -912,6 +977,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Members",
           "de-DE": "Mitglieder",
           "pl-PL": "Członkowie",
+          "fr-FR": "Membres",
         },
       },
     },
@@ -924,6 +990,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Products",
       "de-DE": "Produkte",
       "pl-PL": "Produkty",
+      "fr-FR": "Produits",
     },
     group: "business",
     icon: "package",
@@ -939,6 +1006,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Catalog",
           "de-DE": "Katalog",
           "pl-PL": "Katalog",
+          "fr-FR": "Catalogue",
         },
       },
       "Category Management": {
@@ -950,6 +1018,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Categories",
           "de-DE": "Kategorien",
           "pl-PL": "Kategorie",
+          "fr-FR": "Catégories",
         },
       },
     },
@@ -962,6 +1031,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Point of Sale",
       "de-DE": "Kasse",
       "pl-PL": "Punkt sprzedaży",
+      "fr-FR": "Point de vente",
     },
     group: "business",
     icon: "shopping-cart",
@@ -977,6 +1047,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Orders",
           "de-DE": "Bestellungen",
           "pl-PL": "Zamówienia",
+          "fr-FR": "Commandes",
         },
       },
       "POS: Sessions": {
@@ -988,6 +1059,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Sessions",
           "de-DE": "Sitzungen",
           "pl-PL": "Sesje",
+          "fr-FR": "Sessions",
         },
       },
       "POS: Terminals": {
@@ -999,6 +1071,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Terminals",
           "de-DE": "Terminals",
           "pl-PL": "Terminale",
+          "fr-FR": "Terminaux",
         },
       },
       "POS: Products": {
@@ -1010,6 +1083,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Products",
           "de-DE": "Produkte",
           "pl-PL": "Produkty",
+          "fr-FR": "Produits",
         },
       },
     },
@@ -1022,6 +1096,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Inventory",
       "de-DE": "Lager",
       "pl-PL": "Magazyn",
+      "fr-FR": "Inventaire",
     },
     group: "business",
     icon: "box",
@@ -1037,6 +1112,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Stock",
           "de-DE": "Bestand",
           "pl-PL": "Zapasy",
+          "fr-FR": "Stock",
         },
       },
       "Inventory: Transfers": {
@@ -1048,6 +1124,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Transfers",
           "de-DE": "Transfers",
           "pl-PL": "Transfery",
+          "fr-FR": "Transferts",
         },
       },
       "Inventory: Warehouses": {
@@ -1059,6 +1136,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Warehouses",
           "de-DE": "Lagerhäuser",
           "pl-PL": "Magazyny",
+          "fr-FR": "Entrepôts",
         },
       },
     },
@@ -1071,6 +1149,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Purchasing",
       "de-DE": "Einkauf",
       "pl-PL": "Zakupy",
+      "fr-FR": "Achats",
     },
     group: "business",
     icon: "shopping-bag",
@@ -1086,6 +1165,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Orders",
           "de-DE": "Bestellungen",
           "pl-PL": "Zamówienia",
+          "fr-FR": "Commandes",
         },
       },
       "Purchasing: Vendors": {
@@ -1097,6 +1177,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Vendors",
           "de-DE": "Lieferanten",
           "pl-PL": "Dostawcy",
+          "fr-FR": "Fournisseurs",
         },
       },
     },
@@ -1109,6 +1190,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Referral",
       "de-DE": "Empfehlungen",
       "pl-PL": "Polecenia",
+      "fr-FR": "Parrainage",
     },
     group: "business",
     icon: "share-2",
@@ -1124,6 +1206,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Program",
           "de-DE": "Programm",
           "pl-PL": "Program",
+          "fr-FR": "Programme",
         },
       },
       Payouts: {
@@ -1135,6 +1218,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Payouts",
           "de-DE": "Auszahlungen",
           "pl-PL": "Wypłaty",
+          "fr-FR": "Versements",
         },
       },
     },
@@ -1147,6 +1231,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Tax",
       "de-DE": "Steuern",
       "pl-PL": "Podatki",
+      "fr-FR": "Taxes",
     },
     group: "business",
     icon: "file-text",
@@ -1162,6 +1247,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Tax Rates",
           "de-DE": "Steuersätze",
           "pl-PL": "Stawki podatkowe",
+          "fr-FR": "Taux de taxe",
         },
       },
       "Tax Reports": {
@@ -1173,6 +1259,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Reports",
           "de-DE": "Berichte",
           "pl-PL": "Raporty",
+          "fr-FR": "Rapports",
         },
       },
     },
@@ -1185,6 +1272,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Finance",
       "de-DE": "Finanzen",
       "pl-PL": "Finanse",
+      "fr-FR": "Finance",
     },
     group: "business",
     icon: "wallet",
@@ -1200,6 +1288,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Monitoring",
           "de-DE": "Überwachung",
           "pl-PL": "Monitoring",
+          "fr-FR": "Monitoring",
         },
       },
     },
@@ -1212,6 +1301,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Notifications",
       "de-DE": "Benachrichtigungen",
       "pl-PL": "Powiadomienia",
+      "fr-FR": "Notifications",
     },
     group: "business",
     icon: "bell",
@@ -1226,6 +1316,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Messenger",
       "de-DE": "Messenger",
       "pl-PL": "Komunikator",
+      "fr-FR": "Messagerie",
     },
     group: "comms",
     icon: "mail",
@@ -1241,6 +1332,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Accounts",
           "de-DE": "Konten",
           "pl-PL": "Konta",
+          "fr-FR": "Comptes",
         },
       },
       Inbox: {
@@ -1252,6 +1344,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Inbox",
           "de-DE": "Posteingang",
           "pl-PL": "Skrzynka odbiorcza",
+          "fr-FR": "Boîte de réception",
         },
       },
       Messages: {
@@ -1263,6 +1356,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Messages",
           "de-DE": "Nachrichten",
           "pl-PL": "Wiadomości",
+          "fr-FR": "Messages",
         },
       },
       Providers: {
@@ -1274,6 +1368,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Providers",
           "de-DE": "Anbieter",
           "pl-PL": "Dostawcy",
+          "fr-FR": "Fournisseurs",
         },
       },
     },
@@ -1286,6 +1381,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Newsletter",
       "de-DE": "Newsletter",
       "pl-PL": "Newsletter",
+      "fr-FR": "Newsletter",
     },
     group: "comms",
     icon: "send",
@@ -1301,6 +1397,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Campaign Stats",
           "de-DE": "Kampagnen-Statistiken",
           "pl-PL": "Statystyki kampanii",
+          "fr-FR": "Stats des campagnes",
         },
       },
       emailCampaignsProcessing: {
@@ -1312,6 +1409,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Campaigns",
           "de-DE": "Kampagnen",
           "pl-PL": "Kampanie",
+          "fr-FR": "Campagnes",
         },
       },
       emailCampaignsJourneys: {
@@ -1323,6 +1421,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Journeys",
           "de-DE": "Journeys",
           "pl-PL": "Podróże",
+          "fr-FR": "Parcours",
         },
       },
       emailCampaignsQueue: {
@@ -1334,6 +1433,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Queue",
           "de-DE": "Warteschlange",
           "pl-PL": "Kolejka",
+          "fr-FR": "File d'attente",
         },
       },
       Subscriptions: {
@@ -1345,6 +1445,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Subscriptions",
           "de-DE": "Abonnements",
           "pl-PL": "Subskrypcje",
+          "fr-FR": "Abonnements",
         },
       },
     },
@@ -1357,6 +1458,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Browser",
       "de-DE": "Browser",
       "pl-PL": "Przeglądarka",
+      "fr-FR": "Navigateur",
     },
     group: "platform",
     icon: "globe",
@@ -1372,6 +1474,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Pages",
           "de-DE": "Seiten",
           "pl-PL": "Strony",
+          "fr-FR": "Pages",
         },
       },
       Interaction: {
@@ -1383,6 +1486,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Interaction",
           "de-DE": "Interaktion",
           "pl-PL": "Interakcja",
+          "fr-FR": "Interaction",
         },
       },
       Inspection: {
@@ -1394,6 +1498,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Inspection",
           "de-DE": "Inspektion",
           "pl-PL": "Inspekcja",
+          "fr-FR": "Inspection",
         },
       },
       DevTools: {
@@ -1405,6 +1510,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "DevTools",
           "de-DE": "Entwicklertools",
           "pl-PL": "Narzędzia Dev",
+          "fr-FR": "DevTools",
         },
       },
     },
@@ -1417,6 +1523,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "SSH & Infra",
       "de-DE": "SSH & Infra",
       "pl-PL": "SSH i Infra",
+      "fr-FR": "SSH et infra",
     },
     group: "platform",
     icon: "terminal",
@@ -1432,6 +1539,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Connections",
           "de-DE": "Verbindungen",
           "pl-PL": "Połączenia",
+          "fr-FR": "Connexions",
         },
       },
       Linux: {
@@ -1443,6 +1551,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Linux Users",
           "de-DE": "Linux-Benutzer",
           "pl-PL": "Użytkownicy Linux",
+          "fr-FR": "Utilisateurs Linux",
         },
       },
     },
@@ -1455,6 +1564,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Desktop",
       "de-DE": "Desktop",
       "pl-PL": "Pulpit",
+      "fr-FR": "Bureau",
     },
     group: "platform",
     icon: "monitor",
@@ -1470,6 +1580,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Windows",
           "de-DE": "Fenster",
           "pl-PL": "Okna",
+          "fr-FR": "Fenêtres",
         },
       },
       Interaction: {
@@ -1481,6 +1592,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Interaction",
           "de-DE": "Interaktion",
           "pl-PL": "Interakcja",
+          "fr-FR": "Interaction",
         },
       },
       Capture: {
@@ -1492,6 +1604,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Capture",
           "de-DE": "Erfassung",
           "pl-PL": "Przechwytywanie",
+          "fr-FR": "Capture",
         },
       },
       Inspection: {
@@ -1503,6 +1616,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Inspection",
           "de-DE": "Inspektion",
           "pl-PL": "Inspekcja",
+          "fr-FR": "Inspection",
         },
       },
     },
@@ -1515,6 +1629,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Account",
       "de-DE": "Konto",
       "pl-PL": "Konto",
+      "fr-FR": "Compte",
     },
     group: "system",
     icon: "user",
@@ -1530,6 +1645,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Login & Signup",
           "de-DE": "Login & Registrierung",
           "pl-PL": "Logowanie i rejestracja",
+          "fr-FR": "Connexion et inscription",
         },
       },
       profile: {
@@ -1541,6 +1657,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Profile",
           "de-DE": "Profil",
           "pl-PL": "Profil",
+          "fr-FR": "Profil",
         },
       },
       sessions: {
@@ -1552,6 +1669,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Sessions",
           "de-DE": "Sitzungen",
           "pl-PL": "Sesje",
+          "fr-FR": "Sessions",
         },
       },
       directory: {
@@ -1563,6 +1681,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Directory",
           "de-DE": "Verzeichnis",
           "pl-PL": "Katalog",
+          "fr-FR": "Annuaire",
         },
       },
       manageUsers: {
@@ -1574,6 +1693,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Manage Users",
           "de-DE": "Nutzer verwalten",
           "pl-PL": "Zarządzaj użytkownikami",
+          "fr-FR": "Gérer les utilisateurs",
         },
       },
       userStats: {
@@ -1585,6 +1705,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "User Stats",
           "de-DE": "Nutzerstatistiken",
           "pl-PL": "Statystyki użytkowników",
+          "fr-FR": "Stats des utilisateurs",
         },
       },
       remoteInstances: {
@@ -1596,6 +1717,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Remote Instances",
           "de-DE": "Remote-Instanzen",
           "pl-PL": "Zdalne instancje",
+          "fr-FR": "Instances distantes",
         },
       },
       remoteSelf: {
@@ -1607,6 +1729,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Self",
           "de-DE": "Eigene Instanz",
           "pl-PL": "Własna instancja",
+          "fr-FR": "Instance locale",
         },
       },
     },
@@ -1619,6 +1742,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "System",
       "de-DE": "System",
       "pl-PL": "System",
+      "fr-FR": "Système",
     },
     group: "system",
     icon: "settings",
@@ -1634,6 +1758,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Generators",
           "de-DE": "Generatoren",
           "pl-PL": "Generatory",
+          "fr-FR": "Générateurs",
         },
       },
       Build: {
@@ -1645,6 +1770,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Build",
           "de-DE": "Build",
           "pl-PL": "Kompilacja",
+          "fr-FR": "Build",
         },
       },
       Check: {
@@ -1656,6 +1782,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Check",
           "de-DE": "Prüfen",
           "pl-PL": "Sprawdź",
+          "fr-FR": "Vérification",
         },
       },
       serverManagement: {
@@ -1667,6 +1794,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Server",
           "de-DE": "Server",
           "pl-PL": "Serwer",
+          "fr-FR": "Serveur",
         },
       },
       serverGuard: {
@@ -1678,6 +1806,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Guard",
           "de-DE": "Guard",
           "pl-PL": "Guard",
+          "fr-FR": "Guard",
         },
       },
       serverElectron: {
@@ -1689,6 +1818,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Electron",
           "de-DE": "Electron",
           "pl-PL": "Electron",
+          "fr-FR": "Electron",
         },
       },
       settingsEnv: {
@@ -1700,6 +1830,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Settings",
           "de-DE": "Einstellungen",
           "pl-PL": "Ustawienia",
+          "fr-FR": "Paramètres",
         },
       },
       settingsKeys: {
@@ -1711,6 +1842,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Keys",
           "de-DE": "Schlüssel",
           "pl-PL": "Klucze",
+          "fr-FR": "Clés",
         },
       },
       interfacesCli: {
@@ -1722,6 +1854,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "CLI",
           "de-DE": "CLI",
           "pl-PL": "CLI",
+          "fr-FR": "CLI",
         },
       },
       interfacesMcp: {
@@ -1733,6 +1866,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "MCP",
           "de-DE": "MCP",
           "pl-PL": "MCP",
+          "fr-FR": "MCP",
         },
       },
       interfacesFrame: {
@@ -1744,6 +1878,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Frame",
           "de-DE": "Frame",
           "pl-PL": "Frame",
+          "fr-FR": "Frame",
         },
       },
       tasksCron: {
@@ -1755,6 +1890,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Cron Tasks",
           "de-DE": "Cron-Aufgaben",
           "pl-PL": "Zadania cron",
+          "fr-FR": "Tâches cron",
         },
       },
       tasksMonitoring: {
@@ -1766,6 +1902,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Monitoring",
           "de-DE": "Überwachung",
           "pl-PL": "Monitoring",
+          "fr-FR": "Monitoring",
         },
       },
       tasksPulse: {
@@ -1777,6 +1914,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Pulse",
           "de-DE": "Pulse",
           "pl-PL": "Puls",
+          "fr-FR": "Pulse",
         },
       },
       tasksSync: {
@@ -1788,6 +1926,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Sync",
           "de-DE": "Synchronisierung",
           "pl-PL": "Synchronizacja",
+          "fr-FR": "Synchronisation",
         },
       },
     },
@@ -1800,6 +1939,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "en-GLOBAL": "Database",
       "de-DE": "Datenbank",
       "pl-PL": "Baza danych",
+      "fr-FR": "Base de données",
     },
     group: "system",
     icon: "database",
@@ -1815,6 +1955,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Migrations",
           "de-DE": "Migrationen",
           "pl-PL": "Migracje",
+          "fr-FR": "Migrations",
         },
       },
       Tools: {
@@ -1826,6 +1967,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "en-GLOBAL": "Tools",
           "de-DE": "Werkzeuge",
           "pl-PL": "Narzędzia",
+          "fr-FR": "Outils",
         },
       },
     },

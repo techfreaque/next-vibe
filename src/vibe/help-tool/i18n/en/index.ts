@@ -2,6 +2,14 @@ export const translations = {
   category: "Help & Documentation",
   tag: "Help",
   uncategorized: "Other",
+  groups: {
+    ai: "AI",
+    analytics: "Analytics",
+    business: "Business",
+    system: "System",
+    comms: "Comms",
+    platform: "Platform",
+  },
   get: {
     title: "Tool Help - Discover Available Tools",
     titleShort: "Tool Help",

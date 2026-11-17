@@ -5,6 +5,7 @@
  * desktop and a collapsible one on phones. Semantic tokens only.
  */
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Details } from "next-vibe/ui/components/details";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
@@ -21,6 +22,14 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
 import { CONTAINER, Eyebrow } from "./marketing";
+
+/**
+ * The German legal texts are the binding ones. French pages say so above the
+ * introduction (other translations predate this notice and are unchanged).
+ */
+export function showBindingNotice(locale: CountryLanguage): boolean {
+  return locale.startsWith("fr-");
+}
 
 export interface LegalSection {
   id: string;

@@ -55,6 +55,7 @@ export interface SitemapEntry {
 const SITEMAP_LOCALES: readonly CountryLanguage[] = [
   "de-DE",
   "pl-PL",
+  "fr-FR",
   "en-US",
   "en-GLOBAL",
 ];

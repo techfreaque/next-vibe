@@ -4,6 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Pomoc i Dokumentacja",
   tag: "Pomoc",
   uncategorized: "Inne",
+  groups: {
+    ai: "AI",
+    analytics: "Analityka",
+    business: "Biznes",
+    system: "System",
+    comms: "Komunikacja",
+    platform: "Platforma",
+  },
   get: {
     title: "Pomoc narzędzi - odkryj dostępne narzędzia",
     titleShort: "Pomoc narzędzia",

@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Analytics",
     "de-DE": "Analytik",
     "pl-PL": "Analityka",
+    "fr-FR": "Analytique",
   },
   group: "analytics",
   icon: "bar-chart-2",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Vibe Sense",
         "de-DE": "Vibe Sense",
         "pl-PL": "Vibe Sense",
+        "fr-FR": "Vibe Sense",
       },
     },
     Indicators: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Indicators",
         "de-DE": "Indikatoren",
         "pl-PL": "Wskaźniki",
+        "fr-FR": "Indicateurs",
       },
     },
     Evaluators: {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Evaluators",
         "de-DE": "Auswertungen",
         "pl-PL": "Ewaluatory",
+        "fr-FR": "Évaluateurs",
       },
     },
     Transformers: {
@@ -64,6 +68,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Transformers",
         "de-DE": "Transformatoren",
         "pl-PL": "Transformatory",
+        "fr-FR": "Transformateurs",
       },
     },
     leadsData: {
@@ -74,6 +79,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Leads Data",
         "de-DE": "Lead-Daten",
         "pl-PL": "Dane leadów",
+        "fr-FR": "Données des leads",
       },
     },
     usersData: {
@@ -84,6 +90,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Users Data",
         "de-DE": "Nutzerdaten",
         "pl-PL": "Dane użytkowników",
+        "fr-FR": "Données des utilisateurs",
       },
     },
     messengerData: {
@@ -94,6 +101,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Messenger Data",
         "de-DE": "Messenger-Daten",
         "pl-PL": "Dane komunikatora",
+        "fr-FR": "Données de la messagerie",
       },
     },
     paymentsData: {
@@ -104,6 +112,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Payments Data",
         "de-DE": "Zahlungsdaten",
         "pl-PL": "Dane płatności",
+        "fr-FR": "Données des paiements",
       },
     },
     creditsData: {
@@ -114,6 +123,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Credits Data",
         "de-DE": "Guthaben-Daten",
         "pl-PL": "Dane kredytów",
+        "fr-FR": "Données des crédits",
       },
     },
     subscriptionsData: {
@@ -124,6 +134,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Subscriptions Data",
         "de-DE": "Abonnement-Daten",
         "pl-PL": "Dane subskrypcji",
+        "fr-FR": "Données des abonnements",
       },
     },
     referralData: {
@@ -134,6 +145,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Referral Data",
         "de-DE": "Empfehlungsdaten",
         "pl-PL": "Dane poleceń",
+        "fr-FR": "Données du parrainage",
       },
     },
     newsletterData: {
@@ -144,6 +156,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Newsletter Data",
         "de-DE": "Newsletter-Daten",
         "pl-PL": "Dane newslettera",
+        "fr-FR": "Données de la newsletter",
       },
     },
     chatData: {
@@ -154,6 +167,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Chat Data",
         "de-DE": "Chat-Daten",
         "pl-PL": "Dane czatu",
+        "fr-FR": "Données du chat",
       },
     },
     systemData: {
@@ -164,6 +178,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "System Data",
         "de-DE": "Systemdaten",
         "pl-PL": "Dane systemowe",
+        "fr-FR": "Données système",
       },
     },
     financeData: {
@@ -174,6 +189,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Finance Data",
         "de-DE": "Finanzdaten",
         "pl-PL": "Dane finansowe",
+        "fr-FR": "Données financières",
       },
     },
   },

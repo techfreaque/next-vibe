@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Referral",
     "de-DE": "Empfehlungen",
     "pl-PL": "Polecenia",
+    "fr-FR": "Parrainage",
   },
   group: "business",
   icon: "share-2",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Program",
         "de-DE": "Programm",
         "pl-PL": "Program",
+        "fr-FR": "Programme",
       },
       // inherits parent defaultEntry (referral-stats)
     },
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Payouts",
         "de-DE": "Auszahlungen",
         "pl-PL": "Wypłaty",
+        "fr-FR": "Versements",
       },
     },
   },

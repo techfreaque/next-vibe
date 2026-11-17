@@ -1,0 +1,131 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  get: {
+    title: "Plan comptable",
+    titleShort: "Comptes",
+    description: "Arborescence complète des comptes d'une entreprise",
+    companyId: {
+      label: "ID de l'entreprise",
+      description: "Entreprise dont vous voulez récupérer le plan comptable",
+      placeholder: "Saisissez l'UUID de l'entreprise",
+    },
+    page: {
+      label: "Page",
+      description: "Numéro de page (à partir de 1)",
+    },
+    pageSize: {
+      label: "Par page",
+      description: "Comptes par page (200 max.)",
+    },
+    response: {
+      total: "Total",
+      accounts: "Comptes",
+      id: "ID",
+      code: "Numéro",
+      name: "Intitulé",
+      type: "Type",
+      subtype: "Sous-type",
+      parentId: "ID parent",
+      isPostable: "Imputable",
+      isActive: "Actif",
+      isSystem: "Système",
+      description: "Description",
+      sortOrder: "Ordre d'affichage",
+      companyId: "ID de l'entreprise",
+    },
+    errors: {
+      unauthorized: {
+        title: "Non autorisé",
+        description: "Vous devez être connecté pour voir les comptes",
+      },
+      validation: {
+        title: "Erreur de validation",
+        description: "ID d'entreprise invalide",
+      },
+      forbidden: {
+        title: "Accès refusé",
+        description: "Vous n'avez pas accès aux comptes de cette entreprise",
+      },
+      server: {
+        title: "Erreur serveur",
+        description: "Impossible de charger les comptes",
+      },
+      unknown: {
+        title: "Erreur inconnue",
+        description: "Une erreur inattendue s'est produite",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Conflit de données",
+      },
+      network: {
+        title: "Erreur réseau",
+        description: "Impossible de joindre le serveur",
+      },
+      notFound: {
+        title: "Introuvable",
+        description: "Aucun compte trouvé pour cette entreprise",
+      },
+      unsavedChanges: {
+        title: "Modifications non enregistrées",
+        description: "Vous avez des modifications non enregistrées",
+      },
+    },
+    success: {
+      title: "Comptes chargés",
+      description: "Plan comptable récupéré",
+    },
+    widget: {
+      loading: "Chargement des comptes...",
+      empty:
+        "Aucun compte pour l'instant. Lancez la configuration pour partir d'un modèle.",
+      createButton: "Nouveau compte",
+      inactive: "Inactif",
+      setupButton: "Lancer la configuration",
+      selectCompany: "Saisissez un ID d'entreprise pour voir les comptes",
+      back: "Retour",
+    },
+  },
+  enums: {
+    accountType: {
+      ASSET: "Actif",
+      LIABILITY: "Passif",
+      EQUITY: "Capitaux propres",
+      REVENUE: "Produits",
+      EXPENSE: "Charges",
+    },
+    accountSubtype: {
+      CURRENT_ASSET: "Actif circulant",
+      FIXED_ASSET: "Immobilisation",
+      BANK: "Banque",
+      CASH: "Caisse",
+      ACCOUNTS_RECEIVABLE: "Clients",
+      INVENTORY: "Stocks",
+      PREPAID: "Charges constatées d'avance",
+      ACCOUNTS_PAYABLE: "Fournisseurs",
+      VAT_PAYABLE: "TVA collectée",
+      VAT_RECEIVABLE: "TVA déductible",
+      ACCRUED_LIABILITY: "Charges à payer",
+      SHORT_TERM_DEBT: "Dettes à court terme",
+      LONG_TERM_DEBT: "Dettes à long terme",
+      SHARE_CAPITAL: "Capital social",
+      RETAINED_EARNINGS: "Report à nouveau",
+      REVENUE_SALES: "Ventes de marchandises",
+      REVENUE_SERVICE: "Prestations de services",
+      COGS: "Coût des marchandises vendues",
+      PAYROLL: "Charges de personnel",
+      RENT: "Loyers",
+      UTILITIES: "Énergie et fluides",
+      OPEX: "Charges d'exploitation",
+      FINANCIAL_INCOME: "Produits financiers",
+      FINANCIAL_EXPENSE: "Charges financières",
+      TAX_EXPENSE: "Impôts et taxes",
+      OTHER: "Autre",
+    },
+  },
+  title: "Liste des comptes",
+  description: "Lister tous les comptes du plan comptable",
+  category: "Plan comptable",
+  tag: "Compte",
+};

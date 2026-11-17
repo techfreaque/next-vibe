@@ -16,6 +16,8 @@ export const translations = {
   printButton: "Print",
   title: "Terms of Service",
   lastUpdated: "Last updated: November 2026",
+  bindingVersionNotice:
+    "Translation provided for convenience. The German version of this document is the legally binding one.",
   introduction:
     "Welcome to {{appName}}. By using our uncensored AI chat platform, you agree to these Terms of Service. Please read them carefully. {{appName}} is operated by {{operator}}, Germany.",
   sections: {

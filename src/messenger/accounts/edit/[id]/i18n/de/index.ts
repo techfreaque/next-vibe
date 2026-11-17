@@ -7,12 +7,14 @@ export const translations: typeof enTranslations = {
     global: "Global",
     de: "Deutschland",
     pl: "Polen",
+    fr: "Frankreich",
     us: "USA",
   },
   languages: {
     en: "Englisch",
     de: "Deutsch",
     pl: "Polnisch",
+    fr: "Französisch",
   },
   get: {
     title: "Messenger-Konto anzeigen",

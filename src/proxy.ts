@@ -18,6 +18,7 @@ const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefau
 const supportedLocales: CountryLanguage[] = [
   "de-DE",
   "pl-PL",
+  "fr-FR",
   "en-GLOBAL",
   "en-US",
 ];

@@ -8,13 +8,14 @@ import { transformClientLocaleSource } from "./client-locale-loader.cjs";
 const SCOPE_GLOB = new Glob("src/**/i18n/index.ts");
 
 describe("client-locale-loader", () => {
-  it("rewrites lazy de/pl requires into page-language dynamic imports", () => {
+  it("rewrites lazy de/pl/fr requires into page-language dynamic imports", () => {
     const source = [
       'import { translations as enTranslations } from "./en";',
       "export const scopedTranslation = createScopedTranslation({",
       "  en: enTranslations,",
       '  de: () => require("./de").translations,',
       '  pl: () => require("next-vibe/ui/i18n/pl").translations,',
+      '  fr: () => require("./fr").translations,',
       "});",
     ].join("\n");
 
@@ -29,6 +30,10 @@ describe("client-locale-loader", () => {
     );
     expect(out).toContain("de: () => __vibeI18n_0 ?? {},");
     expect(out).toContain("pl: () => __vibeI18n_1 ?? {},");
+    expect(out).toContain(
+      'const __vibeI18n_2 = __vibeI18nLang === "fr" ? (await import("./fr")).translations : undefined;',
+    );
+    expect(out).toContain("fr: () => __vibeI18n_2 ?? {},");
   });
 
   it("leaves files without the lazy pattern untouched", () => {
@@ -36,7 +41,7 @@ describe("client-locale-loader", () => {
     expect(transformClientLocaleSource(source)).toBe(source);
   });
 
-  it("covers every scope in the repo (no de/pl left in client bundles)", () => {
+  it("covers every scope in the repo (no de/pl/fr left in client bundles)", () => {
     const missed: string[] = [];
     let scopes = 0;
     for (const file of SCOPE_GLOB.scanSync({ cwd: process.cwd() })) {

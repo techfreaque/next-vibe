@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Subscriptions",
     "de-DE": "Abonnements",
     "pl-PL": "Subskrypcje",
+    "fr-FR": "Abonnements",
   },
   group: "business",
   icon: "refresh-cw",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Subscriptions",
         "de-DE": "Abonnements",
         "pl-PL": "Subskrypcje",
+        "fr-FR": "Abonnements",
       },
     },
     Management: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Management",
         "de-DE": "Verwaltung",
         "pl-PL": "Zarządzanie",
+        "fr-FR": "Gestion",
       },
     },
     subscriptionAnalytics: {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Analytics",
         "de-DE": "Analytik",
         "pl-PL": "Analityka",
+        "fr-FR": "Analytique",
       },
     },
   },

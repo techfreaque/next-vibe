@@ -4411,6 +4411,7 @@ export const translations: typeof enTranslations = {
       all: "Wszystkie kraje",
       de: "Niemcy",
       pl: "Polska",
+      fr: "Francja",
       global: "Globalny",
     },
     language: {
@@ -4420,6 +4421,7 @@ export const translations: typeof enTranslations = {
       en: "Angielski",
       de: "Niemiecki",
       pl: "Polski",
+      fr: "Francuski",
     },
     campaignStage: {
       label: "Etap kampanii",
@@ -5228,11 +5230,13 @@ export const translations: typeof enTranslations = {
     country: {
       de: "Niemcy",
       pl: "Polska",
+      fr: "Francja",
       global: "Globalnie",
     },
     language: {
       de: "Niemiecki",
       pl: "Polski",
+      fr: "Francuski",
       en: "Angielski",
     },
     emailProvider: {
@@ -5353,11 +5357,13 @@ export const translations: typeof enTranslations = {
     global: "Globalny",
     de: "Niemcy",
     pl: "Polska",
+    fr: "Francja",
     us: "Stany Zjednoczone",
   },
   languages: {
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
+    fr: "Francuski",
   },
 };

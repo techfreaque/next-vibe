@@ -18,6 +18,15 @@ export const {
     example: defaultLocale,
     comment: "CLI locale setting",
     fieldType: "select",
-    options: ["en-US", "en-GLOBAL", "de-DE", "de-GLOBAL", "pl-PL", "pl-GLOBAL"],
+    options: [
+      "en-US",
+      "en-GLOBAL",
+      "de-DE",
+      "de-GLOBAL",
+      "pl-PL",
+      "pl-GLOBAL",
+      "fr-FR",
+      "fr-GLOBAL",
+    ],
   },
 });

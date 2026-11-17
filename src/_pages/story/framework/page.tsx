@@ -92,49 +92,64 @@ function getCodeSnippets(locale: CountryLanguage): {
 } {
   const isDE = locale.startsWith("de");
   const isPL = locale.startsWith("pl");
+  const isFR = locale.startsWith("fr");
 
   // Localized natural-language strings used inside code examples
   const exampleDecision = isDE
     ? "Alles auf TypeScript umschreiben"
     : isPL
       ? "Przepisz wszystko na TypeScript"
-      : "Rewrite everything in TypeScript";
+      : isFR
+        ? "Tout réécrire en TypeScript"
+        : "Rewrite everything in TypeScript";
 
   const devLabel = isDE
     ? "# development"
     : isPL
       ? "# development"
-      : "# development";
+      : isFR
+        ? "# development"
+        : "# development";
 
   const prodLabel = isDE
     ? "# production - erster Start"
     : isPL
       ? "# production - pierwsze uruchomienie"
-      : "# production - first start";
+      : isFR
+        ? "# production - premier démarrage"
+        : "# production - first start";
 
   const rebuildLabel = isDE
     ? "# production - nach Änderungen"
     : isPL
       ? "# production - po zmianach"
-      : "# production - after changes";
+      : isFR
+        ? "# production - après modifications"
+        : "# production - after changes";
 
   const aiChatComment = isDE
     ? "# In unbottled.ai-Chat oder Claude Code:"
     : isPL
       ? "# W czacie unbottled.ai lub Claude Code:"
-      : "# In unbottled.ai chat or Claude Code:";
+      : isFR
+        ? "# Dans le chat unbottled.ai ou Claude Code :"
+        : "# In unbottled.ai chat or Claude Code:";
 
   const aiPrompt = isDE
     ? '"Bau mir ein Feature, das Entscheidungen meinem Chef erklärt"'
     : isPL
       ? '"Zbuduj mi feature, który tłumaczy decyzje mojemu szefowi"'
-      : '"Build me a feature that explains decisions to my boss"';
+      : isFR
+        ? '"Crée-moi une fonctionnalité qui explique mes décisions à mon chef"'
+        : '"Build me a feature that explains decisions to my boss"';
 
   const aiRunsComment = isDE
     ? "# KI schreibt alle Dateien und führt vibe check automatisch aus"
     : isPL
       ? "# AI pisze wszystkie pliki i automatycznie uruchamia vibe check"
-      : "# AI writes all files and runs vibe check automatically";
+      : isFR
+        ? "# L'IA écrit tous les fichiers et lance vibe check automatiquement"
+        : "# AI writes all files and runs vibe check automatically";
 
   // prettier-ignore
   const definitionCode = [

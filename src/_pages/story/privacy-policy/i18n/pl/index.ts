@@ -21,6 +21,8 @@ export const translations: typeof enTranslations = {
   printButton: "Drukuj",
   title: "Polityka prywatności",
   lastUpdated: "Ostatnia aktualizacja: listopad 2026",
+  bindingVersionNotice:
+    "Tłumaczenie ma charakter wyłącznie informacyjny. Wiążąca prawnie jest niemiecka wersja tego dokumentu.",
   introduction:
     "W {{appName}} poważnie traktujemy Twoją prywatność. Ta polityka prywatności wyjaśnia, jak zbieramy, używamy i chronimy Twoje dane osobowe.",
   sections: {

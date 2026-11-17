@@ -3346,6 +3346,7 @@ export const translations = {
     en: "English",
     de: "German",
     pl: "Polish",
+    fr: "French",
   },
   timezone: {
     utc: "UTC",

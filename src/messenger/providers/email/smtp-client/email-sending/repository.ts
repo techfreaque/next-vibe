@@ -6,10 +6,12 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-import type {
-  Countries,
-  CountryLanguage,
-  Languages,
+import {
+  type Countries,
+  CountriesArr,
+  type CountryLanguage,
+  type Languages,
+  LanguagesArr,
 } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -58,11 +60,11 @@ interface SendEmailResult {
 
 export class EmailSendingRepository {
   private static isLanguage(value: string): value is Languages {
-    return ["en", "de", "pl"].includes(value);
+    return LanguagesArr.some((language) => language === value);
   }
 
   private static isCountry(value: string): value is Countries {
-    return ["GLOBAL", "US", "DE", "PL"].includes(value);
+    return CountriesArr.some((country) => country === value);
   }
 
   private static mapLocaleToSelectionCriteria(locale: CountryLanguage): {

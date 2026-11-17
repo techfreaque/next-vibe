@@ -12,6 +12,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import {
+  Countries,
   CountriesOptions,
   Languages,
   LanguagesOptions,
@@ -426,7 +427,7 @@ const { POST } = createEndpoint({
         placeholder: "fields.countries.placeholder",
         columns: 6,
         options: CountriesOptions,
-        schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+        schema: z.array(z.enum(Countries)).optional(),
       }),
 
       languages: requestField(scopedTranslation, {

@@ -333,12 +333,14 @@ export const translations: typeof enTranslations = {
     global: "Global",
     de: "Deutschland",
     pl: "Polen",
+    fr: "Frankreich",
     us: "Vereinigte Staaten",
   },
   languages: {
     en: "Englisch",
     de: "Deutsch",
     pl: "Polnisch",
+    fr: "Französisch",
   },
   enums: {
     userRole: {

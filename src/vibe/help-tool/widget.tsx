@@ -91,7 +91,6 @@ import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {
   ADMIN_GROUPS,
   CATEGORY_REGISTRY,
-  GROUP_LABELS,
 } from "@/generated/categories/registry";
 
 import { LocaleSelectorContent } from "../agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
@@ -144,6 +143,25 @@ import { scopedTranslation } from "./i18n";
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 /** URL path segment for the tools browser (after locale prefix) */
+/**
+ * Category labels are keyed by full locale ("fr-FR"). A country variant
+ * without its own entry (fr-GLOBAL, de-PL) uses any label of its language.
+ */
+function localizedLabel(
+  labels: Record<string, string>,
+  locale: string,
+): string | undefined {
+  const exact = labels[locale];
+  if (exact !== undefined) {
+    return exact;
+  }
+  const language = `${locale.split("-")[0]}-`;
+  const sameLanguage = Object.keys(labels).find((key) =>
+    key.startsWith(language),
+  );
+  return sameLanguage === undefined ? undefined : labels[sameLanguage];
+}
+
 const ADMIN_ENDPOINTS_PATH = "tools";
 
 /**
@@ -2557,7 +2575,9 @@ export function HelpToolsWidget(): JSX.Element {
                       >
                         <Div className="flex items-center gap-2 mb-2">
                           <Span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
-                            {subDef.labels[locale] ?? subDef.label ?? subKey}
+                            {localizedLabel(subDef.labels, locale) ??
+                              subDef.label ??
+                              subKey}
                           </Span>
                           <Div className="flex-1 h-px bg-border/50" />
                         </Div>
@@ -2699,7 +2719,7 @@ export function HelpToolsWidget(): JSX.Element {
                     <Div key={group} className="mb-5">
                       <Div className="flex items-center gap-2 mb-2">
                         <Span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
-                          {GROUP_LABELS[group]}
+                          {t(`groups.${group}`)}
                         </Span>
                         <Div className="flex-1 h-px bg-border/50" />
                       </Div>
@@ -2712,7 +2732,9 @@ export function HelpToolsWidget(): JSX.Element {
                         }}
                       >
                         {entries.map(({ catDef, count }) => {
-                          const label = catDef.labels[locale] ?? catDef.label;
+                          const label =
+                            localizedLabel(catDef.labels, locale) ??
+                            catDef.label;
                           return (
                             <FolderCell
                               key={label}

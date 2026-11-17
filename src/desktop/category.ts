@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Desktop",
     "de-DE": "Desktop",
     "pl-PL": "Pulpit",
+    "fr-FR": "Bureau",
   },
   group: "platform",
   icon: "monitor",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Windows",
         "de-DE": "Fenster",
         "pl-PL": "Okna",
+        "fr-FR": "Fenêtres",
       },
       // inherits parent defaultEntry (desktop-list-windows)
     },
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Interaction",
         "de-DE": "Interaktion",
         "pl-PL": "Interakcja",
+        "fr-FR": "Interaction",
       },
     },
     Capture: {
@@ -55,6 +58,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Capture",
         "de-DE": "Erfassung",
         "pl-PL": "Przechwytywanie",
+        "fr-FR": "Capture",
       },
     },
     Inspection: {
@@ -65,6 +69,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Inspection",
         "de-DE": "Inspektion",
         "pl-PL": "Inspekcja",
+        "fr-FR": "Inspection",
       },
     },
   },

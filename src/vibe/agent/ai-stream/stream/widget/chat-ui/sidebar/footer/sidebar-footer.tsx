@@ -85,7 +85,9 @@ export function SidebarFooter({
             variant="ghost"
             className="w-full min-h-11 px-3 flex flex-row items-center justify-between hover:bg-accent/50 rounded-none border-b border-border/50 transition-all duration-150"
             aria-label={
-              isExpanded ? "Collapse account section" : "Expand account section"
+              isExpanded
+                ? t("components.sidebar.footer.collapseAccount")
+                : t("components.sidebar.footer.expandAccount")
             }
             suppressHydrationWarning
           >

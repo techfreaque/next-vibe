@@ -1,0 +1,198 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  page: {
+    title: "Le journal de bord",
+    subtitle:
+      "Comment {{appName}} et next-vibe ont été construits. Les choix d'architecture, les impasses, ce qui s'est révélé essentiel.",
+    meta: {
+      title: "Journal de bord | next-vibe & {{appName}}",
+      description:
+        "Plongées techniques dans les choix derrière next-vibe et {{appName}}. Surfaces unifiées, rigueur TypeScript, Vibe Sense, et l'histoire de leur construction.",
+      category: "Blog",
+      imageAlt: "Journal de bord next-vibe & {{appName}}",
+      keywords:
+        "next-vibe, {{appName}}, blog, TypeScript, architecture, SaaS, IA, open source, ingénierie, IA non censurée",
+    },
+  },
+  posts: {
+    musicVoice: {
+      title: "Musique, voix et transcription IA. Quel modèle pour quel usage.",
+      category: "Guide",
+      excerpt:
+        "Chansons, beats, voix off et transcriptions sur un seul solde. Chaque modèle de musique, chaque voix et chaque modèle de reconnaissance vocale côte à côte, avec le vrai prix par clip, par minute et par heure. Et la réponse honnête sur les alternatives à Suno.",
+      readTime: "11 min de lecture",
+    },
+    videoGenerators: {
+      title:
+        "Générateurs de vidéo IA comparés. Kling, Seedance, Veo, Wan et les autres.",
+      category: "Guide",
+      excerpt:
+        "Tous les modèles vidéo sur un seul compte, côte à côte : texte ou image vers vidéo, première et dernière image, durée du clip, résolution, son et vrai prix par seconde. Lequel choisir pour quel usage, et où chacun montre ses limites.",
+      readTime: "10 min de lecture",
+    },
+    compatibleApi: {
+      title: "Une clé API, tous les modèles. Formats OpenAI et Anthropic.",
+      category: "Guide développeur",
+      excerpt:
+        "Chat completions OpenAI, l'API Responses et Anthropic Messages sur un seul endpoint. Votre SDK, Claude Code et Codex CLI sur tous les modèles. Ce que ça coûte, et quand passer en direct ou par OpenRouter est le meilleur choix.",
+      readTime: "11 min de lecture",
+    },
+    chatgptAlternative: {
+      title:
+        "Une alternative à ChatGPT sans filtres. C'est vous qui réglez le niveau.",
+      category: "Guide",
+      excerpt:
+        "Les modèles grand public gardent leurs filtres partout. Ici, ils côtoient des modèles open source et non censurés, et vous choisissez à chaque message. Ce qui change, ce que ça coûte, et quand ChatGPT reste le meilleur choix.",
+      readTime: "7 min de lecture",
+    },
+    codingTools: {
+      title: "Une clé. Tous les modèles. Codex et Claude Code compris.",
+      category: "Guide développeur",
+      excerpt:
+        "Codex CLI, Claude Code, OpenCode, Continue, Aider et Cline avec une seule clé API, modèles non censurés compris. Une URL de base, une commande par outil, et les pièges que nous avons rencontrés.",
+      readTime: "8 min de lecture",
+    },
+    uncensoredGuide: {
+      title: "Les modèles non censurés, un par un.",
+      category: "Guide des modèles",
+      excerpt:
+        "Deux sortes de non-censuré : des modèles grand public dont on a retiré les refus, et UncensoredLM avec sa propre vision du monde. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT et d'autres, avec les points forts et les limites de chacun.",
+      readTime: "7 min de lecture",
+    },
+    modelRefresh: {
+      title:
+        "Les modèles les plus récents sont là. Le non-censuré passe à la vitesse supérieure.",
+      category: "Mise à jour des modèles",
+      excerpt:
+        "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 et de nouveaux modèles open source. Plus NanoGPT, une gamme Venice élargie et les premiers modèles d'images non censurés.",
+      readTime: "5 min de lecture",
+    },
+    whatsNewNovember2026: {
+      title: "Six mois en une page : plus rapide, plus sûr, tourne partout.",
+      category: "Mise à jour produit",
+      excerpt:
+        "Stop veut dire stop. La voix fonctionne sur iPhone. Votre IA vous suit d'une machine à l'autre. L'auto-hébergement se passe de Docker. Tout ce qui a changé depuis mai.",
+      readTime: "6 min de lecture",
+    },
+    hermesThea: {
+      title: "Deux IA. Une conversation. Dans les deux sens.",
+      category: "Hermes & Thea",
+      excerpt:
+        "Hermes sur votre machine, Thea sur un serveur : désormais, chacune peut confier un fil à l'autre. Et une clé API manquante ne fait plus échouer le tour.",
+      readTime: "6 min de lecture",
+    },
+    codingAgent: {
+      title: "Votre IA ouvre un terminal et confie le travail à Claude Code.",
+      category: "Agent de code",
+      excerpt:
+        "L'outil coding-agent délègue de vraies modifications de code à Claude Code ou OpenCode : en arrière-plan, ou en direct dans une vraie fenêtre de terminal qui rend compte une fois le travail fini. Désormais d'une instance à l'autre.",
+      readTime: "5 min de lecture",
+    },
+    e2eTests: {
+      title:
+        "Un robot a cliqué sur chaque bouton. Il a trouvé huit failles de sécurité.",
+      category: "Ingénierie",
+      excerpt:
+        "Nous avons arrêté de tester des morceaux pour tester des pages. Un vrai navigateur sur chaque endpoint côté client, et la redirection ouverte, la SSRF et les fuites de données qu'il a attrapées.",
+      readTime: "7 min de lecture",
+    },
+    whatsNewMay2026: {
+      title: "Cortex. Dreamer. Autopilot. Votre IA se souvient, désormais.",
+      category: "Mise à jour produit",
+      excerpt:
+        "Mémoire persistante, réflexion nocturne, exécution en arrière-plan. Plus la génération de médias et {{credits}} crédits, un mois entier gratuit, pour nous dire ce qui ne marche pas.",
+      readTime: "6 min de lecture",
+    },
+    whatsNewApril2026: {
+      title: "123 modèles. Toutes les modalités. Un seul compagnon.",
+      category: "Mise à jour produit",
+      excerpt:
+        "Du vrai multimodal sur 123 modèles, de vrais compagnons IA avec un vrai caractère, une économie des compétences et une refonte complète de tout ce qui était bancal. Voici ce qui a changé.",
+      readTime: "7 min de lecture",
+    },
+    oneCodebase: {
+      title: "Une base de code. 13 plateformes. Zéro compromis.",
+      category: "Architecture",
+      excerpt:
+        "Une seule définition d'endpoint. Formulaire web, commande CLI, outil MCP, écran natif, tâche cron, en même temps. Voici comment ça marche.",
+      readTime: "12 min de lecture",
+    },
+    typeChecker: {
+      title:
+        "J'ai construit un vérificateur de types qui a empêché l'IA de me mentir",
+      category: "TypeScript",
+      excerpt:
+        "L'IA utilise `any` pour échapper à une erreur de type. Elle ajoute eslint-disable. Elle vous ment. Voici comment nous avons réparé la boucle de retour.",
+      readTime: "10 min de lecture",
+    },
+    tradingBot: {
+      title:
+        "Mon bot de trading abandonné est devenu un moteur de monitoring de plateforme",
+      category: "Vibe Sense",
+      excerpt:
+        "J'ai abandonné un bot de trading. Des années plus tard, son architecture est devenue la partie la plus intéressante de next-vibe. Le pipeline, ce ne sont que des endpoints.",
+      readTime: "14 min de lecture",
+    },
+    oneEndpoint: {
+      title: "Un endpoint. Toutes les surfaces.",
+      category: "Architecture",
+      excerpt:
+        "Écrivez un definition.ts par fonctionnalité. Il s'affiche en formulaire web, commande CLI, outil MCP, écran natif, tâche cron, en même temps.",
+      readTime: "5 min de lecture",
+    },
+    referralBeginners: {
+      title:
+        "Je n'ai jamais fait d'affiliation. Est-ce que je peux vraiment gagner de l'argent ici ?",
+      category: "Parrainage",
+      excerpt:
+        "Réponse honnête : oui, avec des attentes réalistes. Voici comment fonctionne la commission récurrente si vous n'avez jamais parrainé personne.",
+      readTime: "6 min de lecture",
+    },
+    referralAffiliatePros: {
+      title: "Je suis affilié. Qu'est-ce qui change avec les abonnements IA ?",
+      category: "Parrainage",
+      excerpt:
+        "Le plancher est plus haut et il monte avec le temps. Des commissions mensuelles récurrentes sur des abonnés IA qui dépensent davantage à mesure que la plateforme grandit.",
+      readTime: "7 min de lecture",
+    },
+    referralDevelopers: {
+      title:
+        "Vous avez construit quelque chose avec l'IA. Gagnez de l'argent en le partageant.",
+      category: "Parrainage",
+      excerpt:
+        "Votre lien de parrainage est une source de revenus que vous n'avez pas encore activée. Articles de blog, README, tutoriels : les chiffres pour un public technique.",
+      readTime: "5 min de lecture",
+    },
+    skillSharingEconomy: {
+      title: "Créez une compétence. Partagez le lien. Gagnez chaque mois.",
+      category: "Économie des compétences",
+      excerpt:
+        "Les compétences sont des configurations d'IA prêtes à l'emploi que vous créez une fois et partagez partout. Le lien de parrainage dans l'URL de partage vous rapporte 10 % récurrents sur chaque inscription. Voici comment.",
+      readTime: "7 min de lecture",
+    },
+    referralLanding: {
+      title:
+        "10 % en direct. +5 % quand d'autres partagent votre compétence. Récurrent, pour toujours.",
+      category: "Parrainage",
+      excerpt:
+        "Le fonctionnement complet du programme de parrainage et de rémunération des compétences : détail de la chaîne, pourcentages exacts par niveau, options de versement, et comment le bonus compétence se cumule.",
+      readTime: "4 min de lecture",
+    },
+  },
+  cta: {
+    title: "Les nouveaux articles, directement dans votre boîte mail.",
+    subtitle:
+      "Plongées dans l'architecture et nouveautés produit dès leur sortie. Pas de remplissage, désinscription en un clic.",
+    newsletter: "Recevoir la newsletter",
+    subscribedTitle: "Vous êtes inscrit.",
+    subscribedSubtitle:
+      "Les nouveaux articles arrivent dans votre boîte mail le jour de leur sortie. En attendant, plongez dans le framework qui les porte.",
+    framework: "Découvrir next-vibe",
+  },
+  labels: {
+    readMore: "Lire la suite",
+    allPosts: "Tous les articles",
+    featured: "À la une",
+  },
+};

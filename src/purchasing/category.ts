@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Purchasing",
     "de-DE": "Einkauf",
     "pl-PL": "Zakupy",
+    "fr-FR": "Achats",
   },
   group: "business",
   icon: "shopping-bag",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Orders",
         "de-DE": "Bestellungen",
         "pl-PL": "Zamówienia",
+        "fr-FR": "Commandes",
       },
     },
     "Purchasing: Vendors": {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Vendors",
         "de-DE": "Lieferanten",
         "pl-PL": "Dostawcy",
+        "fr-FR": "Fournisseurs",
       },
     },
   },

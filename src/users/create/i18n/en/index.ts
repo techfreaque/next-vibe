@@ -319,12 +319,14 @@ export const translations = {
     global: "Global",
     de: "Germany",
     pl: "Poland",
+    fr: "France",
     us: "United States",
   },
   languages: {
     en: "English",
     de: "German",
     pl: "Polish",
+    fr: "French",
   },
   enums: {
     userRole: {

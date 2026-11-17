@@ -18,6 +18,8 @@ export const translations: typeof enTranslations = {
   printButton: "Drucken",
   title: "Impressum",
   lastUpdated: "Stand: November 2026",
+  bindingVersionNotice:
+    "Diese Übersetzung dient nur der Information. Rechtsverbindlich ist die deutsche Fassung dieses Dokuments.",
   introduction:
     "Dieses Impressum enthält die gesetzlich vorgeschriebenen Angaben zu {{appName}} nach dem geltenden Recht.",
   sections: {

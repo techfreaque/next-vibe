@@ -191,18 +191,22 @@ export class ResilientPool extends Pool {
     if (!callback) {
       return connected;
     }
-    connected.then(
-      (client) => {
-        callback(undefined, client, (release?: Error | boolean) => {
-          client.release(release);
-        });
-        return undefined;
-      },
-      (error: Error) => {
-        callback(error, undefined, () => undefined);
-        return undefined;
-      },
-    );
+    void (async (): Promise<void> => {
+      let client: PoolClient;
+      try {
+        client = await connected;
+      } catch (error) {
+        callback(
+          error instanceof Error ? error : new Error(String(error)),
+          undefined,
+          () => undefined,
+        );
+        return;
+      }
+      callback(undefined, client, (release?: Error | boolean) => {
+        client.release(release);
+      });
+    })();
   }
 }
 

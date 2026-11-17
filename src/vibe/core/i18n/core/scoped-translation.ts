@@ -33,6 +33,7 @@ export type TranslatedKeyType = "createScopedTranslation-key";
  *   en: enTranslations,
  *   de: () => require("./de").translations,  // lazy - loaded on first DE request
  *   pl: () => require("./pl").translations,  // lazy - loaded on first PL request
+ *   fr: () => require("./fr").translations,  // lazy - loaded on first FR request
  * });
  *
  * // Usage:
@@ -65,10 +66,12 @@ export function createScopedTranslation<
   const TEN,
   const TDE,
   const TPL,
+  const TFR,
 >(translationsByLanguage: {
   en: TEN;
   de: LazyOrEager<TDE>;
   pl: LazyOrEager<TPL>;
+  fr: LazyOrEager<TFR>;
 }): {
   readonly ScopedTranslationKey: DotNotation<TEN>;
   readonly scopedT: (locale: CountryLanguage) => {
@@ -93,7 +96,9 @@ export function createScopedTranslation<
     const raw = resolveTranslation(
       translationsByLanguage[language as keyof typeof translationsByLanguage],
     );
-    const resolved = raw as Record<string, NestedValue>;
+    // A scope without this language (e.g. no `fr` yet) resolves to an empty
+    // object so `t()` falls back to English instead of crashing.
+    const resolved = (raw ?? {}) as Record<string, NestedValue>;
     resolvedCache.set(language, resolved);
     return resolved;
   }

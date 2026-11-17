@@ -1,0 +1,136 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Facturation",
+  tags: {
+    payment: "paiement",
+    invoice: "facture",
+  },
+  get: {
+    title: "Factures",
+    titleShort: "Factures",
+    description:
+      "Liste les factures clients d'une entreprise, avec filtres facultatifs",
+    form: {
+      title: "Filtres des factures",
+      description: "Filtrez la liste des factures",
+    },
+    response: {
+      total: "Total",
+      invoices: "Factures",
+      id: "ID de facture",
+      invoiceSequenceNumber: "Numéro de facture",
+      customerId: "ID client",
+      currency: "Devise",
+      status: "Statut",
+      amount: "Montant",
+      dueDate: "Échéance",
+      notes: "Notes",
+      lineCount: "Nombre de lignes",
+      amountPaid: "Montant payé",
+      amountDue: "Montant dû",
+      isOverdue: "En retard",
+      createdAt: "Créée le",
+      updatedAt: "Mise à jour le",
+    },
+    errors: {
+      unauthorized: {
+        title: "Non autorisé",
+        description: "Authentification requise",
+      },
+      validation: {
+        title: "Erreur de validation",
+        description: "Paramètres de filtre invalides",
+      },
+      server: {
+        title: "Erreur serveur",
+        description: "Une erreur interne du serveur s'est produite",
+      },
+      unknown: {
+        title: "Erreur inconnue",
+        description: "Une erreur inconnue s'est produite",
+      },
+      network: {
+        title: "Erreur réseau",
+        description: "Une erreur réseau s'est produite",
+      },
+      forbidden: {
+        title: "Interdit",
+        description: "Vous devez être membre de cette entreprise",
+      },
+      notFound: {
+        title: "Introuvable",
+        description: "Entreprise introuvable",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Un conflit s'est produit",
+      },
+      unsavedChanges: {
+        title: "Modifications non enregistrées",
+        description: "Des modifications ne sont pas enregistrées",
+      },
+    },
+    success: {
+      title: "Succès",
+      description: "Liste des factures récupérée",
+    },
+  },
+  enums: {
+    invoiceStatus: {
+      draft: "Brouillon",
+      open: "Ouverte",
+      paid: "Payée",
+      void: "Annulée",
+      uncollectible: "Irrécouvrable",
+    },
+  },
+  companyId: {
+    label: "ID de l'entreprise",
+    description: "Filtrer les factures de cette entreprise",
+    placeholder: "Saisir l'ID de l'entreprise",
+  },
+  status: {
+    label: "Statut",
+    description: "Filtrer par statut de facture",
+    placeholder: "Tous les statuts",
+  },
+  customerId: {
+    label: "ID client",
+    description: "Filtrer par client",
+    placeholder: "Saisir l'ID client",
+  },
+  page: {
+    label: "Page",
+    description: "Numéro de page",
+  },
+  pageSize: {
+    label: "Taille de page",
+    description: "Résultats par page",
+  },
+  widget: {
+    title: "Factures",
+    newInvoice: "Nouvelle facture",
+    loading: "Chargement des factures...",
+    noInvoices: "Aucune facture pour l'instant.",
+    noInvoicesHint: "Créez votre première facture pour commencer.",
+    overdue: "En retard",
+    due: "Échéance",
+    lines: "lignes",
+    line: "ligne",
+    view: "Voir",
+    back: "Retour",
+    empty: {
+      title: "Aucune facture pour l'instant.",
+      hint: "Créez votre première facture pour commencer.",
+      cta: "Nouvelle facture",
+    },
+    status: {
+      draft: "Brouillon",
+      open: "Ouverte",
+      paid: "Payée",
+      void: "Annulée",
+      uncollectible: "Irrécouvrable",
+    },
+  },
+};

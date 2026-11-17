@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "System",
     "de-DE": "System",
     "pl-PL": "System",
+    "fr-FR": "Système",
   },
   group: "system",
   icon: "settings",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Generators",
         "de-DE": "Generatoren",
         "pl-PL": "Generatory",
+        "fr-FR": "Générateurs",
       },
     },
     Build: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Build",
         "de-DE": "Build",
         "pl-PL": "Kompilacja",
+        "fr-FR": "Build",
       },
     },
     Check: {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Check",
         "de-DE": "Prüfen",
         "pl-PL": "Sprawdź",
+        "fr-FR": "Vérification",
       },
     },
     serverManagement: {
@@ -64,6 +68,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Server",
         "de-DE": "Server",
         "pl-PL": "Serwer",
+        "fr-FR": "Serveur",
       },
     },
     serverGuard: {
@@ -74,6 +79,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Guard",
         "de-DE": "Guard",
         "pl-PL": "Guard",
+        "fr-FR": "Guard",
       },
     },
     serverElectron: {
@@ -84,6 +90,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Electron",
         "de-DE": "Electron",
         "pl-PL": "Electron",
+        "fr-FR": "Electron",
       },
     },
     settingsEnv: {
@@ -94,6 +101,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Settings",
         "de-DE": "Einstellungen",
         "pl-PL": "Ustawienia",
+        "fr-FR": "Paramètres",
       },
     },
     settingsKeys: {
@@ -104,6 +112,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Keys",
         "de-DE": "Schlüssel",
         "pl-PL": "Klucze",
+        "fr-FR": "Clés",
       },
     },
     interfacesCli: {
@@ -114,6 +123,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "CLI",
         "de-DE": "CLI",
         "pl-PL": "CLI",
+        "fr-FR": "CLI",
       },
     },
     interfacesMcp: {
@@ -124,6 +134,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "MCP",
         "de-DE": "MCP",
         "pl-PL": "MCP",
+        "fr-FR": "MCP",
       },
     },
     interfacesFrame: {
@@ -134,6 +145,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Frame",
         "de-DE": "Frame",
         "pl-PL": "Frame",
+        "fr-FR": "Frame",
       },
     },
     tasksCron: {
@@ -144,6 +156,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Cron Tasks",
         "de-DE": "Cron-Aufgaben",
         "pl-PL": "Zadania cron",
+        "fr-FR": "Tâches cron",
       },
     },
     tasksMonitoring: {
@@ -154,6 +167,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Monitoring",
         "de-DE": "Überwachung",
         "pl-PL": "Monitoring",
+        "fr-FR": "Monitoring",
       },
     },
     tasksPulse: {
@@ -164,6 +178,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Pulse",
         "de-DE": "Pulse",
         "pl-PL": "Puls",
+        "fr-FR": "Pulse",
       },
     },
     tasksSync: {
@@ -174,6 +189,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Sync",
         "de-DE": "Synchronisierung",
         "pl-PL": "Synchronizacja",
+        "fr-FR": "Synchronisation",
       },
     },
   },

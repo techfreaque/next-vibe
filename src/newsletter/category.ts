@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Newsletter",
     "de-DE": "Newsletter",
     "pl-PL": "Newsletter",
+    "fr-FR": "Newsletter",
   },
   group: "comms",
   icon: "send",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Campaign Stats",
         "de-DE": "Kampagnen-Statistiken",
         "pl-PL": "Statystyki kampanii",
+        "fr-FR": "Stats des campagnes",
       },
     },
     emailCampaignsProcessing: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Campaigns",
         "de-DE": "Kampagnen",
         "pl-PL": "Kampanie",
+        "fr-FR": "Campagnes",
       },
     },
     emailCampaignsJourneys: {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Journeys",
         "de-DE": "Journeys",
         "pl-PL": "Podróże",
+        "fr-FR": "Parcours",
       },
     },
     emailCampaignsQueue: {
@@ -64,6 +68,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Queue",
         "de-DE": "Warteschlange",
         "pl-PL": "Kolejka",
+        "fr-FR": "File d'attente",
       },
     },
     Subscriptions: {
@@ -74,6 +79,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Subscriptions",
         "de-DE": "Abonnements",
         "pl-PL": "Subskrypcje",
+        "fr-FR": "Abonnements",
       },
     },
   },

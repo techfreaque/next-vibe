@@ -77,7 +77,7 @@ function createScopedEndpointsMetaPlugin(
     name: "scoped-endpoints-meta",
     setup(build) {
       build.onResolve(
-        { filter: /\/system\/generated\/endpoints-meta\/(en|de|pl)$/ },
+        { filter: /\/system\/generated\/endpoints-meta\/(en|de|pl|fr)$/ },
         () => ({
           // eslint-disable-next-line i18next/no-literal-string
           path: existsSync(metaFile) ? metaFile : "stub:endpoints-meta",

@@ -20,7 +20,11 @@ import { pathSegmentsToToolName } from "../../../core/core-utils/path";
 import { zodSchemaToJsonSchema } from "../../../core/definition/endpoint-to-metadata";
 import { FieldUsage } from "../../../core/definition/enums";
 import { coreEnv } from "../../../core/env";
-import type { CountryLanguage } from "../../../core/i18n/core/config";
+import type {
+  CountryLanguage,
+  Languages,
+} from "../../../core/i18n/core/config";
+import { getLanguageFromLocale } from "../../../core/i18n/core/language-utils";
 import type { WidgetData } from "../../../core/utils/json";
 import { filterUserPermissionRoles } from "../../../identity/roles/enum";
 import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
@@ -345,12 +349,15 @@ async function loadMetaForLocale(
   locale: CountryLanguage,
 ): Promise<SkillEndpointInfo[]> {
   // Map locale to generated file
-  const localeFileMap: Partial<Record<CountryLanguage, string>> = {
-    "en-US": "en",
-    "de-DE": "de",
-    "pl-PL": "pl",
+  // Meta is generated per language; any country variant (fr-GLOBAL, de-PL)
+  // reads its language's file.
+  const languageFileMap: Partial<Record<Languages, string>> = {
+    en: "en",
+    de: "de",
+    pl: "pl",
+    fr: "fr",
   };
-  const file = localeFileMap[locale] ?? "en";
+  const file = languageFileMap[getLanguageFromLocale(locale)] ?? "en";
 
   const mod = (await import(`@/generated/endpoints/meta/${file}`)) as {
     endpointsMeta: SkillEndpointInfo[];

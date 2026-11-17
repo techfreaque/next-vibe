@@ -17,6 +17,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Tax",
     "de-DE": "Steuern",
     "pl-PL": "Podatki",
+    "fr-FR": "Taxes",
   },
   group: "business",
   icon: "file-text",
@@ -35,6 +36,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Tax Rates",
         "de-DE": "Steuersätze",
         "pl-PL": "Stawki podatkowe",
+        "fr-FR": "Taux de taxe",
       },
       // inherits parent defaultEntry (tax/rate/list)
     },
@@ -46,6 +48,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Reports",
         "de-DE": "Berichte",
         "pl-PL": "Raporty",
+        "fr-FR": "Rapports",
       },
     },
   },

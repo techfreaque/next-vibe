@@ -51,10 +51,27 @@ export function defaultLlmsLocale(): CountryLanguage {
   );
 }
 
-/** `?locale=de-DE` picks another site locale; anything else is ignored. */
+/**
+ * `?locale=de-DE` picks another site locale, `?locale=fr` (bare language,
+ * any casing) the site locale of that language; anything else is ignored.
+ */
 export function resolveLlmsLocale(requested: string | null): CountryLanguage {
+  const wanted = (requested ?? "").trim().replaceAll("_", "-").toLowerCase();
+  if (!wanted) {
+    return defaultLlmsLocale();
+  }
+  const locales = sitemapLocales();
+  const exact = locales.find((locale) => locale.toLowerCase() === wanted);
+  if (exact) {
+    return exact;
+  }
+  const language = wanted.split("-")[0];
+  const sameLanguage = locales.filter(
+    (locale) => locale.split("-")[0] === language,
+  );
   return (
-    sitemapLocales().find((locale) => locale === requested) ??
+    sameLanguage.find((locale) => locale.endsWith("-GLOBAL")) ??
+    sameLanguage[0] ??
     defaultLlmsLocale()
   );
 }
@@ -98,10 +115,11 @@ export async function buildLlmsTxt(
   const price = (amount: number, currency: typeof pack.currency): string =>
     wholePrice(formatCurrency(amount, currency, locale));
 
-  const [enLocale, deLocale, plLocale] = [
+  const [enLocale, deLocale, plLocale, frLocale] = [
     defaultLlmsLocale(),
     sitemapLocales().find((l) => l.startsWith("de-")) ?? locale,
     sitemapLocales().find((l) => l.startsWith("pl-")) ?? locale,
+    sitemapLocales().find((l) => l.startsWith("fr-")) ?? locale,
   ];
 
   const facts = [
@@ -150,6 +168,7 @@ export async function buildLlmsTxt(
       en: page("/story", enLocale),
       de: page("/story", deLocale),
       pl: page("/story", plLocale),
+      fr: page("/story", frLocale),
     }),
   ];
 

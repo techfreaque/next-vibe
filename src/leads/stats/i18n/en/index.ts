@@ -97,6 +97,7 @@ export const translations = {
     all: "All Countries",
     de: "Germany",
     pl: "Poland",
+    fr: "France",
     global: "Global",
   },
   language: {
@@ -106,6 +107,7 @@ export const translations = {
     en: "English",
     de: "German",
     pl: "Polish",
+    fr: "French",
   },
   campaignStage: {
     label: "Campaign Stage",

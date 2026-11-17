@@ -17,6 +17,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "SSH & Infra",
     "de-DE": "SSH & Infra",
     "pl-PL": "SSH i Infra",
+    "fr-FR": "SSH et infra",
   },
   group: "platform",
   icon: "terminal",
@@ -35,6 +36,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Connections",
         "de-DE": "Verbindungen",
         "pl-PL": "Połączenia",
+        "fr-FR": "Connexions",
       },
     },
     Linux: {
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Linux Users",
         "de-DE": "Linux-Benutzer",
         "pl-PL": "Użytkownicy Linux",
+        "fr-FR": "Utilisateurs Linux",
       },
     },
   },

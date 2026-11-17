@@ -165,6 +165,7 @@ const CountryFilterOptions = [
   { value: CountryFilter.ALL, label: "country.all" as const },
   { value: CountryFilter.DE, label: "country.de" as const },
   { value: CountryFilter.PL, label: "country.pl" as const },
+  { value: CountryFilter.FR, label: "country.fr" as const },
   { value: CountryFilter.GLOBAL, label: "country.global" as const },
 ];
 
@@ -173,6 +174,7 @@ const LanguageFilterOptions = [
   { value: LanguageFilter.EN, label: "language.en" as const },
   { value: LanguageFilter.DE, label: "language.de" as const },
   { value: LanguageFilter.PL, label: "language.pl" as const },
+  { value: LanguageFilter.FR, label: "language.fr" as const },
 ];
 
 /**

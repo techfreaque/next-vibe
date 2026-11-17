@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Messenger",
     "de-DE": "Messenger",
     "pl-PL": "Komunikator",
+    "fr-FR": "Messagerie",
   },
   group: "comms",
   icon: "mail",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Accounts",
         "de-DE": "Konten",
         "pl-PL": "Konta",
+        "fr-FR": "Comptes",
       },
       // inherits parent defaultEntry (messenger-accounts)
     },
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Inbox",
         "de-DE": "Posteingang",
         "pl-PL": "Skrzynka odbiorcza",
+        "fr-FR": "Boîte de réception",
       },
     },
     Messages: {
@@ -55,6 +58,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Messages",
         "de-DE": "Nachrichten",
         "pl-PL": "Wiadomości",
+        "fr-FR": "Messages",
       },
     },
     Providers: {
@@ -65,6 +69,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Providers",
         "de-DE": "Anbieter",
         "pl-PL": "Dostawcy",
+        "fr-FR": "Fournisseurs",
       },
     },
   },

@@ -4,7 +4,7 @@
  */
 
 import { format } from "date-fns";
-import { de, enUS, type Locale, pl } from "date-fns/locale";
+import { de, enUS, fr, type Locale, pl } from "date-fns/locale";
 import type z from "zod";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -26,11 +26,15 @@ function getLocaleString(countryLanguage: CountryLanguage): string {
       return "de-DE";
     case "PL":
       return "pl-PL";
+    case "FR":
+      return "fr-FR";
     case "AT":
       return "de-AT";
     case "CH":
       return lang === "de" ? "de-CH" : "fr-CH";
     case "GLOBAL":
+      // No region: format in the page language (fr-GLOBAL reads French).
+      return lang === "fr" ? "fr-FR" : "en-US";
     case "US":
     default:
       return "en-US";
@@ -42,7 +46,14 @@ function getLocaleString(countryLanguage: CountryLanguage): string {
  */
 function shouldUse24HourFormat(countryLanguage: CountryLanguage): boolean {
   const country = countryLanguage.split("-")[1];
-  return country === "DE" || country === "PL" || country === "AT";
+  const language = countryLanguage.split("-")[0];
+  return (
+    country === "DE" ||
+    country === "PL" ||
+    country === "FR" ||
+    country === "AT" ||
+    language === "fr"
+  );
 }
 
 /**
@@ -56,8 +67,10 @@ function getDateFnsLocale(countryLanguage: CountryLanguage): Locale {
       return de;
     case "PL":
       return pl;
+    case "FR":
+      return fr;
     default:
-      return enUS;
+      return countryLanguage.startsWith("fr-") ? fr : enUS;
   }
 }
 

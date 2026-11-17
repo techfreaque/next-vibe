@@ -15,10 +15,11 @@ export const languageConfig = {
   countries: {
     DE: "DE" as const,
     PL: "PL" as const,
+    FR: "FR" as const,
     US: "US" as const,
     GLOBAL: "GLOBAL" as const,
   },
-  countriesArr: ["DE", "PL", "US", "GLOBAL"] as const,
+  countriesArr: ["DE", "PL", "FR", "US", "GLOBAL"] as const,
 
   currencies: {
     EUR: "EUR" as const,
@@ -30,14 +31,16 @@ export const languageConfig = {
   languages: {
     DE: "de" as const,
     PL: "pl" as const,
+    FR: "fr" as const,
     EN: "en" as const,
   },
-  languagesArr: ["de", "pl", "en"] as const,
+  languagesArr: ["de", "pl", "fr", "en"] as const,
 
   mappings: {
     currencyByCountry: {
       DE: "EUR" as const,
       PL: "PLN" as const,
+      FR: "EUR" as const,
       US: "USD" as const,
       GLOBAL: "USD" as const,
     },
@@ -45,6 +48,7 @@ export const languageConfig = {
     languageByCountry: {
       DE: "de",
       PL: "pl",
+      FR: "fr",
       US: "en",
       GLOBAL: "en",
     },
@@ -68,6 +72,15 @@ export const languageConfig = {
       flag: "🇵🇱",
       currency: "PLN",
       symbol: "zł",
+    },
+    FR: {
+      code: "FR",
+      name: "France",
+      language: "fr",
+      langName: "Français",
+      flag: "🇫🇷",
+      currency: "EUR",
+      symbol: "€",
     },
     US: {
       code: "US",

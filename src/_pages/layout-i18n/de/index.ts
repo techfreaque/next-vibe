@@ -40,6 +40,7 @@ export const translations: typeof enTranslations = {
       en: "Englisch",
       de: "Deutsch",
       pl: "Polnisch",
+      fr: "Französisch",
     },
   },
 };

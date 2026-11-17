@@ -221,6 +221,7 @@ export const translations = {
       en: "English",
       de: "German",
       pl: "Polish",
+      fr: "French",
     },
   },
   native: {
@@ -291,6 +292,7 @@ export const translations = {
     countries: {
       de: "Germany",
       pl: "Poland",
+      fr: "France",
       us: "United States",
       global: "Global",
     },
@@ -298,6 +300,7 @@ export const translations = {
       en: "English",
       de: "German",
       pl: "Polish",
+      fr: "French",
     },
 
     accessibility: {

@@ -1,0 +1,298 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Suivi des leads",
+  tags: {
+    tracking: "Suivi",
+    engagement: "Engagement",
+  },
+  post: {
+    title: "Enregistrer un engagement de lead",
+    titleShort: "Suivre l'engagement",
+    description: "Enregistrer un nouvel événement d'engagement pour un lead",
+    form: {
+      title: "Formulaire d'engagement du lead",
+      description: "Enregistrer les détails de l'engagement du lead",
+    },
+    leadId: {
+      label: "ID du lead",
+      description: "Identifiant unique du lead",
+      placeholder: "Saisir l'ID du lead",
+      helpText: "UUID du lead dont l'engagement est suivi",
+    },
+    engagementType: {
+      label: "Type d'engagement",
+      description: "Type d'événement d'engagement",
+      placeholder: "Choisir le type d'engagement",
+      helpText: "Le type d'interaction ou d'engagement",
+    },
+    campaignId: {
+      label: "ID de campagne",
+      description: "Identifiant de la campagne associée",
+      placeholder: "Saisir l'ID de campagne",
+      helpText: "Campagne facultative à laquelle cet engagement appartient",
+    },
+    metadata: {
+      label: "Métadonnées",
+      description: "Métadonnées supplémentaires de l'engagement",
+      placeholder: "Saisir les métadonnées en JSON",
+      helpText: "Données personnalisées sur cet engagement",
+    },
+    userId: {
+      label: "ID utilisateur",
+      description: "Identifiant de l'utilisateur associé",
+      placeholder: "Saisir l'ID utilisateur",
+      helpText: "ID utilisateur facultatif si le lead est lié à un utilisateur",
+    },
+    response: {
+      id: "ID de l'engagement",
+      leadId: "ID du lead",
+      engagementType: "Type d'engagement",
+      campaignId: "ID de campagne",
+      metadata: "Métadonnées",
+      timestamp: "Horodatage",
+      ipAddress: "Adresse IP",
+      userAgent: "User agent",
+      createdAt: "Créé le",
+      leadCreated: "Lead créé",
+      relationshipEstablished: "Relation établie",
+    },
+    errors: {
+      unauthorized: {
+        title: "Non autorisé",
+        description: "Authentification requise",
+      },
+      validation: {
+        title: "Erreur de validation",
+        description: "Paramètres de requête invalides",
+      },
+      server: {
+        title: "Erreur serveur",
+        description: "Une erreur interne du serveur s'est produite",
+      },
+      unknown: {
+        title: "Erreur inconnue",
+        description: "Une erreur inconnue s'est produite",
+      },
+      forbidden: {
+        title: "Interdit",
+        description: "Accès interdit",
+      },
+      notFound: {
+        title: "Introuvable",
+        description: "Ressource introuvable",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Un conflit de données s'est produit",
+      },
+      network: {
+        title: "Erreur réseau",
+        description: "Une erreur réseau s'est produite",
+      },
+      unsavedChanges: {
+        title: "Modifications non enregistrées",
+        description: "Vous avez des modifications non enregistrées",
+      },
+    },
+    success: {
+      title: "Engagement enregistré",
+      description: "Engagement du lead enregistré",
+    },
+  },
+  get: {
+    title: "Suivre un clic de lead",
+    titleShort: "Suivre le clic",
+    description: "Suivre le clic d'un lead et rediriger vers l'URL cible",
+    form: {
+      title: "Paramètres de suivi des clics",
+      description: "Paramètres de suivi des clics et de redirection",
+    },
+    id: {
+      label: "ID du lead",
+      description: "Identifiant unique du lead",
+      placeholder: "Saisir l'ID du lead",
+      helpText: "UUID du lead dont le clic est suivi",
+    },
+    stage: {
+      label: "Étape de campagne",
+      description: "Étape de la campagne e-mail",
+      placeholder: "Choisir l'étape de campagne",
+      helpText: "Étape de campagne facultative à laquelle ce clic appartient",
+    },
+    source: {
+      label: "Source du lead",
+      description: "Source du lead",
+      placeholder: "Choisir la source du lead",
+      helpText: "Source d'origine du lead",
+    },
+    url: {
+      label: "URL cible",
+      description: "URL de redirection après le suivi",
+      placeholder: "Saisir l'URL cible",
+      helpText: "L'URL de destination de la redirection",
+    },
+    ref: {
+      label: "ID de référence",
+      description: "Identifiant de référence pour le suivi",
+      placeholder: "Saisir l'ID de référence",
+      helpText:
+        "ID de référence facultatif pour un contexte de suivi supplémentaire",
+    },
+    sig: {
+      label: "Signature du lien",
+      description:
+        "Prouve qu'une destination externe provient d'un lien que nous avons généré",
+    },
+    response: {
+      success: "Succès",
+      redirectUrl: "URL de redirection",
+      leadId: "ID du lead",
+      campaignId: "ID de campagne",
+      engagementRecorded: "Engagement enregistré",
+      leadStatusUpdated: "Statut du lead mis à jour",
+      isLoggedIn: "Connecté",
+    },
+    errors: {
+      unauthorized: {
+        title: "Non autorisé",
+        description: "Authentification requise",
+      },
+      validation: {
+        title: "Erreur de validation",
+        description: "Paramètres de requête invalides",
+      },
+      server: {
+        title: "Erreur serveur",
+        description: "Une erreur interne du serveur s'est produite",
+      },
+      unknown: {
+        title: "Erreur inconnue",
+        description: "Une erreur inconnue s'est produite",
+      },
+      forbidden: {
+        title: "Interdit",
+        description: "Accès interdit",
+      },
+      notFound: {
+        title: "Introuvable",
+        description: "Ressource introuvable",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Un conflit de données s'est produit",
+      },
+      network: {
+        title: "Erreur réseau",
+        description: "Une erreur réseau s'est produite",
+      },
+      unsavedChanges: {
+        title: "Modifications non enregistrées",
+        description: "Vous avez des modifications non enregistrées",
+      },
+    },
+    success: {
+      title: "Clic suivi",
+      description: "Clic du lead suivi",
+    },
+  },
+  widget: {
+    post: {
+      headerTitle: "Enregistrer un engagement",
+      viewStatsTitle: "Voir les statistiques des leads",
+      statsButton: "Stats",
+      loading: "Enregistrement de l'engagement…",
+      successTitle: "Engagement enregistré",
+      successSubtitle: "suivi avec succès",
+      event: "Événement",
+      labels: {
+        engagementId: "ID de l'engagement",
+        type: "Type",
+        leadId: "ID du lead",
+        campaignId: "ID de campagne",
+        ipAddress: "Adresse IP",
+        recordedAt: "Enregistré le",
+        leadCreated: "Lead créé",
+        leadCreatedYes: "Oui (nouveau lead)",
+        leadCreatedNo: "Non (existant)",
+        relationshipEst: "Relation établie",
+        relationshipYes: "Oui",
+        relationshipNo: "Non",
+        metadata: "Métadonnées",
+      },
+      nextSteps: "Étapes suivantes :",
+      viewLeadButton: "Voir le lead",
+      leadStatsButton: "Stats du lead",
+      emptyTitle: "Suivre un événement d'engagement",
+      emptyDescription:
+        "Remplissez le formulaire ci-dessous et validez pour enregistrer un nouvel événement d'engagement pour un lead",
+      viewLeadStatsButton: "Voir les stats du lead",
+    },
+    get: {
+      headerTitle: "Suivi des clics",
+      viewStatsTitle: "Voir les statistiques des leads",
+      statsButton: "Stats",
+      loading: "Traitement du suivi de clic…",
+      successTitle: "Clic suivi",
+      successSubtitle: "Engagement enregistré et URL de redirection prête",
+      failTitle: "Échec du suivi",
+      failSubtitle: "Impossible d'enregistrer l'événement de clic",
+      labels: {
+        engagementLabel: "Engagement",
+        recorded: "Enregistré",
+        notRecorded: "Non enregistré",
+        leadStatusLabel: "Statut du lead",
+        updated: "Mis à jour",
+        unchanged: "Inchangé",
+        userLabel: "Utilisateur",
+        loggedIn: "Connecté",
+        anonymous: "Anonyme",
+        leadId: "ID du lead",
+        campaignId: "ID de campagne",
+        redirectUrl: "URL de redirection",
+      },
+      nextSteps: "Étapes suivantes :",
+      openUrlButton: "Ouvrir l'URL",
+      viewLeadButton: "Voir le lead",
+      leadStatsButton: "Stats du lead",
+      emptyTitle: "Suivre un événement de clic",
+      emptyDescription:
+        "Saisissez les paramètres de suivi ci-dessous pour enregistrer un clic et obtenir l'URL de redirection",
+      viewLeadStatsButton: "Voir les stats du lead",
+    },
+  },
+  enums: {
+    engagementLevel: {
+      high: "Élevé",
+      medium: "Moyen",
+      low: "Faible",
+      none: "Aucun",
+    },
+    engagementTypes: {
+      emailOpen: "Ouverture d'e-mail",
+      emailClick: "Clic dans un e-mail",
+      websiteVisit: "Visite du site",
+      formSubmit: "Envoi de formulaire",
+      leadAttribution: "Attribution du lead",
+    },
+    emailCampaignStage: {
+      notStarted: "Non démarrée",
+      initial: "Initiale",
+      followup1: "Relance 1",
+      followup2: "Relance 2",
+      followup3: "Relance 3",
+      nurture: "Nurturing",
+      reactivation: "Réactivation",
+    },
+    leadSource: {
+      website: "Site web",
+      socialMedia: "Réseaux sociaux",
+      emailCampaign: "Campagne e-mail",
+      referral: "Parrainage",
+      csvImport: "Import CSV",
+    },
+  },
+  error: {
+    default: "Une erreur s'est produite lors du traitement de l'engagement",
+  },
+};

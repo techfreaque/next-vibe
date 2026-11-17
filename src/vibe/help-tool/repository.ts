@@ -27,6 +27,7 @@ import type { EndpointMeta } from "../core/definition/endpoints-meta";
 import { FieldUsage } from "../core/definition/enums";
 import { coreClientEnv as envClient } from "../core/env-client";
 import type { CountryLanguage } from "../core/i18n/core/config";
+import { getLanguageFromLocale } from "../core/i18n/core/language-utils";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
 import { type ResponseType, success } from "../core/route/response.schema";
 import { searchField, searchItems } from "../core/utils/in-memory-search";
@@ -246,16 +247,15 @@ export class HelpRepository {
       : "production";
 
     // Load only the locale we need.
-    const localeToFile: Record<string, string> = {
-      "de-DE": "de",
-      "pl-PL": "pl",
-    };
-    const localeFile = localeToFile[locale] ?? "en";
-    const metaModule = await (localeFile === "de"
+    // Meta is generated per language; any country variant reads its language.
+    const language = getLanguageFromLocale(locale);
+    const metaModule = await (language === "de"
       ? import("@/generated/endpoints/meta/de")
-      : localeFile === "pl"
+      : language === "pl"
         ? import("@/generated/endpoints/meta/pl")
-        : import("@/generated/endpoints/meta/en"));
+        : language === "fr"
+          ? import("@/generated/endpoints/meta/fr")
+          : import("@/generated/endpoints/meta/en"));
     const allMeta = metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?

@@ -60,6 +60,8 @@ export const translations = {
       logout: "Logout",
       footer: {
         account: "Account",
+        expandAccount: "Expand account section",
+        collapseAccount: "Collapse account section",
       },
     },
     credits: {

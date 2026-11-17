@@ -18,6 +18,8 @@ export const translations: typeof enTranslations = {
   printButton: "Drukuj",
   title: "Warunki korzystania z usługi",
   lastUpdated: "Ostatnia aktualizacja: listopad 2026",
+  bindingVersionNotice:
+    "Tłumaczenie ma charakter wyłącznie informacyjny. Wiążąca prawnie jest niemiecka wersja tego dokumentu.",
   introduction:
     "Witamy w {{appName}}. Korzystając z naszej platformy czatu AI, zgadzasz się na niniejsze Warunki korzystania z usługi. Przeczytaj je uważnie. Serwis {{appName}} prowadzi {{operator}} z Niemiec.",
   sections: {

@@ -11,7 +11,13 @@ import type { JSX } from "react";
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
-import { LegalCard, LegalDocument, LegalH3, LegalP } from "../_shared/legal";
+import {
+  LegalCard,
+  LegalDocument,
+  LegalH3,
+  LegalP,
+  showBindingNotice,
+} from "../_shared/legal";
 import { PrintButton } from "../_shared/print-button";
 import { scopedTranslation } from "./i18n";
 
@@ -80,7 +86,14 @@ export function TanstackPage({
       actions={
         <PrintButton label={t("printButton")} ariaLabel={t("printAriaLabel")} />
       }
-      intro={<LegalP>{t("introduction", { appName })}</LegalP>}
+      intro={
+        <>
+          {showBindingNotice(locale) && (
+            <LegalP>{t("bindingVersionNotice")}</LegalP>
+          )}
+          <LegalP>{t("introduction", { appName })}</LegalP>
+        </>
+      }
       sections={[
         {
           id: "company",

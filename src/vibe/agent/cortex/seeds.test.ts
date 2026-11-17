@@ -21,7 +21,7 @@ import {
   getMemoryTemplates,
 } from "./seeds/templates";
 
-const LOCALES = ["en-US", "de-DE", "pl-PL"] as const;
+const LOCALES = ["en-US", "de-DE", "pl-PL", "fr-FR"] as const;
 
 for (const locale of LOCALES) {
   describe(`Template registry [${locale}]`, () => {

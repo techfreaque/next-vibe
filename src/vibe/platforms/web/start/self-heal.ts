@@ -45,7 +45,9 @@ export class NextUptimeTracker {
   }
 
   shouldEscalate(now: number): boolean {
-    return this.downSince !== null && this.downForMs(now) >= this.escalateAfterMs;
+    return (
+      this.downSince !== null && this.downForMs(now) >= this.escalateAfterMs
+    );
   }
 }
 

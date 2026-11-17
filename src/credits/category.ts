@@ -15,6 +15,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Credits",
     "de-DE": "Guthaben",
     "pl-PL": "Środki",
+    "fr-FR": "Crédits",
   },
   group: "business",
   icon: "coins",
@@ -33,6 +34,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Credits",
         "de-DE": "Guthaben",
         "pl-PL": "Środki",
+        "fr-FR": "Crédits",
       },
       // inherits parent defaultEntry (credits-balance)
     },
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Management",
         "de-DE": "Verwaltung",
         "pl-PL": "Zarządzanie",
+        "fr-FR": "Gestion",
       },
     },
   },

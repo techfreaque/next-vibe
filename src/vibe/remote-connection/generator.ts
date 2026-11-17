@@ -107,6 +107,7 @@ class RemoteCapabilitiesGenerator {
     "en-US",
     "de-DE",
     "pl-PL",
+    "fr-FR",
   ];
 
   /** Locale → short basename */
@@ -116,6 +117,7 @@ class RemoteCapabilitiesGenerator {
     "en-US": "en",
     "de-DE": "de",
     "pl-PL": "pl",
+    "fr-FR": "fr",
   };
 
   /** User roles we generate snapshots for */

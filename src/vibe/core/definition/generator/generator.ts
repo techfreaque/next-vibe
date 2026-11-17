@@ -27,12 +27,25 @@ export const generator: GeneratorDefinition = {
   cacheKey: "endpoints",
   findInputs(live) {
     const apiDir = getApiDir();
+    // The category registry reads category.ts labels and the per-locale meta
+    // reads the i18n translations, so both must invalidate the cache too.
+    const labelInputs = [
+      ...findFilesRecursively(apiDir, "category.ts"),
+      ...findFilesRecursively(apiDir, "index.ts").filter((file) =>
+        file.includes("/i18n/"),
+      ),
+    ];
     if (live) {
-      return [...live.definitionFiles, ...live.routeFiles].toSorted();
+      return [
+        ...live.definitionFiles,
+        ...live.routeFiles,
+        ...labelInputs,
+      ].toSorted();
     }
     return [
       ...findFilesRecursively(apiDir, "definition.ts"),
       ...findFilesRecursively(apiDir, "route.ts"),
+      ...labelInputs,
     ].toSorted();
   },
   /**

@@ -15,6 +15,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Account",
     "de-DE": "Konto",
     "pl-PL": "Konto",
+    "fr-FR": "Compte",
   },
   group: "system",
   icon: "user",
@@ -33,6 +34,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Login & Signup",
         "de-DE": "Login & Registrierung",
         "pl-PL": "Logowanie i rejestracja",
+        "fr-FR": "Connexion et inscription",
       },
     },
     profile: {
@@ -43,6 +45,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Profile",
         "de-DE": "Profil",
         "pl-PL": "Profil",
+        "fr-FR": "Profil",
       },
     },
     sessions: {
@@ -53,6 +56,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Sessions",
         "de-DE": "Sitzungen",
         "pl-PL": "Sesje",
+        "fr-FR": "Sessions",
       },
     },
     directory: {
@@ -63,6 +67,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Directory",
         "de-DE": "Verzeichnis",
         "pl-PL": "Katalog",
+        "fr-FR": "Annuaire",
       },
     },
     manageUsers: {
@@ -73,6 +78,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Manage Users",
         "de-DE": "Nutzer verwalten",
         "pl-PL": "Zarządzaj użytkownikami",
+        "fr-FR": "Gérer les utilisateurs",
       },
     },
     userStats: {
@@ -83,6 +89,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "User Stats",
         "de-DE": "Nutzerstatistiken",
         "pl-PL": "Statystyki użytkowników",
+        "fr-FR": "Stats des utilisateurs",
       },
     },
     remoteInstances: {
@@ -93,6 +100,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Remote Instances",
         "de-DE": "Remote-Instanzen",
         "pl-PL": "Zdalne instancje",
+        "fr-FR": "Instances distantes",
       },
     },
     remoteSelf: {
@@ -103,6 +111,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Self",
         "de-DE": "Eigene Instanz",
         "pl-PL": "Własna instancja",
+        "fr-FR": "Instance locale",
       },
     },
   },

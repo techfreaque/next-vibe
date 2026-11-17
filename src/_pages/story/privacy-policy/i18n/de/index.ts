@@ -21,6 +21,8 @@ export const translations: typeof enTranslations = {
   printButton: "Drucken",
   title: "Datenschutzrichtlinie",
   lastUpdated: "Zuletzt aktualisiert: November 2026",
+  bindingVersionNotice:
+    "Diese Übersetzung dient nur der Information. Rechtsverbindlich ist die deutsche Fassung dieses Dokuments.",
   introduction:
     "Bei {{appName}} nehmen wir Ihre Privatsphäre ernst. Diese Datenschutzrichtlinie erklärt, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen.",
   sections: {

@@ -194,6 +194,7 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     description: "free.description",
     priceByCountry: {
       DE: { price: 0, currency: "EUR" as const },
+      FR: { price: 0, currency: "EUR" as const },
       PL: { price: 0, currency: "PLN" as const },
       US: { price: 0, currency: "USD" as const },
       GLOBAL: { price: 0, currency: "USD" as const },
@@ -208,12 +209,14 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     description: "subscription.description",
     priceByCountry: {
       DE: { price: 8, currency: "EUR" as const },
+      FR: { price: 8, currency: "EUR" as const },
       PL: { price: 30, currency: "PLN" as const },
       US: { price: 8, currency: "USD" as const },
       GLOBAL: { price: 8, currency: "USD" as const },
     },
     yearlyPriceByCountry: {
       DE: { price: 88, currency: "EUR" as const },
+      FR: { price: 88, currency: "EUR" as const },
       PL: { price: 330, currency: "PLN" as const },
       US: { price: 88, currency: "USD" as const },
       GLOBAL: { price: 88, currency: "USD" as const },
@@ -230,12 +233,14 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     // other interval, and some surfaces read the default price.
     priceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
+      FR: { price: 5, currency: "EUR" as const },
       PL: { price: 40, currency: "PLN" as const },
       US: { price: 5, currency: "USD" as const },
       GLOBAL: { price: 5, currency: "USD" as const },
     },
     oneTimePriceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
+      FR: { price: 5, currency: "EUR" as const },
       PL: { price: 40, currency: "PLN" as const },
       US: { price: 5, currency: "USD" as const },
       GLOBAL: { price: 5, currency: "USD" as const },
@@ -252,12 +257,14 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     description: "creditPackLarge.description",
     priceByCountry: {
       DE: { price: 20, currency: "EUR" as const },
+      FR: { price: 20, currency: "EUR" as const },
       PL: { price: 160, currency: "PLN" as const },
       US: { price: 20, currency: "USD" as const },
       GLOBAL: { price: 20, currency: "USD" as const },
     },
     oneTimePriceByCountry: {
       DE: { price: 20, currency: "EUR" as const },
+      FR: { price: 20, currency: "EUR" as const },
       PL: { price: 160, currency: "PLN" as const },
       US: { price: 20, currency: "USD" as const },
       GLOBAL: { price: 20, currency: "USD" as const },
@@ -465,9 +472,19 @@ function currencySymbol(c: string): string {
   return c === "EUR" ? "€" : c === "PLN" ? "zł" : "$";
 }
 
-/** "$5", "€8", "40 zł": the złoty sign follows the amount. */
-function formatPriceLabel(price: number, currency: string): string {
-  return currency === "PLN"
+/**
+ * "$5", "€8", "40 zł": the złoty sign follows the amount, and so does the
+ * euro sign on French pages ("8 €").
+ */
+function formatPriceLabel(
+  price: number,
+  currency: string,
+  locale?: CountryLanguage,
+): string {
+  const symbolAfter =
+    currency === "PLN" ||
+    (currency === "EUR" && locale !== undefined && locale.startsWith("fr-"));
+  return symbolAfter
     ? `${price} ${currencySymbol(currency)}`
     : `${currencySymbol(currency)}${price}`;
 }
@@ -503,8 +520,13 @@ export function getPricingParams(
     subscriptionPrice: formatPriceLabel(
       subPriceData.price,
       subPriceData.currency,
+      locale,
     ),
-    packPrice: formatPriceLabel(packPriceData.price, packPriceData.currency),
+    packPrice: formatPriceLabel(
+      packPriceData.price,
+      packPriceData.currency,
+      locale,
+    ),
   };
 }
 
@@ -637,6 +659,11 @@ function buildPricingPlans(
           monthly: getPriceData("DE", "month").price,
           annual: getPriceData("DE", "year").price,
           currency: getPriceData("DE", "month").currency,
+        },
+        FR: {
+          monthly: getPriceData("FR", "month").price,
+          annual: getPriceData("FR", "year").price,
+          currency: getPriceData("FR", "month").currency,
         },
         PL: {
           monthly: getPriceData("PL", "month").price,

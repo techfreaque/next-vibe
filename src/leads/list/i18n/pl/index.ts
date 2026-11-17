@@ -213,12 +213,14 @@ export const translations: typeof enTranslations = {
     global: "Globalny",
     de: "Niemcy",
     pl: "Polska",
+    fr: "Francja",
     us: "Stany Zjednoczone",
   },
   languages: {
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
+    fr: "Francuski",
   },
   enums: {
     leadStatus: {

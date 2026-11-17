@@ -224,6 +224,7 @@ export const translations: typeof enTranslations = {
       en: "English",
       de: "Deutsch",
       pl: "Polski",
+      fr: "Français",
     },
   },
   native: {
@@ -298,6 +299,7 @@ export const translations: typeof enTranslations = {
     countries: {
       de: "Deutschland",
       pl: "Polen",
+      fr: "Frankreich",
       us: "Vereinigte Staaten",
       global: "Global",
     },
@@ -305,6 +307,7 @@ export const translations: typeof enTranslations = {
       en: "Englisch",
       de: "Deutsch",
       pl: "Polnisch",
+      fr: "Französisch",
     },
     accessibility: {
       srOnly: {

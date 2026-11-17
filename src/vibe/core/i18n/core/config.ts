@@ -23,13 +23,13 @@ export interface CountryInfo {
 // Enum-like objects to replace the enums
 
 export const Countries = languageConfig.countries;
-export const CountriesArr = ["DE", "PL", "US", "GLOBAL"] as const;
+export const CountriesArr = ["DE", "PL", "FR", "US", "GLOBAL"] as const;
 
 export const Currencies = languageConfig.currencies;
 export const CurrenciesArr = ["EUR", "USD", "PLN"] as const;
 
 export const Languages = languageConfig.languages;
-export const LanguagesArr = ["de", "pl", "en"] as const;
+export const LanguagesArr = ["de", "pl", "fr", "en"] as const;
 
 /**
  * Countries Options for select fields
@@ -39,6 +39,7 @@ export const CountriesOptions = [
   { value: Countries.GLOBAL, label: "countries.global" as const },
   { value: Countries.DE, label: "countries.de" as const },
   { value: Countries.PL, label: "countries.pl" as const },
+  { value: Countries.FR, label: "countries.fr" as const },
   { value: Countries.US, label: "countries.us" as const },
 ];
 
@@ -50,6 +51,7 @@ export const LanguagesOptions = [
   { value: Languages.EN, label: "languages.en" as const },
   { value: Languages.DE, label: "languages.de" as const },
   { value: Languages.PL, label: "languages.pl" as const },
+  { value: Languages.FR, label: "languages.fr" as const },
 ];
 
 // Create a proper enum-like object for CountryLanguageValues that works with z.enum()
@@ -75,6 +77,7 @@ export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
 export const availableCountries: readonly CountryInfo[] = [
   languageConfig.countryInfo.DE as CountryInfo,
   languageConfig.countryInfo.PL as CountryInfo,
+  languageConfig.countryInfo.FR as CountryInfo,
   languageConfig.countryInfo.US as CountryInfo,
   languageConfig.countryInfo.GLOBAL as CountryInfo,
 ];

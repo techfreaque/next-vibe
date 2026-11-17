@@ -12,6 +12,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import {
+  Countries,
   CountriesOptions,
   Languages,
   LanguagesOptions,
@@ -232,7 +233,7 @@ const accountResponseFields = {
   countries: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     label: "response.account.countries",
-    schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])),
+    schema: z.array(z.enum(Countries)),
   }),
   languages: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
@@ -814,7 +815,7 @@ const { PUT } = createEndpoint({
         placeholder: "fields.countries.placeholder",
         columns: 6,
         options: CountriesOptions,
-        schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])),
+        schema: z.array(z.enum(Countries)),
       }),
       languages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

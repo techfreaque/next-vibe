@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Companies",
     "de-DE": "Unternehmen",
     "pl-PL": "Firmy",
+    "fr-FR": "Entreprises",
   },
   group: "business",
   icon: "building",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Companies",
         "de-DE": "Unternehmen",
         "pl-PL": "Firmy",
+        "fr-FR": "Entreprises",
       },
       // inherits parent defaultEntry (companies-list)
     },
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Members",
         "de-DE": "Mitglieder",
         "pl-PL": "Członkowie",
+        "fr-FR": "Membres",
       },
     },
   },

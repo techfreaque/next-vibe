@@ -18,6 +18,8 @@ export const translations: typeof enTranslations = {
   printButton: "Drukuj",
   title: "Nota prawna",
   lastUpdated: "Ostatnia aktualizacja: listopad 2026",
+  bindingVersionNotice:
+    "Tłumaczenie ma charakter wyłącznie informacyjny. Wiążąca prawnie jest niemiecka wersja tego dokumentu.",
   introduction:
     "Niniejsza stopka redakcyjna zawiera informacje wymagane przez prawo dotyczące {{appName}} zgodnie z obowiązującymi przepisami.",
   sections: {

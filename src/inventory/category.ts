@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Inventory",
     "de-DE": "Lager",
     "pl-PL": "Magazyn",
+    "fr-FR": "Inventaire",
   },
   group: "business",
   icon: "box",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Stock",
         "de-DE": "Bestand",
         "pl-PL": "Zapasy",
+        "fr-FR": "Stock",
       },
     },
     "Inventory: Transfers": {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Transfers",
         "de-DE": "Transfers",
         "pl-PL": "Transfery",
+        "fr-FR": "Transferts",
       },
     },
     "Inventory: Warehouses": {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Warehouses",
         "de-DE": "Lagerhäuser",
         "pl-PL": "Magazyny",
+        "fr-FR": "Entrepôts",
       },
     },
   },

@@ -1422,7 +1422,6 @@ export class ServerStartRepository {
           setTimeout((): void => {
             void (async (): Promise<void> => {
               const { default: open } = await import("open");
-              const { readdirSync } = await import("node:fs");
               const { resolve } = await import("node:path");
 
               const cpuProfiles = readdirSync(process.cwd()).filter(

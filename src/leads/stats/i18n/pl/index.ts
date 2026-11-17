@@ -99,6 +99,7 @@ export const translations: typeof enTranslations = {
     all: "Wszystkie kraje",
     de: "Niemcy",
     pl: "Polska",
+    fr: "Francja",
     global: "Globalny",
   },
   language: {
@@ -108,6 +109,7 @@ export const translations: typeof enTranslations = {
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
+    fr: "Francuski",
   },
   campaignStage: {
     label: "Etap kampanii",

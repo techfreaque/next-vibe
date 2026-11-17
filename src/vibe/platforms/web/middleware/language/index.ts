@@ -261,11 +261,8 @@ export function buildLocaleRedirectPath(
   const rest = pathParts.slice(
     (isApiRoute ? 1 : 0) + (redirect.replaceSegment ? 1 : 0),
   );
-  const trailingSlash = path.length > 1 && path.endsWith("/") && rest.length > 0;
-  const parts = [
-    ...(isApiRoute ? ["api"] : []),
-    redirect.locale,
-    ...rest,
-  ];
+  const trailingSlash =
+    path.length > 1 && path.endsWith("/") && rest.length > 0;
+  const parts = [...(isApiRoute ? ["api"] : []), redirect.locale, ...rest];
   return `/${parts.join("/")}${trailingSlash ? "/" : ""}`;
 }

@@ -34,7 +34,7 @@ const LICENSE_URLS = [
   "https://opensource.org/licenses/MIT",
   "https://www.gnu.org/licenses/gpl-3.0.html",
 ];
-const SITE_LANGUAGES = ["en", "de", "pl"];
+const SITE_LANGUAGES = ["en", "de", "pl", "fr"];
 
 /** Canonical origin, same source as every page's canonical/hreflang tags. */
 function siteBase(locale: CountryLanguage): string {
@@ -70,6 +70,7 @@ function buildOrganization(locale: CountryLanguage): JsonLdNode {
         t("constants.languages.en"),
         t("constants.languages.de"),
         t("constants.languages.pl"),
+        t("constants.languages.fr"),
       ],
     },
   };

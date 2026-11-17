@@ -62,6 +62,8 @@ export const translations: typeof enTranslations = {
       logout: "Abmelden",
       footer: {
         account: "Konto",
+        expandAccount: "Kontobereich aufklappen",
+        collapseAccount: "Kontobereich zuklappen",
       },
     },
     credits: {

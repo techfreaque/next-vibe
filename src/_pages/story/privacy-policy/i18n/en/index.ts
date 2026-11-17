@@ -19,6 +19,8 @@ export const translations = {
   printButton: "Print",
   title: "Privacy Policy",
   lastUpdated: "Last updated: November 2026",
+  bindingVersionNotice:
+    "Translation provided for convenience. The German version of this document is the legally binding one.",
   introduction:
     "At {{appName}}, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our uncensored AI chat platform.",
   sections: {

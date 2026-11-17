@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Database",
     "de-DE": "Datenbank",
     "pl-PL": "Baza danych",
+    "fr-FR": "Base de données",
   },
   group: "system",
   icon: "database",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Migrations",
         "de-DE": "Migrationen",
         "pl-PL": "Migracje",
+        "fr-FR": "Migrations",
       },
     },
     Tools: {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Tools",
         "de-DE": "Werkzeuge",
         "pl-PL": "Narzędzia",
+        "fr-FR": "Outils",
       },
     },
   },

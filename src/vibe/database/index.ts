@@ -122,7 +122,7 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
   }
   if (pendingDbWork.size > 0) {
     await Promise.race([
-      Promise.allSettled([...pendingDbWork]),
+      Promise.allSettled(pendingDbWork),
       new Promise<void>((resolve) => {
         setTimeout(resolve, PENDING_DB_WORK_DRAIN_MS);
       }),

@@ -3395,6 +3395,7 @@ export const translations: typeof enTranslations = {
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
+    fr: "Francuski",
   },
   timezone: {
     utc: "UTC",

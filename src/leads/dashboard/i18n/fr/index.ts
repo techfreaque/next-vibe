@@ -1,0 +1,98 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    leads: "leads",
+    dashboard: "tableau de bord",
+  },
+  get: {
+    title: "Tableau de bord des leads",
+    titleShort: "Tableau de bord leads",
+    description:
+      "Chiffres en direct : leads actifs, nouveaux arrivants, campagnes en cours et conversions",
+    errors: {
+      unauthorized: {
+        title: "Non autorisé",
+        description: "Authentification requise",
+      },
+      validation: {
+        title: "Erreur de validation",
+        description: "Paramètres de requête invalides",
+      },
+      server: {
+        title: "Erreur serveur",
+        description: "Impossible de charger les données du tableau de bord",
+      },
+      unknown: {
+        title: "Erreur inconnue",
+        description: "Une erreur inattendue s'est produite",
+      },
+      network: {
+        title: "Erreur réseau",
+        description: "La connexion réseau a échoué",
+      },
+      forbidden: {
+        title: "Interdit",
+        description: "Vous n'avez pas accès à ces données",
+      },
+      notFound: {
+        title: "Introuvable",
+        description: "Données du tableau de bord introuvables",
+      },
+      unsavedChanges: {
+        title: "Modifications non enregistrées",
+        description: "Des modifications ne sont pas enregistrées",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Un conflit de données s'est produit",
+      },
+    },
+    success: {
+      title: "Succès",
+      description: "Données du tableau de bord chargées",
+    },
+    response: {
+      activeLeadsCount: "Leads actifs",
+      newThisWeekCount: "Nouveaux cette semaine",
+      runningCampaignsCount: "Campagnes en cours",
+      convertedCount: "Convertis",
+      totalLeadsCount: "Total des leads",
+      conversionRate: "Taux de conversion",
+      statusBreakdown: "Répartition par statut",
+      recentLeads: "Leads récents",
+      "recentLeads.id": "ID",
+      "recentLeads.businessName": "Nom de l'entreprise",
+      "recentLeads.email": "E-mail",
+      "recentLeads.status": "Statut",
+      "recentLeads.source": "Source",
+      "recentLeads.createdAt": "Créé le",
+    },
+  },
+  widget: {
+    loading: "Chargement du tableau de bord...",
+    activeLeads: "Leads actifs",
+    newThisWeek: "Nouveaux cette semaine",
+    runningCampaigns: "En campagne",
+    converted: "Convertis",
+    totalLeads: "Total des leads",
+    conversionRate: "Taux de conversion",
+    quickActions: "Actions rapides",
+    newLead: "Nouveau lead",
+    newLeadDesc: "Créer un lead manuellement",
+    allLeads: "Tous les leads",
+    allLeadsDesc: "Parcourir et filtrer tous les leads",
+    campaignStats: "Stats des campagnes",
+    campaignStatsDesc: "Analyser la performance des campagnes",
+    searchLeads: "Rechercher des leads",
+    searchLeadsDesc: "Trouver des leads par nom ou e-mail",
+    importLeads: "Importer",
+    importLeadsDesc: "Importer des leads en masse depuis un CSV",
+    statusBreakdown: "Répartition par statut",
+    recentLeads: "Leads récents",
+    viewAll: "Tout voir",
+    noLeadsYet: "Aucun lead pour l'instant",
+    noLeadsHint: "Créez votre premier lead ou importez un CSV pour commencer",
+    createFirst: "Créer un lead",
+  },
+};

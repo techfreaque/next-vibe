@@ -19,6 +19,8 @@ const LOCALES: readonly CountryLanguage[] = [
   "en-GLOBAL",
   "de-DE",
   "pl-PL",
+  "fr-FR",
+  "fr-GLOBAL",
 ];
 
 describe("credit pack price", () => {
@@ -48,5 +50,6 @@ describe("credit pack price", () => {
     expect(getPricingParams("pl-PL").packPrice).toBe("40 zł");
     expect(getPricingParams("en-US").packPrice).toBe("$5");
     expect(getPricingParams("de-DE").packPrice).toBe("€5");
+    expect(getPricingParams("fr-FR").packPrice).toBe("5 €");
   });
 });

@@ -15,6 +15,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "AI Agent",
     "de-DE": "KI-Agent",
     "pl-PL": "Agent AI",
+    "fr-FR": "Agent IA",
   },
   group: "ai",
   icon: "bot",
@@ -33,6 +34,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Inference",
         "de-DE": "Inferenz",
         "pl-PL": "Wnioskowanie",
+        "fr-FR": "Inférence",
       },
     },
     Generation: {
@@ -43,6 +45,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Generation",
         "de-DE": "Generierung",
         "pl-PL": "Generowanie",
+        "fr-FR": "Génération",
       },
     },
     Tools: {
@@ -53,6 +56,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Tools",
         "de-DE": "Werkzeuge",
         "pl-PL": "Narzędzia",
+        "fr-FR": "Outils",
       },
     },
     Search: {
@@ -63,6 +67,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Search",
         "de-DE": "Suche",
         "pl-PL": "Wyszukiwanie",
+        "fr-FR": "Recherche",
       },
     },
     chat: {
@@ -73,6 +78,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Chat",
         "de-DE": "Chat",
         "pl-PL": "Chat",
+        "fr-FR": "Chat",
       },
     },
     chatFavorites: {
@@ -83,6 +89,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Favorites",
         "de-DE": "Favoriten",
         "pl-PL": "Ulubione",
+        "fr-FR": "Favoris",
       },
     },
     chatOrganization: {
@@ -93,6 +100,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Organization",
         "de-DE": "Organisation",
         "pl-PL": "Organizacja",
+        "fr-FR": "Organisation",
       },
     },
     chatSettings: {
@@ -103,6 +111,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Chat Settings",
         "de-DE": "Chat-Einstellungen",
         "pl-PL": "Ustawienia czatu",
+        "fr-FR": "Paramètres du chat",
       },
     },
     skillsManagement: {
@@ -113,6 +122,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Skills",
         "de-DE": "Skills",
         "pl-PL": "Umiejętności",
+        "fr-FR": "Compétences",
       },
     },
     skillsCommunity: {
@@ -123,6 +133,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Community Skills",
         "de-DE": "Community-Skills",
         "pl-PL": "Umiejętności społeczności",
+        "fr-FR": "Compétences de la communauté",
       },
     },
     skillsModeration: {
@@ -133,6 +144,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Skills Moderation",
         "de-DE": "Skills-Moderation",
         "pl-PL": "Moderacja umiejętności",
+        "fr-FR": "Modération des compétences",
       },
     },
     threadsManagement: {
@@ -143,6 +155,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Threads",
         "de-DE": "Threads",
         "pl-PL": "Wątki",
+        "fr-FR": "Fils de discussion",
       },
     },
     threadsSharing: {
@@ -153,6 +166,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Thread Sharing",
         "de-DE": "Thread-Freigabe",
         "pl-PL": "Udostępnianie wątków",
+        "fr-FR": "Partage de fils",
       },
     },
     threadsSearch: {
@@ -163,6 +177,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Thread Search",
         "de-DE": "Thread-Suche",
         "pl-PL": "Wyszukiwanie wątków",
+        "fr-FR": "Recherche de fils",
       },
     },
     messagesModerating: {
@@ -173,6 +188,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Messages",
         "de-DE": "Nachrichten",
         "pl-PL": "Wiadomości",
+        "fr-FR": "Messages",
       },
     },
     messagesSearch: {
@@ -183,6 +199,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Message Search",
         "de-DE": "Nachrichtensuche",
         "pl-PL": "Wyszukiwanie wiadomości",
+        "fr-FR": "Recherche de messages",
       },
     },
     messagesFiles: {
@@ -193,6 +210,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Message Files",
         "de-DE": "Nachrichtendateien",
         "pl-PL": "Pliki wiadomości",
+        "fr-FR": "Fichiers des messages",
       },
     },
     tasksCron: {
@@ -203,6 +221,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Scheduled Tasks",
         "de-DE": "Geplante Aufgaben",
         "pl-PL": "Zadania cykliczne",
+        "fr-FR": "Tâches planifiées",
       },
     },
   },

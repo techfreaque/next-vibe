@@ -15,6 +15,8 @@ export const translations = {
   printButton: "Print",
   title: "Legal Notice",
   lastUpdated: "Last updated: November 2026",
+  bindingVersionNotice:
+    "Translation provided for convenience. The German version of this document is the legally binding one.",
   introduction:
     "This imprint provides legally required information about {{appName}} in accordance with applicable laws.",
   sections: {

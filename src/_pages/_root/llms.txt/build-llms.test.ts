@@ -65,6 +65,9 @@ describe("llms.txt", () => {
 
   it("only accepts site locales from ?locale=", () => {
     expect(resolveLlmsLocale("de-DE")).toBe("de-DE");
+    expect(resolveLlmsLocale("fr")).toBe("fr-FR");
+    expect(resolveLlmsLocale("FR-fr")).toBe("fr-FR");
+    expect(resolveLlmsLocale("en")).toBe("en-GLOBAL");
     expect(resolveLlmsLocale("xx-YY")).toBe(resolveLlmsLocale(null));
   });
 });

@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Point of Sale",
     "de-DE": "Kasse",
     "pl-PL": "Punkt sprzedaży",
+    "fr-FR": "Point de vente",
   },
   group: "business",
   icon: "shopping-cart",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Orders",
         "de-DE": "Bestellungen",
         "pl-PL": "Zamówienia",
+        "fr-FR": "Commandes",
       },
     },
     "POS: Sessions": {
@@ -44,6 +46,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Sessions",
         "de-DE": "Sitzungen",
         "pl-PL": "Sesje",
+        "fr-FR": "Sessions",
       },
     },
     "POS: Terminals": {
@@ -54,6 +57,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Terminals",
         "de-DE": "Terminals",
         "pl-PL": "Terminale",
+        "fr-FR": "Terminaux",
       },
     },
     "POS: Products": {
@@ -64,6 +68,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Products",
         "de-DE": "Produkte",
         "pl-PL": "Produkty",
+        "fr-FR": "Produits",
       },
     },
   },

@@ -16,6 +16,7 @@ export const category: CategoryDefinition = {
     "en-GLOBAL": "Leads",
     "de-DE": "Leads",
     "pl-PL": "Leady",
+    "fr-FR": "Leads",
   },
   group: "business",
   icon: "target",
@@ -34,6 +35,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Management",
         "de-DE": "Verwaltung",
         "pl-PL": "Zarządzanie",
+        "fr-FR": "Gestion",
       },
       // inherits parent defaultEntry (leads-dashboard)
     },
@@ -45,6 +47,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Import",
         "de-DE": "Import",
         "pl-PL": "Import",
+        "fr-FR": "Import",
       },
     },
     Leads: {
@@ -55,6 +58,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Leads",
         "de-DE": "Leads",
         "pl-PL": "Leady",
+        "fr-FR": "Leads",
       },
     },
     emailCampaignsProcessing: {
@@ -65,6 +69,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Campaigns",
         "de-DE": "Kampagnen",
         "pl-PL": "Kampanie",
+        "fr-FR": "Campagnes",
       },
     },
     emailCampaignsJourneys: {
@@ -75,6 +80,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Journeys",
         "de-DE": "Journeys",
         "pl-PL": "Ścieżki",
+        "fr-FR": "Parcours",
       },
     },
     emailCampaignsQueue: {
@@ -85,6 +91,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Queue",
         "de-DE": "Warteschlange",
         "pl-PL": "Kolejka",
+        "fr-FR": "File d'attente",
       },
     },
     emailCampaignsStats: {
@@ -95,6 +102,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Campaign Stats",
         "de-DE": "Kampagnenstatistiken",
         "pl-PL": "Statystyki kampanii",
+        "fr-FR": "Stats des campagnes",
       },
     },
     growth: {
@@ -105,6 +113,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Growth",
         "de-DE": "Wachstum",
         "pl-PL": "Wzrost",
+        "fr-FR": "Croissance",
       },
     },
     outreach: {
@@ -115,6 +124,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Outreach",
         "de-DE": "Outreach",
         "pl-PL": "Outreach",
+        "fr-FR": "Prospection",
       },
     },
     leadMagnetIntegrations: {
@@ -125,6 +135,7 @@ export const category: CategoryDefinition = {
         "en-GLOBAL": "Integrations",
         "de-DE": "Integrationen",
         "pl-PL": "Integracje",
+        "fr-FR": "Intégrations",
       },
     },
   },
