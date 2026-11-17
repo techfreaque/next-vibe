@@ -191,6 +191,7 @@ export async function buildDebugSystemPrompt({
           headless: false,
           subAgentDepth: 0,
           threadId: threadId ?? null,
+          threadlessPreview: !threadId,
           mediaCapabilities: {
             nativeOutputs: [],
             imageGenModelName: effectiveImageGenModel?.name ?? null,

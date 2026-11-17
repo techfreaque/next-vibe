@@ -82,7 +82,27 @@ export class RouteExecutionExecutor {
         // still undefined → TypeError) while another import of the same graph
         // is mid-evaluation. A beat later the fully-evaluated module is cached
         // and the same import succeeds.
-        const { getRouteHandler } = await import("@/generated/routes/handlers");
+        const { getRouteHandler, isRouteExcludedFromBuild } =
+          await import("@/generated/routes/handlers");
+        // Bundle-ignored routes (WEB_OFF, fs-scanning tools) are not part of
+        // the Next.js server build: importing them can only fail with a
+        // module-resolution error. Answer as the platform gate would.
+        if (
+          isRouteExcludedFromBuild(trimmedToolName) ||
+          isRouteExcludedFromBuild(hyphenatedToolName) ||
+          isRouteExcludedFromBuild(`vibe_${trimmedToolName}`)
+        ) {
+          params.logger.warn(
+            "[Route Execution Executor] Tool not part of this server build",
+            { toolName: params.toolName, platform: params.platform },
+          );
+          return fail({
+            message: t("cli.vibe.errors.routeUnavailableOnServer", {
+              toolName: params.toolName,
+            }),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
         // 8 attempts x 100ms backoff (2800ms total window). More, shorter
         // retries beat fewer, longer ones here: the partial-namespace window is
         // brief, so retrying sooner usually succeeds on attempt 2-3, while the

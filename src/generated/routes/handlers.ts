@@ -26,13 +26,75 @@ let routeImportQueue: Promise<GenericHandlerBase | null | undefined> =
 const routeHandlerCache = new Map<string, GenericHandlerBase | null>();
 
 /**
+ * Routes imported with the bundle-ignore hint (WEB_OFF + fs-scanning tools).
+ * Their bare "@/..." specifier resolves only where tsconfig paths apply (bun
+ * CLI, Vite dev). Inside the Next.js server bundle they are not part of the
+ * build: importing one fails with "Cannot find package '@/vibe'".
+ */
+const BUNDLE_EXCLUDED_PATHS = new Set<string>([
+  "b",
+  "build",
+  "builder",
+  "c",
+  "check",
+  "db:migrate",
+  "db:ping",
+  "dgen",
+  "electron",
+  "electron:build",
+  "electron:dev",
+  "electron:start",
+  "headless-client",
+  "m",
+  "mcp",
+  "migrate",
+  "ping",
+  "re",
+  "rebuild",
+  "runner",
+  "s",
+  "stage",
+  "start",
+  "task-runner",
+  "unified-runner",
+  "vibe_database_generate_POST",
+  "vibe_database_migrate_POST",
+  "vibe_database_ping_POST",
+  "vibe_platforms_electron_build_POST",
+  "vibe_platforms_electron_start_POST",
+  "vibe_platforms_headless-client_POST",
+  "vibe_platforms_mcp_serve_POST",
+  "vibe_platforms_web_build_POST",
+  "vibe_platforms_web_rebuild_POST",
+  "vibe_platforms_web_start_POST",
+  "vibe_tasks_unified-runner_POST",
+  "vibe_tooling_builder_POST",
+  "vibe_tooling_check_POST",
+  "vibe_tooling_vibe-stage_POST",
+]);
+
+/**
+ * True when `path` names a route that this server build cannot load (a
+ * bundle-ignored route while running inside the Next.js server). Callers
+ * answer with a clean "not available on this server" instead of importing.
+ */
+export function isRouteExcludedFromBuild(path: string): boolean {
+  return (
+    Boolean(process.env["NEXT_RUNTIME"]) && BUNDLE_EXCLUDED_PATHS.has(path)
+  );
+}
+
+/**
  * Dynamically import route handler by path.
  * @param path - The route path (e.g., "core/agent/chat/threads")
- * @returns The route module or null if not found
+ * @returns The route module or null if not found (or excluded from this build)
  */
 export async function getRouteHandler(
   path: string,
 ): Promise<GenericHandlerBase | null> {
+  if (isRouteExcludedFromBuild(path)) {
+    return null;
+  }
   const cached = routeHandlerCache.get(path);
   if (cached !== undefined) {
     return cached;

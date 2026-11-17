@@ -28,6 +28,11 @@ export const threadRenameFragment: SystemPromptFragment = {
   priority: 10,
   build: async (params) => {
     const { threadId } = params;
+    if (!threadId && params.threadlessPreview) {
+      // system-prompt-debug preview of a chat that does not exist yet: there
+      // is no thread to rename, so the fragment has nothing to say.
+      return null;
+    }
     if (!threadId) {
       // Caller frames name WHICH prompt build ran without a thread (prod row
       // 11-16 07:44, incognito guest, said nothing about the path).

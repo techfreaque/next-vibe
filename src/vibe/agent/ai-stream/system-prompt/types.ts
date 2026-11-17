@@ -71,6 +71,12 @@ export interface SystemPromptServerParams {
   messageEmbedReady?: Promise<void>;
   /** Active thread ID — passed to fragments that need thread context (e.g. rename) */
   threadId?: string | null;
+  /**
+   * The system-prompt debug preview built WITHOUT a thread (a fresh chat that
+   * does not exist yet). Thread-bound fragments skip silently here; a real
+   * stream that reaches the builder without a threadId is still a bug.
+   */
+  threadlessPreview?: boolean;
   /** Incognito only: client-sent current thread title (no DB row exists to read it from). */
   incognitoThreadTitle?: string | null;
   /** Incognito only: client-sent current thread description. */

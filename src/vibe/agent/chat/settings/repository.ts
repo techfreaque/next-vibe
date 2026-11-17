@@ -215,7 +215,7 @@ export class ChatSettingsRepository {
 
       return success(result);
     } catch (error) {
-      logger.error("Failed to fetch settings", parseError(error));
+      logger.error("Failed to fetch settings", parseError(error), { userId });
       return fail({
         message: t("get.errors.server.title") ?? "get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -452,7 +452,9 @@ export class ChatSettingsRepository {
           dreamerSchedule: savedRow.dreamerSchedule ?? undefined,
           dreamerPrompt: savedRow.dreamerPrompt ?? null,
         }).catch((syncError: Error) => {
-          logger.error("Failed to sync dreaming task", parseError(syncError));
+          logger.error("Failed to sync dreaming task", parseError(syncError), {
+            userId,
+          });
         });
       }
       if (
@@ -470,7 +472,9 @@ export class ChatSettingsRepository {
           autopilotSchedule: savedRow.autopilotSchedule ?? undefined,
           autopilotPrompt: savedRow.autopilotPrompt ?? null,
         }).catch((syncError: Error) => {
-          logger.error("Failed to sync autopilot task", parseError(syncError));
+          logger.error("Failed to sync autopilot task", parseError(syncError), {
+            userId,
+          });
         });
       }
       if (
@@ -486,13 +490,15 @@ export class ChatSettingsRepository {
           mamaSchedule: savedRow.mamaSchedule ?? undefined,
           mamaPrompt: savedRow.mamaPrompt ?? null,
         }).catch((syncError: Error) => {
-          logger.error("Failed to sync mama task", parseError(syncError));
+          logger.error("Failed to sync mama task", parseError(syncError), {
+            userId,
+          });
         });
       }
 
       return success();
     } catch (error) {
-      logger.error("Failed to upsert settings", parseError(error));
+      logger.error("Failed to upsert settings", parseError(error), { userId });
       return fail({
         message: t("post.errors.server.title") ?? "post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

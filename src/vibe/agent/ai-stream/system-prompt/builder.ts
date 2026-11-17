@@ -125,6 +125,8 @@ export interface SystemPromptParams {
   /** Fired user-message embed — awaited by the cortex search (see server params). */
   messageEmbedReady?: Promise<void>;
   threadId: string | null;
+  /** Debug preview without a thread (see SystemPromptServerParams.threadlessPreview). */
+  threadlessPreview?: boolean;
   /** Incognito only: client-sent current thread title/description (no DB row). */
   incognitoThreadTitle?: string | null;
   incognitoThreadDescription?: string | null;
@@ -188,6 +190,7 @@ export async function buildSystemPrompt(
     mediaCapabilities,
     messageEmbedReady: params.messageEmbedReady,
     threadId: params.threadId ?? null,
+    threadlessPreview: params.threadlessPreview ?? false,
     incognitoThreadTitle: params.incognitoThreadTitle ?? null,
     incognitoThreadDescription: params.incognitoThreadDescription ?? null,
   };

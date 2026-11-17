@@ -88,6 +88,8 @@ export const translations = {
     vibe: {
       errors: {
         routeNotFound: "Route not found for tool: {{toolName}}",
+        routeUnavailableOnServer:
+          "{{toolName}} runs only in the vibe CLI. This server does not offer it.",
         executionFailed: "Execution failed",
         // Bare label - the CLI error formatter renders it param-free as its
         // last-resort fallback, so the cause gets its own key.

@@ -90,6 +90,8 @@ export const translations: typeof enTranslations = {
     vibe: {
       errors: {
         routeNotFound: "Nie znaleziono trasy dla narzędzia: {{toolName}}",
+        routeUnavailableOnServer:
+          "{{toolName}} działa tylko w vibe CLI. Ten serwer go nie udostępnia.",
         executionFailed: "Wykonanie nie powiodło się",
         unknownError: "Wystąpił nieznany błąd",
         unknownErrorDetail: "Wystąpił nieznany błąd: {{error}}",

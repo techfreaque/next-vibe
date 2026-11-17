@@ -26,13 +26,63 @@ let routeImportQueue: Promise<GenericHandlerBase | null | undefined> =
 const routeHandlerCache = new Map<string, GenericHandlerBase | null>();
 
 /**
+ * Routes imported with the bundle-ignore hint (WEB_OFF + fs-scanning tools).
+ * Their bare "@/..." specifier resolves only where tsconfig paths apply (bun
+ * CLI, Vite dev). Inside the Next.js server bundle they are not part of the
+ * build: importing one fails with "Cannot find package '@/vibe'".
+ */
+const BUNDLE_EXCLUDED_PATHS = new Set<string>([
+  "builder",
+  "c",
+  "cc",
+  "check",
+  "config",
+  "config-create",
+  "create-config",
+  "gen",
+  "generate",
+  "generate-all",
+  "guard",
+  "guard-destroy",
+  "guard-start",
+  "guard-stop",
+  "guard:destroy",
+  "guard:remove",
+  "guard:start",
+  "guard:status",
+  "guard:stop",
+  "vibe_core_generators_POST",
+  "vibe_tooling_builder_POST",
+  "vibe_tooling_check_POST",
+  "vibe_tooling_check_config_POST",
+  "vibe_tooling_guard_destroy_POST",
+  "vibe_tooling_guard_start_POST",
+  "vibe_tooling_guard_status_POST",
+  "vibe_tooling_guard_stop_POST",
+]);
+
+/**
+ * True when `path` names a route that this server build cannot load (a
+ * bundle-ignored route while running inside the Next.js server). Callers
+ * answer with a clean "not available on this server" instead of importing.
+ */
+export function isRouteExcludedFromBuild(path: string): boolean {
+  return (
+    Boolean(process.env["NEXT_RUNTIME"]) && BUNDLE_EXCLUDED_PATHS.has(path)
+  );
+}
+
+/**
  * Dynamically import route handler by path.
  * @param path - The route path (e.g., "core/agent/chat/threads")
- * @returns The route module or null if not found
+ * @returns The route module or null if not found (or excluded from this build)
  */
 export async function getRouteHandler(
   path: string,
 ): Promise<GenericHandlerBase | null> {
+  if (isRouteExcludedFromBuild(path)) {
+    return null;
+  }
   const cached = routeHandlerCache.get(path);
   if (cached !== undefined) {
     return cached;

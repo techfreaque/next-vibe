@@ -220,6 +220,14 @@ export class ExecuteToolGuards {
     ) {
       return null;
     }
+    // A route left out of this server build (bundle-ignored, e.g. builder /
+    // check) has no loadable definition here either: getEndpoint would throw
+    // "Cannot find package". Nothing to confirm; the executor answers it.
+    const { isRouteExcludedFromBuild } =
+      await import("@/generated/routes/handlers");
+    if (isRouteExcludedFromBuild(toolName)) {
+      return null;
+    }
     const { getEndpoint } = await import("@/generated/endpoints/endpoint");
     const targetEndpoint = await getEndpoint(toolName);
     const contextRequiresConfirmation =

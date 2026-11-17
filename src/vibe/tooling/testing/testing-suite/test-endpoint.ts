@@ -253,14 +253,10 @@ export function testEndpoint<
           // Public users get FORBIDDEN (403) - they are authenticated but lack permissions
           // Unauthenticated requests get AUTH_ERROR (401)
           // Note: INTERNAL_ERROR may occur if route handler is not registered (skip this check)
-          // Note: Endpoints with allowedClientRoles including PUBLIC may legitimately
-          // return success for public users (e.g., favorites list with client-side fallback)
-          const allowsPublicViaClientRoles =
-            endpoint.allowedClientRoles?.includes(UserPermissionRole.PUBLIC);
+          // allowedClientRoles only route to the client handler; the server
+          // always rejects a caller outside allowedRoles.
           if (response.success) {
-            if (!allowsPublicViaClientRoles) {
-              expect(response.success).toBe(false);
-            }
+            expect(response.success).toBe(false);
           } else {
             // Accept either AUTH_ERROR (401) or FORBIDDEN (403) as valid rejection
             // Also skip internal errors which indicate route registration issues, not auth failures

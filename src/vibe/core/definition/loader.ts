@@ -80,10 +80,14 @@ export class DefinitionLoader implements IDefinitionLoader {
       // Validate endpoint access using consolidated method
       // Skip for remote execution - the remote server handles its own auth
       if (!skipAccessValidation) {
+        // Loading a definition is not executing it: a client-route caller
+        // (allowedClientRoles) may render it; the server handler still gates
+        // execution on allowedRoles.
         const accessValidation = permissionsRegistry.validateEndpointAccess(
           endpoint,
           user,
           platform,
+          { clientRoute: true },
         );
 
         if (!accessValidation.allowed) {

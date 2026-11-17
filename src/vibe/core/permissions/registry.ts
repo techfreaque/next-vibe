@@ -13,11 +13,24 @@ import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import { coreClientEnv as envClient } from "../env-client";
 import type { EndpointAccessResult, PlatformAccessResult } from "./types";
 
+/**
+ * `allowedClientRoles` name the roles whose calls run the endpoint's CLIENT
+ * route (route-client.ts, browser storage). They never authorize SERVER
+ * execution: the server repository is typed for `allowedRoles` only, so a
+ * public caller let through by them reached e.g. `upsertSettings` with no
+ * `user.id` (prod 2026-11-16, NOT NULL violation -> 500). Only checks that gate
+ * a client-side definition load opt in with `clientRoute: true`.
+ */
+export interface EndpointAccessOptions {
+  clientRoute?: boolean;
+}
+
 interface IPermissionsRegistry {
   validateEndpointAccess(
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
+    options?: EndpointAccessOptions,
   ): EndpointAccessResult;
 
   checkPlatformAccess(
@@ -213,6 +226,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     endpoint: CreateApiEndpointAny,
     user: JwtPayloadType,
     platform: Platform,
+    options?: EndpointAccessOptions,
   ): EndpointAccessResult {
     if (!endpoint.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
       return { allowed: false, denial: { cause: "allowedRolesMissing" } };
@@ -235,7 +249,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
     const hasPermission = this.checkRolePermission(
       endpoint.allowedRoles,
-      endpoint.allowedClientRoles,
+      options?.clientRoute ? endpoint.allowedClientRoles : undefined,
       user,
       platform,
     );
@@ -322,11 +336,13 @@ class PermissionsRegistry implements IPermissionsRegistry {
     user: JwtPayloadType,
     platform: Platform,
   ): CreateApiEndpointAny[] {
+    // Server tool listings (MCP, AI): listing must agree with server execution,
+    // so client-route roles never widen it.
     return endpoints.filter((endpoint) =>
       endpoint.allowedRoles && Array.isArray(endpoint.allowedRoles)
         ? this.checkRolePermission(
             endpoint.allowedRoles,
-            endpoint.allowedClientRoles,
+            undefined,
             user,
             platform,
           )
