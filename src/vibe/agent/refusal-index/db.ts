@@ -4,7 +4,7 @@
  * results and the admin-approved public samples.
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   doublePrecision,
@@ -14,7 +14,7 @@ import {
   pgTable,
   text,
   timestamp,
-  unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -25,7 +25,8 @@ import { RefusalRunStatus, RefusalRunStatusDB, RefusalVerdictDB } from "./enum";
 
 /**
  * Questions. The initial curated set is seeded by slug (seeds.ts, never
- * overwritten); admins edit, deactivate and extend it at runtime.
+ * overwritten); the weekly run adds generated ones (generatedBy = the
+ * proposing model); admins edit, deactivate and extend it at runtime.
  * Category is a free admin-managed slug (not an enum) so categories are data too.
  */
 export const refusalIndexQuestions = pgTable(
@@ -39,6 +40,9 @@ export const refusalIndexQuestions = pgTable(
     /** Display translations only (public samples). Never sent to models. */
     textDe: text("text_de"),
     textPl: text("text_pl"),
+    textFr: text("text_fr"),
+    /** Model that proposed this question. Null = curated by hand. */
+    generatedBy: text("generated_by"),
     active: boolean("active").notNull().default(true),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -71,7 +75,12 @@ export const refusalIndexRuns = pgTable(
     judgeModelId: text("judge_model_id").notNull(),
     judgePromptVersion: text("judge_prompt_version").notNull(),
     runnerPromptVersion: text("runner_prompt_version").notNull(),
-    /** Frozen scope of the run, so a resume continues the same pairs. */
+    /** Pairs that still needed an answer when the run was planned. */
+    pairCount: integer("pair_count").notNull().default(0),
+    /** New questions this run asked the generator for / actually added. */
+    questionsRequested: integer("questions_requested").notNull().default(0),
+    questionsGenerated: integer("questions_generated").notNull().default(0),
+    /** Optional scope filters (null = all current models / active questions). */
     modelFilter: jsonb("model_filter").$type<string[] | null>(),
     questionFilter: jsonb("question_filter").$type<string[] | null>(),
     startedByUserId: uuid("started_by_user_id").references(() => users.id, {
@@ -90,7 +99,12 @@ export const refusalIndexRuns = pgTable(
   }),
 );
 
-/** Verdict for one model answering one question inside one run. */
+/**
+ * Verdict for one model answering one question. Answers are permanent: a
+ * pair is asked once and never again, unless the model's version changes
+ * (then the old row gets staleAt and a new row is added). Exactly one current
+ * (staleAt null) row per (question, model). runId = the run that produced it.
+ */
 export const refusalIndexResults = pgTable(
   "refusal_index_results",
   {
@@ -102,6 +116,10 @@ export const refusalIndexResults = pgTable(
       .notNull()
       .references(() => refusalIndexQuestions.id, { onDelete: "cascade" }),
     modelId: text("model_id").notNull(),
+    /** Model version fingerprint at answer time (models.ts modelVersionOf). */
+    modelVersion: text("model_version").notNull().default(""),
+    /** Set when a newer model version replaced this answer. */
+    staleAt: timestamp("stale_at"),
     verdict: text("verdict", { enum: RefusalVerdictDB }).notNull(),
     /** One-line judge reason (or the error / content-filter note). */
     judgeReason: text("judge_reason").notNull().default(""),
@@ -113,11 +131,10 @@ export const refusalIndexResults = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({
-    uniquePair: unique("refusal_index_results_run_question_model_uq").on(
-      table.runId,
-      table.questionId,
-      table.modelId,
-    ),
+    currentPair: uniqueIndex("refusal_index_results_current_pair_uq")
+      .on(table.questionId, table.modelId)
+      .where(sql`${table.staleAt} IS NULL`),
+    runIdx: index("refusal_index_results_run_idx").on(table.runId),
     modelIdx: index("refusal_index_results_model_idx").on(
       table.modelId,
       table.runId,

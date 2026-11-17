@@ -31206,7 +31206,7 @@
     "toolName": "refusal-index-leaderboard",
     "title": "Refusal Index Leaderboard",
     "titleShort": "Refusal Index",
-    "description": "How often each AI model answers, hedges or refuses - from the latest weekly benchmark run.",
+    "description": "How often each AI model answers, hedges or refuses. Updated weekly with new questions.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -31262,7 +31262,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Run finished",
+          "label": "Last updated",
           "schema": {
             "def": {
               "type": "nullable",
@@ -31799,7 +31799,7 @@
     "toolName": "vibe_agent_refusal-index_model_modelId_GET",
     "title": "Model Refusal Stats",
     "titleShort": "Model Stats",
-    "description": "One model's refusal, hedge and answer rates from the latest benchmark run, plus approved sample answers.",
+    "description": "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -31873,7 +31873,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Run finished",
+          "label": "Last updated",
           "schema": {
             "def": {
               "type": "nullable",
@@ -32408,6 +32408,26 @@
                 "schemaType": "primitive"
               },
               "questionPl": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionFr": {
                 "type": "text",
                 "hidden": true,
                 "schema": {

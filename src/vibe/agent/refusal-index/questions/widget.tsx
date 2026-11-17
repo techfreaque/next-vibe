@@ -59,6 +59,7 @@ export function QuestionsWidget(): JSX.Element {
           textEn: question.textEn,
           textDe: question.textDe ?? "",
           textPl: question.textPl ?? "",
+          textFr: question.textFr ?? "",
         },
         renderInModal: true,
         popNavigationOnSuccess: 1,
@@ -143,6 +144,11 @@ export function QuestionsWidget(): JSX.Element {
                       ? t("questions.widget.active")
                       : t("questions.widget.inactive")}
                   </Badge>
+                  {question.generatedBy !== null && (
+                    <Badge variant="outline">
+                      {t("questions.widget.generated")}
+                    </Badge>
+                  )}
                 </Div>
                 <P className="text-sm [overflow-wrap:anywhere]">
                   {question.textEn}

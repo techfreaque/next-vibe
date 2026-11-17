@@ -111,7 +111,9 @@ export function SampleAnswersSlot({
       ? sample.questionDe
       : locale.startsWith("pl")
         ? sample.questionPl
-        : null) ?? sample.questionEn;
+        : locale.startsWith("fr")
+          ? sample.questionFr
+          : null) ?? sample.questionEn;
   const pct = (value: number): string => `${formatNumber(value, locale)}%`;
 
   return (

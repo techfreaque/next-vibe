@@ -150,8 +150,16 @@ export function RunsWidget(): JSX.Element {
                   {new Date(run.startedAt).toLocaleString()}
                 </Span>
                 <Span className="text-muted-foreground">
-                  {`${String(run.resultCount)}/${String(run.modelCount * run.questionCount)} ${t("runs.widget.results")}`}
+                  {`${String(run.resultCount)}/${String(run.pairCount)} ${t("runs.widget.results")}`}
                 </Span>
+                {run.questionsRequested > 0 && (
+                  <Span className="text-muted-foreground">
+                    {t("runs.widget.newQuestions", {
+                      generated: run.questionsGenerated,
+                      requested: run.questionsRequested,
+                    })}
+                  </Span>
+                )}
                 <Span className="text-muted-foreground">
                   {`${String(run.totalCost)}${run.budgetCredits === null ? "" : `/${String(run.budgetCredits)}`} ${t("runs.widget.credits")}`}
                 </Span>

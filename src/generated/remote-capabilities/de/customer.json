@@ -57196,7 +57196,7 @@
     "toolName": "refusal-index-leaderboard",
     "title": "Bestenliste des Verweigerungs-Index",
     "titleShort": "Verweigerungs-Index",
-    "description": "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert - aus dem neuesten wöchentlichen Messlauf.",
+    "description": "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert. Wöchentlich mit neuen Fragen aktualisiert.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -57252,7 +57252,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Lauf beendet",
+          "label": "Zuletzt aktualisiert",
           "schema": {
             "def": {
               "type": "nullable",
@@ -57789,7 +57789,7 @@
     "toolName": "vibe_agent_refusal-index_model_modelId_GET",
     "title": "Verweigerungs-Werte eines Modells",
     "titleShort": "Modell-Werte",
-    "description": "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells aus dem neuesten Messlauf, plus freigegebene Beispielantworten.",
+    "description": "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells über alle aktuellen Fragen, plus freigegebene Beispielantworten.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -57863,7 +57863,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Lauf beendet",
+          "label": "Zuletzt aktualisiert",
           "schema": {
             "def": {
               "type": "nullable",
@@ -58398,6 +58398,26 @@
                 "schemaType": "primitive"
               },
               "questionPl": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionFr": {
                 "type": "text",
                 "hidden": true,
                 "schema": {

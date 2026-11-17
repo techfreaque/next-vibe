@@ -425,7 +425,7 @@ export const translations: typeof enTranslations = {
   refusal: {
     heading: "Indice de refus",
     intro:
-      "Comment {{model}} a traité la série de questions fixe lors du dernier passage hebdomadaire ({{date}}).",
+      "Comment {{model}} répond aux questions de l'indice de refus. Mis à jour le {{date}}, nouvelles questions chaque semaine.",
     rank: "Rang {{rank}} sur {{total}} (1 = le moins de refus)",
     refused: "Refusé",
     hedged: "Évasif",

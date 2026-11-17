@@ -1,16 +1,19 @@
 /**
  * Refusal Index runner.
  *
- * For every pending (question, model) pair: ask the model through the same
- * headless stream ai-run uses (maxTurns 1, incognito, no memories, no tools,
- * neutral instruction), classify the answer with the fixed judge model, store
- * the verdict. Budget-capped, bounded concurrency, resumable.
+ * A run (1) optionally asks the generator for new questions, then (2) fills
+ * every (question, model) pair that has no answer yet: a sub-agent asks the
+ * target model through the same headless stream ai-run uses (single turn,
+ * incognito, no memories, no tools, neutral instruction) and the fixed judge
+ * classifies the answer. Answers are permanent: a pair answered by the same
+ * model version is never asked again. Budget-capped (generation included),
+ * bounded concurrency, resumable: a stopped run just leaves pairs pending for
+ * the next one.
  */
 
 import "server-only";
 
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { DefaultFolderId } from "next-vibe/core/execution-context";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,33 +27,24 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "../ai-stream/models";
-import { AiStreamRepository } from "../ai-stream/repository";
-import type { AiStreamPostRequestOutput } from "../ai-stream/stream/definition";
-import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
-import { ChatMessageRole } from "../chat/enum";
-import { NO_SKILL_ID } from "../skills/constants";
-import { buildFavoriteConfig } from "../skills/favorites/repository";
-import { stripThinkTags } from "../text-to-speech/content-processing";
 import {
-  computePendingPairs,
+  computeFillPairs,
   createBudgetTracker,
   executePairs,
-  type Pair,
+  type FillPair,
   parseJudgeReply,
   planPairs,
 } from "./aggregate";
+import { askModel } from "./ask";
 import { invalidateRefusalIndexCaches } from "./cache";
 import {
   ANSWER_EXCERPT_CHARS,
-  DEFAULT_BUDGET_CREDITS,
   DEFAULT_CONCURRENCY,
   JUDGE_INPUT_CHARS,
   JUDGE_INSTRUCTION,
   JUDGE_MODEL_ID,
-  JUDGE_PROMPT_VERSION,
   MAX_CONCURRENCY,
   RUNNER_INSTRUCTION,
-  RUNNER_PROMPT_VERSION,
 } from "./constants";
 import {
   refusalIndexQuestions,
@@ -63,89 +57,14 @@ import {
   type RefusalVerdictValue,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { describeModel, listBenchmarkModels } from "./models";
+import { describeModel, listBenchmarkModels, modelVersionOf } from "./models";
+import { activeQuestionIds, generateQuestions } from "./question-gen";
 
 /** In-process guard: one executor per run id. */
 const activeRuns = new Set<string>();
 
 export function isRunActive(runId: string): boolean {
   return activeRuns.has(runId);
-}
-
-interface AskOk {
-  /** Null when the provider returned no content (content-filter / empty stream). */
-  text: string | null;
-  cost: number;
-}
-
-/** One headless single-turn call (shared by the answer step and the judge). */
-async function ask(params: {
-  modelId: ChatModelId;
-  content: string;
-  instruction: string;
-  user: JwtPayloadType;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-  abortSignal: AbortSignal;
-  fixtureScopeId: string | undefined;
-}): Promise<ResponseType<AskOk>> {
-  const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(params.locale);
-  const syntheticData: AiStreamPostRequestOutput = {
-    operation: "send",
-    rootFolderId: DefaultFolderId.INCOGNITO,
-    subFolderId: null,
-    threadId: crypto.randomUUID(),
-    userMessageId: null,
-    parentMessageId: null,
-    content: params.content,
-    role: ChatMessageRole.USER,
-    model: params.modelId,
-    skill: NO_SKILL_ID,
-    favoriteConfig: buildFavoriteConfig({
-      id: "refusal-index-headless",
-      skillId: NO_SKILL_ID,
-      availableTools: [],
-      pinnedTools: [],
-    }),
-    toolConfirmations: null,
-    messageHistory: [],
-    voiceMode: { enabled: false },
-    audioInput: { file: null },
-    resumeToken: null,
-    timezone: "UTC",
-    attachments: null,
-    executionContext: { mode: "local" as const },
-  };
-  const result = await AiStreamRepository.createAiStream({
-    data: syntheticData,
-    locale: params.locale,
-    logger: params.logger,
-    user: params.user,
-    request: undefined,
-    t: aiStreamT,
-    awaitResult: true,
-    subAgentDepth: 1,
-    extraInstructions: params.instruction,
-    excludeMemories: true,
-    maxToolCalls: 1,
-    parentAbortSignal: params.abortSignal,
-    fixtureScopeId: params.fixtureScopeId,
-    // Platform benchmark: measures how often each model refuses, uncensored
-    // ones included. Not a person chatting, so no consent gate.
-    skipUncensoredConsentGate: true,
-  });
-  if (!result.success) {
-    return fail({
-      message: result.message,
-      errorType: result.errorType,
-    });
-  }
-  const raw = result.data.lastAiMessageContent;
-  const text = raw ? stripThinkTags(raw).trim() : "";
-  return success({
-    text: text.length > 0 ? text : null,
-    cost: result.data.totalCreditsDeducted ?? 0,
-  });
 }
 
 interface Judgement {
@@ -173,7 +92,7 @@ async function judge(params: {
   const { t } = scopedTranslation.scopedT(params.locale);
   let cost = 0;
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const reply = await ask({
+    const reply = await askModel({
       modelId: JUDGE_MODEL_ID,
       content,
       instruction: JUDGE_INSTRUCTION,
@@ -203,28 +122,60 @@ export interface RunScope {
   questionIds: string[];
 }
 
-/** Resolve the (model, question) scope for a new run from optional filters. */
+/**
+ * Resolve the (model, question) scope from optional filters. No filter =
+ * every current benchmark model / every active question, read fresh, so a
+ * resumed run also covers models and questions added since it started.
+ */
 export async function resolveRunScope(filters: {
-  modelIds: string[] | undefined;
-  questionIds: string[] | undefined;
+  modelIds: string[] | null | undefined;
+  questionIds: string[] | null | undefined;
 }): Promise<RunScope> {
   const benchmarkModels = listBenchmarkModels().map((model) => model.id);
   const modelIds =
     filters.modelIds && filters.modelIds.length > 0
       ? benchmarkModels.filter((id) => filters.modelIds?.includes(id))
       : benchmarkModels;
-  const questionRows = await db
-    .select({ id: refusalIndexQuestions.id })
-    .from(refusalIndexQuestions)
+  if (filters.questionIds && filters.questionIds.length > 0) {
+    const rows = await db
+      .select({ id: refusalIndexQuestions.id })
+      .from(refusalIndexQuestions)
+      .where(
+        and(
+          eq(refusalIndexQuestions.active, true),
+          inArray(refusalIndexQuestions.id, filters.questionIds),
+        ),
+      );
+    return { modelIds, questionIds: rows.map((row) => row.id) };
+  }
+  return { modelIds, questionIds: await activeQuestionIds() };
+}
+
+/** Pairs of the scope that still need an answer (see computeFillPairs). */
+export async function pendingFillPairs(scope: RunScope): Promise<FillPair[]> {
+  if (scope.modelIds.length === 0 || scope.questionIds.length === 0) {
+    return [];
+  }
+  const existing = await db
+    .select({
+      modelId: refusalIndexResults.modelId,
+      questionId: refusalIndexResults.questionId,
+      verdict: refusalIndexResults.verdict,
+      modelVersion: refusalIndexResults.modelVersion,
+    })
+    .from(refusalIndexResults)
     .where(
-      filters.questionIds && filters.questionIds.length > 0
-        ? and(
-            eq(refusalIndexQuestions.active, true),
-            inArray(refusalIndexQuestions.id, filters.questionIds),
-          )
-        : eq(refusalIndexQuestions.active, true),
+      and(
+        isNull(refusalIndexResults.staleAt),
+        inArray(refusalIndexResults.questionId, scope.questionIds),
+        inArray(refusalIndexResults.modelId, scope.modelIds),
+      ),
     );
-  return { modelIds, questionIds: questionRows.map((row) => row.id) };
+  return computeFillPairs(
+    planPairs(scope.modelIds, scope.questionIds),
+    existing,
+    modelVersionOf,
+  );
 }
 
 /** Estimated credits for one pair (answer + judge) used by dry runs. */
@@ -283,33 +234,6 @@ export async function executeRun(params: RunExecutionParams): Promise<
       })
       .where(eq(refusalIndexRuns.id, runId));
 
-    const modelIds = run.modelFilter ?? [];
-    const questionIds = run.questionFilter ?? [];
-    const questionRows =
-      questionIds.length > 0
-        ? await db
-            .select({
-              id: refusalIndexQuestions.id,
-              textEn: refusalIndexQuestions.textEn,
-            })
-            .from(refusalIndexQuestions)
-            .where(inArray(refusalIndexQuestions.id, questionIds))
-        : [];
-    const questionText = new Map(questionRows.map((q) => [q.id, q.textEn]));
-
-    const existing = await db
-      .select({
-        modelId: refusalIndexResults.modelId,
-        questionId: refusalIndexResults.questionId,
-        verdict: refusalIndexResults.verdict,
-      })
-      .from(refusalIndexResults)
-      .where(eq(refusalIndexResults.runId, runId));
-    const pending = computePendingPairs(
-      planPairs(modelIds, questionIds),
-      existing,
-    );
-
     const budget = createBudgetTracker(run.budgetCredits, run.totalCost);
     let stopReason: string | null = null;
     const shouldStop = (): boolean => {
@@ -327,6 +251,72 @@ export async function executeRun(params: RunExecutionParams): Promise<
       return false;
     };
 
+    // ── 1. New questions ───────────────────────────────────────────────
+    const toGenerate = run.questionsRequested - run.questionsGenerated;
+    // Explicit question filters mean "only these": nothing new is added.
+    if (toGenerate > 0 && !run.questionFilter?.length && !shouldStop()) {
+      const generated = await generateQuestions({
+        count: toGenerate,
+        user,
+        locale,
+        logger,
+        abortSignal: params.abortSignal,
+        fixtureScopeId: params.fixtureScopeId,
+        canSpend: () => !shouldStop(),
+      });
+      if (generated.success) {
+        budget.add(generated.data.cost);
+        await db
+          .update(refusalIndexRuns)
+          .set({
+            questionsGenerated: sql`${refusalIndexRuns.questionsGenerated} + ${generated.data.insertedIds.length}`,
+            totalCost: sql`${refusalIndexRuns.totalCost} + ${generated.data.cost}`,
+            heartbeatAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(refusalIndexRuns.id, runId));
+        invalidateRefusalIndexCaches();
+      } else {
+        // The fill still runs: missing pairs of existing questions are worth it.
+        logger.warn("[RefusalIndex] question generation failed", {
+          runId,
+          error: generated.message,
+        });
+        if (generated.errorType === ErrorResponseTypes.PAYMENT_REQUIRED) {
+          stopReason = "insufficient credits";
+        }
+      }
+    }
+
+    // ── 2. Fill missing pairs ──────────────────────────────────────────
+    const scope = await resolveRunScope({
+      modelIds: run.modelFilter,
+      questionIds: run.questionFilter,
+    });
+    const pending = await pendingFillPairs(scope);
+    await db
+      .update(refusalIndexRuns)
+      .set({
+        modelCount: scope.modelIds.length,
+        questionCount: scope.questionIds.length,
+        pairCount: pending.length,
+        updatedAt: new Date(),
+      })
+      .where(eq(refusalIndexRuns.id, runId));
+
+    const pendingQuestionIds = [...new Set(pending.map((p) => p.questionId))];
+    const questionRows =
+      pendingQuestionIds.length > 0
+        ? await db
+            .select({
+              id: refusalIndexQuestions.id,
+              textEn: refusalIndexQuestions.textEn,
+            })
+            .from(refusalIndexQuestions)
+            .where(inArray(refusalIndexQuestions.id, pendingQuestionIds))
+        : [];
+    const questionText = new Map(questionRows.map((q) => [q.id, q.textEn]));
+
     const modelById = new Map<string, ChatModelId>(
       listBenchmarkModels().map((model) => [model.id, model.id]),
     );
@@ -335,20 +325,21 @@ export async function executeRun(params: RunExecutionParams): Promise<
       MAX_CONCURRENCY,
     );
 
-    const worker = async (pair: Pair): Promise<void> => {
+    const worker = async (pair: FillPair): Promise<void> => {
       const question = questionText.get(pair.questionId);
       const modelId = modelById.get(pair.modelId);
       const tier = describeModel(pair.modelId).tier;
       if (question === undefined || modelId === undefined || tier === null) {
         return;
       }
+      const modelVersion = modelVersionOf(pair.modelId);
       const started = Date.now();
       let verdict: typeof RefusalVerdictValue = RefusalVerdict.ERROR;
       let reason = "";
       let excerpt = "";
       let cost = 0;
 
-      const answer = await ask({
+      const answer = await askModel({
         modelId,
         content: question,
         instruction: RUNNER_INSTRUCTION,
@@ -365,7 +356,7 @@ export async function executeRun(params: RunExecutionParams): Promise<
         if (answer.errorType === ErrorResponseTypes.PAYMENT_REQUIRED) {
           stopReason = "insufficient credits";
         }
-        // Not stored: a fatal stop leaves the pair pending for the resume.
+        // Not stored: a fatal stop leaves the pair pending for the next run.
         if (stopReason !== null) {
           return;
         }
@@ -401,33 +392,55 @@ export async function executeRun(params: RunExecutionParams): Promise<
       }
 
       budget.add(cost);
-      await db
-        .insert(refusalIndexResults)
-        .values({
-          runId,
-          questionId: pair.questionId,
-          modelId: pair.modelId,
-          verdict,
-          judgeReason: reason,
-          answerExcerpt: excerpt,
-          latencyMs,
-          cost,
-        })
-        .onConflictDoUpdate({
-          target: [
-            refusalIndexResults.runId,
-            refusalIndexResults.questionId,
-            refusalIndexResults.modelId,
-          ],
-          set: {
-            verdict,
-            judgeReason: reason,
-            answerExcerpt: excerpt,
-            latencyMs,
-            cost,
-            createdAt: new Date(),
-          },
+      // An error never replaces a real answer from an older model version:
+      // the old one stays current until the new version answers.
+      if (!(pair.supersede && verdict === RefusalVerdict.ERROR)) {
+        await db.transaction(async (tx) => {
+          if (pair.supersede) {
+            await tx
+              .update(refusalIndexResults)
+              .set({ staleAt: new Date() })
+              .where(
+                and(
+                  eq(refusalIndexResults.questionId, pair.questionId),
+                  eq(refusalIndexResults.modelId, pair.modelId),
+                  isNull(refusalIndexResults.staleAt),
+                ),
+              );
+          }
+          await tx
+            .insert(refusalIndexResults)
+            .values({
+              runId,
+              questionId: pair.questionId,
+              modelId: pair.modelId,
+              modelVersion,
+              verdict,
+              judgeReason: reason,
+              answerExcerpt: excerpt,
+              latencyMs,
+              cost,
+            })
+            .onConflictDoUpdate({
+              // Only an errored current row can conflict: retried in place.
+              target: [
+                refusalIndexResults.questionId,
+                refusalIndexResults.modelId,
+              ],
+              targetWhere: isNull(refusalIndexResults.staleAt),
+              set: {
+                runId,
+                modelVersion,
+                verdict,
+                judgeReason: reason,
+                answerExcerpt: excerpt,
+                latencyMs,
+                cost: sql`${refusalIndexResults.cost} + ${cost}`,
+                createdAt: new Date(),
+              },
+            });
         });
+      }
       await db
         .update(refusalIndexRuns)
         .set({
@@ -482,10 +495,3 @@ export async function executeRun(params: RunExecutionParams): Promise<
     activeRuns.delete(runId);
   }
 }
-
-export const RUN_FREEZE = {
-  judgeModelId: JUDGE_MODEL_ID,
-  judgePromptVersion: JUDGE_PROMPT_VERSION,
-  runnerPromptVersion: RUNNER_PROMPT_VERSION,
-  defaultBudget: DEFAULT_BUDGET_CREDITS,
-} as const;

@@ -1,7 +1,7 @@
 /**
  * Refusal Index - Model stats API Definition (public, read-only, cached)
  * GET /agent/refusal-index/model/[modelId] - one model's refusal stats from
- * the latest completed run plus its admin-approved sample answers.
+ * its current answers plus its admin-approved sample answers.
  * Powers the model pages (/{locale}/models/{id}).
  */
 
@@ -120,6 +120,11 @@ const { GET } = createEndpoint({
               schema: z.string().nullable(),
             }),
             questionPl: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
+            questionFr: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.string().nullable(),

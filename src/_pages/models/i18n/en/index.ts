@@ -413,7 +413,7 @@ export const translations = {
   refusal: {
     heading: "Refusal Index",
     intro:
-      "How {{model}} handled the fixed question set in the latest weekly run ({{date}}).",
+      "How {{model}} answers the Refusal Index questions. Updated {{date}}, new questions every week.",
     rank: "Rank {{rank}} of {{total}} (1 = fewest refusals)",
     refused: "Refused",
     hedged: "Hedged",

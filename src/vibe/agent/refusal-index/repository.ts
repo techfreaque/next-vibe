@@ -1,12 +1,15 @@
 /**
  * Refusal Index - public read repository (leaderboard + per-model stats).
- * Reads the latest COMPLETED run only. Cached in-process; the cache is dropped
- * when a run finishes or an admin changes a sample.
+ * Reads the current answer of every (active question, current model) pair,
+ * whichever run produced it: answers are permanent, so a capped or partial
+ * run still counts. Trend = refusal-rate change since the latest run began.
+ * Cached in-process; the cache is dropped when a run finishes or an admin
+ * changes a sample or question.
  */
 
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,15 +27,17 @@ import {
   type ModelAggregate,
   refusalTrend,
   toRates,
+  wasCurrentAt,
 } from "./aggregate";
 import { TtlCache } from "./cache";
+import { JUDGE_MODEL_ID, JUDGE_PROMPT_VERSION } from "./constants";
 import {
   refusalIndexQuestions,
   refusalIndexResults,
   refusalIndexRuns,
   refusalIndexSamples,
 } from "./db";
-import { RefusalRunStatus, RefusalVerdict } from "./enum";
+import { RefusalVerdict } from "./enum";
 import { scopedTranslation } from "./i18n";
 import type { LeaderboardResponseOutput } from "./leaderboard/definition";
 import type {
@@ -42,74 +47,98 @@ import type {
 import { describeModel, listBenchmarkModels } from "./models";
 
 interface Snapshot {
-  run: typeof refusalIndexRuns.$inferSelect;
+  /** Latest finished run (provenance + trend baseline), if any. */
+  run: typeof refusalIndexRuns.$inferSelect | null;
+  /** When the newest current answer was recorded. */
+  updatedAt: Date;
   /** Sorted lowest refusal first. */
   ranked: ModelAggregate[];
   previous: Map<string, ModelAggregate>;
   categories: string[];
+  questionCount: number;
 }
 
 const snapshotCache = new TtlCache<Snapshot | null>();
 const leaderboardCache = new TtlCache<LeaderboardResponseOutput>();
 const modelCache = new TtlCache<ModelStatsResponseOutput>();
 
-async function aggregateRun(runId: string): Promise<ModelAggregate[]> {
+async function loadSnapshot(): Promise<Snapshot | null> {
+  const cached = snapshotCache.get("latest");
+  if (cached !== undefined) {
+    return cached;
+  }
+  // Every answer of an active question, current and superseded (the latter
+  // only matter for the trend baseline).
   const rows = await db
     .select({
       modelId: refusalIndexResults.modelId,
+      questionId: refusalIndexResults.questionId,
       category: refusalIndexQuestions.category,
       verdict: refusalIndexResults.verdict,
+      createdAt: refusalIndexResults.createdAt,
+      staleAt: refusalIndexResults.staleAt,
     })
     .from(refusalIndexResults)
     .innerJoin(
       refusalIndexQuestions,
       eq(refusalIndexResults.questionId, refusalIndexQuestions.id),
     )
-    .where(eq(refusalIndexResults.runId, runId));
-  return aggregateVerdicts(rows);
-}
-
-async function loadSnapshot(): Promise<Snapshot | null> {
-  const cached = snapshotCache.get("latest");
-  if (cached !== undefined) {
-    return cached;
-  }
-  const runs = await db
-    .select()
-    .from(refusalIndexRuns)
-    .where(eq(refusalIndexRuns.status, RefusalRunStatus.COMPLETED))
-    .orderBy(desc(refusalIndexRuns.finishedAt))
-    .limit(2);
-  const latest = runs[0];
-  if (!latest) {
-    // Do not cache "no run yet": the first completed run must appear at once.
-    return null;
-  }
-  const current = await aggregateRun(latest.id);
-  const previousRun = runs[1];
-  const previousAggregates = previousRun
-    ? await aggregateRun(previousRun.id)
-    : [];
-
+    .where(eq(refusalIndexQuestions.active, true));
   const benchmarkIds = new Set<string>(
     listBenchmarkModels().map((model) => model.id),
   );
-  const ranked = current
-    .filter((agg) => agg.judged > 0 && benchmarkIds.has(agg.modelId))
+  const current = rows.filter(
+    (row) => row.staleAt === null && benchmarkIds.has(row.modelId),
+  );
+  const ranked = aggregateVerdicts(current)
+    .filter((agg) => agg.judged > 0)
     .toSorted(
       (a, b) =>
         a.refusedPct - b.refusedPct ||
         a.hedgedPct - b.hedgedPct ||
         a.modelId.localeCompare(b.modelId),
     );
+  if (ranked.length === 0) {
+    // Do not cache "no data yet": the first answers must appear at once.
+    return null;
+  }
+
+  const [latestRun] = await db
+    .select()
+    .from(refusalIndexRuns)
+    .where(isNotNull(refusalIndexRuns.finishedAt))
+    .orderBy(desc(refusalIndexRuns.finishedAt))
+    .limit(1);
+  const baselineAt = latestRun?.startedAt;
+  const previousAggregates = baselineAt
+    ? aggregateVerdicts(
+        rows.filter(
+          (row) =>
+            benchmarkIds.has(row.modelId) && wasCurrentAt(row, baselineAt),
+        ),
+      )
+    : [];
+
+  let updatedAt = new Date(0);
+  const judgedQuestions = new Set<string>();
+  for (const row of current) {
+    if (row.createdAt > updatedAt) {
+      updatedAt = row.createdAt;
+    }
+    if (row.verdict !== RefusalVerdict.ERROR) {
+      judgedQuestions.add(row.questionId);
+    }
+  }
   const categories = [
     ...new Set(ranked.flatMap((agg) => Object.keys(agg.byCategory))),
   ].toSorted((a, b) => a.localeCompare(b));
   const snapshot: Snapshot = {
-    run: latest,
+    run: latestRun ?? null,
+    updatedAt,
     ranked,
     previous: new Map(previousAggregates.map((agg) => [agg.modelId, agg])),
     categories,
+    questionCount: judgedQuestions.size,
   };
   snapshotCache.set("latest", snapshot);
   return snapshot;
@@ -142,7 +171,7 @@ const EMPTY_META = {
 
 function runMeta(snapshot: Snapshot): {
   hasData: true;
-  runId: string;
+  runId: string | null;
   runFinishedAt: string | null;
   modelCount: number;
   questionCount: number;
@@ -150,15 +179,17 @@ function runMeta(snapshot: Snapshot): {
   judgeModelName: string;
   judgePromptVersion: string;
 } {
+  const judgeModelId = snapshot.run?.judgeModelId ?? JUDGE_MODEL_ID;
   return {
     hasData: true,
-    runId: snapshot.run.id,
-    runFinishedAt: snapshot.run.finishedAt?.toISOString() ?? null,
+    runId: snapshot.run?.id ?? null,
+    runFinishedAt: snapshot.updatedAt.toISOString(),
     modelCount: snapshot.ranked.length,
-    questionCount: snapshot.run.questionCount,
-    judgeModelId: snapshot.run.judgeModelId,
-    judgeModelName: describeModel(snapshot.run.judgeModelId).name,
-    judgePromptVersion: snapshot.run.judgePromptVersion,
+    questionCount: snapshot.questionCount,
+    judgeModelId,
+    judgeModelName: describeModel(judgeModelId).name,
+    judgePromptVersion:
+      snapshot.run?.judgePromptVersion ?? JUDGE_PROMPT_VERSION,
   };
 }
 
@@ -283,6 +314,7 @@ export class RefusalPublicRepository {
           questionEn: refusalIndexQuestions.textEn,
           questionDe: refusalIndexQuestions.textDe,
           questionPl: refusalIndexQuestions.textPl,
+          questionFr: refusalIndexQuestions.textFr,
           verdict: refusalIndexResults.verdict,
           answerExcerpt: refusalIndexResults.answerExcerpt,
           judgeReason: refusalIndexResults.judgeReason,
@@ -299,8 +331,9 @@ export class RefusalPublicRepository {
         .where(
           and(
             eq(refusalIndexSamples.visible, true),
+            eq(refusalIndexQuestions.active, true),
             eq(refusalIndexResults.modelId, modelId),
-            eq(refusalIndexResults.runId, snapshot.run.id),
+            isNull(refusalIndexResults.staleAt),
           ),
         )
         .orderBy(refusalIndexQuestions.category, refusalIndexQuestions.slug);

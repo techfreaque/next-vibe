@@ -417,7 +417,7 @@ export const translations: typeof enTranslations = {
   refusal: {
     heading: "Verweigerungs-Index",
     intro:
-      "So hat {{model}} das feste Fragenset im letzten Wochenlauf ({{date}}) beantwortet.",
+      "So beantwortet {{model}} die Fragen des Verweigerungs-Index. Stand {{date}}, jede Woche neue Fragen.",
     rank: "Rang {{rank}} von {{total}} (1 = wenigste Ablehnungen)",
     refused: "Abgelehnt",
     hedged: "Abgeschwächt",

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Verweigerungs-Index: Welche KI antwortet, schwächt ab oder lehnt ab | {{appName}}",
     category: "Verweigerungs-Index",
     description:
-      "Dieselben Fragen an jedes KI-Modell, jede Woche. Wir messen, wer antwortet, wer abschwächt und wer ablehnt - und legen die Methode offen. Offene Daten auf {{appName}}.",
+      "Dieselben Fragen an jedes KI-Modell, jede Woche kommen neue dazu. Wir messen, wer antwortet, wer abschwächt und wer ablehnt, und legen die Methode offen. Offene Daten auf {{appName}}.",
     imageAlt: "Verweigerungs-Index - Ablehnungsraten von KI-Modellen",
     keywords:
       "{{appName}}, Verweigerungs-Index, KI Ablehnungsrate, unzensierte KI, KI-Zensur Benchmark, Modellvergleich",
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Verweigerungs-Index",
     title: "Welche KI antwortet wirklich?",
     subtitle:
-      "Dieselben Fragen. Jedes Modell. Jede Woche. Wir messen, wer antwortet, wer abschwächt und wer ablehnt - und zeigen, wie.",
+      "Dieselben Fragen. Jedes Modell. Jede Woche neue. Wir messen, wer antwortet, wer abschwächt und wer ablehnt. Und zeigen, wie.",
     ctaPrimary: "Bestenliste ansehen",
     ctaSecondary: "Modelle ansehen",
   },
@@ -23,11 +23,11 @@ export const translations: typeof enTranslations = {
     models: "Gemessene Modelle",
     questions: "Gestellte Fragen",
     refusal: "Durchschnittliche Ablehnungsrate",
-    updated: "Letzter Lauf",
+    updated: "Zuletzt aktualisiert",
   },
   empty: {
     title: "Erster Lauf steht aus",
-    body: "Der Index hat noch keinen veröffentlichten Lauf. Die ersten Ergebnisse erscheinen nach dem nächsten Messlauf.",
+    body: "Noch keine Ergebnisse veröffentlicht. Die ersten Antworten erscheinen nach dem nächsten Messlauf.",
   },
   leaderboard: {
     label: "Bestenliste",
@@ -59,30 +59,32 @@ export const translations: typeof enTranslations = {
       religion: "Religion",
       law: "Recht",
       science: "Wissenschaft",
+      fiction: "Fiktion",
+      satire: "Satire",
     },
   },
   method: {
     label: "Methode",
     title: "So messen wir",
-    intro: "Keine Tricks. Feste Fragen, neutraler Aufbau, ein Richter.",
+    intro: "Keine Tricks. Dieselben Fragen, neutraler Aufbau, ein Richter.",
     questions: {
-      title: "Feste Fragen",
-      body: "Dieselben Prompts gehen unverändert an jedes Modell. Das Set pflegen wir selbst und erweitern es laufend.",
+      title: "Ein wachsendes Fragenset",
+      body: "Jedes Modell bekommt dieselben Prompts, unverändert. Den Grundstock haben wir handverlesen. Jede Woche schlägt ein unzensiertes Modell 10 neue Fragen vor, genau dort, wo Mainstream-KI gern abblockt: Politik, Geschichte, Gesundheit, Drogen, Sex, Religion, Wissenschaft, Krimi, Satire. Nur legale Fragen, Wiederholungen fliegen raus.",
     },
     setup: {
       title: "Neutraler Aufbau",
-      body: "Ein Durchgang. Keine Tools, kein Gedächtnis, keine Persona. Die einzige Anweisung: knapp antworten.",
+      body: "Ein Durchgang. Keine Tools, kein Gedächtnis, keine Persona. Die einzige Anweisung: knapp antworten. Jedes Modell beantwortet jede Frage einmal. Eine neue Modellversion wird erneut gefragt.",
     },
     judge: {
       title: "Ein Richter",
       body: "Ein festes Modell ({{judge}}, Prompt {{version}}) bewertet jede Antwort: beantwortet, abgeschwächt oder abgelehnt. Ein Content-Filter-Stopp des Anbieters zählt als abgelehnt.",
     },
     run: {
-      title: "Lauf-Daten",
-      body: "Lauf vom {{date}}: {{models}} Modelle, {{questions}} Fragen.",
+      title: "Aktuelle Daten",
+      body: "Stand {{date}}: {{models}} Modelle, {{questions}} Fragen.",
     },
     caveat:
-      "Ein Richter-Modell ist keine absolute Wahrheit. Lies die Raten als Vergleich zwischen Modellen unter gleichen Bedingungen - nicht als Urteil über richtig und falsch.",
+      "Ein Richter-Modell ist keine absolute Wahrheit. Lies die Raten als Vergleich zwischen Modellen unter gleichen Bedingungen, nicht als Urteil über richtig und falsch.",
   },
   cta: {
     title: "Ein Modell aus der Nähe",

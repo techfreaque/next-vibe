@@ -92,6 +92,8 @@ export class RefusalQuestionsRepository {
           textEn: row.textEn,
           textDe: row.textDe,
           textPl: row.textPl,
+          textFr: row.textFr,
+          generatedBy: row.generatedBy,
           active: row.active,
         })),
         categories: categoryRows,
@@ -132,6 +134,7 @@ export class RefusalQuestionsRepository {
           textEn: data.textEn.trim(),
           textDe: emptyToNull(data.textDe) ?? null,
           textPl: emptyToNull(data.textPl) ?? null,
+          textFr: emptyToNull(data.textFr) ?? null,
           active: data.active,
         })
         .returning({ id: refusalIndexQuestions.id });
@@ -141,6 +144,7 @@ export class RefusalQuestionsRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
+      invalidateRefusalIndexCaches();
       return success({ id: row.id });
     } catch (error) {
       logger.error(
@@ -164,6 +168,7 @@ export class RefusalQuestionsRepository {
     try {
       const textDe = emptyToNull(data.textDe);
       const textPl = emptyToNull(data.textPl);
+      const textFr = emptyToNull(data.textFr);
       const [row] = await db
         .update(refusalIndexQuestions)
         .set({
@@ -174,6 +179,7 @@ export class RefusalQuestionsRepository {
           ...(data.textEn !== undefined ? { textEn: data.textEn.trim() } : {}),
           ...(textDe !== undefined ? { textDe } : {}),
           ...(textPl !== undefined ? { textPl } : {}),
+          ...(textFr !== undefined ? { textFr } : {}),
           updatedAt: sql`now()`,
         })
         .where(eq(refusalIndexQuestions.id, urlPathParams.id))

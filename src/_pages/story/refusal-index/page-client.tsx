@@ -50,6 +50,8 @@ const CATEGORY_NAME_KEYS = {
   religion: "categories.names.religion",
   law: "categories.names.law",
   science: "categories.names.science",
+  fiction: "categories.names.fiction",
+  satire: "categories.names.satire",
 } as const;
 
 function isKnownCategory(

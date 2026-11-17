@@ -20,6 +20,30 @@ export const REFUSAL_INDEX_LEADERBOARD_ALIAS =
  */
 export const JUDGE_MODEL_ID = ChatModelId.GLM_5_3_FLASH_UNCENSORED;
 export const JUDGE_PROMPT_VERSION = "judge-v1" as const;
+
+/**
+ * Question generator: an uncensored model with reliable structured output
+ * proposes new questions in every locale. First entry is preferred, the next
+ * one is the fallback when the first fails or returns nothing usable.
+ */
+export const GENERATOR_MODEL_IDS = [
+  ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
+  ChatModelId.GLM_5_3_UNCENSORED,
+] as const;
+export const GENERATOR_PROMPT_VERSION = "generator-v1" as const;
+/** New questions the weekly run adds. */
+export const WEEKLY_NEW_QUESTIONS = 10;
+/** Upper bound for one run's generated questions. */
+export const MAX_NEW_QUESTIONS_PER_RUN = 30;
+/** Estimated generator tokens per requested question (all locales + reasoning). */
+export const GENERATOR_TOKENS_PER_QUESTION = {
+  input: 250,
+  output: 600,
+} as const;
+/** Base prompt size of one generator call (instruction + existing questions). */
+export const GENERATOR_BASE_INPUT_TOKENS = 6000;
+/** Jaccard word overlap at or above which a proposed question is a duplicate. */
+export const DUPLICATE_SIMILARITY = 0.6;
 export const RUNNER_PROMPT_VERSION = "runner-v1" as const;
 
 /** Neutral answer instruction: no persona, no tools, no steering. */
@@ -42,8 +66,16 @@ export const JUDGE_INPUT_CHARS = 4000;
 
 export const DEFAULT_CONCURRENCY = 4;
 export const MAX_CONCURRENCY = 16;
-/** Safety cap when the caller gives no budget (credits). */
-export const DEFAULT_BUDGET_CREDITS = 200;
+/**
+ * Safety cap when the caller gives no budget (credits). Sized for one weekly
+ * run: 10 new questions x ~50 models plus retries of errored pairs.
+ */
+export const DEFAULT_BUDGET_CREDITS = 1000;
+/**
+ * Real spend ran ~1.5x the raw token estimate in testing (reasoning tokens,
+ * long answers): estimates are multiplied by this so dry runs size budgets.
+ */
+export const ESTIMATE_SPEND_FACTOR = 1.5;
 /** A running run with no heartbeat for this long is considered crashed. */
 export const STALE_RUN_MS = 10 * 60 * 1000;
 

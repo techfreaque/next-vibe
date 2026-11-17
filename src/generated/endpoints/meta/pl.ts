@@ -20845,7 +20845,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Ranking Indeksu odmów",
     titleShort: "Indeks odmów",
     description:
-      "Jak często każdy model AI odpowiada, łagodzi albo odmawia - z najnowszego tygodniowego przebiegu.",
+      "Jak często każdy model AI odpowiada, łagodzi albo odmawia. Co tydzień nowe pytania.",
     icon: "trophy",
     category: "ai",
     subCategory: "Inference",
@@ -20883,7 +20883,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Wskaźniki odmów modelu",
     titleShort: "Wskaźniki modelu",
     description:
-      "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu z najnowszego przebiegu, plus zatwierdzone próbki odpowiedzi.",
+      "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu we wszystkich aktualnych pytaniach, plus zatwierdzone próbki odpowiedzi.",
     icon: "activity",
     category: "ai",
     subCategory: "Inference",
@@ -21031,6 +21031,9 @@ export const endpointsMeta: EndpointMeta[] = [
             finishedAt: "2026-11-01T04:00:00.000Z",
             modelCount: 0,
             questionCount: 0,
+            pairCount: 0,
+            questionsRequested: 0,
+            questionsGenerated: 0,
             resultCount: 0,
             totalCost: 0,
             budgetCredits: null,
@@ -21083,13 +21086,20 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Uruchom przebieg Indeksu odmów",
     titleShort: "Uruchom przebieg",
     description:
-      "Wyślij aktywny zestaw pytań do mierzonych modeli, oceń każdą odpowiedź, opublikuj wyniki. Z limitem budżetu i możliwością wznowienia.",
+      "Dodaj nowe pytania z generatora bez cenzury, potem zadaj każdemu modelowi każde pytanie, na które jeszcze nie odpowiedział, i oceń odpowiedź. Odpowiedzi zostają: nic nie jest pytane dwa razy. Z limitem budżetu i możliwością wznowienia.",
     icon: "play",
     category: "ai",
     subCategory: "Inference",
     tags: ["Indeks odmów"],
     examples: {
-      inputs: { default: { dryRun: true, budgetCredits: 200, wait: false } },
+      inputs: {
+        default: {
+          dryRun: true,
+          newQuestions: 10,
+          budgetCredits: 1000,
+          wait: false,
+        },
+      },
       responses: {
         default: {
           runId: null,
@@ -21097,6 +21107,7 @@ export const endpointsMeta: EndpointMeta[] = [
           isDryRun: true,
           modelCount: 0,
           questionCount: 0,
+          newQuestionCount: 0,
           pendingPairs: 0,
           estimatedCredits: 0,
           note: "",

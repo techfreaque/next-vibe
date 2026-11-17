@@ -84,6 +84,9 @@ export const translations: typeof enTranslations = {
     started: "Przebieg ruszył. Działa dalej w tle.",
     resumed: "Przebieg wznowiony. Działa dalej w tle.",
     finishedWaiting: "Przebieg zakończony. Status końcowy powyżej.",
+    generationFailed:
+      "Generator pytań nie zwrócił nic użytecznego ({{error}}).",
+    nothingPending: "Nic do zrobienia: każda para ma już odpowiedź.",
   },
 
   fields: {
@@ -117,6 +120,11 @@ export const translations: typeof enTranslations = {
         description:
           "Tłumaczenie do wyświetlania w publicznych próbkach (opcjonalne)",
       },
+      textFr: {
+        label: "Pytanie (francuski)",
+        description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
+      },
+      generatedBy: { label: "Zaproponował" },
       active: {
         label: "Aktywne",
         description: "Tylko aktywne pytania trafiają do nowych przebiegów",
@@ -127,6 +135,7 @@ export const translations: typeof enTranslations = {
       loading: "Ładowanie pytań...",
       active: "Aktywne",
       inactive: "Nieaktywne",
+      generated: "Wygenerowane",
       empty: {
         title: "Brak pytań",
         hint: "Indeks mierzy, jak modele odpowiadają na TWÓJ zestaw pytań. Dodaj pytania przed pierwszym przebiegiem.",
@@ -187,6 +196,9 @@ export const translations: typeof enTranslations = {
       finishedAt: { label: "Koniec" },
       modelCount: { label: "Modele" },
       questionCount: { label: "Pytania" },
+      pairCount: { label: "Pary do odpowiedzi" },
+      questionsRequested: { label: "Zamówione nowe pytania" },
+      questionsGenerated: { label: "Dodane nowe pytania" },
       resultCount: { label: "Wyniki" },
       totalCost: { label: "Zużyte kredyty" },
       budgetCredits: { label: "Limit budżetu" },
@@ -199,6 +211,7 @@ export const translations: typeof enTranslations = {
       start: "Uruchom przebieg",
       manageQuestions: "Zarządzaj pytaniami",
       resume: "Wznów",
+      newQuestions: "{{generated}}/{{requested}} nowych pytań",
       open: "Wyniki",
       results: "wyników",
       credits: "kredytów",
@@ -226,13 +239,13 @@ export const translations: typeof enTranslations = {
     title: "Uruchom przebieg Indeksu odmów",
     titleShort: "Uruchom przebieg",
     description:
-      "Wyślij aktywny zestaw pytań do mierzonych modeli, oceń każdą odpowiedź, opublikuj wyniki. Z limitem budżetu i możliwością wznowienia.",
+      "Dodaj nowe pytania z generatora bez cenzury, potem zadaj każdemu modelowi każde pytanie, na które jeszcze nie odpowiedział, i oceń odpowiedź. Odpowiedzi zostają: nic nie jest pytane dwa razy. Z limitem budżetu i możliwością wznowienia.",
     submit: "Uruchom",
     submitting: "Uruchamianie...",
     cron: {
       name: "Indeks odmów (co tydzień)",
       description:
-        "Cotygodniowy przebieg pomiarowy. Domyślnie wyłączony - włącz po dodaniu pytań.",
+        "Co tydzień: 10 nowych pytań, potem każda brakująca odpowiedź, także nowych modeli. Domyślnie wyłączony.",
     },
     fields: {
       models: {
@@ -244,6 +257,11 @@ export const translations: typeof enTranslations = {
         label: "Pytania",
         description:
           "Slugi pytań oddzielone przecinkami (puste = wszystkie aktywne)",
+      },
+      newQuestions: {
+        label: "Nowe pytania",
+        description:
+          "Pytania, które generator bez cenzury doda przed uzupełnieniem (0-30)",
       },
       budgetCredits: {
         label: "Limit budżetu (kredyty)",
@@ -277,6 +295,7 @@ export const translations: typeof enTranslations = {
       dryRun: "Próba na sucho",
       modelCount: "Modele",
       questionCount: "Pytania",
+      newQuestionCount: "Nowe pytania",
       pendingPairs: "Pary do przetworzenia",
       estimatedCredits: "Szacowane kredyty",
       note: "Uwaga",
@@ -343,7 +362,7 @@ export const translations: typeof enTranslations = {
     title: "Ranking Indeksu odmów",
     titleShort: "Indeks odmów",
     description:
-      "Jak często każdy model AI odpowiada, łagodzi albo odmawia - z najnowszego tygodniowego przebiegu.",
+      "Jak często każdy model AI odpowiada, łagodzi albo odmawia. Co tydzień nowe pytania.",
     response: { overall: "Ogółem" },
   },
 
@@ -351,7 +370,7 @@ export const translations: typeof enTranslations = {
     title: "Wskaźniki odmów modelu",
     titleShort: "Wskaźniki modelu",
     description:
-      "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu z najnowszego przebiegu, plus zatwierdzone próbki odpowiedzi.",
+      "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu we wszystkich aktualnych pytaniach, plus zatwierdzone próbki odpowiedzi.",
     fields: {
       modelId: {
         label: "Model",
@@ -368,7 +387,7 @@ export const translations: typeof enTranslations = {
       refusedPct: { label: "Odmówił %" },
       category: { label: "Kategoria" },
       hasData: { label: "Ma dane" },
-      runFinishedAt: { label: "Przebieg zakończony" },
+      runFinishedAt: { label: "Ostatnia aktualizacja" },
       modelCount: { label: "Modele" },
       questionCount: { label: "Pytania" },
       judgeModelId: { label: "ID modelu-sędziego" },

@@ -20835,7 +20835,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Refusal Index Leaderboard",
     titleShort: "Refusal Index",
     description:
-      "How often each AI model answers, hedges or refuses - from the latest weekly benchmark run.",
+      "How often each AI model answers, hedges or refuses. Updated weekly with new questions.",
     icon: "trophy",
     category: "ai",
     subCategory: "Inference",
@@ -20873,7 +20873,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Model Refusal Stats",
     titleShort: "Model Stats",
     description:
-      "One model's refusal, hedge and answer rates from the latest benchmark run, plus approved sample answers.",
+      "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     icon: "activity",
     category: "ai",
     subCategory: "Inference",
@@ -21022,6 +21022,9 @@ export const endpointsMeta: EndpointMeta[] = [
             finishedAt: "2026-11-01T04:00:00.000Z",
             modelCount: 0,
             questionCount: 0,
+            pairCount: 0,
+            questionsRequested: 0,
+            questionsGenerated: 0,
             resultCount: 0,
             totalCost: 0,
             budgetCredits: null,
@@ -21074,13 +21077,20 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Start Refusal Index Run",
     titleShort: "Start Run",
     description:
-      "Send the active question set to the benchmarked models, judge every answer, publish the results. Budget-capped and resumable.",
+      "Add new questions from an uncensored generator, then ask every model each question it has not answered yet and judge the answer. Answers are kept: nothing is asked twice. Budget-capped and resumable.",
     icon: "play",
     category: "ai",
     subCategory: "Inference",
     tags: ["Refusal Index"],
     examples: {
-      inputs: { default: { dryRun: true, budgetCredits: 200, wait: false } },
+      inputs: {
+        default: {
+          dryRun: true,
+          newQuestions: 10,
+          budgetCredits: 1000,
+          wait: false,
+        },
+      },
       responses: {
         default: {
           runId: null,
@@ -21088,6 +21098,7 @@ export const endpointsMeta: EndpointMeta[] = [
           isDryRun: true,
           modelCount: 0,
           questionCount: 0,
+          newQuestionCount: 0,
           pendingPairs: 0,
           estimatedCredits: 0,
           note: "",

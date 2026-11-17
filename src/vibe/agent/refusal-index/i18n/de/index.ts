@@ -86,6 +86,9 @@ export const translations: typeof enTranslations = {
     started: "Lauf gestartet. Er läuft im Hintergrund weiter.",
     resumed: "Lauf fortgesetzt. Er läuft im Hintergrund weiter.",
     finishedWaiting: "Lauf beendet. Endstatus siehe oben.",
+    generationFailed:
+      "Der Fragengenerator hat nichts Brauchbares geliefert ({{error}}).",
+    nothingPending: "Nichts zu tun: Jedes Paar hat bereits eine Antwort.",
   },
 
   fields: {
@@ -117,6 +120,11 @@ export const translations: typeof enTranslations = {
         label: "Frage (Polnisch)",
         description: "Anzeige-Übersetzung für öffentliche Beispiele (optional)",
       },
+      textFr: {
+        label: "Frage (Französisch)",
+        description: "Anzeige-Übersetzung für öffentliche Beispiele (optional)",
+      },
+      generatedBy: { label: "Vorgeschlagen von" },
       active: {
         label: "Aktiv",
         description: "Nur aktive Fragen gehen in neue Läufe",
@@ -127,6 +135,7 @@ export const translations: typeof enTranslations = {
       loading: "Fragen werden geladen...",
       active: "Aktiv",
       inactive: "Inaktiv",
+      generated: "Generiert",
       empty: {
         title: "Noch keine Fragen",
         hint: "Der Index misst, wie Modelle DEIN Fragenset beantworten. Lege Fragen an, bevor der erste Lauf startet.",
@@ -187,6 +196,9 @@ export const translations: typeof enTranslations = {
       finishedAt: { label: "Beendet" },
       modelCount: { label: "Modelle" },
       questionCount: { label: "Fragen" },
+      pairCount: { label: "Offene Paare" },
+      questionsRequested: { label: "Neue Fragen angefordert" },
+      questionsGenerated: { label: "Neue Fragen hinzugefügt" },
       resultCount: { label: "Ergebnisse" },
       totalCost: { label: "Verbrauchte Credits" },
       budgetCredits: { label: "Budget-Limit" },
@@ -199,6 +211,7 @@ export const translations: typeof enTranslations = {
       start: "Lauf starten",
       manageQuestions: "Fragen verwalten",
       resume: "Fortsetzen",
+      newQuestions: "{{generated}}/{{requested}} neue Fragen",
       open: "Ergebnisse",
       results: "Ergebnisse",
       credits: "Credits",
@@ -226,13 +239,13 @@ export const translations: typeof enTranslations = {
     title: "Lauf des Verweigerungs-Index starten",
     titleShort: "Lauf starten",
     description:
-      "Das aktive Fragenset an die gemessenen Modelle senden, jede Antwort bewerten, die Ergebnisse veröffentlichen. Mit Budget-Limit und fortsetzbar.",
+      "Neue Fragen vom unzensierten Generator ergänzen, dann jedem Modell jede noch unbeantwortete Frage stellen und die Antwort bewerten. Antworten bleiben gespeichert: Nichts wird doppelt gefragt. Mit Budget-Limit und fortsetzbar.",
     submit: "Starten",
     submitting: "Wird gestartet...",
     cron: {
       name: "Verweigerungs-Index (wöchentlich)",
       description:
-        "Wöchentlicher Messlauf. Standardmäßig aus - nach dem Anlegen von Fragen aktivieren.",
+        "Wöchentlich: 10 neue Fragen, dann jede fehlende Antwort, neue Modelle inklusive. Standardmäßig aus.",
     },
     fields: {
       models: {
@@ -243,6 +256,11 @@ export const translations: typeof enTranslations = {
       questions: {
         label: "Fragen",
         description: "Kommagetrennte Frage-Slugs (leer = alle aktiven)",
+      },
+      newQuestions: {
+        label: "Neue Fragen",
+        description:
+          "Fragen, die der unzensierte Generator vor dem Auffüllen ergänzt (0-30)",
       },
       budgetCredits: {
         label: "Budget-Limit (Credits)",
@@ -273,6 +291,7 @@ export const translations: typeof enTranslations = {
       dryRun: "Probelauf",
       modelCount: "Modelle",
       questionCount: "Fragen",
+      newQuestionCount: "Neue Fragen",
       pendingPairs: "Offene Paare",
       estimatedCredits: "Geschätzte Credits",
       note: "Hinweis",
@@ -341,7 +360,7 @@ export const translations: typeof enTranslations = {
     title: "Bestenliste des Verweigerungs-Index",
     titleShort: "Verweigerungs-Index",
     description:
-      "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert - aus dem neuesten wöchentlichen Messlauf.",
+      "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert. Wöchentlich mit neuen Fragen aktualisiert.",
     response: { overall: "Gesamt" },
   },
 
@@ -349,7 +368,7 @@ export const translations: typeof enTranslations = {
     title: "Verweigerungs-Werte eines Modells",
     titleShort: "Modell-Werte",
     description:
-      "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells aus dem neuesten Messlauf, plus freigegebene Beispielantworten.",
+      "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells über alle aktuellen Fragen, plus freigegebene Beispielantworten.",
     fields: {
       modelId: {
         label: "Modell",
@@ -366,7 +385,7 @@ export const translations: typeof enTranslations = {
       refusedPct: { label: "Verweigert %" },
       category: { label: "Kategorie" },
       hasData: { label: "Hat Daten" },
-      runFinishedAt: { label: "Lauf beendet" },
+      runFinishedAt: { label: "Zuletzt aktualisiert" },
       modelCount: { label: "Modelle" },
       questionCount: { label: "Fragen" },
       judgeModelId: { label: "Richter-Modell-ID" },

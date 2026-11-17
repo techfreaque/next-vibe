@@ -1,17 +1,19 @@
 /**
  * Refusal Index weekly cron task.
- * Starts (or resumes) a benchmark run through the same start endpoint admins
+ * Each week: the uncensored generator adds WEEKLY_NEW_QUESTIONS new
+ * questions, then every (question, model) pair without an answer is filled,
+ * including every pair of models added since the last run. Already answered
+ * pairs are never asked again. Runs through the same start endpoint admins
  * use. DEFAULT DISABLED in code on purpose: `enabled`, `schedule` and
  * `taskInput` are DB-owned (the task seed never overwrites them), so the
  * switch lives in the DB, per instance:
  *
  *   vibe cron-update --id=refusal-index-weekly --enabled=true \
- *     --taskInput='{"budgetCredits":4000,"dryRun":false,"wait":false}'
+ *     --taskInput='{"newQuestions":10,"budgetCredits":1000,"dryRun":false,"wait":false}'
  *
- * (prod: same command with `--hermes --remote`). The budget must cover a FULL
- * run: a run that hits its cap ends cancelled and is never published. Size it
- * with `vibe refusal-index-run --dryRun=true` (real spend ran ~1.5x the
- * estimate in testing).
+ * (prod: same command with `--hermes --thea`). A run that hits its cap stops
+ * cleanly; its answers count, the rest are filled next week. Size the cap
+ * with `vibe refusal-index-run --dryRun=true --newQuestions=10`.
  */
 
 import "server-only";
@@ -27,6 +29,7 @@ import {
   DEFAULT_BUDGET_CREDITS,
   REFUSAL_INDEX_CRON_ID,
   REFUSAL_INDEX_CRON_SCHEDULE,
+  WEEKLY_NEW_QUESTIONS,
 } from "./constants";
 import startDefinitions from "./runs/start/definition";
 import { tools as startTools } from "./runs/start/route";
@@ -40,12 +43,13 @@ const refusalIndexWeeklyTask = createCronTask(
     description: "start.cron.description" as const,
     schedule: REFUSAL_INDEX_CRON_SCHEDULE,
     category: TaskCategory.MAINTENANCE,
-    // Default OFF - an admin enables it once the question set exists.
+    // Default OFF - an admin enables it per instance (see above).
     enabled: false,
     priority: CronTaskPriority.LOW,
     timeout: TASK_TIMEOUTS.MEDIUM,
     historyInterval: HISTORY_INTERVALS.EVERY_RUN,
     taskInput: {
+      newQuestions: WEEKLY_NEW_QUESTIONS,
       budgetCredits: DEFAULT_BUDGET_CREDITS,
       dryRun: false,
       wait: false,

@@ -327850,7 +327850,7 @@
     "toolName": "refusal-index-leaderboard",
     "title": "Refusal Index Leaderboard",
     "titleShort": "Refusal Index",
-    "description": "How often each AI model answers, hedges or refuses - from the latest weekly benchmark run.",
+    "description": "How often each AI model answers, hedges or refuses. Updated weekly with new questions.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -327906,7 +327906,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Run finished",
+          "label": "Last updated",
           "schema": {
             "def": {
               "type": "nullable",
@@ -328443,7 +328443,7 @@
     "toolName": "vibe_agent_refusal-index_model_modelId_GET",
     "title": "Model Refusal Stats",
     "titleShort": "Model Stats",
-    "description": "One model's refusal, hedge and answer rates from the latest benchmark run, plus approved sample answers.",
+    "description": "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -328517,7 +328517,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Run finished",
+          "label": "Last updated",
           "schema": {
             "def": {
               "type": "nullable",
@@ -329071,6 +329071,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "questionFr": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "verdict": {
                 "type": "badge",
                 "label": "Verdict",
@@ -329291,6 +329311,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Question (Polish)",
+          "description": "Leave empty to clear the translation",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textFr": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Question (French)",
           "description": "Leave empty to clear the translation",
           "columns": 6,
           "schema": {
@@ -329759,6 +329803,46 @@
                 },
                 "schemaType": "primitive"
               },
+              "textFr": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "generatedBy": {
+                "type": "text",
+                "label": "Proposed by",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "active": {
                 "type": "badge",
                 "label": "Active",
@@ -329975,6 +330059,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Question (Polish)",
+          "description": "Display translation for public samples (optional)",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textFr": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Question (French)",
           "description": "Display translation for public samples (optional)",
           "columns": 6,
           "schema": {
@@ -330494,6 +330602,90 @@
             "questionCount": {
               "type": "text",
               "label": "Questions",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "pairCount": {
+              "type": "text",
+              "label": "Pairs to answer",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "questionsRequested": {
+              "type": "text",
+              "label": "New questions requested",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "questionsGenerated": {
+              "type": "text",
+              "label": "New questions added",
               "schema": {
                 "def": {
                   "type": "number",
@@ -331361,6 +331553,90 @@
                 },
                 "schemaType": "primitive"
               },
+              "pairCount": {
+                "type": "text",
+                "label": "Pairs to answer",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionsRequested": {
+                "type": "text",
+                "label": "New questions requested",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionsGenerated": {
+                "type": "text",
+                "label": "New questions added",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "resultCount": {
                 "type": "text",
                 "label": "Results",
@@ -331603,7 +331879,7 @@
     "toolName": "refusal-index-run",
     "title": "Start Refusal Index Run",
     "titleShort": "Start Run",
-    "description": "Send the active question set to the benchmarked models, judge every answer, publish the results. Budget-capped and resumable.",
+    "description": "Add new questions from an uncensored generator, then ask every model each question it has not answered yet and judge the answer. Answers are kept: nothing is asked twice. Budget-capped and resumable.",
     "fields": {
       "type": "container",
       "layoutType": "grid",
@@ -331659,6 +331935,52 @@
           },
           "schemaType": "primitive"
         },
+        "newQuestions": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "New questions",
+          "description": "Questions the uncensored generator adds before the fill (0-30)",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": [
+                        {
+                          "def": {
+                            "type": "number",
+                            "check": "number_format",
+                            "abort": false,
+                            "format": "safeint"
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        {},
+                        {}
+                      ]
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": 0
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "budgetCredits": {
           "type": "form_field",
           "fieldType": "number",
@@ -331683,7 +332005,7 @@
                 },
                 "type": "optional"
               },
-              "defaultValue": 200
+              "defaultValue": 1000
             },
             "type": "default"
           },
@@ -331985,6 +332307,34 @@
         "questionCount": {
           "type": "text",
           "label": "Questions",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "newQuestionCount": {
+          "type": "text",
+          "label": "New questions",
           "schema": {
             "def": {
               "type": "number",

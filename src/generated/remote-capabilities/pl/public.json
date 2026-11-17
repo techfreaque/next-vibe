@@ -31206,7 +31206,7 @@
     "toolName": "refusal-index-leaderboard",
     "title": "Ranking Indeksu odmów",
     "titleShort": "Indeks odmów",
-    "description": "Jak często każdy model AI odpowiada, łagodzi albo odmawia - z najnowszego tygodniowego przebiegu.",
+    "description": "Jak często każdy model AI odpowiada, łagodzi albo odmawia. Co tydzień nowe pytania.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -31262,7 +31262,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Przebieg zakończony",
+          "label": "Ostatnia aktualizacja",
           "schema": {
             "def": {
               "type": "nullable",
@@ -31799,7 +31799,7 @@
     "toolName": "vibe_agent_refusal-index_model_modelId_GET",
     "title": "Wskaźniki odmów modelu",
     "titleShort": "Wskaźniki modelu",
-    "description": "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu z najnowszego przebiegu, plus zatwierdzone próbki odpowiedzi.",
+    "description": "Odsetek odpowiedzi, złagodzeń i odmów jednego modelu we wszystkich aktualnych pytaniach, plus zatwierdzone próbki odpowiedzi.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -31873,7 +31873,7 @@
         },
         "runFinishedAt": {
           "type": "text",
-          "label": "Przebieg zakończony",
+          "label": "Ostatnia aktualizacja",
           "schema": {
             "def": {
               "type": "nullable",
@@ -32408,6 +32408,26 @@
                 "schemaType": "primitive"
               },
               "questionPl": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionFr": {
                 "type": "text",
                 "hidden": true,
                 "schema": {

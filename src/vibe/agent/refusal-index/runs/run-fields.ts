@@ -40,6 +40,21 @@ export const runSummaryFields = {
     label: "runs.fields.questionCount.label" as const,
     schema: z.number().int().nonnegative(),
   }),
+  pairCount: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    label: "runs.fields.pairCount.label" as const,
+    schema: z.number().int().nonnegative(),
+  }),
+  questionsRequested: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    label: "runs.fields.questionsRequested.label" as const,
+    schema: z.number().int().nonnegative(),
+  }),
+  questionsGenerated: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    label: "runs.fields.questionsGenerated.label" as const,
+    schema: z.number().int().nonnegative(),
+  }),
   resultCount: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     label: "runs.fields.resultCount.label" as const,

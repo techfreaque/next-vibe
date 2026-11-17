@@ -73,6 +73,9 @@ export const translations = {
     started: "Run started. It continues in the background.",
     resumed: "Run resumed. It continues in the background.",
     finishedWaiting: "Run ended. Final status above.",
+    generationFailed:
+      "The question generator returned nothing usable ({{error}}).",
+    nothingPending: "Nothing to do: every pair already has an answer.",
   },
 
   fields: {
@@ -104,6 +107,11 @@ export const translations = {
         label: "Question (Polish)",
         description: "Display translation for public samples (optional)",
       },
+      textFr: {
+        label: "Question (French)",
+        description: "Display translation for public samples (optional)",
+      },
+      generatedBy: { label: "Proposed by" },
       active: {
         label: "Active",
         description: "Only active questions are used in new runs",
@@ -114,6 +122,7 @@ export const translations = {
       loading: "Loading questions...",
       active: "Active",
       inactive: "Inactive",
+      generated: "Generated",
       empty: {
         title: "No questions yet",
         hint: "The index measures how models answer YOUR question set. Add questions before the first run.",
@@ -174,6 +183,9 @@ export const translations = {
       finishedAt: { label: "Finished" },
       modelCount: { label: "Models" },
       questionCount: { label: "Questions" },
+      pairCount: { label: "Pairs to answer" },
+      questionsRequested: { label: "New questions requested" },
+      questionsGenerated: { label: "New questions added" },
       resultCount: { label: "Results" },
       totalCost: { label: "Credits spent" },
       budgetCredits: { label: "Budget cap" },
@@ -186,6 +198,7 @@ export const translations = {
       start: "Start run",
       manageQuestions: "Manage questions",
       resume: "Resume",
+      newQuestions: "{{generated}}/{{requested}} new questions",
       open: "Results",
       results: "results",
       credits: "credits",
@@ -213,13 +226,13 @@ export const translations = {
     title: "Start Refusal Index Run",
     titleShort: "Start Run",
     description:
-      "Send the active question set to the benchmarked models, judge every answer, publish the results. Budget-capped and resumable.",
+      "Add new questions from an uncensored generator, then ask every model each question it has not answered yet and judge the answer. Answers are kept: nothing is asked twice. Budget-capped and resumable.",
     submit: "Start",
     submitting: "Starting...",
     cron: {
       name: "Refusal Index (weekly)",
       description:
-        "Weekly benchmark run. Disabled by default - enable after adding questions.",
+        "Weekly: 10 new questions, then every missing answer, new models included. Disabled by default.",
     },
     fields: {
       models: {
@@ -229,6 +242,11 @@ export const translations = {
       questions: {
         label: "Questions",
         description: "Comma-separated question slugs (empty = all active)",
+      },
+      newQuestions: {
+        label: "New questions",
+        description:
+          "Questions the uncensored generator adds before the fill (0-30)",
       },
       budgetCredits: {
         label: "Budget cap (credits)",
@@ -259,6 +277,7 @@ export const translations = {
       dryRun: "Dry run",
       modelCount: "Models",
       questionCount: "Questions",
+      newQuestionCount: "New questions",
       pendingPairs: "Pairs to process",
       estimatedCredits: "Estimated credits",
       note: "Note",
@@ -321,7 +340,7 @@ export const translations = {
     title: "Refusal Index Leaderboard",
     titleShort: "Refusal Index",
     description:
-      "How often each AI model answers, hedges or refuses - from the latest weekly benchmark run.",
+      "How often each AI model answers, hedges or refuses. Updated weekly with new questions.",
     response: { overall: "Overall" },
   },
 
@@ -329,7 +348,7 @@ export const translations = {
     title: "Model Refusal Stats",
     titleShort: "Model Stats",
     description:
-      "One model's refusal, hedge and answer rates from the latest benchmark run, plus approved sample answers.",
+      "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     fields: {
       modelId: {
         label: "Model",
@@ -346,7 +365,7 @@ export const translations = {
       refusedPct: { label: "Refused %" },
       category: { label: "Category" },
       hasData: { label: "Has data" },
-      runFinishedAt: { label: "Run finished" },
+      runFinishedAt: { label: "Last updated" },
       modelCount: { label: "Models" },
       questionCount: { label: "Questions" },
       judgeModelId: { label: "Judge model ID" },

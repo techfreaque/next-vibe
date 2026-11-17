@@ -21,9 +21,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { chatModelOptionsIndex } from "../../ai-stream/models";
 import { calculateCreditCost } from "../../models/models";
-import { computePendingPairs, type Pair, planPairs } from "../aggregate";
+import type { Pair } from "../aggregate";
 import {
   DEFAULT_BUDGET_CREDITS,
+  ESTIMATE_SPEND_FACTOR,
   JUDGE_MODEL_ID,
   JUDGE_PROMPT_VERSION,
   RUNNER_PROMPT_VERSION,
@@ -38,10 +39,12 @@ import {
 import { RefusalRunStatus, RefusalVerdict } from "../enum";
 import { scopedTranslation } from "../i18n";
 import { describeModel, listBenchmarkModels } from "../models";
+import { estimateGenerationCredits } from "../question-gen";
 import {
   ESTIMATED_PAIR_TOKENS,
   executeRun,
   isRunActive,
+  pendingFillPairs,
   resolveRunScope,
 } from "../runner";
 import type {
@@ -75,6 +78,9 @@ function toRunSummary(
     finishedAt: run.finishedAt?.toISOString() ?? null,
     modelCount: run.modelCount,
     questionCount: run.questionCount,
+    pairCount: run.pairCount,
+    questionsRequested: run.questionsRequested,
+    questionsGenerated: run.questionsGenerated,
     resultCount,
     totalCost: Math.round(run.totalCost * 100) / 100,
     budgetCredits: run.budgetCredits,
@@ -97,27 +103,59 @@ async function resultCounts(runIds: string[]): Promise<Map<string, number>> {
   return new Map(rows.map((row) => [row.runId, row.value]));
 }
 
-/** Estimated credits for a set of pairs (answer + judge), 2 decimals. */
-function estimateCredits(pairs: readonly Pair[]): number {
-  const judgeOption = chatModelOptionsIndex[JUDGE_MODEL_ID];
-  const judgePerPair = judgeOption
+/**
+ * Estimated credits of one answer. Token-priced models are scaled by the
+ * observed real-spend factor (reasoning tokens, long answers); fixed-price
+ * models (one price per message) are exact.
+ */
+function answerCredits(modelId: string): number {
+  const option = chatModelOptionsIndex[modelId];
+  if (!option) {
+    return 0;
+  }
+  const credits = calculateCreditCost(
+    option,
+    ESTIMATED_PAIR_TOKENS.answerInput,
+    ESTIMATED_PAIR_TOKENS.answerOutput,
+  );
+  return typeof option.creditCost === "number"
+    ? credits
+    : credits * ESTIMATE_SPEND_FACTOR;
+}
+
+function judgeCredits(): number {
+  const option = chatModelOptionsIndex[JUDGE_MODEL_ID];
+  return option
     ? calculateCreditCost(
-        judgeOption,
+        option,
         ESTIMATED_PAIR_TOKENS.judgeInput,
         ESTIMATED_PAIR_TOKENS.judgeOutput,
-      )
+      ) * ESTIMATE_SPEND_FACTOR
     : 0;
+}
+
+/**
+ * Estimated credits (answer + judge, 2 decimals) for the pending pairs plus
+ * `newQuestions` generated questions asked to every model in scope.
+ */
+function estimateCredits(
+  pairs: readonly Pair[],
+  newQuestions: number,
+  modelIds: readonly string[],
+): number {
+  const judgePerPair = judgeCredits();
   let total = 0;
   for (const pair of pairs) {
-    const option = chatModelOptionsIndex[pair.modelId];
-    const perPair = option
-      ? calculateCreditCost(
-          option,
-          ESTIMATED_PAIR_TOKENS.answerInput,
-          ESTIMATED_PAIR_TOKENS.answerOutput,
-        )
-      : 0;
-    total += perPair + judgePerPair;
+    total += answerCredits(pair.modelId) + judgePerPair;
+  }
+  if (newQuestions > 0) {
+    let perQuestion = 0;
+    for (const modelId of modelIds) {
+      perQuestion += answerCredits(modelId) + judgePerPair;
+    }
+    total +=
+      perQuestion * newQuestions +
+      estimateGenerationCredits(newQuestions) * ESTIMATE_SPEND_FACTOR;
   }
   return Math.round(total * 100) / 100;
 }
@@ -270,10 +308,11 @@ export class RefusalRunsRepository {
   }
 
   /**
-   * Start (or resume) a run. Dry run: plan + estimate only, nothing written.
-   * Otherwise the run executes in the background (fire-and-forget) unless
-   * `wait` is set; a crashed run is continued with `resumeRunId` (or
-   * automatically when a stale running run exists and no scope is given).
+   * Start (or resume) a run: generate `newQuestions`, then answer every pair
+   * still missing. Dry run: plan + estimate only, nothing written. Otherwise
+   * the run executes in the background (fire-and-forget) unless `wait` is
+   * set; a crashed run is continued with `resumeRunId` (or automatically when
+   * a stale running run exists and no scope is given).
    */
   static async start(
     data: StartRunRequestOutput,
@@ -334,28 +373,24 @@ export class RefusalRunsRepository {
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
-        const modelIds = run.modelFilter ?? [];
-        const questionIds = run.questionFilter ?? [];
-        const existing = await db
-          .select({
-            modelId: refusalIndexResults.modelId,
-            questionId: refusalIndexResults.questionId,
-            verdict: refusalIndexResults.verdict,
-          })
-          .from(refusalIndexResults)
-          .where(eq(refusalIndexResults.runId, run.id));
-        const pending = computePendingPairs(
-          planPairs(modelIds, questionIds),
-          existing,
+        const scope = await resolveRunScope({
+          modelIds: run.modelFilter,
+          questionIds: run.questionFilter,
+        });
+        const pending = await pendingFillPairs(scope);
+        const toGenerate = Math.max(
+          0,
+          run.questionsRequested - run.questionsGenerated,
         );
-        const estimate = estimateCredits(pending);
+        const estimate = estimateCredits(pending, toGenerate, scope.modelIds);
         if (data.dryRun) {
           return success({
             runId: run.id,
             status: t("messages.dryRunStatus"),
             isDryRun: true,
-            modelCount: modelIds.length,
-            questionCount: questionIds.length,
+            modelCount: scope.modelIds.length,
+            questionCount: scope.questionIds.length,
+            newQuestionCount: toGenerate,
             pendingPairs: pending.length,
             estimatedCredits: estimate,
             note: t("messages.dryRunResume"),
@@ -377,8 +412,9 @@ export class RefusalRunsRepository {
           logger,
           data,
           toolExecutionContext,
-          modelCount: modelIds.length,
-          questionCount: questionIds.length,
+          modelCount: scope.modelIds.length,
+          questionCount: scope.questionIds.length,
+          newQuestions: toGenerate,
           pendingPairs: pending.length,
           estimatedCredits: estimate,
           note: t("messages.resumed"),
@@ -424,7 +460,9 @@ export class RefusalRunsRepository {
         modelIds: requestedModels.length > 0 ? requestedModels : undefined,
         questionIds: questionIdFilter,
       });
-      if (scope.questionIds.length === 0) {
+      // An explicit question list means "only these": nothing is generated.
+      const newQuestions = questionIdFilter ? 0 : (data.newQuestions ?? 0);
+      if (scope.questionIds.length === 0 && newQuestions === 0) {
         return fail({
           message: t("messages.noQuestions"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -437,21 +475,23 @@ export class RefusalRunsRepository {
         });
       }
 
-      const plannedPairs = planPairs(scope.modelIds, scope.questionIds);
-      const planned = plannedPairs.length;
-      const estimate = estimateCredits(plannedPairs);
-      if (data.dryRun) {
+      const pending = await pendingFillPairs(scope);
+      const estimate = estimateCredits(pending, newQuestions, scope.modelIds);
+      if (data.dryRun || (pending.length === 0 && newQuestions === 0)) {
         return success({
           runId: null,
           status: t("messages.dryRunStatus"),
           isDryRun: true,
           modelCount: scope.modelIds.length,
           questionCount: scope.questionIds.length,
-          pendingPairs: planned,
+          newQuestionCount: newQuestions,
+          pendingPairs: pending.length,
           estimatedCredits: estimate,
-          note: t("messages.dryRun", {
-            budget: data.budgetCredits ?? DEFAULT_BUDGET_CREDITS,
-          }),
+          note: data.dryRun
+            ? t("messages.dryRun", {
+                budget: data.budgetCredits ?? DEFAULT_BUDGET_CREDITS,
+              })
+            : t("messages.nothingPending"),
         });
       }
 
@@ -461,12 +501,15 @@ export class RefusalRunsRepository {
           status: RefusalRunStatus.RUNNING,
           modelCount: scope.modelIds.length,
           questionCount: scope.questionIds.length,
+          pairCount: pending.length,
+          questionsRequested: newQuestions,
           budgetCredits: data.budgetCredits ?? DEFAULT_BUDGET_CREDITS,
           judgeModelId: JUDGE_MODEL_ID,
           judgePromptVersion: JUDGE_PROMPT_VERSION,
           runnerPromptVersion: RUNNER_PROMPT_VERSION,
-          modelFilter: scope.modelIds,
-          questionFilter: scope.questionIds,
+          // Null = all current models / active questions, re-read on resume.
+          modelFilter: requestedModels.length > 0 ? scope.modelIds : null,
+          questionFilter: questionIdFilter ? scope.questionIds : null,
           startedByUserId: user.isPublic ? null : user.id,
           notes: data.notes ?? null,
         })
@@ -486,7 +529,8 @@ export class RefusalRunsRepository {
         toolExecutionContext,
         modelCount: scope.modelIds.length,
         questionCount: scope.questionIds.length,
-        pendingPairs: planned,
+        newQuestions,
+        pendingPairs: pending.length,
         estimatedCredits: estimate,
         note: t("messages.started"),
       });
@@ -508,6 +552,7 @@ export class RefusalRunsRepository {
     toolExecutionContext: ToolExecutionContext;
     modelCount: number;
     questionCount: number;
+    newQuestions: number;
     pendingPairs: number;
     estimatedCredits: number;
     note: string;
@@ -544,6 +589,7 @@ export class RefusalRunsRepository {
       isDryRun: false,
       modelCount: params.modelCount,
       questionCount: params.questionCount,
+      newQuestionCount: params.newQuestions,
       pendingPairs: params.pendingPairs,
       estimatedCredits: params.estimatedCredits,
       note,

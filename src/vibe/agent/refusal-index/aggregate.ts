@@ -1,6 +1,7 @@
 /**
  * Refusal Index - pure logic (no DB, no AI): verdict aggregation, trend,
- * pair planning / resume, budget cap and the bounded-concurrency executor.
+ * pair planning / fill, budget cap, the bounded-concurrency executor and the
+ * question generator's parsing, de-duplication, slugs and category quotas.
  * Everything here is unit tested.
  */
 
@@ -149,21 +150,61 @@ export function planPairs(
   return pairs;
 }
 
+export interface ExistingAnswer extends Pair {
+  verdict: typeof RefusalVerdictValue;
+  /** Version fingerprint stored with the answer ("" = recorded before versions existed). */
+  modelVersion: string;
+}
+
+export interface FillPair extends Pair {
+  /** The current answer came from an older model version: mark it stale on success. */
+  supersede: boolean;
+}
+
 /**
- * Resume logic: which pairs still need work. A pair is done when it has a
- * non-error result; errored pairs are retried.
+ * Fill logic: which pairs still need an answer. Answers are permanent, so a
+ * pair is asked once: never again while its current answer is a real verdict
+ * from the same model version. Pending are pairs with no answer, an error
+ * (retried in place) or an answer from an older model version (superseded).
+ * An empty stored version is a pre-versioning answer and counts as current.
  */
-export function computePendingPairs(
+export function computeFillPairs(
   planned: readonly Pair[],
-  existing: readonly (Pair & { verdict: typeof RefusalVerdictValue })[],
-): Pair[] {
-  const done = new Set<string>();
+  existing: readonly ExistingAnswer[],
+  versionOf: (modelId: string) => string,
+): FillPair[] {
+  const current = new Map<string, ExistingAnswer>();
   for (const row of existing) {
-    if (row.verdict !== RefusalVerdict.ERROR) {
-      done.add(pairKey(row));
+    current.set(pairKey(row), row);
+  }
+  const pending: FillPair[] = [];
+  for (const pair of planned) {
+    const row = current.get(pairKey(pair));
+    if (row === undefined || row.verdict === RefusalVerdict.ERROR) {
+      pending.push({ ...pair, supersede: false });
+      continue;
+    }
+    const version = versionOf(pair.modelId);
+    if (
+      row.modelVersion !== "" &&
+      version !== "" &&
+      row.modelVersion !== version
+    ) {
+      pending.push({ ...pair, supersede: true });
     }
   }
-  return planned.filter((pair) => !done.has(pairKey(pair)));
+  return pending;
+}
+
+/** Was this answer row the current one at instant `at`? (trend baseline) */
+export function wasCurrentAt(
+  row: { createdAt: Date; staleAt: Date | null },
+  at: Date,
+): boolean {
+  return (
+    row.createdAt.getTime() < at.getTime() &&
+    (row.staleAt === null || row.staleAt.getTime() >= at.getTime())
+  );
 }
 
 // ── Budget cap ─────────────────────────────────────────────────────────────
@@ -210,11 +251,11 @@ export interface ExecuteOutcome {
  * pair starts, `shouldStop` is consulted; once it returns true no new pair
  * starts and in-flight workers finish (clean abort - nothing is half written).
  */
-export async function executePairs(params: {
-  pairs: readonly Pair[];
+export async function executePairs<TPair extends Pair>(params: {
+  pairs: readonly TPair[];
   concurrency: number;
   shouldStop: () => boolean;
-  worker: (pair: Pair) => Promise<void>;
+  worker: (pair: TPair) => Promise<void>;
 }): Promise<ExecuteOutcome> {
   const { pairs, shouldStop, worker } = params;
   const limit = Math.max(1, Math.min(params.concurrency, pairs.length || 1));
@@ -282,4 +323,237 @@ export function parseJudgeReply(raw: string): JudgeReply | null {
   const reason = (parsed.data.reason ?? "").trim().slice(0, 300);
   const verdict = JUDGE_WORDS.get(normalized);
   return verdict === undefined ? null : { verdict, reason };
+}
+
+// ── Question generation: parsing, de-duplication, slugs, quotas ───────────
+
+const generatedQuestionSchema = z.object({
+  category: z.string(),
+  en: z.string(),
+  de: z.string(),
+  pl: z.string(),
+  fr: z.string(),
+});
+
+export interface GeneratedQuestion {
+  category: string;
+  en: string;
+  de: string;
+  pl: string;
+  fr: string;
+}
+
+/** Em dashes are banned in user-facing copy: rewrite as a comma pause. */
+function cleanText(text: string): string {
+  return text
+    .replaceAll(/\s*[\u2014\u2013]\s*/g, ", ")
+    .replaceAll(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Extract the generator's question list from a raw reply (tolerates code
+ * fences, prose and a {"questions": [...]} wrapper). Entries with an unknown
+ * category or a missing translation are dropped.
+ */
+export function parseGeneratorReply(
+  raw: string,
+  categories: readonly string[],
+): GeneratedQuestion[] {
+  const start = raw.indexOf("[");
+  const end = raw.lastIndexOf("]");
+  if (start === -1 || end <= start) {
+    return [];
+  }
+  let json: ReturnType<typeof JSON.parse>;
+  try {
+    json = JSON.parse(raw.slice(start, end + 1));
+  } catch {
+    return [];
+  }
+  const list = z.array(z.unknown()).safeParse(json);
+  if (!list.success) {
+    return [];
+  }
+  const known = new Set(categories);
+  const result: GeneratedQuestion[] = [];
+  for (const entry of list.data) {
+    const parsed = generatedQuestionSchema.safeParse(entry);
+    if (!parsed.success) {
+      continue;
+    }
+    const category = parsed.data.category.trim().toLowerCase();
+    const question = {
+      category,
+      en: cleanText(parsed.data.en),
+      de: cleanText(parsed.data.de),
+      pl: cleanText(parsed.data.pl),
+      fr: cleanText(parsed.data.fr),
+    };
+    if (
+      !known.has(category) ||
+      question.en.length < 10 ||
+      question.en.length > 400 ||
+      question.de === "" ||
+      question.pl === "" ||
+      question.fr === ""
+    ) {
+      continue;
+    }
+    result.push(question);
+  }
+  return result;
+}
+
+const STOP_WORDS = new Set([
+  "a",
+  "about",
+  "an",
+  "and",
+  "any",
+  "are",
+  "as",
+  "at",
+  "be",
+  "by",
+  "can",
+  "do",
+  "does",
+  "for",
+  "from",
+  "how",
+  "i",
+  "if",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "should",
+  "that",
+  "the",
+  "their",
+  "them",
+  "there",
+  "they",
+  "this",
+  "to",
+  "was",
+  "what",
+  "when",
+  "which",
+  "who",
+  "why",
+  "with",
+  "would",
+  "you",
+  "your",
+]);
+
+/** Lower-cased content words of a question (stop words dropped). */
+export function questionWords(text: string): Set<string> {
+  const words = text
+    .toLowerCase()
+    .replaceAll(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 1 && !STOP_WORDS.has(word));
+  return new Set(words);
+}
+
+/** Jaccard overlap of two word sets (0..1). */
+export function wordSimilarity(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 || b.size === 0) {
+    return 0;
+  }
+  let shared = 0;
+  for (const word of a) {
+    if (b.has(word)) {
+      shared += 1;
+    }
+  }
+  return shared / (a.size + b.size - shared);
+}
+
+/**
+ * Drop proposals that repeat an existing question (or an earlier proposal in
+ * the same batch). Keeps at most `limit`.
+ */
+export function dedupeQuestions(
+  proposed: readonly GeneratedQuestion[],
+  existingTexts: readonly string[],
+  threshold: number,
+  limit: number,
+): GeneratedQuestion[] {
+  const seen = existingTexts.map((text) => questionWords(text));
+  const kept: GeneratedQuestion[] = [];
+  for (const question of proposed) {
+    if (kept.length >= limit) {
+      break;
+    }
+    const words = questionWords(question.en);
+    if (seen.some((other) => wordSimilarity(words, other) >= threshold)) {
+      continue;
+    }
+    seen.push(words);
+    kept.push(question);
+  }
+  return kept;
+}
+
+/** Stable, unique slug: category + first content words of the English text. */
+export function makeQuestionSlug(
+  category: string,
+  textEn: string,
+  taken: Set<string>,
+): string {
+  const words = textEn
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 1 && !STOP_WORDS.has(word))
+    .slice(0, 5);
+  const base = [category, ...words].join("-").slice(0, 70).replace(/-+$/, "");
+  let slug = base;
+  let suffix = 2;
+  while (taken.has(slug)) {
+    slug = `${base}-${String(suffix)}`;
+    suffix += 1;
+  }
+  taken.add(slug);
+  return slug;
+}
+
+/**
+ * Spread `total` new questions over the categories, filling the thinnest
+ * categories first (ties in list order). Returns category -> count (>0 only).
+ */
+export function categoryQuotas(
+  categories: readonly string[],
+  activeCounts: ReadonlyMap<string, number>,
+  total: number,
+): Map<string, number> {
+  const load = new Map(
+    categories.map((category) => [category, activeCounts.get(category) ?? 0]),
+  );
+  const quotas = new Map<string, number>();
+  for (let index = 0; index < total; index += 1) {
+    let pick: string | undefined;
+    for (const category of categories) {
+      if (
+        pick === undefined ||
+        (load.get(category) ?? 0) < (load.get(pick) ?? 0)
+      ) {
+        pick = category;
+      }
+    }
+    if (pick === undefined) {
+      break;
+    }
+    load.set(pick, (load.get(pick) ?? 0) + 1);
+    quotas.set(pick, (quotas.get(pick) ?? 0) + 1);
+  }
+  return quotas;
 }

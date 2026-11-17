@@ -49,6 +49,20 @@ export function listBenchmarkModels(): BenchmarkModel[] {
   return models;
 }
 
+/**
+ * Version fingerprint of a model: display name + primary provider model.
+ * A change means the answers on file came from a different model, so they are
+ * marked stale and the pair is asked again. Unknown ids get "".
+ */
+export function modelVersionOf(modelId: string): string {
+  const id = Object.values(ChatModelId).find((value) => value === modelId);
+  if (id === undefined) {
+    return "";
+  }
+  const def = chatModelDefinitions[id];
+  return `${def.name}|${def.providers[0]?.providerModel ?? ""}`;
+}
+
 /** Model display facts for any id (including since-retired ones in old runs). */
 export function describeModel(modelId: string): {
   name: string;

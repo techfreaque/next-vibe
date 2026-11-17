@@ -3,7 +3,8 @@
  * GET  /agent/refusal-index/questions - list the admin-curated question set
  * POST /agent/refusal-index/questions - add a question
  *
- * The question set is DATA: nothing is seeded, an admin adds every question.
+ * The question set is DATA: a curated set is seeded once, runs add generated
+ * questions, admins edit, add and deactivate.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -65,6 +66,16 @@ const questionRowSchemaFields = {
   textPl: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     hidden: true,
+    schema: z.string().nullable(),
+  }),
+  textFr: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    hidden: true,
+    schema: z.string().nullable(),
+  }),
+  generatedBy: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    label: "questions.fields.generatedBy.label" as const,
     schema: z.string().nullable(),
   }),
   active: responseField(scopedTranslation, {
@@ -252,6 +263,14 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXTAREA,
         label: "questions.fields.textPl.label" as const,
         description: "questions.fields.textPl.description" as const,
+        columns: 6,
+        schema: z.string().max(4000).optional(),
+      }),
+      textFr: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "questions.fields.textFr.label" as const,
+        description: "questions.fields.textFr.description" as const,
         columns: 6,
         schema: z.string().max(4000).optional(),
       }),

@@ -1,7 +1,8 @@
 /**
  * Refusal Index - Start Run API Definition
- * POST /agent/refusal-index/runs/start - start (or resume) a benchmark run now.
- * The weekly cron task calls this same endpoint.
+ * POST /agent/refusal-index/runs/start - generate new questions and answer
+ * every missing (question, model) pair now. The weekly cron task calls this
+ * same endpoint.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -23,7 +24,9 @@ import { z } from "zod";
 
 import {
   DEFAULT_BUDGET_CREDITS,
+  MAX_NEW_QUESTIONS_PER_RUN,
   REFUSAL_INDEX_RUN_ALIAS,
+  WEEKLY_NEW_QUESTIONS,
 } from "../../constants";
 import { REFUSAL_ERROR_TYPES, REFUSAL_SUCCESS_TYPES } from "../../error-types";
 import { scopedTranslation } from "../../i18n";
@@ -65,6 +68,20 @@ const { POST } = createEndpoint({
         description: "start.fields.questions.description" as const,
         columns: 6,
         schema: z.string().optional(),
+      }),
+      newQuestions: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "start.fields.newQuestions.label" as const,
+        description: "start.fields.newQuestions.description" as const,
+        columns: 4,
+        schema: z.coerce
+          .number()
+          .int()
+          .min(0)
+          .max(MAX_NEW_QUESTIONS_PER_RUN)
+          .optional()
+          .default(0),
       }),
       budgetCredits: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -144,6 +161,11 @@ const { POST } = createEndpoint({
         label: "start.response.questionCount" as const,
         schema: z.number().int().nonnegative(),
       }),
+      newQuestionCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "start.response.newQuestionCount" as const,
+        schema: z.number().int().nonnegative(),
+      }),
       pendingPairs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "start.response.pendingPairs" as const,
@@ -183,6 +205,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         dryRun: true,
+        newQuestions: WEEKLY_NEW_QUESTIONS,
         budgetCredits: DEFAULT_BUDGET_CREDITS,
         wait: false,
       },
@@ -194,6 +217,7 @@ const { POST } = createEndpoint({
         isDryRun: true,
         modelCount: 0,
         questionCount: 0,
+        newQuestionCount: 0,
         pendingPairs: 0,
         estimatedCredits: 0,
         note: "",

@@ -82,6 +82,9 @@ export const translations: typeof enTranslations = {
     started: "Run lancé. Il continue en arrière-plan.",
     resumed: "Run repris. Il continue en arrière-plan.",
     finishedWaiting: "Run terminé. Statut final ci-dessus.",
+    generationFailed:
+      "Le générateur de questions n'a rien renvoyé d'exploitable ({{error}}).",
+    nothingPending: "Rien à faire : chaque paire a déjà une réponse.",
   },
 
   fields: {
@@ -119,6 +122,12 @@ export const translations: typeof enTranslations = {
         description:
           "Traduction affichée dans les exemples publics (facultatif)",
       },
+      textFr: {
+        label: "Question (français)",
+        description:
+          "Traduction affichée dans les exemples publics (facultatif)",
+      },
+      generatedBy: { label: "Proposée par" },
       active: {
         label: "Active",
         description:
@@ -130,6 +139,7 @@ export const translations: typeof enTranslations = {
       loading: "Chargement des questions...",
       active: "Active",
       inactive: "Inactive",
+      generated: "Générée",
       empty: {
         title: "Aucune question pour l'instant",
         hint: "L'indice mesure comment les modèles répondent à VOTRE jeu de questions. Ajoutez des questions avant le premier run.",
@@ -190,6 +200,9 @@ export const translations: typeof enTranslations = {
       finishedAt: { label: "Fin" },
       modelCount: { label: "Modèles" },
       questionCount: { label: "Questions" },
+      pairCount: { label: "Paires à traiter" },
+      questionsRequested: { label: "Nouvelles questions demandées" },
+      questionsGenerated: { label: "Nouvelles questions ajoutées" },
       resultCount: { label: "Résultats" },
       totalCost: { label: "Crédits dépensés" },
       budgetCredits: { label: "Plafond de budget" },
@@ -202,6 +215,7 @@ export const translations: typeof enTranslations = {
       start: "Lancer un run",
       manageQuestions: "Gérer les questions",
       resume: "Reprendre",
+      newQuestions: "{{generated}}/{{requested}} nouvelles questions",
       open: "Résultats",
       results: "résultats",
       credits: "crédits",
@@ -229,13 +243,13 @@ export const translations: typeof enTranslations = {
     title: "Lancer un run de l'indice de refus",
     titleShort: "Lancer un run",
     description:
-      "Envoie le jeu de questions actives aux modèles évalués, juge chaque réponse et publie les résultats. Budget plafonné, reprise possible.",
+      "Ajoute de nouvelles questions venues d'un générateur non censuré, puis pose à chaque modèle chaque question à laquelle il n'a pas encore répondu et juge la réponse. Les réponses sont conservées : rien n'est demandé deux fois. Budget plafonné, reprise possible.",
     submit: "Lancer",
     submitting: "Lancement...",
     cron: {
       name: "Indice de refus (hebdomadaire)",
       description:
-        "Run de benchmark hebdomadaire. Désactivé par défaut : activez-le après avoir ajouté des questions.",
+        "Chaque semaine : 10 nouvelles questions, puis chaque réponse manquante, nouveaux modèles compris. Désactivé par défaut.",
     },
     fields: {
       models: {
@@ -247,6 +261,11 @@ export const translations: typeof enTranslations = {
         label: "Questions",
         description:
           "Slugs de questions séparés par des virgules (vide = toutes les actives)",
+      },
+      newQuestions: {
+        label: "Nouvelles questions",
+        description:
+          "Questions que le générateur non censuré ajoute avant le remplissage (0-30)",
       },
       budgetCredits: {
         label: "Plafond de budget (crédits)",
@@ -277,6 +296,7 @@ export const translations: typeof enTranslations = {
       dryRun: "Simulation",
       modelCount: "Modèles",
       questionCount: "Questions",
+      newQuestionCount: "Nouvelles questions",
       pendingPairs: "Paires à traiter",
       estimatedCredits: "Crédits estimés",
       note: "Note",
@@ -343,7 +363,7 @@ export const translations: typeof enTranslations = {
     title: "Classement de l'indice de refus",
     titleShort: "Indice de refus",
     description:
-      "À quelle fréquence chaque modèle d'IA répond, esquive ou refuse, d'après le dernier run de benchmark hebdomadaire.",
+      "À quelle fréquence chaque modèle d'IA répond, esquive ou refuse. De nouvelles questions chaque semaine.",
     response: { overall: "Global" },
   },
 
@@ -351,7 +371,7 @@ export const translations: typeof enTranslations = {
     title: "Statistiques de refus du modèle",
     titleShort: "Stats du modèle",
     description:
-      "Les taux de refus, d'esquive et de réponse d'un modèle lors du dernier run de benchmark, plus des exemples de réponses approuvés.",
+      "Les taux de refus, d'esquive et de réponse d'un modèle sur toutes les questions actuelles, plus des exemples de réponses approuvés.",
     fields: {
       modelId: {
         label: "Modèle",
@@ -368,7 +388,7 @@ export const translations: typeof enTranslations = {
       refusedPct: { label: "Refuse %" },
       category: { label: "Catégorie" },
       hasData: { label: "Données disponibles" },
-      runFinishedAt: { label: "Fin du run" },
+      runFinishedAt: { label: "Dernière mise à jour" },
       modelCount: { label: "Modèles" },
       questionCount: { label: "Questions" },
       judgeModelId: { label: "ID du modèle juge" },

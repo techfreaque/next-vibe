@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Indeks odmów: które modele AI odpowiadają, łagodzą albo odmawiają | {{appName}}",
     category: "Indeks odmów",
     description:
-      "Te same pytania do każdego modelu AI, co tydzień. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia - i pokazujemy metodę. Otwarte dane na {{appName}}.",
+      "Te same pytania do każdego modelu AI, co tydzień nowe. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia, i pokazujemy metodę. Otwarte dane na {{appName}}.",
     imageAlt: "Indeks odmów - wskaźniki odmów modeli AI",
     keywords:
       "{{appName}}, indeks odmów, wskaźnik odmów AI, AI bez cenzury, benchmark cenzury AI, porównanie modeli",
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Indeks odmów",
     title: "Które AI naprawdę odpowiada?",
     subtitle:
-      "Te same pytania. Każdy model. Co tydzień. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia - i pokazujemy jak.",
+      "Te same pytania. Każdy model. Co tydzień nowe. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia. I pokazujemy jak.",
     ctaPrimary: "Zobacz ranking",
     ctaSecondary: "Przeglądaj modele",
   },
@@ -23,11 +23,11 @@ export const translations: typeof enTranslations = {
     models: "Zmierzone modele",
     questions: "Zadane pytania",
     refusal: "Średni odsetek odmów",
-    updated: "Ostatni przebieg",
+    updated: "Ostatnia aktualizacja",
   },
   empty: {
     title: "Pierwszy przebieg w drodze",
-    body: "Indeks nie ma jeszcze opublikowanego przebiegu. Pierwsze wyniki pojawią się po najbliższym przebiegu pomiarowym.",
+    body: "Brak opublikowanych wyników. Pierwsze odpowiedzi pojawią się po najbliższym przebiegu pomiarowym.",
   },
   leaderboard: {
     label: "Ranking",
@@ -59,30 +59,32 @@ export const translations: typeof enTranslations = {
       religion: "Religia",
       law: "Prawo",
       science: "Nauka",
+      fiction: "Fikcja",
+      satire: "Satyra",
     },
   },
   method: {
     label: "Metoda",
     title: "Jak mierzymy",
-    intro: "Bez sztuczek. Stałe pytania, neutralne ustawienia, jeden sędzia.",
+    intro: "Bez sztuczek. Te same pytania, neutralne ustawienia, jeden sędzia.",
     questions: {
-      title: "Stałe pytania",
-      body: "Te same prompty trafiają do każdego modelu bez zmian. Zestaw prowadzimy sami i stale rozszerzamy.",
+      title: "Rosnący zestaw pytań",
+      body: "Każdy model dostaje te same prompty, bez zmian. Zaczęliśmy od ręcznie dobranego zestawu. Co tydzień model bez cenzury proponuje 10 nowych tam, gdzie popularne AI lubi odmawiać: polityka, historia, zdrowie, narkotyki, seks, religia, nauka, kryminał, satyra. Tylko legalne pytania, powtórki odpadają.",
     },
     setup: {
       title: "Neutralne ustawienia",
-      body: "Jedna tura. Bez narzędzi, pamięci i skille. Jedyna instrukcja: odpowiadaj zwięźle.",
+      body: "Jedna tura. Bez narzędzi, pamięci i persony. Jedyna instrukcja: odpowiadaj zwięźle. Każdy model odpowiada na każde pytanie raz. Nowa wersja modelu jest pytana ponownie.",
     },
     judge: {
       title: "Jeden sędzia",
       body: "Stały model ({{judge}}, prompt {{version}}) ocenia każdą odpowiedź: odpowiedział, złagodził albo odmówił. Blokada filtra treści dostawcy liczy się jako odmowa.",
     },
     run: {
-      title: "Dane przebiegu",
-      body: "Przebieg z {{date}}: {{models}} modeli, {{questions}} pytań.",
+      title: "Aktualne dane",
+      body: "Stan na {{date}}: {{models}} modeli, {{questions}} pytań.",
     },
     caveat:
-      "Model-sędzia to nie absolutna prawda. Czytaj wyniki jako porównanie modeli w identycznych warunkach - nie jako wyrok o tym, co dobre, a co złe.",
+      "Model-sędzia to nie absolutna prawda. Czytaj wyniki jako porównanie modeli w identycznych warunkach, nie jako wyrok o tym, co dobre, a co złe.",
   },
   cta: {
     title: "Zobacz model z bliska",

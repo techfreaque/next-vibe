@@ -20862,7 +20862,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Bestenliste des Verweigerungs-Index",
     titleShort: "Verweigerungs-Index",
     description:
-      "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert - aus dem neuesten wöchentlichen Messlauf.",
+      "Wie oft jedes KI-Modell antwortet, abschwächt oder verweigert. Wöchentlich mit neuen Fragen aktualisiert.",
     icon: "trophy",
     category: "ai",
     subCategory: "Inference",
@@ -20900,7 +20900,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Verweigerungs-Werte eines Modells",
     titleShort: "Modell-Werte",
     description:
-      "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells aus dem neuesten Messlauf, plus freigegebene Beispielantworten.",
+      "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells über alle aktuellen Fragen, plus freigegebene Beispielantworten.",
     icon: "activity",
     category: "ai",
     subCategory: "Inference",
@@ -21049,6 +21049,9 @@ export const endpointsMeta: EndpointMeta[] = [
             finishedAt: "2026-11-01T04:00:00.000Z",
             modelCount: 0,
             questionCount: 0,
+            pairCount: 0,
+            questionsRequested: 0,
+            questionsGenerated: 0,
             resultCount: 0,
             totalCost: 0,
             budgetCredits: null,
@@ -21101,13 +21104,20 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Lauf des Verweigerungs-Index starten",
     titleShort: "Lauf starten",
     description:
-      "Das aktive Fragenset an die gemessenen Modelle senden, jede Antwort bewerten, die Ergebnisse veröffentlichen. Mit Budget-Limit und fortsetzbar.",
+      "Neue Fragen vom unzensierten Generator ergänzen, dann jedem Modell jede noch unbeantwortete Frage stellen und die Antwort bewerten. Antworten bleiben gespeichert: Nichts wird doppelt gefragt. Mit Budget-Limit und fortsetzbar.",
     icon: "play",
     category: "ai",
     subCategory: "Inference",
     tags: ["Verweigerungs-Index"],
     examples: {
-      inputs: { default: { dryRun: true, budgetCredits: 200, wait: false } },
+      inputs: {
+        default: {
+          dryRun: true,
+          newQuestions: 10,
+          budgetCredits: 1000,
+          wait: false,
+        },
+      },
       responses: {
         default: {
           runId: null,
@@ -21115,6 +21125,7 @@ export const endpointsMeta: EndpointMeta[] = [
           isDryRun: true,
           modelCount: 0,
           questionCount: 0,
+          newQuestionCount: 0,
           pendingPairs: 0,
           estimatedCredits: 0,
           note: "",

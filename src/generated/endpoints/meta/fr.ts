@@ -20954,7 +20954,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Classement de l'indice de refus",
     titleShort: "Indice de refus",
     description:
-      "À quelle fréquence chaque modèle d'IA répond, esquive ou refuse, d'après le dernier run de benchmark hebdomadaire.",
+      "À quelle fréquence chaque modèle d'IA répond, esquive ou refuse. De nouvelles questions chaque semaine.",
     icon: "trophy",
     category: "ai",
     subCategory: "Inference",
@@ -20992,7 +20992,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Statistiques de refus du modèle",
     titleShort: "Stats du modèle",
     description:
-      "Les taux de refus, d'esquive et de réponse d'un modèle lors du dernier run de benchmark, plus des exemples de réponses approuvés.",
+      "Les taux de refus, d'esquive et de réponse d'un modèle sur toutes les questions actuelles, plus des exemples de réponses approuvés.",
     icon: "activity",
     category: "ai",
     subCategory: "Inference",
@@ -21141,6 +21141,9 @@ export const endpointsMeta: EndpointMeta[] = [
             finishedAt: "2026-11-01T04:00:00.000Z",
             modelCount: 0,
             questionCount: 0,
+            pairCount: 0,
+            questionsRequested: 0,
+            questionsGenerated: 0,
             resultCount: 0,
             totalCost: 0,
             budgetCredits: null,
@@ -21193,13 +21196,20 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Lancer un run de l'indice de refus",
     titleShort: "Lancer un run",
     description:
-      "Envoie le jeu de questions actives aux modèles évalués, juge chaque réponse et publie les résultats. Budget plafonné, reprise possible.",
+      "Ajoute de nouvelles questions venues d'un générateur non censuré, puis pose à chaque modèle chaque question à laquelle il n'a pas encore répondu et juge la réponse. Les réponses sont conservées : rien n'est demandé deux fois. Budget plafonné, reprise possible.",
     icon: "play",
     category: "ai",
     subCategory: "Inference",
     tags: ["Indice de refus"],
     examples: {
-      inputs: { default: { dryRun: true, budgetCredits: 200, wait: false } },
+      inputs: {
+        default: {
+          dryRun: true,
+          newQuestions: 10,
+          budgetCredits: 1000,
+          wait: false,
+        },
+      },
       responses: {
         default: {
           runId: null,
@@ -21207,6 +21217,7 @@ export const endpointsMeta: EndpointMeta[] = [
           isDryRun: true,
           modelCount: 0,
           questionCount: 0,
+          newQuestionCount: 0,
           pendingPairs: 0,
           estimatedCredits: 0,
           note: "",
