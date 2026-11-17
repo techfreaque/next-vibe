@@ -227,7 +227,7 @@ export function TanstackPage({ locale }: PartnersPageData): JSX.Element {
           </FeatureCard>
           <FeatureCard icon={Sparkles} title={t("product.free.title")}>
             {t("product.free.body", {
-              packPrice: getApiAccessPrices(locale).packPrice,
+              subPrice: getApiAccessPrices(locale).subPrice,
             })}
           </FeatureCard>
         </FeatureGrid>

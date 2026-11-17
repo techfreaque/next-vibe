@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       "1 crédit = {{creditValue}}. Chaque page de modèle indique son prix par message.",
     api: "API : formats OpenAI chat completions, OpenAI Responses et Anthropic Messages sur une seule URL de base ({{apiBaseUrl}}). Elle nécessite un compte payant : n'importe quel abonnement ou un achat de crédits, par exemple le pack à {{packPrice}}. Les comptes gratuits reçoivent HTTP 402.",
     uncensored:
-      "Niveau non censuré : deux types de modèles. Les modèles abliterés sont des modèles grand public modifiés pour ne plus esquiver les questions. Les modèles véritablement non censurés sont entraînés sur d'autres données. Le niveau non censuré demande une confirmation unique de majorité (18+).",
+      "Niveau non censuré : deux types de modèles. Les modèles abliterés sont des modèles grand public modifiés pour ne plus esquiver les questions. Les modèles véritablement non censurés, comme UncensoredLM, sont entraînés sur des livres et des documents bannis de l'internet grand public, d'où des opinions politiques à contre-courant. Le niveau non censuré demande une confirmation unique de majorité (18+).",
     openSource:
       "Open source : le code de l'application est sous licence MIT, le cœur du framework next-vibe sous GPL-3.0. Code source : {{repoUrl}}",
     referral:

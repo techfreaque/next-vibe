@@ -116,7 +116,7 @@ export const translations = {
     intro: "Easy to pitch because it fixes what people complain about.",
     choice: {
       title: "Mainstream, open and uncensored models",
-      body: "The big-name models next to open and uncensored ones, in one chat. Uncensored comes in two kinds: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. Users switch whenever they want.",
+      body: "The big-name models next to open and uncensored ones, in one chat. Uncensored comes in two kinds: mainstream models with the refusals cut out, and UncensoredLM, trained on books and documents banned from the mainstream internet. Users switch whenever they want.",
     },
     control: {
       title: "They set the filter level",
@@ -124,7 +124,7 @@ export const translations = {
     },
     free: {
       title: "Free to start",
-      body: "New users try the chat without a card. Easy yes for your audience, easy conversion for you. Developers: the API needs any plan or a one-time {{packPrice}} credit pack.",
+      body: "New users try the chat without a card. Easy yes for your audience, easy conversion for you. Developers: the API needs any plan, from {{subPrice}} a month.",
     },
   },
   faq: {

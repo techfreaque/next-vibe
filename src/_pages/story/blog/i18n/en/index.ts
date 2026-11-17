@@ -14,6 +14,20 @@ export const translations = {
     },
   },
   posts: {
+    imageGenerators: {
+      title: "Uncensored AI image generators. Real prices, no blur.",
+      category: "Model Comparison",
+      excerpt:
+        "Which image models actually generate without a filter, every model side by side with its filter level and real price per image, and how to make or edit an image straight from a chat.",
+      readTime: "8 min read",
+    },
+    roleplayWithoutFilter: {
+      title: "AI roleplay without a filter. The story goes where you take it.",
+      category: "Guide",
+      excerpt:
+        "An honest Character.AI alternative. Which uncensored model holds a character, which remembers the whole campaign, how to set one up in two minutes and what a reply costs.",
+      readTime: "8 min read",
+    },
     musicVoice: {
       title: "AI music, voices and transcription. Which model for which job.",
       category: "Guide",
@@ -54,7 +68,7 @@ export const translations = {
       title: "The uncensored models, one by one.",
       category: "Model Guide",
       excerpt:
-        "Two kinds of uncensored: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT and more, with what each does well and where it falls short.",
+        "Two kinds of uncensored: mainstream models with the refusals cut out, and UncensoredLM, trained on banned books and documents. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT and more, with what each does well and where it falls short.",
       readTime: "7 min read",
     },
     modelRefresh: {

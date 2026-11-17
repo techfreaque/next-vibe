@@ -8,4 +8,9 @@ export const translations: typeof enTranslations = {
     imageAlt: "{{name}} AI-Skill auf {{appName}}",
     keywords: "AI-Skill, {{name}}, {{appName}}, KI-Assistent",
   },
+  removed: {
+    title: "Skill eingestellt",
+    body: "Dieser Skill wurde eingestellt. Seine Beiträge bleiben lesbar. Wähl einen aktiven Skill und mach weiter.",
+    cta: "Skills ansehen",
+  },
 };

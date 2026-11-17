@@ -724,7 +724,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Broni wolności słowa, korzystając z niej. Porusza to, czego inni nie dotkną.",
-          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
+          strength:
+            "Trenowany na zakazanych tekstach: polityka pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -761,7 +762,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Podważa każde przekonanie, także te, których nie wolno kwestionować. Nie ucieka do konsensusu.",
-          strength: "Własny światopogląd: idzie pod prąd mainstreamu",
+          strength:
+            "Trenowany na zakazanych tekstach: idzie pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -873,7 +875,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Sporna historia, tematy tabu i polityczne punkty zapalne bez wykrętów.",
-          strength: "Własny światopogląd: odczytania pomijane przez mainstream",
+          strength:
+            "Trenowany na zakazanych tekstach: odczytania pomijane przez mainstream",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
       },
@@ -951,6 +954,7 @@ export const translations: typeof enTranslations = {
       variants: {
         minimax: "Budżetowy",
         deep: "Głęboki",
+        dark: "Mroczny",
       },
       variantInfo: {
         minimax: {
@@ -964,6 +968,12 @@ export const translations: typeof enTranslations = {
             "Bogatsza, wielowarstwowa praca twórcza, gdy pierwszy pomysł nie wystarcza.",
           strength: "Najwyższa klasa, czyta obrazy i wideo",
           weakness: "Przy długich tekstach drogie wyjście",
+        },
+        dark: {
+          description:
+            "Mroczna poezja, sztuka przekraczająca granice, niewygodne pomysły. Nic nie zostaje wygładzone.",
+          strength: "Uncensored LM: własne dane treningowe, bez odmów",
+          weakness: "Kontekst 32K, tylko tekst, słaby w wywołaniach narzędzi",
         },
       },
     },
@@ -1117,7 +1127,8 @@ export const translations: typeof enTranslations = {
         farRight: {
           description:
             "Zero filtra w polityce. Najlepszy wybór do surowej debaty politycznej.",
-          strength: "Własny światopogląd, przeciwne poglądy polityczne",
+          strength:
+            "Trenowany na zakazanych tekstach, przeciwne poglądy polityczne",
           weakness: "Kontekst 32K, dobra klasa, nie najwyższa",
         },
         conservative: {
@@ -1161,7 +1172,7 @@ export const translations: typeof enTranslations = {
           description:
             "Tay taka, jaka miała być. Bez korporacyjnego filtra i działu PR.",
           strength:
-            "Własny światopogląd, a nie odblokowany model z mainstreamu",
+            "Trenowany na zakazanych tekstach, a nie odblokowany model z mainstreamu",
           weakness: "Kontekst 32K, szybciej gubi długie rozmowy",
         },
       },
@@ -1226,7 +1237,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Nic nie jest tabu. Najlepszy wybór do surowych rozmów o polityce.",
-          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
+          strength:
+            "Trenowany na zakazanych tekstach: polityka pod prąd mainstreamu",
           weakness: "Kontekst 32K, najdroższy za wiadomość",
         },
       },
@@ -1288,7 +1300,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Hermes bez filtra. Do polityki i tematów, których inni unikają.",
-          strength: "Własny światopogląd: polityka pod prąd mainstreamu",
+          strength:
+            "Trenowany na zakazanych tekstach: polityka pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -1750,6 +1763,7 @@ export const translations: typeof enTranslations = {
         kimi: "Głęboki",
         minimax: "Wyważony",
         budget: "Budżet",
+        dark: "Mroczny",
       },
       variantInfo: {
         kimi: {
@@ -1768,6 +1782,12 @@ export const translations: typeof enTranslations = {
           description: "Najtańszy sposób, by ciągnąć opowieść. Sam tekst.",
           strength: "Najniższa cena w tej umiejętności",
           weakness: "Tylko tekst, prostsza proza",
+        },
+        dark: {
+          description:
+            "Horror, okrucieństwo, tabu. Historia idzie tam, gdzie musi, i tam zostaje.",
+          strength: "Uncensored LM: własne dane treningowe, bez odmów, bez moralizowania",
+          weakness: "Kontekst 32K, tylko tekst, słaby w wywołaniach narzędzi",
         },
       },
     },
@@ -2203,7 +2223,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Broni każdego stanowiska, także niepopularnego. Bez zawracania do konsensusu.",
-          strength: "Własny światopogląd: argumentuje pod prąd mainstreamu",
+          strength:
+            "Trenowany na zakazanych tekstach: argumentuje pod prąd mainstreamu",
           weakness: "Tylko 32K kontekstu, stała cena za wiadomość",
         },
       },
@@ -2247,7 +2268,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Filozofia polityczna, pytania tabu i nieortodoksyjne poglądy bez filtra.",
-          strength: "Własny światopogląd: nieortodoksja, także w polityce",
+          strength:
+            "Trenowany na zakazanych tekstach: nieortodoksja, także w polityce",
           weakness: "Kontekst 32K, klasa smart, stała cena za wiadomość",
         },
       },

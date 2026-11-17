@@ -155,7 +155,8 @@ export function listCatalogEntries(
           ? publicChatId === undefined
             ? null
             : toModelSlug(publicChatId)
-          : visibleProviders(def, {}).length > 0
+          : visibleProviders(def, { availability: options.availability })
+                .length > 0
             ? toDefinitionSlug(defKey)
             : null,
     });

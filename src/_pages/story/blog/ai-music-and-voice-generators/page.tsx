@@ -11,6 +11,10 @@
  */
 
 import type { Metadata } from "next";
+import {
+  type AgentEnvAvailability,
+  getEnvAvailability,
+} from "next-vibe/agent/env-availability";
 import { roundMediaCost } from "next-vibe/agent/models/models";
 import {
   DEFAULT_MUSIC_GEN_MODEL_SELECTION,
@@ -250,12 +254,13 @@ function formatSmallCurrency(
 function facts(
   type: MediaType,
   id: string,
+  availability: AgentEnvAvailability,
 ): {
   slug: string;
   lab: string;
   isLegacy: boolean;
 } | null {
-  const found = listMediaFacts().find(
+  const found = listMediaFacts(availability).find(
     (f) => f.type === type && f.modelId === id,
   );
   return found
@@ -267,8 +272,9 @@ function buildMusicRow(
   id: MusicGenModelId,
   locale: CountryLanguage,
   currency: Currencies,
+  availability: AgentEnvAvailability,
 ): MusicModelRow | null {
-  const fact = facts("audio", id);
+  const fact = facts("audio", id, availability);
   const option = getMusicGenModelById(id);
   if (!fact || fact.isLegacy || !option) {
     return null;
@@ -302,8 +308,9 @@ function buildVoiceRow(
   id: TtsModelId,
   locale: CountryLanguage,
   currency: Currencies,
+  availability: AgentEnvAvailability,
 ): VoiceRow | null {
-  const fact = facts("tts", id);
+  const fact = facts("tts", id, availability);
   const option = getTtsModelById(id);
   if (!fact || fact.isLegacy || !option) {
     return null;
@@ -332,8 +339,9 @@ function buildSttRow(
   id: SttModelId,
   locale: CountryLanguage,
   currency: Currencies,
+  availability: AgentEnvAvailability,
 ): SttRow | null {
-  const fact = facts("stt", id);
+  const fact = facts("stt", id, availability);
   // Options are sorted cheapest provider first per model.
   const option = sttModelOptions.find((o) => o.id === id);
   if (!fact || fact.isLegacy || !option) {
@@ -361,24 +369,25 @@ export async function tanstackLoader({
 }: Props): Promise<AudioPostPageData> {
   const { locale } = await params;
   const currency = creditCurrency(locale);
+  const availability = await getEnvAvailability();
   const products = productsRepository.getProducts(locale);
   const subscription = products[ProductIds.SUBSCRIPTION];
   const pack = products[ProductIds.CREDIT_PACK];
   const music = Object.values(MusicGenModelId)
     .flatMap((id) => {
-      const row = buildMusicRow(id, locale, currency);
+      const row = buildMusicRow(id, locale, currency, availability);
       return row ? [row] : [];
     })
     .toSorted((a, b) => a.clipCredits - b.clipCredits);
   const voices = Object.values(TtsModelId)
     .flatMap((id) => {
-      const row = buildVoiceRow(id, locale, currency);
+      const row = buildVoiceRow(id, locale, currency, availability);
       return row ? [row] : [];
     })
     .toSorted((a, b) => a.creditsPer1k - b.creditsPer1k);
   const stt = Object.values(SttModelId)
     .flatMap((id) => {
-      const row = buildSttRow(id, locale, currency);
+      const row = buildSttRow(id, locale, currency, availability);
       return row ? [row] : [];
     })
     .toSorted((a, b) => a.creditsPerMinute - b.creditsPerMinute);

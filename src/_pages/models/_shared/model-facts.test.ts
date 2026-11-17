@@ -7,16 +7,19 @@ import {
   calculateCreditCost,
   estimateTurnCredits,
 } from "next-vibe/agent/models/models";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 
 import { collectSitemapEntries } from "../../_root/sitemap.xml/build-sitemap";
 import { listCatalogEntries } from "./model-catalog-entries";
+import { findMediaFacts, listMediaFacts } from "./model-media-facts";
 import {
   OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
   FEATURED_COMPARISON_PAIRS,
   findModelPageAlias,
   findPublicModelId,
   getModelFacts,
+  isChatModelAvailable,
   isModelPageAlias,
   listModelFacts,
   PUBLIC_CHAT_MODEL_IDS,
@@ -25,6 +28,47 @@ import {
   suggestComparisons,
   toModelSlug,
 } from "./model-facts";
+
+/** Every provider key configured: the registry-level public set. */
+const ALL: AgentEnvAvailability = {
+  openRouter: true,
+  claudeCode: true,
+  voice: true,
+  braveSearch: true,
+  kagiSearch: true,
+  anySearch: true,
+  uncensoredAI: true,
+  freedomGPT: true,
+  gabAI: true,
+  veniceAI: true,
+  nanoGPT: true,
+  scrappey: true,
+  openAiImages: true,
+  openAiStt: true,
+  replicate: true,
+  falAi: true,
+  modelsLab: true,
+  edenAiStt: true,
+  deepgram: true,
+  openAiTts: true,
+  edenAiTts: true,
+  elevenlabs: true,
+  unbottledSystem: false,
+  unbottledForce: false,
+};
+
+/** Prod's key set (2026-11-17): no OpenAI, Replicate, fal, Deepgram, ElevenLabs. */
+const PROD_LIKE: AgentEnvAvailability = {
+  ...ALL,
+  claudeCode: false,
+  openAiImages: false,
+  openAiStt: false,
+  openAiTts: false,
+  replicate: false,
+  falAi: false,
+  deepgram: false,
+  elevenlabs: false,
+};
 
 const CLAUDE_CODE_ALIASES: readonly (readonly [ChatModelId, ChatModelId])[] = [
   [ChatModelId.CLAUDE_CODE_HAIKU, ChatModelId.CLAUDE_HAIKU_5_5],
@@ -35,7 +79,7 @@ const CLAUDE_CODE_ALIASES: readonly (readonly [ChatModelId, ChatModelId])[] = [
 
 describe("one public page per model", () => {
   test("public model names are unique", () => {
-    const names = listModelFacts().map((f) => f.name);
+    const names = listModelFacts(ALL).map((f) => f.name);
     expect(new Set(names).size).toBe(names.length);
   });
 
@@ -62,7 +106,7 @@ describe("one public page per model", () => {
   });
 
   test("sitemap has no duplicate model pages", () => {
-    const paths = collectSitemapEntries().map((e) => e.path);
+    const paths = collectSitemapEntries(ALL).map((e) => e.path);
     for (const [alias, canonical] of CLAUDE_CODE_ALIASES) {
       expect(paths).not.toContain(`/models/${toModelSlug(alias)}`);
       expect(paths).toContain(`/models/${toModelSlug(canonical)}`);
@@ -79,7 +123,7 @@ describe("own-worldview uncensored model comparisons", () => {
   });
 
   test("every uncensored-tier text model links to it first", () => {
-    for (const facts of listModelFacts()) {
+    for (const facts of listModelFacts(ALL)) {
       if (
         facts.isLegacy ||
         facts.id === OWN_WORLDVIEW_UNCENSORED_MODEL_ID ||
@@ -88,20 +132,20 @@ describe("own-worldview uncensored model comparisons", () => {
       ) {
         continue;
       }
-      expect(suggestComparisons(facts)[0]?.id).toBe(
+      expect(suggestComparisons(facts, ALL)[0]?.id).toBe(
         OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
       );
     }
   });
 
   test("its page links every featured pair, and the sitemap lists them", () => {
-    const facts = getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID);
+    const facts = getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, ALL);
     expect(facts).not.toBeNull();
     if (facts === null) {
       return;
     }
-    const linked = suggestComparisons(facts).map((pick) => pick.id);
-    const paths = new Set(collectSitemapEntries().map((entry) => entry.path));
+    const linked = suggestComparisons(facts, ALL).map((pick) => pick.id);
+    const paths = new Set(collectSitemapEntries(ALL).map((entry) => entry.path));
     for (const [a, b] of FEATURED_COMPARISON_PAIRS) {
       expect(linked).toContain(a === facts.id ? b : a);
       expect(
@@ -146,12 +190,72 @@ describe("model page price per message", () => {
           ),
         ),
       );
-      const shown = getModelFacts(id)?.creditsPerMessage ?? 0;
+      const shown = getModelFacts(id, ALL)?.creditsPerMessage ?? 0;
       expect({ id, shown }).toEqual({
         id,
         shown: Math.round(cheapestEstimate * 100) / 100,
       });
       expect(shown).toBeGreaterThan(cheapestText);
     }
+  });
+});
+
+describe("models without a configured provider key are hidden", () => {
+  test("no ElevenLabs voice on the catalog, sitemap or media facts", () => {
+    const tts = listCatalogEntries("tts", { availability: PROD_LIKE });
+    expect(tts.length).toBeGreaterThan(0);
+    expect(tts.some((entry) => entry.labId === "elevenlabs")).toBe(false);
+    expect(
+      listMediaFacts(PROD_LIKE).some(
+        (facts) =>
+          facts.type === "tts" && facts.modelId.startsWith("elevenlabs-"),
+      ),
+    ).toBe(false);
+    expect(findMediaFacts("elevenlabs-rachel", PROD_LIKE)).toBeNull();
+    const paths = collectSitemapEntries(PROD_LIKE).map((e) => e.path);
+    expect(paths.some((p) => p.includes("elevenlabs-rachel"))).toBe(false);
+  });
+
+  test("the voices exist when the key is configured", () => {
+    expect(findMediaFacts("elevenlabs-rachel", ALL)).not.toBeNull();
+    expect(
+      listCatalogEntries("tts", { availability: ALL }).some(
+        (entry) => entry.labId === "elevenlabs",
+      ),
+    ).toBe(true);
+  });
+
+  test("a chat model with no configured provider has no facts", () => {
+    const none: AgentEnvAvailability = {
+      openRouter: false,
+      claudeCode: false,
+      voice: false,
+      braveSearch: false,
+      kagiSearch: false,
+      anySearch: false,
+      uncensoredAI: false,
+      freedomGPT: false,
+      gabAI: false,
+      veniceAI: false,
+      nanoGPT: false,
+      scrappey: false,
+      openAiImages: false,
+      openAiStt: false,
+      replicate: false,
+      falAi: false,
+      modelsLab: false,
+      edenAiStt: false,
+      deepgram: false,
+      openAiTts: false,
+      edenAiTts: false,
+      elevenlabs: false,
+      unbottledSystem: false,
+      unbottledForce: false,
+    };
+    expect(listModelFacts(none)).toEqual([]);
+    expect(getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, none)).toBeNull();
+    expect(isChatModelAvailable(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, PROD_LIKE)).toBe(
+      true,
+    );
   });
 });

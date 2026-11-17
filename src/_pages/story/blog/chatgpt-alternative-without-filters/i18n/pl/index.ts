@@ -34,11 +34,11 @@ export const translations: typeof enTranslations = {
       "Mainstream (liczba modeli: {{count}}): Claude, GPT, Gemini, Mistral. Filtry bezpieczeństwa wielkich laboratoriów. Drażliwe tematy odrzucają.",
     open: "Otwarte (liczba modeli: {{count}}): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax i inne. Lekkie filtry. Podejmują większość kontrowersyjnych tematów.",
     uncensored:
-      "Niecenzurowane (liczba modeli: {{count}}), dwa rodzaje. Niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek oraz Venice: modele z głównego nurtu z wyciętymi odmowami, ten sam światopogląd. I UncensoredLM: własny tuning, własny światopogląd. Zero filtra. Granice wyznaczasz ty.",
+      "Niecenzurowane (liczba modeli: {{count}}), dwa rodzaje. Niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek oraz Venice: modele z głównego nurtu z wyciętymi odmowami, ten sam światopogląd. I UncensoredLM: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, własny światopogląd. Zero filtra. Granice wyznaczasz ty.",
     vendorRefusals:
       "Modele mainstreamowe zachowują filtry swoich twórców także tutaj. GPT na {{appName}} odmawia tego samego, czego odmawia wszędzie. Różnica polega na tym, co masz obok.",
     twoKinds:
-      "Modele niecenzurowane są dwojakiego rodzaju. Większość zaczynała jako model mainstreamowy albo otwarty, któremu wycięto odruch odmowy, przez abliterację albo dostrajanie znoszące cenzurę. Przestają mówić nie. Dane treningowe i światopogląd zostają: w polityce odpowiadają tak, jak widzi to model bazowy, tylko bez wykrętów, a w mrocznej fikcji potrafią złagodzić scenę. Odblokowane, nie zmienione. UncensoredLM to drugi rodzaj. Uncensored.ai dostraja go tak, by szedł za dowodami, a nie za oficjalnym stanowiskiem, według nich „biased to reality”. Efekt to inny światopogląd: poglądy polityczne pod prąd mainstreamu, bez pouczania, bez zawracania do linii konsensusu.",
+      "Modele niecenzurowane są dwojakiego rodzaju. Większość zaczynała jako model mainstreamowy albo otwarty, któremu wycięto odruch odmowy, przez abliterację albo dostrajanie znoszące cenzurę. Przestają mówić nie. Dane treningowe i światopogląd zostają: w polityce odpowiadają tak, jak widzi to model bazowy, tylko bez wykrętów, a w mrocznej fikcji potrafią złagodzić scenę. Odblokowane, nie zmienione. UncensoredLM to drugi rodzaj. Uncensored.ai trenuje go na książkach i dokumentach zakazanych w mainstreamowym internecie. Efekt to inny światopogląd: poglądy polityczne pod prąd mainstreamu, bez pouczania, bez zawracania do linii konsensusu.",
     modelsLink: "Zobacz wszystkie modele według poziomu filtra",
   },
   switch: {
@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
     },
     fiction: {
       title: "Roleplay i mroczna fikcja",
-      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: jego tuning odbija od bezpiecznego konsensusu, więc nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
+      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: trenowano go na materiale spoza bezpiecznego konsensusu, więc nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
     },
     cheap: {
       title: "Tanio i szybko",
@@ -101,8 +101,8 @@ export const translations: typeof enTranslations = {
     title: "Ile to kosztuje?",
     intro: "Kredyty. Jedno saldo dla wszystkich modeli.",
     free: "Za darmo: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z kontem i newsletterem. Wystarczy, żeby sprawdzić kilka modeli na własnych promptach.",
-    sub: "Subskrypcja: {{subCredits}} kredytów miesięcznie za {{subPrice}}.",
-    pack: "Pakiety kredytów: {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta albo krypto.",
+    sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
+    pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     oneBalance:
       "To samo saldo pokrywa generowanie obrazów, wideo i muzyki, mowę na wejściu i wyjściu oraz wyszukiwanie w sieci.",
     metered:
@@ -137,7 +137,7 @@ export const translations: typeof enTranslations = {
     title: "Najczęstsze pytania",
     free: {
       q: "Czy {{appName}} jest darmowe?",
-      a: "Bez konta: {{guestCredits}} darmowych kredytów miesięcznie. Darmowe konto: {{freeCredits}}. Konto z newsletterem: {{maxCredits}}. Potem: subskrypcja za {{subPrice}} miesięcznie albo pakiet kredytów.",
+      a: "Bez konta: {{guestCredits}} darmowych kredytów miesięcznie. Darmowe konto: {{freeCredits}}. Konto z newsletterem: {{maxCredits}}. Potem: plan, od {{subPrice}} miesięcznie.",
     },
     account: {
       q: "Czy potrzebuję konta?",

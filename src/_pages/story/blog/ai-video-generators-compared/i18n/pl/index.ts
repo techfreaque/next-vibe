@@ -146,8 +146,8 @@ export const translations: typeof enTranslations = {
       "Kredyty schodzą dopiero po dostarczeniu klipu. Nieudane zadanie, odrzucony prompt, przekroczony czas: nie płacisz nic.",
     reported:
       "Trasy obsługiwane przez OpenRouter rozliczają realny koszt zgłoszony przez dostawcę plus marżę, więc końcowa kwota może się lekko różnić od tabeli.",
-    sub: "Subskrypcja: {{subPrice}} miesięcznie, kredyty co miesiąc: {{subCredits}}.",
-    pack: "Pakiet kredytów: {{packPrice}} jednorazowo, kredyty w pakiecie: {{packCredits}}.",
+    sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
+    pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i pakiety kredytów",
   },
   watermark: {
@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy mogę robić wideo AI za darmo?",
-      a: "Nowe konta dostają darmowe kredyty. Wideo to jedna z najdroższych rzeczy do wygenerowania, więc starczą najwyżej na kilka klipów. Najtańszy klip teraz: {{cheapestClipName}}, kredyty: {{cheapestClipCredits}}. Potem subskrypcja ({{subPrice}} miesięcznie) albo pakiet kredytów ({{packPrice}}).",
+      a: "Nowe konta dostają darmowe kredyty. Wideo to jedna z najdroższych rzeczy do wygenerowania, więc starczą najwyżej na kilka klipów. Najtańszy klip teraz: {{cheapestClipName}}, kredyty: {{cheapestClipCredits}}. Potem: plan, od {{subPrice}} miesięcznie.",
     },
     length: {
       q: "Jak długie może być wideo AI?",

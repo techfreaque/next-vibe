@@ -79,6 +79,30 @@ export const allModelDefinitions: ModelDefinition[] = [
   ...Object.values(sttModelDefinitions),
 ];
 
+/**
+ * Ids of models (every role: chat, image, video, music, voice, transcription)
+ * that no configured provider can serve here: each of their routes needs an
+ * API key this instance does not have. Tool schemas drop these from their
+ * option enums so no surface offers a model that cannot run.
+ */
+export function getUnavailableModelIds(
+  availability: AgentEnvAvailability,
+): ReadonlySet<string> {
+  const available = new Set<string>();
+  const all = new Set<string>();
+  // Every route of every model, straight from the definitions: the option
+  // lists keep one (cheapest) route per model, which may be the unconfigured one.
+  for (const def of allModelDefinitions) {
+    for (const provider of def.providers) {
+      all.add(provider.id);
+      if (isApiProviderAvailable(provider.apiProvider, availability)) {
+        available.add(provider.id);
+      }
+    }
+  }
+  return new Set([...all].filter((id) => !available.has(id)));
+}
+
 export function getModelDisplayName(
   model: AnyModelOption,
   isAdmin: boolean,

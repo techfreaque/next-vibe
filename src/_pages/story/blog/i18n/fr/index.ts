@@ -16,6 +16,20 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    imageGenerators: {
+      title: "Générateurs d'images IA sans censure. Vrais prix, aucun flou.",
+      category: "Comparatif de modèles",
+      excerpt:
+        "Les modèles d'image qui génèrent vraiment sans filtre, tous les modèles côte à côte avec leur niveau de filtre et leur vrai prix par image, et comment créer ou retoucher une image depuis une discussion.",
+      readTime: "8 min de lecture",
+    },
+    roleplayWithoutFilter: {
+      title: "Le jeu de rôle IA sans filtre. L'histoire va où vous la menez.",
+      category: "Guide",
+      excerpt:
+        "Une alternative honnête à Character.AI. Quel modèle non censuré tient un personnage, lequel se souvient de toute la campagne, comment démarrer en deux minutes et ce que coûte une réponse.",
+      readTime: "8 min de lecture",
+    },
     musicVoice: {
       title: "Musique, voix et transcription IA. Quel modèle pour quel usage.",
       category: "Guide",
@@ -57,7 +71,7 @@ export const translations: typeof enTranslations = {
       title: "Les modèles non censurés, un par un.",
       category: "Guide des modèles",
       excerpt:
-        "Deux sortes de non-censuré : des modèles grand public dont on a retiré les refus, et UncensoredLM avec sa propre vision du monde. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT et d'autres, avec les points forts et les limites de chacun.",
+        "Deux sortes de non-censuré : des modèles grand public dont on a retiré les refus, et UncensoredLM, entraîné sur des livres et des documents bannis. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT et d'autres, avec les points forts et les limites de chacun.",
       readTime: "7 min de lecture",
     },
     modelRefresh: {

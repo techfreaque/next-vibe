@@ -340,6 +340,13 @@ export function metadataToHead(
     for (const value of toArray(verification.yandex)) {
       pushName(meta, "yandex-verification", value);
     }
+    if (verification.other) {
+      for (const [name, value] of Object.entries(verification.other)) {
+        for (const content of toArray(value)) {
+          pushName(meta, name, content);
+        }
+      }
+    }
   }
 
   if (metadata.openGraph) {

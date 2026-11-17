@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
   filter: {
     title: "Ce que « non censuré » veut dire ici",
     intro: "Trois niveaux. C'est vous qui choisissez.",
-    p1: "Chaque modèle a un niveau de contenu. Les modèles grand public gardent les filtres de leur fournisseur. Les modèles open source sont plus souples. Les modèles non censurés répondent sans faire la morale. Ils sont de deux sortes. La plupart sont des modèles existants dont on a retiré les refus : même entraînement, même vision du monde, ils arrêtent simplement d'esquiver. UncensoredLM est l'autre sorte, avec son propre entraînement et sa propre vision du monde.",
+    p1: "Chaque modèle a un niveau de contenu. Les modèles grand public gardent les filtres de leur fournisseur. Les modèles open source sont plus souples. Les modèles non censurés répondent sans faire la morale. Ils sont de deux sortes. La plupart sont des modèles existants dont on a retiré les refus : même entraînement, même vision du monde, ils arrêtent simplement d'esquiver. UncensoredLM est l'autre sorte : entraîné sur des livres et des documents bannis de l'internet grand public, avec sa propre vision du monde.",
     p2: "Personne ne choisit le niveau à votre place. Prenez un modèle grand public pour le travail, un modèle non censuré pour la question à laquelle personne d'autre ne répondra. Même chat, même compte.",
     mainstream: "Grand public",
     open: "Open source",

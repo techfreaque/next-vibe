@@ -144,8 +144,8 @@ export const translations = {
       "Credits come off only after a clip is delivered. Failed job, refused prompt, timeout: you pay nothing.",
     reported:
       "Routes served through OpenRouter bill the provider's actual reported cost plus the markup, so the final charge can land slightly off the table.",
-    sub: "Subscription: {{subPrice}} a month for {{subCredits}} credits.",
-    pack: "Credit pack: {{packPrice}} for {{packCredits}} credits, one-time.",
+    sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
+    pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and credit packs",
   },
   watermark: {
@@ -197,7 +197,7 @@ export const translations = {
     },
     free: {
       q: "Can I make AI videos for free?",
-      a: "New accounts get free credits. Video is one of the priciest things you can generate, so they cover a few clips at most. The cheapest clip right now is {{cheapestClipName}} at {{cheapestClipCredits}} credits. After that: a subscription ({{subPrice}} a month) or a credit pack ({{packPrice}}).",
+      a: "New accounts get free credits. Video is one of the priciest things you can generate, so they cover a few clips at most. The cheapest clip right now is {{cheapestClipName}} at {{cheapestClipCredits}} credits. After that: a plan, from {{subPrice}} a month.",
     },
     length: {
       q: "How long can an AI video be?",

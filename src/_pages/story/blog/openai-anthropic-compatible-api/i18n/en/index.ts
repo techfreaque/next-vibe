@@ -115,7 +115,7 @@ export const translations = {
     },
     uncensored: {
       title: "Uncensored: no refusal reflex",
-      body: "GLM 5.3 Uncensored and Qwen 3.6 Plus Uncensored are mainstream models with the refusals removed. UncensoredLM v1.2 is different: its own worldview, not just a stripped model. Same API, same tools.",
+      body: "GLM 5.3 Uncensored and Qwen 3.6 Plus Uncensored are mainstream models with the refusals removed. UncensoredLM v1.2 is different: trained on books and documents banned from the mainstream internet, not just a stripped model. Same API, same tools.",
     },
     compare:
       "Torn between two? The comparison pages put two models side by side.",

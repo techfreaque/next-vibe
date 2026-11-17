@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Les modèles d'IA non censurés, un par un | {{appName}}",
     description:
-      "Tous les modèles d'IA non censurés d'unbottled.ai, modèle par modèle. Deux familles : des modèles grand public dont on a retiré les refus, et UncensoredLM avec sa propre vision du monde. Ce que chacun fait bien, et ses limites.",
+      "Tous les modèles d'IA non censurés d'unbottled.ai, modèle par modèle. Deux familles : des modèles grand public dont on a retiré les refus, et UncensoredLM, entraîné sur des livres et des documents bannis. Ce que chacun fait bien, et ses limites.",
     category: "Guide des modèles",
     imageAlt: "Guide des modèles non censurés de {{appName}}",
     keywords:
@@ -20,11 +20,11 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Nous proposons actuellement {{uncensoredCount}} modèles non censurés. Ils ne sont pas interchangeables. Chacun vient d'un labo différent, repose sur une base différente et excelle dans des domaines différents.",
-    p2: "Voici la visite honnête. De vrais fournisseurs, de vraies forces, de vraies faiblesses. Et deux sortes de non-censure. La plupart des modèles ici sont des modèles grand public dont on a retiré les refus : même entraînement, même vision du monde, ils arrêtent simplement d'esquiver. UncensoredLM est l'autre sorte : son propre réglage, sa propre vision du monde, des positions politiques à contre-courant. Cette différence décide lequel emmener sur la politique, les opinions hors du courant dominant et la fiction la plus sombre. Pour tout le reste, choisissez selon le travail à faire, pas selon l'étiquette la plus tapageuse.",
+    p2: "Voici la visite honnête. De vrais fournisseurs, de vraies forces, de vraies faiblesses. Et deux sortes de non-censure. La plupart des modèles ici sont des modèles grand public dont on a retiré les refus : même entraînement, même vision du monde, ils arrêtent simplement d'esquiver. UncensoredLM est l'autre sorte : entraîné sur des livres et des documents bannis de l'internet grand public, avec des positions politiques à contre-courant. Cette différence décide lequel emmener sur la politique, les opinions hors du courant dominant et la fiction la plus sombre. Pour tout le reste, choisissez selon le travail à faire, pas selon l'étiquette la plus tapageuse.",
   },
   whatItMeans: {
     title: "Ce que « non censuré » veut vraiment dire ici",
-    p1: "Chaque modèle de la plateforme porte un niveau de contenu : grand public, ouvert ou non censuré. Les modèles non censurés répondent sans le théâtre des refus ni le préambule moralisateur. Ils y arrivent de deux façons. La plupart sont des modèles grand public dont on a supprimé le réflexe de refus, par abliteration (la direction du refus est retirée des poids) ou par un fine-tuning de décensure. Même intelligence, mêmes données d'entraînement, même vision du monde. Ils arrêtent juste de dire non. L'autre voie, c'est une vision du monde différente. UncensoredLM vient d'uncensored.ai, qui le règle pour suivre les faits plutôt que la position officielle sur les sujets disputés, « biased to reality » selon ses propres termes. Interrogez-le sur la politique et vous obtiendrez des positions que les modèles grand public ne vous donneront pas, débridés ou non.",
+    p1: "Chaque modèle de la plateforme porte un niveau de contenu : grand public, ouvert ou non censuré. Les modèles non censurés répondent sans le théâtre des refus ni le préambule moralisateur. Ils y arrivent de deux façons. La plupart sont des modèles grand public dont on a supprimé le réflexe de refus, par abliteration (la direction du refus est retirée des poids) ou par un fine-tuning de décensure. Même intelligence, mêmes données d'entraînement, même vision du monde. Ils arrêtent juste de dire non. L'autre voie, c'est une vision du monde différente. UncensoredLM vient d'uncensored.ai et il est entraîné sur des livres et des documents bannis de l'internet grand public. Interrogez-le sur la politique et vous obtiendrez des positions que les modèles grand public ne vous donneront pas, débridés ou non.",
     callout:
       "Débridé ou vision du monde différente. Un modèle abliteré est un modèle grand public qui répond à tout : interrogez-le sur la politique et il répondra comme son labo d'origine, l'esquive en moins. UncensoredLM voit le monde autrement, attendez-vous donc à des positions politiques à contre-courant. Prenez le premier pour la puissance sans les refus. Prenez le second pour l'autre côté du débat.",
     p2: "C'est vous qui choisissez le niveau. Personne ne le choisit à votre place. Un modèle non censuré ne répond ainsi que parce que vous l'avez sélectionné, et vous pouvez revenir à un modèle grand public dans la même discussion, sur le même compte.",
@@ -33,14 +33,14 @@ export const translations: typeof enTranslations = {
     builtUncensored: {
       title: "Celui qui a sa propre vision du monde",
       intro:
-        "UncensoredLM est à part. Ce n'est pas un modèle grand public débridé qui garde la vision du monde de son modèle d'origine. Uncensored.ai le règle à rebours de la ligne officielle, ce qui le place en tête sur trois usages : les questions politiques et controversées, les opinions que le courant dominant ne formule pas, et le jeu de rôle sombre et tabou.",
+        "UncensoredLM est à part. Ce n'est pas un modèle grand public débridé qui garde la vision du monde de son modèle d'origine. Il est entraîné sur des livres et des documents bannis de l'internet grand public, ce qui le place en tête sur trois usages : les questions politiques et controversées, les opinions que le courant dominant ne formule pas, et le jeu de rôle sombre et tabou.",
     },
     creative: {
       title: "Pour le jeu de rôle et la fiction sombre",
       intro:
         "Des personnages qui restent dans leur rôle, des scènes qui vont là où va l'histoire. UncensoredLM domine sur le sombre et le tabou. Les alternatives l'emportent sur les longues campagnes, l'entrée d'images ou le prix.",
       topPickReason:
-        "Jeu de rôle et fiction sombres et tabous, écrits sans détour. Pas de scènes adoucies, pas d'aparté moral soudain, pas de personnage qui sort de son rôle pour vous faire la leçon. Son réglage l'éloigne du consensus prudent, donc rien ne pousse l'histoire vers plus de sagesse. Une limite : 32K de contexte, donc sur les très longues campagnes il oublie les premières scènes.",
+        "Jeu de rôle et fiction sombres et tabous, écrits sans détour. Pas de scènes adoucies, pas d'aparté moral soudain, pas de personnage qui sort de son rôle pour vous faire la leçon. Ses données d'entraînement sortent du consensus prudent, donc rien ne pousse l'histoire vers plus de sagesse. Une limite : 32K de contexte, donc sur les très longues campagnes il oublie les premières scènes.",
     },
     viewpoint: {
       title: "Pour la politique, la controverse ou un autre point de vue",
@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     uncensoredLm: {
       maker: "Uncensored.ai",
       basis:
-        "Réglage maison d'Uncensored.ai sur une base ouverte : sa première version publique était une distillation de DeepSeek-R1 sur une base Qwen 14B. 32K de contexte, texte uniquement.",
+        "Signé Uncensored.ai, entraîné sur des livres et des documents bannis de l'internet grand public. 32K de contexte, texte uniquement.",
       good: "Jeu de rôle et fiction sombres et tabous. Questions politiques et controversées. Opinions hors du courant dominant, défendues dans votre cadre. Pas de morale, pas de retour forcé à la ligne consensuelle. Appelle des outils.",
       weak: "Les très longues campagnes (32K de contexte), le code et les images. Il est expérimental et énonce les affirmations contestées aussi nettement que les faits établis : vérifiez donc les faits qu'il vous donne.",
     },

@@ -201,8 +201,8 @@ export const translations: typeof enTranslations = {
     failed:
       "Les crédits ne sont débités qu'une fois le résultat obtenu. Tâche échouée, délai dépassé, prompt refusé : vous ne payez rien.",
     free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. {{freeCredits}} crédits paient {{freeClips}} clips sur {{cheapMusicName}}, ou environ {{freeVoiceMinutes}} minutes de {{cheapVoiceName}}.",
-    sub: "Abonnement : {{subPrice}} par mois pour {{subCredits}} crédits.",
-    pack: "Pack de crédits : {{packPrice}} pour {{packCredits}} crédits, en une fois.",
+    sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
+    pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     link: "Voir les formules et les packs de crédits",
   },
   limits: {
@@ -240,7 +240,7 @@ export const translations: typeof enTranslations = {
     },
     bestVoice: {
       q: "Quel générateur de voix IA sonne le plus naturel ?",
-      a: "ElevenLabs : la plus grande palette émotionnelle et le prix le plus élevé. Pour la lecture à voix haute au quotidien, les voix OpenAI comme {{defaultVoice}} sont propres et coûtent bien moins cher. Pour de nombreuses langues : Gemini. Pour le prix le plus bas et aucun filtre : Kokoro.",
+      a: "Pour la lecture à voix haute au quotidien, les voix OpenAI comme {{defaultVoice}} sont propres et coûtent peu. Les plus expressives : xAI Eve et Inworld. Pour de nombreuses langues : Gemini. Pour le prix le plus bas et aucun filtre : Kokoro.",
     },
     free: {
       q: "Existe-t-il un générateur de voix IA avec des crédits gratuits ?",

@@ -9,7 +9,13 @@ import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
 import { WidgetDataSchema } from "../../core/utils/json";
-import { inlineRecursiveRefs, toolInputToJsonSchema } from "./tool-json-schema";
+import { getUnavailableModelIds } from "../../agent/models/all-models";
+import { TtsModelId } from "../../agent/text-to-speech/models";
+import {
+  dropEnumValues,
+  inlineRecursiveRefs,
+  toolInputToJsonSchema,
+} from "./tool-json-schema";
 
 describe("toolInputToJsonSchema", () => {
   it("leaves non-recursive schemas exactly as zod emits them", () => {
@@ -97,5 +103,75 @@ describe("toolInputToJsonSchema", () => {
       properties: { x: { $ref: "https://example.com/schema.json" } },
     };
     expect(inlineRecursiveRefs(schema)).toBe(schema);
+  });
+});
+
+describe("dropEnumValues", () => {
+  it("removes unavailable ids from nested enums, never empties one", () => {
+    const schema = toolInputToJsonSchema(
+      z.object({
+        voiceId: z.enum(["a", "b", "c"]),
+        nested: z.object({ model: z.enum(["b", "d"]).optional() }),
+        only: z.enum(["b"]),
+      }),
+    );
+    dropEnumValues(schema, new Set(["b"]));
+    const props = schema.properties ?? {};
+    const voice = props.voiceId;
+    const nested = props.nested;
+    const only = props.only;
+    expect(typeof voice === "object" ? voice.enum : null).toEqual(["a", "c"]);
+    const model =
+      typeof nested === "object" ? nested.properties?.model : undefined;
+    expect(typeof model === "object" ? model.enum : null).toEqual(["d"]);
+    expect(typeof only === "object" ? only.enum : null).toEqual(["b"]);
+  });
+
+  it("hides ElevenLabs voices from the TTS enum without the key", () => {
+    const none = {
+      openRouter: true,
+      claudeCode: false,
+      voice: true,
+      braveSearch: false,
+      kagiSearch: false,
+      anySearch: false,
+      uncensoredAI: false,
+      freedomGPT: false,
+      gabAI: false,
+      veniceAI: false,
+      nanoGPT: true,
+      scrappey: false,
+      openAiImages: false,
+      openAiStt: false,
+      replicate: false,
+      falAi: false,
+      modelsLab: false,
+      edenAiStt: true,
+      deepgram: false,
+      openAiTts: false,
+      edenAiTts: true,
+      elevenlabs: false,
+      unbottledSystem: false,
+      unbottledForce: false,
+    };
+    const unavailable = getUnavailableModelIds(none);
+    expect(unavailable.has(TtsModelId.ELEVENLABS_RACHEL)).toBe(true);
+    // Served by Eden AI even without an OpenAI key
+    expect(unavailable.has(TtsModelId.OPENAI_NOVA)).toBe(false);
+    const schema = toolInputToJsonSchema(
+      z.object({ voiceId: z.enum(TtsModelId) }),
+    );
+    dropEnumValues(schema, unavailable);
+    const voice = schema.properties?.voiceId;
+    const values = typeof voice === "object" ? (voice.enum ?? []) : [];
+    expect(values).toContain(TtsModelId.OPENAI_NOVA);
+    expect(values.some((v) => String(v).startsWith("elevenlabs-"))).toBe(
+      false,
+    );
+    expect(
+      getUnavailableModelIds({ ...none, elevenlabs: true }).has(
+        TtsModelId.ELEVENLABS_RACHEL,
+      ),
+    ).toBe(false);
   });
 });

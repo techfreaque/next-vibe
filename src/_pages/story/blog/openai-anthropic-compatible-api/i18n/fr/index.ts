@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       title: "Non censurés : pas de refus réflexe",
-      body: "GLM 5.3 Uncensored et Qwen 3.6 Plus Uncensored sont des modèles grand public dont on a retiré les refus. UncensoredLM v1.2 est différent : sa propre vision du monde, pas seulement un modèle débridé. Même API, mêmes outils.",
+      body: "GLM 5.3 Uncensored et Qwen 3.6 Plus Uncensored sont des modèles grand public dont on a retiré les refus. UncensoredLM v1.2 est différent : entraîné sur des livres et des documents bannis de l'internet grand public, pas seulement un modèle débridé. Même API, mêmes outils.",
     },
     compare:
       "Vous hésitez entre deux ? Les pages de comparaison mettent deux modèles côte à côte.",

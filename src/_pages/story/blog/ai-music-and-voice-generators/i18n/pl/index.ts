@@ -202,8 +202,8 @@ export const translations: typeof enTranslations = {
     failed:
       "Kredyty schodzą dopiero wtedy, gdy masz wynik. Nieudane zadanie, przekroczony czas, odrzucony prompt: nie płacisz nic.",
     free: "Za darmo: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. {{freeCredits}} kredytów to {{freeClips}} klipów w {{cheapMusicName}} albo około {{freeVoiceMinutes}} minut głosu {{cheapVoiceName}}.",
-    sub: "Subskrypcja: {{subPrice}} miesięcznie za {{subCredits}} kredytów.",
-    pack: "Pakiet kredytów: {{packPrice}} za {{packCredits}} kredytów, jednorazowo.",
+    sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
+    pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i pakiety kredytów",
   },
   limits: {
@@ -241,7 +241,7 @@ export const translations: typeof enTranslations = {
     },
     bestVoice: {
       q: "Który generator głosu AI brzmi najbardziej naturalnie?",
-      a: "ElevenLabs: najszersza skala emocji i najwyższa cena. Do codziennego czytania na głos głosy OpenAI, takie jak {{defaultVoice}}, brzmią czysto i kosztują dużo mniej. Do wielu języków: Gemini. Najtaniej i bez filtra: Kokoro.",
+      a: "Do codziennego czytania na głos głosy OpenAI, takie jak {{defaultVoice}}, brzmią czysto i kosztują niewiele. Najbardziej ekspresyjne: xAI Eve i Inworld. Do wielu języków: Gemini. Najtaniej i bez filtra: Kokoro.",
     },
     free: {
       q: "Czy jest generator głosu AI z darmowymi kredytami?",

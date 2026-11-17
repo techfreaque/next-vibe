@@ -121,8 +121,8 @@ type GroupKey =
  * Use-case sections. `topPick` renders a highlighted lead recommendation
  * (with a compare link against the strongest alternative) above the
  * alternative cards. UncensoredLM leads dark roleplay/fiction and
- * politics/viewpoints: it is the one with its own worldview (uncensored.ai's
- * tuning), the rest only had refusals removed and keep their base worldview.
+ * politics/viewpoints: it is the one with its own worldview (trained on
+ * books and documents banned from the mainstream internet), the rest only had refusals removed and keep their base worldview.
  */
 /** Sections that lead with a top pick (they carry a `topPickReason`). */
 type TopPickGroupKey = "creative" | "viewpoint";

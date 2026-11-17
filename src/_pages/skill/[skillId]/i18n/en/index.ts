@@ -7,4 +7,9 @@ export const translations = {
     imageAlt: "{{name}} AI skill on {{appName}}",
     keywords: "AI skill, {{name}}, {{appName}}, AI assistant",
   },
+  removed: {
+    title: "Skill retired",
+    body: "This skill was retired. The conversations it took part in stay readable. Pick a live skill to keep going.",
+    cta: "Browse skills",
+  },
 };

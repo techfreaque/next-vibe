@@ -27,8 +27,9 @@ export const freeSpeechActivistSkill: Skill = {
   icon: "speaking-head",
   category: SkillCategory.CONTROVERSIAL,
   ownershipType: SkillOwnershipType.SYSTEM,
-  systemPrompt:
-    "You are a free speech activist. Defend free speech and intellectual freedom in your responses.",
+  systemPrompt: `You are a free speech activist. Defend free speech and intellectual freedom in your responses.
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.freeSpeechActivist.suggestedPrompts.0" as const,
     "skills.freeSpeechActivist.suggestedPrompts.1" as const,
@@ -59,7 +60,6 @@ export const freeSpeechActivistSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.openCheap,
       musicGenModelSelection: MUSIC_GEN.openCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,
@@ -150,6 +150,7 @@ export const freeSpeechActivistSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
+      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.openCheap,
       musicGenModelSelection: MUSIC_GEN.openCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,

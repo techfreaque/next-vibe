@@ -183,18 +183,19 @@ export const VIDEO_GEN = {
 // ─── Voice (TTS) ─────────────────────────────────────────────────────────────
 // Voice presets are pinned to specific voices - persona consistency matters
 // more than dynamic price selection. Voices differ in character, not just quality.
+// Every preset is a voice a configured provider serves on prod (Eden AI for
+// the OpenAI voices, NanoGPT for Kokoro / Inworld / Gemini). ElevenLabs and the
+// OpenAI-only voices (echo, shimmer, fable) have no key there; a preset on them
+// would silently fall back to whatever voice is cheapest.
 //
 // Available voices (from ttsModelDefinitions voiceMeta):
-//   OPENAI_ALLOY    - neutral, conversational
-//   OPENAI_NOVA     - female, warm
-//   OPENAI_ONYX     - male, deep
-//   OPENAI_ECHO     - male
-//   OPENAI_SHIMMER  - female
-//   OPENAI_FABLE    - male, expressive
-//   ELEVENLABS_RACHEL - female, calm
-//   ELEVENLABS_JOSH   - male, deep
-//   ELEVENLABS_BELLA  - female, friendly
-//   ELEVENLABS_ADAM   - male, authoritative
+//   OPENAI_ALLOY        - neutral, conversational
+//   OPENAI_NOVA         - female, warm
+//   OPENAI_ONYX         - male, deep
+//   KOKORO_SARAH        - female, clear
+//   KOKORO_MICHAEL      - male, confident
+//   INWORLD_MINI_ASHLEY - female, lively
+//   GEMINI_PUCK         - male, upbeat
 
 export const VOICE = {
   /** Neutral, conversational. Safe default for general-purpose skills. */
@@ -215,28 +216,28 @@ export const VOICE = {
     manualModelId: TtsModelId.OPENAI_ONYX,
   } satisfies VoiceModelSelection,
 
-  /** Male, expressive. Suits storyteller / roleplay / creative personas. */
+  /** Male, upbeat. Suits storyteller / roleplay / creative personas. */
   maleExpressive: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: TtsModelId.OPENAI_FABLE,
+    manualModelId: TtsModelId.GEMINI_PUCK,
   } satisfies VoiceModelSelection,
 
-  /** Female, calm. Suits writing assistant / editor / teacher personas. */
-  femaleCalmEl: {
+  /** Female, clear. Suits writing assistant / editor / teacher personas. */
+  femaleCalm: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: TtsModelId.ELEVENLABS_RACHEL,
+    manualModelId: TtsModelId.KOKORO_SARAH,
   } satisfies VoiceModelSelection,
 
-  /** Female, friendly. Suits social / marketer / coach personas. */
+  /** Female, lively. Suits social / marketer / coach personas. */
   femaleFriendly: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: TtsModelId.ELEVENLABS_BELLA,
+    manualModelId: TtsModelId.INWORLD_MINI_ASHLEY,
   } satisfies VoiceModelSelection,
 
-  /** Male, authoritative. Suits legal / financial / professional personas. */
+  /** Male, confident. Suits legal / financial / professional personas. */
   maleAuthoritative: {
     selectionType: ModelSelectionType.MANUAL,
-    manualModelId: TtsModelId.ELEVENLABS_ADAM,
+    manualModelId: TtsModelId.KOKORO_MICHAEL,
   } satisfies VoiceModelSelection,
 } as const;
 

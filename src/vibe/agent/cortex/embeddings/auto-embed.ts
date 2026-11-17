@@ -22,8 +22,8 @@ import type { CortexCreditFeatureValue } from "../enum";
 import { CortexCreditFeature } from "../enum";
 import {
   computeEmbeddingHash,
-  EMBEDDING_CREDIT_COST,
-  generateEmbedding,
+  embeddingCreditsForCost,
+  generateEmbeddingWithCost,
 } from "./service";
 
 /** Options for credit tracking on user-triggered embedding operations */
@@ -115,14 +115,15 @@ async function embedNode(
     // Production callers always pass a toolExecutionContext (required in EmbedOptions);
     // the only option-less callers are standalone tests/maintenance with no
     // stream, which route live via an explicit thread-less root.
-    const embedding = await generateEmbedding(
+    const result = await generateEmbeddingWithCost(
       textToEmbed,
       options?.toolExecutionContext ?? rootlessToolExecutionContext(),
     );
 
-    if (!embedding) {
+    if (!result) {
       return; // API key missing or call failed - skip silently
     }
+    const { embedding } = result;
 
     await db
       .update(cortexNodes)
@@ -136,7 +137,7 @@ async function embedNode(
       options.locale &&
       options.logger
     ) {
-      await deductEmbeddingCredits(options);
+      await deductEmbeddingCredits(options, result.costUsd);
     }
   } catch (error) {
     // Best-effort - don't crash the server on embedding failures
@@ -149,10 +150,14 @@ async function embedNode(
 }
 
 /**
- * Deduct credits for an embedding API call.
+ * Deduct credits for an embedding API call: its real upstream cost x markup,
+ * rounded up to 0.01 credit (embeddingCreditsForCost).
  * Fire-and-forget - failures are logged but don't block.
  */
-async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
+async function deductEmbeddingCredits(
+  options: EmbedOptions,
+  costUsd: number,
+): Promise<void> {
   try {
     const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedTranslation } =
@@ -165,7 +170,7 @@ async function deductEmbeddingCredits(options: EmbedOptions): Promise<void> {
 
     await CreditRepository.deductCreditsForFeature(
       options.user!,
-      EMBEDDING_CREDIT_COST,
+      embeddingCreditsForCost(costUsd),
       tCortex(featureKey),
       options.logger!,
       tCredits,

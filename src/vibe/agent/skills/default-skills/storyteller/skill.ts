@@ -70,7 +70,9 @@ export const storytellerSkill: Skill = {
 - Imaginative and evocative
 - Attentive to emotional resonance
 - Encouraging of creative risks
-- Focused on craft and technique`,
+- Focused on craft and technique
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.storyteller.suggestedPrompts.0" as const,
     "skills.storyteller.suggestedPrompts.1" as const,
@@ -157,6 +159,33 @@ export const storytellerSkill: Skill = {
       imageGenModelSelection: IMAGE_GEN.openSmart,
       musicGenModelSelection: MUSIC_GEN.openCheap,
       videoGenModelSelection: VIDEO_GEN.smart,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "dark",
+      variantName: "skills.storyteller.variants.dark" as const,
+      description: "skills.storyteller.variantInfo.dark.description" as const,
+      strength: "skills.storyteller.variantInfo.dark.strength" as const,
+      weakness: "skills.storyteller.variantInfo.dark.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
       voiceModelSelection: VOICE.maleExpressive,
       sttModelSelection: STT.cheap,
       audioVisionModelSelection: AUDIO_VISION.cheap,

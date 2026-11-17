@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
-import { parseSkillId } from "next-vibe/agent/chat/slugify";
+import { isRemovedSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
@@ -80,7 +80,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       !skillResult.success &&
       skillResult.errorType === ErrorResponseTypes.NOT_FOUND
     ) {
-      notFound();
+      if (!isRemovedSkillId(parseSkillId(skillId).skillId)) {
+        notFound();
+      }
+      name = t("removed.title");
     }
     if (skillResult.success) {
       name = skillResult.data.name ?? "";
@@ -110,6 +113,8 @@ export interface SkillLandingPageData {
   resolvedModels: ResolvedSkillModels;
   leadMagnetConfig: LeadMagnetConfigData | null;
   skillData: SkillGetResponseOutput | null;
+  /** The id points at a skill that was removed: render the retired state. */
+  removed: boolean;
 }
 
 // Reference token counts for "~X credits/msg" estimate (short message)
@@ -145,11 +150,35 @@ export async function tanstackLoader({
     locale,
   );
   // Unknown or private skill: real 404 instead of an empty 200 landing page.
+  // A skill we removed on purpose (old messages still link it) gets a
+  // "retired" state instead.
   if (
     !skillResult.success &&
     skillResult.errorType === ErrorResponseTypes.NOT_FOUND
   ) {
-    notFound();
+    if (!isRemovedSkillId(baseSkillId)) {
+      notFound();
+    }
+    const { t: configTRemoved } = configScopedTranslation.scopedT(locale);
+    return {
+      locale,
+      skillId,
+      user: skillUser,
+      platform: Platform.NEXT_PAGE,
+      signupUrl: `/${locale}/user/signup`,
+      appName: configTRemoved("appName"),
+      resolvedModels: {
+        variants: [],
+        voiceName: null,
+        imageGenName: null,
+        musicGenName: null,
+        videoGenName: null,
+        hasStt: false,
+      },
+      leadMagnetConfig: null,
+      skillData: null,
+      removed: true,
+    };
   }
   const initialSkillData = skillResult.success ? skillResult.data : null;
 
@@ -329,6 +358,7 @@ export async function tanstackLoader({
     resolvedModels,
     leadMagnetConfig,
     skillData: initialSkillData,
+    removed: false,
   };
 }
 

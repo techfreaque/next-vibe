@@ -9,6 +9,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Link } from "next-vibe/ui/components/link";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
+import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
@@ -45,6 +46,50 @@ function SkillsSkeleton(): JSX.Element {
   );
 }
 
+/**
+ * Server-rendered stand-in while the skills chunk loads: a plain list of
+ * skill landing-page links, so the first HTML (and crawlers) already carry
+ * every built-in skill.
+ */
+function SkillsLinkList({
+  locale,
+  initialData,
+}: {
+  locale: CountryLanguage;
+  initialData: SkillListResponseOutput;
+}): JSX.Element {
+  // One link per skill: variant rows ("<skill>__<variant>") share a page.
+  const seen = new Set<string>();
+  const skills = initialData.sections
+    .flatMap((section) => section.skills)
+    .map((skill) => ({ ...skill, baseId: skill.skillId.split("__")[0] ?? "" }))
+    .filter((skill) => {
+      if (skill.baseId === "" || seen.has(skill.baseId)) {
+        return false;
+      }
+      seen.add(skill.baseId);
+      return true;
+    });
+  return (
+    <Div className="flex flex-col divide-y divide-border" aria-busy="true">
+      {skills.map((skill) => (
+        <Link
+          key={skill.baseId}
+          href={`/${locale}/skill/${skill.baseId}`}
+          className="flex flex-col gap-0.5 p-4 hover:bg-muted/50"
+        >
+          <Span className="font-medium text-foreground">{skill.name}</Span>
+          {skill.tagline ? (
+            <Span className="text-sm text-muted-foreground">
+              {skill.tagline}
+            </Span>
+          ) : null}
+        </Link>
+      ))}
+    </Div>
+  );
+}
+
 export function SkillsPageClient({
   locale,
   user,
@@ -72,7 +117,15 @@ export function SkillsPageClient({
 
         {/* overflow-clip (not hidden) keeps the sticky header inside working */}
         <Div className="rounded-xl border bg-card overflow-clip">
-          <Suspense fallback={<SkillsSkeleton />}>
+          <Suspense
+            fallback={
+              initialData === undefined ? (
+                <SkillsSkeleton />
+              ) : (
+                <SkillsLinkList locale={locale} initialData={initialData} />
+              )
+            }
+          >
             <SkillsContent
               locale={locale}
               user={user}

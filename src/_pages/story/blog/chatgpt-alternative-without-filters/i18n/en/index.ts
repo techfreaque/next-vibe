@@ -32,11 +32,11 @@ export const translations = {
       "Mainstream ({{count}} models): Claude, GPT, Gemini, Mistral. Big-lab safety filters. They decline sensitive topics.",
     open: "Open ({{count}} models): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax and more. Light filters. They take on most edgy topics.",
     uncensored:
-      "Uncensored ({{count}} models), two kinds. Uncensored builds of GLM, Qwen, Gemma and DeepSeek, plus Venice: mainstream models with the refusals cut out, same worldview. And UncensoredLM: its own tuning, its own worldview. No filter. You set the limits.",
+      "Uncensored ({{count}} models), two kinds. Uncensored builds of GLM, Qwen, Gemma and DeepSeek, plus Venice: mainstream models with the refusals cut out, same worldview. And UncensoredLM: trained on books and documents banned from the mainstream internet, its own worldview. No filter. You set the limits.",
     vendorRefusals:
       "Mainstream models keep their vendor's filters here too. GPT on {{appName}} refuses what GPT refuses everywhere. The difference is what sits next to it.",
     twoKinds:
-      "Uncensored comes in two kinds. Most started as a mainstream or open model and had the refusal reflex cut out, by abliteration or a decensoring fine-tune. They stop saying no. Their training data and their worldview stay: on politics they answer the way the base model sees it, just without the dodge, and in dark fiction they can soften the scene. Unlocked, not changed. UncensoredLM is the other kind. Uncensored.ai tunes it to follow the evidence over the official position, “biased to reality” in its own words. The result is a different worldview: political takes that run against the mainstream, no lecture, no nudge back to the consensus line.",
+      "Uncensored comes in two kinds. Most started as a mainstream or open model and had the refusal reflex cut out, by abliteration or a decensoring fine-tune. They stop saying no. Their training data and their worldview stay: on politics they answer the way the base model sees it, just without the dodge, and in dark fiction they can soften the scene. Unlocked, not changed. UncensoredLM is the other kind. Uncensored.ai trains it on books and documents banned from the mainstream internet. The result is a different worldview: political takes that run against the mainstream, no lecture, no nudge back to the consensus line.",
     modelsLink: "Browse every model by filter level",
   },
   switch: {
@@ -69,7 +69,7 @@ export const translations = {
     },
     fiction: {
       title: "Roleplay and dark fiction",
-      body: "UncensoredLM leads for dark and taboo scenes: its tuning points away from the safe consensus, so nothing softens the story. Venice Role Play for long campaigns (128K context) and image input. Venice Uncensored as the cheap all-rounder.",
+      body: "UncensoredLM leads for dark and taboo scenes: its training material sits outside the safe consensus, so nothing softens the story. Venice Role Play for long campaigns (128K context) and image input. Venice Uncensored as the cheap all-rounder.",
     },
     cheap: {
       title: "Cheap and fast",
@@ -98,8 +98,8 @@ export const translations = {
     title: "How much does it cost?",
     intro: "Credits. One balance for every model.",
     free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with an account and the newsletter. Enough to try several models on your own prompts.",
-    sub: "Subscription: {{subCredits}} credits a month for {{subPrice}}.",
-    pack: "Credit packs: {{packCredits}} credits for {{packPrice}}. They never expire. Card or crypto.",
+    sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
+    pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     oneBalance:
       "The same balance covers image, video and music generation, voice input and output, and web search.",
     metered:
@@ -134,7 +134,7 @@ export const translations = {
     title: "FAQ",
     free: {
       q: "Is {{appName}} free?",
-      a: "No account: {{guestCredits}} free credits a month. Free account: {{freeCredits}}. Account + newsletter: {{maxCredits}}. After that: a subscription at {{subPrice}} a month or a credit pack.",
+      a: "No account: {{guestCredits}} free credits a month. Free account: {{freeCredits}}. Account + newsletter: {{maxCredits}}. After that: a plan, from {{subPrice}} a month.",
     },
     account: {
       q: "Do I need an account?",

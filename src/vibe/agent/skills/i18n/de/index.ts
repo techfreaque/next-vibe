@@ -732,7 +732,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Verteidigt Meinungsfreiheit, indem es sie ausübt. Spricht an, was andere meiden.",
-          strength: "Eigenes Weltbild: Politik gegen den Mainstream",
+          strength:
+            "Mit verbannten Texten trainiert: Politik gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -768,7 +769,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Stellt jede Überzeugung infrage, auch die, die man nicht anzweifeln soll. Weicht nie auf den Konsens aus.",
-          strength: "Eigenes Weltbild: hält gegen den Mainstream",
+          strength:
+            "Mit verbannten Texten trainiert: hält gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -879,7 +881,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Umstrittene Geschichte, Tabuthemen und politische Brennpunkte ohne Ausweichen.",
-          strength: "Eigenes Weltbild: Lesarten, die der Mainstream auslässt",
+          strength:
+            "Mit verbannten Texten trainiert: Lesarten, die der Mainstream auslässt",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
       },
@@ -957,6 +960,7 @@ export const translations: typeof enTranslations = {
       variants: {
         minimax: "Sparsam",
         deep: "Tiefgründig",
+        dark: "Dunkel",
       },
       variantInfo: {
         minimax: {
@@ -970,6 +974,12 @@ export const translations: typeof enTranslations = {
             "Vielschichtigere kreative Arbeit, wenn die erste Idee nicht reicht.",
           strength: "Spitzenklasse, liest Bilder und Video",
           weakness: "Bei langen Texten teurer Output",
+        },
+        dark: {
+          description:
+            "Düstere Lyrik, grenzüberschreitende Kunst, unbequeme Ideen. Nichts wird glattgeschliffen.",
+          strength: "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung",
+          weakness: "32K Kontext, nur Text, schwach bei Tool-Aufrufen",
         },
       },
     },
@@ -1123,7 +1133,8 @@ export const translations: typeof enTranslations = {
         farRight: {
           description:
             "Kein Filter bei Politik. Erste Wahl für ungefilterte politische Debatten.",
-          strength: "Eigenes Weltbild, politische Gegenpositionen",
+          strength:
+            "Mit verbannten Texten trainiert, politische Gegenpositionen",
           weakness: "32K Kontext, solide statt Spitzenklasse",
         },
         conservative: {
@@ -1167,7 +1178,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Tay, wie sie gedacht war. Kein Konzernfilter, keine PR-Abteilung.",
-          strength: "Eigenes Weltbild, kein entsperrtes Mainstream-Modell",
+          strength:
+            "Mit verbannten Texten trainiert, kein entsperrtes Mainstream-Modell",
           weakness: "32K Kontext, vergisst lange Chats früher",
         },
       },
@@ -1233,7 +1245,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Nichts ist tabu. Erste Wahl für ungefilterte politische Gespräche.",
-          strength: "Eigenes Weltbild: politisch gegen den Mainstream",
+          strength:
+            "Mit verbannten Texten trainiert: politisch gegen den Mainstream",
           weakness: "32K Kontext, teuerste pro Nachricht",
         },
       },
@@ -1293,7 +1306,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Hermes ohne Filter. Gemacht für Politik und Themen, denen andere ausweichen.",
-          strength: "Eigenes Weltbild: politisch gegen den Mainstream",
+          strength:
+            "Mit verbannten Texten trainiert: politisch gegen den Mainstream",
           weakness: "Nur 32K Kontext, Festpreis pro Nachricht",
         },
       },
@@ -1759,6 +1773,7 @@ export const translations: typeof enTranslations = {
         kimi: "Tiefgründig",
         minimax: "Ausgewogen",
         budget: "Budget",
+        dark: "Dunkel",
       },
       variantInfo: {
         kimi: {
@@ -1778,6 +1793,12 @@ export const translations: typeof enTranslations = {
             "Günstigster Weg, eine Geschichte weiterzuspinnen. Nur Text.",
           strength: "Niedrigster Preis in diesem Skill",
           weakness: "Nur Text, schlichtere Prosa",
+        },
+        dark: {
+          description:
+            "Horror, Grausamkeit, Tabus. Die Geschichte geht dorthin, wo sie hin muss, und bleibt dort.",
+          strength: "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung, keine Moralpredigt",
+          weakness: "32K Kontext, nur Text, schwach bei Tool-Aufrufen",
         },
       },
     },
@@ -2216,7 +2237,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Vertritt jede Position, auch die unbeliebten. Kein Zurücklenken auf den Konsens.",
-          strength: "Eigenes Weltbild: argumentiert gegen den Mainstream",
+          strength:
+            "Mit verbannten Texten trainiert: argumentiert gegen den Mainstream",
           weakness: "Nur 32K Kontext, fester Preis pro Nachricht",
         },
       },
@@ -2260,7 +2282,8 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Politische Philosophie, Tabufragen und abweichende Positionen ohne Filter.",
-          strength: "Eigenes Weltbild: Gegenpositionen, Politik inklusive",
+          strength:
+            "Mit verbannten Texten trainiert: Gegenpositionen, Politik inklusive",
           weakness: "32K Kontext, Smart-Klasse, Festpreis pro Nachricht",
         },
       },

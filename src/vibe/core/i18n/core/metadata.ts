@@ -3,8 +3,12 @@ import type { Metadata } from "next";
 import { configScopedTranslation } from "@/env/i18n";
 
 import type { CountryLanguage } from "./config";
-import { Countries, Languages as LanguagesEnum } from "./config";
 import type { TranslatedKeyType } from "./scoped-translation";
+import {
+  canonicalSeoLocale,
+  hreflangFor,
+  seoLanguageAlternates,
+} from "./seo-locales";
 
 /**
  * Options for generating metadata with translations
@@ -42,18 +46,14 @@ export function metadataGenerator(
     includeTwitter = true,
   } = options;
 
-  const canonicalUrl = `${baseUrl}/${locale}${path ? `/${path}` : ""}`;
+  // Mixed locales (de-US, en-PL, ...) are served but not indexed: their
+  // canonical is the language's indexable locale, so search engines see one
+  // URL per language/market (same set as the sitemap).
+  const canonicalUrl = `${baseUrl}/${canonicalSeoLocale(locale)}${path ? `/${path}` : ""}`;
 
-  const languageAlternates: Record<string, string> = {};
-  if (generateAlternates) {
-    Object.values(LanguagesEnum).forEach((lang) => {
-      Object.values(Countries).forEach((country) => {
-        const countryLang = `${lang}-${country}`;
-        languageAlternates[countryLang] =
-          `${baseUrl}/${countryLang}${path ? `/${path}` : ""}`;
-      });
-    });
-  }
+  const languageAlternates: Record<string, string> = generateAlternates
+    ? seoLanguageAlternates(baseUrl, path)
+    : {};
 
   const metadata: Metadata = {
     title: options.title,
@@ -94,7 +94,7 @@ export function metadataGenerator(
       url: canonicalUrl,
       siteName: appName,
       type: "website",
-      locale: locale.replace("-", "_"),
+      locale: hreflangFor(canonicalSeoLocale(locale)).replace("-", "_"),
       images: [
         {
           url: options.image,

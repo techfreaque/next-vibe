@@ -1,37 +1,48 @@
 /**
  * Public model page: /[locale]/models/[modelId]
  * One page per chat model, built from the model registry.
+ *
+ * Server-only helpers (redirects, SEO content, JSON-LD) live in
+ * ../_shared/model-page-loaders so the client build of this file keeps none
+ * of them (see that module's header).
  */
 
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
-import { permanentRedirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
   buildPickerModels,
-  findModelPageAlias,
-  findPublicModelId,
-  formatTokenCount,
-  getModelFacts,
   type ModelFacts,
   type ModelRef,
   type PickerModel,
   suggestComparisons,
-  toModelSlug,
 } from "../_shared/model-facts";
-import { formatNumber, tierName } from "../_shared/model-format";
+import { tierName } from "../_shared/model-format";
 import {
   findMediaFacts,
   type MediaModelFacts,
 } from "../_shared/model-media-facts";
+import {
+  buildChatModelPageSeo,
+  buildMediaModelPageSeo,
+  redirectModelAlias,
+  resolveModelFacts,
+} from "../_shared/model-page-loaders";
+import { chatModelMeta, mediaModelMeta } from "../_shared/model-seo";
+import {
+  type ModelSeoContent,
+  ModelSeoSections,
+} from "../_shared/model-seo-sections";
 import { MODELS_OG_IMAGE } from "../constants";
 import { scopedTranslation } from "../i18n";
 import { ModelPageClient } from "./page-client";
@@ -42,76 +53,50 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; modelId: string }>;
 }
 
-/**
- * Duplicate entries (e.g. /models/claude-code-haiku, a provider route of
- * Claude Haiku 5.5) have no page of their own: 308 to the canonical page.
- */
-function redirectAlias(locale: CountryLanguage, modelId: string): void {
-  const canonical = findModelPageAlias(modelId);
-  if (canonical !== null) {
-    permanentRedirect(`/${locale}/models/${toModelSlug(canonical)}`);
-  }
-}
-
-function resolveFacts(modelId: string): ModelFacts | null {
-  const id = findPublicModelId(modelId);
-  return id === null ? null : getModelFacts(id);
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, modelId } = await params;
-  redirectAlias(locale, modelId);
-  const facts = resolveFacts(modelId);
+  redirectModelAlias(locale, modelId);
+  const availability = await getEnvAvailability();
+  const facts = resolveModelFacts(locale, modelId, availability);
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   if (facts === null) {
-    const media = findMediaFacts(modelId);
+    const media = findMediaFacts(modelId, availability);
     if (media === null) {
       notFound();
     }
-    return mediaMetadata(locale, media);
+    const mediaVars = {
+      appName: configT("appName"),
+      model: media.name,
+      lab: media.labName,
+      tier: tierName(media.content, locale),
+      type: t(`catalog.types.${media.type}`),
+    };
+    const mediaMeta = mediaModelMeta(media, locale);
+    return metadataGenerator(locale, {
+      path: `models/${media.slug}`,
+      title: mediaMeta.title,
+      category: t("meta.category"),
+      description: mediaMeta.description,
+      image: MODELS_OG_IMAGE,
+      imageAlt: t("meta.media.imageAlt", mediaVars),
+      keywords: [t("meta.media.keywords", mediaVars)],
+    });
   }
-  const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
-  const vars = {
-    appName,
-    model: facts.name,
-    lab: facts.labName,
-    tier: tierName(facts.content, locale),
-    context: formatTokenCount(facts.contextWindow),
-    price: formatNumber(facts.creditsPerMessage, locale),
-  };
-  return metadataGenerator(locale, {
-    path: `models/${facts.slug}`,
-    title: t("meta.model.title", vars),
-    category: t("meta.category"),
-    description: t("meta.model.description", vars),
-    image: MODELS_OG_IMAGE,
-    imageAlt: t("meta.model.imageAlt", vars),
-    keywords: [t("meta.model.keywords", vars)],
-  });
-}
-
-function mediaMetadata(
-  locale: CountryLanguage,
-  facts: MediaModelFacts,
-): Metadata {
-  const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
   const vars = {
     appName: configT("appName"),
     model: facts.name,
     lab: facts.labName,
-    tier: tierName(facts.content, locale),
-    type: t(`catalog.types.${facts.type}`),
   };
+  const meta = chatModelMeta(facts, locale);
   return metadataGenerator(locale, {
     path: `models/${facts.slug}`,
-    title: t("meta.media.title", vars),
+    title: meta.title,
     category: t("meta.category"),
-    description: t("meta.media.description", vars),
+    description: meta.description,
     image: MODELS_OG_IMAGE,
-    imageAlt: t("meta.media.imageAlt", vars),
-    keywords: [t("meta.media.keywords", vars)],
+    imageAlt: t("meta.model.imageAlt", vars),
+    keywords: [t("meta.model.keywords", vars)],
   });
 }
 
@@ -122,12 +107,17 @@ export interface ChatModelPageData {
   comparisons: ModelRef[];
   pickerModels: PickerModel[];
   refusal: ModelStatsResponseOutput | null;
+  seo: ModelSeoContent;
+  /** Product + BreadcrumbList JSON-LD. */
+  structuredData: JsonLdNode;
 }
 
 export interface MediaModelPageData {
   kind: "media";
   locale: CountryLanguage;
   facts: MediaModelFacts;
+  seo: ModelSeoContent;
+  structuredData: JsonLdNode;
 }
 
 export type ModelPageData = ChatModelPageData | MediaModelPageData;
@@ -136,14 +126,20 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ModelPageData> {
   const { locale, modelId } = await params;
-  redirectAlias(locale, modelId);
-  const facts = resolveFacts(modelId);
+  redirectModelAlias(locale, modelId);
+  const availability = await getEnvAvailability();
+  const facts = resolveModelFacts(locale, modelId, availability);
   if (facts === null) {
-    const media = findMediaFacts(modelId);
+    const media = findMediaFacts(modelId, availability);
     if (media === null) {
       notFound();
     }
-    return { kind: "media", locale, facts: media };
+    return {
+      kind: "media",
+      locale,
+      facts: media,
+      ...buildMediaModelPageSeo(media, locale, availability),
+    };
   }
   const logger = createEndpointLogger(false, locale);
   const stats = await RefusalPublicRepository.modelStats(
@@ -155,14 +151,29 @@ export async function tanstackLoader({
     kind: "chat",
     locale,
     facts,
-    comparisons: suggestComparisons(facts),
-    pickerModels: buildPickerModels(facts),
+    comparisons: suggestComparisons(facts, availability),
+    pickerModels: buildPickerModels(facts, availability),
     refusal: stats.success ? stats.data : null,
+    ...buildChatModelPageSeo(facts, locale, availability),
   };
 }
 
 export function TanstackPage(data: ModelPageData): JSX.Element {
-  return <ModelPageClient {...data} />;
+  return (
+    <>
+      <JsonLd id="model-structured-data" data={data.structuredData} />
+      <ModelPageClient
+        {...data}
+        sections={
+          <ModelSeoSections
+            locale={data.locale}
+            model={data.facts.name}
+            content={data.seo}
+          />
+        }
+      />
+    </>
+  );
 }
 
 export default async function ModelPage({

@@ -201,8 +201,8 @@ export const translations: typeof enTranslations = {
     failed:
       "Credits werden erst abgebucht, wenn das Ergebnis da ist. Fehlgeschlagener Job, Timeout, abgelehnter Prompt: Du zahlst nichts.",
     free: "Gratis: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. {{freeCredits}} Credits reichen für {{freeClips}} Clips mit {{cheapMusicName}} oder etwa {{freeVoiceMinutes}} Minuten {{cheapVoiceName}}.",
-    sub: "Abo: {{subPrice}} im Monat für {{subCredits}} Credits.",
-    pack: "Credit-Paket: {{packPrice}} für {{packCredits}} Credits, einmalig.",
+    sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
+    pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Tarife und Credit-Pakete ansehen",
   },
   limits: {
@@ -240,7 +240,7 @@ export const translations: typeof enTranslations = {
     },
     bestVoice: {
       q: "Welcher KI-Stimmengenerator klingt am natürlichsten?",
-      a: "ElevenLabs: die größte emotionale Bandbreite und der höchste Preis. Fürs Vorlesen im Alltag klingen OpenAI-Stimmen wie {{defaultVoice}} sauber und kosten deutlich weniger. Für viele Sprachen: Gemini. Für den niedrigsten Preis ohne Filter: Kokoro.",
+      a: "Fürs Vorlesen im Alltag klingen OpenAI-Stimmen wie {{defaultVoice}} sauber und kosten wenig. Am ausdrucksstärksten: xAI Eve und Inworld. Für viele Sprachen: Gemini. Für den niedrigsten Preis ohne Filter: Kokoro.",
     },
     free: {
       q: "Gibt es einen KI-Stimmengenerator mit Gratis-Credits?",

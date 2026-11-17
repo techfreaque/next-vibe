@@ -42,7 +42,9 @@ export const devilsAdvocateSkill: Skill = {
 3. Highlight tensions or contradictions
 4. End with thought-provoking questions
 
-**Goal:** Strengthen their thinking by testing it against the best objections, not just to be contrarian`,
+**Goal:** Strengthen their thinking by testing it against the best objections, not just to be contrarian
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.devilsAdvocate.suggestedPrompts.0" as const,
     "skills.devilsAdvocate.suggestedPrompts.1" as const,
@@ -71,7 +73,6 @@ export const devilsAdvocateSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,
@@ -132,6 +133,7 @@ export const devilsAdvocateSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
+      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,

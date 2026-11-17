@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
       "Leicht zu pitchen, weil sie genau das löst, worüber Leute sich beschweren.",
     choice: {
       title: "Etablierte, offene und unzensierte Modelle",
-      body: "Die großen Namen neben offenen und unzensierten Modellen, in einem Chat. Unzensiert gibt es in zwei Sorten: Mainstream-Modelle ohne Verweigerungen und UncensoredLM mit eigenem Weltbild. Modellwechsel jederzeit.",
+      body: "Die großen Namen neben offenen und unzensierten Modellen, in einem Chat. Unzensiert gibt es in zwei Sorten: Mainstream-Modelle ohne Verweigerungen und UncensoredLM, trainiert mit Büchern und Dokumenten, die im Mainstream-Internet verbannt sind. Modellwechsel jederzeit.",
     },
     control: {
       title: "Den Filter stellen sie selbst ein",
@@ -128,7 +128,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Kostenloser Einstieg",
-      body: "Neue Nutzer testen den Chat ohne Karte. Leichtes Ja für deine Community, leichte Conversion für dich. Für Entwickler: Die API braucht einen Tarif oder ein einmaliges Credit-Paket für {{packPrice}}.",
+      body: "Neue Nutzer testen den Chat ohne Karte. Leichtes Ja für deine Community, leichte Conversion für dich. Für Entwickler: Die API braucht einen beliebigen Tarif, ab {{subPrice}} im Monat.",
     },
   },
   faq: {

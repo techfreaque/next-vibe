@@ -9,6 +9,7 @@ import {
   getAvailableChatModelCount,
   getAvailableChatProviderCount,
 } from "next-vibe/agent/models/all-models";
+import { coreEnv } from "next-vibe/core/env";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
@@ -59,6 +60,23 @@ export async function generateMetadata({
     image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],
+    // No canonical/hreflang at layout level: a page without its own metadata
+    // would inherit the home URL as canonical and be read as a duplicate of
+    // it. Every indexable page sets its own via metadataGenerator.
+    additionalMetadata: {
+      alternates: null,
+      // Search Console / Bing Webmaster tokens, rendered on every page.
+      // Read inline: the client build strips generateMetadata, but a helper
+      // function would keep the server-only env import in the client bundle.
+      verification: {
+        ...(coreEnv.GOOGLE_SITE_VERIFICATION
+          ? { google: coreEnv.GOOGLE_SITE_VERIFICATION }
+          : {}),
+        ...(coreEnv.BING_SITE_VERIFICATION
+          ? { other: { "msvalidate.01": coreEnv.BING_SITE_VERIFICATION } }
+          : {}),
+      },
+    },
   });
 }
 

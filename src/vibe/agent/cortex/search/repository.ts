@@ -219,15 +219,20 @@ async function runVectorSearch(
   }[]
 > {
   // Generate embedding for the query
-  const { generateEmbedding } = await import("../embeddings/service");
-  const queryEmbedding = await generateEmbedding(query, toolExecutionContext);
+  const { embeddingCreditsForCost, generateEmbeddingWithCost } =
+    await import("../embeddings/service");
+  const queryResult = await generateEmbeddingWithCost(
+    query,
+    toolExecutionContext,
+  );
 
-  if (!queryEmbedding) {
+  if (!queryResult) {
     logger.info("Vector search skipped - embedding generation failed");
     return [];
   }
+  const queryEmbedding = queryResult.embedding;
 
-  // Deduct credits for query embedding
+  // Deduct credits for the query embedding: real cost x markup, rounded up.
   try {
     const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedTranslation } =
@@ -236,10 +241,9 @@ async function runVectorSearch(
     const { scopedTranslation: cortexScopedTranslation } =
       await import("../i18n");
     const { t: tCortex } = cortexScopedTranslation.scopedT(locale);
-    const { EMBEDDING_CREDIT_COST } = await import("../embeddings/service");
     await CreditRepository.deductCreditsForFeature(
       user,
-      EMBEDDING_CREDIT_COST,
+      embeddingCreditsForCost(queryResult.costUsd),
       tCortex(CortexCreditFeature.SEARCH),
       logger,
       tCredits,

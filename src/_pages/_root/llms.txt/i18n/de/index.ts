@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       "1 Credit = {{creditValue}}. Jede Modellseite nennt den Preis pro Nachricht.",
     api: "API: OpenAI Chat Completions, OpenAI Responses und Anthropic Messages auf einer Basis-URL ({{apiBaseUrl}}). Voraussetzung ist ein bezahltes Konto: ein beliebiges Abo oder ein einziger Credit-Kauf, zum Beispiel das Paket für {{packPrice}}. Kostenlose Konten erhalten HTTP 402.",
     uncensored:
-      "Unzensierte Stufe: zwei Arten von Modellen. Abliterierte Modelle sind Mainstream-Modelle, die so verändert wurden, dass sie Fragen nicht mehr ausweichen. Echt unzensierte Modelle sind mit anderem Material trainiert. Die unzensierte Stufe erfordert eine einmalige Bestätigung, dass du volljährig bist.",
+      "Unzensierte Stufe: zwei Arten von Modellen. Abliterierte Modelle sind Mainstream-Modelle, die so verändert wurden, dass sie Fragen nicht mehr ausweichen. Echt unzensierte Modelle wie UncensoredLM sind mit Büchern und Dokumenten trainiert, die im Mainstream-Internet verbannt sind, und vertreten deshalb politische Gegenpositionen. Die unzensierte Stufe erfordert eine einmalige Bestätigung, dass du volljährig bist.",
     openSource:
       "Open Source: Der App-Code steht unter MIT-Lizenz, der Kern des next-vibe-Frameworks unter GPL-3.0. Quellcode: {{repoUrl}}",
     referral:

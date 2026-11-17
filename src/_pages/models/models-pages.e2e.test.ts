@@ -9,6 +9,7 @@
  */
 
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { TOUR_SKIPPED_KEY } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-config";
 import { until } from "next-vibe/agent/ai-stream/testing/e2e-chat";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -19,6 +20,9 @@ import { describe, expect } from "vitest";
 import { getModelFacts, toModelSlug } from "./_shared/model-facts";
 import { listMediaFacts } from "./_shared/model-media-facts";
 import { scopedTranslation } from "./i18n";
+
+/** Same provider-key availability the pages render with. */
+const availability = await getEnvAvailability();
 
 const PHONE = { width: 390, height: 844 } as const;
 const DESKTOP = { width: 1440, height: 900 } as const;
@@ -56,7 +60,7 @@ describe("E2E: model pages", () => {
     e2e.it(
       `model page renders the fact sheet at ${viewport.width}px`,
       async ({ page, gotoReady }) => {
-        const facts = getModelFacts(MODEL);
+        const facts = getModelFacts(MODEL, availability);
         expect(facts).not.toBeNull();
         if (facts === null) {
           return;
@@ -97,8 +101,8 @@ describe("E2E: model pages", () => {
     e2e.it(
       `compare page renders both models at ${viewport.width}px`,
       async ({ page, gotoReady }) => {
-        const left = getModelFacts(MODEL);
-        const right = getModelFacts(OTHER);
+        const left = getModelFacts(MODEL, availability);
+        const right = getModelFacts(OTHER, availability);
         expect(left !== null && right !== null).toBe(true);
         if (left === null || right === null) {
           return;
@@ -136,7 +140,7 @@ describe("E2E: model pages", () => {
     expect(await page.locator("[data-tier]").count()).toBeGreaterThanOrEqual(2);
     await expectNoOverflow(page, "index");
 
-    const facts = getModelFacts(OTHER);
+    const facts = getModelFacts(OTHER, availability);
     expect(facts).not.toBeNull();
     if (facts === null) {
       return;
@@ -161,7 +165,7 @@ describe("E2E: model pages", () => {
   });
 
   e2e.it("legacy model page links its successor", async ({ page, gotoReady }) => {
-    const facts = getModelFacts(LEGACY);
+    const facts = getModelFacts(LEGACY, availability);
     expect(facts?.successor).toBeTruthy();
     if (facts === null || facts.successor === null) {
       return;
@@ -181,7 +185,7 @@ describe("E2E: model pages", () => {
     page,
     gotoReady,
   }) => {
-    const media = listMediaFacts().find((facts) => facts.type === "image");
+    const media = listMediaFacts(availability).find((facts) => facts.type === "image");
     expect(media).toBeTruthy();
     if (media === undefined) {
       return;
@@ -241,7 +245,7 @@ describe("E2E: model pages", () => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
       }, TOUR_SKIPPED_KEY);
-      const facts = getModelFacts(LINKED);
+      const facts = getModelFacts(LINKED, availability);
       expect(facts).not.toBeNull();
       if (facts === null) {
         return;

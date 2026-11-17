@@ -195,6 +195,9 @@ export function ComparePageClient({
           <Div className="divide-y divide-border">
             {leftRows.map((row, index) => {
               const other = rightRows[index];
+              if (row.missing && (other === undefined || other.missing)) {
+                return null;
+              }
               return (
                 <Div
                   key={row.key}

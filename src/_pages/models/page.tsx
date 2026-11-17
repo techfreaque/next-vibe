@@ -8,14 +8,21 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import { buildBreadcrumbList } from "../_components/structured-data";
 import {
   type CatalogMediaModelCounts,
   getCatalogMediaModelCounts,
 } from "./_shared/model-catalog-entries";
+import {
+  buildModelDirectory,
+  type DirectoryGroup,
+  ModelDirectory,
+} from "./_shared/model-directory";
 import { MODELS_OG_IMAGE } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { ModelsIndexClient } from "./page-client";
@@ -48,6 +55,10 @@ export interface ModelsIndexPageData {
   /** Public chat-model count, same figure as the rest of the site */
   chatModelCount: number;
   mediaModelCounts: CatalogMediaModelCounts;
+  /** Every model page as a plain link list (crawlable, incl. legacy + media). */
+  directory: DirectoryGroup[];
+  /** BreadcrumbList JSON-LD: Home > Models. */
+  structuredData: JsonLdNode;
 }
 
 export async function tanstackLoader({
@@ -55,15 +66,33 @@ export async function tanstackLoader({
 }: Props): Promise<ModelsIndexPageData> {
   const { locale } = await params;
   const availability = await getEnvAvailability();
+  const { t } = scopedTranslation.scopedT(locale);
   return {
     locale,
+    directory: buildModelDirectory(availability),
+    structuredData: {
+      "@context": "https://schema.org",
+      ...buildBreadcrumbList(locale, [
+        { name: t("breadcrumb.models"), path: "/models" },
+      ]),
+    },
     chatModelCount: getAvailableChatModelCount(false, availability),
     mediaModelCounts: getCatalogMediaModelCounts(availability),
   };
 }
 
 export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
-  return <ModelsIndexClient {...data} />;
+  return (
+    <>
+      <JsonLd id="models-structured-data" data={data.structuredData} />
+      <ModelsIndexClient
+        {...data}
+        directorySection={
+          <ModelDirectory locale={data.locale} groups={data.directory} />
+        }
+      />
+    </>
+  );
 }
 
 export default async function ModelsIndexPage({

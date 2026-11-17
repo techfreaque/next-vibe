@@ -224,3 +224,34 @@ function inlineChildren(
   assign("oneOf", many(node.oneOf));
   return result;
 }
+
+/**
+ * Remove string values in `drop` from every `enum` of a schema, in place.
+ * Used to hide model/voice ids whose provider has no API key configured on
+ * this instance from the schemas the AI, MCP and CLI see (the zod schema
+ * still validates; an id that slips through falls back like any other
+ * unavailable model). An enum is never emptied: if every value would go,
+ * it stays as it was.
+ */
+export function dropEnumValues(
+  schema: JSONSchema7Definition,
+  drop: ReadonlySet<string>,
+): void {
+  if (typeof schema === "boolean" || drop.size === 0) {
+    return;
+  }
+  if (Array.isArray(schema.enum)) {
+    const kept = schema.enum.filter(
+      (value) => typeof value !== "string" || !drop.has(value),
+    );
+    if (kept.length > 0 && kept.length < schema.enum.length) {
+      schema.enum = kept;
+    }
+  }
+  for (const child of childDefinitions(schema)) {
+    dropEnumValues(child, drop);
+  }
+  for (const child of Object.values(schema.definitions ?? {})) {
+    dropEnumValues(child, drop);
+  }
+}

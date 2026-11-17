@@ -18,6 +18,8 @@ import "server-only";
 
 import { z } from "zod";
 
+import { getEnvAvailability } from "../agent/env-availability";
+import { getUnavailableModelIds } from "../agent/models/all-models";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import {
   enrichJsonSchemaFromFields,
@@ -40,6 +42,7 @@ import {
   type UserRoleValue,
 } from "../identity/roles/enum";
 import type { EndpointLogger } from "../logger/types";
+import { dropEnumValues } from "../platforms/ai/tool-json-schema";
 import { Platform } from "../platforms/platforms";
 import { generateSchemaForUsage } from "../unified-ui/_shared/utils";
 import type {
@@ -88,6 +91,7 @@ export class HelpRepository {
     platform: Platform,
     userRoles: readonly (typeof UserPermissionRoleValue)[],
     logger: EndpointLogger,
+    unavailableModelIds: ReadonlySet<string>,
   ): HelpToolParameters | null {
     if (!endpoint.fields) {
       return null;
@@ -126,6 +130,8 @@ export class HelpRepository {
         return null;
       }
       const schema = zodSchemaToJsonSchema(z.object(combinedShape));
+      // Model / voice ids no configured provider can serve are not offered.
+      dropEnumValues(schema, unavailableModelIds);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const topLevelFields: Record<string, any> = {};
@@ -235,6 +241,9 @@ export class HelpRepository {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     const userRoles = filterUserPermissionRoles(user.roles);
+    const unavailableModelIds = getUnavailableModelIds(
+      await getEnvAvailability(),
+    );
 
     const effectivePageSize =
       data.pageSize ??
@@ -411,6 +420,7 @@ export class HelpRepository {
             platform,
             userRoles,
             logger,
+            unavailableModelIds,
           ) ?? undefined)
         : undefined;
       const callAs = matchedTool.toolName;
@@ -462,6 +472,7 @@ export class HelpRepository {
               platform,
               userRoles,
               logger,
+              unavailableModelIds,
             ) ?? undefined)
           : undefined;
         const callAs = exactMatch.toolName;
@@ -593,6 +604,7 @@ export class HelpRepository {
                   platform,
                   userRoles,
                   logger,
+                  unavailableModelIds,
                 ) ?? undefined)
               : undefined;
             return serializeMeta(
@@ -678,6 +690,7 @@ export class HelpRepository {
                 platform,
                 userRoles,
                 logger,
+                unavailableModelIds,
               ) ?? undefined)
             : undefined;
           return serializeMeta(m, parameters, true, getToolPlatforms(m));

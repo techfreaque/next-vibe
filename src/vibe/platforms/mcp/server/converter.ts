@@ -14,6 +14,7 @@ import type { UserPermissionRoleValue } from "../../../identity/roles/enum";
 import { hasChild, hasChildren } from "../../../unified-ui/_shared/type-guards";
 import type { SchemaTypes } from "../../../unified-ui/_shared/types";
 import { generateSchemaForUsage } from "../../../unified-ui/_shared/utils";
+import { dropEnumValues } from "../../ai/tool-json-schema";
 import { Platform } from "../../platforms";
 import type { MCPTool } from "../types";
 
@@ -276,6 +277,8 @@ export function endpointToMCPTool(
   endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
   userRoles: readonly (typeof UserPermissionRoleValue)[],
+  /** Model / voice ids no configured provider can serve: left out of enums. */
+  unavailableModelIds: ReadonlySet<string>,
 ): MCPTool {
   const toolName = getPreferredToolName(endpoint);
 
@@ -299,6 +302,7 @@ export function endpointToMCPTool(
   // Convert to JSON Schema using shared utility
   // z.toJSONSchema automatically handles transforms and includes descriptions
   const jsonSchema = zodSchemaToJsonSchema(zodSchema);
+  dropEnumValues(jsonSchema, unavailableModelIds);
 
   // Enrich with fieldType metadata for accurate types (int vs number, uuid format, etc.)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

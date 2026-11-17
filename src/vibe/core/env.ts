@@ -418,4 +418,18 @@ export const {
       "Absolute path to the project root. Mainly needed for MCP servers which often run in a different working directory.",
     commented: true,
   },
+  GOOGLE_SITE_VERIFICATION: {
+    schema: z.string().optional(),
+    example: "abc123-token-from-search-console",
+    comment:
+      "Google Search Console HTML-tag verification token (content of the google-site-verification meta tag). Rendered on every page when set.",
+    commented: true,
+  },
+  BING_SITE_VERIFICATION: {
+    schema: z.string().optional(),
+    example: "0123456789ABCDEF0123456789ABCDEF",
+    comment:
+      "Bing Webmaster Tools verification token (content of the msvalidate.01 meta tag). Rendered on every page when set.",
+    commented: true,
+  },
 });

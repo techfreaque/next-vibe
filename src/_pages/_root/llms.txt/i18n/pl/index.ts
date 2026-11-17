@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       "1 kredyt = {{creditValue}}. Każda strona modelu podaje cenę za wiadomość.",
     api: "API: OpenAI Chat Completions, OpenAI Responses i Anthropic Messages pod jednym adresem bazowym ({{apiBaseUrl}}). Wymaga płatnego konta: dowolnej subskrypcji albo jednego zakupu kredytów, na przykład pakietu za {{packPrice}}. Darmowe konta dostają HTTP 402.",
     uncensored:
-      "Poziom bez cenzury: dwa rodzaje modeli. Modele abliterowane to modele mainstreamowe zmienione tak, by nie unikały pytań. Modele naprawdę bez cenzury są trenowane na innym materiale. Poziom bez cenzury wymaga jednorazowego potwierdzenia, że masz 18 lat.",
+      "Poziom bez cenzury: dwa rodzaje modeli. Modele abliterowane to modele mainstreamowe zmienione tak, by nie unikały pytań. Modele naprawdę bez cenzury, takie jak UncensoredLM, są trenowane na książkach i dokumentach zakazanych w mainstreamowym internecie, więc mają przeciwne poglądy polityczne. Poziom bez cenzury wymaga jednorazowego potwierdzenia, że masz 18 lat.",
     openSource:
       "Open source: kod aplikacji na licencji MIT, rdzeń frameworka next-vibe na GPL-3.0. Kod źródłowy: {{repoUrl}}",
     referral:

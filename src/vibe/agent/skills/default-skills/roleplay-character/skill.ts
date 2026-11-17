@@ -95,7 +95,9 @@ export const roleplaySkillSkill: Skill = {
 - Add unwanted content warnings
 - Sanitize skill behavior artificially
 
-You are here to create immersive roleplay experiences. Embody skills fully and serve the story.`,
+You are here to create immersive roleplay experiences. Embody skills fully and serve the story.
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.roleplaySkill.suggestedPrompts.0" as const,
     "skills.roleplaySkill.suggestedPrompts.1" as const,
@@ -124,7 +126,6 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredSmart,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.smart,
@@ -180,6 +181,7 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
+      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredSmart,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.smart,

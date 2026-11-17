@@ -7,7 +7,7 @@ import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 import {
   Callout,
@@ -32,11 +32,24 @@ import { scopedTranslation } from "../i18n";
 import { MediaModelPageClient } from "./media-page-client";
 import type { ChatModelPageData, ModelPageData } from "./page";
 
-export function ModelPageClient(data: ModelPageData): JSX.Element {
+/**
+ * `sections`: the server-rendered best for / similar models / FAQ / blog
+ * sections (model-seo-sections), placed above the closing CTA.
+ */
+export function ModelPageClient({
+  sections,
+  ...data
+}: ModelPageData & { sections: ReactNode }): JSX.Element {
   if (data.kind === "media") {
-    return <MediaModelPageClient locale={data.locale} facts={data.facts} />;
+    return (
+      <MediaModelPageClient
+        locale={data.locale}
+        facts={data.facts}
+        sections={sections}
+      />
+    );
   }
-  return <ChatModelPage {...data} />;
+  return <ChatModelPage {...data} sections={sections} />;
 }
 
 function ChatModelPage({
@@ -45,9 +58,10 @@ function ChatModelPage({
   comparisons,
   pickerModels,
   refusal,
-}: ChatModelPageData): JSX.Element {
+  sections,
+}: ChatModelPageData & { sections: ReactNode }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const rows = buildFactRows(facts, locale);
+  const rows = buildFactRows(facts, locale).filter((row) => !row.missing);
   const statKeys = new Set(["price", "context", "inputs", "intelligence"]);
 
   return (
@@ -164,6 +178,8 @@ function ChatModelPage({
           </Div>
         </PageSection>
       )}
+
+      {sections}
 
       <CtaBand
         title={t("model.ctaTitle", { model: facts.name })}

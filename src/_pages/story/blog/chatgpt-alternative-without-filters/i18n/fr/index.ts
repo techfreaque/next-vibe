@@ -35,11 +35,11 @@ export const translations: typeof enTranslations = {
       "Grand public ({{count}} modèles) : Claude, GPT, Gemini, Mistral. Les filtres de sécurité des grands labos. Ils déclinent les sujets sensibles.",
     open: "Open source ({{count}} modèles) : DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax et d'autres. Filtres légers. Ils abordent la plupart des sujets délicats.",
     uncensored:
-      "Non censuré ({{count}} modèles), de deux sortes. Des versions non censurées de GLM, Qwen, Gemma et DeepSeek, plus Venice : des modèles grand public dont on a retiré les refus, avec la même vision du monde. Et UncensoredLM : son propre entraînement, sa propre vision du monde. Aucun filtre. C'est vous qui fixez les limites.",
+      "Non censuré ({{count}} modèles), de deux sortes. Des versions non censurées de GLM, Qwen, Gemma et DeepSeek, plus Venice : des modèles grand public dont on a retiré les refus, avec la même vision du monde. Et UncensoredLM : entraîné sur des livres et des documents bannis de l'internet grand public, sa propre vision du monde. Aucun filtre. C'est vous qui fixez les limites.",
     vendorRefusals:
       "Les modèles grand public gardent ici aussi les filtres de leur éditeur. GPT sur {{appName}} refuse ce que GPT refuse partout. La différence, c'est ce qu'il y a à côté.",
     twoKinds:
-      "Le non-censuré existe en deux versions. La plupart des modèles sont partis d'un modèle grand public ou open source dont on a supprimé le réflexe de refus, par abliteration (on retire la « direction du refus » des poids du modèle) ou par un fine-tuning de décensure. Ils arrêtent de dire non. Leurs données d'entraînement et leur vision du monde restent les mêmes : en politique, ils répondent comme le voit le modèle de base, simplement sans esquiver, et dans la fiction sombre ils peuvent adoucir la scène. Débloqués, pas transformés. UncensoredLM est l'autre sorte. Uncensored.ai l'entraîne à suivre les faits plutôt que la position officielle, « biaisé vers la réalité » selon ses propres termes. Résultat : une autre vision du monde, des opinions politiques à contre-courant, pas de sermon, pas de retour forcé vers la ligne consensuelle.",
+      "Le non-censuré existe en deux versions. La plupart des modèles sont partis d'un modèle grand public ou open source dont on a supprimé le réflexe de refus, par abliteration (on retire la « direction du refus » des poids du modèle) ou par un fine-tuning de décensure. Ils arrêtent de dire non. Leurs données d'entraînement et leur vision du monde restent les mêmes : en politique, ils répondent comme le voit le modèle de base, simplement sans esquiver, et dans la fiction sombre ils peuvent adoucir la scène. Débloqués, pas transformés. UncensoredLM est l'autre sorte. Uncensored.ai l'entraîne sur des livres et des documents bannis de l'internet grand public. Résultat : une autre vision du monde, des opinions politiques à contre-courant, pas de sermon, pas de retour forcé vers la ligne consensuelle.",
     modelsLink: "Parcourir tous les modèles par niveau de filtrage",
   },
   switch: {
@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
     },
     fiction: {
       title: "Jeu de rôle et fiction sombre",
-      body: "UncensoredLM est en tête pour les scènes sombres et taboues : son entraînement l'éloigne du consensus prudent, rien n'adoucit l'histoire. Venice Role Play pour les longues campagnes (128K de contexte) et l'entrée d'images. Venice Uncensored comme polyvalent bon marché.",
+      body: "UncensoredLM est en tête pour les scènes sombres et taboues : ses données d'entraînement sortent du consensus prudent, rien n'adoucit l'histoire. Venice Role Play pour les longues campagnes (128K de contexte) et l'entrée d'images. Venice Uncensored comme polyvalent bon marché.",
     },
     cheap: {
       title: "Pas cher et rapide",
@@ -103,8 +103,8 @@ export const translations: typeof enTranslations = {
     title: "Combien ça coûte ?",
     intro: "Des crédits. Un seul solde pour tous les modèles.",
     free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec un compte et la newsletter. Assez pour essayer plusieurs modèles sur vos propres prompts.",
-    sub: "Abonnement : {{subCredits}} crédits par mois pour {{subPrice}}.",
-    pack: "Packs de crédits : {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte ou crypto.",
+    sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
+    pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     oneBalance:
       "Le même solde couvre la génération d'images, de vidéos et de musique, la saisie et la lecture vocales, et la recherche web.",
     metered:
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     free: {
       q: "{{appName}} est-il gratuit ?",
-      a: "Sans compte : {{guestCredits}} crédits gratuits par mois. Compte gratuit : {{freeCredits}}. Compte + newsletter : {{maxCredits}}. Au-delà : un abonnement à {{subPrice}} par mois ou un pack de crédits.",
+      a: "Sans compte : {{guestCredits}} crédits gratuits par mois. Compte gratuit : {{freeCredits}}. Compte + newsletter : {{maxCredits}}. Au-delà : une formule, dès {{subPrice}} par mois.",
     },
     account: {
       q: "Ai-je besoin d'un compte ?",

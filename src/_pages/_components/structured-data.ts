@@ -42,11 +42,13 @@ function siteBase(locale: CountryLanguage): string {
   return configT("websiteUrl").replace(/\/+$/, "");
 }
 
-function pageUrl(locale: CountryLanguage, path: string): string {
+/** Absolute URL of a locale page, e.g. pageUrl("en-US", "/models"). */
+export function pageUrl(locale: CountryLanguage, path: string): string {
   return `${siteBase(locale)}/${locale}${path}`;
 }
 
-function organizationId(locale: CountryLanguage): string {
+/** @id of the site Organization node, for seller/publisher references. */
+export function organizationId(locale: CountryLanguage): string {
   return `${siteBase(locale)}/#organization`;
 }
 
@@ -318,5 +320,35 @@ export function buildBlogPostStructuredData({
         ],
       },
     ],
+  };
+}
+
+export interface Breadcrumb {
+  name: string;
+  /** Locale-less path, e.g. "/models". */
+  path: string;
+}
+
+/**
+ * BreadcrumbList for a page under Home ({appName} → /story). `crumbs` lists
+ * the levels below Home, the current page last.
+ */
+export function buildBreadcrumbList(
+  locale: CountryLanguage,
+  crumbs: readonly Breadcrumb[],
+): JsonLdNode {
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const items: Breadcrumb[] = [
+    { name: configT("appName"), path: "/story" },
+    ...crumbs,
+  ];
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: pageUrl(locale, crumb.path),
+    })),
   };
 }

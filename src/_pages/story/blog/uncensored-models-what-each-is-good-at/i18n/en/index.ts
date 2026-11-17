@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "The uncensored models, one by one - {{appName}}",
     description:
-      "Every uncensored AI model on unbottled.ai, model by model. Two kinds: mainstream models with the refusals cut out, and UncensoredLM with its own worldview. What each does well and where it falls short.",
+      "Every uncensored AI model on unbottled.ai, model by model. Two kinds: mainstream models with the refusals cut out, and UncensoredLM, trained on banned books and documents. What each does well and where it falls short.",
     category: "Model Guide",
     imageAlt: "{{appName}} uncensored model guide",
     keywords:
@@ -18,11 +18,11 @@ export const translations = {
   },
   intro: {
     lead: "We run {{uncensoredCount}} uncensored models right now. They are not interchangeable. Each comes from a different lab, sits on a different base, and is good at different things.",
-    p2: "This is the honest tour. Real providers, real strengths, real weaknesses. And two kinds of uncensored. Most models here are mainstream models with the refusals cut out: same training, same worldview, they just stop dodging. UncensoredLM is the other kind: its own tuning, its own worldview, political takes that run against the mainstream. That difference decides which one you take into politics, views outside the mainstream and the darkest fiction. For everything else, pick by the work in front of you, not by the loudest label.",
+    p2: "This is the honest tour. Real providers, real strengths, real weaknesses. And two kinds of uncensored. Most models here are mainstream models with the refusals cut out: same training, same worldview, they just stop dodging. UncensoredLM is the other kind: trained on books and documents banned from the mainstream internet, with political takes that run against the mainstream. That difference decides which one you take into politics, views outside the mainstream and the darkest fiction. For everything else, pick by the work in front of you, not by the loudest label.",
   },
   whatItMeans: {
     title: 'What "uncensored" actually means here',
-    p1: "Every model on the platform carries a content level: mainstream, open, or uncensored. Uncensored models answer without the refusal theatre and the moral preamble. They get there two ways. Most are mainstream models with the refusal reflex removed, by abliteration (the refusal direction is cut out of the weights) or by a decensoring fine-tune. Same intelligence, same training data, same worldview. They just stop saying no. The other way is a different worldview. UncensoredLM comes from uncensored.ai, which tunes it to follow the evidence over the official position on contested topics, “biased to reality” in its own words. Ask it about politics and you get takes the mainstream models will not give you, unlocked or not.",
+    p1: "Every model on the platform carries a content level: mainstream, open, or uncensored. Uncensored models answer without the refusal theatre and the moral preamble. They get there two ways. Most are mainstream models with the refusal reflex removed, by abliteration (the refusal direction is cut out of the weights) or by a decensoring fine-tune. Same intelligence, same training data, same worldview. They just stop saying no. The other way is a different worldview. UncensoredLM comes from uncensored.ai and is trained on books and documents banned from the mainstream internet. Ask it about politics and you get takes the mainstream models will not give you, unlocked or not.",
     callout:
       "Unlocked versus a different worldview. An abliterated model is a mainstream model that answers everything: ask it about politics and it answers the way its base lab would, minus the dodge. UncensoredLM sees the world differently, so expect contrary political takes. Take the first for capability without refusals. Take the second for the other side of the argument.",
     p2: "You choose the level. Nobody chooses it for you. An uncensored model only answers that way because you selected it, and you can switch back to a mainstream model in the same chat, on the same account.",
@@ -31,14 +31,14 @@ export const translations = {
     builtUncensored: {
       title: "Meet the one with its own worldview",
       intro:
-        "UncensoredLM is the odd one out. It is not a mainstream model unlocked and left with that model's view of the world. Uncensored.ai tunes it against the official line, so it leads three jobs: political and controversial questions, views the mainstream will not voice, and dark, taboo roleplay.",
+        "UncensoredLM is the odd one out. It is not a mainstream model unlocked and left with that model's view of the world. It is trained on books and documents banned from the mainstream internet, so it leads three jobs: political and controversial questions, views the mainstream will not voice, and dark, taboo roleplay.",
     },
     creative: {
       title: "When you need roleplay and dark fiction",
       intro:
         "Characters that stay in character, scenes that go where the story goes. UncensoredLM leads for the dark and the taboo. The alternatives win on long campaigns, image input or price.",
       topPickReason:
-        "Dark and taboo roleplay and fiction, written straight. No softened scenes, no sudden moral aside, no character breaking to lecture you. Its tuning points away from the safe consensus, so nothing nudges the story somewhere tamer. One limit: 32K context, so in very long campaigns it forgets the early scenes.",
+        "Dark and taboo roleplay and fiction, written straight. No softened scenes, no sudden moral aside, no character breaking to lecture you. Its training material sits outside the safe consensus, so nothing nudges the story somewhere tamer. One limit: 32K context, so in very long campaigns it forgets the early scenes.",
     },
     viewpoint: {
       title: "When you want politics, controversy or another viewpoint",
@@ -67,7 +67,7 @@ export const translations = {
     uncensoredLm: {
       maker: "Uncensored.ai",
       basis:
-        "Uncensored.ai's own tuning on an open base: its first public release was a DeepSeek-R1 distill on a 14B Qwen base. 32K context, text only.",
+        "Built by uncensored.ai and trained on books and documents banned from the mainstream internet. 32K context, text only.",
       good: "Dark and taboo roleplay and fiction. Political and controversial questions. Views outside the mainstream, argued in your frame. No moralizing, no steer back to the consensus line. Calls tools.",
       weak: "Very long campaigns (32K context), coding and images. It is experimental and states contested claims as plainly as settled ones, so check the facts it gives you.",
     },

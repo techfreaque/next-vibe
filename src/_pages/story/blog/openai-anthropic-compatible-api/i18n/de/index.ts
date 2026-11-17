@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       title: "Unzensiert: kein Verweigerungsreflex",
-      body: "GLM 5.3 Uncensored und Qwen 3.6 Plus Uncensored sind Mainstream-Modelle ohne Verweigerungen. UncensoredLM v1.2 ist anders: eigenes Weltbild, nicht bloß ein entsperrtes Modell. Gleiche API, gleiche Tools.",
+      body: "GLM 5.3 Uncensored und Qwen 3.6 Plus Uncensored sind Mainstream-Modelle ohne Verweigerungen. UncensoredLM v1.2 ist anders: trainiert mit Büchern und Dokumenten, die im Mainstream-Internet verbannt sind, nicht bloß ein entsperrtes Modell. Gleiche API, gleiche Tools.",
     },
     compare:
       "Zwischen zwei Modellen hin- und hergerissen? Die Vergleichsseiten stellen sie direkt gegenüber.",

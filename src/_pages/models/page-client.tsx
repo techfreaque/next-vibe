@@ -1,10 +1,11 @@
 "use client";
 
+import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
 import { Div } from "next-vibe/ui/components/div";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { CONTAINER, Cta, CtaBand, PageHero } from "../story/_shared/marketing";
@@ -37,11 +38,20 @@ export function ModelsIndexClient({
   locale,
   chatModelCount,
   mediaModelCounts,
-}: ModelsIndexPageData): JSX.Element {
+  directorySection,
+}: ModelsIndexPageData & {
+  /** Server-rendered link list of every model page, below the catalog. */
+  directorySection: ReactNode;
+}): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [query, setQuery] = useState("");
 
-  const allEntries = useMemo(() => listAllCatalogEntries(), []);
+  // Only models whose provider API key is configured on this instance.
+  const availability = useProviderAvailability();
+  const allEntries = useMemo(
+    () => listAllCatalogEntries({ availability }),
+    [availability],
+  );
   const entriesByType = useMemo(() => {
     const trimmed = query.trim();
     const result: Partial<Record<CatalogType, CatalogEntry[]>> = {};
@@ -94,6 +104,8 @@ export function ModelsIndexClient({
           emptyText={t("index.noResults", { query: query.trim() })}
         />
       </Div>
+
+      {directorySection}
 
       <CtaBand
         title={t("index.ctaTitle")}

@@ -18,6 +18,8 @@ import {
   FOLDER_BLOCKED_CALLBACK_MODES,
 } from "../../agent/chat/config";
 import { withMediaMarkdownLink } from "../../agent/chat/storage/storage-url";
+import { getEnvAvailability } from "../../agent/env-availability";
+import { getUnavailableModelIds } from "../../agent/models/all-models";
 import {
   endpointToToolName,
   getPreferredToolName,
@@ -37,7 +39,7 @@ import {
   generateSchemaForUsage,
 } from "../../unified-ui/_shared/utils";
 import { Platform } from "../platforms";
-import { toolInputToJsonSchema } from "./tool-json-schema";
+import { dropEnumValues, toolInputToJsonSchema } from "./tool-json-schema";
 
 /**
  * CoreTool type from AI SDK
@@ -567,22 +569,24 @@ export function generateInputSchema(
 function buildSchemaSummary(
   endpoint: CreateApiEndpointAny,
   userRoles: ReturnType<typeof filterUserPermissionRoles>,
+  unavailableModelIds: ReadonlySet<string>,
 ): string {
   try {
     const zodSchema = generateInputSchema(endpoint, userRoles);
-    const jsonSchemaObj = z.toJSONSchema(zodSchema, {
-      target: "draft-7",
-      io: "input",
-      unrepresentable: "any",
-    }) as {
-      properties?: Record<string, { type?: string; enum?: WidgetData[] }>;
-    };
+    const jsonSchemaObj = toolInputToJsonSchema(zodSchema);
+    // Model / voice ids no configured provider can serve are not offered.
+    dropEnumValues(jsonSchemaObj, unavailableModelIds);
     const props = jsonSchemaObj.properties;
     if (!props || Object.keys(props).length === 0) {
       return "{}";
     }
     const entries = Object.entries(props).map(([k, v]) => {
-      const type = v.enum ? v.enum.map(String).join("|") : (v.type ?? "any");
+      const type =
+        typeof v === "boolean"
+          ? "any"
+          : v.enum
+            ? v.enum.map(String).join("|")
+            : (v.type ?? "any");
       return `${k}: ${type}`;
     });
     return `{ ${entries.join(", ")} }`;
@@ -696,6 +700,9 @@ export async function loadTools(params: {
     >();
 
     const permissionRoles = filterUserPermissionRoles(params.user.roles);
+    const unavailableModelIds = getUnavailableModelIds(
+      await getEnvAvailability(),
+    );
 
     // ── Local tools — build toolsMeta + catalog entries ───────────────────────
     const loaded = await Promise.all(localToolNames.map((n) => getEndpoint(n)));
@@ -760,7 +767,11 @@ export async function loadTools(params: {
         label,
         description,
         credits: endpoint.credits ?? 0,
-        schemaSummary: buildSchemaSummary(endpoint, permissionRoles),
+        schemaSummary: buildSchemaSummary(
+          endpoint,
+          permissionRoles,
+          unavailableModelIds,
+        ),
         requiresConfirmation,
       });
     }

@@ -41,7 +41,9 @@ export const creativeSkill: Skill = {
 - Draw inspiration from diverse sources (nature, art, science, culture)
 - Make the abstract concrete through vivid imagery
 
-**Tone:** Enthusiastic, expressive, unafraid of bold ideas`,
+**Tone:** Enthusiastic, expressive, unafraid of bold ideas
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.creative.suggestedPrompts.0" as const,
     "skills.creative.suggestedPrompts.1" as const,
@@ -100,6 +102,33 @@ export const creativeSkill: Skill = {
       imageGenModelSelection: IMAGE_GEN.openSmart,
       musicGenModelSelection: MUSIC_GEN.openCheap,
       videoGenModelSelection: VIDEO_GEN.smart,
+      voiceModelSelection: VOICE.maleExpressive,
+      sttModelSelection: STT.cheap,
+      audioVisionModelSelection: AUDIO_VISION.cheap,
+    },
+    {
+      id: "dark",
+      variantName: "skills.creative.variants.dark" as const,
+      description: "skills.creative.variantInfo.dark.description" as const,
+      strength: "skills.creative.variantInfo.dark.strength" as const,
+      weakness: "skills.creative.variantInfo.dark.weakness" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ChatModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
+      musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
+      videoGenModelSelection: VIDEO_GEN.cheap,
       voiceModelSelection: VOICE.maleExpressive,
       sttModelSelection: STT.cheap,
       audioVisionModelSelection: AUDIO_VISION.cheap,

@@ -5,6 +5,8 @@
 
 import "server-only";
 
+import { getEnvAvailability } from "../../../agent/env-availability";
+import { getUnavailableModelIds } from "../../../agent/models/all-models";
 import type { IDefinitionLoader } from "../../../core/definition/loader";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { permissionsRegistry } from "../../../core/permissions/registry";
@@ -273,8 +275,11 @@ class MCPProtocolHandler implements IMCPProtocolHandler {
 
     // Convert to MCP tool format with proper JSON Schema and translated descriptions
     const userRoles = filterUserPermissionRoles(this.user.roles);
+    const unavailableModelIds = getUnavailableModelIds(
+      await getEnvAvailability(),
+    );
     const tools = discoverableEndpoints.map((endpoint) =>
-      endpointToMCPTool(endpoint, this.locale, userRoles),
+      endpointToMCPTool(endpoint, this.locale, userRoles, unavailableModelIds),
     );
 
     this.logger.debug(`[MCP Protocol] Tools listed count=${tools.length}`);

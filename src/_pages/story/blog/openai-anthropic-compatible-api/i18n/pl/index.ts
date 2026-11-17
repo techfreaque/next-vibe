@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       title: "Niecenzurowane: bez odruchu odmowy",
-      body: "GLM 5.3 Uncensored i Qwen 3.6 Plus Uncensored to modele głównego nurtu z usuniętymi odmowami. UncensoredLM v1.2 jest inny: ma własny światopogląd, to nie tylko odblokowany model. To samo API, te same narzędzia.",
+      body: "GLM 5.3 Uncensored i Qwen 3.6 Plus Uncensored to modele głównego nurtu z usuniętymi odmowami. UncensoredLM v1.2 jest inny: trenowano go na książkach i dokumentach zakazanych w mainstreamowym internecie, to nie tylko odblokowany model. To samo API, te same narzędzia.",
     },
     compare:
       "Nie możesz się zdecydować? Strony porównań stawiają dwa modele obok siebie.",

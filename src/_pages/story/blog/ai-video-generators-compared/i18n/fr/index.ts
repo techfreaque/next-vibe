@@ -146,8 +146,8 @@ export const translations: typeof enTranslations = {
       "Les crédits ne sont débités qu'une fois le clip livré. Tâche échouée, prompt refusé, délai dépassé : vous ne payez rien.",
     reported:
       "Les routes servies via OpenRouter facturent le coût réel déclaré par le fournisseur plus la marge : le montant final peut donc légèrement s'écarter du tableau.",
-    sub: "Abonnement : {{subPrice}} par mois pour {{subCredits}} crédits.",
-    pack: "Pack de crédits : {{packPrice}} pour {{packCredits}} crédits, en une fois.",
+    sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
+    pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     link: "Voir les formules et les packs de crédits",
   },
   watermark: {
@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Peut-on créer des vidéos IA gratuitement ?",
-      a: "Les nouveaux comptes reçoivent des crédits gratuits. La vidéo est l'une des générations les plus chères, ils couvrent donc quelques clips tout au plus. Le clip le moins cher en ce moment est {{cheapestClipName}} à {{cheapestClipCredits}} crédits. Ensuite : un abonnement ({{subPrice}} par mois) ou un pack de crédits ({{packPrice}}).",
+      a: "Les nouveaux comptes reçoivent des crédits gratuits. La vidéo est l'une des générations les plus chères, ils couvrent donc quelques clips tout au plus. Le clip le moins cher en ce moment est {{cheapestClipName}} à {{cheapestClipCredits}} crédits. Ensuite : une formule, dès {{subPrice}} par mois.",
     },
     length: {
       q: "Quelle durée peut faire une vidéo IA ?",

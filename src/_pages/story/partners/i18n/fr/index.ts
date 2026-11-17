@@ -122,7 +122,7 @@ export const translations: typeof enTranslations = {
       "Facile à présenter, parce qu'elle règle ce dont les gens se plaignent.",
     choice: {
       title: "Modèles grand public, open source et non censurés",
-      body: "Les grands modèles connus à côté des modèles open source et non censurés, dans un seul chat. Le non censuré existe en deux versions : des modèles grand public débarrassés de leurs refus, et UncensoredLM avec sa propre vision du monde. Les utilisateurs changent quand ils veulent.",
+      body: "Les grands modèles connus à côté des modèles open source et non censurés, dans un seul chat. Le non censuré existe en deux versions : des modèles grand public débarrassés de leurs refus, et UncensoredLM, entraîné sur des livres et des documents bannis de l'internet grand public. Les utilisateurs changent quand ils veulent.",
     },
     control: {
       title: "Ils règlent le niveau de filtrage",
@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Gratuit pour commencer",
-      body: "Les nouveaux utilisateurs essaient le chat sans carte bancaire. Un oui facile pour votre audience, une conversion facile pour vous. Développeurs : l'API nécessite une formule ou un pack de crédits ponctuel à {{packPrice}}.",
+      body: "Les nouveaux utilisateurs essaient le chat sans carte bancaire. Un oui facile pour votre audience, une conversion facile pour vous. Développeurs : l'API nécessite n'importe quelle formule, dès {{subPrice}} par mois.",
     },
   },
   faq: {

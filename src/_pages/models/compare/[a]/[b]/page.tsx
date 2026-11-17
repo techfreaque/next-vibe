@@ -4,23 +4,26 @@
  */
 
 import type { Metadata } from "next";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
-import { permanentRedirect } from "next-vibe/ui/lib/redirect";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
   buildPickerModels,
-  findModelPageAlias,
-  findPublicModelId,
-  getModelFacts,
   type ModelFacts,
   type PickerModel,
-  toModelSlug,
 } from "../../../_shared/model-facts";
+import {
+  redirectCompareAliases,
+  resolveComparePair,
+} from "../../../_shared/model-page-loaders";
+import { compareMeta } from "../../../_shared/model-seo";
+import { buildCompareStructuredData } from "../../../_shared/model-structured-data";
 import { MODELS_OG_IMAGE } from "../../../constants";
 import { scopedTranslation } from "../../../i18n";
 import { ComparePageClient } from "./page-client";
@@ -31,39 +34,11 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; a: string; b: string }>;
 }
 
-/** A duplicate (alias) slug on either side 308s to the canonical pair. */
-function redirectAliases(locale: CountryLanguage, a: string, b: string): void {
-  const left = findModelPageAlias(a);
-  const right = findModelPageAlias(b);
-  if (left === null && right === null) {
-    return;
-  }
-  permanentRedirect(
-    `/${locale}/models/compare/${left === null ? a : toModelSlug(left)}/${right === null ? b : toModelSlug(right)}`,
-  );
-}
-
-function resolvePair(
-  a: string,
-  b: string,
-): { left: ModelFacts; right: ModelFacts } | null {
-  const leftId = findPublicModelId(a);
-  const rightId = findPublicModelId(b);
-  if (leftId === null || rightId === null) {
-    return null;
-  }
-  const left = getModelFacts(leftId);
-  const right = getModelFacts(rightId);
-  if (left === null || right === null) {
-    return null;
-  }
-  return { left, right };
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, a, b } = await params;
-  redirectAliases(locale, a, b);
-  const pair = resolvePair(a, b);
+  redirectCompareAliases(locale, a, b);
+  const availability = await getEnvAvailability();
+  const pair = resolveComparePair(a, b, availability);
   if (pair === null) {
     notFound();
   }
@@ -74,11 +49,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     a: pair.left.name,
     b: pair.right.name,
   };
+  const meta = compareMeta(pair.left, pair.right, locale);
   return metadataGenerator(locale, {
     path: `models/compare/${pair.left.slug}/${pair.right.slug}`,
-    title: t("meta.compare.title", vars),
+    title: meta.title,
     category: t("meta.category"),
-    description: t("meta.compare.description", vars),
+    description: meta.description,
     image: MODELS_OG_IMAGE,
     imageAlt: t("meta.compare.imageAlt", vars),
     keywords: [t("meta.compare.keywords", vars)],
@@ -92,28 +68,42 @@ export interface ComparePageData {
   /** Replacement candidates for the left column (anchored on the right). */
   leftPicker: PickerModel[];
   rightPicker: PickerModel[];
+  /** BreadcrumbList JSON-LD: Home > Models > A vs B. */
+  structuredData: JsonLdNode;
 }
 
 export async function tanstackLoader({
   params,
 }: Props): Promise<ComparePageData> {
   const { locale, a, b } = await params;
-  redirectAliases(locale, a, b);
-  const pair = resolvePair(a, b);
+  redirectCompareAliases(locale, a, b);
+  const availability = await getEnvAvailability();
+  const pair = resolveComparePair(a, b, availability);
   if (pair === null) {
     notFound();
   }
+  const { t } = scopedTranslation.scopedT(locale);
   return {
     locale,
+    structuredData: buildCompareStructuredData(
+      locale,
+      t("compare.title", { a: pair.left.name, b: pair.right.name }),
+      `/models/compare/${pair.left.slug}/${pair.right.slug}`,
+    ),
     left: pair.left,
     right: pair.right,
-    leftPicker: buildPickerModels(pair.right, [pair.left.id]),
-    rightPicker: buildPickerModels(pair.left, [pair.right.id]),
+    leftPicker: buildPickerModels(pair.right, availability, [pair.left.id]),
+    rightPicker: buildPickerModels(pair.left, availability, [pair.right.id]),
   };
 }
 
 export function TanstackPage(data: ComparePageData): JSX.Element {
-  return <ComparePageClient {...data} />;
+  return (
+    <>
+      <JsonLd id="compare-structured-data" data={data.structuredData} />
+      <ComparePageClient {...data} />
+    </>
+  );
 }
 
 export default async function ComparePage({

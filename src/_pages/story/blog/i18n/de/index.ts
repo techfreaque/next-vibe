@@ -16,6 +16,22 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    imageGenerators: {
+      title:
+        "KI-Bildgeneratoren ohne Zensur. Echte Preise, kein Weichzeichner.",
+      category: "Modellvergleich",
+      excerpt:
+        "Welche Bildmodelle wirklich ohne Filter generieren, alle Modelle im Vergleich mit Filterstufe und echtem Preis pro Bild, und wie du Bilder direkt im Chat erzeugst oder bearbeitest.",
+      readTime: "8 Min. Lesezeit",
+    },
+    roleplayWithoutFilter: {
+      title:
+        "KI-Rollenspiel ohne Filter. Die Geschichte geht, wohin du sie führst.",
+      category: "Ratgeber",
+      excerpt:
+        "Die ehrliche Character.AI-Alternative. Welches unzensierte Modell eine Figur hält, welches sich an die ganze Kampagne erinnert, wie du in zwei Minuten startest und was eine Antwort kostet.",
+      readTime: "8 Min. Lesezeit",
+    },
     musicVoice: {
       title:
         "KI-Musik, KI-Stimmen und Transkription. Welches Modell für welchen Job.",
@@ -57,7 +73,7 @@ export const translations: typeof enTranslations = {
       title: "Die unzensierten Modelle, eins nach dem anderen.",
       category: "Modell-Guide",
       excerpt:
-        "Zwei Sorten unzensiert: Mainstream-Modelle ohne Verweigerungen und UncensoredLM mit eigenem Weltbild. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT und mehr, mit Stärken und Schwächen.",
+        "Zwei Sorten unzensiert: Mainstream-Modelle ohne Verweigerungen und UncensoredLM, trainiert mit verbannten Büchern und Dokumenten. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT und mehr, mit Stärken und Schwächen.",
       readTime: "7 Min. Lesezeit",
     },
     modelRefresh: {

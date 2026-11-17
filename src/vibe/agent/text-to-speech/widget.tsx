@@ -28,12 +28,15 @@ import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/te
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CONTENT_TIER_ORDER } from "@/_pages/models/_shared/model-facts";
 import { tierName } from "@/_pages/models/_shared/model-format";
 
 import { resolveMediaSrc } from "../chat/storage/media-src";
+import type { AgentEnvAvailability } from "../env-availability";
+import { useProviderAvailability } from "../env-availability-store";
+import { isModelProviderAvailable } from "../models/models";
 import {
   classifyPlayRejection,
   describeAudioElement,
@@ -59,12 +62,19 @@ interface VoiceGroup {
   voices: TtsModelOption[];
 }
 
-/** Catalog voices (deduped by id), grouped by content tier, uncensored first. */
-function buildVoiceGroups(): VoiceGroup[] {
+/**
+ * Voices whose provider key is configured here (deduped by id, cheapest
+ * configured route), grouped by content tier, uncensored first.
+ */
+function buildVoiceGroups(availability: AgentEnvAvailability): VoiceGroup[] {
   const seen = new Set<TtsModelId>();
   const unique: TtsModelOption[] = [];
   for (const option of ttsModelOptions) {
-    if (!seen.has(option.id)) {
+    if (
+      option.adminOnly !== true &&
+      isModelProviderAvailable(option, availability) &&
+      !seen.has(option.id)
+    ) {
       seen.add(option.id);
       unique.push(option);
     }
@@ -75,7 +85,6 @@ function buildVoiceGroups(): VoiceGroup[] {
   })).filter((g) => g.voices.length > 0);
 }
 
-const VOICE_GROUPS: VoiceGroup[] = buildVoiceGroups();
 
 function genderIcon(gender: string | undefined): string {
   if (gender === "female") {
@@ -107,6 +116,11 @@ export function TextToSpeechContainer({
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
   const { t } = scopedTranslation.scopedT(locale);
+  const availability = useProviderAvailability();
+  const voiceGroups = useMemo(
+    () => buildVoiceGroups(availability),
+    [availability],
+  );
 
   const currentText = form?.watch("text") ?? "";
   const currentVoiceId = form?.watch("voiceId") ?? DEFAULT_TTS_VOICE_ID;
@@ -284,7 +298,7 @@ export function TextToSpeechContainer({
             {t("post.voice.label")}
           </Span>
           <Div className="flex flex-col gap-3">
-            {VOICE_GROUPS.map((group) => (
+            {voiceGroups.map((group) => (
               <Div
                 key={group.tier}
                 className="flex flex-col gap-1.5"

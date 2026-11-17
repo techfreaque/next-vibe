@@ -16,12 +16,18 @@ import {
   chatModelOptionsPool,
   chatModelSuccessors,
 } from "next-vibe/agent/ai-stream/models";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { AgentTranslationKey } from "next-vibe/agent/i18n";
-import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
+import {
+  type Modality,
+  ModelUtility,
+  type ModelUtilityValue,
+} from "next-vibe/agent/models/enum";
 import {
   ApiProvider,
   apiProviderDisplayNames,
   estimateTurnCredits,
+  isApiProviderAvailable,
   type ModelDefinition,
   modelProviders,
 } from "next-vibe/agent/models/models";
@@ -32,7 +38,10 @@ import {
 } from "next-vibe/agent/skills/enum";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
-import { CREDIT_VALUE_USD } from "@/products/constants";
+import {
+  CREDIT_VALUE_USD,
+  STANDARD_MARKUP_PERCENTAGE,
+} from "@/products/constants";
 
 /**
  * Reference message for "price per message" - the same "Normal chat" scenario
@@ -76,9 +85,31 @@ export interface ModelFacts extends ModelRef {
   creditsPerMessage: number;
   /** How many reference messages one unit of currency ($1 / 1 €) buys. Null when free. */
   messagesPerCurrencyUnit: number | null;
+  /**
+   * Credits per 1M tokens on the provider behind creditsPerMessage, markup
+   * included. Null for fixed-price routes (no per-token price exists).
+   */
+  tokenPrice: { inputCredits: number; outputCredits: number } | null;
+  /** Parameter count in billions, when the registry knows it. */
+  parameterCount: number | null;
+  /** Registry strengths (ModelUtility values), registry order, meta tags dropped. */
+  strengths: (typeof ModelUtilityValue)[];
   isLegacy: boolean;
   successor: ModelRef | null;
 }
+
+/** Utilities that describe what a model is good at (not tier/meta tags). */
+const STRENGTH_UTILITIES: ReadonlySet<string> = new Set<string>([
+  ModelUtility.CODING,
+  ModelUtility.REASONING,
+  ModelUtility.ANALYSIS,
+  ModelUtility.CREATIVE,
+  ModelUtility.ROLEPLAY,
+  ModelUtility.ROLEPLAY_DARK,
+  ModelUtility.FAST,
+  ModelUtility.VISION,
+  ModelUtility.IMAGE_GEN,
+]);
 
 /** URL slug: dots and underscores break dev-server routing and read badly. */
 export function toModelSlug(id: string): string {
@@ -95,6 +126,16 @@ function isPublicDefinition(def: ModelDefinition): boolean {
 function publicOptionsFor(id: ChatModelId): ChatModelOption[] {
   return chatModelOptionsPool.filter(
     (option) => option.id === id && option.adminOnly !== true,
+  );
+}
+
+/** Public routes of a model whose provider API key is configured here. */
+function availableOptionsFor(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): ChatModelOption[] {
+  return publicOptionsFor(id).filter((option) =>
+    isApiProviderAvailable(option.apiProvider, availability),
   );
 }
 
@@ -198,15 +239,38 @@ export function findPublicModelId(segment: string): ChatModelId | null {
   );
 }
 
+/**
+ * True when a public visitor can use this model on this instance: a public
+ * model (registry) with at least one route whose provider key is configured.
+ * A model whose only providers lack a key gets no page, catalog row, sitemap
+ * entry or llms.txt line.
+ */
+export function isChatModelAvailable(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): boolean {
+  return (
+    PUBLIC_CHAT_MODEL_IDS.includes(id) &&
+    availableOptionsFor(id, availability).length > 0
+  );
+}
+
 function toRef(id: ChatModelId): ModelRef {
   return { id, slug: toModelSlug(id), name: chatModelDefinitions[id].name };
 }
 
-function resolveSuccessor(id: ChatModelId): ModelRef | null {
+/**
+ * The first current (non-legacy) successor of a model that is available here.
+ * Also where an unavailable model's page redirects to.
+ */
+export function resolveSuccessor(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): ModelRef | null {
   const seen = new Set<ChatModelId>([id]);
   let next = chatModelSuccessors[id];
   while (next !== undefined && !seen.has(next)) {
-    if (PUBLIC_CHAT_MODEL_IDS.includes(next)) {
+    if (isChatModelAvailable(next, availability)) {
       const nextDef = chatModelDefinitions[next];
       if (!nextDef.utilities.includes(ModelUtility.LEGACY)) {
         return toRef(next);
@@ -222,12 +286,25 @@ function roundCredits(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-export function getModelFacts(id: ChatModelId): ModelFacts | null {
+/** USD per 1M tokens (provider list price) → credits per 1M, markup included. */
+function perMillionCredits(usdPerMillion: number): number {
+  return roundCredits(
+    (usdPerMillion * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD,
+  );
+}
+
+export function getModelFacts(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): ModelFacts | null {
   if (!PUBLIC_CHAT_MODEL_IDS.includes(id)) {
     return null;
   }
   const def = chatModelDefinitions[id];
-  const options = publicOptionsFor(id);
+  const options = availableOptionsFor(id, availability);
+  if (options.length === 0) {
+    return null;
+  }
 
   const costs = options.map((option) =>
     estimateTurnCredits(
@@ -236,8 +313,20 @@ export function getModelFacts(id: ChatModelId): ModelFacts | null {
       REFERENCE_OUTPUT_TOKENS,
     ),
   );
-  const creditsPerMessage = roundCredits(Math.min(...costs));
+  const cheapestCost = Math.min(...costs);
+  const creditsPerMessage = roundCredits(cheapestCost);
   const creditsPerUnit = 1 / CREDIT_VALUE_USD;
+  const cheapest = options[costs.indexOf(cheapestCost)];
+  const tokenPrice =
+    cheapest !== undefined &&
+    "inputTokenCost" in cheapest &&
+    typeof cheapest.inputTokenCost === "number" &&
+    typeof cheapest.outputTokenCost === "number"
+      ? {
+          inputCredits: perMillionCredits(cheapest.inputTokenCost),
+          outputCredits: perMillionCredits(cheapest.outputTokenCost),
+        }
+      : null;
 
   const providers: string[] = [];
   for (const option of options) {
@@ -267,16 +356,23 @@ export function getModelFacts(id: ChatModelId): ModelFacts | null {
       creditsPerMessage > 0
         ? Math.floor(creditsPerUnit / creditsPerMessage)
         : null,
+    tokenPrice,
+    parameterCount: def.parameterCount ?? null,
+    strengths: def.utilities.filter((utility) =>
+      STRENGTH_UTILITIES.has(utility),
+    ),
     isLegacy,
-    successor: isLegacy ? resolveSuccessor(id) : null,
+    successor: isLegacy ? resolveSuccessor(id, availability) : null,
   };
 }
 
-/** Facts for every public model, registry order. */
-export function listModelFacts(): ModelFacts[] {
+/** Facts for every public model available on this instance, registry order. */
+export function listModelFacts(
+  availability: AgentEnvAvailability,
+): ModelFacts[] {
   const result: ModelFacts[] = [];
   for (const id of PUBLIC_CHAT_MODEL_IDS) {
-    const facts = getModelFacts(id);
+    const facts = getModelFacts(id, availability);
     if (facts !== null) {
       result.push(facts);
     }
@@ -285,8 +381,8 @@ export function listModelFacts(): ModelFacts[] {
 }
 
 /**
- * The uncensored model with its own worldview (UncensoredLM: uncensored.ai's
- * tuning, contrary political takes), as opposed to the refusal-stripped
+ * The uncensored model with its own worldview (UncensoredLM: trained on books and
+ * documents banned from the mainstream internet, contrary political takes), as opposed to the refusal-stripped
  * (abliterated) variants of mainstream/open models in the same tier, which
  * keep their base model's training and worldview.
  * Every other uncensored-tier text model links to it first.
@@ -322,7 +418,10 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
 ];
 
 /** Featured partners of a model, in pair order, public text models only. */
-function featuredComparisons(facts: ModelFacts): ModelRef[] {
+function featuredComparisons(
+  facts: ModelFacts,
+  availability: AgentEnvAvailability,
+): ModelRef[] {
   const ids: ChatModelId[] = [];
   for (const [a, b] of FEATURED_COMPARISON_PAIRS) {
     if (a === facts.id) {
@@ -340,7 +439,7 @@ function featuredComparisons(facts: ModelFacts): ModelRef[] {
   }
   const refs: ModelRef[] = [];
   for (const id of ids) {
-    const other = getModelFacts(id);
+    const other = getModelFacts(id, availability);
     if (
       other !== null &&
       !other.isLegacy &&
@@ -358,17 +457,21 @@ function featuredComparisons(facts: ModelFacts): ModelRef[] {
  * same-tier models with the same outputs, closest in price.
  * Feeds internal links and the sitemap.
  */
-export function suggestComparisons(facts: ModelFacts, limit = 3): ModelRef[] {
+export function suggestComparisons(
+  facts: ModelFacts,
+  availability: AgentEnvAvailability,
+  limit = 3,
+): ModelRef[] {
   const picks: ModelRef[] = [];
   if (facts.successor !== null) {
     picks.push(facts.successor);
   }
-  for (const featured of featuredComparisons(facts)) {
+  for (const featured of featuredComparisons(facts, availability)) {
     if (!picks.some((pick) => pick.id === featured.id)) {
       picks.push(featured);
     }
   }
-  const candidates = listModelFacts()
+  const candidates = listModelFacts(availability)
     .filter(
       (other) =>
         other.id !== facts.id &&
@@ -423,10 +526,13 @@ export interface PickerModel extends ModelRef {
  */
 export function buildPickerModels(
   anchor: ModelFacts,
+  availability: AgentEnvAvailability,
   exclude: ChatModelId[] = [],
 ): PickerModel[] {
-  const suggestedIds = suggestComparisons(anchor, 5).map((pick) => pick.id);
-  const all = listModelFacts().filter(
+  const suggestedIds = suggestComparisons(anchor, availability, 5).map(
+    (pick) => pick.id,
+  );
+  const all = listModelFacts(availability).filter(
     (other) => other.id !== anchor.id && !exclude.includes(other.id),
   );
   const toRow = (other: ModelFacts, suggested: boolean): PickerModel => ({

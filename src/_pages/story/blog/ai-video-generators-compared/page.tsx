@@ -11,6 +11,10 @@
 
 import type { Metadata } from "next";
 import {
+  type AgentEnvAvailability,
+  getEnvAvailability,
+} from "next-vibe/agent/env-availability";
+import {
   ApiProvider,
   type ModelProviderConfig,
   type ModelProviderConfigVideoBased,
@@ -304,9 +308,10 @@ function buildRow(
   id: VideoGenModelId,
   locale: CountryLanguage,
   currency: Currencies,
+  availability: AgentEnvAvailability,
 ): VideoModelRow | null {
   const def = videoGenModelDefinitions[id];
-  const facts = listMediaFacts().find(
+  const facts = listMediaFacts(availability).find(
     (f) => f.type === "video" && f.modelId === id,
   );
   const option = getVideoGenModelById(id);
@@ -371,16 +376,17 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<VideoPostPageData> {
   const { locale } = await params;
+  const availability = await getEnvAvailability();
   const products = productsRepository.getProducts(locale);
   const subscription = products[ProductIds.SUBSCRIPTION];
   const pack = products[ProductIds.CREDIT_PACK];
   const rows = Object.values(VideoGenModelId)
     .flatMap((id) => {
-      const row = buildRow(id, locale, creditCurrency(locale));
+      const row = buildRow(id, locale, creditCurrency(locale), availability);
       return row ? [row] : [];
     })
     .toSorted((a, b) => a.creditsPerSecond - b.creditsPerSecond);
-  const legacyCount = listMediaFacts().filter(
+  const legacyCount = listMediaFacts(availability).filter(
     (f) => f.type === "video" && f.isLegacy,
   ).length;
   const defaultId =

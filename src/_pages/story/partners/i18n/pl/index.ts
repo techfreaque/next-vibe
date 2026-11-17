@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
     intro: "Łatwo ją polecać, bo rozwiązuje to, na co ludzie narzekają.",
     choice: {
       title: "Modele popularne, otwarte i bez cenzury",
-      body: "Najgłośniejsze modele obok otwartych i niecenzurowanych, w jednym czacie. Niecenzurowane są dwojakie: modele z głównego nurtu z wyciętymi odmowami i UncensoredLM z własnym światopoglądem. Model zmieniasz, kiedy chcesz.",
+      body: "Najgłośniejsze modele obok otwartych i niecenzurowanych, w jednym czacie. Niecenzurowane są dwojakie: modele z głównego nurtu z wyciętymi odmowami i UncensoredLM, trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie. Model zmieniasz, kiedy chcesz.",
     },
     control: {
       title: "Poziom filtrów ustawiają sami",
@@ -127,7 +127,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       title: "Start za darmo",
-      body: "Nowi użytkownicy testują czat bez karty. Łatwe tak dla twoich odbiorców, łatwa konwersja dla ciebie. Dla programistów: API wymaga dowolnego planu albo jednorazowego pakietu kredytów za {{packPrice}}.",
+      body: "Nowi użytkownicy testują czat bez karty. Łatwe tak dla twoich odbiorców, łatwa konwersja dla ciebie. Dla programistów: API wymaga dowolnego planu, od {{subPrice}} miesięcznie.",
     },
   },
   faq: {

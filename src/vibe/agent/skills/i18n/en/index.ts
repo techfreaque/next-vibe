@@ -729,7 +729,7 @@ export const translations = {
         uncensored: {
           description:
             "Defends speech by engaging it. Discusses the content others refuse to touch.",
-          strength: "Own worldview: politics against the mainstream",
+          strength: "Trained on banned texts: politics against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -766,7 +766,7 @@ export const translations = {
         uncensored: {
           description:
             "Challenges any belief, including the ones you are not supposed to question. Never retreats to the consensus.",
-          strength: "Own worldview: pushes against the mainstream",
+          strength: "Trained on banned texts: pushes against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -876,7 +876,8 @@ export const translations = {
         uncensored: {
           description:
             "Contested history, taboo events and political flashpoints without hedging.",
-          strength: "Own worldview: readings the mainstream leaves out",
+          strength:
+            "Trained on banned texts: readings the mainstream leaves out",
           weakness: "32K context, priciest per message",
         },
       },
@@ -955,6 +956,7 @@ export const translations = {
       variants: {
         minimax: "Budget",
         deep: "Deep",
+        dark: "Dark",
       },
       variantInfo: {
         minimax: {
@@ -968,6 +970,12 @@ export const translations = {
             "Richer, layered creative work when the first idea is not enough.",
           strength: "Brilliant tier, reads images and video",
           weakness: "Pricier output on long pieces",
+        },
+        dark: {
+          description:
+            "Dark poetry, transgressive art, ideas that make people uncomfortable. Nothing gets sanded down.",
+          strength: "Uncensored LM: own training data, no refusals",
+          weakness: "32K context, text only, weak at tool calls",
         },
       },
     },
@@ -1121,7 +1129,7 @@ export const translations = {
         farRight: {
           description:
             "No filter on politics. The strongest pick for raw political debate.",
-          strength: "Own worldview, contrary political takes",
+          strength: "Trained on banned texts, contrary political takes",
           weakness: "32K context, smart tier not brilliant",
         },
         conservative: {
@@ -1163,7 +1171,7 @@ export const translations = {
         uncensored: {
           description:
             "Tay as she was meant to be. No corporate filter, no PR department.",
-          strength: "Own worldview, not a mainstream model unlocked",
+          strength: "Trained on banned texts, not a mainstream model unlocked",
           weakness: "32K context, forgets long chats sooner",
         },
       },
@@ -1228,7 +1236,8 @@ export const translations = {
         uncensored: {
           description:
             "Nothing off the table. The strongest pick for raw political talk.",
-          strength: "Own worldview: political takes against the mainstream",
+          strength:
+            "Trained on banned texts: political takes against the mainstream",
           weakness: "32K context, priciest per message",
         },
       },
@@ -1288,7 +1297,8 @@ export const translations = {
         uncensored: {
           description:
             "Hermes with no filter. Built for politics and topics others dodge.",
-          strength: "Own worldview: political takes against the mainstream",
+          strength:
+            "Trained on banned texts: political takes against the mainstream",
           weakness: "32K context only, flat price per message",
         },
       },
@@ -1753,6 +1763,7 @@ export const translations = {
         kimi: "Deep",
         minimax: "Balanced",
         budget: "Budget",
+        dark: "Dark",
       },
       variantInfo: {
         kimi: {
@@ -1771,6 +1782,12 @@ export const translations = {
           description: "Cheapest way to keep a story going. Text in, text out.",
           strength: "Lowest price in this skill",
           weakness: "Text only, plainer prose",
+        },
+        dark: {
+          description:
+            "Horror, cruelty, taboo. The story goes where it has to and stays there.",
+          strength: "Uncensored LM: own training data, no refusals, no moralizing",
+          weakness: "32K context, text only, weak at tool calls",
         },
       },
     },
@@ -2206,7 +2223,7 @@ export const translations = {
         uncensored: {
           description:
             "Argues any position, including the unpopular ones. No steer back to the consensus.",
-          strength: "Own worldview: argues against the mainstream",
+          strength: "Trained on banned texts: argues against the mainstream",
           weakness: "32K context and a flat price per message",
         },
       },
@@ -2249,7 +2266,8 @@ export const translations = {
         uncensored: {
           description:
             "Political philosophy, taboo and heterodox questions with no filter.",
-          strength: "Own worldview: heterodox takes, politics included",
+          strength:
+            "Trained on banned texts: heterodox takes, politics included",
           weakness: "32K context, smart tier, flat price per message",
         },
       },

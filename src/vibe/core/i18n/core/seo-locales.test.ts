@@ -1,0 +1,42 @@
+import { describe, expect, it } from "bun:test";
+
+import {
+  canonicalSeoLocale,
+  hreflangFor,
+  SEO_LOCALES,
+  seoLanguageAlternates,
+} from "./seo-locales";
+
+describe("seo-locales", () => {
+  it("keeps indexable locales canonical", () => {
+    for (const locale of SEO_LOCALES) {
+      expect(canonicalSeoLocale(locale)).toBe(locale);
+    }
+  });
+
+  it("maps mixed locales to their language's indexable locale", () => {
+    expect(canonicalSeoLocale("de-US")).toBe("de-DE");
+    expect(canonicalSeoLocale("de-GLOBAL")).toBe("de-DE");
+    expect(canonicalSeoLocale("pl-GLOBAL")).toBe("pl-PL");
+    expect(canonicalSeoLocale("fr-DE")).toBe("fr-FR");
+    expect(canonicalSeoLocale("en-PL")).toBe("en-GLOBAL");
+    expect(canonicalSeoLocale("en-DE")).toBe("en-GLOBAL");
+  });
+
+  it("announces GLOBAL as the bare language", () => {
+    expect(hreflangFor("en-GLOBAL")).toBe("en");
+    expect(hreflangFor("de-DE")).toBe("de-DE");
+  });
+
+  it("builds valid alternates with x-default and no GLOBAL region", () => {
+    const alternates = seoLanguageAlternates("https://example.com/", "models");
+    expect(Object.keys(alternates).toSorted()).toEqual(
+      ["de-DE", "en", "en-US", "fr-FR", "pl-PL", "x-default"].toSorted(),
+    );
+    expect(alternates["x-default"]).toBe("https://example.com/en-GLOBAL/models");
+    expect(alternates["en"]).toBe("https://example.com/en-GLOBAL/models");
+    expect(seoLanguageAlternates("https://example.com", "")["de-DE"]).toBe(
+      "https://example.com/de-DE",
+    );
+  });
+});

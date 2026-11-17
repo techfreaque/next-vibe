@@ -102,7 +102,9 @@ export async function buildLlmsTxt(
   const modelCount = getAvailableChatModelCount(false, availability);
   const providerCount = getAvailableChatProviderCount(false, availability);
   const tiers = getAvailableChatModelCountsByContentLevel(false, availability);
-  const mediaModels = listMediaFacts().filter((model) => !model.isLegacy);
+  const mediaModels = listMediaFacts(availability).filter(
+    (model) => !model.isLegacy,
+  );
 
   const products = productsRepository.getProducts(locale);
   const subscription = products[ProductIds.SUBSCRIPTION];
@@ -252,7 +254,7 @@ export async function buildLlmsTxt(
           credits: formatNumber(model.creditsPerMessage, locale),
         }),
       );
-    const allChat = listModelFacts();
+    const allChat = listModelFacts(availability);
     const currentChat = allChat.filter((model) => !model.isLegacy);
     const legacyChat = allChat.filter((model) => model.isLegacy);
     const media = mediaModels.map((model) =>

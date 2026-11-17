@@ -1,7 +1,9 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -28,27 +30,18 @@ export async function generateMetadata({
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+  const title = t("page.title", { appName });
 
-  return {
-    title: t("page.title", {
-      appName: configT("appName"),
-    }),
+  return metadataGenerator(locale, {
+    path: "story/newsletter",
+    title,
+    category: t("page.eyebrow", { appName }),
     description: t("page.description"),
-    openGraph: {
-      title: t("page.title", {
-        appName: configT("appName"),
-      }),
-      description: t("page.description"),
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: t("page.title", {
-        appName: configT("appName"),
-      }),
-      description: t("page.description"),
-    },
-  };
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
+    imageAlt: title,
+    keywords: [t("page.eyebrow", { appName })],
+  });
 }
 
 export interface NewsletterPageData {

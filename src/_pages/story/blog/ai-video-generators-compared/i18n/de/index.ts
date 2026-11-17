@@ -146,8 +146,8 @@ export const translations: typeof enTranslations = {
       "Credits werden erst abgebucht, wenn der Clip fertig ist. Fehlgeschlagener Job, abgelehnter Prompt, Timeout: Du zahlst nichts.",
     reported:
       "Routen über OpenRouter rechnen die tatsächlich gemeldeten Anbieterkosten plus Marge ab. Die finale Abbuchung kann deshalb leicht von der Tabelle abweichen.",
-    sub: "Abo: {{subPrice}} im Monat für {{subCredits}} Credits.",
-    pack: "Credit-Paket: {{packPrice}} für {{packCredits}} Credits, einmalig.",
+    sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
+    pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Tarife und Credit-Pakete ansehen",
   },
   watermark: {
@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Kann ich KI-Videos kostenlos erstellen?",
-      a: "Neue Konten bekommen Gratis-Credits. Video gehört zum Teuersten, was du generieren kannst, deshalb reichen sie höchstens für ein paar Clips. Der günstigste Clip ist gerade {{cheapestClipName}} mit {{cheapestClipCredits}} Credits. Danach: ein Abo ({{subPrice}} im Monat) oder ein Credit-Paket ({{packPrice}}).",
+      a: "Neue Konten bekommen Gratis-Credits. Video gehört zum Teuersten, was du generieren kannst, deshalb reichen sie höchstens für ein paar Clips. Der günstigste Clip ist gerade {{cheapestClipName}} mit {{cheapestClipCredits}} Credits. Danach: ein Tarif, ab {{subPrice}} im Monat.",
     },
     length: {
       q: "Wie lang kann ein KI-Video sein?",

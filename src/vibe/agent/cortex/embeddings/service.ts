@@ -10,6 +10,11 @@ import { createHash } from "node:crypto";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { parseError } from "next-vibe/core/utils/parse-error";
 
+import {
+  CREDIT_VALUE_USD,
+  STANDARD_MARKUP_PERCENTAGE,
+} from "@/products/constants";
+
 import { createFixtureFetch } from "../../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../../env";
 import {
@@ -26,8 +31,42 @@ export const EMBEDDING_MODEL = "baai/bge-m3";
 /** Embedding model dimension (baai/bge-m3 native = 1024) */
 export const EMBEDDING_DIMENSIONS = 1024;
 
-/** Credits charged per embedding API call */
-export const EMBEDDING_CREDIT_COST = 0.01;
+/**
+ * bge-m3 list price on OpenRouter, USD per 1M input tokens. Only the fallback
+ * when a response carries no `usage.cost` (OpenRouter normally reports the
+ * real charge, e.g. 161 tokens = $0.00000161).
+ */
+export const EMBEDDING_USD_PER_MILLION_TOKENS = 0.01;
+
+/**
+ * Billing grid for embeddings: charges round UP to 0.01 credit. Not the 0.1
+ * media grid: a typical note costs ~0.0002 credits upstream, so 0.1 would
+ * bill ~500x the real cost. 0.01 is the old flat price, now the floor.
+ */
+const EMBEDDING_CREDIT_STEP = 0.01;
+
+/** An embedding plus what the provider charged for it. */
+export interface EmbeddingResult {
+  embedding: number[];
+  /** Upstream USD cost summed over every chunk request (0 = unknown). */
+  costUsd: number;
+}
+
+/**
+ * Credits billed for an embedding whose upstream cost was `costUsd`: real
+ * cost x (1 + STANDARD_MARKUP_PERCENTAGE), rounded UP to 0.01 credit. Zero or
+ * invalid cost bills nothing. The 1e-9 epsilon keeps float noise on an exact
+ * step from ceiling up a full step.
+ */
+export function embeddingCreditsForCost(costUsd: number): number {
+  if (!(costUsd > 0) || !Number.isFinite(costUsd)) {
+    return 0;
+  }
+  const credits =
+    (costUsd / CREDIT_VALUE_USD) * (1 + STANDARD_MARKUP_PERCENTAGE);
+  const steps = Math.ceil(credits / EMBEDDING_CREDIT_STEP - 1e-9);
+  return Math.round(steps * EMBEDDING_CREDIT_STEP * 100) / 100;
+}
 
 /**
  * Compute a SHA-256 hash of the text that would be embedded (path + content).
@@ -43,6 +82,22 @@ export function computeEmbeddingHash(path: string, content: string): string {
 interface EmbeddingResponse {
   data?: { embedding: number[]; index: number }[];
   error?: { message: string; code?: string };
+  usage?: { prompt_tokens?: number; total_tokens?: number; cost?: number };
+}
+
+/**
+ * Upstream USD cost of one embedding response: OpenRouter's reported
+ * `usage.cost`, else the reported prompt tokens (or our estimate) at the
+ * listed bge-m3 price. Never 0 for a successful call, so billed callers
+ * always charge at least one 0.01-credit step.
+ */
+function responseCostUsd(data: EmbeddingResponse, text: string): number {
+  const reported = data.usage?.cost;
+  if (typeof reported === "number" && Number.isFinite(reported) && reported > 0) {
+    return reported;
+  }
+  const tokens = data.usage?.prompt_tokens ?? estimateEmbeddingTokens(text);
+  return (Math.max(1, tokens) * EMBEDDING_USD_PER_MILLION_TOKENS) / 1_000_000;
 }
 
 /**
@@ -56,6 +111,19 @@ export async function generateEmbedding(
   /** Fixture chain of the calling stream — undefined callers hit live fetch. */
   toolExecutionContext: ToolExecutionContext,
 ): Promise<number[] | null> {
+  const result = await generateEmbeddingWithCost(text, toolExecutionContext);
+  return result?.embedding ?? null;
+}
+
+/**
+ * Same as generateEmbedding, plus the provider's real cost. Billed callers
+ * (user-triggered cortex writes, edits and searches) charge from it via
+ * embeddingCreditsForCost.
+ */
+export async function generateEmbeddingWithCost(
+  text: string,
+  toolExecutionContext: ToolExecutionContext,
+): Promise<EmbeddingResult | null> {
   const apiKey = agentEnv.OPENROUTER_API_KEY;
   if (!apiKey) {
     return null;
@@ -71,7 +139,7 @@ export async function generateEmbedding(
   const fetchImpl = createFixtureFetch(toolExecutionContext);
 
   try {
-    return await embedTextWithFetch(apiKey, trimmed, fetchImpl);
+    return await embedTextWithCost(apiKey, trimmed, fetchImpl);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(
@@ -120,12 +188,26 @@ export async function embedTextWithFetch(
   text: string,
   fetchImpl: typeof globalThis.fetch,
 ): Promise<number[] | null> {
+  const result = await embedTextWithCost(apiKey, text, fetchImpl);
+  return result?.embedding ?? null;
+}
+
+/** embedTextWithFetch plus the summed upstream cost of every chunk call. */
+export async function embedTextWithCost(
+  apiKey: string,
+  text: string,
+  fetchImpl: typeof globalThis.fetch,
+): Promise<EmbeddingResult | null> {
   const chunks = chunkTextForEmbedding(text);
 
   const perChunk = await Promise.all(
     chunks.map((chunk) => embedChunk(apiKey, chunk, fetchImpl, 0)),
   );
-  const valid = perChunk.flat();
+  const flat = perChunk.flat();
+  const costUsd = flat.reduce((sum, part) => sum + part.costUsd, 0);
+  const valid = flat.flatMap((part) =>
+    part.embedding === null ? [] : [part.embedding],
+  );
   if (valid.length === 0) {
     return null;
   }
@@ -133,7 +215,7 @@ export async function embedTextWithFetch(
   // Single embedding: return as the provider produced it (unchanged behaviour
   // for short text).
   if (valid.length === 1) {
-    return valid[0];
+    return { embedding: valid[0], costUsd };
   }
 
   // Average the embeddings
@@ -152,7 +234,13 @@ export async function embedTextWithFetch(
     }
   }
 
-  return avg;
+  return { embedding: avg, costUsd };
+}
+
+/** One chunk request: its embedding (null = rejected) and what it cost. */
+interface ChunkEmbedding {
+  embedding: number[] | null;
+  costUsd: number;
 }
 
 /** Max halving depth after too-long rejections (2^4 = 16 sub-chunks). */
@@ -161,17 +249,18 @@ const MAX_SPLIT_DEPTH = 4;
 /**
  * Embed one chunk. If the provider rejects it as too long (the estimate ran
  * low for unusually dense text), split it in half and embed both halves.
- * Returns zero or more embeddings (empty = this chunk failed).
+ * Returns one entry per request made, each with its cost (a null embedding =
+ * that request failed).
  */
 async function embedChunk(
   apiKey: string,
   chunk: string,
   fetchImpl: typeof globalThis.fetch,
   depth: number,
-): Promise<number[][]> {
+): Promise<ChunkEmbedding[]> {
   const result = await callEmbeddingApi(apiKey, chunk, fetchImpl);
   if (result.kind === "ok") {
-    return [result.embedding];
+    return [{ embedding: result.embedding, costUsd: result.costUsd }];
   }
   if (
     result.kind === "too-long" &&
@@ -192,7 +281,7 @@ async function embedChunk(
 }
 
 type EmbeddingCallResult =
-  | { kind: "ok"; embedding: number[] }
+  | { kind: "ok"; embedding: number[]; costUsd: number }
   | { kind: "too-long" }
   | { kind: "failed" };
 
@@ -266,5 +355,6 @@ async function callEmbeddingApi(
       raw.length > EMBEDDING_DIMENSIONS
         ? raw.slice(0, EMBEDDING_DIMENSIONS)
         : raw,
+    costUsd: responseCostUsd(data, text),
   };
 }

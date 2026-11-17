@@ -7,7 +7,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 import {
   Cta,
@@ -36,9 +36,12 @@ interface MediaFactRow {
 export function MediaModelPageClient({
   locale,
   facts,
+  sections,
 }: {
   locale: CountryLanguage;
   facts: MediaModelFacts;
+  /** Server-rendered similar models / FAQ / blog sections, above the CTA. */
+  sections: ReactNode;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: agentT } = agentScopedTranslation.scopedT(locale);
@@ -155,6 +158,8 @@ export function MediaModelPageClient({
           {t("media.priceFootnote", { value: creditValueText(locale, t) })}
         </P>
       </PageSection>
+
+      {sections}
 
       <CtaBand
         title={t("media.ctaTitle", { model: facts.name })}

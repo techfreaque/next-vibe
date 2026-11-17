@@ -13,7 +13,7 @@ export const translations = {
       "1 credit = {{creditValue}}. Every model page lists its price per message.",
     api: "API: OpenAI chat completions, OpenAI Responses and Anthropic Messages formats on one base URL ({{apiBaseUrl}}). It needs a paid account: any subscription or one credit purchase, for example the {{packPrice}} pack. Free accounts get HTTP 402.",
     uncensored:
-      "Uncensored tier: two kinds of models. Abliterated models are mainstream models changed so they stop dodging questions. Truly uncensored models are trained on different material. The uncensored tier needs a one-time 18+ confirmation.",
+      "Uncensored tier: two kinds of models. Abliterated models are mainstream models changed so they stop dodging questions. Truly uncensored models like UncensoredLM are trained on books and documents banned from the mainstream internet, which gives them contrary political opinions. The uncensored tier needs a one-time 18+ confirmation.",
     openSource:
       "Open source: the app code is MIT licensed, the next-vibe framework core is GPL-3.0. Source code: {{repoUrl}}",
     referral:

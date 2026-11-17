@@ -1,0 +1,192 @@
+/**
+ * schema.org JSON-LD for the public /models pages: Product (the model, sold
+ * per use) with real per-locale offers and a BreadcrumbList. The FAQPage is
+ * rendered next to the visible FAQ from the same items (model-seo-sections). Prices come from the model registry and the
+ * credit pack's checkout price (same anchor as the pricing page offers).
+ * No ratings or reviews.
+ */
+
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { JsonLdNode } from "next-vibe/ui/components/json-ld";
+
+import { getCreditUnitPrice } from "@/products/credit-money";
+
+import {
+  buildBreadcrumbList,
+  organizationId,
+  pageUrl,
+} from "../../_components/structured-data";
+import { scopedTranslation } from "../i18n";
+import type { ModelFacts } from "./model-facts";
+import type { MediaModelFacts } from "./model-media-facts";
+
+const SCHEMA_CONTEXT = "https://schema.org";
+const IN_STOCK = "https://schema.org/InStock";
+const TOKENS_PER_PRICE_UNIT = 1_000_000;
+
+/** Credits → money in the locale's checkout currency, 6 decimals (per-message prices are tiny). */
+function creditsToPrice(credits: number, locale: CountryLanguage): number {
+  const { amount } = getCreditUnitPrice(locale);
+  return Math.round(credits * amount * 1_000_000) / 1_000_000;
+}
+
+function unitPrice(
+  locale: CountryLanguage,
+  credits: number,
+  quantity: number,
+  unitText: string,
+): JsonLdNode {
+  const { currency } = getCreditUnitPrice(locale);
+  return {
+    "@type": "UnitPriceSpecification",
+    price: creditsToPrice(credits, locale),
+    priceCurrency: currency,
+    referenceQuantity: {
+      "@type": "QuantitativeValue",
+      value: quantity,
+      unitText,
+    },
+  };
+}
+
+function modelOffer(
+  locale: CountryLanguage,
+  url: string,
+  credits: number,
+  priceSpecification: JsonLdNode[],
+): JsonLdNode {
+  const { currency } = getCreditUnitPrice(locale);
+  return {
+    "@type": "Offer",
+    price: creditsToPrice(credits, locale),
+    priceCurrency: currency,
+    availability: IN_STOCK,
+    url,
+    seller: { "@id": organizationId(locale) },
+    priceSpecification,
+  };
+}
+
+function modelGraph(
+  locale: CountryLanguage,
+  {
+    path,
+    name,
+    description,
+    labName,
+    category,
+    offer,
+  }: {
+    path: string;
+    name: string;
+    description: string;
+    labName: string;
+    category: string;
+    offer: JsonLdNode | null;
+  },
+): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
+  const url = pageUrl(locale, path);
+  const product: JsonLdNode = {
+    "@type": "Product",
+    "@id": `${url}#product`,
+    name,
+    description,
+    url,
+    brand: { "@type": "Brand", name: labName },
+    category,
+  };
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@graph": [
+      offer === null ? product : { ...product, offers: offer },
+      buildBreadcrumbList(locale, [
+        { name: t("breadcrumb.models"), path: "/models" },
+        { name, path },
+      ]),
+    ],
+  };
+}
+
+/** Product + BreadcrumbList for a chat model page. */
+export function buildChatModelStructuredData(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+  description: string,
+): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
+  const path = `/models/${facts.slug}`;
+  const specs: JsonLdNode[] = [
+    unitPrice(locale, facts.creditsPerMessage, 1, t("jsonLd.perMessage")),
+  ];
+  if (facts.tokenPrice !== null) {
+    specs.push(
+      unitPrice(
+        locale,
+        facts.tokenPrice.inputCredits,
+        TOKENS_PER_PRICE_UNIT,
+        t("jsonLd.perInputTokens"),
+      ),
+      unitPrice(
+        locale,
+        facts.tokenPrice.outputCredits,
+        TOKENS_PER_PRICE_UNIT,
+        t("jsonLd.perOutputTokens"),
+      ),
+    );
+  }
+  return modelGraph(locale, {
+    path,
+    name: facts.name,
+    description,
+    labName: facts.labName,
+    category: t("catalog.types.text"),
+    offer: modelOffer(
+      locale,
+      pageUrl(locale, path),
+      facts.creditsPerMessage,
+      specs,
+    ),
+  });
+}
+
+/** Product + BreadcrumbList for an image/video/music/voice model page. */
+export function buildMediaModelStructuredData(
+  facts: MediaModelFacts,
+  locale: CountryLanguage,
+  description: string,
+  unitText: string | null,
+): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
+  const path = `/models/${facts.slug}`;
+  const offer =
+    facts.price === null || unitText === null
+      ? null
+      : modelOffer(locale, pageUrl(locale, path), facts.price.credits, [
+          unitPrice(locale, facts.price.credits, 1, unitText),
+        ]);
+  return modelGraph(locale, {
+    path,
+    name: facts.name,
+    description,
+    labName: facts.labName,
+    category: t(`catalog.types.${facts.type}`),
+    offer,
+  });
+}
+
+/** BreadcrumbList for a compare page: Home > Models > A vs B. */
+export function buildCompareStructuredData(
+  locale: CountryLanguage,
+  name: string,
+  path: string,
+): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
+  return {
+    "@context": SCHEMA_CONTEXT,
+    ...buildBreadcrumbList(locale, [
+      { name: t("breadcrumb.models"), path: "/models" },
+      { name, path },
+    ]),
+  };
+}

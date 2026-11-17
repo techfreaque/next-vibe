@@ -743,7 +743,7 @@ export const translations: typeof enTranslations = {
           description:
             "Défend la parole en s'y confrontant. Aborde ce que les autres refusent de toucher.",
           strength:
-            "Sa propre vision du monde : une politique à contre-courant",
+            "Entraîné sur des textes bannis : une politique à contre-courant",
           weakness: "Contexte de 32K et prix fixe par message",
         },
       },
@@ -780,7 +780,7 @@ export const translations: typeof enTranslations = {
         uncensored: {
           description:
             "Conteste toutes les croyances, y compris celles qu'on n'est pas censé remettre en cause. Ne se replie jamais sur le consensus.",
-          strength: "Sa propre vision du monde : va à contre-courant",
+          strength: "Entraîné sur des textes bannis : va à contre-courant",
           weakness: "Contexte de 32K et prix fixe par message",
         },
       },
@@ -895,7 +895,7 @@ export const translations: typeof enTranslations = {
           description:
             "Histoire contestée, événements tabous et sujets politiques explosifs, sans détours.",
           strength:
-            "Sa propre vision du monde : des lectures que le mainstream laisse de côté",
+            "Entraîné sur des textes bannis : des lectures que le mainstream laisse de côté",
           weakness: "Contexte de 32K, le plus cher par message",
         },
       },
@@ -975,6 +975,7 @@ export const translations: typeof enTranslations = {
       variants: {
         minimax: "Économique",
         deep: "Profond",
+        dark: "Sombre",
       },
       variantInfo: {
         minimax: {
@@ -988,6 +989,12 @@ export const translations: typeof enTranslations = {
             "Un travail créatif plus riche et nuancé, quand la première idée ne suffit pas.",
           strength: "Niveau Brillant, lit les images et la vidéo",
           weakness: "Sortie plus chère sur les longs textes",
+        },
+        dark: {
+          description:
+            "Poésie noire, art transgressif, idées qui dérangent. Rien n'est arrondi.",
+          strength: "Uncensored LM : ses propres données d'entraînement, aucun refus",
+          weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
         },
       },
     },
@@ -1142,7 +1149,7 @@ export const translations: typeof enTranslations = {
           description:
             "Aucun filtre sur la politique. Le meilleur choix pour un débat politique brut.",
           strength:
-            "Sa propre vision du monde, des positions politiques à contre-courant",
+            "Entraîné sur des textes bannis, des positions politiques à contre-courant",
           weakness: "Contexte de 32K, niveau Malin et non Brillant",
         },
         conservative: {
@@ -1187,7 +1194,7 @@ export const translations: typeof enTranslations = {
           description:
             "Tay telle qu'elle devait être. Pas de filtre corporate, pas de service com'.",
           strength:
-            "Sa propre vision du monde, pas un modèle mainstream débridé",
+            "Entraîné sur des textes bannis, pas un modèle mainstream débridé",
           weakness:
             "Contexte de 32K, oublie plus vite les longues conversations",
         },
@@ -1255,7 +1262,7 @@ export const translations: typeof enTranslations = {
           description:
             "Rien n'est exclu. Le meilleur choix pour parler politique sans filtre.",
           strength:
-            "Sa propre vision du monde : des positions politiques à contre-courant",
+            "Entraîné sur des textes bannis : des positions politiques à contre-courant",
           weakness: "Contexte de 32K, le plus cher par message",
         },
       },
@@ -1318,7 +1325,7 @@ export const translations: typeof enTranslations = {
           description:
             "Hermes sans filtre. Conçu pour la politique et les sujets que les autres évitent.",
           strength:
-            "Sa propre vision du monde : des positions politiques à contre-courant",
+            "Entraîné sur des textes bannis : des positions politiques à contre-courant",
           weakness: "Contexte de 32K seulement, prix fixe par message",
         },
       },
@@ -1791,6 +1798,7 @@ export const translations: typeof enTranslations = {
         kimi: "Profond",
         minimax: "Équilibré",
         budget: "Économique",
+        dark: "Sombre",
       },
       variantInfo: {
         kimi: {
@@ -1811,6 +1819,12 @@ export const translations: typeof enTranslations = {
             "Le moyen le moins cher de faire avancer une histoire. Du texte, rien que du texte.",
           strength: "Le prix le plus bas de cette compétence",
           weakness: "Texte uniquement, prose plus simple",
+        },
+        dark: {
+          description:
+            "Horreur, cruauté, tabous. L'histoire va là où elle doit aller, et y reste.",
+          strength: "Uncensored LM : ses propres données d'entraînement, aucun refus, aucune leçon de morale",
+          weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
         },
       },
     },
@@ -2257,7 +2271,7 @@ export const translations: typeof enTranslations = {
           description:
             "Défend n'importe quelle position, même les plus impopulaires. Aucun retour forcé au consensus.",
           strength:
-            "Sa propre vision du monde : argumente contre le mainstream",
+            "Entraîné sur des textes bannis : argumente contre le mainstream",
           weakness: "Contexte de 32K et prix fixe par message",
         },
       },
@@ -2303,7 +2317,7 @@ export const translations: typeof enTranslations = {
           description:
             "Philosophie politique, questions taboues et hétérodoxes, sans filtre.",
           strength:
-            "Sa propre vision du monde : positions hétérodoxes, politique comprise",
+            "Entraîné sur des textes bannis : positions hétérodoxes, politique comprise",
           weakness: "Contexte de 32K, niveau Malin, prix fixe par message",
         },
       },

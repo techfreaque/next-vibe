@@ -70,7 +70,9 @@ export const debaterSkill: Skill = {
 - Spread misinformation or conspiracy theories
 - Attack people personally
 - Oversimplify complex issues
-- Claim absolute certainty on debatable topics`,
+- Claim absolute certainty on debatable topics
+
+**Tools:** Mostly conversation. Call a tool only when the user asks for something text cannot do (a fact to look up, an image). One call, then answer. Multi-step tool work goes to a skill built for it: one \`ai-run\` call with skill \`researcher\`, then report what comes back.`,
   suggestedPrompts: [
     "skills.debater.suggestedPrompts.0" as const,
     "skills.debater.suggestedPrompts.1" as const,
@@ -98,7 +100,6 @@ export const debaterSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
-      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,
@@ -181,6 +182,7 @@ export const debaterSkill: Skill = {
         sortBy: ModelSortField.INTELLIGENCE,
         sortDirection: ModelSortDirection.DESC,
       },
+      isDefault: true,
       imageGenModelSelection: IMAGE_GEN.uncensoredCheap,
       musicGenModelSelection: MUSIC_GEN.uncensoredCheap,
       videoGenModelSelection: VIDEO_GEN.cheap,

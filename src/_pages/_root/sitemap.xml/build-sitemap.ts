@@ -6,7 +6,13 @@
  * App pages (threads, account, admin, tools) are deliberately absent.
  */
 
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  hreflangFor,
+  SEO_DEFAULT_LOCALE,
+  SEO_LOCALES,
+} from "next-vibe/core/i18n/core/seo-locales";
 
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -51,25 +57,18 @@ export interface SitemapEntry {
   lastmod: string | null;
 }
 
-/** One canonical locale per country - same set the middleware serves. */
-const SITEMAP_LOCALES: readonly CountryLanguage[] = [
-  "de-DE",
-  "pl-PL",
-  "fr-FR",
-  "en-US",
-  "en-GLOBAL",
-];
-
+/** Indexable locales - shared with page canonical/hreflang tags. */
 export function sitemapLocales(): readonly CountryLanguage[] {
-  return SITEMAP_LOCALES;
+  return SEO_LOCALES;
 }
 
-/** hreflang value: GLOBAL is generic language, not a region. */
-function hreflang(locale: CountryLanguage): string {
-  return locale.endsWith("-GLOBAL") ? (locale.split("-")[0] ?? locale) : locale;
-}
-
-export function collectSitemapEntries(): SitemapEntry[] {
+/**
+ * Models are listed only when their provider API key is configured on this
+ * instance (`availability`), same rule as the model pages themselves.
+ */
+export function collectSitemapEntries(
+  availability: AgentEnvAvailability,
+): SitemapEntry[] {
   const entries: SitemapEntry[] = SITEMAP_STATIC_PATHS.map((path) => ({
     path,
     lastmod: null,
@@ -79,19 +78,23 @@ export function collectSitemapEntries(): SitemapEntry[] {
     entries.push({ path: `/story/blog/${slug}`, lastmod: date });
   }
 
-  const models = listModelFacts();
+  const models = listModelFacts(availability);
   const seenPairs = new Set<string>();
   for (const facts of models) {
     entries.push({ path: `/models/${facts.slug}`, lastmod: null });
   }
-  for (const facts of listMediaFacts()) {
+  for (const facts of listMediaFacts(availability)) {
     entries.push({ path: `/models/${facts.slug}`, lastmod: null });
   }
   for (const facts of models) {
     if (facts.isLegacy) {
       continue;
     }
-    for (const other of suggestComparisons(facts, COMPARISONS_PER_MODEL)) {
+    for (const other of suggestComparisons(
+      facts,
+      availability,
+      COMPARISONS_PER_MODEL,
+    )) {
       const pairKey = [facts.slug, other.slug].toSorted().join("|");
       if (seenPairs.has(pairKey)) {
         continue;
@@ -126,25 +129,26 @@ function publicBaseUrl(): string {
   return t("websiteUrl");
 }
 
-export function buildSitemapXml(baseUrl: string = publicBaseUrl()): string {
+export function buildSitemapXml(
+  availability: AgentEnvAvailability,
+  baseUrl: string = publicBaseUrl(),
+): string {
   const base = baseUrl.replace(/\/+$/, "");
   const locales = sitemapLocales();
-  const defaultLocale = locales.find((locale) => locale.endsWith("-GLOBAL"));
+  const defaultLocale = SEO_DEFAULT_LOCALE;
   const lines: string[] = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
   ];
 
-  for (const entry of collectSitemapEntries()) {
+  for (const entry of collectSitemapEntries(availability)) {
     const alternates = locales.map(
       (locale) =>
-        `    <xhtml:link rel="alternate" hreflang="${hreflang(locale)}" href="${escapeXml(`${base}/${locale}${entry.path}`)}"/>`,
+        `    <xhtml:link rel="alternate" hreflang="${hreflangFor(locale)}" href="${escapeXml(`${base}/${locale}${entry.path}`)}"/>`,
     );
-    if (defaultLocale !== undefined) {
-      alternates.push(
-        `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${base}/${defaultLocale}${entry.path}`)}"/>`,
-      );
-    }
+    alternates.push(
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${base}/${defaultLocale}${entry.path}`)}"/>`,
+    );
     for (const locale of locales) {
       lines.push(`  <url>`);
       lines.push(

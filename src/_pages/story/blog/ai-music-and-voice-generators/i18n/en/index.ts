@@ -198,8 +198,8 @@ export const translations = {
     failed:
       "Credits come off only once you have the result. Failed job, timeout, refused prompt: you pay nothing.",
     free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. {{freeCredits}} credits buy {{freeClips}} clips on {{cheapMusicName}}, or about {{freeVoiceMinutes}} minutes of {{cheapVoiceName}}.",
-    sub: "Subscription: {{subPrice}} a month for {{subCredits}} credits.",
-    pack: "Credit pack: {{packPrice}} for {{packCredits}} credits, one-time.",
+    sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
+    pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and credit packs",
   },
   limits: {
@@ -237,7 +237,7 @@ export const translations = {
     },
     bestVoice: {
       q: "Which AI voice generator sounds most natural?",
-      a: "ElevenLabs: the widest emotional range and the highest price. For everyday read-aloud, OpenAI voices like {{defaultVoice}} sound clean and cost far less. For many languages: Gemini. For the lowest price and no filter: Kokoro.",
+      a: "For everyday read-aloud, OpenAI voices like {{defaultVoice}} sound clean and cost little. Most expressive: xAI Eve and Inworld. For many languages: Gemini. For the lowest price and no filter: Kokoro.",
     },
     free: {
       q: "Is there an AI voice generator with free credits?",
