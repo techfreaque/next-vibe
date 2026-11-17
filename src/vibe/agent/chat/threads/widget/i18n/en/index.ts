@@ -73,7 +73,6 @@ export const translations = {
       subscription: "Subscription & Credits",
       partnerDashboard: "Partner Dashboard",
       apiKeys: "API Keys",
-      api: "API",
       referral: "Referral Program",
       settings: "My Profile & Settings",
       leadMagnet: "Lead Magnet",

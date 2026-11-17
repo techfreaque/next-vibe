@@ -75,7 +75,6 @@ export const translations: typeof enTranslations = {
       subscription: "Abonnement et crédits",
       partnerDashboard: "Espace partenaire",
       apiKeys: "Clés API",
-      api: "API",
       referral: "Programme de parrainage",
       settings: "Mon profil et paramètres",
       leadMagnet: "Lead magnet",

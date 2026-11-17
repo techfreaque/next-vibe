@@ -80,18 +80,6 @@ export function SidebarFooter({
 
   return (
     <Div className="border-t border-border bg-background">
-      {/* API: always visible, outside the collapsible account section */}
-      <Link href={`/${locale}/tools/api-keys`}>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-full justify-start gap-2 rounded-none px-3 text-xs text-muted-foreground hover:text-foreground border-b border-border/50"
-          aria-label={t("components.navigation.api")}
-        >
-          <Key className="h-4 w-4 shrink-0" />
-          {t("components.navigation.api")}
-        </Button>
-      </Link>
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         {/* Sticky Header: Credits · Account - Always Visible */}
         <CollapsibleTrigger asChild>
@@ -242,7 +230,7 @@ export function SidebarFooter({
               </Link>
 
               {/* API keys: create keys, see what unlocks API access */}
-              <Link href={`/${locale}/tools/api-keys`}>
+              <Link href={`/${locale}/docs/api`}>
                 <Button
                   variant="ghost"
                   size="sm"
