@@ -33,6 +33,7 @@ import { NewsletterSubscribeInline } from "@/newsletter/_components/newsletter-s
 import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
 
 import { Logo } from "../../_components/logo";
+import { FeaturedOn } from "./featured-on";
 import { scopedTranslation } from "./i18n";
 
 interface FooterProps {
@@ -308,6 +309,10 @@ const Footer: React.FC<FooterProps> = ({
             </Ul>
           </Div>
         </Div>
+
+        <Separator className="my-8" />
+
+        <FeaturedOn locale={locale} />
 
         <Separator className="my-8" />
 

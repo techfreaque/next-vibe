@@ -764,6 +764,10 @@ export const translations = {
       title: "Legal",
     },
     github: "GitHub",
+    featuredOn: {
+      title: "Featured on",
+      ariaLabel: "Directories listing {{appName}}",
+    },
     builtWith: "Built with",
     framework: "{{appName}} Framework",
     copyright: "© {{year}} {{appName}}. All rights reserved.",

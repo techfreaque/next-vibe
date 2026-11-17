@@ -771,6 +771,10 @@ export const translations: typeof enTranslations = {
       title: "Rechtliches",
     },
     github: "GitHub",
+    featuredOn: {
+      title: "Gelistet auf",
+      ariaLabel: "Verzeichnisse, die {{appName}} listen",
+    },
     builtWith: "Erstellt mit",
     framework: "{{appName}} Framework",
     copyright: "© {{year}} {{appName}}. Alle Rechte vorbehalten.",
